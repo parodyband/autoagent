@@ -724,6 +724,7 @@ async function main(): Promise<void> {
     await testSubagent();
     await testApiRetry();
     testTaskMdLifecycle();
+    testTurnBudgetWiring();
     // Inline model-selection smoke test (avoids vitest import in tsx context)
     console.log("  model-selection smoke test...");
     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
@@ -2202,6 +2203,30 @@ function testTaskMdLifecycle(): void {
       `unlinkSync at body line ${unlinkLine}, runFinalization at body line ${runFinalizationLine}`
     );
   }
+}
+
+function testTurnBudgetWiring(): void {
+  console.log("\n📐 Turn Budget Wiring");
+
+  // Static check: computeTurnBudget is imported and called in agent.ts.
+  // This prevents regression of the dead-code period where computeTurnBudget
+  // was defined but never invoked (iteration 121 finding).
+  const agentSrc = readFileSync(path.join(ROOT, "src/agent.ts"), "utf8");
+
+  assert(
+    agentSrc.includes('import { computeTurnBudget }'),
+    "turn-budget-wiring: computeTurnBudget is imported in agent.ts",
+  );
+  assert(
+    agentSrc.includes('computeTurnBudget('),
+    "turn-budget-wiring: computeTurnBudget() is called in agent.ts",
+  );
+
+  // Ensure the call assigns the result (not a fire-and-forget)
+  assert(
+    /const turnBudget\s*=\s*computeTurnBudget\(/.test(agentSrc),
+    "turn-budget-wiring: computeTurnBudget() result is assigned to turnBudget",
+  );
 }
 
 main().catch((err) => {
