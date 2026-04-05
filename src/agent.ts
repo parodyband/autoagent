@@ -161,9 +161,14 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
 // ─── Restart ────────────────────────────────────────────────
 
 function restart(): never {
+  const extraArgs: string[] = [];
+  const repoIdx = process.argv.indexOf("--repo");
+  if (repoIdx !== -1 && process.argv[repoIdx + 1]) {
+    extraArgs.push("--repo", process.argv[repoIdx + 1]);
+  }
   const child = spawnProcess(
     process.execPath,
-    [path.join(ROOT, "node_modules/.bin/tsx"), path.join(ROOT, "src/agent.ts")],
+    [path.join(ROOT, "node_modules/.bin/tsx"), path.join(ROOT, "src/agent.ts"), ...extraArgs],
     { stdio: "inherit", cwd: ROOT, detached: true, env: process.env }
   );
   child.unref();
