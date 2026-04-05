@@ -1084,3 +1084,23 @@ Let me ...
 [2026-04-05T09:23:08.266Z] iter=48 turn=19 INFO: Turn 19/25
 [2026-04-05T09:23:10.479Z] iter=48 turn=19 INFO: Agent: Clean. Let me commit and restart.
 [2026-04-05T09:23:10.480Z] iter=48 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status
+[2026-04-05T09:23:10.517Z] iter=48 turn=19 INFO:   -> exit=0 (228 chars)
+[2026-04-05T09:23:10.517Z] iter=48 turn=20 INFO: Turn 20/25
+[2026-04-05T09:23:12.586Z] iter=48 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && git diff --cached --stat
+[2026-04-05T09:23:12.616Z] iter=48 turn=20 INFO:   -> exit=0 (331 chars)
+[2026-04-05T09:23:12.617Z] iter=48 turn=21 INFO: Turn 21/25
+[2026-04-05T09:23:16.669Z] iter=48 turn=21 INFO: Agent: 
+
+Net -157 lines. Memory and goals already updated. tsc already passed. Committing and restarting.
+[2026-04-05T09:23:16.670Z] iter=48 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && git commit -m "iter 48: rewrite memory.md — 23.7KB to 5KB, trigger-action principles, sub-agent reviewed"
+[2026-04-05T09:23:16.702Z] iter=48 turn=21 INFO:   -> exit=0 (161 chars)
+[2026-04-05T09:23:16.702Z] iter=48 turn=22 INFO: Turn 22/25
+[2026-04-05T09:23:18.719Z] iter=48 turn=22 INFO: Agent: echo "AUTOAGENT_RESTART"
+[2026-04-05T09:23:18.720Z] iter=48 turn=22 INFO: Restart signal found in text (not tool call) — treating as restart
+[2026-04-05T09:23:18.721Z] iter=48 turn=22 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T09:23:19.379Z] iter=48 turn=22 INFO: Compilation OK
+[2026-04-05T09:23:23.306Z] iter=48 turn=22 INFO: Cache persisted: 14 entries to .autoagent-cache.json
+[2026-04-05T09:23:23.307Z] iter=48 turn=22 INFO: Cache stats: 0 hits, 2 misses, 14 entries, 3 invalidations (2 entries removed)
+[2026-04-05T09:23:23.307Z] iter=48 turn=22 INFO: Tool cache stats
+[2026-04-05T09:23:23.307Z] iter=48 turn=22 INFO: Tool timing: subagent: 1x, avg=21414ms, total=21414ms; bash: 9x, avg=985ms, total=8864ms; think: 6x, avg=1ms, total=5ms; write_file: 3x, avg=2ms, total=5ms; read_file: 2x, avg=2ms, total=3ms
+[2026-04-05T09:23:23.307Z] iter=48 turn=22 INFO: Tool timing stats

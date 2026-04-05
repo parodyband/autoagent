@@ -562,3 +562,21 @@
 {"timestamp":"2026-04-05T09:23:08.266Z","iteration":48,"level":"info","message":"Turn 19/25","turn":19}
 {"timestamp":"2026-04-05T09:23:10.479Z","iteration":48,"level":"info","message":"Agent: Clean. Let me commit and restart.","turn":19}
 {"timestamp":"2026-04-05T09:23:10.480Z","iteration":48,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git add -A && git status","turn":19}
+{"timestamp":"2026-04-05T09:23:10.517Z","iteration":48,"level":"info","message":"  -> exit=0 (228 chars)","turn":19}
+{"timestamp":"2026-04-05T09:23:10.517Z","iteration":48,"level":"info","message":"Turn 20/25","turn":20}
+{"timestamp":"2026-04-05T09:23:12.586Z","iteration":48,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git diff --cached --stat","turn":20}
+{"timestamp":"2026-04-05T09:23:12.616Z","iteration":48,"level":"info","message":"  -> exit=0 (331 chars)","turn":20}
+{"timestamp":"2026-04-05T09:23:12.617Z","iteration":48,"level":"info","message":"Turn 21/25","turn":21}
+{"timestamp":"2026-04-05T09:23:16.669Z","iteration":48,"level":"info","message":"Agent: \n\nNet -157 lines. Memory and goals already updated. tsc already passed. Committing and restarting.","turn":21}
+{"timestamp":"2026-04-05T09:23:16.670Z","iteration":48,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git commit -m \"iter 48: rewrite memory.md — 23.7KB to 5KB, trigger-action principles, sub-agent reviewed\"","turn":21}
+{"timestamp":"2026-04-05T09:23:16.702Z","iteration":48,"level":"info","message":"  -> exit=0 (161 chars)","turn":21}
+{"timestamp":"2026-04-05T09:23:16.702Z","iteration":48,"level":"info","message":"Turn 22/25","turn":22}
+{"timestamp":"2026-04-05T09:23:18.719Z","iteration":48,"level":"info","message":"Agent: echo \"AUTOAGENT_RESTART\"","turn":22}
+{"timestamp":"2026-04-05T09:23:18.720Z","iteration":48,"level":"info","message":"Restart signal found in text (not tool call) — treating as restart","turn":22}
+{"timestamp":"2026-04-05T09:23:18.721Z","iteration":48,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":22}
+{"timestamp":"2026-04-05T09:23:19.379Z","iteration":48,"level":"info","message":"Compilation OK","turn":22}
+{"timestamp":"2026-04-05T09:23:23.306Z","iteration":48,"level":"info","message":"Cache persisted: 14 entries to .autoagent-cache.json","turn":22}
+{"timestamp":"2026-04-05T09:23:23.307Z","iteration":48,"level":"info","message":"Cache stats: 0 hits, 2 misses, 14 entries, 3 invalidations (2 entries removed)","turn":22}
+{"timestamp":"2026-04-05T09:23:23.307Z","iteration":48,"level":"info","message":"Tool cache stats","turn":22,"metadata":{"cacheHits":0,"cacheMisses":2,"cacheEntries":14,"invalidations":3,"invalidatedEntries":2,"toolStats":{"read_file":{"hits":0,"misses":2}}}}
+{"timestamp":"2026-04-05T09:23:23.307Z","iteration":48,"level":"info","message":"Tool timing: subagent: 1x, avg=21414ms, total=21414ms; bash: 9x, avg=985ms, total=8864ms; think: 6x, avg=1ms, total=5ms; write_file: 3x, avg=2ms, total=5ms; read_file: 2x, avg=2ms, total=3ms","turn":22}
+{"timestamp":"2026-04-05T09:23:23.307Z","iteration":48,"level":"info","message":"Tool timing stats","turn":22,"metadata":{"timing":{"tools":{"think":{"calls":6,"totalMs":5,"minMs":0,"maxMs":1,"avgMs":1},"read_file":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2},"bash":{"calls":9,"totalMs":8864,"minMs":5,"maxMs":7098,"avgMs":985},"write_file":{"calls":3,"totalMs":5,"minMs":1,"maxMs":2,"avgMs":2},"subagent":{"calls":1,"totalMs":21414,"minMs":21414,"maxMs":21414,"avgMs":21414}},"totalCalls":21,"totalMs":30291}}}
