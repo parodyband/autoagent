@@ -1,173 +1,3 @@
-296 |       {plan.tasks.map((task) => {
-297 |         const icon = TASK_STATUS_ICON[task.status];
-298 |         const color =
-299 |           task.status === "done" ? "green" :
-300 |           task.status === "failed" ? "red" :
-301 |           task.status === "in-progress" ? "yellow" : "gray";
-302 |         const deps = task.dependsOn.length > 0 ? ` (deps: ${task.dependsOn.join(", ")})` : "";
-303 |         return (
-304 |           <Box key={task.id} flexDirection="column" marginLeft={1}>
-305 |             <Text>
-306 |               {icon} <Text color={color}>[{task.id}]</Text> {task.title}{deps}
-307 |             </Text>
-308 |             <Text color="gray" dimColor>    {task.description}</Text>
-309 |             {task.error ? <Text color="red">    Error: {task.error}</Text> : null}
-310 |           </Box>
-311 |         );
-312 |       })}
-313 |     </Box>
-314 |   );
-315 | }
-316 | 
-317 | /** Live streaming message — shown while the assistant is generating text. */
-318 | function StreamingMessage({ buffer }: { buffer: string }) {
-319 |   if (!buffer) return null;
-320 |   return (
-321 |     <Box flexDirection="column" marginTop={1}>
-[2026-04-05T20:08:13.525Z] iter=353 turn=11 INFO: Turn 11/25
-[2026-04-05T20:08:16.370Z] iter=353 turn=11 INFO: Agent: Now I need to add the `/plan` command handler. Let me find the right insertion point — just before the `/export` handler:
-[2026-04-05T20:08:16.371Z] iter=353 turn=11 INFO: read_file: src/tui.tsx
-[2026-04-05T20:08:16.371Z] iter=353 turn=11 INFO:   -> ok (1622 chars)
-[2026-04-05T20:08:16.371Z] iter=353 turn=12 INFO: Turn 12/25
-[2026-04-05T20:08:19.100Z] iter=353 turn=12 INFO: read_file: src/tui.tsx
-[2026-04-05T20:08:19.101Z] iter=353 turn=12 INFO:   -> ok (1451 chars)
-[2026-04-05T20:08:19.101Z] iter=353 turn=13 INFO: Turn 13/25
-[2026-04-05T20:08:23.417Z] iter=353 turn=13 INFO: Agent: 
-
-I've made 2 patches to `src/tui.tsx` so far (imports + TaskPlanDisplay component). I need to finish the `/plan` command handler, add tests, and verify. Let me do this efficiently now.
-[2026-04-05T20:08:23.418Z] iter=353 turn=13 INFO: read_file: src/tui.tsx
-[2026-04-05T20:08:23.418Z] iter=353 turn=13 INFO:   -> ok (439 chars)
-[2026-04-05T20:08:23.419Z] iter=353 turn=14 INFO: Turn 14/25
-[2026-04-05T20:08:27.943Z] iter=353 turn=14 INFO: Agent: 
-
-Let me finish the `/plan` command handler, update help text, run TSC, and wrap up.
-[2026-04-05T20:08:27.944Z] iter=353 turn=14 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T20:08:27.945Z] iter=353 turn=14 INFO:   -> ok: Patched src/tui.tsx: -2 +5 lines
-
-Context after patch:
-607 |           "  /compact  — Manually compact conversation context",
-608 |           "  /diff     — Show uncommitted git changes",
-609 |           "  /undo     — Revert the last autoagent commit",
-610 |           "  /plan Q   — Create and execute a task plan for Q",
-611 |           "  /plan list — Show saved plans",
-612 |           "  /plan resume — Resume the most recent incomplete plan",
-613 |           "  /export   — Export conversation to markdown (optional filename arg)",
-614 |           "  /exit     — Quit AutoAgent",
-615 |         ].join("\n"),
-616 |       }]);
-617 |       return;
-[2026-04-05T20:08:27.946Z] iter=353 turn=15 INFO: Turn 15/25
-[2026-04-05T20:08:30.613Z] iter=353 turn=15 INFO: Agent: Now find where to insert the `/plan` handler — right before the `/export` handler:
-[2026-04-05T20:08:30.613Z] iter=353 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'trimmed === "/export"' src/tui.tsx
-[2026-04-05T20:08:30.634Z] iter=353 turn=15 INFO:   -> exit=0 (71 chars)
-[2026-04-05T20:08:30.635Z] iter=353 turn=16 INFO: Turn 16/25
-[2026-04-05T20:08:32.947Z] iter=353 turn=16 INFO: read_file: src/tui.tsx
-[2026-04-05T20:08:32.948Z] iter=353 turn=16 INFO:   -> ok (424 chars)
-[2026-04-05T20:08:32.949Z] iter=353 turn=17 INFO: Turn 17/25
-[2026-04-05T20:08:49.357Z] iter=353 turn=17 INFO: Agent: 
-
-Let me insert the `/plan` handler and wrap up immediately.
-[2026-04-05T20:08:49.358Z] iter=353 turn=17 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T20:08:49.360Z] iter=353 turn=17 INFO:   -> ok: Patched src/tui.tsx: -1 +80 lines
-
-Context after patch:
-818 |       return;
-819 |     }
-820 | 
-821 |     // /plan commands
-822 |     if (trimmed === "/plan" || trimmed === "/plan help") {
-823 |       setMessages(prev => [...prev, { role: "assistant", content: "Usage:\n  /plan <description> — Create and execute a task plan\n  /plan list — Show saved plans\n  /plan resume — Resume most recent incomplete plan" }]);
-824 |       return;
-825 |     }
-826 |     if (trimmed === "/plan list") {
-827 |       const saved = loadPlan(workDir);
-828 |       if (!saved) {
-829 |         setMessages(prev => [...prev, { role: "assistant", content: "No saved plans. Use /plan <description> to create one." }]);
-830 |       } else {
-831 |         const done = saved.tasks.filter(t => t.status === "done").length;
-832 |         const failed = saved.tasks.filter(t => t.status === "failed").length;
-833 |         const status = done === saved.tasks.length ? "complete" : `${done}/${saved.tasks.length} done${failed ? `, ${failed} failed` : ""}`;
-834 |         setMessages(prev => [...prev, { role: "assistant", content: `Saved plan: "${saved.goal}" — ${status}\nCreated: ${new Date(saved.createdAt).toLocaleString()}\n\n${formatPlan(saved)}` }]);
-835 |       }
-836 |       return;
-837 |     }
-838 |     if (trimmed === "/plan resume") {
-839 |       const saved = loadPlan(workDir);
-840 |       if (!saved) {
-841 |         setMessages(prev => [...prev, { role: "assistant", content: "No saved plans to resume. Use /plan <description> to create one." }]);
-842 |         return;
-843 |       }
-844 |       const pending = saved.tasks.filter(t => t.status === "pending" || t.status === "failed");
-845 |       if (pending.length === 0) {
-846 |         setMessages(prev => [...prev, { role: "assistant", content: "Plan is already complete. Use /plan <description> to create a new one." }]);
-847 |         return;
-848 |       }
-849 |       // Reset failed tasks to pending for retry
-850 |       saved.tasks.forEach(t => { if (t.status === "failed") t.status = "pending"; });
-851 |       setMessages(prev => [...prev, { role: "assistant", content: `Resuming plan: "${saved.goal}" (${pending.length} tasks remaining)` }]);
-852 |       setLoading(true);
-853 |       setStatus("Executing plan...");
-854 |       try {
-855 |         const result = await executePlan(saved, async (task) => {
-856 |           const res = await orchestratorRef.current!.send(task.description);
-857 |           return res.text ?? "done";
-858 |         }, (_task, plan) => {
-859 |           setMessages(prev => [...prev, { role: "assistant", content: formatPlan(plan) }]);
-860 |         });
-861 |         savePlan(result, workDir);
-862 |         setMessages(prev => [...prev, { role: "assistant", content: `Plan complete.\n\n${formatPlan(result)}` }]);
-863 |       } catch (err) {
-864 |         setMessages(prev => [...prev, { role: "assistant", content: `Plan execution error: ${err instanceof Error ? err.message : String(err)}` }]);
-865 |       }
-866 |       setLoading(false);
-867 |       setStatus("");
-868 |       return;
-869 |     }
-870 |     if (trimmed.startsWith("/plan ")) {
-871 |       const description = trimmed.slice(6).trim();
-872 |       if (!description) {
-873 |         setMessages(prev => [...prev, { role: "assistant", content: "Usage: /plan <description>" }]);
-874 |         return;
-875 |       }
-876 |       setLoading(true);
-877 |       setStatus("Creating plan...");
-878 |       try {
-879 |         const projectContext = orchestratorRef.current?.getProjectContext?.() ?? `Working directory: ${workDir}`;
-880 |         const plan = await createPlan(description, projectContext);
-881 |         setMessages(prev => [...prev, { role: "assistant", content: `Created plan:\n\n${formatPlan(plan)}` }]);
-882 |         savePlan(plan, workDir);
-883 |         setStatus("Executing plan...");
-884 |         const result = await executePlan(plan, async (task) => {
-885 |           const res = await orchestratorRef.current!.send(task.description);
-886 |           return res.text ?? "done";
-887 |         }, (_task, updatedPlan) => {
-888 |           setMessages(prev => [...prev, { role: "assistant", content: formatPlan(updatedPlan) }]);
-889 |         });
-890 |         savePlan(result, workDir);
-891 |         setMessages(prev => [...prev, { role: "assistant", content: `Plan complete.\n\n${formatPlan(result)}` }]);
-892 |       } catch (err) {
-893 |         setMessages(prev => [...prev, { role: "assistant", content: `Plan error: ${err instanceof Error ? err.message : String(err)}` }]);
-894 |       }
-895 |       setLoading(false);
-896 |       setStatus("");
-897 |       return;
-898 |     }
-899 | 
-900 |     if (trimmed === "/export" || trimmed.startsWith("/export ")) {
-901 |       const arg = trimmed.slice(7).trim();
-902 |       const now = new Date();
-903 |       const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
-[2026-04-05T20:08:49.361Z] iter=353 turn=18 INFO: Turn 18/25
-[2026-04-05T20:08:51.766Z] iter=353 turn=18 INFO: Agent: Now check if `getProjectContext` exists on the Orchestrator:
-[2026-04-05T20:08:51.767Z] iter=353 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getProjectContext" src/orchestrator.ts | head -5
-[2026-04-05T20:08:51.789Z] iter=353 turn=18 INFO:   -> exit=0 (11 chars)
-[2026-04-05T20:08:51.789Z] iter=353 turn=19 INFO: Turn 19/25
-[2026-04-05T20:08:54.784Z] iter=353 turn=19 INFO: Agent: It doesn't exist, but I used optional chaining (`?.()`) with a fallback, so it's safe. Let me run TSC:
-[2026-04-05T20:08:54.785Z] iter=353 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T20:08:55.862Z] iter=353 turn=19 INFO:   -> exit=2 (103 chars)
-[2026-04-05T20:08:55.862Z] iter=353 turn=20 INFO: Turn 20/25
-[2026-04-05T20:08:58.658Z] iter=353 turn=20 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T20:08:58.660Z] iter=353 turn=20 INFO:   -> ok: Patched src/tui.tsx: -1 +1 lines
 
 Context after patch:
 876 |       setLoading(true);
@@ -1166,3 +996,68 @@ Context after patch:
 [2026-04-05T20:22:44.642Z] iter=360 turn=25 INFO: Pre-commit review (1384in/508out): ## Issues
 
 - **Missing `orch.cleanup()` / resource leak**: Each task spawns a `new Orchestrator` and calls `orch.init()`, but there's no `finally` block to call any teardown method. If `orch.send()` t
+[2026-04-05T20:22:44.699Z] iter=360 turn=25 INFO: Committed: af8aa86c (41 in / 5737 out, cache: 21603 created, 330821 read)
+[2026-04-05T20:22:44.700Z] iter=360 turn=25 INFO: Restarting as iteration 361...
+[2026-04-05T20:22:44.903Z] iter=361 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T20:22:44.906Z] iter=361 INFO: Turn budget: 13/25 (calibration=1.25x, predicted=8)
+[2026-04-05T20:22:44.906Z] iter=361 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T20:22:45.087Z] iter=361 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T20:22:45.087Z] iter=361 turn=1 INFO: Turn 1/25
+[2026-04-05T20:22:49.096Z] iter=361 turn=1 INFO: Agent: 
+
+I'll start by reviewing what was built in iteration 360, then research to identify the highest-leverage next feature.
+[2026-04-05T20:22:49.098Z] iter=361 turn=1 INFO: read_file: src/plan-executor.ts
+[2026-04-05T20:22:49.099Z] iter=361 turn=1 INFO:   -> ok (1823 chars)
+[2026-04-05T20:22:49.100Z] iter=361 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
+[2026-04-05T20:22:49.104Z] iter=361 turn=1 INFO: read_file: goals.md
+[2026-04-05T20:22:49.105Z] iter=361 turn=1 INFO:   -> ok (928 chars)
+[2026-04-05T20:22:49.119Z] iter=361 turn=1 INFO:   -> exit=0 (330 chars)
+[2026-04-05T20:22:49.120Z] iter=361 turn=2 INFO: Turn 2/25
+[2026-04-05T20:22:53.354Z] iter=361 turn=2 INFO: Agent: 
+
+You're right. My deliverable is **goals.md for iteration 362 (Engineer)**. Let me do focused research on the highest-leverage feature, then write it.
+[2026-04-05T20:22:53.354Z] iter=361 turn=2 INFO: web_search: "Claude Code hooks PreToolUse PostToolUse lifecycle architecture 2025"
+[2026-04-05T20:22:53.375Z] iter=361 turn=2 INFO: web_search: "coding agent hook system tool lifecycle extensibility architecture"
+[2026-04-05T20:22:54.369Z] iter=361 turn=2 INFO:   -> 8 results
+[2026-04-05T20:22:54.700Z] iter=361 turn=2 INFO:   -> 8 results
+[2026-04-05T20:22:54.701Z] iter=361 turn=3 INFO: Turn 3/25
+[2026-04-05T20:22:57.755Z] iter=361 turn=3 INFO: web_fetch: https://code.claude.com/docs/en/hooks
+[2026-04-05T20:22:57.759Z] iter=361 turn=3 INFO: web_fetch: https://maxpool.dev/research-papers/coding_agents_extensions.html
+[2026-04-05T20:22:58.097Z] iter=361 turn=3 INFO:   -> ok (54860 chars)
+[2026-04-05T20:22:58.271Z] iter=361 turn=3 INFO:   -> ok (29885 chars)
+[2026-04-05T20:22:58.271Z] iter=361 turn=4 INFO: Turn 4/25
+[2026-04-05T20:23:09.484Z] iter=361 turn=4 INFO: Agent: 
+
+**Goal status:** "Review and plan next feature track" — IN PROGRESS.
+
+I've completed research. Now I need to synthesize findings and write goals.md. Let me finish by this turn.
+[2026-04-05T20:23:09.486Z] iter=361 turn=4 INFO: think: Based on my research, the hook system is clearly the highest-leverage next feature. Claude Code's hook system is describ...
+[2026-04-05T20:23:09.487Z] iter=361 turn=5 INFO: Turn 5/25
+[2026-04-05T20:23:11.760Z] iter=361 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T20:23:12.882Z] iter=361 turn=5 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:23:12.882Z] iter=361 turn=6 INFO: Turn 6/25
+[2026-04-05T20:23:38.311Z] iter=361 turn=6 INFO: Agent: 
+
+Right — Architect iterations produce goals.md + memory, not src/ changes. Let me write the deliverables now.
+[2026-04-05T20:23:38.313Z] iter=361 turn=6 INFO: write_file: goals.md (write)
+[2026-04-05T20:23:38.317Z] iter=361 turn=6 INFO:   -> ok: Updated goals.md (3874 chars, +58 lines delta)
+[2026-04-05T20:23:38.319Z] iter=361 turn=7 INFO: Turn 7/25
+[2026-04-05T20:23:46.896Z] iter=361 turn=7 INFO: save_memory: "[Architect] Hook system design (iter 361)"
+[2026-04-05T20:23:46.899Z] iter=361 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:23:46.900Z] iter=361 turn=7 INFO: save_memory: "[Research] Coding agent extensibility landscape (Jan 2026)"
+[2026-04-05T20:23:46.901Z] iter=361 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:23:46.902Z] iter=361 turn=8 INFO: Turn 8/25
+[2026-04-05T20:23:50.069Z] iter=361 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "TSC CLEAN"
+[2026-04-05T20:23:51.081Z] iter=361 turn=8 INFO:   -> exit=0 (10 chars)
+[2026-04-05T20:23:51.081Z] iter=361 turn=9 INFO: Turn 9/25
+[2026-04-05T20:23:53.091Z] iter=361 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:23:53.093Z] iter=361 turn=9 INFO: RESTART signal
+[2026-04-05T20:23:53.094Z] iter=361 turn=9 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:23:54.173Z] iter=361 turn=9 INFO: Compilation OK
+[2026-04-05T20:24:01.844Z] iter=361 turn=9 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-05T20:24:01.844Z] iter=361 turn=9 INFO: Cache stats: 0 hits, 2 misses, 56 entries, 1 invalidations (1 entries removed)
+[2026-04-05T20:24:01.844Z] iter=361 turn=9 INFO: Tool cache stats
+[2026-04-05T20:24:01.844Z] iter=361 turn=9 INFO: Tool timing: web_search: 2x, avg=1172ms, total=2343ms; bash: 4x, avg=539ms, total=2155ms; web_fetch: 2x, avg=427ms, total=854ms; read_file: 2x, avg=4ms, total=8ms; save_memory: 2x, avg=3ms, total=6ms; write_file: 1x, avg=5ms, total=5ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T20:24:01.844Z] iter=361 turn=9 INFO: Tool timing stats
+[2026-04-05T20:24:08.660Z] iter=361 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 361: predicted 8 turns, actual 9 turns, ratio 1.13**
+[2026-04-05T20:24:08.685Z] iter=361 turn=9 INFO: Pre-commit review: no significant code changes to review
