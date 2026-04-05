@@ -680,6 +680,9 @@ function App() {
         sessionLines.push(`  Cost:           ${stats.costSummary}`);
         sessionLines.push(`  Avg cost/turn:  ${stats.avgCostPerTurn.toFixed(4)}`);
         sessionLines.push(`  Cost trend:     ${stats.costTrend}`);
+        if (stats.filesModified?.length) {
+          sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(", ")}`);
+        }
       }
       setMessages(prev => [...prev, {
         role: "assistant",

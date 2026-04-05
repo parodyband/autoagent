@@ -73,3 +73,6 @@ Recent calibration (391–394): avg ratio 1.00x — well calibrated.
 
 **[AUTO-SCORED] Iteration 397: predicted 15 turns, actual 23 turns, ratio 1.53**
 ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+
+**[AUTO-SCORED] Iteration 398: predicted 12 turns, actual 16 turns, ratio 1.33**
+⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
