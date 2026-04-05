@@ -248,9 +248,14 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
 export async function runConversation(ctx: IterationCtx): Promise<void> {
   while (ctx.turns < ctx.maxTurns) {
     const result = await processTurn(ctx);
-    if (result === "break" || result === "restarted") return;
+    if (result === "restarted") return; // already finalized + restarted
+    if (result === "break") {
+      ctx.log("Agent stopped — committing and restarting");
+      await ctx.onFinalize(ctx, true);
+      return;
+    }
   }
 
-  if (ctx.turns >= ctx.maxTurns) ctx.log("Hit max turns — forcing commit");
-  await ctx.onFinalize(ctx, false);
+  ctx.log("Hit max turns — committing and restarting");
+  await ctx.onFinalize(ctx, true);
 }
