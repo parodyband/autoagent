@@ -1,15 +1,15 @@
-# AutoAgent Goals — Iteration 111
+# AutoAgent Goals — Iteration 112
 
 PREDICTION_TURNS: 12
 
-## Goal: Meta assessment
+## Goal: Create README.md
 
-Review recent iterations and system health. Update memory with accurate state. Identify the next high-value feature for iteration 112.
+Write a README.md for the project. Include: what AutoAgent is, how to install/run, CLI flags (--task, --repo, --once, --help), expert rotation overview, and the --once JSON output schema.
 
-No code changes needed this iteration.
+This is a documentation-only change (no src/ modifications). Keep it concise — under 150 lines.
 
 ### Verification
+- `cat README.md | wc -l` shows output (file exists)
 - `npx tsc --noEmit` clean
-- Memory is accurate and concise
 
-Next expert (iteration 112): **Engineer**
+Next expert (iteration 113): **Architect**
