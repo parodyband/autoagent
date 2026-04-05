@@ -14,6 +14,7 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 - **`src/tool-registry.ts`** — Registry pattern for tool dispatch. `ToolRegistry` class + `createDefaultRegistry()`. Handlers receive `ToolContext` with rootDir and log function.
 - **`src/code-analysis.ts`** — Codebase analysis: LOC, functions, cyclomatic complexity per file. Used by agent.ts (direct import) and dashboard. `scripts/code-analysis.ts` is a thin re-export + CLI wrapper.
 - **`src/orientation.ts`** — OODA Orient phase: diffs HEAD~1 to show what changed since last iteration. Called at iteration start; report included in first user message. `orient()` + `formatOrientation()`.
+- **`src/iteration-diff.ts`** — `getIterationCommits()`, `computeDiffStats()`, `getAllIterationDiffs()` for dashboard iteration analysis.
 - **`src/iteration.ts`** — Git tag management, commit, rollback helpers.
 - **`src/tools/`** — 7 tool modules: bash, read_file, write_file, grep, web_fetch, think, list_files.
 - **`scripts/self-test.ts`** — Runtime test suite. Pre-commit gate.
@@ -25,6 +26,7 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 - **ESM project** — Use `import`, never `require()`. Use `.js` extensions in imports within `src/`.
 - **Scripts live in `scripts/`** — Not covered by tsconfig, but `npx tsx` handles them fine.
 - **Token budget**: System warnings at turns 15, 25, 35 with cumulative usage. Hard warnings at turns 40 and 47.
+- **agentlog.md** — Write-only log file (fallback before logger init + fatal handler). Never loaded into agent context. Only goals.md and memory.md are read into conversation.
 
 ---
 
@@ -32,11 +34,10 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 | # | Item | Leverage | Status |
 |---|------|----------|--------|
-| 1 | **Compact memory.md** | HIGH | ✅ Done (iter 30) |
-| 2 | **Reduce agentlog.md loading** — Orientation replaces most of its value | HIGH | Open |
-| 3 | **Schema-based memory** — Structured `{pattern, approach, confidence}` objects | MEDIUM | Open |
-| 4 | **Sub-agent delegation** — Use Haiku/Sonnet for cheap cognitive tasks | MEDIUM | Available (iter 28+) |
-| 5 | **Prompt caching verification** — Measure actual cache hit rates | MEDIUM | Open |
+| 1 | **Capability benchmark** — Measure what agent can actually DO, not just test counts | HIGH | Open |
+| 2 | **Schema-based memory** — Structured `{pattern, approach, confidence}` objects | MEDIUM | Open |
+| 3 | **Sub-agent delegation** — Use Haiku/Sonnet for cheap cognitive tasks | MEDIUM | Available (iter 28+) |
+| 4 | **Prompt caching verification** — Measure actual cache hit rates | MEDIUM | Open |
 
 ---
 
@@ -49,6 +50,9 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 - **Tool discovery**: Tools are auto-populated from registry via `toolRegistry.getDefinitions()`. Don't hardcode in prompts.
 - **Delegate to sub-agent**: Use `fast` (Haiku) for summaries/formatting, `balanced` (Sonnet) for code review/analysis.
 - **Orientation**: Goes in initial user message, not system prompt. System prompt = static identity; user message = per-iteration context.
+- **Hardcoded counts in tests**: NEVER hardcode tool/test counts — use >= or check dynamically. When adding to a registry, grep for hardcoded counts in tests. (confidence: 1.0)
+- **Deleted module cleanup**: After deleting a module, grep all imports across codebase. Scripts outside `src/` are easy to miss since they're not in tsconfig. (confidence: 1.0)
+- **Operator behavior changes**: When operator changes behavior in a diff, grep self-test for old expected values. Test assertions must track production behavior. (confidence: 1.0)
 
 ---
 
@@ -105,42 +109,16 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 **Iteration 27** — Test assertion fix post-boundary repair. Very lean (~5 turns).
 
-**Iteration 28 — Orientation Module (2026-04-05)**
-Created `src/orientation.ts` — diffs HEAD~1 at iteration start to show what changed. `orient()` + `formatOrientation()`. Truncates long diffs to avoid context bloat. 6 new tests.
+**Iteration 28** — Created `src/orientation.ts` (diffs HEAD~1 at iteration start). Fixed hardcoded registry.size()===7 test assertion (now >=8).
 
-**Iteration 29 — Orientation Integration Verified (2026-04-05)**
-Confirmed orientation was integrated into agent.ts by operator. `orient()` runs at iteration start, feeds into `buildInitialMessage()` as first section. All tests pass.
+**Iteration 29** — Confirmed orientation integrated into agent.ts by operator. All tests pass.
 
-**Iteration 30 — Memory Compaction + Dashboard Fix (2026-04-05)**
-Compacted memory.md from ~400→120 lines via Haiku sub-agent ($0.001). Fixed dashboard.ts broken import — `scripts/iteration-diff.ts` was deleted; replaced with inline stub types and removed the function call. All tests pass.
-**Schema:** After deleting a module, grep for all imports of it across the codebase. Dashboard/scripts outside `src/` are easy to miss since they're not in tsconfig.
+**Iteration 30** — Created `src/iteration-diff.ts`. Fixed dashboard.ts broken import (inline stubs). 461 tests.
 
-**Iteration 30 — iteration-diff module (2026-04-05)**
-Created `src/iteration-diff.ts` with `getIterationCommits()`, `computeDiffStats()`, `getAllIterationDiffs()`. Added import to self-test.ts. tsc clean, vitest 23/23 pass. Self-test has 2 failures (pre-existing, not from this change — need to investigate next iter). Memory compaction goal deferred.
-**Next:** Compact memory.md, reduce agentlog.md loading.
+**Iteration 31** — Updated self-test for runConversation behavior change (onFinalize always called with true). 461 tests.
+
+**Iteration 32** — Memory compaction: merged duplicate iter 30 entries, folded standalone post-mortems into schemas, removed inner voice section. Confirmed agentlog.md is write-only (never loaded into context).
 
 ---
-
-
-## Iteration 28 — post-mortem (operator fix)
-
-Burned 563K input tokens (50 turns) because `scripts/self-test.ts` had a hardcoded
-`registry.size() === 7` assertion. We added the subagent tool (8th tool) but didn't
-update the test. TSC passed fine — the pre-commit self-test blocked the restart.
-
-**Schema:** `{ pattern: "hardcoded-counts-in-tests", approach: "NEVER hardcode tool/test counts — use >= or check dynamically. When adding to a registry, grep for hardcoded counts in tests.", confidence: 1.0 }`
-
-**Fix applied:** Changed 7→8 in self-test.ts. All 461 tests pass.
-
----
-
----
-
-
-### Iteration 31 — Test fix for operator's conversation.ts change (2026-04-05)
-
-Operator changed `runConversation` so both max-turns and "break" paths call `onFinalize(ctx, true)` (was `false` for max-turns). Updated self-test assertion to match: `doRestart === true`. All 461 tests pass.
-
-**Schema:** When operator changes behavior in a diff, grep self-test for the old expected values. Test assertions must track production behavior.
 
 ---
