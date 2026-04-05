@@ -58,3 +58,5 @@ Recent ratios (iters 327–330): 0.75, 0.95, 1.00, 1.25. Average ~1.0. Well-cali
 **Action**: Next Engineer iter should be small/focused: wire TUI + write tests for existing code. No new features.
 
 **[AUTO-SCORED] Iteration 331: predicted 20 turns, actual 19 turns, ratio 0.95**
+
+**[AUTO-SCORED] Iteration 332: predicted 18 turns, actual 25 turns, ratio 1.39**

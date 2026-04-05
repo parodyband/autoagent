@@ -466,6 +466,10 @@ function App() {
         setFileSuggestions([]);
         return;
       }
+      if (loading) {
+        orchestratorRef.current?.abort();
+        return;
+      }
       exit();
     }
   });
@@ -609,6 +613,16 @@ function App() {
       const turns = messages.filter(m => m.role === "user").length;
       const { tokensIn, tokensOut, cost, model } = footerStats;
       const costStr = cost < 0.01 ? `${cost.toFixed(4)}` : `${cost.toFixed(2)}`;
+      const stats = orchestratorRef.current?.getSessionStats();
+      const sessionLines: string[] = [];
+      if (stats) {
+        const totalSec = Math.floor(stats.durationMs / 1000);
+        const m = Math.floor(totalSec / 60);
+        const s = totalSec % 60;
+        sessionLines.push(`  Session:        ${m}m ${s}s`);
+        sessionLines.push(`  Avg cost/turn:  ${stats.avgCostPerTurn.toFixed(4)}`);
+        sessionLines.push(`  Cost trend:     ${stats.costTrend}`);
+      }
       setMessages(prev => [...prev, {
         role: "assistant",
         content: [
@@ -618,6 +632,7 @@ function App() {
           `  Tokens out: ${tokensOut.toLocaleString()}`,
           `  Cost:       ${costStr}`,
           `  Model:      ${model}`,
+          ...sessionLines,
         ].join("\n"),
       }]);
       return;
@@ -789,14 +804,19 @@ function App() {
       setStreamBuffer("");
 
       if (result.text) {
-        const assistantMsg: Message = {
-          role: "assistant",
-          content: result.text,
-          tokens: { in: result.tokensIn, out: result.tokensOut },
-          model: result.model,
-          verificationPassed: result.verificationPassed,
-        };
-        setMessages(prev => [...prev, assistantMsg]);
+        // Cancelled generation — show as neutral system message
+        if (result.text.startsWith("⏹")) {
+          setMessages(prev => [...prev, { role: "assistant", content: result.text }]);
+        } else {
+          const assistantMsg: Message = {
+            role: "assistant",
+            content: result.text,
+            tokens: { in: result.tokensIn, out: result.tokensOut },
+            model: result.model,
+            verificationPassed: result.verificationPassed,
+          };
+          setMessages(prev => [...prev, assistantMsg]);
+        }
       }
 
       // Show commit info if auto-commit fired
