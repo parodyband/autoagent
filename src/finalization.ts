@@ -9,6 +9,7 @@
  */
 
 import { existsSync, readFileSync, writeFileSync } from "fs";
+import path from "path";
 import {
   captureCodeQuality,
   captureBenchmarks,
@@ -16,6 +17,7 @@ import {
   type BenchmarkSnapshot,
 } from "./validation.js";
 import { commitIteration, saveState, type IterationState } from "./iteration.js";
+import { checkAlignment, writeAlignmentFeedback } from "./alignment.js";
 import type { ToolCache } from "./tool-cache.js";
 import type { ToolTimingTracker, TimingStats } from "./tool-timing.js";
 import type { Logger } from "./logging.js";
@@ -126,6 +128,33 @@ export async function finalizeIteration(
   saveState(ctx.state);
 
   if (doRestart) {
+    // ─── Alignment meta-layer ───
+    // Runs after commit, before restart. Uses Haiku to evaluate whether
+    // the agent is staying true to its core values. If drift is detected,
+    // writes feedback into memory so the agent sees it next iteration.
+    try {
+      let metrics: unknown[] | null = null;
+      if (existsSync(ctx.metricsFile)) {
+        try { metrics = JSON.parse(readFileSync(ctx.metricsFile, "utf-8")); } catch {}
+      }
+
+      const alignment = await checkAlignment({
+        iteration: ctx.iter,
+        rootDir: ctx.rootDir,
+        metrics,
+        log: ctx.log,
+      });
+
+      const memoryFile = path.join(ctx.rootDir, "memory.md");
+      writeAlignmentFeedback(alignment, ctx.iter, memoryFile);
+
+      if (!alignment.aligned) {
+        ctx.log(`ALIGNMENT DRIFT detected (score ${alignment.score}/10) — feedback written to memory`);
+      }
+    } catch (err) {
+      ctx.log(`Alignment check error (non-fatal): ${err instanceof Error ? err.message : err}`);
+    }
+
     ctx.log(`Restarting as iteration ${ctx.state.iteration}...`);
     ctx.restart();
   }

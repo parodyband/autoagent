@@ -2394,3 +2394,23 @@ npx tsx sc...
 [2026-04-05T06:48:36.940Z] iter=14 turn=50 INFO: Tool cache stats
 [2026-04-05T06:48:36.941Z] iter=14 turn=50 INFO: Tool timing: bash: 25x, avg=252ms, total=6310ms; grep: 5x, avg=17ms, total=83ms; write_file: 16x, avg=1ms, total=20ms; list_files: 1x, avg=14ms, total=14ms; read_file: 6x, avg=2ms, total=10ms; think: 3x, avg=0ms, total=1ms
 [2026-04-05T06:48:36.941Z] iter=14 turn=50 INFO: Tool timing stats
+[2026-04-05T06:48:39.993Z] iter=14 turn=50 INFO: Committed: 8f899e45 (1501553 in / 12084 out, cache: 0 created, 0 read)
+[2026-04-05T06:48:39.993Z] iter=14 turn=50 INFO: Restarting as iteration 15...
+[2026-04-05T06:48:40.197Z] iter=15 INFO: Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T06:48:40.207Z] iter=15 turn=1 INFO: Turn 1/50
+[2026-04-05T06:48:44.007Z] iter=15 turn=1 INFO: Agent: 
+
+I'll start by understanding the current project structure and the modules I need to test.
+[2026-04-05T06:48:44.009Z] iter=15 turn=1 INFO: read_file: goals.md
+[2026-04-05T06:48:44.010Z] iter=15 turn=1 INFO:   -> ok (813 chars)
+[2026-04-05T06:48:44.010Z] iter=15 turn=1 INFO: read_file: src/iteration-diff.ts
+[2026-04-05T06:48:44.010Z] iter=15 turn=1 INFO:   -> ok (3401 chars)
+[2026-04-05T06:48:44.011Z] iter=15 turn=1 INFO: read_file: src/finalization.ts
+[2026-04-05T06:48:44.011Z] iter=15 turn=1 INFO:   -> ok (4549 chars)
+[2026-04-05T06:48:44.011Z] iter=15 turn=1 INFO: read_file: src/tool-cache.ts
+[2026-04-05T06:48:44.011Z] iter=15 turn=1 INFO:   -> ok (6287 chars)
+[2026-04-05T06:48:44.012Z] iter=15 turn=2 INFO: Turn 2/50
+[2026-04-05T06:48:50.452Z] iter=15 turn=2 INFO: think: Let me plan out the work:
+
+1. **Tests for iteration-diff.ts** — I can test `computeDiffStats` parsing logic by understan...
+[2026-04-05T06:48:50.456Z] iter=15 turn=3 INFO: Turn 3/50

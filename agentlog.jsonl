@@ -523,3 +523,19 @@
 {"timestamp":"2026-04-05T06:48:36.940Z","iteration":14,"level":"info","message":"Tool cache stats","turn":50,"metadata":{"cacheHits":0,"cacheMisses":12,"cacheEntries":3,"invalidations":16,"invalidatedEntries":9,"toolStats":{"list_files":{"hits":0,"misses":1},"read_file":{"hits":0,"misses":6},"grep":{"hits":0,"misses":5}}}}
 {"timestamp":"2026-04-05T06:48:36.941Z","iteration":14,"level":"info","message":"Tool timing: bash: 25x, avg=252ms, total=6310ms; grep: 5x, avg=17ms, total=83ms; write_file: 16x, avg=1ms, total=20ms; list_files: 1x, avg=14ms, total=14ms; read_file: 6x, avg=2ms, total=10ms; think: 3x, avg=0ms, total=1ms","turn":50}
 {"timestamp":"2026-04-05T06:48:36.941Z","iteration":14,"level":"info","message":"Tool timing stats","turn":50,"metadata":{"timing":{"tools":{"list_files":{"calls":1,"totalMs":14,"minMs":14,"maxMs":14,"avgMs":14},"bash":{"calls":25,"totalMs":6310,"minMs":2,"maxMs":2963,"avgMs":252},"think":{"calls":3,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":0},"read_file":{"calls":6,"totalMs":10,"minMs":1,"maxMs":5,"avgMs":2},"write_file":{"calls":16,"totalMs":20,"minMs":0,"maxMs":4,"avgMs":1},"grep":{"calls":5,"totalMs":83,"minMs":15,"maxMs":19,"avgMs":17}},"totalCalls":56,"totalMs":6438}}}
+{"timestamp":"2026-04-05T06:48:39.993Z","iteration":14,"level":"info","message":"Committed: 8f899e45 (1501553 in / 12084 out, cache: 0 created, 0 read)","turn":50}
+{"timestamp":"2026-04-05T06:48:39.993Z","iteration":14,"level":"info","message":"Restarting as iteration 15...","turn":50}
+{"timestamp":"2026-04-05T06:48:40.197Z","iteration":15,"level":"info","message":"Starting. Model=claude-opus-4-6 MaxTokens=16384"}
+{"timestamp":"2026-04-05T06:48:40.207Z","iteration":15,"level":"info","message":"Turn 1/50","turn":1}
+{"timestamp":"2026-04-05T06:48:44.007Z","iteration":15,"level":"info","message":"Agent: \n\nI'll start by understanding the current project structure and the modules I need to test.","turn":1}
+{"timestamp":"2026-04-05T06:48:44.009Z","iteration":15,"level":"info","message":"read_file: goals.md","turn":1}
+{"timestamp":"2026-04-05T06:48:44.010Z","iteration":15,"level":"info","message":"  -> ok (813 chars)","turn":1}
+{"timestamp":"2026-04-05T06:48:44.010Z","iteration":15,"level":"info","message":"read_file: src/iteration-diff.ts","turn":1}
+{"timestamp":"2026-04-05T06:48:44.010Z","iteration":15,"level":"info","message":"  -> ok (3401 chars)","turn":1}
+{"timestamp":"2026-04-05T06:48:44.011Z","iteration":15,"level":"info","message":"read_file: src/finalization.ts","turn":1}
+{"timestamp":"2026-04-05T06:48:44.011Z","iteration":15,"level":"info","message":"  -> ok (4549 chars)","turn":1}
+{"timestamp":"2026-04-05T06:48:44.011Z","iteration":15,"level":"info","message":"read_file: src/tool-cache.ts","turn":1}
+{"timestamp":"2026-04-05T06:48:44.011Z","iteration":15,"level":"info","message":"  -> ok (6287 chars)","turn":1}
+{"timestamp":"2026-04-05T06:48:44.012Z","iteration":15,"level":"info","message":"Turn 2/50","turn":2}
+{"timestamp":"2026-04-05T06:48:50.452Z","iteration":15,"level":"info","message":"think: Let me plan out the work:\n\n1. **Tests for iteration-diff.ts** — I can test `computeDiffStats` parsing logic by understan...","turn":2}
+{"timestamp":"2026-04-05T06:48:50.456Z","iteration":15,"level":"info","message":"Turn 3/50","turn":3}
