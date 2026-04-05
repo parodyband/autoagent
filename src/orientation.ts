@@ -13,6 +13,7 @@ import { readFileSync } from "fs";
 import { executeBash } from "./tools/bash.js";
 import { parallelResearch } from "./tools/subagent.js";
 import { readPredictionCalibration, computeCalibration } from "./turn-budget.js";
+import { rankFiles } from "./file-ranker.js";
 
 export interface OrientationReport {
   /** Summary of files changed since last iteration commit */
@@ -33,6 +34,41 @@ interface IterationMetrics {
   outputTokens?: number;
   cacheReadTokens?: number;
   codeQuality?: { totalLOC: number };
+}
+
+/**
+ * Re-order changed files in git diff stat output by importance score.
+ * Truncates to top 10 files if more than 10 changed, with "(and N more)" note.
+ */
+function rankChangedFiles(statOutput: string, cwd: string = "."): string {
+  const lines = statOutput.split("\n");
+  const fileLines = lines.filter(line => line.includes("|"));
+  const otherLines = lines.filter(line => !line.includes("|") && line.trim());
+
+  if (fileLines.length <= 1) return statOutput;
+
+  const ranked = rankFiles(cwd);
+  const scoreMap = new Map<string, number>(ranked.map(f => [f.path, f.score]));
+
+  const scoredLines = fileLines.map(line => ({
+    line,
+    score: scoreMap.get(line.trim().split("|")[0].trim()) ?? -1,
+  }));
+  scoredLines.sort((a, b) => b.score - a.score);
+
+  const MAX_FILES = 10;
+  const orderedLines = scoredLines.map(s => s.line);
+  let truncationNote = "";
+  if (orderedLines.length > MAX_FILES) {
+    const remaining = orderedLines.length - MAX_FILES;
+    orderedLines.splice(MAX_FILES);
+    truncationNote = `... (and ${remaining} more)`;
+  }
+
+  const parts = [...orderedLines];
+  if (truncationNote) parts.push(truncationNote);
+  parts.push(...otherLines);
+  return parts.join("\n");
 }
 
 /**
@@ -79,6 +115,9 @@ export async function orient(
     return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary(cwd) };
   }
 
+  // Rank changed files by importance so the most relevant appear first
+  const rankedStatOutput = rankChangedFiles(statOutput, cwd ?? ".");
+
   // Try parallel subagent summaries when 5+ src files changed
   if (useSubagentSummaries) {
     const srcFiles = extractSrcFiles(statOutput);
@@ -102,7 +141,7 @@ export async function orient(
           .join("\n");
 
         const diffSummary =
-          `Files changed:\n${statOutput}\n\nPer-file summaries (src):\n${perFileSummaries}`;
+          `Files changed:\n${rankedStatOutput}\n\nPer-file summaries (src):\n${perFileSummaries}`;
 
         return {
           diffSummary,
@@ -131,8 +170,8 @@ export async function orient(
   }
 
   const summary = diffContent
-    ? `Files changed:\n${statOutput}\n\nDiff (src only):\n${diffContent}`
-    : `Files changed:\n${statOutput}`;
+    ? `Files changed:\n${rankedStatOutput}\n\nDiff (src only):\n${diffContent}`
+    : `Files changed:\n${rankedStatOutput}`;
 
   return {
     diffSummary: summary,
