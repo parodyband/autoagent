@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775417724177,
+  "generatedAt": 1775418719465,
   "files": [
     {
       "path": "src/context-loader.ts",
@@ -774,265 +774,6 @@
       "lastModified": 1775396355226.5557
     },
     {
-      "path": "src/orchestrator.ts",
-      "exports": [
-        {
-          "name": "PARALLEL_SAFE_TOOLS",
-          "kind": "const",
-          "line": 52,
-          "exported": true
-        },
-        {
-          "name": "MICRO_COMPACT_THRESHOLD",
-          "kind": "const",
-          "line": 67,
-          "exported": true
-        },
-        {
-          "name": "COMPACT_TIER1_THRESHOLD",
-          "kind": "const",
-          "line": 69,
-          "exported": true
-        },
-        {
-          "name": "COMPACT_THRESHOLD",
-          "kind": "const",
-          "line": 71,
-          "exported": true
-        },
-        {
-          "name": "CONTEXT_WARNING_THRESHOLD",
-          "kind": "const",
-          "line": 73,
-          "exported": true
-        },
-        {
-          "name": "PRUNE_THRESHOLD",
-          "kind": "const",
-          "line": 74,
-          "exported": true
-        },
-        {
-          "name": "selectCompactionTier",
-          "kind": "function",
-          "line": 80,
-          "exported": true
-        },
-        {
-          "name": "MODEL_PRICING",
-          "kind": "const",
-          "line": 88,
-          "exported": true
-        },
-        {
-          "name": "ConversationCheckpoint",
-          "kind": "interface",
-          "line": 111,
-          "exported": true
-        },
-        {
-          "name": "MAX_CHECKPOINTS",
-          "kind": "const",
-          "line": 119,
-          "exported": true
-        },
-        {
-          "name": "OrchestratorOptions",
-          "kind": "interface",
-          "line": 121,
-          "exported": true
-        },
-        {
-          "name": "OrchestratorResult",
-          "kind": "interface",
-          "line": 156,
-          "exported": true
-        },
-        {
-          "name": "CostInfo",
-          "kind": "interface",
-          "line": 165,
-          "exported": true
-        },
-        {
-          "name": "routeModel",
-          "kind": "function",
-          "line": 180,
-          "exported": true
-        },
-        {
-          "name": "computeCost",
-          "kind": "function",
-          "line": 208,
-          "exported": true
-        },
-        {
-          "name": "buildSystemPrompt",
-          "kind": "function",
-          "line": 220,
-          "exported": true
-        },
-        {
-          "name": "buildCachedSystem",
-          "kind": "function",
-          "line": 293,
-          "exported": true
-        },
-        {
-          "name": "injectMessageCacheBreakpoints",
-          "kind": "function",
-          "line": 304,
-          "exported": true
-        },
-        {
-          "name": "isToolError",
-          "kind": "function",
-          "line": 400,
-          "exported": true
-        },
-        {
-          "name": "Orchestrator",
-          "kind": "class",
-          "line": 722,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [
-            "Anthropic"
-          ],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [
-            "compressToolOutput"
-          ],
-          "from": "./tool-output-compressor.js"
-        },
-        {
-          "names": [
-            "fingerprintRepo"
-          ],
-          "from": "./repo-context.js"
-        },
-        {
-          "names": [
-            "rankFiles"
-          ],
-          "from": "./file-ranker.js"
-        },
-        {
-          "names": [
-            "buildRepoMap",
-            "formatRepoMap",
-            "rankSymbols",
-            "truncateRepoMap",
-            "saveRepoMapCache",
-            "loadRepoMapCache",
-            "getStaleFiles",
-            "updateRepoMapIncremental",
-            "cacheToRepoMap"
-          ],
-          "from": "./tree-sitter-map.js"
-        },
-        {
-          "names": [
-            "shouldDecompose",
-            "decomposeTasks",
-            "formatSubtasks"
-          ],
-          "from": "./task-decomposer.js"
-        },
-        {
-          "names": [
-            "runVerification",
-            "formatVerificationResults"
-          ],
-          "from": "./verification.js"
-        },
-        {
-          "names": [
-            "createDefaultRegistry"
-          ],
-          "from": "./tool-registry.js"
-        },
-        {
-          "names": [
-            "getProjectMemoryBlock"
-          ],
-          "from": "./project-memory.js"
-        },
-        {
-          "names": [
-            "autoCommit",
-            "type AutoCommitResult"
-          ],
-          "from": "./auto-commit.js"
-        },
-        {
-          "names": [
-            "runDiagnostics"
-          ],
-          "from": "./diagnostics.js"
-        },
-        {
-          "names": [
-            "findRelatedTests",
-            "runRelatedTests"
-          ],
-          "from": "./test-runner.js"
-        },
-        {
-          "names": [
-            "computeUnifiedDiff"
-          ],
-          "from": "./diff-preview.js"
-        },
-        {
-          "names": [
-            "autoLoadContext",
-            "extractFileReferences",
-            "loadFileReferences",
-            "stripFileReferences"
-          ],
-          "from": "./context-loader.js"
-        },
-        {
-          "names": [
-            "enhanceToolError"
-          ],
-          "from": "./tool-recovery.js"
-        },
-        {
-          "names": [
-            "detectProject"
-          ],
-          "from": "./project-detector.js"
-        },
-        {
-          "names": [
-            "* as fs"
-          ],
-          "from": "fs"
-        },
-        {
-          "names": [
-            "FileWatcher"
-          ],
-          "from": "./file-watcher.js"
-        },
-        {
-          "names": [
-            "scoredPrune"
-          ],
-          "from": "./context-pruner.js"
-        }
-      ],
-      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775417176393.604
-    },
-    {
       "path": "src/tui.tsx",
       "exports": [
         {
@@ -1232,7 +973,7 @@
         {
           "name": "printHelp",
           "kind": "function",
-          "line": 30,
+          "line": 31,
           "exported": true
         }
       ],
@@ -1255,6 +996,10 @@
         },
         {
           "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
           "from": "dotenv/config"
         },
         {
@@ -1266,7 +1011,357 @@
           "from": "./init-command.js"
         }
       ],
-      "lastModified": 1775417717193.5632
+      "lastModified": 1775418407871.365
+    },
+    {
+      "path": "src/loop-detector.ts",
+      "exports": [
+        {
+          "name": "LoopDetectorResult",
+          "kind": "interface",
+          "line": 12,
+          "exported": true
+        },
+        {
+          "name": "detectLoop",
+          "kind": "function",
+          "line": 61,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        }
+      ],
+      "lastModified": 1775418649613.4583
+    },
+    {
+      "path": "src/orchestrator.ts",
+      "exports": [
+        {
+          "name": "PARALLEL_SAFE_TOOLS",
+          "kind": "const",
+          "line": 53,
+          "exported": true
+        },
+        {
+          "name": "MICRO_COMPACT_THRESHOLD",
+          "kind": "const",
+          "line": 68,
+          "exported": true
+        },
+        {
+          "name": "COMPACT_TIER1_THRESHOLD",
+          "kind": "const",
+          "line": 70,
+          "exported": true
+        },
+        {
+          "name": "COMPACT_THRESHOLD",
+          "kind": "const",
+          "line": 72,
+          "exported": true
+        },
+        {
+          "name": "CONTEXT_WARNING_THRESHOLD",
+          "kind": "const",
+          "line": 74,
+          "exported": true
+        },
+        {
+          "name": "PRUNE_THRESHOLD",
+          "kind": "const",
+          "line": 75,
+          "exported": true
+        },
+        {
+          "name": "selectCompactionTier",
+          "kind": "function",
+          "line": 81,
+          "exported": true
+        },
+        {
+          "name": "MODEL_PRICING",
+          "kind": "const",
+          "line": 89,
+          "exported": true
+        },
+        {
+          "name": "ConversationCheckpoint",
+          "kind": "interface",
+          "line": 112,
+          "exported": true
+        },
+        {
+          "name": "MAX_CHECKPOINTS",
+          "kind": "const",
+          "line": 120,
+          "exported": true
+        },
+        {
+          "name": "OrchestratorOptions",
+          "kind": "interface",
+          "line": 122,
+          "exported": true
+        },
+        {
+          "name": "OrchestratorResult",
+          "kind": "interface",
+          "line": 162,
+          "exported": true
+        },
+        {
+          "name": "CostInfo",
+          "kind": "interface",
+          "line": 171,
+          "exported": true
+        },
+        {
+          "name": "routeModel",
+          "kind": "function",
+          "line": 186,
+          "exported": true
+        },
+        {
+          "name": "computeCost",
+          "kind": "function",
+          "line": 214,
+          "exported": true
+        },
+        {
+          "name": "buildSystemPrompt",
+          "kind": "function",
+          "line": 226,
+          "exported": true
+        },
+        {
+          "name": "buildCachedSystem",
+          "kind": "function",
+          "line": 299,
+          "exported": true
+        },
+        {
+          "name": "injectMessageCacheBreakpoints",
+          "kind": "function",
+          "line": 310,
+          "exported": true
+        },
+        {
+          "name": "isToolError",
+          "kind": "function",
+          "line": 406,
+          "exported": true
+        },
+        {
+          "name": "Orchestrator",
+          "kind": "class",
+          "line": 761,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [
+            "Anthropic"
+          ],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [
+            "compressToolOutput"
+          ],
+          "from": "./tool-output-compressor.js"
+        },
+        {
+          "names": [
+            "fingerprintRepo"
+          ],
+          "from": "./repo-context.js"
+        },
+        {
+          "names": [
+            "rankFiles"
+          ],
+          "from": "./file-ranker.js"
+        },
+        {
+          "names": [
+            "buildRepoMap",
+            "formatRepoMap",
+            "rankSymbols",
+            "truncateRepoMap",
+            "saveRepoMapCache",
+            "loadRepoMapCache",
+            "getStaleFiles",
+            "updateRepoMapIncremental",
+            "cacheToRepoMap"
+          ],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [
+            "shouldDecompose",
+            "decomposeTasks",
+            "formatSubtasks"
+          ],
+          "from": "./task-decomposer.js"
+        },
+        {
+          "names": [
+            "runVerification",
+            "formatVerificationResults"
+          ],
+          "from": "./verification.js"
+        },
+        {
+          "names": [
+            "createDefaultRegistry"
+          ],
+          "from": "./tool-registry.js"
+        },
+        {
+          "names": [
+            "getProjectMemoryBlock"
+          ],
+          "from": "./project-memory.js"
+        },
+        {
+          "names": [
+            "autoCommit",
+            "type AutoCommitResult"
+          ],
+          "from": "./auto-commit.js"
+        },
+        {
+          "names": [
+            "runDiagnostics"
+          ],
+          "from": "./diagnostics.js"
+        },
+        {
+          "names": [
+            "findRelatedTests",
+            "runRelatedTests"
+          ],
+          "from": "./test-runner.js"
+        },
+        {
+          "names": [
+            "computeUnifiedDiff"
+          ],
+          "from": "./diff-preview.js"
+        },
+        {
+          "names": [
+            "autoLoadContext",
+            "extractFileReferences",
+            "loadFileReferences",
+            "stripFileReferences"
+          ],
+          "from": "./context-loader.js"
+        },
+        {
+          "names": [
+            "enhanceToolError"
+          ],
+          "from": "./tool-recovery.js"
+        },
+        {
+          "names": [
+            "detectProject"
+          ],
+          "from": "./project-detector.js"
+        },
+        {
+          "names": [
+            "detectLoop"
+          ],
+          "from": "./loop-detector.js"
+        },
+        {
+          "names": [
+            "* as fs"
+          ],
+          "from": "fs"
+        },
+        {
+          "names": [
+            "FileWatcher"
+          ],
+          "from": "./file-watcher.js"
+        },
+        {
+          "names": [
+            "scoredPrune"
+          ],
+          "from": "./context-pruner.js"
+        }
+      ],
+      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
+      "lastModified": 1775418402074.0774
+    },
+    {
+      "path": "src/task-planner.ts",
+      "exports": [
+        {
+          "name": "Task",
+          "kind": "interface",
+          "line": 10,
+          "exported": true
+        },
+        {
+          "name": "TaskPlan",
+          "kind": "interface",
+          "line": 18,
+          "exported": true
+        },
+        {
+          "name": "getNextTasks",
+          "kind": "function",
+          "line": 35,
+          "exported": true
+        },
+        {
+          "name": "formatPlan",
+          "kind": "function",
+          "line": 48,
+          "exported": true
+        },
+        {
+          "name": "createPlan",
+          "kind": "function",
+          "line": 75,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        }
+      ],
+      "lastModified": 1775418420421.8577
+    },
+    {
+      "path": "src/__tests__/loop-detector.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "../loop-detector.js"
+        }
+      ],
+      "lastModified": 1775418341410.3752
     }
   ]
 }
