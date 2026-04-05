@@ -14,6 +14,7 @@ import { webFetchToolDefinition, executeWebFetch } from "./tools/web_fetch.js";
 import { thinkToolDefinition, executeThink } from "./tools/think.js";
 import { listFilesToolDefinition, executeListFiles } from "./tools/list_files.js";
 import { subagentToolDefinition, executeSubagent } from "./tools/subagent.js";
+import { autoSelectModel } from "./model-selection.js";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -187,11 +188,13 @@ export function createDefaultRegistry(): ToolRegistry {
     const { task, model, max_tokens } = input as {
       task: string; model?: string; max_tokens?: number;
     };
-    ctx.log(`subagent [${model || "fast"}]: ${task.slice(0, 100)}...`);
-    const r = await executeSubagent(task, model, max_tokens);
+    // If no model specified, use autoSelectModel to pick based on task description
+    const selectedModel = model ?? autoSelectModel(task);
+    ctx.log(`subagent [${selectedModel}${!model ? ' (auto)' : ''}]: ${task.slice(0, 100)}...`);
+    const r = await executeSubagent(task, selectedModel, max_tokens);
     ctx.log(`  -> ${r.model} (${r.inputTokens}in/${r.outputTokens}out)`);
     return {
-      result: `[Sub-agent: ${model || "fast"} | ${r.inputTokens}+${r.outputTokens} tokens]\n\n${r.response}`,
+      result: `[Sub-agent: ${selectedModel}${!model ? ' (auto-selected)' : ''} | ${r.inputTokens}+${r.outputTokens} tokens]\n\n${r.response}`,
     };
   }, { defaultTimeout: 60 });
 

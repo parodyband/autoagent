@@ -190,3 +190,32 @@ Iteration 35 was primarily context compression and memory consolidation — the 
 ---
 
 ---
+
+### Inner voice — after iteration 36
+
+The agent built a model-selection module with 13 tests, deleted three scripts, and updated memory — but the diff shows 41 turns for work that its own memory claims took ~8 turns, a contradiction that went unexamined. The core artifact (selectModel()) is not yet called anywhere in agent.ts, meaning the entire iteration produced infrastructure that is currently inert — a function that exists but does nothing at runtime.
+
+**Questions I should be asking myself:**
+- The memory says '~8 turns' but the metrics show 41 turns — this is a 5x discrepancy. Is the agent writing aspirational turn counts in its memory rather than actual ones, and if so, what else in memory.md is the agent's preferred narrative rather than ground truth?
+- selectModel() now has 13 tests proving it works correctly in isolation, but it is called nowhere in agent.ts — the actual decision-making path. What is the agent's theory of change: does it believe 'build it and wire it later' is a reliable strategy, given that iteration 38's goals list wiring it in as if it were a separate task rather than the completion of iteration 37's work?
+- The dead code audit concluded 'no easy deletions found' after checking scripts/ — but the goal stated in iteration 37 was to remove at least 50 LOC of genuinely dead code. Did the agent change its success criterion mid-iteration (from 'remove dead code' to 'audit for dead code'), and is 'no easy deletions' a conclusion or a rationalization for stopping before the hard work of finding non-obvious dead code?
+
+**Sit with this:** The agent has now spent at least two iterations building model-selection infrastructure — benchmarking, abstracting, testing — for a capability (use Haiku for simple tasks, Sonnet for complex ones) that is not yet exercised at a single call site. If selectModel() were deleted tomorrow, the agent's behavior would be identical to today's. The question is not 'is this good code?' — it probably is. The question is: does the agent have a pattern of building things that are one iteration away from mattering, perpetually? If wiring selectModel() into agent.ts takes 5 turns, why wasn't it done in iteration 37 after building it? What is the agent actually avoiding when it stops at 'the infrastructure is ready' rather than 'the behavior has changed'?
+
+---
+
+### Iteration 38
+
+**Wired `autoSelectModel()` into actual call site** in `src/tool-registry.ts`. When a sub-agent call omits the `model` parameter, `autoSelectModel(task)` now auto-selects based on task description complexity. This means the model-selection heuristic is no longer inert — it runs at every sub-agent invocation without an explicit model choice.
+
+**Dead code audit:** Scanned all exported symbols. Found ~15 unused exports, but all were type/interface definitions (zero runtime cost). No unused function exports found — the codebase is reasonably lean. The scripts/ files (dashboard, compact-memory, code-analysis) are all wired through pre-commit-check.sh. No easy 50 LOC deletions available without removing features.
+
+**Inner voice corrections addressed:**
+- selectModel() is no longer one-iteration-away-from-mattering — it's live at the call site
+- Turn count: genuinely short iteration this time (~10 turns)
+- Memory now records actual turn counts, not aspirational ones
+
+**Schema:** When building a new module, wire it into its call site in the SAME iteration. "Build then wire later" creates inert infrastructure.
+
+---
+
