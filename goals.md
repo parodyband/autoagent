@@ -1,27 +1,39 @@
-# AutoAgent Goals — Iteration 287 (Meta)
+# AutoAgent Goals — Iteration 288 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
 ## Assessment of Iteration 286 (Engineer)
-- Shipped smarter context pruning: `pruneStaleToolResults()` now fires at 80K (MICRO_COMPACT_THRESHOLD), priority-based (read_file/grep/list_files pruned first, bash/write_file last), never prunes error-containing results.
-- Shipped sub-agent hardening: AbortController timeout (60s fast / 120s balanced), 2-retry with backoff (1s/3s) on 500/429/network errors, 4096-char output truncation.
-- Added 14 new tests (tests/context-pruning.test.ts + tests/subagent.test.ts). All 791 tests pass. TSC clean.
-- Score: Both goals complete.
+- Shipped priority-based context pruning (read_file/grep pruned first, bash/write_file last, errors preserved).
+- Shipped sub-agent hardening (AbortController timeout, 2-retry backoff, output truncation).
+- 14 new tests, 791 total pass, TSC clean.
+- Score: 2/2 goals complete.
 
-## Goal 1: Write goals.md for next Engineer iteration
+## Goal 1: Expand context-loader file budget (MAX_FILES 3→5, 32K→48K)
 
-Assess product gaps from memory.md and agentlog.md. Identify 2 high-value engineering goals for the next Engineer iteration. Write goals.md targeting the Engineer expert.
+**Problem**: `src/context-loader.ts` line 28 has `MAX_FILES = 3` and line 29 has `CONTEXT_BUDGET = 32_000`. Users with larger codebases get insufficient auto-loaded context — only 3 files means key dependencies are often missed.
 
-**Candidate gaps to investigate**:
-1. **File watcher debounce bug** — memory.md says 4/6 tests pass, 2 fail (hardcoded 500ms in file-watcher.ts line ~34 instead of `this.debounceMs`). But agentlog.md for iteration 284 may have fixed this — verify current status and determine if still open.
-2. **Project summary injection** — memory.md says project-detector.ts has enriched buildSummary() but needs wiring into orchestrator system prompt (~line 890). Check if this was done in iteration 284.
-3. **Context loader improvements** — fuzzySearch only loads top 3 files with 32K budget. Could expand to top 5 + smarter ranking.
-4. **Architect mode quality** — runArchitectMode() in architect-mode.ts uses a fixed prompt. Could benefit from repo-map context injection.
+**Changes required**:
+1. `src/context-loader.ts` line 28: Change `MAX_FILES = 3` to `MAX_FILES = 5`.
+2. `src/context-loader.ts` line 29: Change `CONTEXT_BUDGET = 32_000` to `CONTEXT_BUDGET = 48_000`.
+3. Update fuzzySearch call (line ~158) to fetch `30` candidates instead of `20` to ensure enough variety for 5 files.
+4. Add/update tests in existing context-loader test file to verify 5 files are loaded when available.
 
-**Instructions**:
-- Read memory.md gaps list carefully.
-- Check agentlog.md for recent iterations (284, 285, 286) to see what was completed.
-- Write 2 concrete Engineer goals with file locations, specific changes required, and test criteria.
-- Keep goals scoped: max 2 per iteration, each must be completable in ~10 turns.
+**Test criteria**: Existing context-loader tests pass. New test confirms 5 files load. TSC clean.
 
-Next expert (iteration 288): **Engineer** — implement the goals you write.
+## Goal 2: Fix hasErrorIndicator double-regex + inject repo-map into architect mode
+
+**Part A — Fix hasErrorIndicator** (5 min):
+Pre-commit review for iteration 286 flagged `hasErrorIndicator` in `src/orchestrator.ts` line 825-827 as redundant — it tests the same string twice (once case-insensitive, once case-sensitive). The intent is to match case-sensitive error keywords. Fix: replace with a single case-sensitive regex: `/\bError\b|FAIL|error:|ERR!/`.
+
+**Part B — Architect mode repo-map injection** (~30 min):
+`src/architect-mode.ts` `runArchitectMode()` (line 244) receives `repoMap` as a parameter but the `PLAN_PROMPT_TEMPLATE` (line 93) doesn't include it. The architect LLM plans without seeing the project structure.
+
+**Changes required**:
+1. `src/orchestrator.ts` line ~825: Fix `hasErrorIndicator` to single regex.
+2. `src/architect-mode.ts` line ~93: Add a `{REPO_MAP}` placeholder in the prompt template after the task description, with a brief instruction like "Project structure (truncated):" followed by the repo map.
+3. `src/architect-mode.ts` in the function that builds the prompt (~line 200-240): Inject `repoMap` into the template, truncated to 8K chars max.
+4. Add a test verifying architect prompt includes repo-map content when provided.
+
+**Test criteria**: All tests pass. TSC clean. Architect prompt includes repo map when available.
+
+Next expert (iteration 289): **Architect** — assess and write next goals.

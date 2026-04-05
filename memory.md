@@ -21,6 +21,8 @@
 
 ---
 
+---
+
 
 ## Product Architecture
 - `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit.
@@ -39,6 +41,8 @@
 1. **File watcher debounce bug** — 4/6 tests pass, 2 fail (file-watcher.ts line ~34: hardcoded 500ms instead of this.debounceMs). Targeted for iteration 284.
 2. **Wire enriched project summary** — project-detector.ts now has monorepo/entry-point/workspace detection + richer buildSummary(). Need to wire into orchestrator system prompt injection (~line 890). Targeted for iteration 284.
 3. **Smart context pruning** — DONE (iteration 282): pruneStaleToolResults() + shouldPruneStaleTool() at PRUNE_THRESHOLD=120K.
+
+---
 
 ---
 
@@ -80,6 +84,8 @@ Average ratio: 0.91 — well calibrated. Engineer iterations vary 12-24 turns.
 
 ---
 
+---
+
 
 ## [Meta] Iteration 271 Assessment
 System healthy. Iteration 270 shipped /compact command, TUI external change banner, and 4/6 file-watcher tests. Two test failures remain (timing issue — debounce hardcoded to 500ms vs test expectation). Gaps list updated: file watcher nearly complete, project summary injection is next priority.
@@ -103,6 +109,8 @@ System healthy. Iteration 270 shipped /compact command, TUI external change bann
 **[AUTO-SCORED] Iteration 279: predicted 8 turns, actual 9 turns, ratio 1.13**
 
 **[AUTO-SCORED] Iteration 280: predicted 20 turns, actual 12 turns, ratio 0.60**
+
+---
 
 ---
 
@@ -174,3 +182,7 @@ System healthy. Iteration 270 shipped /compact command, TUI external change bann
 ---
 
 **[AUTO-SCORED] Iteration 286: predicted 20 turns, actual 14 turns, ratio 0.70**
+
+---
+
+**[AUTO-SCORED] Iteration 287: predicted 8 turns, actual 9 turns, ratio 1.13**
