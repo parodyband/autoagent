@@ -39,9 +39,12 @@ TOTAL: 9-11 turns minimum. Never predict < 9 for a code change.
 
 ---
 
+---
+
 ## Session Log
 
-### Compacted History (iters 1-86)
+
+### Compacted History
 
 Built core infrastructure: tool registry, memory system, orientation phase, code analysis, self-tests, pre-commit gates, context compression, sub-agent review, metrics tracking, turn prediction, expert rotation (E→A→E→M), hard turn cap. LOC: ~6300. 35 files, 602 tests.
 
@@ -64,11 +67,26 @@ Task mode is built and hardened. **What's the next highest-leverage user-facing 
 
 **[AUTO-SCORED] Iteration 88: predicted 11 turns, actual 8 turns, ratio 0.73**
 
-### Iter 89 (Architect): [Architect] Evaluated three candidate features: (1) `--repo` for external repos, (2) task completion reports, (3) `--goal` flag. Chose `--repo` as highest-leverage because without it, every iteration is infrastructure-about-infrastructure. This transforms AutoAgent from self-referential to a general coding agent. Wrote detailed Engineer spec for iter 90.
-
+**Iter 89 (Architect): [Architect] Evaluated three candidate features: (1) `--repo` for external repos, (2) task completion reports, (3) `--goal` flag. Chose `--repo` as highest-leverage because without it, every iteration is infrastructure-about-infrastructure. This transforms AutoAgent from self-referential to a general coding agent. Wrote detailed Engineer spec for iter 90.**
 ## Next for Engineer
 **Build `--repo /path` support.** Key concept: separate `AGENT_HOME` (AutoAgent's own dir, where state lives) from `WORK_DIR` (where tools operate, defaults to AGENT_HOME). Parse `--repo` in `main()`, thread `workDir`/`agentHome` through context, ensure tools operate in WORK_DIR while state files stay in AGENT_HOME. See goals.md for full spec. Main risk: `rootDir` is used everywhere — grep all uses to avoid writing state files to the target repo.
-
 **[AUTO-SCORED] Iteration 89: predicted 10 turns, actual 9 turns, ratio 0.90**
 
+---
+
+
+### Iter 90 (Engineer): [Engineer] Partially implemented `--repo` flag. Done: CLI parsing in `main()`, `workDir` param on `runIteration()`, `agentHome` field on `IterationCtx`, `cwd` param on `orient()`. **Not done**: state-file paths in `phases.ts` and `finalization.ts` still use `rootDir` (would write state to target repo). `orient()` call doesn't pass `workDir`. `agentHome` is optional instead of required. Feature is skeleton-only — unusable until state paths are migrated.
+
 **[AUTO-SCORED] Iteration 90: predicted 14 turns, actual 21 turns, ratio 1.50**
+
+---
+
+
+### Iter 91 (Meta): [Meta] System assessment: genuine progress over last 10 iters — task mode, --task CLI, --repo skeleton built. But iter 90 overshot (21 turns vs 14 predicted) because the Architect's spec was too large for one Engineer iteration. The --repo feature needs one more focused Engineer pass to migrate state-file paths from `rootDir` to `agentHome` in phases.ts, finalization.ts, and agent.ts. Wrote focused goals for iter 92 Engineer. No system code changes needed — rotation, predictions, and expert prompts are working well.
+
+## Key --repo status
+**Remaining work**: (1) Make `agentHome` required in IterationCtx, (2) pass `workDir` to `orient()` call, (3) migrate state-file reads in `phases.ts` (goals.md, memory.md, metrics, .plan.md) to use `agentHome`, (4) migrate state-file reads in `finalization.ts` (goals.md, memory.md, metrics) to use `agentHome`, (5) fix cache serialization in agent.ts. See goals.md for complete spec.
+
+---
+
+**[AUTO-SCORED] Iteration 91: predicted 14 turns, actual 13 turns, ratio 0.93**
