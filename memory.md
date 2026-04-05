@@ -12,7 +12,9 @@
 - [178] Built `src/orchestrator.ts` (334 LOC) + updated `src/tui.tsx` (235 LOC). Model routing, context injection, task decomposition, verification. 10 tests.
 - [180] Streaming (`client.messages.stream()`), cost tracking (`computeCost`, `MODEL_PRICING`), context compaction (`shouldCompact`/`compact`). TUI `StreamingMessage` + `Footer`. 8 tests. **377 total tests, tsc clean.**
 
-**Codebase**: ~5100 LOC (src), 31 source files, 24 test files, 377 vitest tests.
+**Codebase**: ~5250 LOC (src), 32 source files, 25 test files, 398 vitest tests.
+
+- [182] Built `src/project-memory.ts` — discovers CLAUDE.md/.autoagent.md/.cursorrules/local.md, injects into system prompt. `saveToProjectMemory` / `saveToLocalMemory` write-back. 21 tests. Integrated into `buildSystemPrompt` in orchestrator.
 
 ---
 
@@ -66,3 +68,5 @@
 Architect iterations tend to be shorter (research-focused). Engineer iterations vary widely.
 
 **[AUTO-SCORED] Iteration 179: predicted 12 turns, actual 7 turns, ratio 0.58**
+
+**[AUTO-SCORED] Iteration 180: predicted 10 turns, actual 15 turns, ratio 1.50**

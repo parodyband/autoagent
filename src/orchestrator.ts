@@ -19,6 +19,7 @@ import { rankFiles } from "./file-ranker.js";
 import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
 import { runVerification, formatVerificationResults } from "./verification.js";
 import { createDefaultRegistry } from "./tool-registry.js";
+import { getProjectMemoryBlock } from "./project-memory.js";
 
 // ─── Constants ────────────────────────────────────────────────
 
@@ -119,6 +120,8 @@ export function buildSystemPrompt(workDir: string, repoFingerprint: string): str
       rankedFiles.map(f => `- ${f.path} (${f.reason})`).join("\n")
     : "";
 
+  const projectMemory = getProjectMemoryBlock(workDir);
+
   return `You are an expert coding assistant with direct access to the filesystem and shell.
 
 Working directory: ${workDir}
@@ -131,8 +134,9 @@ Rules:
 - After making code changes, always verify with the appropriate test/build command.
 - If you encounter an error, diagnose and fix it before giving up.
 - Never ask for confirmation — just do it.
+- To persist instructions for future sessions, ask the user to say "remember: ..." or use the save_memory tool.
 
-${repoFingerprint}${fileList}`;
+${repoFingerprint}${fileList}${projectMemory}`;
 }
 
 // ─── Simple Claude caller (for task decomposition / compaction) ─

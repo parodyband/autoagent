@@ -1,78 +1,3 @@
-- Add readExpertBreadcrumbs(exper...
-[2026-04-05T13:38:23.878Z] iter=172 turn=15 INFO:   -> exit=0 (116 chars)
-[2026-04-05T13:38:23.878Z] iter=172 turn=16 INFO: Turn 16/25
-[2026-04-05T13:38:28.571Z] iter=172 turn=16 INFO: Agent: All code is committed. Wrapping up now.
-[2026-04-05T13:38:28.572Z] iter=172 turn=16 INFO: write_file: memory.md (patch)
-[2026-04-05T13:38:28.574Z] iter=172 turn=16 INFO:   -> ok: Patched memory.md: -1 +8 lines
-
-Context after patch:
-46 | 
-47 | ---
-48 | 
-49 | ## [Engineer] Iteration 172
-50 | 
-51 | Built expert-aware orientation breadcrumbs in `src/orientation.ts`:
-52 | - `readExpertBreadcrumbs(expertName, rootDir)`: Engineer sees `[Architect]`/`[Next for Engineer]` lines from memory.md; Architect sees `[Engineer]`; Meta sees both. Returns last 3 matches, null if none.
-53 | - `formatOrientation(report, expertName?, rootDir?)`: appends `## Expert Context (Name)` section when matches found; falls back gracefully.
-54 | - 10 new tests added (348 total). tsc clean.
-55 | 
-56 | ## [Meta] Iteration 171
-57 | 
-58 | **Diagnosis: polish loop.** Iterations 164-170 were increasingly tiny hygiene tasks (export audits, single symbol changes). Each produced less value than the last. The system was cycling, not improving.
-59 | 
-[2026-04-05T13:38:28.575Z] iter=172 turn=17 INFO: Turn 17/25
-[2026-04-05T13:38:38.972Z] iter=172 turn=17 INFO: write_file: goals.md (write)
-[2026-04-05T13:38:38.973Z] iter=172 turn=17 INFO:   -> ok: Updated goals.md (1414 chars, -3 lines delta)
-[2026-04-05T13:38:38.973Z] iter=172 turn=18 INFO: Turn 18/25
-[2026-04-05T13:38:41.205Z] iter=172 turn=18 INFO: $ npx tsc --noEmit && echo "TSC_CLEAN"
-[2026-04-05T13:38:41.936Z] iter=172 turn=18 INFO:   -> exit=0 (10 chars)
-[2026-04-05T13:38:41.937Z] iter=172 turn=19 INFO: Turn 19/25
-[2026-04-05T13:38:43.478Z] iter=172 turn=19 INFO: $ git add goals.md memory.md && git commit -m "meta: update goals and memory for iteration 173"
-[2026-04-05T13:38:43.520Z] iter=172 turn=19 INFO:   -> exit=0 (117 chars)
-[2026-04-05T13:38:43.520Z] iter=172 turn=20 INFO: Turn 20/25
-[2026-04-05T13:38:46.551Z] iter=172 turn=20 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T13:38:46.553Z] iter=172 turn=20 INFO: RESTART signal
-[2026-04-05T13:38:46.553Z] iter=172 turn=20 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T13:38:47.243Z] iter=172 turn=20 INFO: Compilation OK
-[2026-04-05T13:38:52.309Z] iter=172 turn=20 INFO: Cache persisted: 43 entries to .autoagent-cache.json
-[2026-04-05T13:38:52.310Z] iter=172 turn=20 INFO: Cache stats: 0 hits, 1 misses, 43 entries, 6 invalidations (2 entries removed)
-[2026-04-05T13:38:52.310Z] iter=172 turn=20 INFO: Tool cache stats
-[2026-04-05T13:38:52.310Z] iter=172 turn=20 INFO: Tool timing: bash: 14x, avg=648ms, total=9073ms; write_file: 6x, avg=2ms, total=13ms; think: 3x, avg=2ms, total=7ms; read_file: 1x, avg=2ms, total=2ms
-[2026-04-05T13:38:52.310Z] iter=172 turn=20 INFO: Tool timing stats
-[2026-04-05T13:38:57.278Z] iter=172 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 172: predicted 18 turns, actual 20 turns, ratio 1.11**
-[2026-04-05T13:38:57.298Z] iter=172 turn=20 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T13:38:57.331Z] iter=172 turn=20 INFO: Committed: e591bf44 (30 in / 9223 out, cache: 27965 created, 341134 read)
-[2026-04-05T13:38:57.331Z] iter=172 turn=20 INFO: Restarting as iteration 173...
-[2026-04-05T13:38:57.508Z] iter=173 INFO: Cache restored: 43/43 entries (0 stale)
-[2026-04-05T13:38:57.509Z] iter=173 INFO: Turn budget: 21/25 (calibration=1.11x, predicted=18)
-[2026-04-05T13:38:57.510Z] iter=173 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T13:38:57.554Z] iter=173 turn=1 INFO: Turn 1/25
-[2026-04-05T13:39:01.593Z] iter=173 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state and then wire the expert name into the orientation pipeline.
-[2026-04-05T13:39:01.595Z] iter=173 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "formatOrientation" src/orientation.ts | head -20
-[2026-04-05T13:39:01.600Z] iter=173 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "formatOrientation" src/ --include="*.ts" | grep -v __tests__
-[2026-04-05T13:39:01.605Z] iter=173 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "expert" src/ --include="*.ts" -l | grep -v __tests__
-[2026-04-05T13:39:01.614Z] iter=173 turn=1 INFO:   -> exit=0 (119 chars)
-[2026-04-05T13:39:01.620Z] iter=173 turn=1 INFO:   -> exit=0 (47 chars)
-[2026-04-05T13:39:01.621Z] iter=173 turn=1 INFO:   -> exit=0 (292 chars)
-[2026-04-05T13:39:01.621Z] iter=173 turn=2 INFO: Turn 2/25
-[2026-04-05T13:39:04.385Z] iter=173 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat src/experts.ts
-[2026-04-05T13:39:04.389Z] iter=173 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '275,300p' src/agent.ts
-[2026-04-05T13:39:04.402Z] iter=173 turn=2 INFO:   -> exit=0 (11182 chars)
-[2026-04-05T13:39:04.405Z] iter=173 turn=2 INFO:   -> exit=0 (1134 chars)
-[2026-04-05T13:39:04.406Z] iter=173 turn=3 INFO: Turn 3/25
-[2026-04-05T13:39:08.312Z] iter=173 turn=3 INFO: think: Now I can see the situation clearly. In `src/agent.ts` line 286, `formatOrientation(orientReport)` is called without the...
-[2026-04-05T13:39:08.314Z] iter=173 turn=4 INFO: Turn 4/25
-[2026-04-05T13:39:11.432Z] iter=173 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "formatOrientation" src/agent.ts
-[2026-04-05T13:39:11.434Z] iter=173 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '280,295p' src/agent.ts
-[2026-04-05T13:39:11.444Z] iter=173 turn=4 INFO:   -> exit=0 (128 chars)
-[2026-04-05T13:39:11.444Z] iter=173 turn=4 INFO:   -> exit=0 (791 chars)
-[2026-04-05T13:39:11.445Z] iter=173 turn=5 INFO: Turn 5/25
-[2026-04-05T13:39:15.224Z] iter=173 turn=5 INFO: Agent: 
-
-You're right. The deliverable is simple: pass `expert.name` and `ROOT` to `formatOrientation()` on line 286 of `src/agent.ts`.
-[2026-04-05T13:39:15.225Z] iter=173 turn=5 INFO: write_file: src/agent.ts (patch)
 [2026-04-05T13:39:15.227Z] iter=173 turn=5 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
 
 Context after patch:
@@ -1071,3 +996,180 @@ Let me finish the remaining two now:
 [2026-04-05T14:29:48.725Z] iter=179 turn=7 INFO: Tool timing stats
 [2026-04-05T14:29:53.604Z] iter=179 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 179: predicted 12 turns, actual 7 turns, ratio 0.58**
 [2026-04-05T14:29:53.624Z] iter=179 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T14:29:53.656Z] iter=179 turn=7 INFO: Committed: a07b0c99 (13 in / 3426 out, cache: 12701 created, 58331 read)
+[2026-04-05T14:29:53.657Z] iter=179 turn=7 INFO: Restarting as iteration 180...
+[2026-04-05T14:29:53.860Z] iter=180 INFO: Cache restored: 41/41 entries (0 stale)
+[2026-04-05T14:29:53.862Z] iter=180 INFO: Turn budget: 13/25 (calibration=1.00x, predicted=10)
+[2026-04-05T14:29:53.862Z] iter=180 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T14:29:53.919Z] iter=180 INFO: Hard turn cap: 15 (1.5x prediction of 10)
+[2026-04-05T14:29:53.919Z] iter=180 turn=1 INFO: Turn 1/25
+[2026-04-05T14:29:56.377Z] iter=180 turn=1 INFO: think: Let me read the current goals.md to understand what the Architect designed for the project memory system, and then imple...
+[2026-04-05T14:29:56.378Z] iter=180 turn=2 INFO: Turn 2/25
+[2026-04-05T14:29:58.559Z] iter=180 turn=2 INFO: read_file: goals.md
+[2026-04-05T14:29:58.560Z] iter=180 turn=2 INFO:   -> ok (1478 chars)
+[2026-04-05T14:29:58.560Z] iter=180 turn=2 INFO: read_file: memory.md
+[2026-04-05T14:29:58.561Z] iter=180 turn=2 INFO:   -> ok (3450 chars)
+[2026-04-05T14:29:58.561Z] iter=180 turn=3 INFO: Turn 3/25
+[2026-04-05T14:30:12.042Z] iter=180 turn=3 INFO: think: The goals.md says this is iteration 182 (Architect task). But the header says "Execute your goals" and I'm the Engineer....
+[2026-04-05T14:30:12.043Z] iter=180 turn=4 INFO: Turn 4/25
+[2026-04-05T14:30:15.728Z] iter=180 turn=4 INFO: Agent: Goals status:
+- Design project memory system: NOT STARTED (goals.md has Architect research tasks, no Engineer impl spec)
+
+I'm the Engineer. I'll implement project memory based on the known Claude Code pattern (CLAUDE.md hierarchy). Let me read the orchestrator quickly then build.
+[2026-04-05T14:30:15.728Z] iter=180 turn=4 INFO: read_file: src/orchestrator.ts
+[2026-04-05T14:30:15.729Z] iter=180 turn=4 INFO:   -> ok (15010 chars)
+[2026-04-05T14:30:15.729Z] iter=180 turn=5 INFO: Turn 5/25
+[2026-04-05T14:30:44.398Z] iter=180 turn=5 INFO: Agent: Now I have what I need. I'll implement `src/project-memory.ts` and integrate it into the orchestrator.
+[2026-04-05T14:30:44.399Z] iter=180 turn=5 INFO: write_file: src/project-memory.ts (write)
+[2026-04-05T14:30:44.401Z] iter=180 turn=5 INFO:   -> ok: Created src/project-memory.ts (6011 chars)
+[2026-04-05T14:30:44.402Z] iter=180 turn=6 INFO: Turn 6/25
+[2026-04-05T14:30:47.625Z] iter=180 turn=6 INFO: Agent: Now integrate into the orchestrator's `buildSystemPrompt`:
+[2026-04-05T14:30:47.626Z] iter=180 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T14:30:47.626Z] iter=180 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
+
+Context after patch:
+18 | import { rankFiles } from "./file-ranker.js";
+19 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
+20 | import { runVerification, formatVerificationResults } from "./verification.js";
+21 | import { createDefaultRegistry } from "./tool-registry.js";
+22 | import { getProjectMemoryBlock } from "./project-memory.js";
+23 | 
+24 | // ─── Constants ────────────────────────────────────────────────
+25 | 
+[2026-04-05T14:30:47.627Z] iter=180 turn=7 INFO: Turn 7/25
+[2026-04-05T14:30:58.121Z] iter=180 turn=7 INFO: Agent: I've created `src/project-memory.ts` and patched the import into `src/orchestrator.ts`. Now integrate the memory block into `buildSystemPrompt`, write tests, run tsc, and wrap up.
+[2026-04-05T14:30:58.122Z] iter=180 turn=7 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T14:30:58.123Z] iter=180 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -21 +24 lines
+
+Context after patch:
+113 |  * Build an enriched system prompt for the given workDir.
+114 |  * Includes repo fingerprint and top-ranked files.
+115 |  */
+116 | export function buildSystemPrompt(workDir: string, repoFingerprint: string): string {
+117 |   const rankedFiles = rankFiles(workDir, 8);
+118 |   const fileList = rankedFiles.length > 0
+119 |     ? "\n\n## Key Files (ranked by importance)\n" +
+120 |       rankedFiles.map(f => `- ${f.path} (${f.reason})`).join("\n")
+121 |     : "";
+122 | 
+123 |   const projectMemory = getProjectMemoryBlock(workDir);
+124 | 
+125 |   return `You are an expert coding assistant with direct access to the filesystem and shell.
+126 | 
+127 | Working directory: ${workDir}
+128 | 
+129 | You have these tools: bash, read_file, write_file, grep, web_search.
+130 | 
+131 | Rules:
+132 | - Be concise and action-oriented. Do the thing, show the result.
+133 | - Use bash for commands, read_file/write_file for files, grep for search.
+134 | - After making code changes, always verify with the appropriate test/build command.
+135 | - If you encounter an error, diagnose and fix it before giving up.
+136 | - Never ask for confirmation — just do it.
+137 | - To persist instructions for future sessions, ask the user to say "remember: ..." or use the save_memory tool.
+138 | 
+139 | ${repoFingerprint}${fileList}${projectMemory}`;
+140 | }
+141 | 
+142 | // ─── Simple Claude caller (for task decomposition / compaction) ─
+[2026-04-05T14:30:58.125Z] iter=180 turn=8 INFO: Turn 8/25
+[2026-04-05T14:31:29.118Z] iter=180 turn=8 INFO: Agent: Now write tests:
+[2026-04-05T14:31:29.119Z] iter=180 turn=8 INFO: write_file: tests/project-memory.test.ts (write)
+[2026-04-05T14:31:29.121Z] iter=180 turn=8 INFO:   -> ok: Created tests/project-memory.test.ts (8390 chars)
+[2026-04-05T14:31:29.122Z] iter=180 turn=9 INFO: Turn 9/25
+[2026-04-05T14:31:36.932Z] iter=180 turn=9 INFO: Agent: The test file has `await import("fs")` inside non-async functions - let me fix that quickly, then run tsc and wrap up.
+[2026-04-05T14:31:36.934Z] iter=180 turn=9 INFO: write_file: tests/project-memory.test.ts (patch)
+[2026-04-05T14:31:36.935Z] iter=180 turn=9 INFO:   -> ok: Patched tests/project-memory.test.ts: -20 +17 lines
+
+Context after patch:
+188 |     writeFileSync(join(tmp, "package.json"), "{}");
+189 |     const filePath = saveToProjectMemory(tmp, "Remember this note.");
+190 |     expect(existsSync(filePath)).toBe(true);
+191 |     const content = readFileSync(filePath, "utf8");
+192 |     expect(content).toContain("Remember this note.");
+193 |   });
+194 | 
+195 |   it("appends to existing .autoagent.md", () => {
+196 |     writeFileSync(join(tmp, "package.json"), "{}");
+197 |     writeFileSync(join(tmp, ".autoagent.md"), "# Existing\nOld content.");
+198 |     saveToProjectMemory(tmp, "New note.");
+199 |     const content = readFileSync(join(tmp, ".autoagent.md"), "utf8");
+200 |     expect(content).toContain("Old content.");
+201 |     expect(content).toContain("New note.");
+202 |   });
+203 | 
+204 |   it("includes date timestamp", () => {
+205 |     writeFileSync(join(tmp, "package.json"), "{}");
+206 |     saveToProjectMemory(tmp, "Dated note.");
+207 |     const content = readFileSync(join(tmp, ".autoagent.md"), "utf8");
+208 |     const today = new Date().toISOString().split("T")[0];
+209 |     expect(content).toContain(today);
+210 |   });
+[2026-04-05T14:31:36.936Z] iter=180 turn=10 INFO: Turn 10/25
+[2026-04-05T14:31:42.766Z] iter=180 turn=10 INFO: write_file: tests/project-memory.test.ts (patch)
+[2026-04-05T14:31:42.767Z] iter=180 turn=10 INFO:   -> ok: Patched tests/project-memory.test.ts: -14 +12 lines
+
+Context after patch:
+219 | 
+220 |   it("creates .autoagent/local.md and directory", () => {
+221 |     writeFileSync(join(tmp, "package.json"), "{}");
+222 |     const filePath = saveToLocalMemory(tmp, "Local secret.");
+223 |     expect(existsSync(filePath)).toBe(true);
+224 |     const content = readFileSync(filePath, "utf8");
+225 |     expect(content).toContain("Local secret.");
+226 |   });
+227 | 
+228 |   it("appends to existing local.md", () => {
+229 |     writeFileSync(join(tmp, "package.json"), "{}");
+230 |     mkdirSync(join(tmp, ".autoagent"));
+231 |     writeFileSync(join(tmp, ".autoagent", "local.md"), "# Local\nFirst note.");
+232 |     saveToLocalMemory(tmp, "Second note.");
+233 |     const content = readFileSync(join(tmp, ".autoagent", "local.md"), "utf8");
+234 |     expect(content).toContain("First note.");
+235 |     expect(content).toContain("Second note.");
+236 |   });
+[2026-04-05T14:31:42.768Z] iter=180 turn=11 INFO: Turn 11/25
+[2026-04-05T14:31:44.607Z] iter=180 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC_OK"
+[2026-04-05T14:31:45.461Z] iter=180 turn=11 INFO:   -> exit=0 (7 chars)
+[2026-04-05T14:31:45.461Z] iter=180 turn=12 INFO: Turn 12/25
+[2026-04-05T14:31:47.343Z] iter=180 turn=12 INFO: Agent: tsc clean. Now write memory, update goals, restart.
+[2026-04-05T14:31:47.344Z] iter=180 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/project-memory.test.ts 2>&1 | tail -20
+[2026-04-05T14:31:48.302Z] iter=180 turn=12 INFO:   -> exit=0 (785 chars)
+[2026-04-05T14:31:48.302Z] iter=180 turn=13 INFO: Turn 13/25
+[2026-04-05T14:31:50.956Z] iter=180 turn=13 INFO: write_file: tests/project-memory.test.ts (patch)
+[2026-04-05T14:31:50.957Z] iter=180 turn=13 INFO:   -> ok: Patched tests/project-memory.test.ts: -1 +1 lines
+
+Context after patch:
+1 | import { describe, it, expect, beforeEach, afterEach } from "vitest";
+2 | import { mkdirSync, writeFileSync, readFileSync, rmSync, existsSync } from "fs";
+3 | import { join } from "path";
+4 | import os from "os";
+5 | import {
+[2026-04-05T14:31:50.958Z] iter=180 turn=14 INFO: Turn 14/25
+[2026-04-05T14:31:53.825Z] iter=180 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/project-memory.test.ts 2>&1 | tail -5 && npx tsc --noEmit 2>&1 && echo "ALL_OK"
+[2026-04-05T14:31:55.615Z] iter=180 turn=14 INFO:   -> exit=0 (188 chars)
+[2026-04-05T14:31:55.615Z] iter=180 turn=15 INFO: Turn 15/25
+[2026-04-05T14:32:00.991Z] iter=180 turn=15 INFO: Agent: 21 tests passing, tsc clean. Write memory and goals now.
+[2026-04-05T14:32:00.992Z] iter=180 turn=15 INFO: write_file: memory.md (patch)
+[2026-04-05T14:32:00.993Z] iter=180 turn=15 INFO:   -> ok: Patched memory.md: -1 +3 lines
+
+Context after patch:
+12 | - [178] Built `src/orchestrator.ts` (334 LOC) + updated `src/tui.tsx` (235 LOC). Model routing, context injection, task decomposition, verification. 10 tests.
+13 | - [180] Streaming (`client.messages.stream()`), cost tracking (`computeCost`, `MODEL_PRICING`), context compaction (`shouldCompact`/`compact`). TUI `StreamingMessage` + `Footer`. 8 tests. **377 total tests, tsc clean.**
+14 | 
+15 | **Codebase**: ~5250 LOC (src), 32 source files, 25 test files, 398 vitest tests.
+16 | 
+17 | - [182] Built `src/project-memory.ts` — discovers CLAUDE.md/.autoagent.md/.cursorrules/local.md, injects into system prompt. `saveToProjectMemory` / `saveToLocalMemory` write-back. 21 tests. Integrated into `buildSystemPrompt` in orchestrator.
+18 | 
+19 | ---
+20 | 
+[2026-04-05T14:32:00.994Z] iter=180 turn=15 INFO: HARD TURN CAP REACHED: 15 turns (predicted 10, cap 15). Forcing commit.
+[2026-04-05T14:32:01.000Z] iter=180 turn=15 INFO: Cache persisted: 42 entries to .autoagent-cache.json
+[2026-04-05T14:32:01.001Z] iter=180 turn=15 INFO: Cache stats: 0 hits, 3 misses, 42 entries, 8 invalidations (2 entries removed)
+[2026-04-05T14:32:01.001Z] iter=180 turn=15 INFO: Tool cache stats
+[2026-04-05T14:32:01.002Z] iter=180 turn=15 INFO: Tool timing: bash: 3x, avg=1201ms, total=3602ms; write_file: 8x, avg=2ms, total=13ms; read_file: 3x, avg=1ms, total=4ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T14:32:01.002Z] iter=180 turn=15 INFO: Tool timing stats
+[2026-04-05T14:32:05.961Z] iter=180 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 180: predicted 10 turns, actual 15 turns, ratio 1.50**
+[2026-04-05T14:32:15.228Z] iter=180 turn=15 INFO: Pre-commit review (2791in/359out): **Issues found:**
+
+- **Windows root detection bug**: `findProjectRoot` hardcodes `root: "/"` and will loop to the iteration limit on Windows instead of stopping at the drive root (e.g. `C:\`). Use `pa
