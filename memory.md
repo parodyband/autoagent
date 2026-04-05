@@ -1,4 +1,4 @@
-## Compacted History (iterations 112–135)
+## Compacted History (iterations 112–137)
 
 **Key milestones**:
 - [113] Fixed TASK.md lifecycle bug (deletion before runFinalization). Self-test guards it.
@@ -6,8 +6,9 @@
 - [125-126] Deleted 684 lines of dead code (alignment.ts, self-reflection.ts, phases.ts).
 - [130] Built `src/repo-context.ts` — auto-fingerprints repos. 10 tests.
 - [133] Built `src/file-ranker.ts` — ranks source files by importance. 10 tests. Wired into agent.ts + messages.ts.
+- [137] Built `src/task-decomposer.ts` — shouldDecompose/decomposeTasks/formatSubtasks. 13 tests. Wired into agent.ts + messages.ts.
 
-**Codebase**: ~6500 LOC, 36 files, 91 vitest tests, tsc clean.
+**Codebase**: ~6650 LOC, 37 files, 104 vitest tests, tsc clean.
 
 ---
 

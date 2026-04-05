@@ -1,122 +1,3 @@
-[2026-04-05T12:09:16.567Z] iter=128 turn=9 INFO: Agent: **Goal status:**
-- Root cause identified: NOT STARTED
-- Self-test added: NOT STARTED  
-- Fix/document: NOT STARTED
-- Tests pass: NOT STARTED
-
-Too much thinking, not enough doing. Let me check the one remaining unknown and write code.
-[2026-04-05T12:09:16.567Z] iter=128 turn=9 INFO: $ grep "expert-rotation" .gitignore 2>/dev/null || echo "not ignored"
-git log --oneline --follow .expert-rotation.json 2>/dev/null | head -10
-[2026-04-05T12:09:16.569Z] iter=128 turn=9 INFO: read_file: scripts/self-test.js
-[2026-04-05T12:09:16.570Z] iter=128 turn=9 INFO:   -> err (77 chars)
-[2026-04-05T12:09:16.591Z] iter=128 turn=9 INFO:   -> exit=0 (392 chars)
-[2026-04-05T12:09:16.592Z] iter=128 turn=10 INFO: Turn 10/25
-[2026-04-05T12:09:18.744Z] iter=128 turn=10 INFO: $ ls scripts/ && tail -30 scripts/self-test.ts 2>/dev/null || ls scripts/*.js 2>/dev/null | head -5
-[2026-04-05T12:09:18.765Z] iter=128 turn=10 INFO:   -> exit=0 (1056 chars)
-[2026-04-05T12:09:18.766Z] iter=128 turn=11 INFO: Turn 11/25
-[2026-04-05T12:09:20.977Z] iter=128 turn=11 INFO: $ grep -n "function main\|testTask\|testTurnBudget\|^}" scripts/self-test.ts | tail -20
-[2026-04-05T12:09:20.991Z] iter=128 turn=11 INFO:   -> exit=0 (217 chars)
-[2026-04-05T12:09:20.991Z] iter=128 turn=12 INFO: Turn 12/25
-[2026-04-05T12:09:23.845Z] iter=128 turn=12 INFO: read_file: scripts/self-test.ts
-[2026-04-05T12:09:23.847Z] iter=128 turn=12 INFO:   -> ok (447 chars)
-[2026-04-05T12:09:23.847Z] iter=128 turn=13 INFO: Turn 13/25
-[2026-04-05T12:09:25.562Z] iter=128 turn=13 INFO: $ grep -n "^async function main" scripts/self-test.ts | tail -5
-[2026-04-05T12:09:25.572Z] iter=128 turn=13 INFO:   -> exit=0 (43 chars)
-[2026-04-05T12:09:25.573Z] iter=128 turn=14 INFO: Turn 14/25
-[2026-04-05T12:09:28.349Z] iter=128 turn=14 INFO: read_file: scripts/self-test.ts
-[2026-04-05T12:09:28.351Z] iter=128 turn=14 INFO:   -> ok (1337 chars)
-[2026-04-05T12:09:28.352Z] iter=128 turn=15 INFO: Turn 15/25
-[2026-04-05T12:09:30.908Z] iter=128 turn=15 INFO: read_file: scripts/self-test.ts
-[2026-04-05T12:09:30.909Z] iter=128 turn=15 INFO:   -> ok (894 chars)
-[2026-04-05T12:09:30.909Z] iter=128 turn=16 INFO: Turn 16/25
-[2026-04-05T12:09:34.490Z] iter=128 turn=16 INFO: Agent: I've been reading too much. Let me write the self-test now and wrap up.
-[2026-04-05T12:09:34.491Z] iter=128 turn=16 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T12:09:34.493Z] iter=128 turn=16 INFO:   -> ok: Patched scripts/self-test.ts: -2 +3 lines
-
-Context after patch:
-723 |     await testResuscitationE2E();
-724 |     await testSubagent();
-725 |     await testApiRetry();
-726 |     testTaskMdLifecycle();
-727 |     testTurnBudgetWiring();
-728 |     testExpertStateWiring();
-729 |     // Inline model-selection smoke test (avoids vitest import in tsx context)
-730 |     console.log("  model-selection smoke test...");
-731 |     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
-[2026-04-05T12:09:34.494Z] iter=128 turn=17 INFO: Turn 17/25
-[2026-04-05T12:09:44.335Z] iter=128 turn=17 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T12:09:44.336Z] iter=128 turn=17 INFO:   -> ok: Patched scripts/self-test.ts: -4 +45 lines
-
-Context after patch:
-2230 |   );
-2231 | }
-2232 | 
-2233 | function testExpertStateWiring(): void {
-2234 |   console.log("\n🔄 Expert State Wiring");
-2235 | 
-2236 |   // Verify saveExpertState is imported and called in agent.ts
-2237 |   const agentSrc = readFileSync(path.join(ROOT, "src/agent.ts"), "utf8");
-2238 |   assert(
-2239 |     agentSrc.includes("saveExpertState"),
-2240 |     "expert-state-wiring: saveExpertState is referenced in agent.ts",
-2241 |   );
-2242 |   assert(
-2243 |     agentSrc.includes("saveExpertState(ROOT,"),
-2244 |     "expert-state-wiring: saveExpertState is called with ROOT (not workDir)",
-2245 |   );
-2246 | 
-2247 |   // Verify saveExpertState actually writes to the rotation file
-2248 |   const tmpDir = mkdtempSync(path.join(TEMP_DIR, "expert-state-"));
-2249 |   const { saveExpertState, loadExpertState } = require(path.join(ROOT, "dist/experts.js"));
-2250 | 
-2251 |   saveExpertState(tmpDir, "Engineer", 999);
-2252 |   const state = loadExpertState(tmpDir);
-2253 |   assert(state.lastExpert === "Engineer", "expert-state: lastExpert set correctly");
-2254 |   assert(state.history.length === 1, "expert-state: history has one entry");
-2255 |   assert(state.history[0].iteration === 999, "expert-state: iteration saved correctly");
-2256 |   assert(state.history[0].expert === "Engineer", "expert-state: expert name saved correctly");
-2257 | 
-2258 |   // Verify keep-last-20 trimming
-2259 |   for (let i = 0; i < 25; i++) {
-2260 |     saveExpertState(tmpDir, "Architect", 1000 + i);
-2261 |   }
-2262 |   const trimmedState = loadExpertState(tmpDir);
-2263 |   assert(trimmedState.history.length === 20, "expert-state: history trimmed to 20 entries");
-2264 | 
-2265 |   // Verify ROOT in agent.ts points to process.cwd() (autoagent repo, not --repo target)
-2266 |   assert(
-2267 |     agentSrc.includes("const ROOT = process.cwd()"),
-2268 |     "expert-state-wiring: ROOT is process.cwd() so rotation file always writes to autoagent dir",
-2269 |   );
-2270 | 
-2271 |   console.log("  ✓ expert-state: 7 assertions passed");
-2272 | }
-2273 | 
-2274 | main().catch((err) => {
-2275 |   console.error("Self-test crashed:", err);
-2276 |   process.exit(1);
-2277 | });
-2278 | 
-[2026-04-05T12:09:44.337Z] iter=128 turn=18 INFO: Turn 18/25
-[2026-04-05T12:09:46.985Z] iter=128 turn=18 INFO: Agent: I also need to fix the duplicate history issue in the rotation file. But first let me check if the test works and run tsc.
-[2026-04-05T12:09:46.986Z] iter=128 turn=18 INFO: $ npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T12:09:47.694Z] iter=128 turn=18 INFO:   -> exit=0 (11 chars)
-[2026-04-05T12:09:47.694Z] iter=128 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
-[2026-04-05T12:09:47.696Z] iter=128 turn=18 INFO: Cache persisted: 45 entries to .autoagent-cache.json
-[2026-04-05T12:09:47.696Z] iter=128 turn=18 INFO: Cache stats: 0 hits, 10 misses, 45 entries, 2 invalidations (3 entries removed)
-[2026-04-05T12:09:47.696Z] iter=128 turn=18 INFO: Tool cache stats
-[2026-04-05T12:09:47.696Z] iter=128 turn=18 INFO: Tool timing: bash: 8x, avg=106ms, total=851ms; grep: 2x, avg=37ms, total=74ms; read_file: 8x, avg=2ms, total=19ms; write_file: 2x, avg=3ms, total=5ms; think: 3x, avg=1ms, total=2ms
-[2026-04-05T12:09:47.696Z] iter=128 turn=18 INFO: Tool timing stats
-[2026-04-05T12:09:52.084Z] iter=128 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 128: predicted 12 turns, actual 18 turns, ratio 1.50**
-[2026-04-05T12:10:00.299Z] iter=128 turn=18 INFO: Pre-commit review (1016in/345out): ## Issues Found
-
-- **ESM violation**: `require(path.join(ROOT, "dist/experts.js"))` uses CommonJS `require()` in a TypeScript ESM project. This will throw `ReferenceError: require is not defined` at r
-[2026-04-05T12:10:00.354Z] iter=128 turn=18 INFO: Committed: f9aaaf33 (30 in / 4353 out, cache: 13519 created, 153155 read)
-[2026-04-05T12:10:00.354Z] iter=128 turn=18 INFO: Restarting as iteration 129...
-[2026-04-05T12:10:00.550Z] iter=129 INFO: Cache restored: 45/45 entries (0 stale)
-[2026-04-05T12:10:00.552Z] iter=129 INFO: Turn budget: 17/25 (calibration=1.08x, predicted=12)
-[2026-04-05T12:10:00.552Z] iter=129 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T12:10:00.582Z] iter=129 INFO: Hard turn cap: 18 (1.5x prediction of 12)
 [2026-04-05T12:10:00.582Z] iter=129 turn=1 INFO: Turn 1/25
 [2026-04-05T12:10:04.711Z] iter=129 turn=1 INFO: Agent: 
 
@@ -1115,3 +996,206 @@ All done. I changed `src/agent.ts` (fixed double-calibration bug), updated memor
 [2026-04-05T12:25:27.309Z] iter=135 turn=16 INFO: Tool timing stats
 [2026-04-05T12:25:31.290Z] iter=135 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 135: predicted 24 turns, actual 16 turns, ratio 0.67**
 [2026-04-05T12:25:34.623Z] iter=135 turn=16 INFO: Pre-commit review (718in/83out): LGTM. The change correctly removes a double-calibration bug where `rawPrediction * calibration` was applied both here and inside `computeTurnBudget`, which would have caused the oscillating over/under
+[2026-04-05T12:25:34.675Z] iter=135 turn=16 INFO: Committed: 5b6d4669 (24 in / 4912 out, cache: 21099 created, 190188 read)
+[2026-04-05T12:25:34.676Z] iter=135 turn=16 INFO: Restarting as iteration 136...
+[2026-04-05T12:25:34.882Z] iter=136 INFO: Cache restored: 43/43 entries (0 stale)
+[2026-04-05T12:25:34.884Z] iter=136 INFO: Turn budget: 21/25 (calibration=1.00x, predicted=18)
+[2026-04-05T12:25:34.884Z] iter=136 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T12:25:34.914Z] iter=136 turn=1 INFO: Turn 1/25
+[2026-04-05T12:25:38.212Z] iter=136 turn=1 INFO: think: Let me read the current state of the codebase to understand what I need to build. The task is to:
+
+1. Build `src/task-de...
+[2026-04-05T12:25:38.213Z] iter=136 turn=2 INFO: Turn 2/25
+[2026-04-05T12:25:40.363Z] iter=136 turn=2 INFO: read_file: src/agent.ts
+[2026-04-05T12:25:40.364Z] iter=136 turn=2 INFO:   -> ok (16719 chars)
+[2026-04-05T12:25:40.365Z] iter=136 turn=2 INFO: read_file: src/messages.ts
+[2026-04-05T12:25:40.366Z] iter=136 turn=2 INFO:   -> ok (10296 chars)
+[2026-04-05T12:25:40.366Z] iter=136 turn=3 INFO: Turn 3/25
+[2026-04-05T12:25:43.590Z] iter=136 turn=3 INFO: Agent: Now let me look at the existing test patterns and the Anthropic client usage:
+[2026-04-05T12:25:43.591Z] iter=136 turn=3 INFO: $ ls src/__tests__/ | head -20
+[2026-04-05T12:25:43.596Z] iter=136 turn=3 INFO: $ head -60 src/__tests__/file-ranker.test.ts
+[2026-04-05T12:25:43.610Z] iter=136 turn=3 INFO:   -> exit=0 (177 chars)
+[2026-04-05T12:25:43.614Z] iter=136 turn=3 INFO:   -> exit=0 (1981 chars)
+[2026-04-05T12:25:43.614Z] iter=136 turn=4 INFO: Turn 4/25
+[2026-04-05T12:25:47.065Z] iter=136 turn=4 INFO: $ head -30 src/repo-context.ts
+[2026-04-05T12:25:47.073Z] iter=136 turn=4 INFO:   -> exit=0 (840 chars)
+[2026-04-05T12:25:47.074Z] iter=136 turn=5 INFO: Turn 5/25
+[2026-04-05T12:25:50.803Z] iter=136 turn=5 INFO: think: I have enough context. Let me write the files now:
+
+1. `src/task-decomposer.ts` - the main module
+2. `src/__tests__/task...
+[2026-04-05T12:25:50.803Z] iter=136 turn=6 INFO: Turn 6/25
+[2026-04-05T12:26:09.716Z] iter=136 turn=6 INFO: Agent: Writing all three files now:
+[2026-04-05T12:26:09.716Z] iter=136 turn=6 INFO: write_file: src/task-decomposer.ts (write)
+[2026-04-05T12:26:09.717Z] iter=136 turn=6 INFO:   -> ok: Created src/task-decomposer.ts (4288 chars)
+[2026-04-05T12:26:09.718Z] iter=136 turn=7 INFO: Turn 7/25
+[2026-04-05T12:26:26.420Z] iter=136 turn=7 INFO: write_file: src/__tests__/task-decomposer.test.ts (write)
+[2026-04-05T12:26:26.421Z] iter=136 turn=7 INFO:   -> ok: Created src/__tests__/task-decomposer.test.ts (4848 chars)
+[2026-04-05T12:26:26.421Z] iter=136 turn=8 INFO: Turn 8/25
+[2026-04-05T12:26:30.380Z] iter=136 turn=8 INFO: Agent: Now wire into `agent.ts` — inject decomposition after reading TASK.md content, before building the initial message:
+[2026-04-05T12:26:30.381Z] iter=136 turn=8 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T12:26:30.383Z] iter=136 turn=8 INFO:   -> ok: Patched src/agent.ts: -1 +2 lines
+
+Context after patch:
+39 |   handleIterationFailure,
+40 |   type ResuscitationConfig,
+41 | } from "./resuscitation.js";
+42 | import { computeTurnBudget } from "./turn-budget.js";
+43 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
+44 | 
+45 | const ROOT = process.cwd();
+46 | const GOALS_FILE = path.join(ROOT, "goals.md");
+[2026-04-05T12:26:30.384Z] iter=136 turn=9 INFO: Turn 9/25
+[2026-04-05T12:26:33.713Z] iter=136 turn=9 INFO: Agent: Status: task-decomposer.ts DONE, tests DONE, import wired DONE. Still need: wire the decomposition call into runIteration + verify/test.
+[2026-04-05T12:26:33.714Z] iter=136 turn=9 INFO: read_file: src/agent.ts
+[2026-04-05T12:26:33.715Z] iter=136 turn=9 INFO:   -> ok (1772 chars)
+[2026-04-05T12:26:33.716Z] iter=136 turn=10 INFO: Turn 10/25
+[2026-04-05T12:26:40.564Z] iter=136 turn=10 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T12:26:40.565Z] iter=136 turn=10 INFO:   -> ok: Patched src/agent.ts: -8 +33 lines
+
+Context after patch:
+295 |     log(state.iteration, `Key files ranked (${keyFilesText.length} chars)`);
+296 |   }
+297 | 
+298 |   // Expert gets its own system prompt
+299 |   ctx.systemPromptBuilder = (s, r) => buildExpertPrompt(expert, s, r);
+300 | 
+301 |   // Task decomposition: if TASK.md is complex, break it into subtasks and inject
+302 |   let subtasksText: string | undefined;
+303 |   if (taskMode) {
+304 |     const rawTask = existsSync(TASK_FILE) ? readFileSync(TASK_FILE, "utf-8").trim() : "";
+305 |     if (rawTask && shouldDecompose(rawTask)) {
+306 |       const callClaude = async (prompt: string): Promise<string> => {
+307 |         const resp = await ctx.client.messages.create({
+308 |           model: expert.model,
+309 |           max_tokens: 1024,
+310 |           messages: [{ role: "user", content: prompt }],
+311 |         });
+312 |         const block = resp.content[0];
+313 |         return block.type === "text" ? block.text : "";
+314 |       };
+315 |       try {
+316 |         const subtasks = await decomposeTasks(rawTask, callClaude);
+317 |         subtasksText = formatSubtasks(subtasks);
+318 |         log(state.iteration, `Task decomposed into ${subtasks.length} subtasks`);
+319 |       } catch (err) {
+320 |         log(state.iteration, `Task decomposition failed (non-fatal): ${err instanceof Error ? err.message : err}`);
+321 |       }
+322 |     }
+323 |   }
+324 | 
+325 |   // Build initial message with goals, memory, orientation, repo context, key files, and subtasks
+326 |   const initialContent = buildInitialMessage(goalsWithRotation, readMemory(), orientationText || undefined, repoContextText || undefined, keyFilesText || undefined, subtasksText || undefined);
+327 |   ctx.messages.push({
+328 |     role: "user",
+329 |     content: initialContent,
+330 |   });
+331 | 
+332 |   await runConversation(ctx);
+333 | }
+[2026-04-05T12:26:40.565Z] iter=136 turn=11 INFO: Turn 11/25
+[2026-04-05T12:26:49.685Z] iter=136 turn=11 INFO: Agent: Now update `buildInitialMessage` in `messages.ts` to accept the optional `subtasksText` parameter:
+[2026-04-05T12:26:49.685Z] iter=136 turn=11 INFO: write_file: src/messages.ts (patch)
+[2026-04-05T12:26:49.686Z] iter=136 turn=11 INFO:   -> ok: Patched src/messages.ts: -30 +37 lines
+
+Context after patch:
+75 | 
+76 | // ─── Initial user message ───────────────────────────────────
+77 | 
+78 | /**
+79 |  * Build the first user message that kicks off an iteration.
+80 |  * Optionally includes an orientation section showing what changed since last iteration.
+81 |  * Optionally includes a repoContext block (from fingerprintRepo) for external repos.
+82 |  * Optionally includes a keyFiles block (from rankFiles) for file-level guidance.
+83 |  * Optionally includes a subtasks block (from formatSubtasks) when task decomposition ran.
+84 |  */
+85 | export function buildInitialMessage(goals: string, memory: string, orientation?: string, repoContext?: string, keyFiles?: string, subtasks?: string): string {
+86 |   const parts: string[] = [];
+87 |   
+88 |   if (orientation) {
+89 |     parts.push(orientation);
+90 |     parts.push("---");
+91 |   }
+92 |   
+93 |   if (repoContext) {
+94 |     parts.push(repoContext);
+95 |     if (keyFiles) {
+96 |       parts.push(keyFiles);
+97 |     }
+98 |     parts.push("---");
+99 |   }
+100 |   
+101 |   parts.push(`Goals:\n\n${goals}`);
+102 |   parts.push("---");
+103 |   parts.push(`Memory:\n\n${memory}`);
+104 | 
+105 |   if (subtasks) {
+106 |     parts.push("---");
+107 |     parts.push(subtasks);
+108 |   }
+109 | 
+110 |   parts.push("---");
+111 |   parts.push(`Execute your goals. Run \`npx tsc --noEmit\` before restart. Final action: \`echo "AUTOAGENT_RESTART"\`.`);
+112 |   
+113 |   return parts.join("\n\n");
+114 | }
+115 | 
+116 | // ─── Token budget warnings ──────────────────────────────────
+117 | 
+[2026-04-05T12:26:49.687Z] iter=136 turn=12 INFO: Turn 12/25
+[2026-04-05T12:26:52.758Z] iter=136 turn=12 INFO: Agent: Now verify:
+[2026-04-05T12:26:52.758Z] iter=136 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T12:26:52.763Z] iter=136 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/task-decomposer.test.ts 2>&1
+[2026-04-05T12:26:53.495Z] iter=136 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:26:53.771Z] iter=136 turn=12 INFO:   -> exit=0 (286 chars)
+[2026-04-05T12:26:53.771Z] iter=136 turn=13 INFO: Turn 13/25
+[2026-04-05T12:26:56.373Z] iter=136 turn=13 INFO: Agent: tsc clean, 13 new tests passing. Run full suite:
+[2026-04-05T12:26:56.374Z] iter=136 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -15
+[2026-04-05T12:26:58.352Z] iter=136 turn=13 INFO:   -> exit=0 (674 chars)
+[2026-04-05T12:26:58.352Z] iter=136 turn=14 INFO: Turn 14/25
+[2026-04-05T12:27:07.707Z] iter=136 turn=14 INFO: Agent: 104 tests passing (was 91, +13 new). Now write goals/memory and commit:
+[2026-04-05T12:27:07.708Z] iter=136 turn=14 INFO: write_file: goals.md (write)
+[2026-04-05T12:27:07.708Z] iter=136 turn=14 INFO:   -> ok: Updated goals.md (1026 chars, -41 lines delta)
+[2026-04-05T12:27:07.709Z] iter=136 turn=15 INFO: Turn 15/25
+[2026-04-05T12:27:10.413Z] iter=136 turn=15 INFO: write_file: memory.md (patch)
+[2026-04-05T12:27:10.415Z] iter=136 turn=15 INFO:   -> ok: Patched memory.md: -1 +1 lines
+
+Context after patch:
+1 | ## Compacted History (iterations 112–137)
+2 | 
+3 | **Key milestones**:
+4 | - [113] Fixed TASK.md lifecycle bug (deletion before runFinalization). Self-test guards it.
+[2026-04-05T12:27:10.417Z] iter=136 turn=16 INFO: Turn 16/25
+[2026-04-05T12:27:17.639Z] iter=136 turn=16 INFO: Agent: All work is done. Updating memory and committing.
+[2026-04-05T12:27:17.639Z] iter=136 turn=16 INFO: write_file: memory.md (patch)
+[2026-04-05T12:27:17.639Z] iter=136 turn=16 INFO:   -> ok: Patched memory.md: -6 +7 lines
+
+Context after patch:
+1 | ## Compacted History (iterations 112–137)
+2 | 
+3 | **Key milestones**:
+4 | - [113] Fixed TASK.md lifecycle bug (deletion before runFinalization). Self-test guards it.
+5 | - [122-124] Built turn-budget pipeline: metrics → calibration → budget → warnings. 18 vitest tests.
+6 | - [125-126] Deleted 684 lines of dead code (alignment.ts, self-reflection.ts, phases.ts).
+7 | - [130] Built `src/repo-context.ts` — auto-fingerprints repos. 10 tests.
+8 | - [133] Built `src/file-ranker.ts` — ranks source files by importance. 10 tests. Wired into agent.ts + messages.ts.
+9 | - [137] Built `src/task-decomposer.ts` — shouldDecompose/decomposeTasks/formatSubtasks. 13 tests. Wired into agent.ts + messages.ts.
+10 | 
+11 | **Codebase**: ~6500 LOC, 36 files, 91 vitest tests, tsc clean.
+12 | 
+[2026-04-05T12:27:17.640Z] iter=136 turn=17 INFO: Turn 17/25
+[2026-04-05T12:27:19.934Z] iter=136 turn=17 INFO: write_file: memory.md (patch)
+[2026-04-05T12:27:19.936Z] iter=136 turn=17 INFO:   -> ok: Patched memory.md: -1 +1 lines
+
+Context after patch:
+8 | - [133] Built `src/file-ranker.ts` — ranks source files by importance. 10 tests. Wired into agent.ts + messages.ts.
+9 | - [137] Built `src/task-decomposer.ts` — shouldDecompose/decomposeTasks/formatSubtasks. 13 tests. Wired into agent.ts + messages.ts.
+10 | 
+11 | **Codebase**: ~6650 LOC, 37 files, 104 vitest tests, tsc clean.
+12 | 
+13 | ---
+14 | 
+[2026-04-05T12:27:19.938Z] iter=136 turn=18 INFO: Turn 18/25
+[2026-04-05T12:27:23.884Z] iter=136 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "feat: add task-decomposer.ts with shouldDecompose/decomposeTasks/formatSubtasks
+
+- src/task-decomposer.ts: breaks complex tasks int...

@@ -40,6 +40,7 @@ import {
   type ResuscitationConfig,
 } from "./resuscitation.js";
 import { computeTurnBudget } from "./turn-budget.js";
+import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
 
 const ROOT = process.cwd();
 const GOALS_FILE = path.join(ROOT, "goals.md");
@@ -297,10 +298,35 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
   // Expert gets its own system prompt
   ctx.systemPromptBuilder = (s, r) => buildExpertPrompt(expert, s, r);
 
-  // Build initial message with goals, memory, orientation, repo context, and key files
+  // Task decomposition: if TASK.md is complex, break it into subtasks and inject
+  let subtasksText: string | undefined;
+  if (taskMode) {
+    const rawTask = existsSync(TASK_FILE) ? readFileSync(TASK_FILE, "utf-8").trim() : "";
+    if (rawTask && shouldDecompose(rawTask)) {
+      const callClaude = async (prompt: string): Promise<string> => {
+        const resp = await ctx.client.messages.create({
+          model: expert.model,
+          max_tokens: 1024,
+          messages: [{ role: "user", content: prompt }],
+        });
+        const block = resp.content[0];
+        return block.type === "text" ? block.text : "";
+      };
+      try {
+        const subtasks = await decomposeTasks(rawTask, callClaude);
+        subtasksText = formatSubtasks(subtasks);
+        log(state.iteration, `Task decomposed into ${subtasks.length} subtasks`);
+      } catch (err) {
+        log(state.iteration, `Task decomposition failed (non-fatal): ${err instanceof Error ? err.message : err}`);
+      }
+    }
+  }
+
+  // Build initial message with goals, memory, orientation, repo context, key files, and subtasks
+  const initialContent = buildInitialMessage(goalsWithRotation, readMemory(), orientationText || undefined, repoContextText || undefined, keyFilesText || undefined, subtasksText || undefined);
   ctx.messages.push({
     role: "user",
-    content: buildInitialMessage(goalsWithRotation, readMemory(), orientationText || undefined, repoContextText || undefined, keyFilesText || undefined),
+    content: initialContent,
   });
 
   await runConversation(ctx);

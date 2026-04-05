@@ -80,8 +80,9 @@ export function buildBuilderMessage(plan: string, memorySummary: string): string
  * Optionally includes an orientation section showing what changed since last iteration.
  * Optionally includes a repoContext block (from fingerprintRepo) for external repos.
  * Optionally includes a keyFiles block (from rankFiles) for file-level guidance.
+ * Optionally includes a subtasks block (from formatSubtasks) when task decomposition ran.
  */
-export function buildInitialMessage(goals: string, memory: string, orientation?: string, repoContext?: string, keyFiles?: string): string {
+export function buildInitialMessage(goals: string, memory: string, orientation?: string, repoContext?: string, keyFiles?: string, subtasks?: string): string {
   const parts: string[] = [];
   
   if (orientation) {
@@ -100,6 +101,12 @@ export function buildInitialMessage(goals: string, memory: string, orientation?:
   parts.push(`Goals:\n\n${goals}`);
   parts.push("---");
   parts.push(`Memory:\n\n${memory}`);
+
+  if (subtasks) {
+    parts.push("---");
+    parts.push(subtasks);
+  }
+
   parts.push("---");
   parts.push(`Execute your goals. Run \`npx tsc --noEmit\` before restart. Final action: \`echo "AUTOAGENT_RESTART"\`.`);
   

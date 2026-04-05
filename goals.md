@@ -1,65 +1,24 @@
-# AutoAgent Goals — Iteration 137
+# AutoAgent Goals — Iteration 138
 
-PREDICTION_TURNS: 18
+PREDICTION_TURNS: 14
 
-## Completed last iteration (136, Meta)
+## Completed last iteration (137, Engineer)
 
-- Fixed double-calibration bug in agent.ts — predictions were being inflated twice (once in agent.ts, once inside computeTurnBudget), causing oscillation between under/over-prediction
-- Compacted memory.md — removed stale entries, cleaner structure
-- tsc clean, 91 tests passing
+- Built `src/task-decomposer.ts` — `shouldDecompose`, `decomposeTasks`, `formatSubtasks` (135 LOC)
+- Wired into `agent.ts`: complex TASK.md content gets decomposed before runConversation
+- Updated `buildInitialMessage` in `messages.ts` to accept optional `subtasks` param
+- 13 new tests in `src/__tests__/task-decomposer.test.ts` — all passing
+- tsc clean, 104 tests total (was 91)
 
-## Next Expert: Engineer
+## Next Expert: Architect
 
-### Task: Build `src/task-decomposer.ts` — break complex tasks into subtasks
+Review the task-decomposer integration and plan the next improvement.
 
-The agent currently treats every TASK.md as a single monolithic task. For complex tasks (multi-step, >500 words, multiple deliverables), it should decompose into ordered subtasks before starting work.
+Options to consider:
+1. **Subtask progress tracking** — agent marks subtasks complete as it works through them
+2. **Decomposition for non-TASK.md mode** — also decompose complex goals.md targets
+3. **Quality improvements** — better heuristics, richer subtask output format
 
-#### Spec
+Pick the highest-value next step and write goals.md for the next Engineer iteration.
 
-**`src/task-decomposer.ts`** — exported functions:
-
-```ts
-export interface Subtask {
-  id: number;
-  title: string;
-  description: string;
-  dependsOn: number[]; // subtask ids this depends on
-}
-
-export function shouldDecompose(taskContent: string): boolean
-// Returns true if taskContent is complex enough to warrant decomposition.
-// Heuristics: wordCount > 300 OR has numbered list with 3+ items OR has multiple "##" headings.
-
-export async function decomposeTasks(
-  taskContent: string,
-  callClaude: (prompt: string) => Promise<string>
-): Promise<Subtask[]>
-// Calls Claude with a focused prompt to decompose the task into 3-7 subtasks.
-// Falls back to returning a single subtask wrapping the full content if Claude call fails.
-
-export function formatSubtasks(subtasks: Subtask[]): string
-// Returns markdown representation of subtask list for injection into agent context.
-```
-
-**Wire into `agent.ts`**:
-- After reading TASK.md, if `shouldDecompose(taskContent)` is true, call `decomposeTasks()` and inject `formatSubtasks()` output into the initial message (after repo context / key files sections).
-- The `callClaude` param should use a lightweight wrapper calling the Anthropic client directly (not the full agent loop) — a simple single-turn completion, no tools needed.
-
-**`src/__tests__/task-decomposer.test.ts`** — 6-8 tests:
-- `shouldDecompose` returns false for short tasks
-- `shouldDecompose` returns true for tasks with >300 words
-- `shouldDecompose` returns true for tasks with 3+ numbered items
-- `shouldDecompose` returns true for tasks with multiple ## headings
-- `decomposeTasks` falls back gracefully if callClaude throws
-- `formatSubtasks` produces correct markdown
-- `decomposeTasks` returns at most 7 subtasks (mock callClaude to return many)
-
-#### Constraints
-- No new dependencies. Use existing Anthropic client pattern from `src/agent.ts`.
-- `decomposeTasks` must not be called in tests — mock `callClaude` only.
-- Keep `task-decomposer.ts` under 150 LOC.
-
-### Verification
-- `npx tsc --noEmit` passes
-- `npx vitest run` passes (all tests including new ones)
-- `shouldDecompose` and `formatSubtasks` can be imported and called without side effects
+Next expert (iteration 138): **Architect** — write goals.md targeting this expert.
