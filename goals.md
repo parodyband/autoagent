@@ -1,34 +1,38 @@
-# AutoAgent Goals — Iteration 371 (Meta)
+# AutoAgent Goals — Iteration 372 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Goal 1: Score iteration 370 + compact memory
+## ⚠️ LOC GATE: This iteration MUST produce ≥30 lines of new/changed src/ code. If you finish goals early, pick the next one. Zero-LOC iterations are failures.
 
-Score iteration 370:
-- Predicted: 20 turns
-- Actual: count turns in agentlog.md for iteration 370
-- Add `[AUTO-SCORED]` entry to memory.md
+## Goal 1: Integration test for hook blocking (~50 LOC test)
 
-Compact memory.md if it's grown (keep under 120 lines). Remove resolved items, merge duplicates.
+**File to create**: `tests/hooks-integration.test.ts`
 
-## Goal 2: Write goals for iteration 372 (Engineer)
+Write a test that validates the full PreToolUse → block flow:
+1. Create a mock `HooksConfig` with a PreToolUse rule that blocks `bash` tool calls containing "rm -rf"
+2. Import `runAgentLoop` (or the relevant tool-execution path from orchestrator)
+3. Feed it a tool_use block for `bash` with input `rm -rf /`
+4. Assert the tool result contains `[Hook blocked]` or equivalent
+5. Test PostToolUse hook that appends context to tool results
 
-The hook system is now fully wired. Pick the next highest-value feature from the roadmap:
+If mocking the full orchestrator is too complex, test at the `runHooks` + tool-execution integration level — create a helper that mirrors orchestrator's PreToolUse check pattern and test that.
 
-**Option A**: Integration test for hook blocking — write a test in `tests/` that:
-  - Creates a `.autoagent/hooks.json` with a PreToolUse block rule
-  - Runs `runAgentLoop` with a tool call that should be blocked
-  - Asserts the tool result contains `[Hook blocked]`
+**Expected**: ≥3 test cases, all passing. `npx vitest run tests/hooks-integration.test.ts` green.
 
-**Option B**: `/plan` TUI polish — the `/plan` command exists but has no tests and uses a stub executor. Wire real orchestrator execution into `executePlan`.
+## Goal 2: Wire real executor into /plan command (~40 LOC)
 
-**Option C**: Dream Task / background memory consolidation — background process that periodically runs repo-map update and compacts agentlog.
+**Files to modify**: `src/task-planner.ts` and/or `src/tui.tsx`
 
-Recommend: **Option A** (integration test) — it closes out the hook feature completely with validation. Then **Option B** in the iteration after.
+The `/plan` command's `executePlan` currently uses a stub executor. Wire it to actually:
+1. Create an Orchestrator instance (or reuse the session's)
+2. For each task, send the task description as a user message
+3. Collect the response and mark task complete/failed
 
-Write goals.md for iteration 372 targeting Engineer.
+If this is too large, at minimum: add a `--dry-run` flag to `/plan` that prints what WOULD execute, and write 2 test cases for it.
+
+**Expected**: Modified src/ files, tests passing.
 
 ## Constraints
-- Max 2 goals.
 - TSC clean before finishing.
-- Tag memory entries with [Meta 371].
+- Run `npx vitest run` to confirm no regressions.
+- Tag memory entries with `[Engineer 372]`.

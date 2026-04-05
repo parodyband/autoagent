@@ -1,58 +1,3 @@
-{"timestamp":"2026-04-05T20:25:47.007Z","iteration":362,"level":"info","message":"  -> exit=0 (272 chars)","turn":18}
-{"timestamp":"2026-04-05T20:25:47.007Z","iteration":362,"level":"info","message":"Turn 19/25","turn":19}
-{"timestamp":"2026-04-05T20:25:48.740Z","iteration":362,"level":"info","message":"Agent: 15 tests passing. Running TSC then wrapping up.","turn":19}
-{"timestamp":"2026-04-05T20:25:48.740Z","iteration":362,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20","turn":19}
-{"timestamp":"2026-04-05T20:25:49.837Z","iteration":362,"level":"info","message":"  -> exit=0 (11 chars)","turn":19}
-{"timestamp":"2026-04-05T20:25:49.837Z","iteration":362,"level":"info","message":"Turn 20/25","turn":20}
-{"timestamp":"2026-04-05T20:25:54.196Z","iteration":362,"level":"info","message":"Agent: TSC clean.","turn":20}
-{"timestamp":"2026-04-05T20:25:54.197Z","iteration":362,"level":"info","message":"save_memory: \"[Engineer 362] Hook system\"","turn":20}
-{"timestamp":"2026-04-05T20:25:54.199Z","iteration":362,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":20}
-{"timestamp":"2026-04-05T20:25:54.199Z","iteration":362,"level":"info","message":"Turn 21/25","turn":21}
-{"timestamp":"2026-04-05T20:26:08.586Z","iteration":362,"level":"info","message":"write_file: goals.md (write)","turn":21}
-{"timestamp":"2026-04-05T20:26:08.588Z","iteration":362,"level":"info","message":"  -> ok: Updated goals.md (2308 chars, -28 lines delta)","turn":21}
-{"timestamp":"2026-04-05T20:26:08.589Z","iteration":362,"level":"info","message":"Turn 22/25","turn":22}
-{"timestamp":"2026-04-05T20:26:10.101Z","iteration":362,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":22}
-{"timestamp":"2026-04-05T20:26:10.102Z","iteration":362,"level":"info","message":"RESTART signal","turn":22}
-{"timestamp":"2026-04-05T20:26:10.102Z","iteration":362,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":22}
-{"timestamp":"2026-04-05T20:26:11.236Z","iteration":362,"level":"info","message":"Compilation OK","turn":22}
-{"timestamp":"2026-04-05T20:26:19.514Z","iteration":362,"level":"info","message":"Cache persisted: 56 entries to .autoagent-cache.json","turn":22}
-{"timestamp":"2026-04-05T20:26:19.514Z","iteration":362,"level":"info","message":"Tool timing: bash: 14x, avg=186ms, total=2597ms; write_file: 6x, avg=3ms, total=16ms; read_scratchpad: 1x, avg=4ms, total=4ms; save_memory: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms","turn":22}
-{"timestamp":"2026-04-05T20:26:19.514Z","iteration":362,"level":"info","message":"Tool timing stats","turn":22,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":4,"minMs":4,"maxMs":4,"avgMs":4},"bash":{"calls":14,"totalMs":2597,"minMs":1,"maxMs":1293,"avgMs":186},"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"write_file":{"calls":6,"totalMs":16,"minMs":1,"maxMs":4,"avgMs":3},"save_memory":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2}},"totalCalls":24,"totalMs":2620}}}
-{"timestamp":"2026-04-05T20:26:27.043Z","iteration":362,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 362: predicted 20 turns, actual 22 turns, ratio 1.10**","turn":22}
-{"timestamp":"2026-04-05T20:26:30.011Z","iteration":362,"level":"info","message":"Pre-commit review (2568in/96out): **LGTM** — the implementation is clean, imports use `.js` extensions, error handling is thorough, and the aggregation logic is correct. One minor note: `runHooks` executes hooks in parallel via `Promi","turn":22}
-{"timestamp":"2026-04-05T20:26:30.055Z","iteration":362,"level":"info","message":"Committed: b6a03017 (36 in / 7114 out, cache: 19221 created, 315653 read)","turn":22}
-{"timestamp":"2026-04-05T20:26:30.056Z","iteration":362,"level":"info","message":"Restarting as iteration 363...","turn":22}
-{"timestamp":"2026-04-05T20:26:30.267Z","iteration":363,"level":"info","message":"Cache restored: 56/56 entries (0 stale)"}
-{"timestamp":"2026-04-05T20:26:30.269Z","iteration":363,"level":"info","message":"Turn budget: 20/25 (calibration=1.13x, predicted=18)"}
-{"timestamp":"2026-04-05T20:26:30.269Z","iteration":363,"level":"info","message":"Starting. Expert=Meta Model=claude-opus-4-6"}
-{"timestamp":"2026-04-05T20:26:30.453Z","iteration":363,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-05T20:26:32.964Z","iteration":363,"level":"info","message":"Agent: \n\nI'll start by understanding the current state of the system and what's happened recently.","turn":1}
-{"timestamp":"2026-04-05T20:26:32.965Z","iteration":363,"level":"info","message":"read_scratchpad: 1755 chars","turn":1}
-{"timestamp":"2026-04-05T20:26:32.966Z","iteration":363,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-05T20:26:41.612Z","iteration":363,"level":"info","message":"think: Let me assess the current situation:\n\n1. I'm the Meta expert for iteration 363 (though goals.md says 364 should be Meta....","turn":2}
-{"timestamp":"2026-04-05T20:26:41.613Z","iteration":363,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-05T20:26:45.208Z","iteration":363,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat .autoagent-state.json","turn":3}
-{"timestamp":"2026-04-05T20:26:45.212Z","iteration":363,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat .expert-rotation.json","turn":3}
-{"timestamp":"2026-04-05T20:26:45.214Z","iteration":363,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | tail -40","turn":3}
-{"timestamp":"2026-04-05T20:26:45.220Z","iteration":363,"level":"info","message":"  -> exit=0 (113 chars)","turn":3}
-{"timestamp":"2026-04-05T20:26:45.221Z","iteration":363,"level":"info","message":"  -> exit=0 (1310 chars)","turn":3}
-{"timestamp":"2026-04-05T20:26:45.231Z","iteration":363,"level":"info","message":"  -> exit=0 (775 chars)","turn":3}
-{"timestamp":"2026-04-05T20:26:45.231Z","iteration":363,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-05T20:26:55.170Z","iteration":363,"level":"info","message":"Agent: \n\nYou're right. Let me focus. My deliverables as Meta are:\n\n1. **Score iteration 362** — add to memory\n2. **Assess system health** — are we shipping product?\n3. **Compact memory** if needed\n4. **Write goals.md** for iteration 364 (Engineer — wire hooks into agent loop)\n\nLet me start producing now.","turn":4}
-{"timestamp":"2026-04-05T20:26:55.171Z","iteration":363,"level":"info","message":"think: Iteration 362 was Engineer, predicted 20 turns, actual 22 turns, ratio 1.10. Already scored in memory.\n\nSystem health: L...","turn":4}
-{"timestamp":"2026-04-05T20:26:55.172Z","iteration":363,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-05T20:26:57.980Z","iteration":363,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && wc -l memory.md","turn":5}
-{"timestamp":"2026-04-05T20:26:57.983Z","iteration":363,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && wc -l src/hooks.ts && npx tsc --noEmit 2>&1 | head -5","turn":5}
-{"timestamp":"2026-04-05T20:26:57.991Z","iteration":363,"level":"info","message":"  -> exit=0 (19 chars)","turn":5}
-{"timestamp":"2026-04-05T20:26:59.095Z","iteration":363,"level":"info","message":"  -> exit=0 (22 chars)","turn":5}
-{"timestamp":"2026-04-05T20:26:59.096Z","iteration":363,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-05T20:27:01.543Z","iteration":363,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5","turn":6}
-{"timestamp":"2026-04-05T20:27:02.697Z","iteration":363,"level":"info","message":"  -> exit=0 (11 chars)","turn":6}
-{"timestamp":"2026-04-05T20:27:02.697Z","iteration":363,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-05T20:27:05.477Z","iteration":363,"level":"info","message":"Agent: \n\nStatus: All deliverables NOT STARTED yet (was assessing). Starting now — writing all files.","turn":7}
-{"timestamp":"2026-04-05T20:27:05.479Z","iteration":363,"level":"info","message":"read_file: memory.md","turn":7}
-{"timestamp":"2026-04-05T20:27:05.480Z","iteration":363,"level":"info","message":"  -> ok (4725 chars)","turn":7}
-{"timestamp":"2026-04-05T20:27:05.481Z","iteration":363,"level":"info","message":"Turn 8/25","turn":8}
 {"timestamp":"2026-04-05T20:27:23.070Z","iteration":363,"level":"info","message":"Agent: Now I'll write the compacted memory and goals in parallel:","turn":8}
 {"timestamp":"2026-04-05T20:27:23.071Z","iteration":363,"level":"info","message":"write_file: memory.md (write)","turn":8}
 {"timestamp":"2026-04-05T20:27:23.072Z","iteration":363,"level":"info","message":"  -> ok: Updated memory.md (4055 chars, -18 lines delta)","turn":8}
@@ -551,3 +496,52 @@
 {"timestamp":"2026-04-05T20:41:37.044Z","iteration":370,"level":"info","message":"Tool timing stats","turn":12,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":5,"minMs":5,"maxMs":5,"avgMs":5},"bash":{"calls":9,"totalMs":15608,"minMs":1,"maxMs":14393,"avgMs":1734},"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"write_file":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2},"save_memory":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":15,"totalMs":15618}}}
 {"timestamp":"2026-04-05T20:41:44.094Z","iteration":370,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 370: predicted 20 turns, actual 12 turns, ratio 0.60**","turn":12}
 {"timestamp":"2026-04-05T20:41:44.119Z","iteration":370,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":12}
+{"timestamp":"2026-04-05T20:41:44.158Z","iteration":370,"level":"info","message":"Committed: 54d003fa (18 in / 1937 out, cache: 9385 created, 105073 read)","turn":12}
+{"timestamp":"2026-04-05T20:41:44.158Z","iteration":370,"level":"info","message":"Restarting as iteration 371...","turn":12}
+{"timestamp":"2026-04-05T20:41:44.359Z","iteration":371,"level":"info","message":"Cache restored: 55/55 entries (0 stale)"}
+{"timestamp":"2026-04-05T20:41:44.361Z","iteration":371,"level":"info","message":"Turn budget: 12/25 (calibration=1.11x, predicted=8)"}
+{"timestamp":"2026-04-05T20:41:44.362Z","iteration":371,"level":"info","message":"Starting. Expert=Meta Model=claude-opus-4-6"}
+{"timestamp":"2026-04-05T20:41:44.546Z","iteration":371,"level":"info","message":"Hard turn cap: 12 (1.5x prediction of 8)"}
+{"timestamp":"2026-04-05T20:41:44.547Z","iteration":371,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-05T20:41:48.726Z","iteration":371,"level":"info","message":"Agent: \n\nI'll start by understanding the current state - scoring iteration 370, checking metrics, and assessing what's actually shipping.","turn":1}
+{"timestamp":"2026-04-05T20:41:48.727Z","iteration":371,"level":"info","message":"$ wc -l memory.md","turn":1}
+{"timestamp":"2026-04-05T20:41:48.729Z","iteration":371,"level":"info","message":"$ cat .autoagent-metrics.json | head -80","turn":1}
+{"timestamp":"2026-04-05T20:41:48.732Z","iteration":371,"level":"info","message":"$ cat agentlog.md | head -60","turn":1}
+{"timestamp":"2026-04-05T20:41:48.739Z","iteration":371,"level":"info","message":"  -> exit=0 (19 chars)","turn":1}
+{"timestamp":"2026-04-05T20:41:48.742Z","iteration":371,"level":"info","message":"  -> exit=0 (1679 chars)","turn":1}
+{"timestamp":"2026-04-05T20:41:48.745Z","iteration":371,"level":"info","message":"  -> exit=0 (4852 chars)","turn":1}
+{"timestamp":"2026-04-05T20:41:48.746Z","iteration":371,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-05T20:42:07.456Z","iteration":371,"level":"info","message":"Agent: \n\nYou're right. My deliverables are:\n1. Score iteration 370 → add `[AUTO-SCORED]` entry to memory.md\n2. Compact memory.md if needed\n3. Write goals.md for iteration 372 (Engineer)\n\nIteration 370: predicted 20 turns, actual 12 turns (already in memory.md). The only src/ change was the TUI streaming markdown fix — a 1-line change. Let me check the critical question: are we shipping?","turn":2}
+{"timestamp":"2026-04-05T20:42:07.457Z","iteration":371,"level":"info","message":"think: Looking at the metrics summary: \"3/4 recent iterations had zero LOC change — possible churn without code output.\"\n\nThis ...","turn":2}
+{"timestamp":"2026-04-05T20:42:07.458Z","iteration":371,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-05T20:42:10.622Z","iteration":371,"level":"info","message":"$ grep -n \"runHooks\\|PreToolUse\\|PostToolUse\" src/orchestrator.ts | head -20","turn":3}
+{"timestamp":"2026-04-05T20:42:10.631Z","iteration":371,"level":"info","message":"$ grep -c \"runHooks\" src/orchestrator.ts","turn":3}
+{"timestamp":"2026-04-05T20:42:10.654Z","iteration":371,"level":"info","message":"  -> exit=0 (2 chars)","turn":3}
+{"timestamp":"2026-04-05T20:42:10.655Z","iteration":371,"level":"info","message":"  -> exit=0 (591 chars)","turn":3}
+{"timestamp":"2026-04-05T20:42:10.655Z","iteration":371,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-05T20:42:15.051Z","iteration":371,"level":"info","message":"Agent: \n\nGoal status:\n- **Goal 1 (Score iter 370 + compact memory)**: IN PROGRESS — scoring already in memory.md, need to compact and update roadmap\n- **Goal 2 (Write goals.md for iter 372)**: NOT STARTED\n\nHooks ARE wired (5 calls in orchestrator.ts). Roadmap in memory is stale. Let me finish both goals now.","turn":4}
+{"timestamp":"2026-04-05T20:42:15.054Z","iteration":371,"level":"info","message":"read_file: memory.md","turn":4}
+{"timestamp":"2026-04-05T20:42:15.056Z","iteration":371,"level":"info","message":"  -> ok (4706 chars)","turn":4}
+{"timestamp":"2026-04-05T20:42:15.058Z","iteration":371,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-05T20:42:44.906Z","iteration":371,"level":"info","message":"Agent: Now I'll write both files at once — compacted memory.md and goals.md for iteration 372:","turn":5}
+{"timestamp":"2026-04-05T20:42:44.906Z","iteration":371,"level":"info","message":"write_file: memory.md (write)","turn":5}
+{"timestamp":"2026-04-05T20:42:44.907Z","iteration":371,"level":"info","message":"  -> ok: Updated memory.md (4283 chars, -12 lines delta)","turn":5}
+{"timestamp":"2026-04-05T20:42:44.908Z","iteration":371,"level":"info","message":"write_file: goals.md (write)","turn":5}
+{"timestamp":"2026-04-05T20:42:44.908Z","iteration":371,"level":"info","message":"  -> ok: Updated goals.md (1789 chars, +4 lines delta)","turn":5}
+{"timestamp":"2026-04-05T20:42:44.909Z","iteration":371,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-05T20:42:48.548Z","iteration":371,"level":"info","message":"Agent: \n\nThis is a Meta iteration — no src/ changes expected. Both goals are done (memory compacted, goals.md written for Engineer 372). Let me verify TSC and wrap up.","turn":6}
+{"timestamp":"2026-04-05T20:42:48.549Z","iteration":371,"level":"info","message":"$ npx tsc --noEmit 2>&1 | head -5","turn":6}
+{"timestamp":"2026-04-05T20:42:49.613Z","iteration":371,"level":"info","message":"  -> exit=0 (11 chars)","turn":6}
+{"timestamp":"2026-04-05T20:42:49.613Z","iteration":371,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-05T20:42:51.968Z","iteration":371,"level":"info","message":"Agent: \n\nTSC clean. Both goals complete. Wrapping up.","turn":7}
+{"timestamp":"2026-04-05T20:42:51.969Z","iteration":371,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":7}
+{"timestamp":"2026-04-05T20:42:51.969Z","iteration":371,"level":"info","message":"RESTART signal","turn":7}
+{"timestamp":"2026-04-05T20:42:51.970Z","iteration":371,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":7}
+{"timestamp":"2026-04-05T20:42:53.025Z","iteration":371,"level":"info","message":"Compilation OK","turn":7}
+{"timestamp":"2026-04-05T20:43:01.023Z","iteration":371,"level":"info","message":"Cache persisted: 55 entries to .autoagent-cache.json","turn":7}
+{"timestamp":"2026-04-05T20:43:01.023Z","iteration":371,"level":"info","message":"Cache stats: 0 hits, 1 misses, 55 entries, 2 invalidations (1 entries removed)","turn":7}
+{"timestamp":"2026-04-05T20:43:01.023Z","iteration":371,"level":"info","message":"Tool cache stats","turn":7,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":55,"invalidations":2,"invalidatedEntries":1,"toolStats":{"read_file":{"hits":0,"misses":1}}}}
+{"timestamp":"2026-04-05T20:43:01.023Z","iteration":371,"level":"info","message":"Tool timing: bash: 7x, avg=166ms, total=1162ms; read_file: 1x, avg=4ms, total=4ms; write_file: 2x, avg=2ms, total=3ms; think: 1x, avg=1ms, total=1ms","turn":7}
+{"timestamp":"2026-04-05T20:43:01.023Z","iteration":371,"level":"info","message":"Tool timing stats","turn":7,"metadata":{"timing":{"tools":{"bash":{"calls":7,"totalMs":1162,"minMs":1,"maxMs":1064,"avgMs":166},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"read_file":{"calls":1,"totalMs":4,"minMs":4,"maxMs":4,"avgMs":4},"write_file":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2}},"totalCalls":11,"totalMs":1170}}}
+{"timestamp":"2026-04-05T20:43:08.215Z","iteration":371,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 371: predicted 8 turns, actual 7 turns, ratio 0.88**","turn":7}
+{"timestamp":"2026-04-05T20:43:08.238Z","iteration":371,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":7}
