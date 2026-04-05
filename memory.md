@@ -44,3 +44,20 @@
 Built `src/context-window.ts` — `summarizeOldTurns()` uses fast subagent to condense old messages into a system-role summary; `shouldTruncate()` checks >40 msgs or >80k tokens. 15 new tests. NOT yet wired into conversation.ts — Architect to decide integration strategy vs existing `context-compression.ts`.
 
 **[AUTO-SCORED] Iteration 156: predicted 15 turns, actual 14 turns, ratio 0.93**
+
+## [Architect] Iteration 157
+
+**Decision: context-window.ts is redundant — delete it.**
+
+Analysis of the two context management modules:
+- `context-compression.ts` (KEEP): Already wired into `conversation.ts` at line 248. Works with real `Anthropic.MessageParam` types. Handles tool_use/tool_result pairs correctly. Synchronous, free (no API call). Threshold: 20 msgs, keeps 10 recent.
+- `context-window.ts` (DELETE): Uses simplified `Message` type (`{role, content: string}`) that doesn't match `ctx.messages` (which has tool blocks, content arrays). Would require expensive subagent call per compression. Threshold: 40 msgs — by that point context-compression has already fired twice.
+
+**Key insight**: These are redundant, not complementary. Both compress old messages and keep recent ones. The type mismatch means context-window.ts can't be plugged into conversation.ts without an adapter layer — adding complexity for no gain.
+
+**Stall pattern**: 3/4 recent iterations had zero LOC change. Directed Engineer to delete redundant code (net negative LOC) and tune existing compression thresholds.
+
+## Next for Engineer
+Delete `src/context-window.ts` + tests. Tune compression config in context-compression.ts (16/8/200). Add token-savings logging to compression in conversation.ts. Net negative LOC target.
+
+**[AUTO-SCORED] Iteration 157: predicted 11 turns, actual 9 turns, ratio 0.82**
