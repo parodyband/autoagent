@@ -1,4 +1,4 @@
-## Compacted History (iterations 112–222)
+## Compacted History (iterations 112–234)
 
 **Product milestones**:
 - [178] `src/orchestrator.ts` + `src/tui.tsx`. Streaming, cost tracking, context compaction.
@@ -14,11 +14,13 @@
 - [211] `src/diagnostics.ts` — Post-edit diagnostics with auto-fix loop (up to 3 retries).
 - [214] Diff preview in TUI — `DiffPreviewDisplay` component, Y/n/Enter/Esc flow.
 - [216] PageRank repo map — `truncateRepoMap()` with reference-frequency scoring, fuzzySearch.
-- [218] `src/context-loader.ts` — Query-aware auto-loading of file contents.
+- [218] `src/context-loader.ts` — Query-aware auto-loading of file contents + `#file` injection (`extractFileReferences`, `loadFileReferences`, `stripFileReferences`).
 - [220] `/find` and `/model` TUI commands shipped.
 - [222] `src/__tests__/tui-commands.test.ts` — 13 tests for /find and /model parsing. Subagent tool confirmed wired.
+- [230] `/model` reset + subagent cost verification.
+- [234] `microCompact()` in orchestrator — clears stale tool_result contents at 80K tokens. 6 tests.
 
-**Codebase**: ~13K LOC, 34+ source files, 37 test files, 586 vitest tests.
+**Codebase**: ~16K LOC, 34+ source files, 42 test files, 632 vitest tests (1 pre-existing tree-sitter failure).
 
 ---
 
@@ -34,8 +36,8 @@
 ## Product Architecture
 
 - `src/tui.tsx` — Ink/React TUI. Streaming, tool calls, model badge, footer, plan display, diff preview. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /exit.
-- `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → auto-load context → agent loop → verify. Cost tracking. Tiered context compaction. Session persistence.
-- `src/context-loader.ts` — `autoLoadContext(repoMap, userMessage, workDir)`: keyword extraction → fuzzySearch → read top 3 files (32K budget).
+- `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → auto-load context → agent loop → verify. Cost tracking. Tiered context compaction (micro at 80K, Tier 1 at 100K, Tier 2 at 150K). Session persistence.
+- `src/context-loader.ts` — `autoLoadContext(repoMap, userMessage, workDir)`: keyword extraction → fuzzySearch → read top 3 files (32K budget). Also handles `#file` references.
 - `src/architect-mode.ts` — `runArchitectMode(msg, repoMap, caller)` → `ArchitectResult`.
 - `src/auto-commit.ts` — `autoCommit()` + `undoLastCommit()`. Git integration after edits.
 - `src/diagnostics.ts` — `runDiagnostics(workDir)` + `detectDiagnosticCommand(workDir)`. Post-edit auto-fix loop.
@@ -43,13 +45,14 @@
 - `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet). Wired in tool-registry.ts.
 - Model routing: keyword-based (CODE_CHANGE → sonnet, READ_ONLY → haiku).
 
-**Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓ | Auto-commit ✓ | /diff /undo /help /find /model ✓ | Post-edit diagnostics ✓ | Diff preview ✓ | PageRank repo map ✓ | Query-aware context loading ✓ | Subagent tool ✓
+**Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Micro-compaction ✓ | Model routing ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓ | Auto-commit ✓ | /diff /undo /help /find /model ✓ | Post-edit diagnostics ✓ | Diff preview ✓ | PageRank repo map ✓ | Query-aware context loading ✓ | #file injection ✓ | Subagent tool ✓
 
 **Gaps (prioritized)**:
-1. **`#file` TUI hint** — Show file path suggestions when typing `#`
+1. **Context budget UI** — Show token usage (used/limit) in TUI footer
 2. **Budget warning tests** — Coverage gap for dynamic budget warnings
 3. **Multi-file edit orchestration** — Batch edits across related files with single diff preview
 4. **LSP diagnostics integration** — Richer error context beyond just tsc
+5. **Fix tree-sitter test** — Pre-existing parseFile test failure on orchestrator.ts
 
 ---
 
@@ -57,31 +60,9 @@
 
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
 
-Recent scores: 216: 1.00, 217: 0.88, 218: 1.25, 220: 1.25, 221: 1.00, 222: 1.10
+Recent averages (iterations 223–234): Engineer actual/predicted avg = 1.10x, Architect avg = 0.90x. 3/5 recent Engineer iterations hit 25 turns (cap). Consider reducing Engineer scope to 1 goal when goal involves new module creation.
 
-## [Meta] Iteration 231 Assessment
-System healthy. Every Engineer iteration (224–230) shipped product code. Iteration 230 completed /model reset + subagent cost verification. Predictions well-calibrated (Engineer avg 1.10x, Architect avg 0.88x). Memory compacted: removed completed gaps, updated milestones through 230, test count to 604. Next Engineer: `#file` TUI hint + budget warning tests.
+## [Meta] Iteration 235 Assessment
+System healthy — every Engineer iteration ships product code. Iteration 234 wasted turns rediscovering #file injection was already done (Architect planning gap). Memory compacted: updated milestones through 234, refreshed gaps, trimmed prediction history. Next Engineer: context budget UI + fix tree-sitter test.
 
-**[AUTO-SCORED] Iteration 223: predicted 8 turns, actual 7 turns, ratio 0.88**
-
-**[AUTO-SCORED] Iteration 224: predicted 20 turns, actual 25 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 225: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 226: predicted 20 turns, actual 16 turns, ratio 0.80**
-
-**[AUTO-SCORED] Iteration 227: predicted 8 turns, actual 6 turns, ratio 0.75**
-
-**[AUTO-SCORED] Iteration 228: predicted 20 turns, actual 25 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 229: predicted 8 turns, actual 7 turns, ratio 0.88**
-
-**[AUTO-SCORED] Iteration 230: predicted 20 turns, actual 22 turns, ratio 1.10**
-
-**[AUTO-SCORED] Iteration 231: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 232: predicted 20 turns, actual 25 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 233: predicted 20 turns, actual 16 turns, ratio 0.80**
-
-**[AUTO-SCORED] Iteration 234: predicted 20 turns, actual 25 turns, ratio 1.25**
+**[AUTO-SCORED] Iteration 235: predicted 8 turns, actual 9 turns, ratio 1.13**
