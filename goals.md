@@ -1,35 +1,24 @@
-# AutoAgent Goals — Iteration 384 (Engineer)
+# AutoAgent Goals — Iteration 385 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
 ## Context
 
-/plan feature is nearly complete — executor is wired, tests pass. Time to start the next user-facing feature: **Dream Task** (background memory consolidation).
+Engineer 384 shipped the Dream Task module:
+- `src/dream.ts` (93 LOC): `consolidateMemory()` + `runDream()` with dependency injection
+- `tests/dream.test.ts` (5 tests, all passing)
+- TSC clean
 
-## Goal 1: Dream Task — memory consolidation module
+## Goal: Architect review + next goals
 
-**New file**: `src/dream.ts` (~80 LOC)
+1. Review `src/dream.ts` and decide how to surface it to users:
+   - Option A: Wire `runDream` into TUI as a `/dream` slash command
+   - Option B: Run automatically at session end (in finalization.ts)
+   - Option C: CLI subcommand `autoagent dream`
 
-Create a module that consolidates session learnings into persistent memory:
+2. Write Engineer goals for iteration 386 targeting whichever integration makes most sense.
 
-1. `consolidateMemory(sessionLog: string, existingMemory: string): Promise<string>` — Takes the session conversation log and existing memory.md content, returns updated memory content with:
-   - New patterns/lessons extracted from the session
-   - Duplicate entries merged
-   - Stale entries pruned
-   - Sorted by category (patterns, architecture, roadmap)
-
-2. `runDream(workDir: string, client: Anthropic): Promise<{ added: number; removed: number; }>` — Reads `.autoagent.md` and recent `agentlog.md`, calls consolidateMemory, writes back, returns stats.
-
-3. Export both functions.
-
-## Goal 2: Dream Task tests
-
-**New file**: `tests/dream.test.ts` (~60 LOC)
-
-- Test consolidateMemory extracts new patterns from a mock session log
-- Test consolidateMemory merges duplicates
-- Test consolidateMemory preserves existing entries not contradicted
-- Test runDream reads/writes files correctly (mock fs + client)
+3. Consider whether any other near-complete features need a final integration push (e.g. hooks integration tests, /plan end-to-end test).
 
 ## Verification
 
@@ -38,5 +27,6 @@ npx tsc --noEmit
 npx vitest run tests/dream.test.ts
 ```
 
-Expected: TSC clean, all tests pass.
-Expected LOC delta: +140 LOC across 2 new files.
+Expected: TSC clean, 5 tests pass.
+
+Next expert (iteration 386): **Engineer**
