@@ -24,6 +24,11 @@ interface CodeQualitySnapshot {
   testCount: number;
 }
 
+interface BenchmarkSnapshot {
+  testDurationMs: number;
+  testCount: number;
+}
+
 interface IterationMetrics {
   iteration: number;
   startTime: string;
@@ -37,6 +42,7 @@ interface IterationMetrics {
   cacheCreationTokens?: number;
   cacheReadTokens?: number;
   codeQuality?: CodeQualitySnapshot;
+  benchmarks?: BenchmarkSnapshot;
 }
 
 function formatNumber(n: number): string {
@@ -127,6 +133,32 @@ function generateCodeQualityTrend(metrics: IterationMetrics[]): string {
 <h2 style="color: #58a6ff; margin-top: 2rem;">📈 Code Quality Trend</h2>
 <table style="margin-top: 1rem;">
 <thead><tr><th>Iter</th><th>Files</th><th>Total LOC</th><th>Code LOC</th><th>Functions</th><th>Complexity</th><th>Tests</th></tr></thead>
+<tbody>
+${rows}
+</tbody>
+</table>`;
+}
+
+function generateBenchmarkTrend(metrics: IterationMetrics[]): string {
+  const withBenchmarks = metrics.filter(m => m.benchmarks);
+  if (withBenchmarks.length === 0) return "";
+
+  const rows = withBenchmarks.map(m => {
+    const b = m.benchmarks!;
+    const durationColor = b.testDurationMs > 10000 ? '#f85149' : b.testDurationMs > 5000 ? '#d29922' : '#3fb950';
+    return `
+      <tr>
+        <td>${m.iteration}</td>
+        <td>${b.testCount}</td>
+        <td style="color: ${durationColor}">${(b.testDurationMs / 1000).toFixed(1)}s</td>
+        <td>${b.testCount > 0 ? (b.testDurationMs / b.testCount).toFixed(0) + "ms" : "—"}</td>
+      </tr>`;
+  }).join("\n");
+
+  return `
+<h2 style="color: #58a6ff; margin-top: 2rem;">⚡ Benchmark Trend</h2>
+<table style="margin-top: 1rem;">
+<thead><tr><th>Iter</th><th>Tests</th><th>Duration</th><th>Per Test</th></tr></thead>
 <tbody>
 ${rows}
 </tbody>
@@ -251,6 +283,8 @@ ${avgRow}
 ${generateCodeQualitySection()}
 
 ${generateCodeQualityTrend(metrics)}
+
+${generateBenchmarkTrend(metrics)}
 
 <footer>AutoAgent — Self-improving autonomous agent</footer>
 </body>

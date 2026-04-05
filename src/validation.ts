@@ -21,6 +21,11 @@ export interface CodeQualitySnapshot {
   testCount: number;
 }
 
+export interface BenchmarkSnapshot {
+  testDurationMs: number;
+  testCount: number;
+}
+
 export interface ValidationResult {
   ok: boolean;
   output: string;
@@ -93,6 +98,36 @@ export async function captureCodeQuality(
       complexity: totals.complexity,
       testCount,
     };
+  } catch {
+    return undefined;
+  }
+}
+
+// ─── Benchmarks ─────────────────────────────────────────────
+
+/**
+ * Run self-test suite with timing. Returns duration and test count.
+ * Returns undefined on any error (non-critical).
+ */
+export async function captureBenchmarks(
+  rootDir: string,
+): Promise<BenchmarkSnapshot | undefined> {
+  try {
+    const start = Date.now();
+    const result = await executeBash(
+      `npx tsx scripts/self-test.ts 2>&1`,
+      120,
+      rootDir,
+    );
+    const durationMs = Date.now() - start;
+
+    if (result.exitCode !== 0) return undefined;
+
+    // Parse test count from output: "Results: X passed, Y failed"
+    const match = result.output.match(/Results:\s+(\d+)\s+passed/);
+    const testCount = match ? parseInt(match[1], 10) : 0;
+
+    return { testDurationMs: durationMs, testCount };
   } catch {
     return undefined;
   }

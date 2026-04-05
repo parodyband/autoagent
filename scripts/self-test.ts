@@ -18,6 +18,7 @@ import { validateBeforeCommit, captureCodeQuality, type ValidationOptions } from
 import { compactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
+import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage } from "../src/messages.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync } from "fs";
 import path from "path";
 
@@ -648,12 +649,49 @@ async function main(): Promise<void> {
     await testToolRegistry();
     await testValidation();
     await testParallelExecution();
+    testMessages();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {
       rmSync(TEMP_DIR, { recursive: true });
     }
   }
+
+function testMessages(): void {
+  console.log("\n🔤 Messages tests:");
+  const state = { iteration: 5, lastSuccessfulIteration: 4, lastFailedCommit: null, lastFailureReason: null };
+
+  // buildSystemPrompt - with real file
+  const sp = buildSystemPrompt(state, ROOT);
+  assert(sp.includes("iteration 5") || sp.includes("Iteration: 5") || sp.length > 100, "buildSystemPrompt returns content");
+
+  // buildInitialMessage
+  const msg = buildInitialMessage("goal1", "mem1");
+  assert(msg.includes("goal1"), "buildInitialMessage includes goals");
+  assert(msg.includes("mem1"), "buildInitialMessage includes memory");
+  assert(msg.includes("AUTOAGENT_RESTART"), "buildInitialMessage includes restart instruction");
+
+  // budgetWarning - milestone turns
+  const bw15 = budgetWarning(15, 50, { inputTokens: 100000, outputTokens: 5000, cacheReadTokens: 50000, elapsedMs: 60000 });
+  assert(bw15 !== null, "budgetWarning returns message at turn 15");
+  assert(bw15!.includes("100.0K in"), "budgetWarning includes input tokens");
+  assert(bw15!.includes("60s"), "budgetWarning includes elapsed time");
+
+  // budgetWarning - non-milestone turns
+  assert(budgetWarning(10, 50, { inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, elapsedMs: 0 }) === null, "budgetWarning null at turn 10");
+  assert(budgetWarning(25, 50, { inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, elapsedMs: 0 }) !== null, "budgetWarning fires at turn 25");
+  assert(budgetWarning(35, 50, { inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, elapsedMs: 0 }) !== null, "budgetWarning fires at turn 35");
+
+  // turnLimitNudge
+  assert(turnLimitNudge(10)!.includes("10 turns left"), "turnLimitNudge at 10");
+  assert(turnLimitNudge(3)!.includes("URGENT"), "turnLimitNudge at 3");
+  assert(turnLimitNudge(20) === null, "turnLimitNudge null at 20");
+
+  // validationBlockedMessage
+  const vb = validationBlockedMessage("error: TS2345");
+  assert(vb.includes("BLOCKED"), "validationBlockedMessage includes BLOCKED");
+  assert(vb.includes("TS2345"), "validationBlockedMessage includes error text");
+}
 
   const duration = ((Date.now() - start) / 1000).toFixed(1);
   console.log(`\n${"=".repeat(40)}`);

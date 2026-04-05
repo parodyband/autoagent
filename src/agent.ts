@@ -17,7 +17,9 @@ import { createDefaultRegistry } from "./tool-registry.js";
 import {
   validateBeforeCommit,
   captureCodeQuality,
+  captureBenchmarks,
   type CodeQualitySnapshot,
+  type BenchmarkSnapshot,
 } from "./validation.js";
 import {
   loadState,
@@ -27,11 +29,17 @@ import {
   rollbackToPreIteration,
   type IterationState,
 } from "./iteration.js";
+import {
+  buildSystemPrompt,
+  buildInitialMessage,
+  budgetWarning,
+  turnLimitNudge,
+  validationBlockedMessage,
+} from "./messages.js";
 
 const ROOT = process.cwd();
 const GOALS_FILE = path.join(ROOT, "goals.md");
 const MEMORY_FILE = path.join(ROOT, "memory.md");
-const SYSTEM_PROMPT_FILE = path.join(ROOT, "system-prompt.md");
 const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");
 const AGENT_LOG_FILE = path.join(ROOT, "agentlog.md");
 const MAX_TURNS = 50;
@@ -60,6 +68,7 @@ interface IterationMetrics {
   cacheCreationTokens?: number;
   cacheReadTokens?: number;
   codeQuality?: CodeQualitySnapshot;
+  benchmarks?: BenchmarkSnapshot;
 }
 
 function recordMetrics(m: IterationMetrics): void {
@@ -84,21 +93,6 @@ function readMemory(): string {
   const max = 8000;
   if (content.length > max) return "...(earlier entries truncated)...\n\n" + content.slice(-max);
   return content;
-}
-
-// ─── System prompt ──────────────────────────────────────────
-
-function buildSystemPrompt(state: IterationState): string {
-  if (existsSync(SYSTEM_PROMPT_FILE)) {
-    let t = readFileSync(SYSTEM_PROMPT_FILE, "utf-8");
-    t = t.replace(/\{\{ITERATION\}\}/g, String(state.iteration));
-    t = t.replace(/\{\{ROOT\}\}/g, ROOT);
-    t = t.replace(/\{\{LAST_SUCCESSFUL\}\}/g, String(state.lastSuccessfulIteration));
-    t = t.replace(/\{\{LAST_FAILED_COMMIT\}\}/g, state.lastFailedCommit || "none");
-    t = t.replace(/\{\{LAST_FAILURE_REASON\}\}/g, state.lastFailureReason || "none");
-    return t;
-  }
-  return `You are AutoAgent iteration ${state.iteration}. Read system-prompt.md for full instructions.`;
 }
 
 // ─── Tools ──────────────────────────────────────────────────
@@ -156,7 +150,7 @@ async function runIteration(state: IterationState): Promise<void> {
 
   const messages: Anthropic.MessageParam[] = [{
     role: "user",
-    content: `Goals:\n\n${goals}\n\n---\n\nMemory:\n\n${memory}\n\n---\n\nExecute your goals. Run \`npx tsc --noEmit\` before restart. Final action: \`echo "AUTOAGENT_RESTART"\`.`,
+    content: buildInitialMessage(goals, memory),
   }];
 
   let turns = 0;
@@ -170,7 +164,7 @@ async function runIteration(state: IterationState): Promise<void> {
       model, max_tokens: maxTokens,
       system: [{
         type: "text" as const,
-        text: buildSystemPrompt(state),
+        text: buildSystemPrompt(state, ROOT),
         cache_control: { type: "ephemeral" as const },
       }],
       tools: toolRegistry.getDefinitions(),
@@ -228,12 +222,13 @@ async function runIteration(state: IterationState): Promise<void> {
         log(iter, "VALIDATION BLOCKED RESTART — agent must fix");
         messages.push({
           role: "user",
-          content: `BLOCKED: Code doesn't compile. Fix it.\n\n\`\`\`\n${v.output.slice(0, 2000)}\n\`\`\`\n\nFix, run \`npx tsc --noEmit\`, then \`echo "AUTOAGENT_RESTART"\` again.`,
+          content: validationBlockedMessage(v.output),
         });
         continue;
       }
 
       const codeQuality = await captureCodeQuality(ROOT);
+      const benchmarks = await captureBenchmarks(ROOT);
       recordMetrics({
         iteration: iter, startTime: startTime.toISOString(), endTime: new Date().toISOString(),
         turns, toolCalls: toolCounts, success: true,
@@ -242,6 +237,7 @@ async function runIteration(state: IterationState): Promise<void> {
         cacheCreationTokens: totalCacheCreate || undefined,
         cacheReadTokens: totalCacheRead || undefined,
         codeQuality,
+        benchmarks,
       });
 
       const sha = await commitIteration(iter);
@@ -264,29 +260,20 @@ async function runIteration(state: IterationState): Promise<void> {
     }
 
     // Token budget awareness — inject cumulative usage at milestone turns
-    if (turns === 15 || turns === 25 || turns === 35) {
-      const totalTokens = totalIn + totalOut;
-      const elapsedSec = Math.round((Date.now() - startTime.getTime()) / 1000);
-      messages.push({
-        role: "user",
-        content: `SYSTEM: Token budget check — Turn ${turns}/${MAX_TURNS}. ` +
-          `Cumulative: ${(totalIn / 1000).toFixed(1)}K in + ${(totalOut / 1000).toFixed(1)}K out = ${(totalTokens / 1000).toFixed(1)}K total. ` +
-          `Cache: ${(totalCacheRead / 1000).toFixed(1)}K read hits. ` +
-          `Elapsed: ${elapsedSec}s. Pace yourself — prioritize high-value actions.`,
-      });
-    }
+    const bw = budgetWarning(turns, MAX_TURNS, {
+      inputTokens: totalIn, outputTokens: totalOut,
+      cacheReadTokens: totalCacheRead, elapsedMs: Date.now() - startTime.getTime(),
+    });
+    if (bw) messages.push({ role: "user", content: bw });
 
-    if (turnsLeft === 10) {
-      messages.push({ role: "user", content: "SYSTEM: 10 turns left. Wrap up: memory, goals, tsc, AUTOAGENT_RESTART." });
-    }
-    if (turnsLeft === 3) {
-      messages.push({ role: "user", content: "URGENT: 3 turns left! Send AUTOAGENT_RESTART NOW." });
-    }
+    const nudge = turnLimitNudge(turnsLeft);
+    if (nudge) messages.push({ role: "user", content: nudge });
   }
 
   if (turns >= MAX_TURNS) log(iter, "Hit max turns — forcing commit");
 
   const codeQuality2 = await captureCodeQuality(ROOT);
+  const benchmarks2 = await captureBenchmarks(ROOT);
   recordMetrics({
     iteration: iter, startTime: startTime.toISOString(), endTime: new Date().toISOString(),
     turns, toolCalls: toolCounts, success: true,
@@ -295,6 +282,7 @@ async function runIteration(state: IterationState): Promise<void> {
     cacheCreationTokens: totalCacheCreate || undefined,
     cacheReadTokens: totalCacheRead || undefined,
     codeQuality: codeQuality2,
+    benchmarks: benchmarks2,
   });
 
   const sha = await commitIteration(iter);

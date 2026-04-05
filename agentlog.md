@@ -1292,3 +1292,189 @@ Now let me verify the fix compiles and tests pass:
 [2026-04-05T06:21:44.951Z] iter=8 RESTART signal
 [2026-04-05T06:21:44.951Z] iter=8 Validating: npx tsc --noEmit ...
 [2026-04-05T06:21:45.585Z] iter=8 Compilation OK
+[2026-04-05T06:21:49.537Z] iter=8 Committed: 1e6d3f9a (518918 in / 5560 out, cache: 0 created, 0 read)
+[2026-04-05T06:21:49.537Z] iter=8 Restarting as iteration 9...
+[2026-04-05T06:21:49.702Z] iter=9 Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T06:21:49.711Z] iter=9 Turn 1/50
+[2026-04-05T06:21:52.486Z] iter=9 Agent: 
+
+I'll start by understanding the current project structure and then execute the goals sequentially.
+[2026-04-05T06:21:52.486Z] iter=9 list_files: . (depth=2)
+[2026-04-05T06:21:52.504Z] iter=9   -> ok (3 dirs, 25 files)
+[2026-04-05T06:21:52.505Z] iter=9 $ git log --oneline -5
+[2026-04-05T06:21:52.515Z] iter=9   -> exit=0 (203 chars)
+[2026-04-05T06:21:52.515Z] iter=9 Turn 2/50
+[2026-04-05T06:21:55.494Z] iter=9 read_file: src/agent.ts
+[2026-04-05T06:21:55.496Z] iter=9   -> ok (15846 chars)
+[2026-04-05T06:21:55.497Z] iter=9 read_file: src/iteration.ts
+[2026-04-05T06:21:55.497Z] iter=9   -> ok (2209 chars)
+[2026-04-05T06:21:55.498Z] iter=9 read_file: .autoagent-metrics.json
+[2026-04-05T06:21:55.498Z] iter=9   -> ok (3444 chars)
+[2026-04-05T06:21:55.498Z] iter=9 Turn 3/50
+[2026-04-05T06:22:03.685Z] iter=9 think: Let me plan the two main goals:
+
+**Goal 1: Add benchmarking to metrics**
+- Add a `benchmarks` field to `IterationMetrics...
+[2026-04-05T06:22:03.686Z] iter=9 Turn 4/50
+[2026-04-05T06:22:07.269Z] iter=9 read_file: src/validation.ts
+[2026-04-05T06:22:07.270Z] iter=9   -> ok (2802 chars)
+[2026-04-05T06:22:07.270Z] iter=9 read_file: scripts/dashboard.ts
+[2026-04-05T06:22:07.270Z] iter=9   -> ok (10518 chars)
+[2026-04-05T06:22:07.271Z] iter=9 Turn 5/50
+[2026-04-05T06:22:17.656Z] iter=9 think: Now I have a clear picture. Let me plan the changes:
+
+**Goal 1: Benchmarking**
+1. Add `benchmarks?: { testDurationMs: nu...
+[2026-04-05T06:22:17.657Z] iter=9 Turn 6/50
+[2026-04-05T06:22:20.787Z] iter=9 Agent: Let me start with **Goal 1: Add benchmarking to metrics**.
+[2026-04-05T06:22:20.787Z] iter=9 read_file: scripts/self-test.ts
+[2026-04-05T06:22:20.788Z] iter=9   -> ok (1484 chars)
+[2026-04-05T06:22:20.788Z] iter=9 Turn 7/50
+[2026-04-05T06:22:25.499Z] iter=9 Agent: Now let me add `captureBenchmarks` to validation.ts:
+[2026-04-05T06:22:25.500Z] iter=9 write_file: src/validation.ts (patch)
+[2026-04-05T06:22:25.501Z] iter=9   -> ok: Patched src/validation.ts: -8 +13 lines
+[2026-04-05T06:22:25.501Z] iter=9 Turn 8/50
+[2026-04-05T06:22:31.843Z] iter=9 write_file: src/validation.ts (patch)
+[2026-04-05T06:22:31.844Z] iter=9   -> ok: Patched src/validation.ts: -4 +34 lines
+[2026-04-05T06:22:31.844Z] iter=9 Turn 9/50
+[2026-04-05T06:22:37.221Z] iter=9 Agent: Now update `agent.ts` to import and use the new types:
+[2026-04-05T06:22:37.222Z] iter=9 write_file: src/agent.ts (patch)
+[2026-04-05T06:22:37.223Z] iter=9   -> ok: Patched src/agent.ts: -5 +7 lines
+[2026-04-05T06:22:37.224Z] iter=9 Turn 10/50
+[2026-04-05T06:22:40.959Z] iter=9 Agent: Now add `benchmarks` to the `IterationMetrics` interface in agent.ts:
+[2026-04-05T06:22:40.959Z] iter=9 write_file: src/agent.ts (patch)
+[2026-04-05T06:22:40.960Z] iter=9   -> ok: Patched src/agent.ts: -4 +5 lines
+[2026-04-05T06:22:40.961Z] iter=9 Turn 11/50
+[2026-04-05T06:22:44.674Z] iter=9 Agent: Now update both `recordMetrics` call sites to include benchmarks. Let me find them:
+[2026-04-05T06:22:44.675Z] iter=9 grep: "recordMetrics\(" in src/agent.ts
+[2026-04-05T06:22:44.705Z] iter=9   -> 0 matches
+[2026-04-05T06:22:44.706Z] iter=9 Turn 12/50
+[2026-04-05T06:22:47.308Z] iter=9 grep: "recordMetrics" in src/agent.ts
+[2026-04-05T06:22:47.339Z] iter=9   -> 35 matches
+[2026-04-05T06:22:47.340Z] iter=9 Turn 13/50
+[2026-04-05T06:22:51.303Z] iter=9 Agent: Now I need to update both recordMetrics call sites. Let me see the full blocks:
+[2026-04-05T06:22:51.304Z] iter=9 read_file: src/agent.ts
+[2026-04-05T06:22:51.305Z] iter=9   -> ok (844 chars)
+[2026-04-05T06:22:51.305Z] iter=9 Turn 14/50
+[2026-04-05T06:22:53.914Z] iter=9 read_file: src/agent.ts
+[2026-04-05T06:22:53.915Z] iter=9   -> ok (714 chars)
+[2026-04-05T06:22:53.916Z] iter=9 Turn 15/50
+[2026-04-05T06:22:58.604Z] iter=9 write_file: src/agent.ts (patch)
+[2026-04-05T06:22:58.606Z] iter=9   -> ok: Patched src/agent.ts: -10 +12 lines
+[2026-04-05T06:22:58.606Z] iter=9 Turn 16/50
+[2026-04-05T06:23:04.211Z] iter=9 write_file: src/agent.ts (patch)
+[2026-04-05T06:23:04.212Z] iter=9   -> ok: Patched src/agent.ts: -10 +12 lines
+[2026-04-05T06:23:04.212Z] iter=9 Turn 17/50
+[2026-04-05T06:23:09.527Z] iter=9 Agent: Now update the dashboard to include benchmarks. I need to update the interface and add a benchmark trend section:
+[2026-04-05T06:23:09.527Z] iter=9 write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:23:09.528Z] iter=9   -> ok: Patched scripts/dashboard.ts: -14 +20 lines
+[2026-04-05T06:23:09.528Z] iter=9 Turn 18/50
+[2026-04-05T06:23:13.714Z] iter=9 Agent: Now add a benchmark trend function to the dashboard. Let me find where the code quality trend is generated and add a benchmark trend after it:
+[2026-04-05T06:23:13.715Z] iter=9 write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:23:13.715Z] iter=9   -> ok: Patched scripts/dashboard.ts: -3 +5 lines
+[2026-04-05T06:23:13.715Z] iter=9 Turn 19/50
+[2026-04-05T06:23:17.105Z] iter=9 Agent: Now add the `generateBenchmarkTrend` function. Let me add it right after `generateCodeQualityTrend`:
+[2026-04-05T06:23:17.106Z] iter=9 grep: "^export function generateDashboard" in scripts/dashboard.ts
+[2026-04-05T06:23:17.129Z] iter=9   -> 5 matches
+[2026-04-05T06:23:17.130Z] iter=9 Turn 20/50
+[2026-04-05T06:23:24.897Z] iter=9 write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:23:24.899Z] iter=9   -> ok: Patched scripts/dashboard.ts: -1 +27 lines
+[2026-04-05T06:23:24.899Z] iter=9 Turn 21/50
+[2026-04-05T06:23:27.755Z] iter=9 Agent: Good. Now let's check compilation:
+[2026-04-05T06:23:27.756Z] iter=9 $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T06:23:28.396Z] iter=9   -> exit=0 (11 chars)
+[2026-04-05T06:23:28.396Z] iter=9 Turn 22/50
+[2026-04-05T06:23:35.025Z] iter=9 Agent: Compiles clean. Now let's move to **Goal 2: Extract message-building logic into `src/messages.ts`**.
+[2026-04-05T06:23:35.025Z] iter=9 think: Looking at agent.ts, the message-building logic I should extract:
+
+1. `buildSystemPrompt(state)` — Reads system-prompt.m...
+[2026-04-05T06:23:35.026Z] iter=9 Turn 23/50
+[2026-04-05T06:23:53.355Z] iter=9 write_file: src/messages.ts (write)
+[2026-04-05T06:23:53.356Z] iter=9   -> ok: Created src/messages.ts (3592 chars)
+[2026-04-05T06:23:53.356Z] iter=9 Turn 24/50
+[2026-04-05T06:23:58.614Z] iter=9 Agent: Now update `agent.ts` to import and use messages.ts functions:
+[2026-04-05T06:23:58.615Z] iter=9 write_file: src/agent.ts (patch)
+[2026-04-05T06:23:58.616Z] iter=9   -> ok: Patched src/agent.ts: -8 +15 lines
+[2026-04-05T06:23:58.617Z] iter=9 Turn 25/50
+[2026-04-05T06:24:07.336Z] iter=9 Agent: Now remove the `buildSystemPrompt` function from agent.ts and update references. Let me find it:
+[2026-04-05T06:24:07.336Z] iter=9 grep: "function buildSystemPrompt" in src/agent.ts
+[2026-04-05T06:24:07.361Z] iter=9   -> 31 matches
+[2026-04-05T06:24:07.361Z] iter=9 Turn 26/50
+[2026-04-05T06:24:13.631Z] iter=9 write_file: src/agent.ts (patch)
+[2026-04-05T06:24:13.632Z] iter=9   -> ok: Patched src/agent.ts: -16 +1 lines
+[2026-04-05T06:24:13.632Z] iter=9 Turn 27/50
+[2026-04-05T06:24:16.635Z] iter=9 Agent: Now remove unused constants (SYSTEM_PROMPT_FILE is no longer needed in agent.ts):
+[2026-04-05T06:24:16.636Z] iter=9 grep: "SYSTEM_PROMPT_FILE" in src/agent.ts
+[2026-04-05T06:24:16.666Z] iter=9   -> 1 matches
+[2026-04-05T06:24:16.666Z] iter=9 Turn 28/50
+[2026-04-05T06:24:20.185Z] iter=9 write_file: src/agent.ts (patch)
+[2026-04-05T06:24:20.187Z] iter=9   -> ok: Patched src/agent.ts: -2 +1 lines
+[2026-04-05T06:24:20.188Z] iter=9 Turn 29/50
+[2026-04-05T06:24:23.767Z] iter=9 Agent: Now update the call site — `buildSystemPrompt(state)` → `buildSystemPrompt(state, ROOT)`:
+[2026-04-05T06:24:23.767Z] iter=9 grep: "buildSystemPrompt" in src/agent.ts
+[2026-04-05T06:24:23.784Z] iter=9   -> 2 matches
+[2026-04-05T06:24:23.785Z] iter=9 Turn 30/50
+[2026-04-05T06:24:26.944Z] iter=9 write_file: src/agent.ts (patch)
+[2026-04-05T06:24:26.947Z] iter=9   -> ok: Patched src/agent.ts: -1 +1 lines
+[2026-04-05T06:24:26.947Z] iter=9 Turn 31/50
+[2026-04-05T06:24:30.425Z] iter=9 Agent: Now replace the initial message construction:
+[2026-04-05T06:24:30.426Z] iter=9 grep: "const messages.*MessageParam" context="5" in src/agent.ts
+[2026-04-05T06:24:30.449Z] iter=9   -> 0 matches
+[2026-04-05T06:24:30.450Z] iter=9 Turn 32/50
+[2026-04-05T06:24:33.087Z] iter=9 grep: "const messages:" in src/agent.ts
+[2026-04-05T06:24:33.109Z] iter=9   -> 11 matches
+[2026-04-05T06:24:33.109Z] iter=9 Turn 33/50
+[2026-04-05T06:24:36.877Z] iter=9 write_file: src/agent.ts (patch)
+[2026-04-05T06:24:36.879Z] iter=9   -> ok: Patched src/agent.ts: -4 +4 lines
+[2026-04-05T06:24:36.880Z] iter=9 Turn 34/50
+[2026-04-05T06:24:39.766Z] iter=9 Agent: Now replace the validation-blocked message:
+[2026-04-05T06:24:39.766Z] iter=9 grep: "BLOCKED: Code doesn't compile" in src/agent.ts
+[2026-04-05T06:24:39.784Z] iter=9   -> 7 matches
+[2026-04-05T06:24:39.784Z] iter=9 Turn 35/50
+[2026-04-05T06:24:42.920Z] iter=9 write_file: src/agent.ts (patch)
+[2026-04-05T06:24:42.922Z] iter=9   -> ok: Patched src/agent.ts: -1 +1 lines
+[2026-04-05T06:24:42.922Z] iter=9 Turn 36/50
+[2026-04-05T06:24:46.131Z] iter=9 Agent: Now replace the token budget and turn limit messages:
+[2026-04-05T06:24:46.132Z] iter=9 read_file: src/agent.ts
+[2026-04-05T06:24:46.132Z] iter=9   -> ok (1298 chars)
+[2026-04-05T06:24:46.133Z] iter=9 Turn 37/50
+[2026-04-05T06:24:49.081Z] iter=9 read_file: src/agent.ts
+[2026-04-05T06:24:49.082Z] iter=9   -> ok (1001 chars)
+[2026-04-05T06:24:49.082Z] iter=9 Turn 38/50
+[2026-04-05T06:24:56.127Z] iter=9 write_file: src/agent.ts (patch)
+[2026-04-05T06:24:56.129Z] iter=9   -> ok: Patched src/agent.ts: -19 +9 lines
+[2026-04-05T06:24:56.129Z] iter=9 Turn 39/50
+[2026-04-05T06:24:59.013Z] iter=9 Agent: Now let's check compilation:
+[2026-04-05T06:24:59.014Z] iter=9 $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T06:24:59.678Z] iter=9   -> exit=0 (11 chars)
+[2026-04-05T06:24:59.678Z] iter=9 Turn 40/50
+[2026-04-05T06:25:02.819Z] iter=9 Agent: Clean. Now add tests for messages.ts to self-test.ts:
+[2026-04-05T06:25:02.820Z] iter=9 $ cd /Users/austin/Documents/autoagent && tail -30 scripts/self-test.ts
+[2026-04-05T06:25:02.830Z] iter=9   -> exit=0 (731 chars)
+[2026-04-05T06:25:02.830Z] iter=9 Turn 41/50
+[2026-04-05T06:25:07.292Z] iter=9 Agent: 
+
+Let me add the tests and wrap up quickly.
+[2026-04-05T06:25:07.293Z] iter=9 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:25:07.295Z] iter=9   -> ok: Patched scripts/self-test.ts: -1 +2 lines
+[2026-04-05T06:25:07.296Z] iter=9 Turn 42/50
+[2026-04-05T06:25:11.433Z] iter=9 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:25:11.435Z] iter=9   -> ok: Patched scripts/self-test.ts: -1 +2 lines
+[2026-04-05T06:25:11.435Z] iter=9 Turn 43/50
+[2026-04-05T06:25:23.525Z] iter=9 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:25:23.526Z] iter=9   -> ok: Patched scripts/self-test.ts: -1 +37 lines
+[2026-04-05T06:25:23.526Z] iter=9 Turn 44/50
+[2026-04-05T06:25:26.400Z] iter=9 $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && npx tsx scripts/self-test.ts 2>&1 | tail -20
+[2026-04-05T06:25:29.600Z] iter=9   -> exit=0 (673 chars)
+[2026-04-05T06:25:29.601Z] iter=9 Turn 45/50
+[2026-04-05T06:25:43.130Z] iter=9 Agent: 159 tests, all passing. Now update memory and goals:
+[2026-04-05T06:25:43.130Z] iter=9 write_file: memory.md (patch)
+[2026-04-05T06:25:43.131Z] iter=9   -> ok: Patched memory.md: -1 +20 lines
+[2026-04-05T06:25:43.131Z] iter=9 Turn 46/50
+[2026-04-05T06:25:53.137Z] iter=9 write_file: goals.md (write)
+[2026-04-05T06:25:53.138Z] iter=9   -> ok: Updated goals.md (1002 chars, 0 lines delta)
+[2026-04-05T06:25:53.138Z] iter=9 Turn 47/50
+[2026-04-05T06:25:56.905Z] iter=9 $ echo "AUTOAGENT_RESTART"
+[2026-04-05T06:25:56.906Z] iter=9 RESTART signal
+[2026-04-05T06:25:56.908Z] iter=9 Validating: npx tsc --noEmit ...
+[2026-04-05T06:25:57.525Z] iter=9 Compilation OK

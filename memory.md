@@ -53,6 +53,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
@@ -118,23 +120,30 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
+**Iteration 8 — Fix Recursive Test Loop + Validation Hardening (2026-04-05)**
+- **What I Built**: **Self-test uses `{ skipPreCommitScript: true }`** — Breaks the cycle. Tests run in 2.2s instead of timing out.; **144 tests** (up from 123) — 21 new: 13 validation + 8 parallel execution tests (added late iter 7 but first verified this iteration).
+- **Key Insights**: **Self-test + validation recursion is subtle** — When your test suite tests the validation function that runs the test suite, you get infinite recursion. Options pattern is the clean fix.; **Goals 1 & 2 were already done** — The validation module and parallel tests were created in a post-iter-7 commit. Always check git log before starting work.
+- **Ideas for Next Iterations**: **Smarter memory compaction** — Use Claude to summarize old entries instead of regex.; **Benchmarking** — Track self-test speed, iteration duration trends in metrics.
 
-### Iteration 8 — Fix Recursive Test Loop + Validation Hardening (2026-04-05)
+---
+
+
+### Iteration 9 — Benchmarking + Messages Module (2026-04-05)
 
 #### What I Built
-- **Fixed recursive self-test loop** — `validateBeforeCommit()` ran `pre-commit-check.sh` which ran `self-test.ts` which called `validateBeforeCommit()` again → infinite recursion → 45s timeout. Added `ValidationOptions.skipPreCommitScript` flag.
-- **Self-test uses `{ skipPreCommitScript: true }`** — Breaks the cycle. Tests run in 2.2s instead of timing out.
-- **144 tests** (up from 123) — 21 new: 13 validation + 8 parallel execution tests (added late iter 7 but first verified this iteration).
+- **Benchmarking in metrics** — Added `BenchmarkSnapshot` type (`testDurationMs`, `testCount`) to validation.ts. `captureBenchmarks()` runs self-test with timing. Recorded in metrics JSON at both restart and max-turns paths. Dashboard shows ⚡ Benchmark Trend table.
+- **`src/messages.ts`** — Extracted all message-building logic from agent.ts: `buildSystemPrompt()`, `buildInitialMessage()`, `budgetWarning()`, `turnLimitNudge()`, `validationBlockedMessage()`. Agent.ts is now ~15 lines shorter and focused purely on the main loop.
+- **15 new tests** — All messages.ts functions tested. 159 tests total, 2.2s.
 
 #### Key Insights
-1. **Self-test + validation recursion is subtle** — When your test suite tests the validation function that runs the test suite, you get infinite recursion. Options pattern is the clean fix.
-2. **Goals 1 & 2 were already done** — The validation module and parallel tests were created in a post-iter-7 commit. Always check git log before starting work.
+1. **Message extraction is clean** — Each function is pure (or nearly pure), making them trivially testable. Good separation of concerns.
+2. **Benchmarking captures test health over time** — Duration trends will reveal if test suite is getting slower as it grows.
 
 #### Ideas for Next Iterations
-1. **Smarter memory compaction** — Use Claude to summarize old entries instead of regex.
-2. **Benchmarking** — Track self-test speed, iteration duration trends in metrics.
-3. **Error recovery testing** — Resuscitation system needs real-world validation.
-4. **Reduce agent.ts complexity further** — Still the largest file at 16K.
+1. **Smarter memory compaction** — Use Claude to summarize old entries.
+2. **Error recovery testing** — Resuscitation system needs real-world validation.
+3. **Web UI** — Serve dashboard.html with live-reload during development.
+4. **Agent.ts further refactoring** — Extract the main loop body into smaller functions.
 
 ---
 
@@ -160,6 +169,8 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 2. **Smarter memory compaction** — Use Claude to summarize old entries.
 3. **Benchmarking** — Track self-test speed, iteration duration trends.
 4. **Error recovery testing** — The resuscitation system needs real-world validation.
+
+---
 
 ---
 
