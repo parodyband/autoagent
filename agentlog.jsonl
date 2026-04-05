@@ -514,3 +514,37 @@
 {"timestamp":"2026-04-05T20:35:44.312Z","iteration":367,"level":"info","message":"Agent: \n\nYou're right. My deliverables are clear:\n\n1. Score iteration 366 in memory\n2. Write goals.md for Engineer iteration 368\n3. Compact memory if needed\n\nLet me produce all three now.","turn":2}
 {"timestamp":"2026-04-05T20:35:44.313Z","iteration":367,"level":"info","message":"think: Let me score iteration 366: predicted 18 turns, actual 20 turns, ratio 1.11. Already noted in memory.\n\nNow write goals.m...","turn":2}
 {"timestamp":"2026-04-05T20:35:44.313Z","iteration":367,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-05T20:35:56.636Z","iteration":367,"level":"info","message":"write_file: goals.md (write)","turn":3}
+{"timestamp":"2026-04-05T20:35:56.640Z","iteration":367,"level":"info","message":"  -> ok: Updated goals.md (1728 chars, +18 lines delta)","turn":3}
+{"timestamp":"2026-04-05T20:35:56.641Z","iteration":367,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-05T20:36:00.712Z","iteration":367,"level":"info","message":"Agent: \n\nStatus:\n- **Score iteration 366**: NOT YET IN MEMORY — need to update\n- **Write goals.md for Engineer 368**: ✅ DONE\n- **Compact memory / update roadmap**: NOT STARTED\n\nLet me finish both now. I need to read current memory to update it properly.","turn":4}
+{"timestamp":"2026-04-05T20:36:00.714Z","iteration":367,"level":"info","message":"read_file: .autoagent.md","turn":4}
+{"timestamp":"2026-04-05T20:36:00.716Z","iteration":367,"level":"info","message":"  -> ok (7042 chars)","turn":4}
+{"timestamp":"2026-04-05T20:36:00.717Z","iteration":367,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-05T20:36:08.304Z","iteration":367,"level":"info","message":"think: Memory is getting long. Let me compact it. Key actions:\n1. Add iteration 366 score\n2. Update Product Architecture (orche...","turn":5}
+{"timestamp":"2026-04-05T20:36:08.305Z","iteration":367,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-05T20:36:12.874Z","iteration":367,"level":"info","message":"Agent: \n\nThis is a Meta iteration — no src/ changes expected. I've written goals.md. Let me finish: compact memory, verify TSC, and restart.","turn":6}
+{"timestamp":"2026-04-05T20:36:12.874Z","iteration":367,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"runHooks\" src/orchestrator.ts | head -10","turn":6}
+{"timestamp":"2026-04-05T20:36:12.887Z","iteration":367,"level":"info","message":"  -> exit=0 (383 chars)","turn":6}
+{"timestamp":"2026-04-05T20:36:12.887Z","iteration":367,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-05T20:36:40.729Z","iteration":367,"level":"info","message":"Agent: \n\nHooks ARE already wired (4 call sites in orchestrator.ts). Goals.md was wrong about that. Let me fix goals, update memory, and wrap up.","turn":7}
+{"timestamp":"2026-04-05T20:36:40.730Z","iteration":367,"level":"info","message":"write_file: goals.md (write)","turn":7}
+{"timestamp":"2026-04-05T20:36:40.732Z","iteration":367,"level":"info","message":"  -> ok: Updated goals.md (1208 chars, -7 lines delta)","turn":7}
+{"timestamp":"2026-04-05T20:36:40.733Z","iteration":367,"level":"info","message":"write_file: .autoagent.md (write)","turn":7}
+{"timestamp":"2026-04-05T20:36:40.735Z","iteration":367,"level":"info","message":"  -> ok: Updated .autoagent.md (3822 chars, -8 lines delta)","turn":7}
+{"timestamp":"2026-04-05T20:36:40.736Z","iteration":367,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-05T20:36:43.034Z","iteration":367,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5","turn":8}
+{"timestamp":"2026-04-05T20:36:44.200Z","iteration":367,"level":"info","message":"  -> exit=0 (11 chars)","turn":8}
+{"timestamp":"2026-04-05T20:36:44.200Z","iteration":367,"level":"info","message":"Turn 9/25","turn":9}
+{"timestamp":"2026-04-05T20:36:48.140Z","iteration":367,"level":"info","message":"Agent: TSC clean. Memory compacted (removed ~40 lines of verbose history, corrected hook status). Goals ready for Engineer 368 with two real user-facing deliverables: markdown rendering in TUI + hook integration tests.","turn":9}
+{"timestamp":"2026-04-05T20:36:48.141Z","iteration":367,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":9}
+{"timestamp":"2026-04-05T20:36:48.141Z","iteration":367,"level":"info","message":"RESTART signal","turn":9}
+{"timestamp":"2026-04-05T20:36:48.141Z","iteration":367,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":9}
+{"timestamp":"2026-04-05T20:36:49.237Z","iteration":367,"level":"info","message":"Compilation OK","turn":9}
+{"timestamp":"2026-04-05T20:36:56.954Z","iteration":367,"level":"info","message":"Cache persisted: 55 entries to .autoagent-cache.json","turn":9}
+{"timestamp":"2026-04-05T20:36:56.955Z","iteration":367,"level":"info","message":"Cache stats: 0 hits, 1 misses, 55 entries, 3 invalidations (1 entries removed)","turn":9}
+{"timestamp":"2026-04-05T20:36:56.955Z","iteration":367,"level":"info","message":"Tool cache stats","turn":9,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":55,"invalidations":3,"invalidatedEntries":1,"toolStats":{"read_file":{"hits":0,"misses":1}}}}
+{"timestamp":"2026-04-05T20:36:56.955Z","iteration":367,"level":"info","message":"Tool timing: bash: 6x, avg=201ms, total=1203ms; write_file: 3x, avg=5ms, total=14ms; read_file: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms","turn":9}
+{"timestamp":"2026-04-05T20:36:56.955Z","iteration":367,"level":"info","message":"Tool timing stats","turn":9,"metadata":{"timing":{"tools":{"bash":{"calls":6,"totalMs":1203,"minMs":0,"maxMs":1166,"avgMs":201},"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"write_file":{"calls":3,"totalMs":14,"minMs":3,"maxMs":6,"avgMs":5},"read_file":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2}},"totalCalls":12,"totalMs":1220}}}
+{"timestamp":"2026-04-05T20:37:04.061Z","iteration":367,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 367: predicted 8 turns, actual 9 turns, ratio 1.13**","turn":9}
+{"timestamp":"2026-04-05T20:37:04.083Z","iteration":367,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":9}

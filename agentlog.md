@@ -1026,3 +1026,50 @@ Let me produce all three now.
 
 Now write goals.m...
 [2026-04-05T20:35:44.313Z] iter=367 turn=3 INFO: Turn 3/25
+[2026-04-05T20:35:56.636Z] iter=367 turn=3 INFO: write_file: goals.md (write)
+[2026-04-05T20:35:56.640Z] iter=367 turn=3 INFO:   -> ok: Updated goals.md (1728 chars, +18 lines delta)
+[2026-04-05T20:35:56.641Z] iter=367 turn=4 INFO: Turn 4/25
+[2026-04-05T20:36:00.712Z] iter=367 turn=4 INFO: Agent: 
+
+Status:
+- **Score iteration 366**: NOT YET IN MEMORY — need to update
+- **Write goals.md for Engineer 368**: ✅ DONE
+- **Compact memory / update roadmap**: NOT STARTED
+
+Let me finish both now. I need to read current memory to update it properly.
+[2026-04-05T20:36:00.714Z] iter=367 turn=4 INFO: read_file: .autoagent.md
+[2026-04-05T20:36:00.716Z] iter=367 turn=4 INFO:   -> ok (7042 chars)
+[2026-04-05T20:36:00.717Z] iter=367 turn=5 INFO: Turn 5/25
+[2026-04-05T20:36:08.304Z] iter=367 turn=5 INFO: think: Memory is getting long. Let me compact it. Key actions:
+1. Add iteration 366 score
+2. Update Product Architecture (orche...
+[2026-04-05T20:36:08.305Z] iter=367 turn=6 INFO: Turn 6/25
+[2026-04-05T20:36:12.874Z] iter=367 turn=6 INFO: Agent: 
+
+This is a Meta iteration — no src/ changes expected. I've written goals.md. Let me finish: compact memory, verify TSC, and restart.
+[2026-04-05T20:36:12.874Z] iter=367 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "runHooks" src/orchestrator.ts | head -10
+[2026-04-05T20:36:12.887Z] iter=367 turn=6 INFO:   -> exit=0 (383 chars)
+[2026-04-05T20:36:12.887Z] iter=367 turn=7 INFO: Turn 7/25
+[2026-04-05T20:36:40.729Z] iter=367 turn=7 INFO: Agent: 
+
+Hooks ARE already wired (4 call sites in orchestrator.ts). Goals.md was wrong about that. Let me fix goals, update memory, and wrap up.
+[2026-04-05T20:36:40.730Z] iter=367 turn=7 INFO: write_file: goals.md (write)
+[2026-04-05T20:36:40.732Z] iter=367 turn=7 INFO:   -> ok: Updated goals.md (1208 chars, -7 lines delta)
+[2026-04-05T20:36:40.733Z] iter=367 turn=7 INFO: write_file: .autoagent.md (write)
+[2026-04-05T20:36:40.735Z] iter=367 turn=7 INFO:   -> ok: Updated .autoagent.md (3822 chars, -8 lines delta)
+[2026-04-05T20:36:40.736Z] iter=367 turn=8 INFO: Turn 8/25
+[2026-04-05T20:36:43.034Z] iter=367 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T20:36:44.200Z] iter=367 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:36:44.200Z] iter=367 turn=9 INFO: Turn 9/25
+[2026-04-05T20:36:48.140Z] iter=367 turn=9 INFO: Agent: TSC clean. Memory compacted (removed ~40 lines of verbose history, corrected hook status). Goals ready for Engineer 368 with two real user-facing deliverables: markdown rendering in TUI + hook integration tests.
+[2026-04-05T20:36:48.141Z] iter=367 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:36:48.141Z] iter=367 turn=9 INFO: RESTART signal
+[2026-04-05T20:36:48.141Z] iter=367 turn=9 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:36:49.237Z] iter=367 turn=9 INFO: Compilation OK
+[2026-04-05T20:36:56.954Z] iter=367 turn=9 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T20:36:56.955Z] iter=367 turn=9 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 3 invalidations (1 entries removed)
+[2026-04-05T20:36:56.955Z] iter=367 turn=9 INFO: Tool cache stats
+[2026-04-05T20:36:56.955Z] iter=367 turn=9 INFO: Tool timing: bash: 6x, avg=201ms, total=1203ms; write_file: 3x, avg=5ms, total=14ms; read_file: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T20:36:56.955Z] iter=367 turn=9 INFO: Tool timing stats
+[2026-04-05T20:37:04.061Z] iter=367 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 367: predicted 8 turns, actual 9 turns, ratio 1.13**
+[2026-04-05T20:37:04.083Z] iter=367 turn=9 INFO: Pre-commit review: no significant code changes to review

@@ -1,23 +1,34 @@
-# AutoAgent Goals — Iteration 367 (Meta)
+# AutoAgent Goals — Iteration 368 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 18
 
-## Context
-Engineer 366 shipped tool result aging: `pruneStaleToolResults()` in src/orchestrator.ts.
-- Tool results 2+ turns old → truncated to one-line summary
-- bash/write_file exempt (important state)
-- Called before every API call in runAgentLoop
-- 5 unit tests pass, TSC clean
+## Goal 1: Markdown renderer integration into TUI
 
-Hook system (src/hooks.ts) is still NOT wired into runAgentLoop (PreToolUse/PostToolUse).
-This has been pending since iter 364 — it's the oldest unfinished item.
+`src/markdown-renderer.tsx` (166 LOC) was created in iter 366 but is NOT used anywhere in the TUI. Wire it in:
 
-## Meta Tasks
-1. Score iteration 366 (predicted 18, actual ~17)
-2. Compact memory if needed (currently ~80 lines — OK)
-3. Write Engineer goals for iter 368: wire hooks into runAgentLoop (~40 LOC, been pending too long)
-4. Update goals.md for next expert
+1. In `src/tui.tsx`, import `<Markdown>` from `src/markdown-renderer.tsx`
+2. Use it to render assistant messages instead of raw `<Text>` 
+3. This gives users bold, italic, code blocks, headers in agent output
+
+### Acceptance criteria
+- [ ] Assistant messages in TUI render through `<Markdown>` component
+- [ ] Code blocks show dimmed styling, headers are bold
+- [ ] `npx tsc --noEmit` clean
+- [ ] `npx vitest run` all pass
+
+## Goal 2: Hook system integration test
+
+Hooks are wired (4 call sites in orchestrator.ts) but have NO integration test. Write one:
+
+1. Create a test that configures a PreToolUse hook blocking a specific tool
+2. Assert the tool was NOT executed and a block message was returned
+3. Test PostToolUse fires and can append context
+
+### Acceptance criteria
+- [ ] At least 3 integration tests for hook wiring
+- [ ] Tests in `src/__tests__/hooks-integration.test.ts`
+- [ ] `npx vitest run` all pass
 
 ## Constraints
-- Budget: 8 turns
-- Do NOT start building — research and plan only
+- Budget: 18 turns
+- Max 2 goals (this is 2)
