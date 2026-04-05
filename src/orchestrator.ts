@@ -622,6 +622,8 @@ export class Orchestrator {
 
   /** Whether project summary has been injected into the system prompt already. */
   private projectSummaryInjected = false;
+  /** Cached project summary from detectProject(). */
+  private projectSummary: string = "";
 
   /** Path to current session's JSONL file */
   sessionPath: string = "";
@@ -654,6 +656,16 @@ export class Orchestrator {
     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
     ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
       buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
+    // Cache project summary and inject into system prompt
+    try {
+      const projectInfo = detectProject(this.opts.workDir);
+      this.projectSummary = projectInfo.summary;
+      if (this.projectSummary) {
+        this.systemPrompt += `\n\n## Project Context\n${this.projectSummary}`;
+      }
+    } catch {
+      // Non-fatal
+    }
 
     // Session persistence: resume or create new
     if (this.opts.resumeSessionPath) {

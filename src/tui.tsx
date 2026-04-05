@@ -20,7 +20,7 @@ import { undoLastCommit } from "./auto-commit.js";
 import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
 import { execSync } from "child_process";
 import { runInit } from "./init-command.js";
-import { writeFileSync, mkdirSync } from "fs";
+import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
 
 // Parse args
 let workDir = process.cwd();
@@ -313,46 +313,8 @@ function buildExportContent(
   workDir: string,
   filePath: string,
 ): void {
-  const dir = path.dirname(filePath);
-  mkdirSync(dir, { recursive: true });
-  const now = new Date();
-  const projectName = path.basename(workDir);
-  const { tokensIn, tokensOut, cost } = stats;
-  const lines: string[] = [
-    `# AutoAgent Conversation Export`,
-    ``,
-    `**Date**: ${now.toLocaleString()}`,
-    `**Model**: ${model}`,
-    `**Project**: ${projectName}`,
-    ``,
-    `---`,
-    ``,
-  ];
-  for (const msg of messages) {
-    if (msg.role === "user") {
-      lines.push(`## User`, ``, msg.content, ``);
-    } else {
-      const textContent = msg.content
-        .split("\n")
-        .filter(l => !l.startsWith('{"type":"tool'))
-        .join("\n")
-        .trim();
-      if (textContent) {
-        lines.push(`## Assistant`, ``, textContent, ``);
-      }
-    }
-  }
-  lines.push(
-    `---`,
-    ``,
-    `## Session Summary`,
-    ``,
-    `- **Tokens in**: ${tokensIn.toLocaleString()}`,
-    `- **Tokens out**: ${tokensOut.toLocaleString()}`,
-    `- **Total cost**: ${cost < 0.01 ? cost.toFixed(4) : cost.toFixed(2)}`,
-    ``,
-  );
-  writeFileSync(filePath, lines.join("\n"), "utf-8");
+  const exportMsgs = messages.filter(m => m.role === "user" || m.role === "assistant") as import("./export-helper.js").ExportMessage[];
+  buildExportContentHelper(exportMsgs, model, { tokensIn: stats.tokensIn, tokensOut: stats.tokensOut, cost: stats.cost }, workDir, filePath);
 }
 
 function App() {

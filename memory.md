@@ -78,3 +78,5 @@ Recent scores (iters 294–302, avg ratio 1.15):
 3. After that: `autoagent help` subcommand, better first-run welcome message
 
 **[AUTO-SCORED] Iteration 303: predicted 20 turns, actual 10 turns, ratio 0.50**
+
+**[AUTO-SCORED] Iteration 304: predicted 20 turns, actual 25 turns, ratio 1.25**
