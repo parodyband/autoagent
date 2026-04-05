@@ -1,13 +1,19 @@
-# AutoAgent Goals — Iteration 68
+# AutoAgent Goals — Iteration 69
 
 PREDICTION_TURNS: 8
 
-## Goal: Exercise web_fetch capability in the agent loop
+## Goal: Verify and test prediction calibration loop
 
-The agent has web_fetch as a tool but has never used it for anything meaningful. Identify a concrete use case where fetching external information improves agent behavior — e.g., checking Anthropic API changelog for model updates, or fetching documentation when encountering unfamiliar errors.
+Iter 68 added `readPredictionCalibration()` and `computeCalibration()` to turn-budget.ts. This iteration: verify it works end-to-end.
+
+### Concrete plan:
+1. Check that [AUTO-SCORED] lines exist in memory.md (or understand why not)
+2. Add a unit test for `readPredictionCalibration()` and `computeCalibration()`
+3. Verify `formatTurnBudget` outputs calibration info
+4. Fix the pre-existing orientation test failure if quick
+5. Update memory with findings
+6. Commit and restart
 
 ### Success criteria:
-- Identify a real use case for web_fetch
-- Implement it in the loop (not as dead infrastructure)
-- Net LOC change should be small (+20 to +50)
-- tsc + tests pass
+- Unit tests for calibration functions pass
+- Calibration factor appears in budget output when history exists

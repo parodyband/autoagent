@@ -8,6 +8,7 @@
  */
 
 import { readFileSync, existsSync } from "fs";
+import path from "path";
 
 export interface TurnBudget {
   /** Recommended max turns for this iteration */
@@ -22,6 +23,8 @@ export interface TurnBudget {
   sampleSize: number;
   /** The predicted turns from goals.md, if any */
   predicted: number | null;
+  /** Calibration factor from past prediction accuracy (1.0 = perfect) */
+  calibration: number;
 }
 
 interface MetricsEntry {
@@ -32,12 +35,45 @@ interface MetricsEntry {
 }
 
 /**
+ * Read past prediction accuracy ratios from memory.md.
+ * These are injected by finalization.ts as [AUTO-SCORED] lines.
+ * Returns array of (actual/predicted) ratios, most recent last.
+ */
+export function readPredictionCalibration(rootDir: string): number[] {
+  const memFile = path.join(rootDir, "memory.md");
+  if (!existsSync(memFile)) return [];
+  const content = readFileSync(memFile, "utf-8");
+  const ratios: number[] = [];
+  const re = /\[AUTO-SCORED\].*ratio[:\s=]+(\d+\.?\d*)/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(content)) !== null) {
+    ratios.push(parseFloat(m[1]));
+  }
+  return ratios;
+}
+
+/**
+ * Compute a calibration factor from recent prediction accuracy.
+ * If the agent consistently underestimates (ratio > 1), calibration > 1.
+ * Uses median of last N ratios, clamped to [0.6, 2.5].
+ * Returns 1.0 if insufficient data.
+ */
+export function computeCalibration(ratios: number[], minSamples: number = 2): number {
+  if (ratios.length < minSamples) return 1.0;
+  const recent = ratios.slice(-5); // last 5 predictions
+  const sorted = [...recent].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)];
+  return Math.max(0.6, Math.min(2.5, median));
+}
+
+/**
  * Read metrics history and compute an adaptive turn budget.
  *
  * Logic:
  * - Compute average turns over last N successful iterations
- * - If goals.md has a prediction, use min(prediction * 1.3, avg * 1.2) as budget
- * - If no prediction, use avg * 1.2 as budget
+ * - Read prediction accuracy history and compute calibration factor
+ * - If prediction exists, adjust it: calibratedPrediction = prediction * calibration
+ * - Use min(calibratedPrediction * 1.3, avg * 1.2) as budget
  * - Hard max is always 25 (system constraint)
  * - Warn at 80% of recommended budget
  */
@@ -46,6 +82,7 @@ export function computeTurnBudget(
   predictedTurns: number | null,
   hardMax: number = 25,
   lookback: number = 10,
+  rootDir: string = ".",
 ): TurnBudget {
   let entries: MetricsEntry[] = [];
 
@@ -62,9 +99,14 @@ export function computeTurnBudget(
   const successful = entries.filter(e => e.success).slice(-lookback);
   const sampleSize = successful.length;
 
+  // Compute calibration from past prediction accuracy
+  const pastRatios = readPredictionCalibration(rootDir);
+  const calibration = computeCalibration(pastRatios);
+
   if (sampleSize === 0) {
     // No history — use conservative defaults
-    const recommended = predictedTurns ? Math.min(Math.ceil(predictedTurns * 1.5), hardMax) : 18;
+    const calibratedPrediction = predictedTurns ? Math.ceil(predictedTurns * calibration) : null;
+    const recommended = calibratedPrediction ? Math.min(Math.ceil(calibratedPrediction * 1.5), hardMax) : 18;
     return {
       recommended,
       hardMax,
@@ -72,16 +114,18 @@ export function computeTurnBudget(
       historicalAvg: 0,
       sampleSize: 0,
       predicted: predictedTurns,
+      calibration,
     };
   }
 
   const avgTurns = successful.reduce((sum, e) => sum + e.turns, 0) / sampleSize;
 
-  // Determine recommended budget
+  // Determine recommended budget — calibrate prediction using past accuracy
   let recommended: number;
   if (predictedTurns !== null && predictedTurns > 0) {
-    // Use the more conservative of: prediction with buffer, or historical avg with buffer
-    const fromPrediction = Math.ceil(predictedTurns * 1.3);
+    // Apply calibration: if agent consistently underestimates by 1.8x, inflate prediction
+    const calibratedPrediction = Math.ceil(predictedTurns * calibration);
+    const fromPrediction = Math.ceil(calibratedPrediction * 1.3);
     const fromHistory = Math.ceil(avgTurns * 1.2);
     recommended = Math.min(fromPrediction, fromHistory);
   } else {
@@ -98,6 +142,7 @@ export function computeTurnBudget(
     historicalAvg: Math.round(avgTurns * 10) / 10,
     sampleSize,
     predicted: predictedTurns,
+    calibration,
   };
 }
 
@@ -114,6 +159,9 @@ export function formatTurnBudget(budget: TurnBudget): string {
   }
   if (budget.predicted !== null) {
     parts.push(`Predicted: ${budget.predicted}`);
+  }
+  if (budget.calibration !== 1.0) {
+    parts.push(`Calibration: ${budget.calibration.toFixed(2)}x (${budget.calibration > 1 ? "you underestimate — budget inflated" : "you overestimate — budget deflated"})`);
   }
   return parts.join(" | ");
 }
