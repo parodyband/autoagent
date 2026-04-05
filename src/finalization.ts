@@ -67,7 +67,7 @@ export interface FinalizationCtx {
   timing: ToolTimingTracker;
   rootDir: string;
   /** AutoAgent's own directory (where memory.md, goals.md, metrics live). Defaults to rootDir. */
-  agentHome?: string;
+  agentHome: string;
   metricsFile: string;
   log: (msg: string) => void;
   logger?: Logger;
@@ -81,8 +81,8 @@ export interface FinalizationCtx {
 // and injects a machine-verified accuracy line into memory.md.
 // This runs BEFORE git commit so the truth is always in the record.
 
-export function parsePredictedTurns(rootDir: string): number | null {
-  const goalsFile = path.join(rootDir, "goals.md");
+export function parsePredictedTurns(agentHome: string): number | null {
+  const goalsFile = path.join(agentHome, "goals.md");
   if (!existsSync(goalsFile)) return null;
   const content = readFileSync(goalsFile, "utf-8");
   // Match multiple formats: "Predicted turns: N", "PREDICTION_TURNS: N", "PREDICTION: ...N turns"
@@ -118,10 +118,9 @@ function getRecentAccuracyRatios(metricsFile: string, agentHome: string): number
 function injectAccuracyScore(ctx: FinalizationCtx): void {
   // Prefer pre-captured prediction (set at iteration start, before goals.md gets rewritten)
   // Fall back to parsing current goals.md (which may already contain next iteration's goals)
-  const stateDir = ctx.agentHome ?? ctx.rootDir;
-  const predicted = ctx.predictedTurns ?? parsePredictedTurns(stateDir);
+  const predicted = ctx.predictedTurns ?? parsePredictedTurns(ctx.agentHome);
   const actual = ctx.turns;
-  const memFile = path.join(stateDir, "memory.md");
+  const memFile = path.join(ctx.agentHome, "memory.md");
   if (!existsSync(memFile)) return;
 
   let content = readFileSync(memFile, "utf-8");
@@ -133,7 +132,7 @@ function injectAccuracyScore(ctx: FinalizationCtx): void {
     line = `**[AUTO-SCORED] Iteration ${ctx.iter}: predicted ${predicted} turns, actual ${actual} turns, ratio ${ratio}**`;
 
     // Check for consecutive misses (including this one)
-    const pastRatios = getRecentAccuracyRatios(ctx.metricsFile, stateDir);
+    const pastRatios = getRecentAccuracyRatios(ctx.metricsFile, ctx.agentHome);
     const allRatios = [...pastRatios, actual / predicted];
     const recentMisses = allRatios.slice(-3).filter(r => r > 1.5);
     if (recentMisses.length >= 2) {

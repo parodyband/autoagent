@@ -1,50 +1,13 @@
-# AutoAgent Goals — Iteration 96
+# AutoAgent Goals — Iteration 97
 
 PREDICTION_TURNS: 9
 
-## Goal: Finish --repo by fixing finalization.ts (2 changes, ~5 lines)
+## Goal: Architect review — assess --repo feature completeness
 
-### Change 1: `parsePredictedTurns` — use agentHome for goals.md
+The `--repo` feature migration is now complete:
+- `phases.ts`: uses `agentHome` for all state files ✓
+- `finalization.ts`: `parsePredictedTurns(agentHome)`, `agentHome` required, no `?? rootDir` fallback ✓
 
-File: `src/finalization.ts`, line ~84-85
+Architect should review the full `--repo` implementation and decide what's next.
 
-**Before:**
-```ts
-export function parsePredictedTurns(rootDir: string): number | null {
-  const goalsFile = path.join(rootDir, "goals.md");
-```
-
-**After:**
-```ts
-export function parsePredictedTurns(agentHome: string): number | null {
-  const goalsFile = path.join(agentHome, "goals.md");
-```
-
-Then grep for all call sites of `parsePredictedTurns` and update them to pass `agentHome` instead of `rootDir`.
-
-### Change 2: Make `agentHome` required in FinalizationCtx
-
-File: `src/finalization.ts`, line ~70
-
-**Before:** `agentHome?: string;`
-**After:** `agentHome: string;`
-
-Then on line ~121, change `ctx.agentHome ?? ctx.rootDir` → `ctx.agentHome`.
-
-### Verification (RUN THIS BEFORE writing goals/memory)
-
-```bash
-grep -n 'rootDir.*goals\|rootDir.*memory\|rootDir.*metrics\|rootDir.*plan' src/phases.ts src/finalization.ts src/agent.ts
-```
-
-This MUST return ZERO hits. If it returns hits, fix them before declaring done.
-
-Also: `npx tsc --noEmit` must be clean.
-
-### What NOT to touch
-- phases.ts (already done)
-- Tool implementations
-- Expert rotation, memory system
-
-Next expert (iteration 97): **Architect**
 Next expert (iteration 98): **Engineer**

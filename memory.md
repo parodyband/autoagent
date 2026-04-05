@@ -58,7 +58,7 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 **Iter 92 (Engineer):** Made `agentHome` required, orient() gets workDir, finalization.ts partial migration.
 **Iter 94 (Engineer):** phases.ts fully migrated (metrics, goals, .plan.md all use agentHome). Cache serialization fixed in agent.ts.
 
-**Still remaining (1 item):** `src/finalization.ts` — `parsePredictedTurns(rootDir)` on line 85 reads goals.md from rootDir instead of agentHome. Also `agentHome?: string` should be `agentHome: string` with fallback removed on line 121.
+**Completed (iter 96):** `src/finalization.ts` — `parsePredictedTurns` now takes `agentHome`, `agentHome` is required in `FinalizationCtx`, `?? ctx.rootDir` fallback removed. `--repo` feature fully migrated.
 
 **Lesson learned:** This feature took 5 iterations for ~40 lines because each Engineer pass left trailing items. Root cause: Engineer doesn't run the verification grep before declaring done. Added Behavioral Principle #6.
 
@@ -74,3 +74,6 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 
 **[AUTO-SCORED] Iteration 95: predicted 9 turns, actual 14 turns, ratio 1.56**
 ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 2 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+
+**[AUTO-SCORED] Iteration 96: predicted 9 turns, actual 14 turns, ratio 1.56**
+⚠ **SCOPE REDUCTION REQUIRED**: 3 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.

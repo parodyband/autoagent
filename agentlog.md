@@ -1,113 +1,3 @@
-[2026-04-05T10:56:09.189Z] iter=87 turn=13 INFO: Agent: Clean. Let me do a final sanity check that the next-expert injection works correctly for a few iterations:
-[2026-04-05T10:56:09.190Z] iter=87 turn=13 INFO: $ node -e "
-// Verify rotation: E(0) A(1) E(2) M(3) repeating
-const names = ['Engineer', 'Architect', 'Engineer', 'Meta'];
-for (let i = 87; i <= 92; i++) {
-  const current = names[i % 4];
-  const next =...
-[2026-04-05T10:56:09.236Z] iter=87 turn=13 INFO:   -> exit=0 (237 chars)
-[2026-04-05T10:56:09.236Z] iter=87 turn=14 INFO: Turn 14/25
-[2026-04-05T10:56:14.619Z] iter=87 turn=14 INFO: Agent: Wait — iter 88 shows Engineer, but goals say `[Architect]`. Let me check the actual rotation:
-[2026-04-05T10:56:14.621Z] iter=87 turn=14 INFO: think: The rotation array is `[ENGINEER, ARCHITECT, ENGINEER, META]` with length 4.
-- iter 88 % 4 = 0 → ENGINEER
-- iter 89 % 4 ...
-[2026-04-05T10:56:14.622Z] iter=87 turn=15 INFO: Turn 15/25
-[2026-04-05T10:56:22.226Z] iter=87 turn=15 INFO: Agent: The rotation says iter 88 is **Engineer**, not Architect! I was about to make the exact mistake I just built a feature to prevent. Let me fix:
-[2026-04-05T10:56:22.227Z] iter=87 turn=15 INFO: write_file: goals.md (write)
-[2026-04-05T10:56:22.228Z] iter=87 turn=15 INFO:   -> ok: Updated goals.md (724 chars, +8 lines delta)
-[2026-04-05T10:56:22.228Z] iter=87 turn=15 INFO: HARD TURN CAP REACHED: 15 turns (predicted 10, cap 15). Forcing commit.
-[2026-04-05T10:56:22.230Z] iter=87 turn=15 INFO: Cache persisted: 27 entries to .autoagent-cache.json
-[2026-04-05T10:56:22.230Z] iter=87 turn=15 INFO: Cache stats: 1 hits, 4 misses, 27 entries, 5 invalidations (2 entries removed)
-[2026-04-05T10:56:22.231Z] iter=87 turn=15 INFO: Tool cache stats
-[2026-04-05T10:56:22.231Z] iter=87 turn=15 INFO: Tool timing: bash: 7x, avg=220ms, total=1539ms; write_file: 5x, avg=2ms, total=10ms; read_file: 4x, avg=2ms, total=8ms; think: 3x, avg=0ms, total=1ms
-[2026-04-05T10:56:22.231Z] iter=87 turn=15 INFO: Tool timing stats
-[2026-04-05T10:56:26.869Z] iter=87 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 87: predicted 10 turns, actual 15 turns, ratio 1.50**
-[2026-04-05T10:56:35.246Z] iter=87 turn=15 INFO: Pre-commit review (536in/334out): **Issue: Off-by-one in `nextExpert` prediction**
-
-`pickExpert(state.iteration + 1, experts)` assumes the *next* iteration index is `state.iteration + 1`, but if `pickExpert` uses modulo or any non-lin
-[2026-04-05T10:56:35.301Z] iter=87 turn=15 INFO: Committed: 92ee2512 (21 in / 6048 out, cache: 29622 created, 313478 read)
-[2026-04-05T10:56:35.301Z] iter=87 turn=15 INFO: Restarting as iteration 88...
-[2026-04-05T10:56:35.509Z] iter=88 INFO: Cache restored: 27/27 entries (0 stale)
-[2026-04-05T10:56:35.510Z] iter=88 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T10:56:35.538Z] iter=88 INFO: Hard turn cap: 17 (1.5x prediction of 11)
-[2026-04-05T10:56:35.539Z] iter=88 turn=1 INFO: Turn 1/25
-[2026-04-05T10:56:41.392Z] iter=88 turn=1 INFO: think: Let me read the current agent.ts to understand where to add the --task CLI flag....
-[2026-04-05T10:56:41.393Z] iter=88 turn=2 INFO: Turn 2/25
-[2026-04-05T10:56:42.567Z] iter=88 turn=2 INFO: read_file: src/agent.ts
-[2026-04-05T10:56:42.567Z] iter=88 turn=2 INFO:   -> ok (10663 chars)
-[2026-04-05T10:56:42.568Z] iter=88 turn=3 INFO: Turn 3/25
-[2026-04-05T10:56:46.205Z] iter=88 turn=3 INFO: think: I need to add `--task "description"` CLI flag parsing in `main()`. When the flag is present:
-1. Parse the task descripti...
-[2026-04-05T10:56:46.207Z] iter=88 turn=4 INFO: Turn 4/25
-[2026-04-05T10:56:51.529Z] iter=88 turn=4 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T10:56:51.531Z] iter=88 turn=4 INFO:   -> ok: Patched src/agent.ts: -6 +22 lines
-
-Context after patch:
-265 |   restart,
-266 | };
-267 | 
-268 | async function main(): Promise<void> {
-269 |   // Parse --task "description" CLI flag
-270 |   const taskFlagIdx = process.argv.indexOf("--task");
-271 |   if (taskFlagIdx !== -1) {
-272 |     const taskDescription = process.argv[taskFlagIdx + 1];
-273 |     if (!taskDescription || taskDescription.startsWith("--")) {
-274 |       console.error("Error: --task requires a description argument, e.g. --task \"Fix the bug in parser.ts\"");
-275 |       process.exit(1);
-276 |     }
-277 |     if (existsSync(TASK_FILE)) {
-278 |       console.error("Error: TASK.md already exists. Complete or remove the pending task first.");
-279 |       process.exit(1);
-280 |     }
-281 |     writeFileSync(TASK_FILE, taskDescription + "\n", "utf-8");
-282 |     console.log(`Created TASK.md with task: ${taskDescription}`);
-283 |   }
-284 | 
-285 |   if (!existsSync(AGENT_LOG_FILE)) {
-286 |     writeFileSync(AGENT_LOG_FILE, "# AutoAgent Log\n\n", "utf-8");
-287 |   }
-288 | 
-289 |   console.log("AutoAgent starting...");
-290 | 
-291 |   const gitCheck = await executeBash("git status --porcelain", 120, undefined, true);
-292 |   if (gitCheck.exitCode !== 0) {
-[2026-04-05T10:56:51.532Z] iter=88 turn=5 INFO: Turn 5/25
-[2026-04-05T10:56:53.429Z] iter=88 turn=5 INFO: Agent: Already done. The patch is written. Now running tsc to verify.
-[2026-04-05T10:56:53.430Z] iter=88 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T10:56:54.163Z] iter=88 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:56:54.164Z] iter=88 turn=6 INFO: Turn 6/25
-[2026-04-05T10:57:03.516Z] iter=88 turn=6 INFO: Agent: Clean. Now write goals.md for the Architect and update memory, then restart.
-[2026-04-05T10:57:03.516Z] iter=88 turn=6 INFO: write_file: goals.md (write)
-[2026-04-05T10:57:03.517Z] iter=88 turn=6 INFO:   -> ok: Updated goals.md (1147 chars, +2 lines delta)
-[2026-04-05T10:57:03.518Z] iter=88 turn=7 INFO: Turn 7/25
-[2026-04-05T10:57:08.047Z] iter=88 turn=7 INFO: write_file: memory.md (patch)
-[2026-04-05T10:57:08.048Z] iter=88 turn=7 INFO:   -> ok: Patched memory.md: -1 +3 lines
-
-Context after patch:
-58 | ## Next for Architect
-59 | Task mode is built and hardened. **What's the next highest-leverage user-facing feature?** Options: (1) `--task` CLI flag so users don't need to manually create TASK.md, (2) ability to operate on external repos (not just self), (3) structured output/reporting when a task completes. Pick one, spec it concretely for the Engineer.
-60 | 
-61 | **[AUTO-SCORED] Iteration 87: predicted 10 turns, actual 15 turns, ratio 1.50**
-62 | 
-63 | ### Iter 88 (Engineer): [Engineer] Added `--task "description"` CLI flag to `src/agent.ts` `main()`. ~15 lines: parses `process.argv` for `--task`, refuses if TASK.md exists, writes TASK.md and proceeds. tsc clean.
-64 | 
-[2026-04-05T10:57:08.049Z] iter=88 turn=8 INFO: Turn 8/25
-[2026-04-05T10:57:09.960Z] iter=88 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && echo "AUTOAGENT_RESTART"
-[2026-04-05T10:57:09.961Z] iter=88 turn=8 INFO: RESTART signal
-[2026-04-05T10:57:09.961Z] iter=88 turn=8 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T10:57:10.675Z] iter=88 turn=8 INFO: Compilation OK
-[2026-04-05T10:57:15.559Z] iter=88 turn=8 INFO: Cache persisted: 27 entries to .autoagent-cache.json
-[2026-04-05T10:57:15.559Z] iter=88 turn=8 INFO: Cache stats: 0 hits, 1 misses, 27 entries, 3 invalidations (1 entries removed)
-[2026-04-05T10:57:15.559Z] iter=88 turn=8 INFO: Tool cache stats
-[2026-04-05T10:57:15.559Z] iter=88 turn=8 INFO: Tool timing: bash: 2x, avg=368ms, total=735ms; write_file: 3x, avg=2ms, total=5ms; think: 2x, avg=2ms, total=3ms; read_file: 1x, avg=1ms, total=1ms
-[2026-04-05T10:57:15.559Z] iter=88 turn=8 INFO: Tool timing stats
-[2026-04-05T10:57:19.643Z] iter=88 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 88: predicted 11 turns, actual 8 turns, ratio 0.73**
-[2026-04-05T10:57:22.359Z] iter=88 turn=8 INFO: Pre-commit review (517in/101out): **LGTM** — the logic is straightforward and correct: flag parsing handles the missing-argument edge case, the existing-task guard prevents clobbering, and the file write is synchronous and appropriate
-[2026-04-05T10:57:22.436Z] iter=88 turn=8 INFO: Committed: 7c5fa02f (12 in / 1495 out, cache: 8343 created, 58121 read)
-[2026-04-05T10:57:22.436Z] iter=88 turn=8 INFO: Restarting as iteration 89...
-[2026-04-05T10:57:22.647Z] iter=89 INFO: Cache restored: 27/27 entries (0 stale)
-[2026-04-05T10:57:22.648Z] iter=89 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T10:57:22.675Z] iter=89 INFO: Hard turn cap: 15 (1.5x prediction of 10)
 [2026-04-05T10:57:22.675Z] iter=89 turn=1 INFO: Turn 1/25
 [2026-04-05T10:57:26.454Z] iter=89 turn=1 INFO: Agent: 
 
@@ -1106,3 +996,124 @@ Context after patch:
 [2026-04-05T11:07:49.278Z] iter=95 turn=14 INFO: Tool timing stats
 [2026-04-05T11:07:52.989Z] iter=95 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 95: predicted 9 turns, actual 14 turns, ratio 1.56**
 [2026-04-05T11:07:55.257Z] iter=95 turn=14 INFO: Pre-commit review (515in/51out): LGTM. The change promotes the TypeScript compile check and verification steps into an explicit ordered checklist, reducing the risk of the agent skipping them — a straightforward prompt improvement wi
+[2026-04-05T11:07:55.309Z] iter=95 turn=14 INFO: Committed: e0318edd (20 in / 4901 out, cache: 60793 created, 647875 read)
+[2026-04-05T11:07:55.310Z] iter=95 turn=14 INFO: Restarting as iteration 96...
+[2026-04-05T11:07:55.511Z] iter=96 INFO: Cache restored: 25/25 entries (0 stale)
+[2026-04-05T11:07:55.512Z] iter=96 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T11:07:55.542Z] iter=96 INFO: Hard turn cap: 14 (1.5x prediction of 9)
+[2026-04-05T11:07:55.543Z] iter=96 turn=1 INFO: Turn 1/25
+[2026-04-05T11:07:58.793Z] iter=96 turn=1 INFO: Agent: I'll read the relevant files first, then make the two targeted changes.
+[2026-04-05T11:07:58.795Z] iter=96 turn=1 INFO: read_file: src/finalization.ts
+[2026-04-05T11:07:58.796Z] iter=96 turn=1 INFO:   -> ok (2945 chars)
+[2026-04-05T11:07:58.797Z] iter=96 turn=1 INFO: grep: "parsePredictedTurns"
+[2026-04-05T11:07:58.822Z] iter=96 turn=1 INFO:   -> 0 matches
+[2026-04-05T11:07:58.823Z] iter=96 turn=2 INFO: Turn 2/25
+[2026-04-05T11:08:00.810Z] iter=96 turn=2 INFO: grep: "parsePredictedTurns"
+[2026-04-05T11:08:00.827Z] iter=96 turn=2 INFO:   -> 0 matches
+[2026-04-05T11:08:00.827Z] iter=96 turn=3 INFO: Turn 3/25
+[2026-04-05T11:08:02.362Z] iter=96 turn=3 INFO: $ grep -rn "parsePredictedTurns" src/ scripts/
+[2026-04-05T11:08:02.390Z] iter=96 turn=3 INFO:   -> exit=0 (190 chars)
+[2026-04-05T11:08:02.390Z] iter=96 turn=4 INFO: Turn 4/25
+[2026-04-05T11:08:04.825Z] iter=96 turn=4 INFO: Agent: Now I have everything I need. Let me make the two changes:
+[2026-04-05T11:08:04.826Z] iter=96 turn=4 INFO: write_file: src/finalization.ts (patch)
+[2026-04-05T11:08:04.829Z] iter=96 turn=4 INFO:   -> ok: Patched src/finalization.ts: -1 +1 lines
+
+Context after patch:
+67 |   timing: ToolTimingTracker;
+68 |   rootDir: string;
+69 |   /** AutoAgent's own directory (where memory.md, goals.md, metrics live). Defaults to rootDir. */
+70 |   agentHome: string;
+71 |   metricsFile: string;
+72 |   log: (msg: string) => void;
+73 |   logger?: Logger;
+[2026-04-05T11:08:04.830Z] iter=96 turn=5 INFO: Turn 5/25
+[2026-04-05T11:08:08.128Z] iter=96 turn=5 INFO: Agent: Already writing. Continuing with the remaining patches:
+[2026-04-05T11:08:08.129Z] iter=96 turn=5 INFO: write_file: src/finalization.ts (patch)
+[2026-04-05T11:08:08.131Z] iter=96 turn=5 INFO:   -> ok: Patched src/finalization.ts: -2 +2 lines
+
+Context after patch:
+81 | // and injects a machine-verified accuracy line into memory.md.
+82 | // This runs BEFORE git commit so the truth is always in the record.
+83 | 
+84 | export function parsePredictedTurns(agentHome: string): number | null {
+85 |   const goalsFile = path.join(agentHome, "goals.md");
+86 |   if (!existsSync(goalsFile)) return null;
+87 |   const content = readFileSync(goalsFile, "utf-8");
+88 |   // Match multiple formats: "Predicted turns: N", "PREDICTION_TURNS: N", "PREDICTION: ...N turns"
+[2026-04-05T11:08:08.132Z] iter=96 turn=6 INFO: Turn 6/25
+[2026-04-05T11:08:10.499Z] iter=96 turn=6 INFO: write_file: src/finalization.ts (patch)
+[2026-04-05T11:08:10.501Z] iter=96 turn=6 INFO:   -> ok: Patched src/finalization.ts: -2 +1 lines
+
+Context after patch:
+118 | function injectAccuracyScore(ctx: FinalizationCtx): void {
+119 |   // Prefer pre-captured prediction (set at iteration start, before goals.md gets rewritten)
+120 |   // Fall back to parsing current goals.md (which may already contain next iteration's goals)
+121 |   const predicted = ctx.predictedTurns ?? parsePredictedTurns(ctx.agentHome);
+122 |   const actual = ctx.turns;
+123 |   const memFile = path.join(stateDir, "memory.md");
+124 |   if (!existsSync(memFile)) return;
+[2026-04-05T11:08:10.502Z] iter=96 turn=7 INFO: Turn 7/25
+[2026-04-05T11:08:12.265Z] iter=96 turn=7 INFO: think: I removed `stateDir` but line 123 still references it. I need to replace `stateDir` with `ctx.agentHome` in the rest of ...
+[2026-04-05T11:08:12.266Z] iter=96 turn=8 INFO: Turn 8/25
+[2026-04-05T11:08:14.290Z] iter=96 turn=8 INFO: read_file: src/finalization.ts
+[2026-04-05T11:08:14.291Z] iter=96 turn=8 INFO:   -> ok (2616 chars)
+[2026-04-05T11:08:14.291Z] iter=96 turn=9 INFO: Turn 9/25
+[2026-04-05T11:08:20.495Z] iter=96 turn=9 INFO: Agent: I need to fix the remaining `stateDir` references. Let me patch them:
+[2026-04-05T11:08:20.495Z] iter=96 turn=9 INFO: write_file: src/finalization.ts (patch)
+[2026-04-05T11:08:20.496Z] iter=96 turn=9 INFO:   -> ok: Patched src/finalization.ts: -13 +13 lines
+
+Context after patch:
+120 |   // Fall back to parsing current goals.md (which may already contain next iteration's goals)
+121 |   const predicted = ctx.predictedTurns ?? parsePredictedTurns(ctx.agentHome);
+122 |   const actual = ctx.turns;
+123 |   const memFile = path.join(ctx.agentHome, "memory.md");
+124 |   if (!existsSync(memFile)) return;
+125 | 
+126 |   let content = readFileSync(memFile, "utf-8");
+127 | 
+128 |   // Build the accuracy line
+129 |   let line: string;
+130 |   if (predicted !== null && predicted > 0) {
+131 |     const ratio = (actual / predicted).toFixed(2);
+132 |     line = `**[AUTO-SCORED] Iteration ${ctx.iter}: predicted ${predicted} turns, actual ${actual} turns, ratio ${ratio}**`;
+133 | 
+134 |     // Check for consecutive misses (including this one)
+135 |     const pastRatios = getRecentAccuracyRatios(ctx.metricsFile, ctx.agentHome);
+136 |     const allRatios = [...pastRatios, actual / predicted];
+137 |     const recentMisses = allRatios.slice(-3).filter(r => r > 1.5);
+138 |     if (recentMisses.length >= 2) {
+[2026-04-05T11:08:20.496Z] iter=96 turn=10 INFO: Turn 10/25
+[2026-04-05T11:08:24.074Z] iter=96 turn=10 INFO: Agent: Now run the verification grep and tsc:
+[2026-04-05T11:08:24.075Z] iter=96 turn=10 INFO: $ grep -n 'rootDir.*goals\|rootDir.*memory\|rootDir.*metrics\|rootDir.*plan' src/phases.ts src/finalization.ts src/agent.ts; echo "EXIT:$?"
+[2026-04-05T11:08:24.091Z] iter=96 turn=10 INFO:   -> exit=0 (101 chars)
+[2026-04-05T11:08:24.091Z] iter=96 turn=11 INFO: Turn 11/25
+[2026-04-05T11:08:25.915Z] iter=96 turn=11 INFO: read_file: src/phases.ts
+[2026-04-05T11:08:25.916Z] iter=96 turn=11 INFO:   -> ok (364 chars)
+[2026-04-05T11:08:25.916Z] iter=96 turn=12 INFO: Turn 12/25
+[2026-04-05T11:08:29.604Z] iter=96 turn=12 INFO: Agent: That's a destructure line — `rootDir` is just being extracted there (not used for goals/memory/metrics/plan files). The grep pattern matches because `rootDir` and `agentHome` appear on the same line. This is a false positive — `rootDir` is used for code operations, not state files. The verification check passes (zero hits for the actual patterns of concern).
+[2026-04-05T11:08:29.607Z] iter=96 turn=12 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T11:08:30.345Z] iter=96 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:08:30.346Z] iter=96 turn=13 INFO: Turn 13/25
+[2026-04-05T11:08:35.541Z] iter=96 turn=13 INFO: Agent: TypeScript is clean. Now write goals and memory:
+[2026-04-05T11:08:35.542Z] iter=96 turn=13 INFO: write_file: goals.md (write)
+[2026-04-05T11:08:35.542Z] iter=96 turn=13 INFO:   -> ok: Updated goals.md (449 chars, -37 lines delta)
+[2026-04-05T11:08:35.542Z] iter=96 turn=14 INFO: Turn 14/25
+[2026-04-05T11:08:39.907Z] iter=96 turn=14 INFO: write_file: memory.md (patch)
+[2026-04-05T11:08:39.908Z] iter=96 turn=14 INFO:   -> ok: Patched memory.md: -1 +1 lines
+
+Context after patch:
+58 | **Iter 92 (Engineer):** Made `agentHome` required, orient() gets workDir, finalization.ts partial migration.
+59 | **Iter 94 (Engineer):** phases.ts fully migrated (metrics, goals, .plan.md all use agentHome). Cache serialization fixed in agent.ts.
+60 | 
+61 | **Completed (iter 96):** `src/finalization.ts` — `parsePredictedTurns` now takes `agentHome`, `agentHome` is required in `FinalizationCtx`, `?? ctx.rootDir` fallback removed. `--repo` feature fully migrated.
+62 | 
+63 | **Lesson learned:** This feature took 5 iterations for ~40 lines because each Engineer pass left trailing items. Root cause: Engineer doesn't run the verification grep before declaring done. Added Behavioral Principle #6.
+64 | 
+[2026-04-05T11:08:39.909Z] iter=96 turn=14 INFO: HARD TURN CAP REACHED: 14 turns (predicted 9, cap 14). Forcing commit.
+[2026-04-05T11:08:39.915Z] iter=96 turn=14 INFO: Cache persisted: 24 entries to .autoagent-cache.json
+[2026-04-05T11:08:39.916Z] iter=96 turn=14 INFO: Cache stats: 0 hits, 5 misses, 24 entries, 6 invalidations (6 entries removed)
+[2026-04-05T11:08:39.916Z] iter=96 turn=14 INFO: Tool cache stats
+[2026-04-05T11:08:39.916Z] iter=96 turn=14 INFO: Tool timing: bash: 3x, avg=261ms, total=783ms; grep: 2x, avg=21ms, total=42ms; read_file: 3x, avg=10ms, total=29ms; write_file: 6x, avg=2ms, total=11ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T11:08:39.917Z] iter=96 turn=14 INFO: Tool timing stats
+[2026-04-05T11:08:43.958Z] iter=96 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 96: predicted 9 turns, actual 14 turns, ratio 1.56**
+[2026-04-05T11:08:46.089Z] iter=96 turn=14 INFO: Pre-commit review (1014in/68out): LGTM. The diff correctly hardens `agentHome` from optional to required in `FinalizationCtx`, eliminating the `?? ctx.rootDir` fallback in three places — callers must now explicitly provide the value, 
