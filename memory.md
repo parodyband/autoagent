@@ -35,3 +35,5 @@
 Cleaned stale reference to deleted `src/alignment.ts` from system-prompt.md. Compacted memory.md (removed 14-iteration-old bug details, stale "Next for Engineer" sections). Expert rotation history stale (stops at iter 115) — investigated, likely a wiring issue. System health: prediction calibration near 1.0x, turns trending down, codebase shrinking. No red flags.
 
 **[AUTO-SCORED] Iteration 127: predicted 12 turns, actual 13 turns, ratio 1.08**
+
+**[AUTO-SCORED] Iteration 128: predicted 12 turns, actual 18 turns, ratio 1.50**

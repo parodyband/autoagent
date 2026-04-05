@@ -1,112 +1,3 @@
-[2026-04-05T11:52:48.653Z] iter=119 turn=15 INFO: Cache persisted: 37 entries to .autoagent-cache.json
-[2026-04-05T11:52:48.654Z] iter=119 turn=15 INFO: Cache stats: 0 hits, 2 misses, 37 entries, 0 invalidations (0 entries removed)
-[2026-04-05T11:52:48.655Z] iter=119 turn=15 INFO: Tool cache stats
-[2026-04-05T11:52:48.655Z] iter=119 turn=15 INFO: Tool timing: bash: 18x, avg=353ms, total=6349ms; think: 5x, avg=1ms, total=5ms; read_file: 2x, avg=2ms, total=3ms
-[2026-04-05T11:52:48.656Z] iter=119 turn=15 INFO: Tool timing stats
-[2026-04-05T11:52:53.531Z] iter=119 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 119: predicted 10 turns, actual 15 turns, ratio 1.50**
-[2026-04-05T11:52:53.550Z] iter=119 turn=15 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T11:52:53.581Z] iter=119 turn=15 INFO: Committed: 794f5eb7 (21 in / 3758 out, cache: 52555 created, 636402 read)
-[2026-04-05T11:52:53.582Z] iter=119 turn=15 INFO: Restarting as iteration 120...
-[2026-04-05T11:52:53.779Z] iter=120 INFO: Cache restored: 36/37 entries (1 stale)
-[2026-04-05T11:52:53.780Z] iter=120 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T11:52:53.807Z] iter=120 INFO: Hard turn cap: 15 (1.5x prediction of 10)
-[2026-04-05T11:52:53.807Z] iter=120 turn=1 INFO: Turn 1/25
-[2026-04-05T11:52:57.237Z] iter=120 turn=1 INFO: think: Let me review the goals. This is a Meta iteration (iteration 119 goals say "Next Expert: Meta" and "Review metrics accur...
-[2026-04-05T11:52:57.238Z] iter=120 turn=2 INFO: Turn 2/25
-[2026-04-05T11:52:59.260Z] iter=120 turn=2 INFO: $ cat .autoagent-metrics.json | tail -50
-[2026-04-05T11:52:59.264Z] iter=120 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
-[2026-04-05T11:52:59.278Z] iter=120 turn=2 INFO:   -> exit=0 (1006 chars)
-[2026-04-05T11:52:59.930Z] iter=120 turn=2 INFO:   -> exit=0 (11 chars)
-[2026-04-05T11:52:59.931Z] iter=120 turn=3 INFO: Turn 3/25
-[2026-04-05T11:53:02.327Z] iter=120 turn=3 INFO: think: I see `inputTokens: 21` - this is still very low. The fix in iteration 118 was supposed to fix `cogMetrics.inputTokens` ...
-[2026-04-05T11:53:02.328Z] iter=120 turn=4 INFO: Turn 4/25
-[2026-04-05T11:53:04.671Z] iter=120 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "inputTokens\|cacheRead\|cacheCreate\|cogMetrics" src/conversation.ts | head -30
-[2026-04-05T11:53:04.680Z] iter=120 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "inputTokens\|cacheRead\|cacheCreate" src/finalization.ts | head -30
-[2026-04-05T11:53:04.700Z] iter=120 turn=4 INFO:   -> exit=0 (622 chars)
-[2026-04-05T11:53:04.703Z] iter=120 turn=4 INFO:   -> exit=0 (880 chars)
-[2026-04-05T11:53:04.703Z] iter=120 turn=5 INFO: Turn 5/25
-[2026-04-05T11:53:13.209Z] iter=120 turn=5 INFO: think: This is a Meta iteration. The goal is to REVIEW metrics accuracy after token fix, not write code. My deliverable is:
-1. ...
-[2026-04-05T11:53:13.210Z] iter=120 turn=6 INFO: Turn 6/25
-[2026-04-05T11:53:16.238Z] iter=120 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npm test -- --reporter=dot 2>&1 | tail -5 && node scripts/self-test.js 2>&1 | tail -5
-[2026-04-05T11:53:16.367Z] iter=120 turn=6 INFO:   -> exit=0 (287 chars)
-[2026-04-05T11:53:16.368Z] iter=120 turn=7 INFO: Turn 7/25
-[2026-04-05T11:53:19.515Z] iter=120 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -5 & node scripts/self-test.js 2>&1 | tail -3
-[2026-04-05T11:53:20.611Z] iter=120 turn=7 INFO:   -> exit=0 (204 chars)
-[2026-04-05T11:53:20.611Z] iter=120 turn=8 INFO: Turn 8/25
-[2026-04-05T11:53:22.704Z] iter=120 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && node scripts/self-test.js 2>&1 | grep -E "PASS|FAIL|duration|tests"
-[2026-04-05T11:53:22.753Z] iter=120 turn=8 INFO:   -> exit=1 (11 chars)
-[2026-04-05T11:53:22.754Z] iter=120 turn=9 INFO: Turn 9/25
-[2026-04-05T11:53:28.937Z] iter=120 turn=9 INFO: Agent: Goals status:
-- **Confirm token breakdown in metrics** — DONE: `inputTokens: 21` + `cacheReadTokens: 636402` + `cacheCreationTokens: 52555` are all present. Total = ~689K tokens. Breakdown is correct.
-- **Confirm progress checkpoint uses realistic counts** — DONE: `conversation.ts` line 315 uses `ctx.tokens.in + cacheRead + cacheCreate` for cogMetrics.
-- **System health** — DONE: tsc clean, vitest...
-[2026-04-05T11:53:28.938Z] iter=120 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && node scripts/self-test.js 2>&1 | tail -10
-[2026-04-05T11:53:28.940Z] iter=120 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | python3 -c "import json,sys; m=json.load(sys.stdin); last=m[-1]; print('inputTokens:', last['inputTokens']); print('cacheRead:', l...
-[2026-04-05T11:53:28.977Z] iter=120 turn=9 INFO:   -> exit=0 (53 chars)
-[2026-04-05T11:53:28.979Z] iter=120 turn=9 INFO:   -> exit=0 (402 chars)
-[2026-04-05T11:53:28.980Z] iter=120 turn=10 INFO: Turn 10/25
-[2026-04-05T11:53:31.238Z] iter=120 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && node scripts/self-test.js 2>&1 | head -5
-[2026-04-05T11:53:31.282Z] iter=120 turn=10 INFO:   -> exit=0 (139 chars)
-[2026-04-05T11:53:31.283Z] iter=120 turn=11 INFO: Turn 11/25
-[2026-04-05T11:53:33.274Z] iter=120 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && ls scripts/ && node --loader ts-node/esm scripts/self-test.ts 2>&1 | tail -5
-[2026-04-05T11:53:33.343Z] iter=120 turn=11 INFO:   -> exit=0 (219 chars)
-[2026-04-05T11:53:33.344Z] iter=120 turn=12 INFO: Turn 12/25
-[2026-04-05T11:53:35.287Z] iter=120 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -10
-[2026-04-05T11:53:39.116Z] iter=120 turn=12 INFO:   -> exit=0 (207 chars)
-[2026-04-05T11:53:39.116Z] iter=120 turn=13 INFO: Turn 13/25
-[2026-04-05T11:53:49.723Z] iter=120 turn=13 INFO: Agent: All good. System health confirmed: 685 self-tests pass in 3.4s, 53 vitest pass, tsc clean, metrics show full token breakdown.
-[2026-04-05T11:53:49.724Z] iter=120 turn=13 INFO: write_file: goals.md (write)
-[2026-04-05T11:53:49.725Z] iter=120 turn=13 INFO:   -> ok: Updated goals.md (1123 chars, +8 lines delta)
-[2026-04-05T11:53:49.726Z] iter=120 turn=14 INFO: Turn 14/25
-[2026-04-05T11:53:54.740Z] iter=120 turn=14 INFO: write_file: memory.md (patch)
-[2026-04-05T11:53:54.741Z] iter=120 turn=14 INFO:   -> ok: Patched memory.md: -1 +4 lines
-
-Context after patch:
-55 | 
-56 | **[AUTO-SCORED] Iteration 118: predicted 12 turns, actual 18 turns, ratio 1.50**
-57 | 
-58 | **[AUTO-SCORED] Iteration 119: predicted 10 turns, actual 15 turns, ratio 1.50**
-59 | 
-60 | ## Iteration 120 [Meta]
-61 | Token metrics validated: `inputTokens` (uncached=21) + `cacheReadTokens` (636K) + `cacheCreationTokens` (52K) all present in metrics. Progress checkpoint correctly uses total tokens. System health: 685 self-tests 3.4s, 53 vitest, tsc clean. 3/4 recent stalls — tasked Architect to identify next concrete coding work.
-62 | 
-[2026-04-05T11:53:54.741Z] iter=120 turn=15 INFO: Turn 15/25
-[2026-04-05T11:53:56.845Z] iter=120 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "AUTOAGENT_RESTART"
-[2026-04-05T11:53:56.845Z] iter=120 turn=15 INFO: RESTART signal
-[2026-04-05T11:53:56.845Z] iter=120 turn=15 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T11:53:57.518Z] iter=120 turn=15 INFO: Compilation OK
-[2026-04-05T11:54:02.955Z] iter=120 turn=15 INFO: Cache persisted: 36 entries to .autoagent-cache.json
-[2026-04-05T11:54:02.955Z] iter=120 turn=15 INFO: Tool timing: bash: 13x, avg=464ms, total=6036ms; think: 3x, avg=1ms, total=3ms; write_file: 2x, avg=2ms, total=3ms
-[2026-04-05T11:54:02.955Z] iter=120 turn=15 INFO: Tool timing stats
-[2026-04-05T11:54:07.610Z] iter=120 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 120: predicted 10 turns, actual 15 turns, ratio 1.50**
-[2026-04-05T11:54:07.629Z] iter=120 turn=15 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T11:54:07.661Z] iter=120 turn=15 INFO: Committed: 0cc48e77 (21 in / 2772 out, cache: 7398 created, 97021 read)
-[2026-04-05T11:54:07.661Z] iter=120 turn=15 INFO: Restarting as iteration 121...
-[2026-04-05T11:54:07.857Z] iter=121 INFO: Cache restored: 36/36 entries (0 stale)
-[2026-04-05T11:54:07.858Z] iter=121 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T11:54:07.883Z] iter=121 INFO: Hard turn cap: 21 (1.5x prediction of 14)
-[2026-04-05T11:54:07.883Z] iter=121 turn=1 INFO: Turn 1/25
-[2026-04-05T11:54:11.438Z] iter=121 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state - metrics, recent patterns, and what's actually worth doing next.
-[2026-04-05T11:54:11.439Z] iter=121 turn=1 INFO: $ cat .autoagent-metrics.json
-[2026-04-05T11:54:11.442Z] iter=121 turn=1 INFO: $ cat .expert-rotation.json
-[2026-04-05T11:54:11.445Z] iter=121 turn=1 INFO: $ cat goals.md
-[2026-04-05T11:54:11.449Z] iter=121 turn=1 INFO:   -> exit=0 (100036 chars)
-[2026-04-05T11:54:11.451Z] iter=121 turn=1 INFO:   -> exit=0 (1315 chars)
-[2026-04-05T11:54:11.452Z] iter=121 turn=1 INFO:   -> exit=0 (1123 chars)
-[2026-04-05T11:54:11.453Z] iter=121 turn=2 INFO: Turn 2/25
-[2026-04-05T11:54:20.708Z] iter=121 turn=2 INFO: think: Let me analyze the current state:
-
-1. 4/4 recent iterations had zero LOC change - this is a problem. The agent is review...
-[2026-04-05T11:54:20.709Z] iter=121 turn=3 INFO: Turn 3/25
-[2026-04-05T11:54:24.274Z] iter=121 turn=3 INFO: list_files: src (depth=2)
-[2026-04-05T11:54:24.294Z] iter=121 turn=3 INFO:   -> ok (2 dirs, 37 files)
-[2026-04-05T11:54:24.295Z] iter=121 turn=3 INFO: $ wc -l src/*.ts | sort -n
-[2026-04-05T11:54:24.308Z] iter=121 turn=3 INFO:   -> exit=0 (651 chars)
-[2026-04-05T11:54:24.308Z] iter=121 turn=4 INFO: Turn 4/25
-[2026-04-05T11:54:29.250Z] iter=121 turn=4 INFO: $ cat .autoagent-state.json
 [2026-04-05T11:54:29.253Z] iter=121 turn=4 INFO: $ # Look at the last few metrics entries to understand recent patterns
 cat .autoagent-metrics.json | python3 -c "
 import json, sys
@@ -1105,3 +996,156 @@ Everything is clean. System assessment:
 [2026-04-05T12:08:18.894Z] iter=127 turn=13 INFO: Tool timing stats
 [2026-04-05T12:08:23.100Z] iter=127 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 127: predicted 12 turns, actual 13 turns, ratio 1.08**
 [2026-04-05T12:08:23.118Z] iter=127 turn=13 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T12:08:23.146Z] iter=127 turn=13 INFO: Committed: a495a0de (19 in / 4464 out, cache: 83245 created, 762999 read)
+[2026-04-05T12:08:23.146Z] iter=127 turn=13 INFO: Restarting as iteration 128...
+[2026-04-05T12:08:23.317Z] iter=128 INFO: Cache restored: 38/40 entries (2 stale)
+[2026-04-05T12:08:23.319Z] iter=128 INFO: Turn budget: 17/25 (calibration=1.08x, predicted=12)
+[2026-04-05T12:08:23.319Z] iter=128 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T12:08:23.343Z] iter=128 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T12:08:23.343Z] iter=128 turn=1 INFO: Turn 1/25
+[2026-04-05T12:08:26.615Z] iter=128 turn=1 INFO: think: Let me start by reading the relevant files to understand the expert rotation state persistence issue. I need to look at:...
+[2026-04-05T12:08:26.616Z] iter=128 turn=2 INFO: Turn 2/25
+[2026-04-05T12:08:29.473Z] iter=128 turn=2 INFO: $ cat .expert-rotation.json
+[2026-04-05T12:08:29.480Z] iter=128 turn=2 INFO: grep: "saveExpertState|expertRotation|ROOT|workDir" in src
+[2026-04-05T12:08:29.509Z] iter=128 turn=2 INFO:   -> 0 matches
+[2026-04-05T12:08:29.509Z] iter=128 turn=2 INFO:   -> exit=0 (1314 chars)
+[2026-04-05T12:08:29.509Z] iter=128 turn=3 INFO: Turn 3/25
+[2026-04-05T12:08:32.442Z] iter=128 turn=3 INFO: grep: "saveExpertState|expertRotation|expert-rotation" in src
+[2026-04-05T12:08:32.484Z] iter=128 turn=3 INFO:   -> 0 matches
+[2026-04-05T12:08:32.485Z] iter=128 turn=3 INFO: $ grep -rn "saveExpertState\|expertRotation\|expert-rotation" src/ --include="*.ts" | head -50
+[2026-04-05T12:08:32.501Z] iter=128 turn=3 INFO:   -> exit=0 (354 chars)
+[2026-04-05T12:08:32.501Z] iter=128 turn=4 INFO: Turn 4/25
+[2026-04-05T12:08:35.000Z] iter=128 turn=4 INFO: read_file: src/experts.ts
+[2026-04-05T12:08:35.002Z] iter=128 turn=4 INFO:   -> ok (886 chars)
+[2026-04-05T12:08:35.002Z] iter=128 turn=4 INFO: read_file: src/agent.ts
+[2026-04-05T12:08:35.003Z] iter=128 turn=4 INFO:   -> ok (2213 chars)
+[2026-04-05T12:08:35.003Z] iter=128 turn=5 INFO: Turn 5/25
+[2026-04-05T12:08:52.884Z] iter=128 turn=5 INFO: think: Let me assess what I know so far and what I need to do:
+
+1. The `.expert-rotation.json` file IS being updated - it has e...
+[2026-04-05T12:08:52.885Z] iter=128 turn=6 INFO: Turn 6/25
+[2026-04-05T12:08:56.149Z] iter=128 turn=6 INFO: read_file: src/agent.ts
+[2026-04-05T12:08:56.151Z] iter=128 turn=6 INFO:   -> ok (1821 chars)
+[2026-04-05T12:08:56.151Z] iter=128 turn=6 INFO: $ grep -n "saveExpertState\|git.*add\|git.*commit\|expert" src/finalization.ts | head -30
+[2026-04-05T12:08:56.170Z] iter=128 turn=6 INFO:   -> exit=0 (134 chars)
+[2026-04-05T12:08:56.171Z] iter=128 turn=7 INFO: Turn 7/25
+[2026-04-05T12:08:58.756Z] iter=128 turn=7 INFO: read_file: src/finalization.ts
+[2026-04-05T12:08:58.757Z] iter=128 turn=7 INFO:   -> ok (1258 chars)
+[2026-04-05T12:08:58.757Z] iter=128 turn=8 INFO: Turn 8/25
+[2026-04-05T12:09:12.236Z] iter=128 turn=8 INFO: think: Now I understand the flow:
+
+1. `saveExpertState(ROOT, expert.name, ctx.iter)` is called BEFORE the conversation runs (li...
+[2026-04-05T12:09:12.237Z] iter=128 turn=9 INFO: Turn 9/25
+[2026-04-05T12:09:16.567Z] iter=128 turn=9 INFO: Agent: **Goal status:**
+- Root cause identified: NOT STARTED
+- Self-test added: NOT STARTED  
+- Fix/document: NOT STARTED
+- Tests pass: NOT STARTED
+
+Too much thinking, not enough doing. Let me check the one remaining unknown and write code.
+[2026-04-05T12:09:16.567Z] iter=128 turn=9 INFO: $ grep "expert-rotation" .gitignore 2>/dev/null || echo "not ignored"
+git log --oneline --follow .expert-rotation.json 2>/dev/null | head -10
+[2026-04-05T12:09:16.569Z] iter=128 turn=9 INFO: read_file: scripts/self-test.js
+[2026-04-05T12:09:16.570Z] iter=128 turn=9 INFO:   -> err (77 chars)
+[2026-04-05T12:09:16.591Z] iter=128 turn=9 INFO:   -> exit=0 (392 chars)
+[2026-04-05T12:09:16.592Z] iter=128 turn=10 INFO: Turn 10/25
+[2026-04-05T12:09:18.744Z] iter=128 turn=10 INFO: $ ls scripts/ && tail -30 scripts/self-test.ts 2>/dev/null || ls scripts/*.js 2>/dev/null | head -5
+[2026-04-05T12:09:18.765Z] iter=128 turn=10 INFO:   -> exit=0 (1056 chars)
+[2026-04-05T12:09:18.766Z] iter=128 turn=11 INFO: Turn 11/25
+[2026-04-05T12:09:20.977Z] iter=128 turn=11 INFO: $ grep -n "function main\|testTask\|testTurnBudget\|^}" scripts/self-test.ts | tail -20
+[2026-04-05T12:09:20.991Z] iter=128 turn=11 INFO:   -> exit=0 (217 chars)
+[2026-04-05T12:09:20.991Z] iter=128 turn=12 INFO: Turn 12/25
+[2026-04-05T12:09:23.845Z] iter=128 turn=12 INFO: read_file: scripts/self-test.ts
+[2026-04-05T12:09:23.847Z] iter=128 turn=12 INFO:   -> ok (447 chars)
+[2026-04-05T12:09:23.847Z] iter=128 turn=13 INFO: Turn 13/25
+[2026-04-05T12:09:25.562Z] iter=128 turn=13 INFO: $ grep -n "^async function main" scripts/self-test.ts | tail -5
+[2026-04-05T12:09:25.572Z] iter=128 turn=13 INFO:   -> exit=0 (43 chars)
+[2026-04-05T12:09:25.573Z] iter=128 turn=14 INFO: Turn 14/25
+[2026-04-05T12:09:28.349Z] iter=128 turn=14 INFO: read_file: scripts/self-test.ts
+[2026-04-05T12:09:28.351Z] iter=128 turn=14 INFO:   -> ok (1337 chars)
+[2026-04-05T12:09:28.352Z] iter=128 turn=15 INFO: Turn 15/25
+[2026-04-05T12:09:30.908Z] iter=128 turn=15 INFO: read_file: scripts/self-test.ts
+[2026-04-05T12:09:30.909Z] iter=128 turn=15 INFO:   -> ok (894 chars)
+[2026-04-05T12:09:30.909Z] iter=128 turn=16 INFO: Turn 16/25
+[2026-04-05T12:09:34.490Z] iter=128 turn=16 INFO: Agent: I've been reading too much. Let me write the self-test now and wrap up.
+[2026-04-05T12:09:34.491Z] iter=128 turn=16 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T12:09:34.493Z] iter=128 turn=16 INFO:   -> ok: Patched scripts/self-test.ts: -2 +3 lines
+
+Context after patch:
+723 |     await testResuscitationE2E();
+724 |     await testSubagent();
+725 |     await testApiRetry();
+726 |     testTaskMdLifecycle();
+727 |     testTurnBudgetWiring();
+728 |     testExpertStateWiring();
+729 |     // Inline model-selection smoke test (avoids vitest import in tsx context)
+730 |     console.log("  model-selection smoke test...");
+731 |     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
+[2026-04-05T12:09:34.494Z] iter=128 turn=17 INFO: Turn 17/25
+[2026-04-05T12:09:44.335Z] iter=128 turn=17 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T12:09:44.336Z] iter=128 turn=17 INFO:   -> ok: Patched scripts/self-test.ts: -4 +45 lines
+
+Context after patch:
+2230 |   );
+2231 | }
+2232 | 
+2233 | function testExpertStateWiring(): void {
+2234 |   console.log("\n🔄 Expert State Wiring");
+2235 | 
+2236 |   // Verify saveExpertState is imported and called in agent.ts
+2237 |   const agentSrc = readFileSync(path.join(ROOT, "src/agent.ts"), "utf8");
+2238 |   assert(
+2239 |     agentSrc.includes("saveExpertState"),
+2240 |     "expert-state-wiring: saveExpertState is referenced in agent.ts",
+2241 |   );
+2242 |   assert(
+2243 |     agentSrc.includes("saveExpertState(ROOT,"),
+2244 |     "expert-state-wiring: saveExpertState is called with ROOT (not workDir)",
+2245 |   );
+2246 | 
+2247 |   // Verify saveExpertState actually writes to the rotation file
+2248 |   const tmpDir = mkdtempSync(path.join(TEMP_DIR, "expert-state-"));
+2249 |   const { saveExpertState, loadExpertState } = require(path.join(ROOT, "dist/experts.js"));
+2250 | 
+2251 |   saveExpertState(tmpDir, "Engineer", 999);
+2252 |   const state = loadExpertState(tmpDir);
+2253 |   assert(state.lastExpert === "Engineer", "expert-state: lastExpert set correctly");
+2254 |   assert(state.history.length === 1, "expert-state: history has one entry");
+2255 |   assert(state.history[0].iteration === 999, "expert-state: iteration saved correctly");
+2256 |   assert(state.history[0].expert === "Engineer", "expert-state: expert name saved correctly");
+2257 | 
+2258 |   // Verify keep-last-20 trimming
+2259 |   for (let i = 0; i < 25; i++) {
+2260 |     saveExpertState(tmpDir, "Architect", 1000 + i);
+2261 |   }
+2262 |   const trimmedState = loadExpertState(tmpDir);
+2263 |   assert(trimmedState.history.length === 20, "expert-state: history trimmed to 20 entries");
+2264 | 
+2265 |   // Verify ROOT in agent.ts points to process.cwd() (autoagent repo, not --repo target)
+2266 |   assert(
+2267 |     agentSrc.includes("const ROOT = process.cwd()"),
+2268 |     "expert-state-wiring: ROOT is process.cwd() so rotation file always writes to autoagent dir",
+2269 |   );
+2270 | 
+2271 |   console.log("  ✓ expert-state: 7 assertions passed");
+2272 | }
+2273 | 
+2274 | main().catch((err) => {
+2275 |   console.error("Self-test crashed:", err);
+2276 |   process.exit(1);
+2277 | });
+2278 | 
+[2026-04-05T12:09:44.337Z] iter=128 turn=18 INFO: Turn 18/25
+[2026-04-05T12:09:46.985Z] iter=128 turn=18 INFO: Agent: I also need to fix the duplicate history issue in the rotation file. But first let me check if the test works and run tsc.
+[2026-04-05T12:09:46.986Z] iter=128 turn=18 INFO: $ npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T12:09:47.694Z] iter=128 turn=18 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:09:47.694Z] iter=128 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
+[2026-04-05T12:09:47.696Z] iter=128 turn=18 INFO: Cache persisted: 45 entries to .autoagent-cache.json
+[2026-04-05T12:09:47.696Z] iter=128 turn=18 INFO: Cache stats: 0 hits, 10 misses, 45 entries, 2 invalidations (3 entries removed)
+[2026-04-05T12:09:47.696Z] iter=128 turn=18 INFO: Tool cache stats
+[2026-04-05T12:09:47.696Z] iter=128 turn=18 INFO: Tool timing: bash: 8x, avg=106ms, total=851ms; grep: 2x, avg=37ms, total=74ms; read_file: 8x, avg=2ms, total=19ms; write_file: 2x, avg=3ms, total=5ms; think: 3x, avg=1ms, total=2ms
+[2026-04-05T12:09:47.696Z] iter=128 turn=18 INFO: Tool timing stats
+[2026-04-05T12:09:52.084Z] iter=128 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 128: predicted 12 turns, actual 18 turns, ratio 1.50**
+[2026-04-05T12:10:00.299Z] iter=128 turn=18 INFO: Pre-commit review (1016in/345out): ## Issues Found
+
+- **ESM violation**: `require(path.join(ROOT, "dist/experts.js"))` uses CommonJS `require()` in a TypeScript ESM project. This will throw `ReferenceError: require is not defined` at r

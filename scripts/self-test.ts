@@ -725,6 +725,7 @@ async function main(): Promise<void> {
     await testApiRetry();
     testTaskMdLifecycle();
     testTurnBudgetWiring();
+    testExpertStateWiring();
     // Inline model-selection smoke test (avoids vitest import in tsx context)
     console.log("  model-selection smoke test...");
     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
@@ -2227,6 +2228,47 @@ function testTurnBudgetWiring(): void {
     /const turnBudget\s*=\s*computeTurnBudget\(/.test(agentSrc),
     "turn-budget-wiring: computeTurnBudget() result is assigned to turnBudget",
   );
+}
+
+function testExpertStateWiring(): void {
+  console.log("\n🔄 Expert State Wiring");
+
+  // Verify saveExpertState is imported and called in agent.ts
+  const agentSrc = readFileSync(path.join(ROOT, "src/agent.ts"), "utf8");
+  assert(
+    agentSrc.includes("saveExpertState"),
+    "expert-state-wiring: saveExpertState is referenced in agent.ts",
+  );
+  assert(
+    agentSrc.includes("saveExpertState(ROOT,"),
+    "expert-state-wiring: saveExpertState is called with ROOT (not workDir)",
+  );
+
+  // Verify saveExpertState actually writes to the rotation file
+  const tmpDir = mkdtempSync(path.join(TEMP_DIR, "expert-state-"));
+  const { saveExpertState, loadExpertState } = require(path.join(ROOT, "dist/experts.js"));
+
+  saveExpertState(tmpDir, "Engineer", 999);
+  const state = loadExpertState(tmpDir);
+  assert(state.lastExpert === "Engineer", "expert-state: lastExpert set correctly");
+  assert(state.history.length === 1, "expert-state: history has one entry");
+  assert(state.history[0].iteration === 999, "expert-state: iteration saved correctly");
+  assert(state.history[0].expert === "Engineer", "expert-state: expert name saved correctly");
+
+  // Verify keep-last-20 trimming
+  for (let i = 0; i < 25; i++) {
+    saveExpertState(tmpDir, "Architect", 1000 + i);
+  }
+  const trimmedState = loadExpertState(tmpDir);
+  assert(trimmedState.history.length === 20, "expert-state: history trimmed to 20 entries");
+
+  // Verify ROOT in agent.ts points to process.cwd() (autoagent repo, not --repo target)
+  assert(
+    agentSrc.includes("const ROOT = process.cwd()"),
+    "expert-state-wiring: ROOT is process.cwd() so rotation file always writes to autoagent dir",
+  );
+
+  console.log("  ✓ expert-state: 7 assertions passed");
 }
 
 main().catch((err) => {
