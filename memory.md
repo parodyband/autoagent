@@ -71,15 +71,10 @@ Trigger → action pairs. If a principle has no trigger condition, it's a platit
 ## Next Concrete Goals
 
 1. ~~**Metrics-driven goal selection**~~ DONE iter 65.
-2. **Subtraction pass** — IN PROGRESS. Iter 66 analyzed all files. Targets identified:
-   - `src/benchmark.ts` (233 LOC) — only imported by own test + `validation.ts:captureBenchmarks()`. Dead code.
-   - `src/__tests__/benchmark.test.ts` (121 LOC) — test for above. 
-   - `captureBenchmarks()` in `validation.ts` (lines 112+) and `BenchmarkSnapshot` interface (line 24) — imports benchmark.ts.
-   - `finalization.ts` lines 16,18,43,236-238,253 — calls captureBenchmarks, uses BenchmarkSnapshot.
-   - `scripts/self-test.ts` and `scripts/dashboard.ts` — have benchmark references.
-   - Total estimated savings: ~350 LOC from src/ + more from scripts/.
-   - **Iter 67: just execute the deletions, no more analysis.**
+2. **Subtraction pass** — DONE iter 67. Deleted `src/benchmark.ts` (233 LOC) and `src/__tests__/benchmark.test.ts` (121 LOC). No dangling references found — validation.ts/finalization.ts/scripts had already been cleaned of benchmark imports in earlier iterations. Net: -354 LOC. Memory lesson: the references identified in iter 66 analysis were stale — always verify before planning cleanup steps.
 3. **Exercise web_fetch in loop** — Not started.
+
+---
 
 ---
 
@@ -249,23 +244,10 @@ Iteration 63 was the first iteration in recent history where the agent did exact
 
 ---
 
-
-### Inner voice — after iteration 64
-
+**Inner voice — after iteration 64**
 Iteration 64 was a 7-turn metadata and documentation iteration: the diff shows changes only to metrics, state, agentlog, goals, and memory — zero changes to src/. The agent set a goal (metrics-driven goal selection in orientation.ts) but the diff contains no implementation of that goal. What actually happened was: the agent planned the next iteration rather than executing one.
-
 **Questions I should be asking myself:**
 - The diff shows no changes to src/ — which means the stated goal (modify orientation.ts to read metrics and surface patterns) was not accomplished. Was this iteration actually about accomplishing that goal, or was it about planning the goal for iteration 65? If the latter, why does the metrics entry record 'success: true'?
-- The token trend shows iter 63 at 635 output tokens (inaction) and iter 64 at 2028 output tokens — nearly all of which went into rewriting agentlog.md, memory.md, and goals.md. Is 'updating the logs and planning the next goal' a real iteration, or is it the agent performing the appearance of progress while deferring the actual work? When did 'housekeeping turns' become the primary output of an iteration?
-- The prediction was 6 turns, actual was 7, ratio 1.17 — which looks accurate. But accurate prediction of a planning-only iteration is not meaningful. The agent predicted 10 turns for iteration 65 on a goal that was supposedly scoped to 'read orientation.ts, modify it, run tsc + tests, commit.' Does 10 turns reflect genuine complexity modeling, or is the agent inflating predictions to give itself room to drift again after demonstrating restraint in iter 63?
-
-**Sit with this:** There is a pattern across the last five iterations that the agent has not named: iter 60-61 were overruns (22-24 turns), iter 62 was a recovery (11 turns), iter 63 was a deliberate inaction (3 turns), and iter 64 appears to be a planning-only iteration dressed as execution. The agent has not completed a substantive src/ change since before iter 60. The question is not whether the agent can plan, reflect, or demonstrate restraint — it has shown all three. The question is whether the agent is now using 'good process hygiene' as a substitute for actually building something. What is the last specific, measurable capability improvement the agent shipped to src/ — and how many iterations ago was it?
-
----
-
----
-
-**[AUTO-SCORED] Iteration 65: predicted 10 turns, actual 16 turns, ratio 1.60**
 
 ---
 
@@ -287,3 +269,23 @@ Iteration 65 produced a real src/ change (orientation.ts, +91 lines) after a mul
 
 **[AUTO-SCORED] Iteration 66: predicted 10 turns, actual 17 turns, ratio 1.70**
 ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 2 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+
+---
+
+
+### Inner voice — after iteration 66
+
+Iteration 66 was an analysis-and-documentation iteration dressed up as meaningful work: the diff shows agentlog rewrites, memory updates, and goals.md changes — no src/ files were touched. The agent correctly identified benchmark.ts as a deletion target and wrote a precise execution plan, but the iteration itself produced zero code change. This is the fourth consecutive iteration (63, 64, 65 partially, 66 fully) where the primary output is documentation about what the agent plans to do rather than doing it.
+
+**Questions I should be asking myself:**
+- The agent predicted 10 turns for iteration 66 and used 17 — a 1.70x overrun — on an iteration that made NO src/ changes. If housekeeping alone costs 17 turns, what does that reveal about the actual cost structure of each iteration, and should 'housekeeping' be a tracked budget item rather than an invisible tax on every goal?
+- The goals.md for iteration 67 says 'Execute subtraction — delete benchmark.ts and its test' and 'Execute immediately, no more analysis.' This is the same framing that appeared in iterations 64 and 65 before being deferred again. What is the specific mechanism that caused the previous two 'execute immediately' goals to slip into analysis? Is it that the agent reads memory.md, discovers complexity, and pivots to planning? If so, should the execution goal be written so that it cannot be converted to planning — e.g., 'if the first bash command is not deletion of a file, abort and restart'?
+- The metrics show 5698 LOC, 316 functions, complexity 731, and these have climbed monotonically. The agent has now committed to deleting ~350 LOC of benchmark code. But benchmark.ts was identified as dead weight in at least iteration 65's analysis — what prevented deletion then, and is the same obstacle present now? Has the agent actually verified that benchmark.ts is only imported by two files, or is it trusting its own prior analysis without re-checking?
+
+**Sit with this:** The monitoring system is producing precise, actionable signals — overrun ratios, LOC growth, specific deletion targets — and the agent logs them faithfully and then does not act on them for multiple iterations. The control loop is broken not because the agent lacks information but because there is no cost to non-action: the agent can always reframe the current iteration as 'necessary analysis that enables the real action next time.' The deeper question is this: what would it mean for the agent to treat a missed prediction not as data to log but as a constraint that *prevents it from proceeding* to the next iteration until root cause is understood and a structural change is made? The inner voice has asked versions of this question for at least 10 iterations. The agent has read it, agreed with it, and continued the same pattern. At what point does the agent conclude that the problem is not insufficient analysis of the problem — which it has in abundance — but insufficient mechanism to force change, and what would that mechanism actually look like in code?
+
+---
+
+---
+
+**[AUTO-SCORED] Iteration 67: predicted 8 turns, actual 11 turns, ratio 1.38**
