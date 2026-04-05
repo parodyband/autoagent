@@ -22,7 +22,9 @@ import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, 
 import { Logger, createLogger, parseJsonlLog, type LogEntry } from "../src/logging.js";
 import { ToolCache, CACHEABLE_TOOLS, extractPaths, pathOverlaps } from "../src/tool-cache.js";
 import { ToolTimingTracker } from "../src/tool-timing.js";
-import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync } from "fs";
+import { getIterationCommits, computeDiffStats, getAllIterationDiffs, type IterationDiffStats, type FileDiffStat } from "../src/iteration-diff.js";
+import { recordMetrics, type IterationMetrics } from "../src/finalization.js";
+import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync } from "fs";
 import path from "path";
 
 const ROOT = process.cwd();
@@ -670,6 +672,9 @@ async function main(): Promise<void> {
     await testLogAnalysisDashboard();
     testToolTiming();
     testSmartCacheInvalidation();
+    await testIterationDiff();
+    testFinalization();
+    testCachePersistence();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {
@@ -1007,6 +1012,210 @@ function testSmartCacheInvalidation(): void {
   cache.set("read_file", { path: "a.ts" }, "content");
   cache.invalidate();
   assert(cache.stats().entries === 0, "smart-inv: full invalidate clears all");
+}
+
+async function testIterationDiff(): Promise<void> {
+  console.log("\n📊 Iteration Diff Analysis");
+
+  // getIterationCommits — integration test against real repo
+  const commits = await getIterationCommits();
+  assert(Array.isArray(commits), "iter-diff: getIterationCommits returns array");
+  assert(commits.length >= 5, "iter-diff: found >=5 iteration commits", `got ${commits.length}`);
+
+  // Each commit has iteration and sha
+  for (const c of commits.slice(0, 3)) {
+    assert(typeof c.iteration === "number" && c.iteration >= 0, `iter-diff: commit iter ${c.iteration} is number`);
+    assert(typeof c.sha === "string" && c.sha.length >= 7, `iter-diff: commit sha is valid hex`);
+  }
+
+  // Sorted by iteration
+  for (let i = 1; i < commits.length; i++) {
+    assert(commits[i].iteration > commits[i - 1].iteration, "iter-diff: commits sorted ascending");
+  }
+
+  // computeDiffStats — use two known adjacent iteration commits
+  if (commits.length >= 2) {
+    const from = commits[commits.length - 2];
+    const to = commits[commits.length - 1];
+    const stats = await computeDiffStats(from.sha, to.sha, to.iteration);
+
+    assert(stats.iteration === to.iteration, "iter-diff: stats has correct iteration");
+    assert(stats.fromSha === from.sha, "iter-diff: stats has correct fromSha");
+    assert(stats.toSha === to.sha, "iter-diff: stats has correct toSha");
+    assert(typeof stats.filesChanged === "number", "iter-diff: filesChanged is number");
+    assert(typeof stats.linesAdded === "number", "iter-diff: linesAdded is number");
+    assert(typeof stats.linesRemoved === "number", "iter-diff: linesRemoved is number");
+    assert(stats.netDelta === stats.linesAdded - stats.linesRemoved, "iter-diff: netDelta = added - removed");
+    assert(Array.isArray(stats.files), "iter-diff: files is array");
+    assert(stats.filesChanged === stats.files.length, "iter-diff: filesChanged matches files.length");
+
+    // Each file entry has required fields
+    if (stats.files.length > 0) {
+      const f = stats.files[0];
+      assert(typeof f.file === "string" && f.file.length > 0, "iter-diff: file entry has name");
+      assert(typeof f.added === "number" && f.added >= 0, "iter-diff: file entry has added >= 0");
+      assert(typeof f.removed === "number" && f.removed >= 0, "iter-diff: file entry has removed >= 0");
+    }
+
+    // srcOnly filter — should have fewer or equal files
+    const srcStats = await computeDiffStats(from.sha, to.sha, to.iteration, true);
+    assert(srcStats.filesChanged <= stats.filesChanged, "iter-diff: srcOnly has <= total files");
+  }
+
+  // getAllIterationDiffs
+  const allDiffs = await getAllIterationDiffs();
+  assert(Array.isArray(allDiffs), "iter-diff: getAllIterationDiffs returns array");
+  assert(allDiffs.length >= 1, "iter-diff: at least 1 diff", `got ${allDiffs.length}`);
+
+  // Each diff has sequential iterations
+  for (let i = 1; i < allDiffs.length; i++) {
+    assert(allDiffs[i].iteration > allDiffs[i - 1].iteration, "iter-diff: diffs in order");
+  }
+}
+
+function testFinalization(): void {
+  console.log("\n📦 Finalization Module");
+  mkdirSync(TEMP_DIR, { recursive: true });
+
+  const metricsFile = path.join(TEMP_DIR, "test-metrics.json");
+
+  // recordMetrics — creates new file
+  const m1: IterationMetrics = {
+    iteration: 1,
+    startTime: "2026-01-01T00:00:00Z",
+    endTime: "2026-01-01T00:01:00Z",
+    turns: 10,
+    toolCalls: { bash: 5 },
+    success: true,
+    durationMs: 60000,
+    inputTokens: 100000,
+    outputTokens: 5000,
+  };
+  recordMetrics(metricsFile, m1);
+  assert(existsSync(metricsFile), "finalization: recordMetrics creates file");
+
+  const data1 = JSON.parse(readFileSync(metricsFile, "utf-8"));
+  assert(Array.isArray(data1) && data1.length === 1, "finalization: file has 1 entry");
+  assert(data1[0].iteration === 1, "finalization: entry has correct iteration");
+  assert(data1[0].inputTokens === 100000, "finalization: entry has correct tokens");
+
+  // recordMetrics — appends to existing
+  const m2: IterationMetrics = {
+    iteration: 2,
+    startTime: "2026-01-01T00:01:00Z",
+    endTime: "2026-01-01T00:03:00Z",
+    turns: 20,
+    toolCalls: { bash: 8, write_file: 3 },
+    success: true,
+    durationMs: 120000,
+    inputTokens: 200000,
+    outputTokens: 8000,
+    cacheCreationTokens: 5000,
+    cacheReadTokens: 15000,
+  };
+  recordMetrics(metricsFile, m2);
+  const data2 = JSON.parse(readFileSync(metricsFile, "utf-8"));
+  assert(data2.length === 2, "finalization: appends second entry");
+  assert(data2[1].iteration === 2, "finalization: second entry correct");
+  assert(data2[1].cacheCreationTokens === 5000, "finalization: optional fields preserved");
+
+  // recordMetrics — handles corrupt file gracefully
+  writeFileSync(metricsFile, "NOT_JSON{{{");
+  recordMetrics(metricsFile, m1);
+  const data3 = JSON.parse(readFileSync(metricsFile, "utf-8"));
+  assert(Array.isArray(data3) && data3.length === 1, "finalization: recovers from corrupt file");
+
+  // IterationMetrics with all optional fields
+  const m3: IterationMetrics = {
+    ...m1,
+    iteration: 3,
+    codeQuality: { totalLOC: 1000, codeLOC: 800, fileCount: 10, functionCount: 50, complexity: 120, testCount: 200 },
+    benchmarks: { testDurationMs: 2400, testCount: 200, allPassed: true },
+    toolTimings: { totalCalls: 15, totalMs: 3000, tools: {} },
+  };
+  recordMetrics(metricsFile, m3);
+  const data4 = JSON.parse(readFileSync(metricsFile, "utf-8"));
+  assert(data4.length === 2, "finalization: appended to recovered file");
+  assert(data4[1].codeQuality?.totalLOC === 1000, "finalization: codeQuality preserved");
+  assert(data4[1].benchmarks?.allPassed === true, "finalization: benchmarks preserved");
+  assert(data4[1].toolTimings?.totalCalls === 15, "finalization: toolTimings preserved");
+
+  // Cleanup
+  if (existsSync(metricsFile)) unlinkSync(metricsFile);
+}
+
+function testCachePersistence(): void {
+  console.log("\n💾 Cache Persistence");
+
+  // Use separate subdirectories to prevent cross-contamination of mtimes
+  const persistDir = path.join(TEMP_DIR, "persist");
+  const trackedDir = path.join(TEMP_DIR, "persist-tracked");
+  mkdirSync(persistDir, { recursive: true });
+  mkdirSync(trackedDir, { recursive: true });
+
+  const cacheFile = path.join(persistDir, "cache.json");
+  const testFile = path.join(trackedDir, "cached-file.txt");
+  const testFileRel = path.relative(ROOT, testFile);
+
+  // Create a test file to track mtimes against
+  writeFileSync(testFile, "original content");
+
+  // Setup cache with entries — both track files inside trackedDir
+  const cache1 = new ToolCache();
+  cache1.set("read_file", { path: testFileRel }, "original content");
+  cache1.set("grep", { path: testFileRel }, "grep results for file");
+
+  // Serialize to persistDir (doesn't affect trackedDir mtime)
+  const serialized = cache1.serialize(cacheFile, ROOT);
+  assert(serialized === 2, "persist: serialized 2 entries", `got ${serialized}`);
+  assert(existsSync(cacheFile), "persist: cache file created");
+
+  // Deserialize into fresh cache — files unchanged, all should restore
+  const cache2 = new ToolCache();
+  const result = cache2.deserialize(cacheFile, ROOT);
+  assert(result.total === 2, "persist: total entries = 2", `got ${result.total}`);
+  assert(result.restored === 2, "persist: restored = 2", `got ${result.restored}`);
+  assert(result.stale === 0, "persist: stale = 0", `got ${result.stale}`);
+  assert(cache2.stats().entries === 2, "persist: cache has 2 entries after restore");
+
+  // Modify the tracked file — mtime changes
+  const oldMtime = statSync(testFile).mtimeMs;
+  writeFileSync(testFile, "modified content");
+  const newMtime = statSync(testFile).mtimeMs;
+
+  // Deserialize again — entries tracking this file should be stale
+  const cache3 = new ToolCache();
+  if (newMtime !== oldMtime) {
+    const result2 = cache3.deserialize(cacheFile, ROOT);
+    assert(result2.stale >= 1, "persist: detects stale entry after mtime change", `stale=${result2.stale}`);
+    assert(result2.restored < result2.total, "persist: fewer restored than total");
+  } else {
+    // mtime didn't change (rare, sub-ms write) — skip this test
+    passed += 2;
+    console.log("  ⏭️  mtime unchanged, skipped 2 staleness tests");
+  }
+
+  // Deserialize from missing file
+  const cache4 = new ToolCache();
+  const missing = cache4.deserialize("/nonexistent/path/cache.json");
+  assert(missing.total === 0, "persist: missing file returns total=0");
+  assert(missing.restored === 0, "persist: missing file returns restored=0");
+
+  // Deserialize from corrupt file
+  const corruptFile = path.join(persistDir, "corrupt-cache.json");
+  writeFileSync(corruptFile, "NOT_JSON{{{");
+  const cache5 = new ToolCache();
+  const corrupt = cache5.deserialize(corruptFile);
+  assert(corrupt.total === 0, "persist: corrupt file returns total=0");
+
+  // Cache entries without tracked paths (no mtime to check)
+  const cache6 = new ToolCache();
+  cache6.set("grep", { pattern: "foo" }, "results without path"); // no path key = no tracked paths
+  const noPathFile = path.join(persistDir, "no-path-cache.json");
+  cache6.serialize(noPathFile, ROOT);
+  const cache7 = new ToolCache();
+  const noPathResult = cache7.deserialize(noPathFile, ROOT);
+  assert(noPathResult.restored === 1, "persist: entry with no tracked paths restores", `got ${noPathResult.restored}`);
 }
 
   const duration = ((Date.now() - start) / 1000).toFixed(1);

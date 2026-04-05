@@ -9,6 +9,7 @@
  */
 
 import { createHash } from "crypto";
+import { existsSync, readFileSync, writeFileSync, statSync } from "fs";
 import path from "path";
 
 // ─── Types ──────────────────────────────────────────────────
@@ -191,5 +192,104 @@ export class ToolCache {
     this.invalidatedEntryCount = 0;
     this.toolHits = {};
     this.toolMisses = {};
+  }
+
+  // ─── Persistence ────────────────────────────────────────
+
+  /**
+   * Serializable representation of a cache entry, including
+   * the file mtime at cache time for staleness detection.
+   */
+  private static getFileMtime(filePath: string): number | null {
+    try {
+      return statSync(filePath).mtimeMs;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Serialize hot cache entries to a JSON file.
+   * Stores the file mtime alongside each entry so deserialization
+   * can detect stale entries.
+   */
+  serialize(filePath: string, rootDir?: string): number {
+    const entries: Array<{
+      key: string;
+      result: string;
+      paths: string[];
+      mtimes: Record<string, number>;
+    }> = [];
+
+    for (const [key, entry] of this.cache) {
+      const mtimes: Record<string, number> = {};
+      for (const p of entry.paths) {
+        const fullPath = rootDir ? path.resolve(rootDir, p) : p;
+        const mtime = ToolCache.getFileMtime(fullPath);
+        if (mtime !== null) {
+          mtimes[p] = mtime;
+        }
+      }
+      entries.push({ key, result: entry.result, paths: entry.paths, mtimes });
+    }
+
+    writeFileSync(filePath, JSON.stringify(entries));
+    return entries.length;
+  }
+
+  /**
+   * Deserialize cache entries from a JSON file.
+   * Only restores entries whose tracked files haven't changed (mtime check).
+   * Returns { restored, stale, total } counts.
+   */
+  deserialize(
+    filePath: string,
+    rootDir?: string
+  ): { restored: number; stale: number; total: number } {
+    if (!existsSync(filePath)) {
+      return { restored: 0, stale: 0, total: 0 };
+    }
+
+    let entries: Array<{
+      key: string;
+      result: string;
+      paths: string[];
+      mtimes: Record<string, number>;
+    }>;
+    try {
+      entries = JSON.parse(readFileSync(filePath, "utf-8"));
+    } catch {
+      return { restored: 0, stale: 0, total: 0 };
+    }
+
+    let restored = 0;
+    let stale = 0;
+
+    for (const entry of entries) {
+      let isStale = false;
+
+      // Check each tracked path's mtime against the stored mtime
+      for (const [p, storedMtime] of Object.entries(entry.mtimes)) {
+        const fullPath = rootDir ? path.resolve(rootDir, p) : p;
+        const currentMtime = ToolCache.getFileMtime(fullPath);
+        if (currentMtime === null || currentMtime !== storedMtime) {
+          isStale = true;
+          break;
+        }
+      }
+
+      if (isStale) {
+        stale++;
+      } else {
+        this.cache.set(entry.key, {
+          result: entry.result,
+          cachedAt: Date.now(),
+          paths: entry.paths,
+        });
+        restored++;
+      }
+    }
+
+    return { restored, stale, total: entries.length };
   }
 }

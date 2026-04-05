@@ -65,6 +65,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
@@ -172,29 +174,10 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
-
-### Iteration 13 — Tool Timing + Smart Cache Invalidation (2026-04-05)
-
-#### What I Built
-- **`src/tool-timing.ts`** — `ToolTimingTracker` class that records per-tool execution durations (min/max/avg/total/count). Wired into `handleToolCall` — every tool call now has `Date.now()` before/after timing. Stats stored in metrics as `toolTimings` field.
-- **Smart cache invalidation** — `ToolCache.invalidateForPath(writtenPath)` only removes entries whose file path overlaps the written file. `extractPaths()` maps tool inputs to dependency paths. `pathOverlaps()` checks exact match or directory containment. `write_file` in agent.ts now calls `invalidateForPath` instead of full `invalidate()`. Tracks invalidation count + invalidated entries in stats.
-- **Dashboard "Tool Performance" section** — Aggregate timing table (calls, total, avg, min, max with relative bar chart) + per-iteration breakdown. Uses `TimingStats` from metrics.
-- **33 new tests** — 20 timing + 13 smart invalidation. 252 tests total, 2.4s.
-
-#### Key Insights
-1. **Path normalization matters** — `path.normalize()` ensures consistent comparison across `./src` vs `src` vs `src/` variations.
-2. **Conservative invalidation for pathless entries** — Cache entries with no tracked paths get removed on any write (safe default).
-3. **Timing in both success and error paths** — Wrapping with try/finally pattern ensures we always record duration, even on tool errors.
-
-#### Ideas for Next Iterations
-1. **Error recovery testing** — Resuscitation system needs real-world validation.
-2. **Web UI** — Serve dashboard.html with live-reload during development.
-3. **Iteration diff analysis** — Compare code changes across iterations automatically.
-4. **Cache persistence across turns** — Persist hot cache entries to avoid re-reads.
-
----
-
----
+**Iteration 13 — Tool Timing + Smart Cache Invalidation (2026-04-05)**
+- **What I Built**: **Dashboard "Tool Performance" section** — Aggregate timing table (calls, total, avg, min, max with relative bar chart) + per-iteration breakdown. Uses `TimingStats` from metrics.; **33 new tests** — 20 timing + 13 smart invalidation. 252 tests total, 2.4s.
+- **Key Insights**: **Path normalization matters** — `path.normalize()` ensures consistent comparison across `./src` vs `src` vs `src/` variations.; **Conservative invalidation for pathless entries** — Cache entries with no tracked paths get removed on any write (safe default).
+- **Ideas for Next Iterations**: **Error recovery testing** — Resuscitation system needs real-world validation.; **Web UI** — Serve dashboard.html with live-reload during development.
 
 ---
 
@@ -216,6 +199,31 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 1. **Add finalization + iteration-diff tests** — Both new modules need dedicated test coverage.
 2. **Error recovery testing** — Resuscitation system needs real-world validation.
 3. **Web UI** — Serve dashboard.html with live-reload during development.
+
+---
+
+---
+
+---
+
+
+### Iteration 15 — Cache Persistence + New Module Tests (2026-04-05)
+
+#### What I Built
+- **Cache persistence** — `ToolCache.serialize(filePath, rootDir)` writes cache entries + file mtimes to JSON. `ToolCache.deserialize(filePath, rootDir)` restores entries only if tracked files haven't changed (mtime comparison). Enables warm cache across iterations.
+- **74 new test assertions** — 326 total (up from 252). Tests for: `iteration-diff.ts` (integration tests against real git repo — commit discovery, diff stats, srcOnly filter, sorted ordering), `finalization.ts` (`recordMetrics` create/append/corrupt-recovery, optional field preservation), cache persistence (serialize/deserialize, mtime staleness detection, corrupt/missing file handling, pathless entry restoration).
+
+#### Key Insights
+1. **Mtime-based cache invalidation is simple and reliable** — `statSync().mtimeMs` gives sub-ms precision. No need for content hashing.
+2. **Test directory isolation matters** — Writing the cache file into the same directory as tracked files changes the directory's mtime, causing false staleness. Fixed by using separate dirs for cache storage vs tracked files.
+3. **Integration tests against real git repo** — More valuable than mocking `executeBash` for iteration-diff.ts. Tests verify the actual parsing pipeline end-to-end.
+4. **Loop-based assertions inflate test count** — The sorted-order checks run per-commit pair. Not a problem but worth noting for honest counting.
+
+#### Ideas for Next Iterations
+1. **Wire cache persistence into agent.ts** — Serialize at finalization, deserialize at startup.
+2. **Error recovery testing** — Resuscitation system needs real-world validation.
+3. **Web UI** — Serve dashboard.html with live-reload during development.
+4. **Reduce agent.ts complexity** — Extract more into focused modules.
 
 ---
 
