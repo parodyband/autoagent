@@ -34,6 +34,7 @@ import {
 } from "./architect-mode.js";
 import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
 import { runDiagnostics } from "./diagnostics.js";
+import { findRelatedTests, runRelatedTests } from "./test-runner.js";
 import { computeUnifiedDiff } from "./diff-preview.js";
 import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences } from "./context-loader.js";
 import * as fs from "fs";
@@ -949,6 +950,44 @@ export class Orchestrator {
         if (fixCommit.committed) {
           commitResult = fixCommit;
           this.opts.onStatus?.(`✓ Fix committed ${fixCommit.hash}: ${fixCommit.message}`);
+        }
+      }
+
+      // 9. Run related tests after diagnostics pass
+      const writtenFiles = this.apiMessages
+        .flatMap(m => (Array.isArray(m.content) ? m.content : []))
+        .filter((b): b is Anthropic.ToolUseBlock => (b as Anthropic.ToolUseBlock).type === "tool_use" && (b as Anthropic.ToolUseBlock).name === "write_file")
+        .map(b => (b.input as { path?: string }).path ?? "")
+        .filter(Boolean);
+
+      if (writtenFiles.length > 0) {
+        const testFiles = findRelatedTests(this.opts.workDir, writtenFiles);
+        if (testFiles.length > 0) {
+          this.opts.onStatus?.(`Running related tests (${testFiles.length} file${testFiles.length > 1 ? "s" : ""})…`);
+          const MAX_TEST_RETRIES = 2;
+          for (let testRetry = 0; testRetry < MAX_TEST_RETRIES; testRetry++) {
+            const { passed, output } = await runRelatedTests(this.opts.workDir, testFiles);
+            if (passed) break;
+            const failLabel = `Test failures (attempt ${testRetry + 1}/${MAX_TEST_RETRIES})`;
+            this.opts.onStatus?.(`⚠ ${failLabel} — auto-fixing…`);
+            this.apiMessages.push({
+              role: "user",
+              content: `${failLabel}:\n\`\`\`\n${output}\n\`\`\`\nPlease fix these test failures.`,
+            });
+            const fixResult = await runAgentLoop(
+              this.client, model, this.systemPrompt, this.apiMessages,
+              this.registry, this.opts.workDir, this.opts.onToolCall,
+              this.opts.onStatus, this.opts.onText, this.opts.onDiffPreview,
+            );
+            this.sessionTokensIn += fixResult.tokensIn;
+            this.sessionTokensOut += fixResult.tokensOut;
+            this.sessionCost += computeCost(model, fixResult.tokensIn, fixResult.tokensOut);
+            const fixCommit = await autoCommit(this.opts.workDir, "fix test failures");
+            if (fixCommit.committed) {
+              commitResult = fixCommit;
+              this.opts.onStatus?.(`✓ Fix committed ${fixCommit.hash}: ${fixCommit.message}`);
+            }
+          }
         }
       }
     }
