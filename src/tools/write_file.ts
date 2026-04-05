@@ -52,6 +52,13 @@ function countLines(s: string): number {
   return s.split("\n").length;
 }
 
+// Files that are append-only: write mode must start with existing content
+const APPEND_ONLY_FILES = new Set(["memory.md", "agentlog.md"]);
+
+export function isAppendOnly(filePath: string): boolean {
+  return APPEND_ONLY_FILES.has(path.basename(filePath));
+}
+
 export function executeWriteFile(
   filePath: string,
   content: string = "",
@@ -73,6 +80,16 @@ export function executeWriteFile(
     let oldContent = "";
     if (existed) {
       try { oldContent = readFileSync(resolved, "utf-8"); } catch {}
+    }
+
+    // Append-only enforcement for protected files
+    if (isAppendOnly(filePath) && existed && oldContent.length > 0) {
+      if (mode === "write" && !content.startsWith(oldContent)) {
+        return {
+          message: `ERROR: ${path.basename(filePath)} is append-only. Use mode 'append' or ensure new content starts with existing content.`,
+          success: false,
+        };
+      }
     }
 
     if (mode === "patch") {

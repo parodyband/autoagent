@@ -141,6 +141,34 @@ function testWriteFile(): void {
   const nestedPath = ".self-test-tmp/deep/nested/dir/file.txt";
   const nested = executeWriteFile(nestedPath, "nested content", "write", ROOT);
   assert(nested.success && existsSync(path.join(ROOT, nestedPath)), "write_file: creates nested directories");
+
+  // Append-only enforcement for protected files (memory.md, agentlog.md)
+  const memFile = path.join(TEMP_DIR, "memory.md");
+  writeFileSync(memFile, "# Memory\n\nExisting content.\n", "utf-8");
+  const memRel = path.relative(ROOT, memFile);
+
+  // Non-append write to memory.md should be rejected
+  const rewrite = executeWriteFile(memRel, "Completely new content", "write", ROOT);
+  assert(!rewrite.success && rewrite.message.includes("append-only"), "write_file: rejects non-append write to memory.md");
+  // Verify file unchanged
+  assert(readFileSync(memFile, "utf-8") === "# Memory\n\nExisting content.\n", "write_file: memory.md unchanged after rejected write");
+
+  // Append mode to memory.md should succeed
+  const memAppend = executeWriteFile(memRel, "\nNew entry.", "append", ROOT);
+  assert(memAppend.success, "write_file: append to memory.md succeeds");
+  assert(readFileSync(memFile, "utf-8").endsWith("\nNew entry."), "write_file: memory.md has appended content");
+
+  // Write mode that starts with existing content (effective append) should succeed
+  const currentMem = readFileSync(memFile, "utf-8");
+  const extendedWrite = executeWriteFile(memRel, currentMem + "\nMore content.", "write", ROOT);
+  assert(extendedWrite.success, "write_file: write that extends memory.md succeeds");
+
+  // Same enforcement for agentlog.md
+  const logFile = path.join(TEMP_DIR, "agentlog.md");
+  writeFileSync(logFile, "# Log\n\nEntry 1.\n", "utf-8");
+  const logRel = path.relative(ROOT, logFile);
+  const logRewrite = executeWriteFile(logRel, "Rewritten log", "write", ROOT);
+  assert(!logRewrite.success && logRewrite.message.includes("append-only"), "write_file: rejects non-append write to agentlog.md");
 }
 
 // ─── Grep Tests ─────────────────────────────────────────────
