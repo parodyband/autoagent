@@ -1,95 +1,3 @@
-[2026-04-05T15:33:01.211Z] iter=208 turn=7 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T15:33:02.105Z] iter=208 turn=7 INFO: Compilation OK
-[2026-04-05T15:33:07.777Z] iter=208 turn=7 INFO: Cache persisted: 44 entries to .autoagent-cache.json
-[2026-04-05T15:33:07.777Z] iter=208 turn=7 INFO: Cache stats: 0 hits, 1 misses, 44 entries, 1 invalidations (1 entries removed)
-[2026-04-05T15:33:07.778Z] iter=208 turn=7 INFO: Tool cache stats
-[2026-04-05T15:33:07.778Z] iter=208 turn=7 INFO: Tool timing: bash: 4x, avg=243ms, total=970ms; write_file: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms; save_memory: 1x, avg=1ms, total=1ms; read_file: 1x, avg=0ms, total=0ms
-[2026-04-05T15:33:07.778Z] iter=208 turn=7 INFO: Tool timing stats
-[2026-04-05T15:33:12.949Z] iter=208 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 208: predicted 8 turns, actual 7 turns, ratio 0.88**
-[2026-04-05T15:33:12.969Z] iter=208 turn=7 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T15:33:13.000Z] iter=208 turn=7 INFO: Committed: af170f4e (17 in / 1932 out, cache: 5950 created, 41172 read)
-[2026-04-05T15:33:13.000Z] iter=208 turn=7 INFO: Restarting as iteration 209...
-[2026-04-05T15:33:13.197Z] iter=209 INFO: Cache restored: 44/44 entries (0 stale)
-[2026-04-05T15:33:13.199Z] iter=209 INFO: Turn budget: 15/25 (calibration=0.88x, predicted=20)
-[2026-04-05T15:33:13.199Z] iter=209 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T15:33:13.308Z] iter=209 turn=1 INFO: Turn 1/25
-[2026-04-05T15:33:17.737Z] iter=209 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the codebase, then implement the two goals: fuzzy search and rankSymbols wiring.
-[2026-04-05T15:33:17.738Z] iter=209 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && head -50 src/tree-sitter-map.ts
-[2026-04-05T15:33:17.742Z] iter=209 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "rankSymbols\|formatRepoMap\|fuzzySearch\|RepoMap\|SearchResult" src/tree-sitter-map.ts | head -60
-[2026-04-05T15:33:17.746Z] iter=209 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "formatRepoMap\|rankSymbols\|buildRepoMap" src/orchestrator.ts | head -20
-[2026-04-05T15:33:17.759Z] iter=209 turn=1 INFO:   -> exit=0 (310 chars)
-[2026-04-05T15:33:17.760Z] iter=209 turn=1 INFO:   -> exit=0 (1320 chars)
-[2026-04-05T15:33:17.765Z] iter=209 turn=1 INFO:   -> exit=0 (285 chars)
-[2026-04-05T15:33:17.765Z] iter=209 turn=2 INFO: Turn 2/25
-[2026-04-05T15:33:21.357Z] iter=209 turn=2 INFO: think: Interesting - Goal 2 says rankSymbols is NOT called in the orchestrator, but looking at line 155, it IS already called. ...
-[2026-04-05T15:33:21.358Z] iter=209 turn=3 INFO: Turn 3/25
-[2026-04-05T15:33:24.836Z] iter=209 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '140,170p' src/orchestrator.ts
-[2026-04-05T15:33:24.838Z] iter=209 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '340,440p' src/tree-sitter-map.ts
-[2026-04-05T15:33:24.846Z] iter=209 turn=3 INFO:   -> exit=0 (1242 chars)
-[2026-04-05T15:33:24.848Z] iter=209 turn=3 INFO:   -> exit=0 (3276 chars)
-[2026-04-05T15:33:24.848Z] iter=209 turn=4 INFO: Turn 4/25
-[2026-04-05T15:33:30.570Z] iter=209 turn=4 INFO: Agent: 
-
-Good checkpoint. Goal 2 (rankSymbols wiring) is already done in the codebase. My deliverables are:
-
-1. **`fuzzySearch()` function in `src/tree-sitter-map.ts`**
-2. **`/find` command in `src/tui.tsx`**
-3. **Tests in `src/__tests__/tree-sitter-map.test.ts`**
-
-Starting now.
-[2026-04-05T15:33:30.570Z] iter=209 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && tail -5 src/tree-sitter-map.ts
-[2026-04-05T15:33:30.572Z] iter=209 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "/diff\|/undo\|/help\|/clear\|/reindex\|handleCommand\|setInput\|slashCommand" src/tui.tsx | head -30
-[2026-04-05T15:33:30.580Z] iter=209 turn=4 INFO:   -> exit=0 (40 chars)
-[2026-04-05T15:33:30.583Z] iter=209 turn=4 INFO:   -> exit=0 (655 chars)
-[2026-04-05T15:33:30.584Z] iter=209 turn=5 INFO: Turn 5/25
-[2026-04-05T15:33:33.130Z] iter=209 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '240,340p' src/tui.tsx
-[2026-04-05T15:33:33.139Z] iter=209 turn=5 INFO:   -> exit=0 (3636 chars)
-[2026-04-05T15:33:33.139Z] iter=209 turn=6 INFO: Turn 6/25
-[2026-04-05T15:33:36.201Z] iter=209 turn=6 INFO: Agent: Now I have all the context I need. Let me implement the fuzzy search function and the /find command.
-[2026-04-05T15:33:36.202Z] iter=209 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/tree-sitter-map.ts
-[2026-04-05T15:33:36.217Z] iter=209 turn=6 INFO:   -> exit=0 (32 chars)
-[2026-04-05T15:33:36.218Z] iter=209 turn=7 INFO: Turn 7/25
-[2026-04-05T15:33:55.590Z] iter=209 turn=7 INFO: Agent: 
-
-**Goal status:**
-- Goal 1 (`/find` fuzzy search): NOT STARTED — have all context, writing now
-- Goal 2 (rankSymbols wiring): DONE — already wired in orchestrator.ts lines 154-156
-
-Let me write the code now.
-[2026-04-05T15:33:55.591Z] iter=209 turn=7 INFO: write_file: src/tree-sitter-map.ts (patch)
-[2026-04-05T15:33:55.594Z] iter=209 turn=7 INFO:   -> ok: Patched src/tree-sitter-map.ts: -2 +112 lines
-
-Context after patch:
-437 |     }
-438 |   }
-439 | 
-440 |   return lines.join("\n");
-441 | }
-442 | 
-443 | // ─── Fuzzy Search ─────────────────────────────────────────────
-444 | 
-445 | export interface SearchResult {
-446 |   file: string;        // relative path
-447 |   symbol?: string;     // undefined = file match only
-448 |   kind?: string;       // 'function' | 'class' | 'interface' etc.
-449 |   line?: number;
-450 |   score: number;       // match quality 0–1
-451 | }
-452 | 
-453 | /**
-454 |  * Subsequence match score: how well `query` matches `target` as a subsequence.
-455 |  * Returns 0 if not a subsequence match. Returns 0–1 for quality.
-456 |  *
-457 |  * Scoring heuristics (fzf-like):
-458 |  * - Base: proportion of query chars matched (always 1.0 if subsequence)
-459 |  * - Bonus for consecutive chars matched
-460 |  * - Bonus for prefix match (query starts at target start)
-461 |  * - Bonus for shorter targets (tighter match)
-462 |  */
-463 | function subsequenceScore(query: string, target: string): number {
-464 |   const q = query.toLowerCase();
 465 |   const t = target.toLowerCase();
 466 |   if (q.length === 0) return 0;
 467 |   if (q.length > t.length) return 0;
@@ -1088,3 +996,190 @@ Let me produce the deliverable now.
 [2026-04-05T15:43:53.732Z] iter=213 turn=12 INFO: Tool timing stats
 [2026-04-05T15:43:59.398Z] iter=213 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 213: predicted 20 turns, actual 12 turns, ratio 0.60**
 [2026-04-05T15:43:59.418Z] iter=213 turn=12 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T15:43:59.449Z] iter=213 turn=12 INFO: Committed: f540f16a (18 in / 3855 out, cache: 20442 created, 159515 read)
+[2026-04-05T15:43:59.450Z] iter=213 turn=12 INFO: Restarting as iteration 214...
+[2026-04-05T15:43:59.640Z] iter=214 INFO: Cache restored: 47/47 entries (0 stale)
+[2026-04-05T15:43:59.641Z] iter=214 INFO: Turn budget: 19/25 (calibration=1.05x, predicted=18)
+[2026-04-05T15:43:59.642Z] iter=214 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T15:43:59.739Z] iter=214 turn=1 INFO: Turn 1/25
+[2026-04-05T15:44:02.687Z] iter=214 turn=1 INFO: Agent: I'll read the goals and current state, then execute the tasks.
+[2026-04-05T15:44:02.688Z] iter=214 turn=1 INFO: read_file: goals.md
+[2026-04-05T15:44:02.688Z] iter=214 turn=1 INFO:   -> ok (3289 chars)
+[2026-04-05T15:44:02.689Z] iter=214 turn=1 INFO: read_file: CACHE HIT
+[2026-04-05T15:44:02.689Z] iter=214 turn=2 INFO: Turn 2/25
+[2026-04-05T15:44:05.016Z] iter=214 turn=2 INFO: read_file: src/tui.tsx
+[2026-04-05T15:44:05.018Z] iter=214 turn=2 INFO:   -> ok (16948 chars)
+[2026-04-05T15:44:05.019Z] iter=214 turn=3 INFO: Turn 3/25
+[2026-04-05T15:44:10.300Z] iter=214 turn=3 INFO: think: Now I have all the context I need. Let me plan the changes:
+
+1. **Fix test failure** in `src/__tests__/diff-preview.test...
+[2026-04-05T15:44:10.301Z] iter=214 turn=4 INFO: Turn 4/25
+[2026-04-05T15:44:13.232Z] iter=214 turn=4 INFO: Agent: Starting implementation now. Two files to change.
+[2026-04-05T15:44:13.233Z] iter=214 turn=4 INFO: grep: "onDiffPreview" in src/orchestrator.ts
+[2026-04-05T15:44:13.269Z] iter=214 turn=4 INFO:   -> 7 matches
+[2026-04-05T15:44:13.270Z] iter=214 turn=5 INFO: Turn 5/25
+[2026-04-05T15:44:16.199Z] iter=214 turn=5 INFO: Agent: Good. Now I'll make both changes simultaneously.
+
+**Step 1: Fix the test**
+[2026-04-05T15:44:16.201Z] iter=214 turn=5 INFO: write_file: src/__tests__/diff-preview.test.ts (patch)
+[2026-04-05T15:44:16.202Z] iter=214 turn=5 INFO:   -> ok: Patched src/__tests__/diff-preview.test.ts: -1 +1 lines
+
+Context after patch:
+14 |     expect(diff).toContain("+hello");
+15 |     expect(diff).toContain("+world");
+16 |     // no deletion lines (lines starting with -)
+17 |     const diffLines = diff.split("\n").filter(l => l.startsWith("-") && !l.startsWith("---"));
+18 |     expect(diffLines).toHaveLength(0);
+19 |   });
+20 | 
+[2026-04-05T15:44:16.203Z] iter=214 turn=6 INFO: Turn 6/25
+[2026-04-05T15:44:24.291Z] iter=214 turn=6 INFO: Agent: **Step 2 & 3: Add DiffPreviewDisplay component and wire into App**
+[2026-04-05T15:44:24.292Z] iter=214 turn=6 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:44:24.295Z] iter=214 turn=6 INFO:   -> ok: Patched src/tui.tsx: -1 +27 lines
+
+Context after patch:
+141 |   );
+142 | }
+143 | 
+144 | /** Diff preview display — shown when agent proposes a file edit. */
+145 | function DiffPreviewDisplay({ diff, filePath }: { diff: string; filePath: string }) {
+146 |   const lines = diff.split("\n");
+147 |   return (
+148 |     <Box flexDirection="column" borderStyle="round" borderColor="yellow" paddingX={1} marginTop={1}>
+149 |       <Text bold>📝 {filePath}</Text>
+150 |       {lines.map((line, i) => {
+151 |         if (line.startsWith("---") || line.startsWith("+++")) {
+152 |           return <Text key={i} color="yellow" bold>{line}</Text>;
+153 |         }
+154 |         if (line.startsWith("+")) {
+155 |           return <Text key={i} color="green">{line}</Text>;
+156 |         }
+157 |         if (line.startsWith("-")) {
+158 |           return <Text key={i} color="red">{line}</Text>;
+159 |         }
+160 |         if (line.startsWith("@@")) {
+161 |           return <Text key={i} color="cyan">{line}</Text>;
+162 |         }
+163 |         return <Text key={i}>{line}</Text>;
+164 |       })}
+165 |       <Text bold color="yellow">[Y]es / [n]o — Apply this change?</Text>
+166 |     </Box>
+167 |   );
+168 | }
+169 | 
+170 | /** Architect plan display — shown before execution begins. */
+171 | function PlanDisplay({ plan }: { plan: EditPlan }) {
+172 |   return (
+173 |     <Box flexDirection="column" marginTop={1} borderStyle="round" borderColor="magenta" paddingX={1}>
+[2026-04-05T15:44:24.296Z] iter=214 turn=7 INFO: Turn 7/25
+[2026-04-05T15:44:29.408Z] iter=214 turn=7 INFO: Agent: **Goal 1 status:**
+- Step 1 (fix test): ✅ DONE
+- Step 2 (DiffPreviewDisplay component): ✅ DONE  
+- Step 3 (wire into App): 🔄 IN PROGRESS — need to add `pendingDiff` state, `useInput` intercept, render, and `onDiffPreview` callback
+
+Continuing now:
+[2026-04-05T15:44:29.408Z] iter=214 turn=7 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:44:29.409Z] iter=214 turn=7 INFO:   -> ok: Patched src/tui.tsx: -1 +2 lines
+
+Context after patch:
+235 |   const [streamBuffer, setStreamBuffer] = useState("");
+236 |   const [sessionList, setSessionList] = useState<SessionInfo[]>([]);
+237 |   const [showResume, setShowResume] = useState(false);
+238 |   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
+239 |   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
+240 |   const [footerStats, setFooterStats] = useState<FooterStats>({
+241 |     tokensIn: 0,
+242 |     tokensOut: 0,
+[2026-04-05T15:44:29.409Z] iter=214 turn=8 INFO: Turn 8/25
+[2026-04-05T15:44:33.197Z] iter=214 turn=8 INFO: Agent: Now wire `onDiffPreview` in the orchestrator initialization:
+[2026-04-05T15:44:33.197Z] iter=214 turn=8 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:44:33.198Z] iter=214 turn=8 INFO:   -> ok: Patched src/tui.tsx: -4 +9 lines
+
+Context after patch:
+260 |         // Append delta to streaming buffer for real-time display
+261 |         setStreamBuffer(prev => prev + delta);
+262 |       },
+263 |       onPlan: (plan: EditPlan) => {
+264 |         setActivePlan(plan);
+265 |       },
+266 |       onDiffPreview: noConfirm ? undefined : (diff, filePath) => {
+267 |         return new Promise<boolean>((resolve) => {
+268 |           setPendingDiff({ diff, filePath, resolve });
+269 |         });
+270 |       },
+271 |     });
+272 |     orchestratorRef.current = orch;
+273 |     orch.init().then(() => {
+274 |       if (continueFlag) {
+[2026-04-05T15:44:33.198Z] iter=214 turn=9 INFO: Turn 9/25
+[2026-04-05T15:44:37.134Z] iter=214 turn=9 INFO: Agent: Now update `useInput` to intercept keys when `pendingDiff` is set:
+[2026-04-05T15:44:37.135Z] iter=214 turn=9 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:44:37.135Z] iter=214 turn=9 INFO:   -> ok: Patched src/tui.tsx: -3 +13 lines
+
+Context after patch:
+288 |     }).catch(() => setStatus("Init failed"));
+289 |   }, []);
+290 | 
+291 |   useInput((ch, key) => {
+292 |     if (pendingDiff) {
+293 |       if (ch === "y" || ch === "Y" || key.return) {
+294 |         pendingDiff.resolve(true);
+295 |         setPendingDiff(null);
+296 |       } else if (ch === "n" || ch === "N" || key.escape) {
+297 |         pendingDiff.resolve(false);
+298 |         setPendingDiff(null);
+299 |       }
+300 |       return;
+301 |     }
+302 |     if (key.escape) exit();
+303 |   });
+304 | 
+305 |   const handleSubmit = useCallback(async (value: string) => {
+306 |     const trimmed = value.trim();
+[2026-04-05T15:44:37.136Z] iter=214 turn=10 INFO: Turn 10/25
+[2026-04-05T15:44:40.741Z] iter=214 turn=10 INFO: Agent: Now add the `DiffPreviewDisplay` to the render section:
+[2026-04-05T15:44:40.741Z] iter=214 turn=10 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:44:40.742Z] iter=214 turn=10 INFO:   -> ok: Patched src/tui.tsx: -2 +7 lines
+
+Context after patch:
+519 |         />
+520 |       </Box>
+521 | 
+522 |       {/* Diff preview — shown when agent proposes a file edit */}
+523 |       {pendingDiff && (
+524 |         <DiffPreviewDisplay diff={pendingDiff.diff} filePath={pendingDiff.filePath} />
+525 |       )}
+526 | 
+527 |       {/* Live streaming text */}
+528 |       {!pendingDiff && streamBuffer && <StreamingMessage buffer={streamBuffer} />}
+529 | 
+530 |       {/* Status / spinner */}
+531 |       {(loading || status) && (
+[2026-04-05T15:44:40.742Z] iter=214 turn=11 INFO: Turn 11/25
+[2026-04-05T15:44:43.232Z] iter=214 turn=11 INFO: Agent: Now run both verification checks:
+[2026-04-05T15:44:43.232Z] iter=214 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/diff-preview.test.ts 2>&1 | tail -20
+[2026-04-05T15:44:44.165Z] iter=214 turn=11 INFO:   -> exit=0 (283 chars)
+[2026-04-05T15:44:44.165Z] iter=214 turn=12 INFO: Turn 12/25
+[2026-04-05T15:44:46.570Z] iter=214 turn=12 INFO: Agent: All changes done. Running final check:
+[2026-04-05T15:44:46.571Z] iter=214 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -20
+[2026-04-05T15:44:47.468Z] iter=214 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:44:47.468Z] iter=214 turn=13 INFO: Turn 13/25
+[2026-04-05T15:44:51.705Z] iter=214 turn=13 INFO: Agent: Clean. Writing memory and updating goals:
+[2026-04-05T15:44:51.706Z] iter=214 turn=13 INFO: save_memory: "[Engineer] Iteration 215"
+[2026-04-05T15:44:51.709Z] iter=214 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T15:44:51.710Z] iter=214 turn=14 INFO: Turn 14/25
+[2026-04-05T15:45:01.943Z] iter=214 turn=14 INFO: write_file: goals.md (write)
+[2026-04-05T15:45:01.944Z] iter=214 turn=14 INFO:   -> ok: Updated goals.md (1341 chars, -42 lines delta)
+[2026-04-05T15:45:01.945Z] iter=214 turn=15 INFO: Turn 15/25
+[2026-04-05T15:45:03.951Z] iter=214 turn=15 INFO: Agent: Already done. Running restart:
+[2026-04-05T15:45:03.951Z] iter=214 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T15:45:03.951Z] iter=214 turn=15 INFO: RESTART signal
+[2026-04-05T15:45:03.952Z] iter=214 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T15:45:04.808Z] iter=214 turn=15 INFO: Compilation OK
+[2026-04-05T15:45:10.397Z] iter=214 turn=15 INFO: Cache persisted: 47 entries to .autoagent-cache.json
+[2026-04-05T15:45:10.398Z] iter=214 turn=15 INFO: Cache stats: 1 hits, 3 misses, 47 entries, 7 invalidations (3 entries removed)
+[2026-04-05T15:45:10.398Z] iter=214 turn=15 INFO: Tool cache stats
+[2026-04-05T15:45:10.398Z] iter=214 turn=15 INFO: Tool timing: bash: 3x, avg=610ms, total=1831ms; grep: 1x, avg=37ms, total=37ms; write_file: 7x, avg=2ms, total=12ms; read_file: 2x, avg=2ms, total=4ms; save_memory: 1x, avg=4ms, total=4ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T15:45:10.398Z] iter=214 turn=15 INFO: Tool timing stats
+[2026-04-05T15:45:15.612Z] iter=214 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 214: predicted 18 turns, actual 15 turns, ratio 0.83**
+[2026-04-05T15:45:17.332Z] iter=214 turn=15 INFO: Pre-commit review (370in/44out): LGTM. The fix correctly excludes the `---` header line (which marks the original file in unified diff format) from being counted as a deletion line, preventing a false test failure.

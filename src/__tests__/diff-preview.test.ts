@@ -14,7 +14,7 @@ describe("computeUnifiedDiff", () => {
     expect(diff).toContain("+hello");
     expect(diff).toContain("+world");
     // no deletion lines (lines starting with -)
-    const diffLines = diff.split("\n").filter(l => l.startsWith("-"));
+    const diffLines = diff.split("\n").filter(l => l.startsWith("-") && !l.startsWith("---"));
     expect(diffLines).toHaveLength(0);
   });
 

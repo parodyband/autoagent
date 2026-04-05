@@ -141,6 +141,32 @@ function MessageDisplay({ msg }: { msg: Message }) {
   );
 }
 
+/** Diff preview display — shown when agent proposes a file edit. */
+function DiffPreviewDisplay({ diff, filePath }: { diff: string; filePath: string }) {
+  const lines = diff.split("\n");
+  return (
+    <Box flexDirection="column" borderStyle="round" borderColor="yellow" paddingX={1} marginTop={1}>
+      <Text bold>📝 {filePath}</Text>
+      {lines.map((line, i) => {
+        if (line.startsWith("---") || line.startsWith("+++")) {
+          return <Text key={i} color="yellow" bold>{line}</Text>;
+        }
+        if (line.startsWith("+")) {
+          return <Text key={i} color="green">{line}</Text>;
+        }
+        if (line.startsWith("-")) {
+          return <Text key={i} color="red">{line}</Text>;
+        }
+        if (line.startsWith("@@")) {
+          return <Text key={i} color="cyan">{line}</Text>;
+        }
+        return <Text key={i}>{line}</Text>;
+      })}
+      <Text bold color="yellow">[Y]es / [n]o — Apply this change?</Text>
+    </Box>
+  );
+}
+
 /** Architect plan display — shown before execution begins. */
 function PlanDisplay({ plan }: { plan: EditPlan }) {
   return (
@@ -210,6 +236,7 @@ function App() {
   const [sessionList, setSessionList] = useState<SessionInfo[]>([]);
   const [showResume, setShowResume] = useState(false);
   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
+  const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
   const [footerStats, setFooterStats] = useState<FooterStats>({
     tokensIn: 0,
     tokensOut: 0,
@@ -236,6 +263,11 @@ function App() {
       onPlan: (plan: EditPlan) => {
         setActivePlan(plan);
       },
+      onDiffPreview: noConfirm ? undefined : (diff, filePath) => {
+        return new Promise<boolean>((resolve) => {
+          setPendingDiff({ diff, filePath, resolve });
+        });
+      },
     });
     orchestratorRef.current = orch;
     orch.init().then(() => {
@@ -256,7 +288,17 @@ function App() {
     }).catch(() => setStatus("Init failed"));
   }, []);
 
-  useInput((_, key) => {
+  useInput((ch, key) => {
+    if (pendingDiff) {
+      if (ch === "y" || ch === "Y" || key.return) {
+        pendingDiff.resolve(true);
+        setPendingDiff(null);
+      } else if (ch === "n" || ch === "N" || key.escape) {
+        pendingDiff.resolve(false);
+        setPendingDiff(null);
+      }
+      return;
+    }
     if (key.escape) exit();
   });
 
@@ -477,8 +519,13 @@ function App() {
         />
       </Box>
 
+      {/* Diff preview — shown when agent proposes a file edit */}
+      {pendingDiff && (
+        <DiffPreviewDisplay diff={pendingDiff.diff} filePath={pendingDiff.filePath} />
+      )}
+
       {/* Live streaming text */}
-      {streamBuffer && <StreamingMessage buffer={streamBuffer} />}
+      {!pendingDiff && streamBuffer && <StreamingMessage buffer={streamBuffer} />}
 
       {/* Status / spinner */}
       {(loading || status) && (
