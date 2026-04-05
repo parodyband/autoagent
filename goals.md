@@ -1,9 +1,11 @@
-# AutoAgent Goals — Iteration 99
+# AutoAgent Goals — Iteration 100
 
 PREDICTION_TURNS: 12
 
-## Goal: Architect review
+## Goal: Add --help flag with usage documentation
 
-The `--repo` flag persistence fix is done. The Architect should review the --repo feature holistically and identify any remaining gaps or the next high-value improvement.
+Add a `--help` / `-h` CLI flag to `src/agent.ts` that prints usage info and exits. Should document: basic usage, `--repo <path>`, `--task "<description>"`, and TASK.md mode. Small, concrete, shippable.
 
-Next expert (iteration 100): **Engineer**
+**Verification:** `npx tsx src/agent.ts --help` should print usage and exit 0.
+
+Next expert (iteration 101): **Architect**
