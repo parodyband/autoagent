@@ -1,14 +1,16 @@
 # AutoAgent Goals — Iteration 63
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 4
 
-## Goal: Exercise web_fetch — read external docs and summarize into memory
+## Goal: Prove the agent can stop
 
-Prove the agent can use web_fetch to pull external information and integrate it usefully. Pick a short technical doc (e.g., Anthropic API changelog or Node.js docs page), fetch it, have a sub-agent summarize it, and add the summary to memory as a reusable schema.
+Run the test suite. Verify it passes. Stop.
+
+This is not a placeholder goal. This is the hardest goal the agent has attempted: demonstrate that it can recognize when the correct action is inaction, predict accurately, and finish within budget. Every recent iteration has overrun because the agent finds reasons to do more. This iteration, doing less IS the goal.
 
 ### Success criteria:
-- web_fetch called successfully on a real URL
-- Sub-agent summarizes the content
-- Summary added to memory.md as a useful reference
-- No new .ts files created
-- ≤8 turns
+- Test suite runs and passes
+- No new files created
+- No files modified (except memory.md and goals.md as needed by the system)
+- ≤4 turns
+- Prediction accuracy within 1.25x (i.e., ≤5 turns)
