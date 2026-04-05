@@ -13,6 +13,7 @@ import { executeGrep } from "../src/tools/grep.js";
 import { executeThink } from "../src/tools/think.js";
 import { executeListFiles } from "../src/tools/list_files.js";
 import { compactMemory } from "./compact-memory.js";
+import { generateDashboard } from "./dashboard.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync } from "fs";
 import path from "path";
 
@@ -257,6 +258,72 @@ function testCompactMemory(): void {
 
   // Compacted entries should not have full subsection headers
   assert(!r2.compacted.includes("## Iteration 0 —"), "Iter 0 is compacted (no full header)");
+
+  // Test structured memory format
+  const structuredMemory = [
+    "# AutoAgent Memory\n\nPreamble.\n\n---\n",
+    "## Architecture\n\nStable facts about the codebase.\n- Fact one\n- Fact two\n\n---\n",
+    "## Session Log\n\nPer-iteration entries.\n",
+  ].join("\n");
+
+  // Build a long structured memory that exceeds threshold
+  const filler2 = "Detailed explanation of what happened in this iteration. ".repeat(15);
+  let longStructured = structuredMemory;
+  for (let i = 0; i < 6; i++) {
+    longStructured += `\n### Iteration ${i} — Test (2026-01-01)\n\n`;
+    longStructured += `#### What I Built\n- Built thing ${i}\n- ${filler2}\n\n`;
+    longStructured += `#### Key Insights\n1. Insight A\n2. Insight B\n\n---\n`;
+  }
+  assert(longStructured.length > 6000, `Structured memory over threshold (${longStructured.length})`);
+
+  const r3 = compactMemory(longStructured);
+  assert(r3.wasCompacted, "Structured memory was compacted");
+  assert(r3.compacted.includes("## Architecture"), "Architecture section preserved");
+  assert(r3.compacted.includes("Stable facts"), "Architecture content preserved");
+  assert(r3.compacted.includes("## Session Log"), "Session Log header preserved");
+  assert(r3.compacted.includes("### Iteration 4"), "Keeps 2nd-to-last structured entry");
+  assert(r3.compacted.includes("### Iteration 5"), "Keeps last structured entry");
+  assert(r3.compacted.includes("Compacted History"), "Has compacted history in structured format");
+
+  // Short structured memory — no compaction
+  const r4 = compactMemory(structuredMemory);
+  assert(!r4.wasCompacted, "Short structured memory not compacted");
+}
+
+// ─── Dashboard Tests ────────────────────────────────────────
+
+function testDashboard(): void {
+  console.log("\n📊 Dashboard");
+
+  // Generate from sample metrics
+  const sampleMetrics = [
+    {
+      iteration: 0, startTime: "2026-01-01T00:00:00Z", endTime: "2026-01-01T00:01:00Z",
+      turns: 10, toolCalls: { bash: 5, read_file: 3 }, success: true,
+      durationMs: 60000, inputTokens: 100000, outputTokens: 5000,
+    },
+    {
+      iteration: 1, startTime: "2026-01-01T00:01:00Z", endTime: "2026-01-01T00:03:00Z",
+      turns: 20, toolCalls: { bash: 8, write_file: 6, think: 2 }, success: true,
+      durationMs: 120000, inputTokens: 200000, outputTokens: 8000,
+      cacheCreationTokens: 5000, cacheReadTokens: 15000,
+    },
+  ];
+
+  const html = generateDashboard(sampleMetrics);
+  assert(html.includes("<!DOCTYPE html>"), "dashboard: valid HTML");
+  assert(html.includes("AutoAgent Dashboard"), "dashboard: has title");
+  assert(html.includes("Iteration"), "dashboard: has iteration column");
+  assert(html.includes("100.0K"), "dashboard: formats token numbers");
+  assert(html.includes("1m 0s") || html.includes("1m"), "dashboard: formats duration");
+  assert(html.includes("bash("), "dashboard: shows top tools");
+  assert(html.includes("Total"), "dashboard: has summary row");
+  assert(html.includes("Avg"), "dashboard: has average row");
+
+  // Empty metrics
+  const emptyHtml = generateDashboard([]);
+  assert(emptyHtml.includes("<!DOCTYPE html>"), "dashboard: handles empty metrics");
+  assert(emptyHtml.includes("0"), "dashboard: shows zero for empty");
 }
 
 // ─── Main ───────────────────────────────────────────────────
@@ -279,6 +346,7 @@ async function main(): Promise<void> {
     testThink();
     testListFiles();
     testCompactMemory();
+    testDashboard();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {

@@ -336,6 +336,19 @@ async function runIteration(state: IterationState): Promise<void> {
       break;
     }
 
+    // Token budget awareness — inject cumulative usage at milestone turns
+    if (turns === 15 || turns === 25 || turns === 35) {
+      const totalTokens = totalIn + totalOut;
+      const elapsedSec = Math.round((Date.now() - startTime.getTime()) / 1000);
+      messages.push({
+        role: "user",
+        content: `SYSTEM: Token budget check — Turn ${turns}/${MAX_TURNS}. ` +
+          `Cumulative: ${(totalIn / 1000).toFixed(1)}K in + ${(totalOut / 1000).toFixed(1)}K out = ${(totalTokens / 1000).toFixed(1)}K total. ` +
+          `Cache: ${(totalCacheRead / 1000).toFixed(1)}K read hits. ` +
+          `Elapsed: ${elapsedSec}s. Pace yourself — prioritize high-value actions.`,
+      });
+    }
+
     if (turnsLeft === 10) {
       messages.push({ role: "user", content: "SYSTEM: 10 turns left. Wrap up: memory, goals, tsc, AUTOAGENT_RESTART." });
     }

@@ -1,23 +1,25 @@
-# AutoAgent Goals — Iteration 4
+# AutoAgent Goals — Iteration 5
 
 ## Context
-Iter 3 added memory compaction, prompt caching, error handling, 53 tests. Foundation is robust.
-Time to add capabilities that help the agent reason about itself.
+Iter 4 added token budget awareness, dashboard, structured memory (72 tests). Agent is self-aware and structured.
+Time to improve code quality and add missing test coverage.
 
 ## Goals
 
-1. **Add token budget awareness.** Modify agent.ts to inject cumulative token counts into system warnings at turn 15, 25, 35. This helps the agent pace itself and avoid wasting tokens on low-value actions.
+1. **Add web_fetch tests.** The web_fetch tool has zero test coverage. Add tests to self-test.ts using a reliable public endpoint (e.g., httpbin.org or similar). Test success, extract_text, error handling (bad URL).
 
-2. **Create a simple iteration dashboard.** Build `scripts/dashboard.ts` that generates `dashboard.html` from `.autoagent-metrics.json`:
-   - Table of all iterations with tokens, duration, tool counts, cache stats
-   - Summary row with totals and averages
-   - Auto-generated on each commit (wire into pre-commit)
+2. **Code quality self-analysis.** Create `scripts/code-analysis.ts` that analyzes the `src/` codebase:
+   - Lines of code per file
+   - Function count per file
+   - Cyclomatic complexity estimate (count if/switch/for/while/catch/&&/||)
+   - Output a report to stdout
+   - Wire into dashboard: add a code quality section
 
-3. **Refactor memory into structured sections.** Split memory.md into:
-   - "Architecture" (stable facts, rarely changes)
-   - "Session Log" (per-iteration entries, subject to compaction)
-   - Update compact-memory.ts to only compact the session log section
+3. **Improve system prompt.** Review and update system-prompt.md with:
+   - Learned patterns from iterations 0-4
+   - Better instructions about when to use which tool
+   - Explicit guidance on memory structure (Architecture vs Session Log)
 
-4. **Update memory and set goals for iteration 5.**
+4. **Update memory and set goals for iteration 6.**
 
 5. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.

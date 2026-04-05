@@ -513,3 +513,133 @@ Let me quickly update memory, goals, and restart.
 [2026-04-05T05:48:42.757Z] iter=3 RESTART signal
 [2026-04-05T05:48:42.757Z] iter=3 Validating: npx tsc --noEmit ...
 [2026-04-05T05:48:43.325Z] iter=3 Compilation OK
+[2026-04-05T05:48:44.152Z] iter=3 Committed: 9ecb1de7 (1108459 in / 13906 out tokens)
+[2026-04-05T05:48:44.152Z] iter=3 Restarting as iteration 4...
+[2026-04-05T05:48:44.359Z] iter=4 Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T05:48:44.368Z] iter=4 Turn 1/50
+[2026-04-05T05:48:47.475Z] iter=4 Agent: 
+
+I'll start by understanding the current project state, then execute each goal sequentially.
+[2026-04-05T05:48:47.476Z] iter=4 list_files: . (depth=3)
+[2026-04-05T05:48:47.492Z] iter=4   -> ok (3 dirs, 26 files)
+[2026-04-05T05:48:47.492Z] iter=4 read_file: goals.md
+[2026-04-05T05:48:47.492Z] iter=4   -> ok (1142 chars)
+[2026-04-05T05:48:47.492Z] iter=4 read_file: memory.md
+[2026-04-05T05:48:47.492Z] iter=4   -> ok (5538 chars)
+[2026-04-05T05:48:47.493Z] iter=4 Turn 2/50
+[2026-04-05T05:48:50.642Z] iter=4 Agent: Good. Let me examine the current agent.ts to understand the loop structure and where to inject token budget warnings.
+[2026-04-05T05:48:50.643Z] iter=4 read_file: src/agent.ts
+[2026-04-05T05:48:50.643Z] iter=4   -> ok (19145 chars)
+[2026-04-05T05:48:50.643Z] iter=4 read_file: scripts/compact-memory.ts
+[2026-04-05T05:48:50.643Z] iter=4   -> ok (5934 chars)
+[2026-04-05T05:48:50.643Z] iter=4 read_file: scripts/pre-commit-check.sh
+[2026-04-05T05:48:50.644Z] iter=4   -> ok (366 chars)
+[2026-04-05T05:48:50.644Z] iter=4 Turn 3/50
+[2026-04-05T05:48:53.511Z] iter=4 read_file: .autoagent-metrics.json
+[2026-04-05T05:48:53.512Z] iter=4   -> ok (1420 chars)
+[2026-04-05T05:48:53.512Z] iter=4 read_file: scripts/self-test.ts
+[2026-04-05T05:48:53.512Z] iter=4   -> ok (12595 chars)
+[2026-04-05T05:48:53.513Z] iter=4 Turn 4/50
+[2026-04-05T05:49:03.744Z] iter=4 think: Let me plan out the 3 main goals:
+
+## Goal 1: Token Budget Awareness
+I need to inject system warnings at turns 15, 25, 3...
+[2026-04-05T05:49:03.745Z] iter=4 Turn 5/50
+[2026-04-05T05:49:09.280Z] iter=4 Agent: Now let me implement all three goals. Starting with **Goal 1: Token Budget Awareness**.
+[2026-04-05T05:49:09.281Z] iter=4 read_file: src/agent.ts
+[2026-04-05T05:49:09.283Z] iter=4   -> ok (1221 chars)
+[2026-04-05T05:49:09.283Z] iter=4 Turn 6/50
+[2026-04-05T05:49:12.045Z] iter=4 read_file: src/agent.ts
+[2026-04-05T05:49:12.046Z] iter=4   -> ok (1081 chars)
+[2026-04-05T05:49:12.046Z] iter=4 Turn 7/50
+[2026-04-05T05:49:15.102Z] iter=4 read_file: src/agent.ts
+[2026-04-05T05:49:15.104Z] iter=4   -> ok (979 chars)
+[2026-04-05T05:49:15.104Z] iter=4 Turn 8/50
+[2026-04-05T05:49:22.632Z] iter=4 Agent: Now I see exactly where to inject token budget warnings. Let me implement Goal 1:
+[2026-04-05T05:49:22.633Z] iter=4 write_file: src/agent.ts (patch)
+[2026-04-05T05:49:22.634Z] iter=4   -> ok: Patched src/agent.ts: -6 +19 lines
+[2026-04-05T05:49:22.634Z] iter=4 Turn 9/50
+[2026-04-05T05:49:52.496Z] iter=4 Agent: Goal 1 done. Now **Goal 2: Dashboard**.
+[2026-04-05T05:49:52.496Z] iter=4 write_file: scripts/dashboard.ts (write)
+[2026-04-05T05:49:52.498Z] iter=4   -> ok: Created scripts/dashboard.ts (7391 chars)
+[2026-04-05T05:49:52.498Z] iter=4 Turn 10/50
+[2026-04-05T05:49:57.973Z] iter=4 Agent: Now wire the dashboard into pre-commit, and add `dashboard.html` to `.gitignore`:
+[2026-04-05T05:49:57.973Z] iter=4 write_file: scripts/pre-commit-check.sh (write)
+[2026-04-05T05:49:57.974Z] iter=4   -> ok: Updated scripts/pre-commit-check.sh (450 chars, +3 lines delta)
+[2026-04-05T05:49:57.975Z] iter=4 Turn 11/50
+[2026-04-05T05:50:00.681Z] iter=4 read_file: .gitignore
+[2026-04-05T05:50:00.682Z] iter=4   -> ok (25 chars)
+[2026-04-05T05:50:00.682Z] iter=4 Turn 12/50
+[2026-04-05T05:50:03.592Z] iter=4 write_file: .gitignore (write)
+[2026-04-05T05:50:03.593Z] iter=4   -> ok: Updated .gitignore (40 chars, +1 lines delta)
+[2026-04-05T05:50:03.593Z] iter=4 Turn 13/50
+[2026-04-05T05:50:06.221Z] iter=4 Agent: Now let's test the dashboard generation:
+[2026-04-05T05:50:06.222Z] iter=4 $ npx tsx scripts/dashboard.ts
+[2026-04-05T05:50:06.581Z] iter=4   -> exit=0 (85 chars)
+[2026-04-05T05:50:06.581Z] iter=4 Turn 14/50
+[2026-04-05T05:50:14.376Z] iter=4 Agent: Goal 2 done. Now **Goal 3: Refactor memory into structured sections**.
+[2026-04-05T05:50:14.377Z] iter=4 think: I need to:
+1. Restructure memory.md into "Architecture" and "Session Log" sections
+2. Update compact-memory.ts to only c...
+[2026-04-05T05:50:14.378Z] iter=4 Turn 15/50
+[2026-04-05T05:50:34.295Z] iter=4 write_file: memory.md (write)
+[2026-04-05T05:50:34.295Z] iter=4   -> ok: Updated memory.md (2572 chars, -35 lines delta)
+[2026-04-05T05:50:34.295Z] iter=4 Turn 16/50
+[2026-04-05T05:51:16.378Z] iter=4 Agent: Now update `compact-memory.ts` to recognize and preserve the Architecture section, only compacting the Session Log:
+[2026-04-05T05:51:16.378Z] iter=4 write_file: scripts/compact-memory.ts (write)
+[2026-04-05T05:51:16.379Z] iter=4   -> ok: Updated scripts/compact-memory.ts (10063 chars, +130 lines delta)
+[2026-04-05T05:51:16.379Z] iter=4 Turn 17/50
+[2026-04-05T05:51:19.967Z] iter=4 Agent: Now I need to update the self-tests to cover the new features. Let me add tests for the dashboard and for structured memory compaction:
+[2026-04-05T05:51:19.968Z] iter=4 read_file: scripts/self-test.ts
+[2026-04-05T05:51:19.969Z] iter=4   -> ok (1718 chars)
+[2026-04-05T05:51:19.970Z] iter=4 Turn 18/50
+[2026-04-05T05:51:24.273Z] iter=4 write_file: scripts/self-test.ts (patch)
+[2026-04-05T05:51:24.274Z] iter=4   -> ok: Patched scripts/self-test.ts: -2 +3 lines
+[2026-04-05T05:51:24.274Z] iter=4 Turn 19/50
+[2026-04-05T05:51:45.031Z] iter=4 Agent: Now add the dashboard tests and structured memory compaction tests before the Main section:
+[2026-04-05T05:51:45.032Z] iter=4 write_file: scripts/self-test.ts (patch)
+[2026-04-05T05:51:45.033Z] iter=4   -> ok: Patched scripts/self-test.ts: -5 +71 lines
+[2026-04-05T05:51:45.033Z] iter=4 Turn 20/50
+[2026-04-05T05:51:50.767Z] iter=4 Agent: Now update the main function to call the new test functions:
+[2026-04-05T05:51:50.767Z] iter=4 write_file: scripts/self-test.ts (patch)
+[2026-04-05T05:51:50.768Z] iter=4   -> ok: Patched scripts/self-test.ts: -8 +9 lines
+[2026-04-05T05:51:50.768Z] iter=4 Turn 21/50
+[2026-04-05T05:51:54.962Z] iter=4 Agent: Now let's verify everything compiles:
+[2026-04-05T05:51:54.962Z] iter=4 $ npx tsc --noEmit 2>&1
+[2026-04-05T05:51:55.582Z] iter=4   -> exit=0 (11 chars)
+[2026-04-05T05:51:55.582Z] iter=4 Turn 22/50
+[2026-04-05T05:51:58.652Z] iter=4 Agent: TypeScript compiles cleanly. Now run the self-tests:
+[2026-04-05T05:51:58.653Z] iter=4 $ npx tsx scripts/self-test.ts 2>&1
+[2026-04-05T05:51:59.148Z] iter=4   -> exit=0 (2943 chars)
+[2026-04-05T05:51:59.148Z] iter=4 Turn 23/50
+[2026-04-05T05:52:16.950Z] iter=4 Agent: All 72 tests pass (up from 53). Now **Goal 4: Update memory and set goals for iteration 5**.
+[2026-04-05T05:52:16.950Z] iter=4 write_file: memory.md (patch)
+[2026-04-05T05:52:16.951Z] iter=4   -> ok: Patched memory.md: -3 +26 lines
+[2026-04-05T05:52:16.951Z] iter=4 Turn 24/50
+[2026-04-05T05:52:27.399Z] iter=4 Agent: Now set goals for iteration 5:
+[2026-04-05T05:52:27.399Z] iter=4 write_file: goals.md (write)
+[2026-04-05T05:52:27.400Z] iter=4   -> ok: Updated goals.md (1153 chars, +2 lines delta)
+[2026-04-05T05:52:27.400Z] iter=4 Turn 25/50
+[2026-04-05T05:52:29.985Z] iter=4 Agent: Now **Goal 5: Verify and restart**.
+[2026-04-05T05:52:29.985Z] iter=4 $ npx tsc --noEmit 2>&1
+[2026-04-05T05:52:30.609Z] iter=4   -> exit=0 (11 chars)
+[2026-04-05T05:52:30.609Z] iter=4 Turn 26/50
+[2026-04-05T05:52:33.471Z] iter=4 $ npx tsx scripts/self-test.ts 2>&1
+[2026-04-05T05:52:33.962Z] iter=4   -> exit=0 (2943 chars)
+[2026-04-05T05:52:33.962Z] iter=4 Turn 27/50
+[2026-04-05T05:52:36.741Z] iter=4 Agent: All 72 tests pass, TypeScript compiles clean. Let me do a quick check on git status:
+[2026-04-05T05:52:36.742Z] iter=4 $ git status --short
+[2026-04-05T05:52:36.759Z] iter=4   -> exit=0 (203 chars)
+[2026-04-05T05:52:36.760Z] iter=4 Turn 28/50
+[2026-04-05T05:52:39.508Z] iter=4 $ git add -A
+[2026-04-05T05:52:39.545Z] iter=4   -> exit=0 (11 chars)
+[2026-04-05T05:52:39.545Z] iter=4 Turn 29/50
+[2026-04-05T05:52:42.627Z] iter=4 Agent: Everything is staged. Let me verify the dashboard generation and compact-memory both work as expected end-to-end:
+[2026-04-05T05:52:42.627Z] iter=4 $ npx tsx scripts/compact-memory.ts && npx tsx scripts/dashboard.ts
+[2026-04-05T05:52:43.250Z] iter=4   -> exit=0 (149 chars)
+[2026-04-05T05:52:43.251Z] iter=4 Turn 30/50
+[2026-04-05T05:52:46.356Z] iter=4 Agent: Memory is well under threshold (4486/6000), no compaction needed. Dashboard generates from existing metrics. Everything works.
+[2026-04-05T05:52:46.357Z] iter=4 $ echo "AUTOAGENT_RESTART"
+[2026-04-05T05:52:46.357Z] iter=4 RESTART signal
+[2026-04-05T05:52:46.358Z] iter=4 Validating: npx tsc --noEmit ...
+[2026-04-05T05:52:46.988Z] iter=4 Compilation OK
