@@ -9,6 +9,7 @@
 
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
+import { analyzeCodebase, type CodebaseAnalysis } from "./code-analysis.js";
 
 const ROOT = process.cwd();
 const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");
@@ -51,6 +52,47 @@ function topTools(tc: Record<string, number>): string {
     .slice(0, 3)
     .map(([name, count]) => `${name}(${count})`)
     .join(", ");
+}
+
+function generateCodeQualitySection(): string {
+  try {
+    const analysis = analyzeCodebase();
+    const fileRows = analysis.files.map(f => `
+      <tr>
+        <td>${f.file}</td>
+        <td>${f.totalLines}</td>
+        <td>${f.codeLines}</td>
+        <td>${f.commentLines}</td>
+        <td>${f.functionCount}</td>
+        <td style="color: ${f.complexity > 30 ? '#f85149' : f.complexity > 15 ? '#d29922' : '#3fb950'}">${f.complexity}</td>
+      </tr>`).join("\n");
+
+    return `
+<h2 style="color: #58a6ff; margin-top: 2rem;">📊 Code Quality</h2>
+<div class="stats" style="margin-top: 1rem;">
+  <div class="stat-card"><div class="stat-value">${analysis.totals.fileCount}</div><div class="stat-label">Source Files</div></div>
+  <div class="stat-card"><div class="stat-value">${analysis.totals.codeLines}</div><div class="stat-label">Code Lines</div></div>
+  <div class="stat-card"><div class="stat-value">${analysis.totals.functionCount}</div><div class="stat-label">Functions</div></div>
+  <div class="stat-card"><div class="stat-value">${analysis.totals.complexity}</div><div class="stat-label">Total Complexity</div></div>
+  <div class="stat-card"><div class="stat-value">${analysis.averageComplexityPerFunction}</div><div class="stat-label">Avg Cmplx/Func</div></div>
+</div>
+<table style="margin-top: 1rem;">
+<thead><tr><th>File</th><th>Lines</th><th>Code</th><th>Comments</th><th>Functions</th><th>Complexity</th></tr></thead>
+<tbody>
+${fileRows}
+<tr class="summary">
+  <td><strong>Total</strong></td>
+  <td>${analysis.totals.totalLines}</td>
+  <td>${analysis.totals.codeLines}</td>
+  <td>${analysis.totals.commentLines}</td>
+  <td>${analysis.totals.functionCount}</td>
+  <td>${analysis.totals.complexity}</td>
+</tr>
+</tbody>
+</table>`;
+  } catch {
+    return '<p style="color: #8b949e; margin-top: 2rem;">Code quality analysis unavailable.</p>';
+  }
 }
 
 export function generateDashboard(metrics: IterationMetrics[]): string {
@@ -167,6 +209,8 @@ ${summaryRow}
 ${avgRow}
 </tbody>
 </table>
+
+${generateCodeQualitySection()}
 
 <footer>AutoAgent — Self-improving autonomous agent</footer>
 </body>

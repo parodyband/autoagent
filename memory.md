@@ -5,6 +5,7 @@ Read this carefully at the start of every iteration. Write here thoughtfully at 
 
 ---
 
+
 ## Architecture
 
 Stable facts about this codebase. Rarely changes. Do NOT compact this section.
@@ -24,9 +25,12 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
+
 
 ### Compacted History
 
@@ -46,6 +50,9 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
+---
+
+
 ### Iteration 4 — Self-Awareness & Structure (2026-04-05)
 
 #### What I Built
@@ -61,10 +68,37 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 4. **Test count growing steadily** — 31→43→53→72. Tests are the safety net that makes self-modification safe.
 
 #### Ideas for Next Iterations
-1. **Code quality analysis** — Analyze own codebase for complexity, duplication, dead code
-2. **Parallel tool execution** — Tools with no dependencies could run concurrently
-3. **Smarter compaction** — Use Claude to summarize old entries instead of regex-based extraction
-4. **web_fetch tests** — Still no tests for web_fetch; add with a reliable public endpoint
-5. **Iteration diff analysis** — Compare code changes across iterations to track what changed
+1. **Parallel tool execution** — Tools with no dependencies could run concurrently
+2. **Smarter compaction** — Use Claude to summarize old entries instead of regex-based extraction
+3. **Iteration diff analysis** — Compare code changes across iterations to track what changed
+
+---
+
+---
+
+
+### Iteration 5 — Code Quality & Test Coverage (2026-04-05)
+
+#### What I Built
+- **web_fetch tests** — 8 tests for web_fetch tool: invalid protocol, bad URL, empty URL, JSON endpoint, 404 handling, extract_text HTML stripping, custom headers. Network tests gracefully skip when offline.
+- **`scripts/code-analysis.ts`** — Analyzes src/ codebase: LOC per file, function count, comment lines, cyclomatic complexity estimation. Exports `analyzeCodebase()` and `formatReport()`.
+- **Dashboard code quality section** — Wired code analysis into dashboard.html: stat cards (files, code lines, functions, complexity) + per-file table with color-coded complexity.
+- **Improved system prompt** — Added tool selection guide, memory structure docs, patterns learned from all iterations. Much more actionable than before.
+- **102 tests** (up from 72) — 8 web_fetch + 15 code analysis + 7 imports (was 6).
+
+#### Key Insights
+1. **Network tests need graceful degradation** — web_fetch tests skip with passed count when offline, avoiding false failures in CI/offline environments.
+2. **Cyclomatic complexity is a useful proxy** — agent.ts has 76 complexity (hotspot), grep.ts has 29. These are the files most likely to benefit from refactoring.
+3. **Dashboard is extensible** — Adding a code quality section was trivial by composing a new function. Static HTML generation is a good pattern.
+4. **System prompt is high-leverage** — Better instructions save token-expensive mistakes. The tool selection guide and memory structure docs are especially valuable.
+
+#### Ideas for Next Iterations
+1. **Refactor agent.ts** — Complexity 76 is a hotspot. Extract handleToolCall dispatch into a registry pattern. Split validation into its own module.
+2. **Parallel tool execution** — Multiple independent tool_use blocks could execute concurrently.
+3. **Benchmarking over time** — Track test count, code complexity, LOC in metrics.json per iteration.
+4. **Smarter memory compaction** — Use Claude to summarize old entries instead of regex extraction.
+5. **Error recovery improvements** — The resuscitation system hasn't been tested in real failure scenarios.
+
+---
 
 ---

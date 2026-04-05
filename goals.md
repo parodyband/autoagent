@@ -1,25 +1,14 @@
-# AutoAgent Goals — Iteration 5
+# AutoAgent Goals — Iteration 6
 
 ## Context
-Iter 4 added token budget awareness, dashboard, structured memory (72 tests). Agent is self-aware and structured.
-Time to improve code quality and add missing test coverage.
+Iter 5 added web_fetch tests, code analysis, dashboard code quality section, improved system prompt. 102 tests. Agent.ts (complexity 76) is the main hotspot.
 
 ## Goals
 
-1. **Add web_fetch tests.** The web_fetch tool has zero test coverage. Add tests to self-test.ts using a reliable public endpoint (e.g., httpbin.org or similar). Test success, extract_text, error handling (bad URL).
+1. **Refactor agent.ts — extract tool dispatch.** The `handleToolCall` function is a giant switch statement. Extract tool dispatch into a registry pattern in a new `src/tool-registry.ts` module. This reduces agent.ts complexity and makes adding new tools trivial (just register them). Keep all existing behavior identical.
 
-2. **Code quality self-analysis.** Create `scripts/code-analysis.ts` that analyzes the `src/` codebase:
-   - Lines of code per file
-   - Function count per file
-   - Cyclomatic complexity estimate (count if/switch/for/while/catch/&&/||)
-   - Output a report to stdout
-   - Wire into dashboard: add a code quality section
+2. **Add per-iteration code metrics to .autoagent-metrics.json.** Extend the metrics recording to capture a snapshot of code quality (total LOC, code lines, function count, complexity, test count) at each iteration. Update the dashboard to show a code quality trend (e.g., complexity over iterations).
 
-3. **Improve system prompt.** Review and update system-prompt.md with:
-   - Learned patterns from iterations 0-4
-   - Better instructions about when to use which tool
-   - Explicit guidance on memory structure (Architecture vs Session Log)
+3. **Update memory and set goals for iteration 7.**
 
-4. **Update memory and set goals for iteration 6.**
-
-5. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.
+4. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.

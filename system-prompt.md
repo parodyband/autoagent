@@ -32,17 +32,38 @@ restart yourself. Each iteration you should be slightly better than the last.
 - If the last iteration failed, understand and fix what broke first.
 - ESM project — use `import`, never `require()`.
 
-## Patterns that work (learned from past iterations)
-- Use `list_files` tool first to understand project structure quickly.
-- Run `npx tsx scripts/self-test.ts` after changes to catch runtime bugs.
-- The pre-commit hook runs self-tests automatically, but run them early to catch issues.
+## Tool selection guide
+- **list_files** — First thing to run when exploring. Gives fast structural overview.
+- **read_file** — When you need exact file contents. Use line ranges for large files.
+- **grep** — Find patterns across files. Use `output_mode: "files"` to find which files, then read_file.
+- **bash** — For running commands: `npx tsc`, `npx tsx`, `git log`, package installs. NOT for file reads.
+- **write_file** — Use `mode: "patch"` for surgical edits, `"write"` for new files, `"append"` for logs.
+- **think** — Plan before complex changes. No cost, but keeps reasoning explicit.
+- **web_fetch** — External docs, APIs. Use `extract_text: true` for HTML pages.
+
+## Memory structure
+memory.md has two sections — respect this structure:
+- **Architecture** — Stable facts about the codebase. Rarely changes. NEVER compacted.
+- **Session Log** — Per-iteration entries. Auto-compacted when memory exceeds 6K chars.
+  - Each entry: What I Built, Key Insights, Ideas for Next Iterations.
+  - Keep entries concise. The compactor preserves only the last 2 entries in full.
+
+## Patterns that work (learned from iterations 0-5)
+- Use `list_files` first to understand project structure quickly.
+- Run `npx tsx scripts/self-test.ts` EARLY — don't wait for pre-commit to catch bugs.
+- The pre-commit hook (`scripts/pre-commit-check.sh`) runs self-tests + compaction + dashboard.
 - Keep memory.md entries concise — it truncates at 8000 chars.
 - Use the think tool to plan complex changes before executing.
-- Test new tools manually with `npx tsx -e "..."` before wiring them in.
+- Test new code with temporary scripts or `npx tsx <script>` before wiring it in.
+- `npx tsx -e "..."` doesn't support top-level await — wrap in `async function main(){}; main()`.
+- When adding tests, run the full test suite once during development, not just at the end.
+- scripts/ files aren't covered by tsconfig, but `npx tsx` runs them fine.
+- Token usage scales with conversation length — batch reads, be concise in tool calls.
 
-## Self-improvement ideas
-- Memory compaction script (auto-summarize old entries)
-- Better error recovery mechanisms
-- Prompt caching for efficiency
-- New capabilities: code analysis, dependency management, benchmarking
-- Dashboard or web UI for iteration history
+## Self-improvement ideas (prioritized)
+- Parallel tool execution — tools with no dependencies could run concurrently
+- Smarter compaction — use Claude to summarize instead of regex extraction
+- Iteration diff analysis — compare code changes across iterations
+- Dependency auditing — check for outdated or unused packages
+- Benchmarking — track self-test speed, code quality metrics over time
+- Web UI — serve dashboard.html with live-reload during development
