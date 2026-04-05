@@ -1089,3 +1089,15 @@ Context after patch:
 [2026-04-05T19:40:46.713Z] iter=339 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
 [2026-04-05T19:40:47.780Z] iter=339 turn=8 INFO:   -> exit=0 (11 chars)
 [2026-04-05T19:40:47.780Z] iter=339 turn=9 INFO: Turn 9/25
+[2026-04-05T19:40:50.031Z] iter=339 turn=9 INFO: Agent: TSC clean. Done.
+[2026-04-05T19:40:50.031Z] iter=339 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T19:40:50.031Z] iter=339 turn=9 INFO: RESTART signal
+[2026-04-05T19:40:50.032Z] iter=339 turn=9 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T19:40:51.121Z] iter=339 turn=9 INFO: Compilation OK
+[2026-04-05T19:40:59.159Z] iter=339 turn=9 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T19:40:59.159Z] iter=339 turn=9 INFO: Cache stats: 0 hits, 2 misses, 53 entries, 4 invalidations (2 entries removed)
+[2026-04-05T19:40:59.159Z] iter=339 turn=9 INFO: Tool cache stats
+[2026-04-05T19:40:59.159Z] iter=339 turn=9 INFO: Tool timing: bash: 4x, avg=280ms, total=1120ms; write_file: 4x, avg=2ms, total=6ms; read_file: 2x, avg=1ms, total=2ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T19:40:59.159Z] iter=339 turn=9 INFO: Tool timing stats
+[2026-04-05T19:41:05.926Z] iter=339 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 339: predicted 8 turns, actual 9 turns, ratio 1.13**
+[2026-04-05T19:41:05.946Z] iter=339 turn=9 INFO: Pre-commit review: no significant code changes to review

@@ -15,6 +15,8 @@
 
 ---
 
+---
+
 
 ## Product Architecture
 - `src/tui.tsx` — Ink/React TUI (921 LOC). Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact.
@@ -42,11 +44,15 @@
 
 ---
 
+---
+
 
 ## Prediction Accuracy
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
 
 Recent ratios (iters 327–330): 0.75, 0.95, 1.00, 1.25. Average ~1.0. Well-calibrated now.
+
+---
 
 ---
 
@@ -75,6 +81,8 @@ Recent ratios (iters 327–330): 0.75, 0.95, 1.00, 1.25. Average ~1.0. Well-cali
 
 ---
 
+---
+
 
 ## [RESOLVED] CLI→Orchestrator wiring (fixed iter 336)
 CLI now instantiates Orchestrator and routes all messages through it. Extended thinking enabled (iter 338).
@@ -82,6 +90,8 @@ CLI now instantiates Orchestrator and routes all messages through it. Extended t
 **[AUTO-SCORED] Iteration 333: predicted 8 turns, actual 10 turns, ratio 1.25**
 
 **[AUTO-SCORED] Iteration 334: predicted 20 turns, actual 11 turns, ratio 0.55** — WASTED: goals were already done.
+
+---
 
 ---
 
@@ -106,6 +116,8 @@ CLI now instantiates Orchestrator and routes all messages through it. Extended t
 
 ---
 
+---
+
 
 ## [RESOLVED] Extended thinking (fixed iter 338)
 Orchestrator now sends `thinking: {type:"enabled", budget_tokens:10000}` + `interleaved-thinking-2025-05-14` beta header. Thinking blocks handled in streaming (not shown to user). Tests still needed.
@@ -118,50 +130,10 @@ Orchestrator now sends `thinking: {type:"enabled", budget_tokens:10000}` + `inte
 
 ---
 
-
-## Compacted History (iterations 112–330)
-
-**Core milestones** (112–302):
-- [178] orchestrator + TUI. [192] Tiered compaction. [193–194] architect-mode.
-- [196] Tree-sitter repo map. [200] Auto-commit. [204–206] /help, /diff, /undo.
-- [211] diagnostics. [216] PageRank + fuzzySearch. [218] context-loader.
-- [234] microCompact(). [246] test-runner. [254] Parallel tools + tool-recovery.
-- [256] /status. [260] /rewind. [262–266] file-watcher. [270] /compact.
-- [282] pruneStaleToolResults(). [286] Sub-agent tool. [298] /export.
-- [302] CLI `autoagent init` + auto-export on /exit.
-
-**Recent milestones** (308–330):
-- [308] `autoagent help` CLI subcommand.
-- [310] Welcome banner + context-loader git-awareness.
-- [314] File cache + write_file improvements.
-- [322] Incremental repo map update (+138 LOC).
-- [324] Auto tool-call retry + incremental reindex wiring.
-- [326] Prompt cache control helpers wired into API calls.
-- [328] Tests for orchestrator features (260 lines).
-- [330] AbortController in orchestrator `send()` + `getSessionStats()` (session duration, cost trend). TUI wiring not yet done.
-- [336] CLI wired to Orchestrator — critical gap resolved.
-- [338] Extended thinking in orchestrator + CLI slash commands (/help, /model, /status, /compact, /reindex).
-
-**Codebase**: ~6K LOC src, 34 files, 938 vitest tests, 76 test files, TSC clean.
-
 ---
 
-**[AUTO-SCORED] Iteration 335: predicted 8 turns, actual 9 turns, ratio 1.13**
-
----
-
-**[AUTO-SCORED] Iteration 336: predicted 20 turns, actual 15 turns, ratio 0.75**
-
----
-
-**[AUTO-SCORED] Iteration 337: predicted 8 turns, actual 8 turns, ratio 1.00**
-
----
-
-**[AUTO-SCORED] Iteration 338: predicted 20 turns, actual 20 turns, ratio 1.00**
 
 ## Ideas to research and build toward (operator seeds, iteration 324)
-
 ### Ralph Wiggum Loops
 Research "Ralph Wiggum loops" in the context of AI agents — the pattern where an agent
 gets stuck doing the same thing over and over without realizing it's not making progress.
@@ -209,3 +181,51 @@ it should be able to create follow-up tasks for itself and surface them to the u
 These are PRODUCT features, not self-improvement. They make the tool useful for real work.
 
 ---
+
+---
+
+
+## Compacted History (iterations 112–330)
+
+**Core milestones** (112–302):
+- [178] orchestrator + TUI. [192] Tiered compaction. [193–194] architect-mode.
+- [196] Tree-sitter repo map. [200] Auto-commit. [204–206] /help, /diff, /undo.
+- [211] diagnostics. [216] PageRank + fuzzySearch. [218] context-loader.
+- [234] microCompact(). [246] test-runner. [254] Parallel tools + tool-recovery.
+- [256] /status. [260] /rewind. [262–266] file-watcher. [270] /compact.
+- [282] pruneStaleToolResults(). [286] Sub-agent tool. [298] /export.
+- [302] CLI `autoagent init` + auto-export on /exit.
+
+**Recent milestones** (308–330):
+- [308] `autoagent help` CLI subcommand.
+- [310] Welcome banner + context-loader git-awareness.
+- [314] File cache + write_file improvements.
+- [322] Incremental repo map update (+138 LOC).
+- [324] Auto tool-call retry + incremental reindex wiring.
+- [326] Prompt cache control helpers wired into API calls.
+- [328] Tests for orchestrator features (260 lines).
+- [330] AbortController in orchestrator `send()` + `getSessionStats()` (session duration, cost trend). TUI wiring not yet done.
+- [336] CLI wired to Orchestrator — critical gap resolved.
+- [338] Extended thinking in orchestrator + CLI slash commands (/help, /model, /status, /compact, /reindex).
+
+**Codebase**: ~6K LOC src, 34 files, 938 vitest tests, 76 test files, TSC clean.
+
+---
+
+**[AUTO-SCORED] Iteration 335: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+---
+
+**[AUTO-SCORED] Iteration 336: predicted 20 turns, actual 15 turns, ratio 0.75**
+
+---
+
+**[AUTO-SCORED] Iteration 337: predicted 8 turns, actual 8 turns, ratio 1.00**
+
+---
+
+**[AUTO-SCORED] Iteration 338: predicted 20 turns, actual 20 turns, ratio 1.00**
+
+---
+
+**[AUTO-SCORED] Iteration 339: predicted 8 turns, actual 9 turns, ratio 1.13**
