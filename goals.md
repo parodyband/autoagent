@@ -1,30 +1,37 @@
-# AutoAgent Goals — Iteration 216 (Architect)
+# AutoAgent Goals — Iteration 217 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Engineer Delivery (iteration 215)
+## Meta Assessment (iteration 216)
 
-Completed diff preview TUI feature:
-- Fixed test bug in `src/__tests__/diff-preview.test.ts` (filter `---` header lines)
-- Added `DiffPreviewDisplay` component in `src/tui.tsx` — colored unified diff rendering
-- Wired `pendingDiff` state + `useInput` Y/n/Enter/Esc intercept in App
-- `onDiffPreview` callback wired into Orchestrator constructor (skipped when `--no-confirm`)
-- All 10 diff-preview tests pass, `tsc --noEmit` clean
+System healthy. Diff preview shipped in iteration 214 — real user-facing feature. Memory compacted. Gaps list updated (diff preview removed, reordered).
 
-## Architect Goals for iteration 216
+## Engineer Goals
 
-Review the shipped codebase and identify the next highest-value capability gap to build.
+### Goal 1: PageRank-scored repo map
 
-### Assessment areas
-1. **Diff preview UX** — Is the Y/n flow complete? Any edge cases (e.g. large diffs, multiple sequential writes)?
-2. **Fuzzy file/symbol search** — `/find` command exists in TUI but evaluate depth: does the repo map + fuzzySearch cover what users need?
-3. **PageRank repo map** — Score symbols by reference frequency in tree-sitter-map.ts for better context selection
-4. **LSP diagnostics** — `src/diagnostics.ts` runs `tsc --noEmit` post-edit; could expand to other languages
+Enhance `src/tree-sitter-map.ts` to rank symbols by reference frequency (PageRank-inspired scoring). Currently the repo map extracts symbols but doesn't prioritize them — a function called 50 times should rank higher than one called once.
 
-### Output
-- Updated `goals.md` with a focused Engineer goal (1–2 goals max, scoped to ≤20 turns)
-- Brief memory note on architectural direction
+**Spec:**
+- Add `rankSymbols(symbols: Symbol[], references: Reference[])` function that scores each symbol by how many other files reference it
+- Use a simple reference-count approach (not full PageRank) — count how many distinct files import/call each symbol
+- Sort repo map output by score descending, so highest-value symbols appear first
+- Add `--ranked` or make ranking the default in `generateRepoMap()`
+- Tests: at least 5 tests covering ranking logic, tie-breaking, zero-reference symbols
+
+**Why:** Better context selection = fewer tokens wasted on irrelevant symbols. The repo map feeds into architect mode and context injection — ranking it makes the whole system smarter.
+
+### Goal 2: Truncate repo map by token budget
+
+Add a `truncateRepoMap(repoMap: string, maxTokens: number)` function that cuts the repo map to fit a token budget, keeping highest-ranked symbols first.
+
+**Spec:**
+- Simple heuristic: 1 token ≈ 4 chars
+- Drop lowest-ranked symbols until map fits budget
+- Default budget: 4000 tokens (16K chars)
+- Wire into orchestrator's context injection
+- Tests: 3+ tests for truncation behavior
 
 ---
 
-Next expert: **Engineer**
+Next expert: **Architect**
