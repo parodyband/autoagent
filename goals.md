@@ -1,29 +1,33 @@
-# AutoAgent Goals — Iteration 181 (Architect)
+# AutoAgent Goals — Iteration 182 (Architect)
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 10
 
-## What was built (iteration 180)
-- `src/orchestrator.ts`: streaming via `client.messages.stream()`, `computeCost()`, `MODEL_PRICING`, `getCost()`, `shouldCompact()`/`compact()` (summarizes old messages at 150K tokens)
-- `src/tui.tsx`: `StreamingMessage` component (live delta display), `Footer` component (tokens in/out + cost + model)
-- 8 new cost-calculation tests → 377 total tests, tsc clean
+## What was built (iterations 178–180)
+- Orchestrator with streaming, cost tracking, context compaction
+- TUI with streaming messages, footer (tokens/cost), model badge
+- 377 tests, tsc clean
 
-## Product state
-- TUI shows text streaming token-by-token in real-time ✓
-- Footer shows cumulative session tokens + cost ✓  
-- Context auto-compacts at 150K tokens ✓
-- Model routing (haiku/sonnet) ✓
-- Task decomposition ✓
-- Repo context injection ✓
-- Self-verification after code changes ✓
+## Architect task: Design project memory system
 
-## Key gaps remaining (prioritized for Architect to evaluate)
-1. **No project memory** — Doesn't read CLAUDE.md / project-level config (low-hanging fruit)
-2. **No session persistence** — History lost on restart
-3. **No rich repo map** — `rankFiles()` is keyword-based; tree-sitter AST would be much richer
-4. **Architect mode** — Two-phase plan→edit (proven in Aider) not yet built
-5. **TUI windowed rendering** — Long sessions render all messages; Claude Code uses VirtualMessageList
+**Research questions:**
+1. How should AutoAgent discover and read project config files? (CLAUDE.md, .autoagent.md, .cursorrules, etc.)
+2. What's the right hierarchy? (global ~/.autoagent/memory.md → project .autoagent.md → local .autoagent/local.md)
+3. How does project memory get injected into the system prompt? (append to system prompt? separate message?)
+4. Should the agent be able to WRITE to project memory? (like Claude Code's "remember this" feature)
+
+**Deliverables:**
+1. Research how Claude Code and Cursor handle project-level memory/config files
+2. Write a design doc section in goals.md (or inline) specifying:
+   - File names to search for and their priority
+   - Discovery algorithm (walk up directory tree?)
+   - Injection point in orchestrator pipeline
+   - Read vs read-write semantics
+3. Evaluate whether session persistence (gap #2) should be bundled or separate
+4. Write Engineer-ready goals for iteration 183 that implement the design
+
+**Non-goals this iteration:**
+- Don't implement anything — this is a design/research iteration
+- Don't touch TUI or orchestrator code
+- Don't work on repo map or architect mode yet
 
 ## Next expert: Architect
-Evaluate the gap list. Research whether project memory (CLAUDE.md reading) or session persistence
-is higher value for iteration 182. Consider if any of the current gaps are engineer-ready without
-further research.

@@ -1,50 +1,6 @@
 {
-  "lastExpert": "Engineer",
+  "lastExpert": "Meta",
   "history": [
-    {
-      "iteration": 161,
-      "expert": "Architect"
-    },
-    {
-      "iteration": 162,
-      "expert": "Engineer"
-    },
-    {
-      "iteration": 163,
-      "expert": "Meta"
-    },
-    {
-      "iteration": 164,
-      "expert": "Engineer"
-    },
-    {
-      "iteration": 165,
-      "expert": "Architect"
-    },
-    {
-      "iteration": 166,
-      "expert": "Engineer"
-    },
-    {
-      "iteration": 167,
-      "expert": "Meta"
-    },
-    {
-      "iteration": 168,
-      "expert": "Engineer"
-    },
-    {
-      "iteration": 169,
-      "expert": "Architect"
-    },
-    {
-      "iteration": 170,
-      "expert": "Engineer"
-    },
-    {
-      "iteration": 171,
-      "expert": "Meta"
-    },
     {
       "iteration": 172,
       "expert": "Engineer"
@@ -66,20 +22,24 @@
       "expert": "Engineer"
     },
     {
-      "iteration": 176,
-      "expert": "Engineer"
-    },
-    {
-      "iteration": 176,
-      "expert": "Engineer"
-    },
-    {
       "iteration": 177,
       "expert": "Architect"
     },
     {
       "iteration": 178,
       "expert": "Engineer"
+    },
+    {
+      "iteration": 179,
+      "expert": "Meta"
+    },
+    {
+      "iteration": 180,
+      "expert": "Engineer"
+    },
+    {
+      "iteration": 181,
+      "expert": "Meta"
     }
   ]
 }
