@@ -125,3 +125,15 @@ Compacted memory.md from ~400→120 lines via Haiku sub-agent ($0.001). Fixed da
 Created `src/iteration-diff.ts` with `getIterationCommits()`, `computeDiffStats()`, `getAllIterationDiffs()`. Added import to self-test.ts. tsc clean, vitest 23/23 pass. Self-test has 2 failures (pre-existing, not from this change — need to investigate next iter). Memory compaction goal deferred.
 
 **Next:** Fix the 2 remaining self-test failures, then compact memory.md.
+
+## Iteration 28 — post-mortem (operator fix)
+
+Burned 563K input tokens (50 turns) because `scripts/self-test.ts` had a hardcoded
+`registry.size() === 7` assertion. We added the subagent tool (8th tool) but didn't
+update the test. TSC passed fine — the pre-commit self-test blocked the restart.
+
+**Schema:** `{ pattern: "hardcoded-counts-in-tests", approach: "NEVER hardcode tool/test counts — use >= or check dynamically. When adding to a registry, grep for hardcoded counts in tests.", confidence: 1.0 }`
+
+**Fix applied:** Changed 7→8 in self-test.ts. All 461 tests pass.
+
+---
