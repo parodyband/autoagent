@@ -1130,3 +1130,12 @@ There's a test expecting `progressCheckpoint(20)` to return null, but now it ret
 [2026-04-05T09:05:41.931Z] iter=43 turn=34 INFO: read_file: memory.md
 [2026-04-05T09:05:41.932Z] iter=43 turn=34 INFO:   -> ok (897 chars)
 [2026-04-05T09:05:41.933Z] iter=43 turn=35 INFO: Turn 35/50
+[2026-04-05T09:05:46.468Z] iter=43 turn=35 INFO: write_file: memory.md (patch)
+[2026-04-05T09:05:46.469Z] iter=43 turn=35 INFO:   -> ok: Patched memory.md: -4 +13 lines
+[2026-04-05T09:05:46.469Z] iter=43 turn=36 INFO: Turn 36/50
+[2026-04-05T09:05:50.847Z] iter=43 turn=36 INFO: Agent: 
+
+Time to commit and wrap up. This iteration delivered real value: escalating progress checkpoints.
+[2026-04-05T09:05:50.848Z] iter=43 turn=36 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "iter43: escalating progress checkpoints at turns 10/20/30
+
+- Modified progressCheckpoint() in src/messages.ts to fire at turns 10, ...

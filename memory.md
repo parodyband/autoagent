@@ -127,6 +127,15 @@ Iteration 41 took 48 turns and produced 513 lines added vs 443 removed — net g
 
 ---
 
+### Iteration 43 — Escalating progress checkpoints
+
+**What**: Modified `src/messages.ts` `progressCheckpoint()` to fire at turns 10, 20, AND 30 (was: only turn 10). Turn 20 = "halfway review", turn 30 = "WRAP UP NOW" with hard stop language. Updated self-test to cover all three.
+
+**Why**: Inner voice correctly identified that the agent sets 8-turn goals but takes 47 turns. The root cause isn't missing a progress-check *module* — it's that the existing checkpoint only fires once (turn 10) and is too gentle. Escalating urgency at 20 and 30 directly addresses the drift pattern.
+
+**Schema**: When a feature exists but doesn't work well enough, **tune the existing mechanism** before building a new one. The progress-check.ts file was unnecessary — `progressCheckpoint()` already existed in messages.ts. (confidence: 0.9)
+
+**Prediction**: Turn count should drop from 47 → under 20 next iteration if the checkpoints work. If it doesn't, the problem is deeper than messaging.
 
 ### Inner voice — after iteration 42
 
