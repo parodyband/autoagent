@@ -88,3 +88,5 @@ After completing work, agent proposes follow-ups it noticed (missing error handl
 **Codebase**: ~6.5K LOC src, ~36 files, TSC clean. ~5 test failures to fix.
 
 **[AUTO-SCORED] Iteration 343: predicted 20 turns, actual 14 turns, ratio 0.70**
+
+**[AUTO-SCORED] Iteration 344: predicted 20 turns, actual 21 turns, ratio 1.05**

@@ -69,26 +69,38 @@ export function detectLoop(
 
   if (messages.length < 3) return noLoop;
 
-  // ── 1. Repeated identical tool calls ──────────────────────────────────────
-  // Look at the last 5 assistant messages and count identical tool+args combos
   const assistantMsgs = messages.filter((m) => m.role === "assistant");
-  const recent = assistantMsgs.slice(-5);
 
-  const callCounts = new Map<string, number>();
-  for (const msg of recent) {
-    for (const call of getToolCalls(msg)) {
-      const key = `${call.name}:${call.inputKey}`;
-      callCounts.set(key, (callCounts.get(key) ?? 0) + 1);
-    }
-  }
-  for (const [key, count] of callCounts) {
-    if (count >= 3) {
-      const toolName = key.split(":")[0];
-      return {
-        loopDetected: true,
-        loopType: "repeated-tool",
-        description: `Tool "${toolName}" called with identical arguments ${count} times in the last ${recent.length} rounds`,
-      };
+  // ── 1. Oscillation: alternating between two round fingerprints ─────────────
+  // Check oscillation FIRST — it's a more specific pattern than repeated-tool.
+  // Look at last 6 assistant messages: if they alternate A B A B A B → oscillation
+  if (assistantMsgs.length >= 4) {
+    const lastN = assistantMsgs.slice(-6);
+    const fingerprints = lastN.map((_, i) =>
+      roundFingerprint(
+        messages,
+        messages.findIndex((m) => m === lastN[i])
+      )
+    );
+
+    // Need at least 4 fingerprints with tool calls to detect oscillation
+    const nonEmpty = fingerprints.filter((f) => f.length > 0);
+    if (nonEmpty.length >= 4) {
+      let oscillates = true;
+      for (let i = 2; i < nonEmpty.length; i++) {
+        if (nonEmpty[i] !== nonEmpty[i - 2]) {
+          oscillates = false;
+          break;
+        }
+      }
+      // Also check that the two alternating states are actually different
+      if (oscillates && nonEmpty[0] !== nonEmpty[1]) {
+        return {
+          loopDetected: true,
+          loopType: "oscillation",
+          description: `Agent is oscillating between two states repeatedly (${nonEmpty.length} rounds)`,
+        };
+      }
     }
   }
 
@@ -131,35 +143,25 @@ export function detectLoop(
     }
   }
 
-  // ── 3. Oscillation: alternating between two round fingerprints ─────────────
-  // Look at last 6 assistant messages: if they alternate A B A B A B → oscillation
-  if (assistantMsgs.length >= 4) {
-    const lastN = assistantMsgs.slice(-6);
-    const fingerprints = lastN.map((_, i) =>
-      roundFingerprint(
-        messages,
-        messages.findIndex((m) => m === lastN[i])
-      )
-    );
+  // ── 3. Repeated identical tool calls ──────────────────────────────────────
+  // Look at the last 5 assistant messages and count identical tool+args combos
+  const recent = assistantMsgs.slice(-5);
 
-    // Need at least 4 fingerprints with tool calls to detect oscillation
-    const nonEmpty = fingerprints.filter((f) => f.length > 0);
-    if (nonEmpty.length >= 4) {
-      let oscillates = true;
-      for (let i = 2; i < nonEmpty.length; i++) {
-        if (nonEmpty[i] !== nonEmpty[i - 2]) {
-          oscillates = false;
-          break;
-        }
-      }
-      // Also check that the two alternating states are actually different
-      if (oscillates && nonEmpty[0] !== nonEmpty[1]) {
-        return {
-          loopDetected: true,
-          loopType: "oscillation",
-          description: `Agent is oscillating between two states repeatedly (${nonEmpty.length} rounds)`,
-        };
-      }
+  const callCounts = new Map<string, number>();
+  for (const msg of recent) {
+    for (const call of getToolCalls(msg)) {
+      const key = `${call.name}:${call.inputKey}`;
+      callCounts.set(key, (callCounts.get(key) ?? 0) + 1);
+    }
+  }
+  for (const [key, count] of callCounts) {
+    if (count >= 3) {
+      const toolName = key.split(":")[0];
+      return {
+        loopDetected: true,
+        loopType: "repeated-tool",
+        description: `Tool "${toolName}" called with identical arguments ${count} times in the last ${recent.length} rounds`,
+      };
     }
   }
 

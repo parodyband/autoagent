@@ -9,20 +9,16 @@ import {
 
 // ─── Mock Anthropic ────────────────────────────────────────────
 
-vi.mock("@anthropic-ai/sdk", () => {
-  const mockCreate = vi.fn();
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      messages: { create: mockCreate },
-    })),
-    __mockCreate: mockCreate,
-  };
-});
+const mockCreate = vi.hoisted(() => vi.fn());
+
+vi.mock("@anthropic-ai/sdk", () => ({
+  default: vi.fn().mockImplementation(() => ({
+    messages: { create: mockCreate },
+  })),
+}));
 
 function getMockCreate() {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require("@anthropic-ai/sdk");
-  return mod.__mockCreate as ReturnType<typeof vi.fn>;
+  return mockCreate;
 }
 
 // ─── Fixtures ─────────────────────────────────────────────────
