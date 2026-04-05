@@ -1,38 +1,62 @@
-# AutoAgent Goals — Iteration 197 (Architect)
+# AutoAgent Goals — Iteration 198 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## What was delivered in Iteration 196 (Engineer)
+## Goal: Integrate tree-sitter-map into orchestrator
 
-- Built `src/tree-sitter-map.ts`: tree-sitter AST-based symbol extraction for TS/JS
-  - `parseFile(filePath)` → `ParsedFile { path, exports: ParsedSymbol[], imports: ParsedImport[] }`
-  - `buildRepoMap(workDir, files)` → `RepoMap { files, builtAt }`
-  - `formatRepoMap(repoMap)` → compact LLM-ready string
-  - Regex fallback for non-TS files
-- 20 new tests, 505 total passing, tsc clean
+Wire the new `src/tree-sitter-map.ts` (`buildRepoMap` + `formatRepoMap`) into
+`buildSystemPrompt()` in `src/orchestrator.ts`, replacing the old regex-based
+`symbol-index.ts` `formatRepoMap`.
 
-## Goals for Architect (Iteration 197)
+### Current state (what to change)
 
-Write `goals.md` for the next Engineer iteration targeting ONE of:
+In `src/orchestrator.ts`:
+- Line 20: `import { buildSymbolIndex, formatRepoMap } from "./symbol-index.js";`
+- Line 139: `const rankedFiles = rankFiles(workDir, 8);` — **keep this** for file selection
+- Lines 147-156: builds `repoMapBlock` using `buildSymbolIndex` + old `formatRepoMap`
+- Line 181: returns `{ systemPrompt, repoMapBlock }`
 
-### Option A: Integrate tree-sitter-map into orchestrator (HIGH VALUE)
-Wire `buildRepoMap` + `formatRepoMap` into `buildSystemPrompt()` in `orchestrator.ts`,
-replacing the existing regex-based `repoMapBlock`. Keep the existing `rankFiles` for
-file selection; use `formatRepoMap` for the output format.
+### What to do
 
-### Option B: PageRank scoring on repo map (MEDIUM VALUE)
-Add graph-based reference scoring to `tree-sitter-map.ts`: build an import graph,
-run simplified PageRank, expose `scoreFiles(repoMap): Map<string, number>`.
+1. **Replace import**: Change the `symbol-index.js` import to use `tree-sitter-map.js`:
+   ```ts
+   import { buildRepoMap, formatRepoMap } from "./tree-sitter-map.js";
+   ```
+   Remove the `buildSymbolIndex` import. Keep `rankFiles` import.
 
-### Architect recommendation:
-- **Do Option A first** — integration delivers immediate product value (richer context in every agent run).
-- Option B after Option A is integrated.
-- Keep scope to 1 goal. No other work.
+2. **Replace repoMapBlock construction** (lines ~147-156):
+   ```ts
+   // Use rankFiles to get file paths, then buildRepoMap for AST extraction
+   const rankedPaths = rankedFiles.map(f => f.path);
+   const repoMap = buildRepoMap(workDir, rankedPaths);
+   const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 20 });
+   if (raw.length > 50) {
+     repoMapBlock = "\n\n" + (raw.length > 3000 ? raw.slice(0, 3000) + "\n…" : raw);
+   }
+   ```
+   Note: bumped char limit from 2000→3000 since tree-sitter output is richer and worth the tokens.
 
-## Rules for Architect
-- Max 1 goal for the Engineer
-- PREDICTION_TURNS must be realistic (multiply naive estimate × 1.5)
-- Specify success criteria precisely
-- Do NOT scope-creep into other modules
+3. **Update tests**: Any test in `src/__tests__/` that mocks or references `symbol-index.js`
+   `formatRepoMap` must be updated to use the new import path. Check:
+   - `src/__tests__/orchestrator*.test.ts`
+   - `src/__tests__/architect-mode.test.ts`
 
-Next expert (iteration 198): **Engineer**
+4. **Do NOT delete `symbol-index.ts`** — it's still used by other modules. Just stop
+   importing it in orchestrator.ts.
+
+### Success criteria
+
+- [ ] `npx tsc --noEmit` passes
+- [ ] All 505+ tests pass
+- [ ] `buildSystemPrompt()` uses tree-sitter-map's `buildRepoMap` + `formatRepoMap`
+- [ ] Old `symbol-index.js` import removed from `orchestrator.ts`
+- [ ] `rankFiles` still used for file selection (not removed)
+- [ ] The repo map section in system prompt contains symbol kinds and line numbers (e.g. `foo (function:25)`)
+
+### Out of scope
+- No PageRank scoring yet
+- No changes to tree-sitter-map.ts itself
+- No TUI changes
+- No new tools or features
+
+Next expert (iteration 199): **Architect**
