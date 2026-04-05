@@ -4,10 +4,12 @@
  * Before the first LLM call, extract keywords from the user message,
  * fuzzy-search the repo map for relevant files, and return their contents
  * as a formatted string to prepend as context.
+ *
+ * Also supports explicit #file mentions in user messages.
  */
 
-import { readFileSync } from "fs";
-import { join } from "path";
+import { readFileSync, existsSync } from "fs";
+import { join, resolve } from "path";
 import type { RepoMap } from "./tree-sitter-map.js";
 import { fuzzySearch } from "./tree-sitter-map.js";
 
@@ -25,6 +27,97 @@ const STOPWORDS = new Set([
 const MAX_CONTEXT_CHARS = 32_000; // ~8000 tokens
 const MAX_FILES = 3;
 const MAX_LINES_PER_FILE = 500;
+
+/** Budget cap for #file auto-loading (same as query-aware loading). */
+const FILE_REF_BUDGET = 32_000;
+
+/**
+ * Extract explicit #file references from a user message.
+ * Matches patterns like #src/foo.ts, #package.json, #path/to/file.ext
+ * Only returns paths that exist on disk (relative to workDir).
+ *
+ * @param message - raw user message
+ * @param workDir - working directory to resolve relative paths
+ * @returns array of resolved absolute paths that exist
+ */
+export function extractFileReferences(message: string, workDir: string): string[] {
+  // Match #<path> — path can contain letters, digits, /, ., -, _
+  const regex = /#([\w./\-]+)/g;
+  const seen = new Set<string>();
+  const results: string[] = [];
+
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(message)) !== null) {
+    const rawPath = match[1];
+    // Resolve relative to workDir
+    const absPath = rawPath.startsWith("/")
+      ? rawPath
+      : resolve(workDir, rawPath);
+
+    if (seen.has(absPath)) continue;
+    seen.add(absPath);
+
+    if (existsSync(absPath)) {
+      results.push(absPath);
+    }
+    // Non-existent paths are silently skipped
+  }
+
+  return results;
+}
+
+/**
+ * Strip #file references from a user message, returning clean text.
+ * e.g. "look at #src/foo.ts and fix it" → "look at src/foo.ts and fix it"
+ */
+export function stripFileReferences(message: string): string {
+  return message.replace(/#([\w./\-]+)/g, "$1");
+}
+
+/**
+ * Load contents of explicitly-referenced files (from #file mentions),
+ * respecting a char budget. Returns formatted context block or empty string.
+ *
+ * @param filePaths - absolute paths to load (pre-filtered to existing files)
+ * @param workDir - working directory (for display paths)
+ */
+export function loadFileReferences(filePaths: string[], workDir: string): string {
+  if (filePaths.length === 0) return "";
+
+  const sections: string[] = [];
+  let totalChars = 0;
+
+  for (const absPath of filePaths) {
+    if (totalChars >= FILE_REF_BUDGET) break;
+
+    let contents: string;
+    try {
+      contents = readFileSync(absPath, "utf-8");
+    } catch {
+      continue;
+    }
+
+    // Relative path for display
+    const displayPath = absPath.startsWith(workDir)
+      ? absPath.slice(workDir.length + 1)
+      : absPath;
+
+    const section = `--- file: ${displayPath} ---\n${contents}\n`;
+    const remaining = FILE_REF_BUDGET - totalChars;
+
+    if (section.length > remaining) {
+      sections.push(section.slice(0, remaining) + "\n(... budget truncated)");
+      totalChars = FILE_REF_BUDGET;
+      break;
+    }
+
+    sections.push(section);
+    totalChars += section.length;
+  }
+
+  if (sections.length === 0) return "";
+  return `[Referenced files]\n\n${sections.join("\n")}`;
+}
 
 /**
  * Extract meaningful keywords from a user message.

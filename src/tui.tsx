@@ -239,6 +239,7 @@ function App() {
   const [showResume, setShowResume] = useState(false);
   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
+  const [contextBudgetRatio, setContextBudgetRatio] = useState(0);
   const [footerStats, setFooterStats] = useState<FooterStats>({
     tokensIn: 0,
     tokensOut: 0,
@@ -269,6 +270,9 @@ function App() {
         return new Promise<boolean>((resolve) => {
           setPendingDiff({ diff, filePath, resolve });
         });
+      },
+      onContextBudget: (ratio) => {
+        setContextBudgetRatio(ratio);
       },
     });
     orchestratorRef.current = orch;
@@ -568,6 +572,13 @@ function App() {
             </Text>
           )}
           <Text color="gray"> {status}</Text>
+        </Box>
+      )}
+
+      {/* Context budget warning */}
+      {contextBudgetRatio >= 0.8 && (
+        <Box marginTop={1}>
+          <Text color="yellow">⚠ Context {Math.round(contextBudgetRatio * 100)}% full — compaction will trigger soon</Text>
         </Box>
       )}
 

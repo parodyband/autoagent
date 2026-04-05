@@ -1,66 +1,3 @@
-[2026-04-05T15:55:07.902Z] iter=220 turn=10 INFO: Turn 10/25
-[2026-04-05T15:55:08.999Z] iter=220 turn=10 INFO: $ sed -n '530,560p' src/orchestrator.ts
-[2026-04-05T15:55:09.008Z] iter=220 turn=10 INFO:   -> exit=0 (1152 chars)
-[2026-04-05T15:55:09.009Z] iter=220 turn=11 INFO: Turn 11/25
-[2026-04-05T15:55:11.864Z] iter=220 turn=11 INFO: Agent: Now I have everything I need. Let me add `getModel()`/`setModel()` to orchestrator and the `/model` command to tui.tsx:
-[2026-04-05T15:55:11.865Z] iter=220 turn=11 INFO: read_file: src/orchestrator.ts
-[2026-04-05T15:55:11.866Z] iter=220 turn=11 INFO:   -> ok (789 chars)
-[2026-04-05T15:55:11.866Z] iter=220 turn=12 INFO: Turn 12/25
-[2026-04-05T15:55:18.315Z] iter=220 turn=12 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:55:18.317Z] iter=220 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -9 +11 lines
-
-Context after patch:
-337 | 
-338 | // ─── Orchestrator class ───────────────────────────────────────
-339 | 
-340 | export class Orchestrator {
-341 |   private client: Anthropic;
-342 |   private registry: ReturnType<typeof createDefaultRegistry>;
-343 |   private repoFingerprint: string = "";
-344 |   private systemPrompt: string = "";
-345 |   private repoMapBlock: string = "";
-346 |   private apiMessages: Anthropic.MessageParam[] = [];
-347 |   private opts: OrchestratorOptions;
-348 |   private initialized = false;
-349 |   /** Model override — if set, bypasses routeModel() */
-350 |   private modelOverride: string | null = null;
-351 | 
-352 |   // Cost tracking
-353 |   private sessionTokensIn = 0;
-[2026-04-05T15:55:18.317Z] iter=220 turn=13 INFO: Turn 13/25
-[2026-04-05T15:55:20.842Z] iter=220 turn=13 INFO: Agent: I've only patched one line. Let me ship both features now, fast.
-[2026-04-05T15:55:20.843Z] iter=220 turn=13 INFO: $ grep -n "getCost\|reindex\|resumeSession\|clearHistory" src/orchestrator.ts | head -10
-[2026-04-05T15:55:20.853Z] iter=220 turn=13 INFO:   -> exit=0 (306 chars)
-[2026-04-05T15:55:20.853Z] iter=220 turn=14 INFO: Turn 14/25
-[2026-04-05T15:55:23.162Z] iter=220 turn=14 INFO: $ sed -n '418,425p' src/orchestrator.ts
-[2026-04-05T15:55:23.170Z] iter=220 turn=14 INFO:   -> exit=0 (157 chars)
-[2026-04-05T15:55:23.171Z] iter=220 turn=15 INFO: Turn 15/25
-[2026-04-05T15:55:27.431Z] iter=220 turn=15 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:55:27.433Z] iter=220 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -7 +17 lines
-
-Context after patch:
-415 |   }
-416 | 
-417 |   /** Get current session cost info. */
-418 |   getCost(): CostInfo {
-419 |     return {
-420 |       cost: this.sessionCost,
-421 |       tokensIn: this.sessionTokensIn,
-422 |       tokensOut: this.sessionTokensOut,
-423 |     };
-424 |   }
-425 | 
-426 |   /** Get the current model (override if set, otherwise auto-route). */
-427 |   getModel(): string {
-428 |     return this.modelOverride ?? MODEL_COMPLEX;
-429 |   }
-430 | 
-431 |   /** Override model for all subsequent sends. Pass null to restore auto-routing. */
-432 |   setModel(model: string | null): void {
-433 |     this.modelOverride = model;
-434 |   }
-435 | 
-436 |   /** Check if Tier 1 compaction is needed (compress old tool outputs). */
 437 |   private shouldCompactTier1(): boolean {
 [2026-04-05T15:55:27.434Z] iter=220 turn=16 INFO: Turn 16/25
 [2026-04-05T15:55:29.937Z] iter=220 turn=16 INFO: Agent: Now wire the model override into `send()` and add the `/model` command to tui.tsx:
@@ -1059,3 +996,381 @@ Wrapping up now.
 [2026-04-05T16:08:42.455Z] iter=227 turn=6 INFO: Tool timing stats
 [2026-04-05T16:08:47.423Z] iter=227 turn=6 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 227: predicted 8 turns, actual 6 turns, ratio 0.75**
 [2026-04-05T16:08:47.444Z] iter=227 turn=6 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T16:08:47.476Z] iter=227 turn=6 INFO: Committed: a6688305 (14 in / 3347 out, cache: 10120 created, 38543 read)
+[2026-04-05T16:08:47.476Z] iter=227 turn=6 INFO: Restarting as iteration 228...
+[2026-04-05T16:08:47.670Z] iter=228 INFO: Cache restored: 47/47 entries (0 stale)
+[2026-04-05T16:08:47.672Z] iter=228 INFO: Turn budget: 19/25 (calibration=0.88x, predicted=20)
+[2026-04-05T16:08:47.672Z] iter=228 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T16:08:47.783Z] iter=228 turn=1 INFO: Turn 1/25
+[2026-04-05T16:08:49.831Z] iter=228 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what needs to be built.
+[2026-04-05T16:08:49.833Z] iter=228 turn=1 INFO: $ cat goals.md
+[2026-04-05T16:08:49.837Z] iter=228 turn=1 INFO: $ ls src/
+[2026-04-05T16:08:49.848Z] iter=228 turn=1 INFO:   -> exit=0 (2525 chars)
+[2026-04-05T16:08:49.851Z] iter=228 turn=1 INFO:   -> exit=0 (594 chars)
+[2026-04-05T16:08:49.852Z] iter=228 turn=2 INFO: Turn 2/25
+[2026-04-05T16:08:51.376Z] iter=228 turn=2 INFO: $ cat src/orchestrator.ts
+[2026-04-05T16:08:51.380Z] iter=228 turn=2 INFO: $ cat src/context-loader.ts
+[2026-04-05T16:08:51.390Z] iter=228 turn=2 INFO:   -> exit=0 (30282 chars)
+[2026-04-05T16:08:51.391Z] iter=228 turn=2 INFO:   -> exit=0 (3981 chars)
+[2026-04-05T16:08:51.392Z] iter=228 turn=3 INFO: Turn 3/25
+[2026-04-05T16:08:54.154Z] iter=228 turn=3 INFO: $ cat src/tui.tsx | head -200
+[2026-04-05T16:08:54.157Z] iter=228 turn=3 INFO: $ ls src/__tests__/
+[2026-04-05T16:08:54.166Z] iter=228 turn=3 INFO:   -> exit=0 (6401 chars)
+[2026-04-05T16:08:54.166Z] iter=228 turn=3 INFO:   -> exit=0 (784 chars)
+[2026-04-05T16:08:54.167Z] iter=228 turn=4 INFO: Turn 4/25
+[2026-04-05T16:08:59.776Z] iter=228 turn=4 INFO: think: I have two goals:
+1. Auto-context from `#file` mentions - extract file refs from user messages, inject contents
+2. Token...
+[2026-04-05T16:08:59.777Z] iter=228 turn=5 INFO: Turn 5/25
+[2026-04-05T16:09:06.885Z] iter=228 turn=5 INFO: Agent: Starting production now. Two deliverables: (1) `extractFileReferences` + orchestrator wiring, (2) token budget warnings.
+[2026-04-05T16:09:06.886Z] iter=228 turn=5 INFO: write_file: src/context-loader.ts (patch)
+[2026-04-05T16:09:06.887Z] iter=228 turn=5 INFO:   -> ok: Patched src/context-loader.ts: -12 +14 lines
+
+Context after patch:
+1 | /**
+2 |  * Query-aware context loading.
+3 |  *
+4 |  * Before the first LLM call, extract keywords from the user message,
+5 |  * fuzzy-search the repo map for relevant files, and return their contents
+6 |  * as a formatted string to prepend as context.
+7 |  *
+8 |  * Also supports explicit #file mentions in user messages.
+9 |  */
+10 | 
+11 | import { readFileSync, existsSync } from "fs";
+12 | import { join, resolve } from "path";
+13 | import type { RepoMap } from "./tree-sitter-map.js";
+14 | import { fuzzySearch } from "./tree-sitter-map.js";
+15 | 
+16 | const STOPWORDS = new Set([
+17 |   "the", "and", "for", "are", "but", "not", "you", "all", "can", "has",
+[2026-04-05T16:09:06.887Z] iter=228 turn=6 INFO: Turn 6/25
+[2026-04-05T16:09:08.540Z] iter=228 turn=6 INFO: read_file: src/context-loader.ts
+[2026-04-05T16:09:08.542Z] iter=228 turn=6 INFO:   -> ok (467 chars)
+[2026-04-05T16:09:08.543Z] iter=228 turn=7 INFO: Turn 7/25
+[2026-04-05T16:09:25.588Z] iter=228 turn=7 INFO: Agent: **Goal 1** (auto-context from #file mentions): IN PROGRESS — added imports, need to add `extractFileReferences()` function and wire into orchestrator  
+**Goal 2** (token budget warnings): NOT STARTED
+
+Let me ship both now:
+[2026-04-05T16:09:25.590Z] iter=228 turn=7 INFO: write_file: src/context-loader.ts (patch)
+[2026-04-05T16:09:25.591Z] iter=228 turn=7 INFO:   -> ok: Patched src/context-loader.ts: -5 +96 lines
+
+Context after patch:
+28 | const MAX_FILES = 3;
+29 | const MAX_LINES_PER_FILE = 500;
+30 | 
+31 | /** Budget cap for #file auto-loading (same as query-aware loading). */
+32 | const FILE_REF_BUDGET = 32_000;
+33 | 
+34 | /**
+35 |  * Extract explicit #file references from a user message.
+36 |  * Matches patterns like #src/foo.ts, #package.json, #path/to/file.ext
+37 |  * Only returns paths that exist on disk (relative to workDir).
+38 |  *
+39 |  * @param message - raw user message
+40 |  * @param workDir - working directory to resolve relative paths
+41 |  * @returns array of resolved absolute paths that exist
+42 |  */
+43 | export function extractFileReferences(message: string, workDir: string): string[] {
+44 |   // Match #<path> — path can contain letters, digits, /, ., -, _
+45 |   const regex = /#([\w./\-]+)/g;
+46 |   const seen = new Set<string>();
+47 |   const results: string[] = [];
+48 | 
+49 |   let match: RegExpExecArray | null;
+50 |   while ((match = regex.exec(message)) !== null) {
+51 |     const rawPath = match[1];
+52 |     // Resolve relative to workDir
+53 |     const absPath = rawPath.startsWith("/")
+54 |       ? rawPath
+55 |       : resolve(workDir, rawPath);
+56 | 
+57 |     if (seen.has(absPath)) continue;
+58 |     seen.add(absPath);
+59 | 
+60 |     if (existsSync(absPath)) {
+61 |       results.push(absPath);
+62 |     }
+63 |     // Non-existent paths are silently skipped
+64 |   }
+65 | 
+66 |   return results;
+67 | }
+68 | 
+69 | /**
+70 |  * Strip #file references from a user message, returning clean text.
+71 |  * e.g. "look at #src/foo.ts and fix it" → "look at src/foo.ts and fix it"
+72 |  */
+73 | export function stripFileReferences(message: string): string {
+74 |   return message.replace(/#([\w./\-]+)/g, "$1");
+75 | }
+76 | 
+77 | /**
+78 |  * Load contents of explicitly-referenced files (from #file mentions),
+79 |  * respecting a char budget. Returns formatted context block or empty string.
+80 |  *
+81 |  * @param filePaths - absolute paths to load (pre-filtered to existing files)
+82 |  * @param workDir - working directory (for display paths)
+83 |  */
+84 | export function loadFileReferences(filePaths: string[], workDir: string): string {
+85 |   if (filePaths.length === 0) return "";
+86 | 
+87 |   const sections: string[] = [];
+88 |   let totalChars = 0;
+89 | 
+90 |   for (const absPath of filePaths) {
+91 |     if (totalChars >= FILE_REF_BUDGET) break;
+92 | 
+93 |     let contents: string;
+94 |     try {
+95 |       contents = readFileSync(absPath, "utf-8");
+96 |     } catch {
+97 |       continue;
+98 |     }
+99 | 
+100 |     // Relative path for display
+101 |     const displayPath = absPath.startsWith(workDir)
+102 |       ? absPath.slice(workDir.length + 1)
+103 |       : absPath;
+104 | 
+105 |     const section = `--- file: ${displayPath} ---\n${contents}\n`;
+106 |     const remaining = FILE_REF_BUDGET - totalChars;
+107 | 
+108 |     if (section.length > remaining) {
+109 |       sections.push(section.slice(0, remaining) + "\n(... budget truncated)");
+110 |       totalChars = FILE_REF_BUDGET;
+111 |       break;
+112 |     }
+113 | 
+114 |     sections.push(section);
+115 |     totalChars += section.length;
+116 |   }
+117 | 
+118 |   if (sections.length === 0) return "";
+119 |   return `[Referenced files]\n\n${sections.join("\n")}`;
+120 | }
+121 | 
+122 | /**
+123 |  * Extract meaningful keywords from a user message.
+124 |  * Splits on non-word chars, filters stopwords, deduplicates, takes words ≥ 3 chars.
+125 |  */
+126 | export function extractKeywords(message: string): string[] {
+127 |   const words = message
+128 |     .split(/\W+/)
+129 |     .map(w => w.toLowerCase())
+[2026-04-05T16:09:25.593Z] iter=228 turn=8 INFO: Turn 8/25
+[2026-04-05T16:09:29.058Z] iter=228 turn=8 INFO: Agent: Now wire into orchestrator — import the new functions and add #file processing + budget warnings:
+[2026-04-05T16:09:29.059Z] iter=228 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:09:29.060Z] iter=228 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+35 | import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
+36 | import { runDiagnostics } from "./diagnostics.js";
+37 | import { computeUnifiedDiff } from "./diff-preview.js";
+38 | import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences } from "./context-loader.js";
+39 | import * as fs from "fs";
+40 | 
+41 | // ─── Constants ────────────────────────────────────────────────
+[2026-04-05T16:09:29.061Z] iter=228 turn=9 INFO: Turn 9/25
+[2026-04-05T16:09:39.349Z] iter=228 turn=9 INFO: Agent: Now add the `onContextBudget` callback to `OrchestratorOptions` and a `contextBudgetRatio()` helper, then wire both features into `send()`:
+[2026-04-05T16:09:39.350Z] iter=228 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:09:39.352Z] iter=228 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -19 +24 lines
+
+Context after patch:
+71 | 
+72 | // ─── Types ───────────────────────────────────────────────────
+73 | 
+74 | export interface OrchestratorOptions {
+75 |   workDir: string;
+76 |   /** Called when a tool is invoked */
+77 |   onToolCall?: (name: string, input: string, result: string) => void;
+78 |   /** Called with status updates (e.g. "Indexing repo...") */
+79 |   onStatus?: (status: string) => void;
+80 |   /** Called with streaming text deltas */
+81 |   onText?: (delta: string) => void;
+82 |   /** If provided, resume an existing session instead of creating a new one */
+83 |   resumeSessionPath?: string;
+84 |   /** Called when an architect plan is generated */
+85 |   onPlan?: (plan: EditPlan) => void;
+86 |   /**
+87 |    * Called before write_file executes. Receives the unified diff and file path.
+88 |    * Return true to accept the write, false to reject it.
+89 |    * If not provided (or --no-confirm), writes proceed without confirmation.
+90 |    */
+91 |   onDiffPreview?: (diff: string, filePath: string) => Promise<boolean>;
+92 |   /**
+93 |    * Called when the context budget ratio changes (0.0–1.0).
+94 |    * TUI uses this to show a warning when approaching compaction threshold.
+95 |    */
+96 |   onContextBudget?: (ratio: number) => void;
+97 | }
+98 | 
+99 | export interface OrchestratorResult {
+100 |   text: string;
+[2026-04-05T16:09:39.353Z] iter=228 turn=10 INFO: Turn 10/25
+[2026-04-05T16:09:50.592Z] iter=228 turn=10 INFO: Agent: Now wire both features into the `send()` method. I need to find the right place — after model routing, before task decomposition:
+[2026-04-05T16:09:50.592Z] iter=228 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:09:50.594Z] iter=228 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -13 +29 lines
+
+Context after patch:
+667 |   async send(userMessage: string): Promise<OrchestratorResult> {
+668 |     if (!this.initialized) await this.init();
+669 | 
+670 |     // 1. Model routing
+671 |     const model = this.modelOverride ?? routeModel(userMessage);
+672 |     this.opts.onStatus?.(`Using ${model === MODEL_COMPLEX ? "Sonnet" : "Haiku"}...`);
+673 | 
+674 |     // 1b. Token budget warning — emit ratio before compaction so TUI can warn user
+675 |     const budgetRatio = this.sessionTokensIn / COMPACT_TIER1_THRESHOLD;
+676 |     this.opts.onContextBudget?.(budgetRatio);
+677 | 
+678 |     // 2. Context compaction if needed (tiered)
+679 |     if (this.shouldCompact()) {
+680 |       await this.compact(); // Tier 2: summarize
+681 |       // After compaction, notify TUI that budget is now low
+682 |       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
+683 |     } else if (this.shouldCompactTier1()) {
+684 |       this.compactTier1(); // Tier 1: compress old tool outputs
+685 |     }
+686 | 
+687 |     // 2b. Extract #file references from user message, inject as context
+688 |     const fileRefs = extractFileReferences(userMessage, this.opts.workDir);
+689 |     let fileRefContext = "";
+690 |     if (fileRefs.length > 0) {
+691 |       fileRefContext = loadFileReferences(fileRefs, this.opts.workDir);
+692 |       this.opts.onStatus?.(`Loading ${fileRefs.length} referenced file${fileRefs.length > 1 ? "s" : ""}...`);
+693 |     }
+694 |     // Strip # prefixes so model sees clean text
+695 |     const cleanMessage = fileRefs.length > 0 ? stripFileReferences(userMessage) : userMessage;
+696 | 
+697 |     // 3. Task decomposition for complex tasks
+698 |     let effectiveMessage = cleanMessage;
+699 |     if (shouldDecompose(userMessage)) {
+700 |       this.opts.onStatus?.("Decomposing task...");
+701 |       const caller = makeSimpleCaller(this.client);
+[2026-04-05T16:09:50.594Z] iter=228 turn=11 INFO: Turn 11/25
+[2026-04-05T16:09:56.092Z] iter=228 turn=11 INFO: Agent: Now I need to inject the file reference context into the user message that goes to the model. Find where the user message is pushed to apiMessages:
+[2026-04-05T16:09:56.093Z] iter=228 turn=11 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:09:56.095Z] iter=228 turn=11 INFO:   -> ok: Patched src/orchestrator.ts: -4 +8 lines
+
+Context after patch:
+717 |       this.opts.onPlan?.(architectResult.plan);
+718 |     }
+719 | 
+720 |     // 4. Add user message to history and persist
+721 |     // Prepend file reference context if present
+722 |     const messageWithContext = fileRefContext
+723 |       ? `${fileRefContext}\n\n---\n\nUser message: ${effectiveMessage}`
+724 |       : effectiveMessage;
+725 |     const userMsg: Anthropic.MessageParam = { role: "user", content: messageWithContext };
+726 |     this.apiMessages.push(userMsg);
+727 |     if (this.sessionPath) saveMessage(this.sessionPath, userMsg);
+728 | 
+729 |     // 4b. Inject architect plan as prefilled assistant message
+730 |     if (architectResult.activated && architectResult.prefill) {
+[2026-04-05T16:09:56.095Z] iter=228 turn=12 INFO: Turn 12/25
+[2026-04-05T16:09:58.662Z] iter=228 turn=12 INFO: Agent: Now add the TUI token budget warning. Let me look at the relevant part of tui.tsx to add the warning bar:
+[2026-04-05T16:09:58.663Z] iter=228 turn=12 INFO: $ grep -n "onStatus\|FooterStats\|contextBudget\|orchestrator\|onContextBudget\|useState\|onPlan" src/tui.tsx | head -50
+[2026-04-05T16:09:58.685Z] iter=228 turn=12 INFO:   -> exit=0 (1788 chars)
+[2026-04-05T16:09:58.685Z] iter=228 turn=13 INFO: Turn 13/25
+[2026-04-05T16:10:04.350Z] iter=228 turn=13 INFO: Agent: I've changed `src/context-loader.ts` (added `extractFileReferences`, `stripFileReferences`, `loadFileReferences`) and `src/orchestrator.ts` (wired file refs + budget callback). I still need to: wire `onContextBudget` in TUI, write tests, then wrap up.
+
+Let me finish TUI wiring + tests fast:
+[2026-04-05T16:10:04.351Z] iter=228 turn=13 INFO: $ grep -n "onDiffPreview\|onPlan\|onStatus\|onText\|onToolCall" src/tui.tsx | head -20
+[2026-04-05T16:10:04.367Z] iter=228 turn=13 INFO:   -> exit=0 (237 chars)
+[2026-04-05T16:10:04.368Z] iter=228 turn=14 INFO: Turn 14/25
+[2026-04-05T16:10:05.718Z] iter=228 turn=14 INFO: $ sed -n '230,285p' src/tui.tsx
+[2026-04-05T16:10:05.733Z] iter=228 turn=14 INFO:   -> exit=0 (2042 chars)
+[2026-04-05T16:10:05.733Z] iter=228 turn=15 INFO: Turn 15/25
+[2026-04-05T16:10:10.118Z] iter=228 turn=15 INFO: Agent: Now I'll add the `contextBudgetRatio` state and wire `onContextBudget`, plus add the warning bar component:
+[2026-04-05T16:10:10.118Z] iter=228 turn=15 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:10:10.119Z] iter=228 turn=15 INFO:   -> ok: Patched src/tui.tsx: -2 +3 lines
+
+Context after patch:
+237 |   const [streamBuffer, setStreamBuffer] = useState("");
+238 |   const [sessionList, setSessionList] = useState<SessionInfo[]>([]);
+239 |   const [showResume, setShowResume] = useState(false);
+240 |   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
+241 |   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
+242 |   const [contextBudgetRatio, setContextBudgetRatio] = useState(0);
+243 |   const [footerStats, setFooterStats] = useState<FooterStats>({
+244 |     tokensIn: 0,
+245 |     tokensOut: 0,
+[2026-04-05T16:10:10.119Z] iter=228 turn=16 INFO: Turn 16/25
+[2026-04-05T16:10:14.231Z] iter=228 turn=16 INFO: Agent: Let me finish fast — wire `onContextBudget` in the orchestrator init, add the warning bar render, write tests, then wrap up.
+[2026-04-05T16:10:14.231Z] iter=228 turn=16 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:10:14.232Z] iter=228 turn=16 INFO:   -> ok: Patched src/tui.tsx: -6 +9 lines
+
+Context after patch:
+266 |       onPlan: (plan: EditPlan) => {
+267 |         setActivePlan(plan);
+268 |       },
+269 |       onDiffPreview: noConfirm ? undefined : (diff, filePath) => {
+270 |         return new Promise<boolean>((resolve) => {
+271 |           setPendingDiff({ diff, filePath, resolve });
+272 |         });
+273 |       },
+274 |       onContextBudget: (ratio) => {
+275 |         setContextBudgetRatio(ratio);
+276 |       },
+277 |     });
+278 |     orchestratorRef.current = orch;
+279 |     orch.init().then(() => {
+280 |       if (continueFlag) {
+[2026-04-05T16:10:14.232Z] iter=228 turn=17 INFO: Turn 17/25
+[2026-04-05T16:10:16.114Z] iter=228 turn=17 INFO: Agent: Stopping new work. Running TSC, writing memory, updating goals.
+[2026-04-05T16:10:16.115Z] iter=228 turn=17 INFO: $ npx tsc --noEmit 2>&1 | head -40
+[2026-04-05T16:10:17.022Z] iter=228 turn=17 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:10:17.022Z] iter=228 turn=18 INFO: Turn 18/25
+[2026-04-05T16:10:19.658Z] iter=228 turn=18 INFO: Agent: TSC clean. Now I need to find where to add the warning bar in the TUI render and write tests:
+[2026-04-05T16:10:19.659Z] iter=228 turn=18 INFO: $ grep -n "pendingDiff\|activePlan\|Header\|Footer\|contextBudget" src/tui.tsx | tail -30
+[2026-04-05T16:10:19.678Z] iter=228 turn=18 INFO:   -> exit=0 (1048 chars)
+[2026-04-05T16:10:19.679Z] iter=228 turn=19 INFO: Turn 19/25
+[2026-04-05T16:10:21.446Z] iter=228 turn=19 INFO: $ sed -n '545,585p' src/tui.tsx
+[2026-04-05T16:10:21.462Z] iter=228 turn=19 INFO:   -> exit=0 (1185 chars)
+[2026-04-05T16:10:21.463Z] iter=228 turn=20 INFO: Turn 20/25
+[2026-04-05T16:10:25.102Z] iter=228 turn=20 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:10:25.105Z] iter=228 turn=20 INFO:   -> ok: Patched src/tui.tsx: -2 +9 lines
+
+Context after patch:
+575 |         </Box>
+576 |       )}
+577 | 
+578 |       {/* Context budget warning */}
+579 |       {contextBudgetRatio >= 0.8 && (
+580 |         <Box marginTop={1}>
+581 |           <Text color="yellow">⚠ Context {Math.round(contextBudgetRatio * 100)}% full — compaction will trigger soon</Text>
+582 |         </Box>
+583 |       )}
+584 | 
+585 |       {/* Footer: token + cost stats */}
+586 |       <Footer stats={footerStats} />
+587 | 
+588 |       {/* Input */}
+589 |       {!loading && (
+[2026-04-05T16:10:25.106Z] iter=228 turn=21 INFO: Turn 21/25
+[2026-04-05T16:10:36.683Z] iter=228 turn=21 INFO: write_file: src/__tests__/file-references.test.ts (write)
+[2026-04-05T16:10:36.684Z] iter=228 turn=21 INFO:   -> ok: Created src/__tests__/file-references.test.ts (2447 chars)
+[2026-04-05T16:10:36.684Z] iter=228 turn=22 INFO: Turn 22/25
+[2026-04-05T16:10:38.489Z] iter=228 turn=22 INFO: $ npx tsc --noEmit 2>&1 && npx vitest run src/__tests__/file-references.test.ts 2>&1 | tail -20
+[2026-04-05T16:10:40.338Z] iter=228 turn=22 INFO:   -> exit=0 (286 chars)
+[2026-04-05T16:10:40.338Z] iter=228 turn=23 INFO: Turn 23/25
+[2026-04-05T16:10:45.139Z] iter=228 turn=23 INFO: save_memory: "[Engineer] Iteration 228"
+[2026-04-05T16:10:45.141Z] iter=228 turn=23 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T16:10:45.141Z] iter=228 turn=24 INFO: Turn 24/25
+[2026-04-05T16:10:55.994Z] iter=228 turn=24 INFO: write_file: goals.md (write)
+[2026-04-05T16:10:55.996Z] iter=228 turn=24 INFO:   -> ok: Updated goals.md (1421 chars, -22 lines delta)
+[2026-04-05T16:10:55.997Z] iter=228 turn=25 INFO: Turn 25/25
+[2026-04-05T16:11:02.344Z] iter=228 turn=25 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T16:11:02.345Z] iter=228 turn=25 INFO: RESTART signal
+[2026-04-05T16:11:02.346Z] iter=228 turn=25 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T16:11:03.258Z] iter=228 turn=25 INFO: Compilation OK
+[2026-04-05T16:11:09.333Z] iter=228 turn=25 INFO: Cache persisted: 47 entries to .autoagent-cache.json
+[2026-04-05T16:11:09.333Z] iter=228 turn=25 INFO: Cache stats: 0 hits, 1 misses, 47 entries, 11 invalidations (1 entries removed)
+[2026-04-05T16:11:09.334Z] iter=228 turn=25 INFO: Tool cache stats
+[2026-04-05T16:11:09.334Z] iter=228 turn=25 INFO: Tool timing: bash: 14x, avg=209ms, total=2927ms; write_file: 11x, avg=2ms, total=20ms; read_file: 1x, avg=3ms, total=3ms; save_memory: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T16:11:09.334Z] iter=228 turn=25 INFO: Tool timing stats
+[2026-04-05T16:11:14.462Z] iter=228 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 228: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T16:11:24.213Z] iter=228 turn=25 INFO: Pre-commit review (2911in/421out): ## Issues Found
+
+- **Budget cap test is fragile**: The test writes 40,000 chars and asserts `result.length < 35_000`, but `FILE_REF_BUDGET` is 32,000 plus overhead from `[Referenced files]\n\n`, `--- 

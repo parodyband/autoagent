@@ -35,7 +35,7 @@ import {
 import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
 import { runDiagnostics } from "./diagnostics.js";
 import { computeUnifiedDiff } from "./diff-preview.js";
-import { autoLoadContext } from "./context-loader.js";
+import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences } from "./context-loader.js";
 import * as fs from "fs";
 
 // ─── Constants ────────────────────────────────────────────────
@@ -89,6 +89,11 @@ export interface OrchestratorOptions {
    * If not provided (or --no-confirm), writes proceed without confirmation.
    */
   onDiffPreview?: (diff: string, filePath: string) => Promise<boolean>;
+  /**
+   * Called when the context budget ratio changes (0.0–1.0).
+   * TUI uses this to show a warning when approaching compaction threshold.
+   */
+  onContextBudget?: (ratio: number) => void;
 }
 
 export interface OrchestratorResult {
@@ -666,15 +671,31 @@ export class Orchestrator {
     const model = this.modelOverride ?? routeModel(userMessage);
     this.opts.onStatus?.(`Using ${model === MODEL_COMPLEX ? "Sonnet" : "Haiku"}...`);
 
+    // 1b. Token budget warning — emit ratio before compaction so TUI can warn user
+    const budgetRatio = this.sessionTokensIn / COMPACT_TIER1_THRESHOLD;
+    this.opts.onContextBudget?.(budgetRatio);
+
     // 2. Context compaction if needed (tiered)
     if (this.shouldCompact()) {
       await this.compact(); // Tier 2: summarize
+      // After compaction, notify TUI that budget is now low
+      this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
     } else if (this.shouldCompactTier1()) {
       this.compactTier1(); // Tier 1: compress old tool outputs
     }
 
+    // 2b. Extract #file references from user message, inject as context
+    const fileRefs = extractFileReferences(userMessage, this.opts.workDir);
+    let fileRefContext = "";
+    if (fileRefs.length > 0) {
+      fileRefContext = loadFileReferences(fileRefs, this.opts.workDir);
+      this.opts.onStatus?.(`Loading ${fileRefs.length} referenced file${fileRefs.length > 1 ? "s" : ""}...`);
+    }
+    // Strip # prefixes so model sees clean text
+    const cleanMessage = fileRefs.length > 0 ? stripFileReferences(userMessage) : userMessage;
+
     // 3. Task decomposition for complex tasks
-    let effectiveMessage = userMessage;
+    let effectiveMessage = cleanMessage;
     if (shouldDecompose(userMessage)) {
       this.opts.onStatus?.("Decomposing task...");
       const caller = makeSimpleCaller(this.client);
@@ -697,7 +718,11 @@ export class Orchestrator {
     }
 
     // 4. Add user message to history and persist
-    const userMsg: Anthropic.MessageParam = { role: "user", content: effectiveMessage };
+    // Prepend file reference context if present
+    const messageWithContext = fileRefContext
+      ? `${fileRefContext}\n\n---\n\nUser message: ${effectiveMessage}`
+      : effectiveMessage;
+    const userMsg: Anthropic.MessageParam = { role: "user", content: messageWithContext };
     this.apiMessages.push(userMsg);
     if (this.sessionPath) saveMessage(this.sessionPath, userMsg);
 
