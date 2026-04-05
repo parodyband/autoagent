@@ -129,7 +129,7 @@ function analyzeFile(filePath: string, rootDir: string): FileAnalysis {
   };
 }
 
-function analyzeCodebase(srcDir?: string): CodebaseAnalysis {
+export function analyzeCodebase(srcDir?: string): CodebaseAnalysis {
   const dir = srcDir || path.join(process.cwd(), "src");
   const files = findTsFiles(dir);
   const rootDir = process.cwd();
@@ -178,7 +178,7 @@ export interface ValidationResult {
 
 // ─── Options ────────────────────────────────────────────────
 
-interface ValidationOptions {
+export interface ValidationOptions {
   /** Skip running pre-commit-check.sh (useful to avoid recursion in self-tests). */
   skipPreCommitScript?: boolean;
 }
