@@ -1,14 +1,13 @@
 /**
  * Resuscitation — circuit breaker and failure recovery.
  *
- * When the agent hits consecutive failures, this module:
- * 1. Detects the failure streak via countConsecutiveFailures()
- * 2. Rolls back to last known-good state
- * 3. Writes recovery notes to memory + goals
- * 4. Bumps iteration and restarts
+ * When the agent hits too many consecutive failures, this module:
+ * 1. Rolls back to the last known good state
+ * 2. Writes recovery notes to memory
+ * 3. Sets conservative recovery goals
+ * 4. Restarts with a cooldown
  *
- * For single-iteration failures, handleIterationFailure() captures the
- * error, rolls back, records state, and restarts.
+ * Also handles per-iteration failure recording (rollback, state update, memory note).
  */
 
 import { appendFileSync, writeFileSync } from "fs";
@@ -19,7 +18,7 @@ import {
   type IterationState,
 } from "./iteration.js";
 
-// ─── Configuration ──────────────────────────────────────────
+// ─── Types ──────────────────────────────────────────────────
 
 export interface ResuscitationConfig {
   memoryFile: string;
@@ -28,21 +27,18 @@ export interface ResuscitationConfig {
   restart: () => never;
 }
 
-// ─── Failure detection ──────────────────────────────────────
+// ─── Failure counting ───────────────────────────────────────
 
-/**
- * Count how many iterations have failed since the last success.
- */
 export function countConsecutiveFailures(state: IterationState): number {
   if (state.lastSuccessfulIteration < 0) return state.iteration;
   return state.iteration - state.lastSuccessfulIteration - 1;
 }
 
-// ─── Circuit breaker ────────────────────────────────────────
+// ─── Resuscitation (circuit breaker) ────────────────────────
 
 /**
- * Full resuscitation: roll back to last good state, write recovery
- * notes, bump iteration, cooldown, restart.
+ * Triggered after MAX_CONSECUTIVE_FAILURES. Rolls back to last good state,
+ * writes recovery notes, sets conservative goals, and restarts.
  */
 export async function resuscitate(
   state: IterationState,
@@ -91,11 +87,11 @@ export async function resuscitate(
   config.restart();
 }
 
-// ─── Single-failure handling ────────────────────────────────
+// ─── Per-iteration failure handling ─────────────────────────
 
 /**
- * Handle a single iteration failure: capture error, rollback,
- * record state, append to memory, restart.
+ * Called when a single iteration fails. Records the failure, rolls back,
+ * updates state, and restarts.
  */
 export async function handleIterationFailure(
   state: IterationState,

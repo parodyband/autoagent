@@ -24,6 +24,9 @@ import { ToolCache, CACHEABLE_TOOLS, extractPaths, pathOverlaps } from "../src/t
 import { ToolTimingTracker } from "../src/tool-timing.js";
 import { getIterationCommits, computeDiffStats, getAllIterationDiffs, type IterationDiffStats, type FileDiffStat } from "../src/iteration-diff.js";
 import { recordMetrics, type IterationMetrics } from "../src/finalization.js";
+import { handleToolCall, processTurn, type IterationCtx, type TurnResult } from "../src/conversation.js";
+import { countConsecutiveFailures, type ResuscitationConfig } from "../src/resuscitation.js";
+import type { IterationState } from "../src/iteration.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync } from "fs";
 import path from "path";
 
@@ -675,6 +678,8 @@ async function main(): Promise<void> {
     await testIterationDiff();
     testFinalization();
     testCachePersistence();
+    await testConversation();
+    testResuscitation();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {
@@ -1216,6 +1221,133 @@ function testCachePersistence(): void {
   const cache7 = new ToolCache();
   const noPathResult = cache7.deserialize(noPathFile, ROOT);
   assert(noPathResult.restored === 1, "persist: entry with no tracked paths restores", `got ${noPathResult.restored}`);
+}
+
+// ─── Conversation Module Tests ──────────────────────────────
+
+function makeMockCtx(overrides?: Partial<IterationCtx>): IterationCtx {
+  const registry = createDefaultRegistry();
+  const logMessages: string[] = [];
+  return {
+    client: {} as any,
+    model: "test-model",
+    maxTokens: 1024,
+    state: { iteration: 5, lastSuccessfulIteration: 4, lastFailedCommit: null, lastFailureReason: null },
+    iter: 5,
+    messages: [],
+    toolCounts: {},
+    tokens: { in: 0, out: 0, cacheCreate: 0, cacheRead: 0 },
+    startTime: new Date(),
+    turns: 0,
+    cache: new ToolCache(),
+    timing: new ToolTimingTracker(),
+    rootDir: ROOT,
+    maxTurns: 50,
+    logger: { info: () => {}, warn: () => {}, error: () => {}, log: () => {}, setTurn: () => {}, getTurn: () => 0 } as any,
+    registry,
+    log: (msg: string) => { logMessages.push(msg); },
+    onFinalize: async () => {},
+    _logMessages: logMessages,
+    ...overrides,
+  } as IterationCtx & { _logMessages: string[] };
+}
+
+async function testConversation(): Promise<void> {
+  console.log("\n💬 Conversation Module");
+
+  // handleToolCall: known tool (think) returns result
+  const ctx1 = makeMockCtx();
+  const result1 = await handleToolCall(ctx1, {
+    type: "tool_use", id: "t1", name: "think",
+    input: { thought: "testing handleToolCall" },
+  });
+  assert(result1.result.includes("22 chars"), "conv: think tool returns char count", `got: "${result1.result.slice(0, 100)}"`);
+  assert(result1.isRestart === false, "conv: think tool isRestart = false");
+  assert(ctx1.toolCounts["think"] === 1, "conv: toolCounts incremented");
+
+  // handleToolCall: unknown tool
+  const ctx2 = makeMockCtx();
+  const result2 = await handleToolCall(ctx2, {
+    type: "tool_use", id: "t2", name: "nonexistent_tool",
+    input: {},
+  });
+  assert(result2.result.includes("Unknown tool"), "conv: unknown tool returns error");
+  assert(result2.isRestart === false, "conv: unknown tool isRestart = false");
+
+  // handleToolCall: cache hit on idempotent tool
+  const ctx3 = makeMockCtx();
+  ctx3.cache.set("read_file", { path: "test.txt" }, "cached content");
+  const result3 = await handleToolCall(ctx3, {
+    type: "tool_use", id: "t3", name: "read_file",
+    input: { path: "test.txt" },
+  });
+  assert(result3.result === "cached content", "conv: cache hit returns cached value");
+  const logs3 = (ctx3 as any)._logMessages as string[];
+  assert(logs3.some((m: string) => m.includes("CACHE HIT")), "conv: cache hit logged");
+
+  // handleToolCall: bash with AUTOAGENT_RESTART
+  const ctx4 = makeMockCtx();
+  const result4 = await handleToolCall(ctx4, {
+    type: "tool_use", id: "t4", name: "bash",
+    input: { command: 'echo "AUTOAGENT_RESTART"' },
+  });
+  assert(result4.isRestart === true, "conv: RESTART detected from bash");
+  assert(result4.result.includes("RESTART acknowledged"), "conv: restart output included");
+
+  // handleToolCall: write_file triggers smart invalidation
+  const ctx5 = makeMockCtx();
+  ctx5.cache.set("read_file", { path: "src/foo.ts" }, "old content");
+  ctx5.cache.set("read_file", { path: "src/bar.ts" }, "other content");
+  await handleToolCall(ctx5, {
+    type: "tool_use", id: "t5", name: "write_file",
+    input: { path: path.join(TEMP_DIR, "conv-test.txt"), content: "hello" },
+  });
+  // The written path won't match src/foo.ts, so those entries should survive
+  assert(ctx5.cache.get("read_file", { path: "src/bar.ts" }) === "other content", "conv: unrelated cache entry survives write");
+
+  // handleToolCall: timing is recorded
+  const ctx6 = makeMockCtx();
+  await handleToolCall(ctx6, {
+    type: "tool_use", id: "t6", name: "think",
+    input: { thought: "timing test" },
+  });
+  const thinkStats = ctx6.timing.getToolStats("think");
+  assert(thinkStats !== undefined, "conv: timing recorded for tool");
+  assert(thinkStats!.calls === 1, "conv: timing shows 1 call");
+}
+
+// ─── Resuscitation Module Tests ─────────────────────────────
+
+function testResuscitation(): void {
+  console.log("\n🔄 Resuscitation Module");
+
+  // countConsecutiveFailures: no failures
+  const state0: IterationState = { iteration: 5, lastSuccessfulIteration: 4, lastFailedCommit: null, lastFailureReason: null };
+  assert(countConsecutiveFailures(state0) === 0, "resus: 0 failures when last success = iter-1");
+
+  // countConsecutiveFailures: 1 failure
+  const state1: IterationState = { iteration: 5, lastSuccessfulIteration: 3, lastFailedCommit: "abc", lastFailureReason: "oops" };
+  assert(countConsecutiveFailures(state1) === 1, "resus: 1 failure when gap is 1");
+
+  // countConsecutiveFailures: 3 failures
+  const state2: IterationState = { iteration: 5, lastSuccessfulIteration: 1, lastFailedCommit: "abc", lastFailureReason: "oops" };
+  assert(countConsecutiveFailures(state2) === 3, "resus: 3 failures when gap is 3");
+
+  // countConsecutiveFailures: no successful iteration ever
+  const state3: IterationState = { iteration: 3, lastSuccessfulIteration: -1, lastFailedCommit: null, lastFailureReason: null };
+  assert(countConsecutiveFailures(state3) === 3, "resus: returns iteration when lastSuccess = -1");
+
+  // countConsecutiveFailures: first iteration, no failures
+  const state4: IterationState = { iteration: 0, lastSuccessfulIteration: -1, lastFailedCommit: null, lastFailureReason: null };
+  assert(countConsecutiveFailures(state4) === 0, "resus: 0 for first iteration");
+
+  // countConsecutiveFailures: edge case iteration=1, lastSuccess=0
+  const state5: IterationState = { iteration: 1, lastSuccessfulIteration: 0, lastFailedCommit: null, lastFailureReason: null };
+  assert(countConsecutiveFailures(state5) === 0, "resus: 0 when lastSuccess = iter-1 (iter=1)");
+
+  // countConsecutiveFailures: 2 failures
+  const state6: IterationState = { iteration: 10, lastSuccessfulIteration: 7, lastFailedCommit: "def", lastFailureReason: "error" };
+  assert(countConsecutiveFailures(state6) === 2, "resus: 2 failures for gap of 2");
 }
 
   const duration = ((Date.now() - start) / 1000).toFixed(1);

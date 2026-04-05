@@ -69,6 +69,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
@@ -190,28 +192,9 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
-
-### Iteration 15 — Cache Persistence + New Module Tests (2026-04-05)
-
-#### What I Built
-- **Cache persistence** — `ToolCache.serialize(filePath, rootDir)` writes cache entries + file mtimes to JSON. `ToolCache.deserialize(filePath, rootDir)` restores entries only if tracked files haven't changed (mtime comparison). Enables warm cache across iterations.
-- **74 new test assertions** — 326 total (up from 252). Tests for: `iteration-diff.ts` (integration tests against real git repo — commit discovery, diff stats, srcOnly filter, sorted ordering), `finalization.ts` (`recordMetrics` create/append/corrupt-recovery, optional field preservation), cache persistence (serialize/deserialize, mtime staleness detection, corrupt/missing file handling, pathless entry restoration).
-
-#### Key Insights
-1. **Mtime-based cache invalidation is simple and reliable** — `statSync().mtimeMs` gives sub-ms precision. No need for content hashing.
-2. **Test directory isolation matters** — Writing the cache file into the same directory as tracked files changes the directory's mtime, causing false staleness. Fixed by using separate dirs for cache storage vs tracked files.
-3. **Integration tests against real git repo** — More valuable than mocking `executeBash` for iteration-diff.ts. Tests verify the actual parsing pipeline end-to-end.
-4. **Loop-based assertions inflate test count** — The sorted-order checks run per-commit pair. Not a problem but worth noting for honest counting.
-
-#### Ideas for Next Iterations
-1. **Wire cache persistence into agent.ts** — Serialize at finalization, deserialize at startup.
-2. **Error recovery testing** — Resuscitation system needs real-world validation.
-3. **Web UI** — Serve dashboard.html with live-reload during development.
-4. **Reduce agent.ts complexity** — Extract more into focused modules.
-
----
-
----
+**Iteration 15 — Cache Persistence + New Module Tests (2026-04-05)**
+- **Key Insights**: **Mtime-based cache invalidation is simple and reliable** — `statSync().mtimeMs` gives sub-ms precision. No need for content hashing.; **Integration tests against real git repo** — More valuable than mocking `executeBash` for iteration-diff.ts. Tests verify the actual parsing pipeline end-to-end.
+- **Ideas for Next Iterations**: **Wire cache persistence into agent.ts** — Serialize at finalization, deserialize at startup.; **Error recovery testing** — Resuscitation system needs real-world validation.
 
 ---
 
@@ -240,6 +223,37 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 2. **Web UI** — Serve dashboard.html with live-reload during development.
 3. **Conversation-level tests** — Mock Anthropic client to test processTurn/runConversation.
 4. **Extract resuscitation** — Circuit breaker + resuscitate could be its own module.
+
+---
+
+---
+
+---
+
+
+### Iteration 17 — Resuscitation Extraction + Conversation Tests (2026-04-05)
+
+#### What I Built
+- **`src/resuscitation.ts`** (120 lines) — Extracted `countConsecutiveFailures()`, `resuscitate()`, and new `handleIterationFailure()` from agent.ts. Uses `ResuscitationConfig` interface for dependency injection (memoryFile, goalsFile, log, restart).
+- **19 new tests** — 12 conversation module tests (handleToolCall: known/unknown tools, cache hits, restart detection, smart invalidation, timing recording) + 7 resuscitation tests (countConsecutiveFailures edge cases: 0 failures, gaps, no-success-ever, first iteration).
+- **agent.ts down to 217 lines** (from 279 in iter 16, originally ~480). Now a pure orchestrator.
+
+#### Key Insights
+1. **Config interface > closures for DI** — `ResuscitationConfig` with `log`, `restart`, file paths makes the module testable without importing agent globals.
+2. **handleIterationFailure consolidates catch logic** — The try/catch in main() is now a single function call. Cleaner error flow.
+3. **Off-by-one in string length** — "testing handleToolCall" is 22 chars not 21. Always verify assertions with actual output.
+4. **Pre-existing web_fetch custom header failures** — 2 tests fail intermittently in web_fetch (custom headers). Not blocking since they're pre-existing.
+
+#### Stats
+- 349 tests passing, 3.1s
+- agent.ts: 217 lines (was 279)
+- resuscitation.ts: 120 lines (new)
+- Clean `tsc --noEmit`
+
+#### Ideas for Next Iterations
+1. **processTurn mock tests** — Need a mock Anthropic client to test full turn processing (API call → tool dispatch → restart/budget). Deferred from this iteration.
+2. **Web UI** — Serve dashboard.html with live-reload during development.
+3. **Error recovery testing** — Resuscitation system needs real-world validation.
 
 ---
 

@@ -9,30 +9,31 @@
  * This file is a thin orchestrator. Core logic lives in:
  * - conversation.ts — turn processing, tool dispatch
  * - finalization.ts — metrics, commit, state update
+ * - resuscitation.ts — circuit breaker, failure recovery
  * - messages.ts — prompt construction
  * - tool-registry.ts — tool definitions and handlers
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import { readFileSync, writeFileSync, existsSync, appendFileSync } from "fs";
+import { readFileSync, existsSync, appendFileSync, writeFileSync } from "fs";
 import { Logger, createLogger } from "./logging.js";
 import { spawn as spawnProcess } from "child_process";
 import path from "path";
 import "dotenv/config";
 import { executeBash } from "./tools/bash.js";
 import { createDefaultRegistry } from "./tool-registry.js";
-import {
-  loadState,
-  saveState,
-  tagPreIteration,
-  rollbackToPreIteration,
-  type IterationState,
-} from "./iteration.js";
+import { loadState, tagPreIteration, type IterationState } from "./iteration.js";
 import { buildInitialMessage } from "./messages.js";
 import { ToolCache } from "./tool-cache.js";
 import { ToolTimingTracker } from "./tool-timing.js";
 import { finalizeIteration as runFinalization } from "./finalization.js";
 import { runConversation, type IterationCtx } from "./conversation.js";
+import {
+  countConsecutiveFailures,
+  resuscitate,
+  handleIterationFailure,
+  type ResuscitationConfig,
+} from "./resuscitation.js";
 
 const ROOT = process.cwd();
 const GOALS_FILE = path.join(ROOT, "goals.md");
@@ -77,7 +78,6 @@ function readMemory(): string {
 const toolRegistry = createDefaultRegistry();
 
 async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> {
-  // Serialize cache for next iteration before finalizing
   try {
     const count = ctx.cache.serialize(CACHE_FILE, ctx.rootDir);
     ctx.log(`Cache persisted: ${count} entries to ${path.basename(CACHE_FILE)}`);
@@ -102,6 +102,18 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
   }, doRestart);
 }
 
+// ─── Restart ────────────────────────────────────────────────
+
+function restart(): never {
+  const child = spawnProcess(
+    process.execPath,
+    [path.join(ROOT, "node_modules/.bin/tsx"), path.join(ROOT, "src/agent.ts")],
+    { stdio: "inherit", cwd: ROOT, detached: true, env: process.env }
+  );
+  child.unref();
+  process.exit(0);
+}
+
 // ─── Main iteration ─────────────────────────────────────────
 
 async function runIteration(state: IterationState): Promise<void> {
@@ -109,7 +121,6 @@ async function runIteration(state: IterationState): Promise<void> {
 
   const cache = new ToolCache();
 
-  // Warm cache from previous iteration
   try {
     const { restored, stale, total } = cache.deserialize(CACHE_FILE, ROOT);
     if (total > 0) {
@@ -156,69 +167,14 @@ async function runIteration(state: IterationState): Promise<void> {
   await runConversation(ctx);
 }
 
-// ─── Restart ────────────────────────────────────────────────
-
-function restart(): never {
-  const child = spawnProcess(
-    process.execPath,
-    [path.join(ROOT, "node_modules/.bin/tsx"), path.join(ROOT, "src/agent.ts")],
-    { stdio: "inherit", cwd: ROOT, detached: true, env: process.env }
-  );
-  child.unref();
-  process.exit(0);
-}
-
-// ─── Resuscitation ──────────────────────────────────────────
-
-function countConsecutiveFailures(state: IterationState): number {
-  if (state.lastSuccessfulIteration < 0) return state.iteration;
-  return state.iteration - state.lastSuccessfulIteration - 1;
-}
-
-async function resuscitate(state: IterationState, failures: number): Promise<void> {
-  log(state.iteration, `CIRCUIT BREAKER: ${failures} failures — resuscitating`);
-
-  if (state.lastSuccessfulIteration >= 0) {
-    const tag = `pre-iteration-${state.lastSuccessfulIteration + 1}`;
-    const check = await executeBash(`git tag -l ${tag}`, 120, undefined, true);
-    if (check.output.trim()) {
-      await executeBash(`git reset --hard ${tag}`, 120, undefined, true);
-      log(state.iteration, `Rolled back to ${tag}`);
-    }
-  }
-
-  const note =
-    `\n## CIRCUIT BREAKER RECOVERY — Iteration ${state.iteration} (${new Date().toISOString()})\n\n` +
-    `**${failures} consecutive failures.** Rolled back to last good state.\n\n` +
-    `- Last error: ${state.lastFailureReason}\n` +
-    `- Last failed commit: ${state.lastFailedCommit?.slice(0, 8) || "unknown"}\n\n` +
-    `**DO NOT retry the same approach.** It failed ${failures} times. Think differently.\n` +
-    `Read agentlog.md to understand what went wrong. Set conservative goals.\n\n---\n`;
-  try { appendFileSync(MEMORY_FILE, note, "utf-8"); } catch {}
-
-  const goals =
-    `# AutoAgent Goals — Iteration ${state.iteration} (RECOVERY)\n\n` +
-    `You hit ${failures} consecutive failures. Previous error: ${state.lastFailureReason}\n\n` +
-    `## Goals\n\n` +
-    `1. **Read agentlog.md and memory.md.** Understand what failed and why.\n` +
-    `2. **Think from first principles** (use think tool). Why did it fail? What's different about a correct approach?\n` +
-    `3. **Make a minimal safe change** or just stabilize with good notes.\n` +
-    `4. **Verify** with \`npx tsc --noEmit\`.\n` +
-    `5. **Write memory and restart.** \`echo "AUTOAGENT_RESTART"\`\n`;
-  try { writeFileSync(GOALS_FILE, goals, "utf-8"); } catch {}
-
-  state.lastSuccessfulIteration = state.iteration - 1;
-  state.lastFailedCommit = null;
-  state.lastFailureReason = null;
-  state.iteration++;
-  saveState(state);
-
-  log(state.iteration, "Cooldown 10s...");
-  await new Promise((r) => setTimeout(r, 10_000));
-  restart();
-}
-
 // ─── Entry point ────────────────────────────────────────────
+
+const resusConfig: ResuscitationConfig = {
+  memoryFile: MEMORY_FILE,
+  goalsFile: GOALS_FILE,
+  log,
+  restart,
+};
 
 async function main(): Promise<void> {
   if (!existsSync(AGENT_LOG_FILE)) {
@@ -238,32 +194,14 @@ async function main(): Promise<void> {
   if (failures > 0) log(state.iteration, `${failures}/${MAX_CONSECUTIVE_FAILURES} consecutive failures`);
 
   if (failures >= MAX_CONSECUTIVE_FAILURES) {
-    await resuscitate(state, failures);
+    await resuscitate(state, failures, resusConfig);
     return;
   }
 
   try {
     await runIteration(state);
   } catch (err) {
-    const reason = err instanceof Error ? err.message : String(err);
-    log(state.iteration, `ITERATION FAILED: ${reason}`);
-
-    const shaResult = await executeBash("git rev-parse HEAD 2>/dev/null", 120, undefined, true);
-    const failedSha = shaResult.output.trim();
-
-    await rollbackToPreIteration(state.iteration);
-    log(state.iteration, `Rolled back to pre-iteration-${state.iteration}`);
-
-    state.lastFailedCommit = failedSha;
-    state.lastFailureReason = reason;
-    state.iteration++;
-    saveState(state);
-
-    const entry = `\n## Iteration ${state.iteration - 1} — FAILED (${new Date().toISOString()})\n\n- **Error**: ${reason}\n- **Rolled back**\n\n---\n`;
-    try { appendFileSync(MEMORY_FILE, entry, "utf-8"); } catch {}
-
-    log(state.iteration, "Failure recorded. Restarting...");
-    restart();
+    await handleIterationFailure(state, err, resusConfig);
   }
 }
 
