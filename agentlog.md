@@ -1,178 +1,3 @@
-[2026-04-05T11:44:08.690Z] iter=115 turn=7 INFO: Tool cache stats
-[2026-04-05T11:44:08.690Z] iter=115 turn=7 INFO: Tool timing: bash: 4x, avg=281ms, total=1125ms; read_file: 6x, avg=2ms, total=13ms; write_file: 2x, avg=2ms, total=3ms; think: 2x, avg=1ms, total=1ms
-[2026-04-05T11:44:08.690Z] iter=115 turn=7 INFO: Tool timing stats
-[2026-04-05T11:44:39.905Z] iter=115 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 115: predicted 10 turns, actual 7 turns, ratio 0.70**
-[2026-04-05T11:44:39.938Z] iter=115 turn=7 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T11:44:39.975Z] iter=115 turn=7 INFO: Committed: 7241e1ae (3861 in / 2637 out, cache: 68101 created, 326506 read)
-[2026-04-05T11:44:39.975Z] iter=115 turn=7 INFO: Restarting as iteration 116...
-[2026-04-05T11:44:40.162Z] iter=116 INFO: Cache restored: 35/37 entries (2 stale)
-[2026-04-05T11:44:40.164Z] iter=116 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T11:44:40.190Z] iter=116 INFO: Hard turn cap: 18 (1.5x prediction of 12)
-[2026-04-05T11:44:40.190Z] iter=116 turn=1 INFO: Turn 1/25
-[2026-04-05T11:44:43.525Z] iter=116 turn=1 INFO: Agent: I'll start by investigating the self-test performance regression. Let me run the self-test with timing and examine the script simultaneously.
-[2026-04-05T11:44:43.526Z] iter=116 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && time npx tsx scripts/self-test.ts 2>&1
-[2026-04-05T11:44:43.530Z] iter=116 turn=1 INFO: read_file: scripts/self-test.ts
-[2026-04-05T11:44:43.531Z] iter=116 turn=1 INFO:   -> ok (97034 chars)
-[2026-04-05T11:45:14.982Z] iter=116 turn=1 INFO:   -> exit=0 (26360 chars)
-[2026-04-05T11:45:14.983Z] iter=116 turn=2 INFO: Turn 2/25
-[2026-04-05T11:45:45.201Z] iter=116 turn=2 INFO: think: Looking at the output, there are a few slow sections:
-
-1. `⚠️ processTurn Error Handling Tests` - I can see:
-```
-[api-re...
-[2026-04-05T11:45:45.201Z] iter=116 turn=3 INFO: Turn 3/25
-[2026-04-05T11:45:47.481Z] iter=116 turn=3 INFO: $ cat /Users/austin/Documents/autoagent/src/api-retry.ts
-[2026-04-05T11:45:47.488Z] iter=116 turn=3 INFO: $ grep -n "callWithRetry" /Users/austin/Documents/autoagent/src/conversation.ts | head -20
-[2026-04-05T11:45:47.496Z] iter=116 turn=3 INFO:   -> exit=0 (2181 chars)
-[2026-04-05T11:45:47.498Z] iter=116 turn=3 INFO:   -> exit=0 (108 chars)
-[2026-04-05T11:45:47.499Z] iter=116 turn=4 INFO: Turn 4/25
-[2026-04-05T11:46:04.641Z] iter=116 turn=4 INFO: think: Now I understand the issue clearly.
-
-The delays causing slowness:
-1. `testProcessTurnErrors` test 1: `new Error("network...
-[2026-04-05T11:46:04.642Z] iter=116 turn=5 INFO: Turn 5/25
-[2026-04-05T11:46:13.428Z] iter=116 turn=5 INFO: Agent: I have the diagnosis. Making the fixes now.
-[2026-04-05T11:46:13.428Z] iter=116 turn=5 INFO: write_file: src/api-retry.ts (patch)
-[2026-04-05T11:46:13.430Z] iter=116 turn=5 INFO:   -> ok: Patched src/api-retry.ts: -36 +39 lines
-
-Context after patch:
-34 |   return false;
-35 | }
-36 | 
-37 | /**
-38 |  * Call the Anthropic messages API with exponential backoff retry.
-39 |  *
-40 |  * @param client  - Anthropic client instance
-41 |  * @param params  - Message creation params
-42 |  * @param maxRetries - Max retry attempts (default 3). Total attempts = maxRetries + 1.
-43 |  * @param _delay  - Optional delay function (default: real setTimeout). Pass `() => Promise.resolve()` in tests.
-44 |  */
-45 | export async function callWithRetry(
-46 |   client: Anthropic,
-47 |   params: Anthropic.MessageCreateParams,
-48 |   maxRetries: number = DEFAULT_MAX_RETRIES,
-49 |   _delay?: (ms: number) => Promise<void>
-50 | ): Promise<Anthropic.Message> {
-51 |   const sleep = _delay ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
-52 |   let lastError: unknown;
-53 | 
-54 |   for (let attempt = 0; attempt <= maxRetries; attempt++) {
-55 |     try {
-56 |       return await client.messages.create(params) as Anthropic.Message;
-57 |     } catch (err) {
-58 |       lastError = err;
-59 | 
-60 |       if (!isRetryable(err) || attempt === maxRetries) {
-61 |         throw err;
-62 |       }
-63 | 
-64 |       const delayMs = BACKOFF_BASE_MS * Math.pow(BACKOFF_MULTIPLIER, attempt);
-65 |       const status = err instanceof Anthropic.APIError ? ` (status ${err.status})` : "";
-66 |       console.error(
-67 |         `[api-retry] Attempt ${attempt + 1}/${maxRetries + 1} failed${status}. Retrying in ${delayMs}ms...`
-68 |       );
-69 | 
-70 |       await sleep(delayMs);
-71 |     }
-72 |   }
-73 | 
-74 |   throw lastError;
-75 | }
-76 | 
-[2026-04-05T11:46:13.430Z] iter=116 turn=6 INFO: Turn 6/25
-[2026-04-05T11:46:21.164Z] iter=116 turn=6 INFO: Agent: Now fix the self-test: change "network timeout" error message to avoid retry logic, and pass zero-delay to `callWithRetry` tests:
-[2026-04-05T11:46:21.165Z] iter=116 turn=6 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T11:46:21.166Z] iter=116 turn=6 INFO:   -> ok: Patched scripts/self-test.ts: -18 +19 lines
-
-Context after patch:
-1619 | async function testProcessTurnErrors(): Promise<void> {
-1620 |   console.log("\n⚠️ processTurn Error Handling Tests");
-1621 | 
-1622 |   // 1. API call throws error → propagates (processTurn doesn't catch API errors)
-1623 |   // Use a non-retryable message so callWithRetry doesn't add retry delays
-1624 |   {
-1625 |     const client = {
-1626 |       messages: {
-1627 |         create: async () => { throw new Error("mock API failure"); },
-1628 |       },
-1629 |     };
-1630 |     const ctx = makeMockCtx({ client: client as any });
-1631 |     let threw = false;
-1632 |     try {
-1633 |       await processTurn(ctx);
-1634 |     } catch (e: any) {
-1635 |       threw = true;
-1636 |       assert(e.message === "mock API failure", "error: API error message preserved");
-1637 |     }
-1638 |     assert(threw, "error: API network error propagates from processTurn");
-1639 |     assert(ctx.turns === 1, "error: turns still incremented before API call");
-1640 |   }
-1641 | 
-1642 |   // 2. Tool handler throws → error caught, tool_result contains error message
-1643 |   {
-[2026-04-05T11:46:21.168Z] iter=116 turn=7 INFO: Turn 7/25
-[2026-04-05T11:46:46.544Z] iter=116 turn=7 INFO: Agent: Now update `testApiRetry` to use zero-delay:
-[2026-04-05T11:46:46.545Z] iter=116 turn=7 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T11:46:46.547Z] iter=116 turn=7 INFO:   -> ok: Patched scripts/self-test.ts: -125 +125 lines
-
-Context after patch:
-2026 | async function testApiRetry(): Promise<void> {
-2027 |   console.log("\n🔄 callWithRetry Tests");
-2028 | 
-2029 |   // Use zero-delay for all retry tests to avoid real sleep delays
-2030 |   const noDelay = () => Promise.resolve();
-2031 | 
-2032 |   // Test 1: Succeeds on first try — no retry needed
-2033 |   {
-2034 |     let callCount = 0;
-2035 |     const mockClient = {
-2036 |       messages: {
-2037 |         create: async (_params: unknown) => {
-2038 |           callCount++;
-2039 |           return {
-2040 |             content: [{ type: "text", text: "ok" }],
-2041 |             usage: { input_tokens: 10, output_tokens: 5 },
-2042 |             stop_reason: "end_turn",
-2043 |             role: "assistant",
-2044 |             type: "message",
-2045 |             model: "test",
-2046 |             id: "msg_test1",
-2047 |           };
-2048 |         },
-2049 |       },
-2050 |     } as any;
-2051 |     const result = await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3, noDelay);
-2052 |     assert(callCount === 1, "retry: succeeds on first try with no retries");
-2053 |     assert(result.content[0].type === "text", "retry: returns valid response");
-2054 |   }
-2055 | 
-2056 |   // Test 2: Retries on 429, succeeds on 2nd attempt
-2057 |   {
-2058 |     let callCount = 0;
-2059 |     const mockClient = {
-2060 |       messages: {
-2061 |         create: async (_params: unknown) => {
-2062 |           callCount++;
-2063 |           if (callCount === 1) {
-2064 |             const err = Object.assign(new Error("Rate limit"), { status: 429 });
-2065 |             Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
-2066 |             throw err;
-2067 |           }
-2068 |           return {
-2069 |             content: [{ type: "text", text: "ok after retry" }],
-2070 |             usage: { input_tokens: 10, output_tokens: 5 },
-2071 |             stop_reason: "end_turn",
-2072 |             role: "assistant",
-2073 |             type: "message",
-2074 |             model: "test",
-2075 |             id: "msg_test2",
-2076 |           };
-2077 |         },
-2078 |       },
-2079 |     } as any;
-2080 |     const result = await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 1, noDelay);
-2081 |     assert(callCount === 2, "retry: retries once on 429 then succeeds", `callCount=${callCount}`);
-2082 |     assert((result.content[0] as any).text === "ok after retry", "retry: returns response from second attempt");
 2083 |   }
 2084 | 
 2085 |   // Test 3: Gives up after maxRetries and throws
@@ -1171,3 +996,160 @@ Context after patch:
 [2026-04-05T12:00:19.072Z] iter=123 turn=20 INFO: Pre-commit review (650in/319out): **Issues:**
 
 - **`computeTurnBudget` is synchronous but reads a file (`METRICS_FILE`)** — if it uses `fs.readFileSync`, that's a blocking call on every iteration in what is likely an async context. If
+[2026-04-05T12:00:19.129Z] iter=123 turn=20 INFO: Committed: af426f0c (28 in / 4468 out, cache: 20477 created, 250311 read)
+[2026-04-05T12:00:19.129Z] iter=123 turn=20 INFO: Restarting as iteration 124...
+[2026-04-05T12:00:19.358Z] iter=124 INFO: Cache restored: 37/37 entries (0 stale)
+[2026-04-05T12:00:19.359Z] iter=124 INFO: Turn budget: 20/25 (calibration=1.36x, predicted=20)
+[2026-04-05T12:00:19.360Z] iter=124 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T12:00:19.387Z] iter=124 turn=1 INFO: Turn 1/25
+[2026-04-05T12:00:24.297Z] iter=124 turn=1 INFO: think: Let me read the goals and understand what I need to build:
+
+1. Add vitest tests for `computeTurnBudget()` — verify it re...
+[2026-04-05T12:00:24.298Z] iter=124 turn=2 INFO: Turn 2/25
+[2026-04-05T12:00:26.800Z] iter=124 turn=2 INFO: $ cat src/turn-budget.ts
+[2026-04-05T12:00:26.807Z] iter=124 turn=2 INFO: $ ls src/tests/ | head -20
+[2026-04-05T12:00:26.820Z] iter=124 turn=2 INFO:   -> exit=0 (8365 chars)
+[2026-04-05T12:00:26.825Z] iter=124 turn=2 INFO:   -> exit=0 (42 chars)
+[2026-04-05T12:00:26.826Z] iter=124 turn=3 INFO: Turn 3/25
+[2026-04-05T12:00:30.045Z] iter=124 turn=3 INFO: $ ls tests/ 2>/dev/null || ls *.test.ts 2>/dev/null || find . -name "*.test.ts" -not -path "*/node_modules/*" | head -20
+[2026-04-05T12:00:30.047Z] iter=124 turn=3 INFO: $ grep -r "computeTurnBudget\|dynamicBudgetWarning" src/agent.ts | head -10
+[2026-04-05T12:00:30.057Z] iter=124 turn=3 INFO:   -> exit=0 (174 chars)
+[2026-04-05T12:00:30.090Z] iter=124 turn=3 INFO:   -> exit=0 (196 chars)
+[2026-04-05T12:00:30.090Z] iter=124 turn=4 INFO: Turn 4/25
+[2026-04-05T12:00:33.473Z] iter=124 turn=4 INFO: $ ls src/__tests__/
+[2026-04-05T12:00:33.478Z] iter=124 turn=4 INFO: $ cat src/__tests__/orientation.test.ts | head -50
+[2026-04-05T12:00:33.497Z] iter=124 turn=4 INFO:   -> exit=0 (116 chars)
+[2026-04-05T12:00:33.499Z] iter=124 turn=4 INFO:   -> exit=0 (1605 chars)
+[2026-04-05T12:00:33.500Z] iter=124 turn=5 INFO: Turn 5/25
+[2026-04-05T12:00:37.529Z] iter=124 turn=5 INFO: think: I have enough context. I need to:
+1. Write vitest tests for `computeTurnBudget()` in `src/__tests__/turn-budget.test.ts`...
+[2026-04-05T12:00:37.530Z] iter=124 turn=6 INFO: Turn 6/25
+[2026-04-05T12:00:39.846Z] iter=124 turn=6 INFO: $ grep -n "testTaskMdLifecycle\|function test\|selfTest\|PASS\|FAIL" scripts/self-test.ts | tail -30
+[2026-04-05T12:00:39.863Z] iter=124 turn=6 INFO:   -> exit=0 (1549 chars)
+[2026-04-05T12:00:39.864Z] iter=124 turn=7 INFO: Turn 7/25
+[2026-04-05T12:00:42.021Z] iter=124 turn=7 INFO: $ grep -n "testTaskMdLifecycle\|testTurnBudget\|main()" scripts/self-test.ts | tail -20
+[2026-04-05T12:00:42.036Z] iter=124 turn=7 INFO:   -> exit=0 (147 chars)
+[2026-04-05T12:00:42.037Z] iter=124 turn=8 INFO: Turn 8/25
+[2026-04-05T12:00:44.670Z] iter=124 turn=8 INFO: $ sed -n '2157,2210p' scripts/self-test.ts
+[2026-04-05T12:00:44.686Z] iter=124 turn=8 INFO:   -> exit=0 (2042 chars)
+[2026-04-05T12:00:44.687Z] iter=124 turn=9 INFO: Turn 9/25
+[2026-04-05T12:01:16.728Z] iter=124 turn=9 INFO: Agent: Goals status:
+- Vitest tests for `computeTurnBudget()`: **NOT STARTED**
+- Self-test assertion for wiring: **NOT STARTED**
+
+Writing both now.
+[2026-04-05T12:01:16.729Z] iter=124 turn=9 INFO: write_file: src/__tests__/turn-budget.test.ts (write)
+[2026-04-05T12:01:16.737Z] iter=124 turn=9 INFO:   -> ok: Created src/__tests__/turn-budget.test.ts (7646 chars)
+[2026-04-05T12:01:16.739Z] iter=124 turn=10 INFO: Turn 10/25
+[2026-04-05T12:01:20.219Z] iter=124 turn=10 INFO: Agent: Now add the self-test assertion:
+[2026-04-05T12:01:20.220Z] iter=124 turn=10 INFO: $ sed -n '720,735p' scripts/self-test.ts
+[2026-04-05T12:01:20.236Z] iter=124 turn=10 INFO:   -> exit=0 (780 chars)
+[2026-04-05T12:01:20.237Z] iter=124 turn=11 INFO: Turn 11/25
+[2026-04-05T12:01:24.095Z] iter=124 turn=11 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T12:01:24.098Z] iter=124 turn=11 INFO:   -> ok: Patched scripts/self-test.ts: -2 +3 lines
+
+Context after patch:
+723 |     await testResuscitationE2E();
+724 |     await testSubagent();
+725 |     await testApiRetry();
+726 |     testTaskMdLifecycle();
+727 |     testTurnBudgetWiring();
+728 |     // Inline model-selection smoke test (avoids vitest import in tsx context)
+729 |     console.log("  model-selection smoke test...");
+730 |     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
+731 |     assert(selectModel({ description: "test", forceModel: "balanced" }) === "balanced", "force balanced");
+[2026-04-05T12:01:24.099Z] iter=124 turn=12 INFO: Turn 12/25
+[2026-04-05T12:01:32.052Z] iter=124 turn=12 INFO: Agent: Now add the `testTurnBudgetWiring` function at the end of the file (before `main()` call):
+[2026-04-05T12:01:32.053Z] iter=124 turn=12 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T12:01:32.056Z] iter=124 turn=12 INFO:   -> ok: Patched scripts/self-test.ts: -4 +28 lines
+
+Context after patch:
+2205 |   }
+2206 | }
+2207 | 
+2208 | function testTurnBudgetWiring(): void {
+2209 |   console.log("\n📐 Turn Budget Wiring");
+2210 | 
+2211 |   // Static check: computeTurnBudget is imported and called in agent.ts.
+2212 |   // This prevents regression of the dead-code period where computeTurnBudget
+2213 |   // was defined but never invoked (iteration 121 finding).
+2214 |   const agentSrc = readFileSync(path.join(ROOT, "src/agent.ts"), "utf8");
+2215 | 
+2216 |   assert(
+2217 |     agentSrc.includes('import { computeTurnBudget }'),
+2218 |     "turn-budget-wiring: computeTurnBudget is imported in agent.ts",
+2219 |   );
+2220 |   assert(
+2221 |     agentSrc.includes('computeTurnBudget('),
+2222 |     "turn-budget-wiring: computeTurnBudget() is called in agent.ts",
+2223 |   );
+2224 | 
+2225 |   // Ensure the call assigns the result (not a fire-and-forget)
+2226 |   assert(
+2227 |     /const turnBudget\s*=\s*computeTurnBudget\(/.test(agentSrc),
+2228 |     "turn-budget-wiring: computeTurnBudget() result is assigned to turnBudget",
+2229 |   );
+2230 | }
+2231 | 
+2232 | main().catch((err) => {
+2233 |   console.error("Self-test crashed:", err);
+2234 |   process.exit(1);
+2235 | });
+2236 | 
+[2026-04-05T12:01:32.057Z] iter=124 turn=13 INFO: Turn 13/25
+[2026-04-05T12:01:35.233Z] iter=124 turn=13 INFO: Agent: Now run all checks:
+[2026-04-05T12:01:35.234Z] iter=124 turn=13 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T12:01:35.237Z] iter=124 turn=13 INFO: $ npx vitest run src/__tests__/turn-budget.test.ts 2>&1
+[2026-04-05T12:01:35.905Z] iter=124 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:01:36.198Z] iter=124 turn=13 INFO:   -> exit=0 (284 chars)
+[2026-04-05T12:01:36.198Z] iter=124 turn=14 INFO: Turn 14/25
+[2026-04-05T12:01:39.152Z] iter=124 turn=14 INFO: $ npx vitest run 2>&1 | tail -15
+[2026-04-05T12:01:39.157Z] iter=124 turn=14 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -20
+[2026-04-05T12:01:40.213Z] iter=124 turn=14 INFO:   -> exit=0 (562 chars)
+[2026-04-05T12:01:43.236Z] iter=124 turn=14 INFO:   -> exit=0 (711 chars)
+[2026-04-05T12:01:43.237Z] iter=124 turn=15 INFO: Turn 15/25
+[2026-04-05T12:01:49.900Z] iter=124 turn=15 INFO: Agent: All green. 71 vitest (up from 53), 696 self-tests (up from 691), tsc clean. Now commit and update goals/memory.
+[2026-04-05T12:01:49.901Z] iter=124 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && git add src/__tests__/turn-budget.test.ts scripts/self-test.ts && git commit -m "Add vitest tests for computeTurnBudget + self-test wiring check
+
+- 18 new vites...
+[2026-04-05T12:01:49.942Z] iter=124 turn=15 INFO:   -> exit=0 (171 chars)
+[2026-04-05T12:01:49.942Z] iter=124 turn=16 INFO: Turn 16/25
+[2026-04-05T12:02:00.298Z] iter=124 turn=16 INFO: Agent: Goals are DONE. Wrapping up now.
+[2026-04-05T12:02:00.299Z] iter=124 turn=16 INFO: write_file: goals.md (write)
+[2026-04-05T12:02:00.300Z] iter=124 turn=16 INFO:   -> ok: Updated goals.md (1029 chars, -1 lines delta)
+[2026-04-05T12:02:00.301Z] iter=124 turn=17 INFO: Turn 17/25
+[2026-04-05T12:02:09.459Z] iter=124 turn=17 INFO: write_file: memory.md (patch)
+[2026-04-05T12:02:09.461Z] iter=124 turn=17 INFO:   -> ok: Patched memory.md: -7 +11 lines
+
+Context after patch:
+79 | ---
+80 | 
+81 | 
+82 | ## Iteration 123 [Meta]
+83 | 
+84 | Wired up `computeTurnBudget()` — was dead code since creation. Added import to agent.ts, compute budget after parsing predictedTurns, assign to `ctx.turnBudget`. conversation.ts already had the plumbing: `dynamicBudgetWarning()` fires at 80% and 100% of recommended budget. Now the adaptive budget system is live: metrics → calibration → budget → warnings → behavior change. This closes the feedback loop that was broken (code existed but was never called). tsc clean, 53 vitest pass.
+85 | 
+86 | ---
+87 | 
+88 | **[AUTO-SCORED] Iteration 123: predicted 16 turns, actual 20 turns, ratio 1.25**
+89 | 
+90 | ## Iteration 124 [Engineer]
+91 | 
+92 | Added full test coverage for turn-budget system. 18 vitest tests in `src/__tests__/turn-budget.test.ts` covering `computeCalibration`, `readPredictionCalibration`, `computeTurnBudget` (no metrics, empty, normal, calibration applied, failed exclusion, clamp, warnAt), and `dynamicBudgetWarning`. Added `testTurnBudgetWiring()` self-test: static check that `computeTurnBudget` is imported, called, and assigned in agent.ts — prevents dead-code regression. vitest: 71 (was 53), self-tests: 696 (was 691), tsc clean.
+93 | 
+[2026-04-05T12:02:09.461Z] iter=124 turn=18 INFO: Turn 18/25
+[2026-04-05T12:02:13.145Z] iter=124 turn=18 INFO: $ npx tsc --noEmit 2>&1 && echo "TSC_CLEAN"
+[2026-04-05T12:02:13.883Z] iter=124 turn=18 INFO:   -> exit=0 (10 chars)
+[2026-04-05T12:02:13.883Z] iter=124 turn=19 INFO: Turn 19/25
+[2026-04-05T12:02:16.018Z] iter=124 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && git add goals.md memory.md && git commit -m "Update goals/memory for iteration 124 completion"
+[2026-04-05T12:02:16.055Z] iter=124 turn=19 INFO:   -> exit=0 (118 chars)
+[2026-04-05T12:02:16.055Z] iter=124 turn=20 INFO: Turn 20/25
+[2026-04-05T12:02:18.059Z] iter=124 turn=20 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T12:02:18.060Z] iter=124 turn=20 INFO: RESTART signal
+[2026-04-05T12:02:18.060Z] iter=124 turn=20 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:02:18.783Z] iter=124 turn=20 INFO: Compilation OK
+[2026-04-05T12:02:23.559Z] iter=124 turn=20 INFO: Cache persisted: 37 entries to .autoagent-cache.json
+[2026-04-05T12:02:23.560Z] iter=124 turn=20 INFO: Tool timing: bash: 18x, avg=433ms, total=7799ms; write_file: 5x, avg=4ms, total=20ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T12:02:23.560Z] iter=124 turn=20 INFO: Tool timing stats
+[2026-04-05T12:02:28.310Z] iter=124 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 124: predicted 20 turns, actual 20 turns, ratio 1.00**
+[2026-04-05T12:02:28.329Z] iter=124 turn=20 INFO: Pre-commit review: no significant code changes to review
