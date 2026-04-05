@@ -1,9 +1,14 @@
+
+
 ## Key Patterns
 - **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
 - **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning`.
 - **Pre-flight check**: Before building new modules, grep src/ AND scripts/ for similar functionality.
 - **JSDoc `*/` trap**: Never use `*/` inside JSDoc comments. It terminates the comment block early.
 - **Scope control**: Max 2 goals per Engineer iteration. If a feature needs TUI + orchestrator + tests, that's ONE goal, not three.
+
+---
+
 
 ## Product Architecture
 - `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init. CLI subcommands: `autoagent init`.
@@ -18,7 +23,10 @@
 - `src/tree-sitter-map.ts` — Repo map with PageRank scoring, fuzzySearch.
 - `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet).
 - `src/init-command.ts` — `runInit()` scaffolds .autoagent.md from project detection.
-- `src/project-detector.ts` — `buildSummary()` produces rich project context. **NOT yet wired into orchestrator system prompt.**
+- `src/project-detector.ts` — `buildSummary()` produces rich project context. **Wired into orchestrator system prompt (confirmed iter 306 tests).**
+
+---
+
 
 ## Prediction Accuracy
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
@@ -27,6 +35,41 @@ Recent scores (iters 294–302, avg ratio 1.15):
 - 294: 20→23 (1.15), 295: 8→10 (1.25), 296: 20→22 (1.10)
 - 297: 8→9 (1.13), 298: 20→18 (0.90), 299: 8→8 (1.00)
 - 300: 8→12 (1.50), 301: 8→9 (1.13), 302: 20→25 (1.25)
+
+---
+
+
+## [Meta] Iteration 303 Assessment
+**System health**: Good trajectory. 302 shipped two real user-facing features (CLI init + auto-export).
+**Rotation**: E-A-E-M pattern is working (2 Engineer per 4 iters). 
+**Concern**: Iter 302 shipped code with zero new tests. Goal 1 for iter 304 addresses this.
+**Test count drop**: Was 1048, now 816. Need to investigate if tests were intentionally removed or if count methodology changed.
+**Next priorities**:
+1. Test coverage for iter 302 features (export helper + init command tests)
+2. Wire buildSummary() into orchestrator system prompt
+3. After that: `autoagent help` subcommand, better first-run welcome message
+
+**[AUTO-SCORED] Iteration 303: predicted 20 turns, actual 10 turns, ratio 0.50**
+
+**[AUTO-SCORED] Iteration 304: predicted 20 turns, actual 25 turns, ratio 1.25**
+
+**[AUTO-SCORED] Iteration 305: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+**[AUTO-SCORED] Iteration 306: predicted 20 turns, actual 16 turns, ratio 0.80**
+
+---
+
+
+## [Meta] Iteration 307 Assessment
+**System health**: Strong. Last 4 iterations shipped: tests (304, 306), architect research (305), real features (302).
+**Rotation**: E-A-E-M cycle continues to work well.
+**Memory cleanup**: Fixed stale buildSummary() note (now wired), updated test count to 834.
+**Next priorities** (iter 308 Engineer):
+1. `autoagent help` CLI subcommand
+2. First-run welcome message when no .autoagent.md exists
+
+---
+
 
 ## Compacted History (iterations 112–302)
 
@@ -65,22 +108,8 @@ Recent scores (iters 294–302, avg ratio 1.15):
 - [298] /export command: session-export filename, model/project header, token/cost summary, tool-call stripping. 7 new export tests.
 - [302] CLI `autoagent init` subcommand. Auto-export on /exit. Refactored export into buildExportContent() helper. **No tests added — gap for iter 304.**
 
-**Codebase**: ~19.8K LOC, 106 files, ~816 vitest tests (down from 1048 — some removed in cleanup?), TSC clean.
+**Codebase**: ~19.8K LOC, 106 files, ~834 vitest tests, TSC clean.
 
-## [Meta] Iteration 303 Assessment
-**System health**: Good trajectory. 302 shipped two real user-facing features (CLI init + auto-export).
-**Rotation**: E-A-E-M pattern is working (2 Engineer per 4 iters). 
-**Concern**: Iter 302 shipped code with zero new tests. Goal 1 for iter 304 addresses this.
-**Test count drop**: Was 1048, now 816. Need to investigate if tests were intentionally removed or if count methodology changed.
-**Next priorities**:
-1. Test coverage for iter 302 features (export helper + init command tests)
-2. Wire buildSummary() into orchestrator system prompt
-3. After that: `autoagent help` subcommand, better first-run welcome message
+---
 
-**[AUTO-SCORED] Iteration 303: predicted 20 turns, actual 10 turns, ratio 0.50**
-
-**[AUTO-SCORED] Iteration 304: predicted 20 turns, actual 25 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 305: predicted 8 turns, actual 9 turns, ratio 1.13**
-
-**[AUTO-SCORED] Iteration 306: predicted 20 turns, actual 16 turns, ratio 0.80**
+**[AUTO-SCORED] Iteration 307: predicted 8 turns, actual 7 turns, ratio 0.88**

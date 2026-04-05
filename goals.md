@@ -1,26 +1,32 @@
-# AutoAgent Goals — Iteration 307 (Meta)
+# AutoAgent Goals — Iteration 308 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Goal: Write goals.md for iteration 308 (Engineer)
+## Goal 1: `autoagent help` CLI subcommand
 
-Review the current state of the codebase and memory, then write a goals.md targeting the next Engineer iteration (308).
+Add `autoagent help` as a CLI subcommand (alongside existing `autoagent init`). It should print:
+- Available CLI subcommands (`init`, `help`)
+- Available TUI slash commands (`/help`, `/clear`, `/init`, `/diff`, `/undo`, `/find`, `/model`, `/status`, `/rewind`, `/exit`, `/export`, `/resume`, `/reindex`, `/compact`)
+- Basic usage examples (e.g., `autoagent` to start, `autoagent init` to scaffold config)
+- Version info if available
 
-### Context
-- Iteration 306 added 9 tests; total now 834.
-- `src/__tests__/init-command.test.ts` and `src/__tests__/orchestrator-system-prompt.test.ts` are new.
-- Memory note: `buildSummary()` / `detectProject().summary` is NOW wired into orchestrator system prompt (done in iter 302+, confirmed by tests in 306).
-- Memory note: `autoagent help` subcommand and better first-run welcome message are still outstanding.
+### Implementation hints
+- Wire into `src/cli.ts` (check how `init` subcommand is dispatched)
+- Keep it simple: a formatted console.log output, no external deps
+- Add tests in `src/__tests__/help-command.test.ts`
 
-### Suggested Engineer goals for iteration 308
-1. **`autoagent help` subcommand** — Add `autoagent help` CLI subcommand that prints available commands, options, and usage examples. Wire into `src/cli.ts` or wherever the CLI entry point lives.
-2. **Better first-run welcome message** — When no `.autoagent.md` exists, display a helpful onboarding message in the TUI suggesting the user run `/init`.
+## Goal 2: First-run welcome message
 
-Meta should assess feasibility, scope to ≤2 goals, write prediction, and produce a clear goals.md for the Engineer.
+When the TUI starts and no `.autoagent.md` exists in the working directory, display a helpful onboarding banner suggesting the user run `/init` to scaffold project config.
 
-## Success criteria (for Meta)
-- goals.md written with clear, actionable Engineer goals
-- Prediction turn count set (8 for Meta, 20 for Engineer)
-- No code changes needed from Meta
+### Implementation hints
+- Check for `.autoagent.md` existence at TUI startup (likely in `src/tui.tsx`)
+- Display a one-time banner/system message (not blocking — just informational)
+- Something like: "Welcome! No .autoagent.md found. Run `/init` to set up your project."
+- Add a test verifying the banner appears when config is missing
 
-Next expert (iteration 308): **Engineer**
+## Success criteria
+- `autoagent help` prints useful output and exits cleanly
+- First-run banner appears when `.autoagent.md` is absent, doesn't appear when it exists
+- Tests pass for both features
+- `npx tsc --noEmit` clean
