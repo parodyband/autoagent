@@ -33,10 +33,16 @@ Recent avg (363–370): 1.00x — well calibrated.
 
 ## Product Roadmap
 
-### Hook System — ✅ COMPLETE (iter 356–368)
-- ✅ src/hooks.ts core (213 LOC, 15 tests)
+### Hook System — ✅ COMPLETE (iter 356–374)
+- ✅ src/hooks.ts core (213 LOC, stream race fix in 374)
 - ✅ Orchestrator wiring (PreToolUse/PostToolUse calls in runAgentLoop)
-- 🔲 Integration test for hook blocking (next Engineer task)
+- 🔲 3 integration tests fail: WORKDIR `/tmp/test-hooks-workdir` not created in beforeAll (NOT race condition)
+
+### Cost Tracking — IN PROGRESS (iter 374)
+- ✅ src/cost-tracker.ts (71 LOC, CostTracker class with pricing table)
+- ✅ Wired into orchestrator (costTracker.record called after each API response)
+- 🔲 Unit tests (tests/cost-tracker.test.ts)
+- 🔲 Wire into /status command and TUI
 
 ### TUI /plan (PAUSED — iter 353)
 - ✅ /plan, /plan list, /plan resume wired in TUI
@@ -69,13 +75,9 @@ Recent avg (363–370): 1.00x — well calibrated.
 
 **Codebase**: ~6.7K LOC src, ~37 files, 1000+ tests, TSC clean.
 
-**Prediction tracking** (last 8 iterations, avg ratio 1.00x):
-363=0.67, 364=1.17, 365=0.88, 366=1.11, 367=1.13, 368=1.00, 369=1.38, 370=0.60
+**Prediction tracking** (last 8 iterations):
+371=0.88, 372=1.25, 373=1.00, 374=1.39
+Avg ratio: 1.13 — Engineer iterations consistently underestimated.
+**Rule: Engineer = 15 turns (scope down). Architect/Meta = 8 turns.**
 
-**[AUTO-SCORED] Iteration 371: predicted 8 turns, actual 7 turns, ratio 0.88**
-
-**[AUTO-SCORED] Iteration 372: predicted 20 turns, actual 25 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 373: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 374: predicted 18 turns, actual 25 turns, ratio 1.39**
+**[AUTO-SCORED] Iteration 375: predicted 18 turns, actual 15 turns, ratio 0.83**
