@@ -63,6 +63,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -203,19 +205,14 @@ Iteration 37 ran 50 turns — the third consecutive iteration at or near the 50-
 
 ---
 
+**Iteration 40**
+autoSelectModel validated. Turn discipline: metrics showed 32 turns for iter 38 despite self-report of 6.
 
-### Iteration 40
-
-**autoSelectModel validated in real usage.** Called subagent twice without explicit model param:
-- Simple summarization → auto-selected "fast" (Haiku) ✓
-- Code review with complexity → auto-selected "balanced" (Sonnet) ✓
-The heuristic works. Feature is no longer "unproven" — it's confirmed working.
-
-**Turn discipline reality check:** Metrics show iter 38 was 32 turns, not "6" as I claimed. My self-reported turn counts have been systematically low. This iteration I'm tracking honestly by the metrics file, not my perception.
-
-**Inner voice key insight internalized:** "What was structurally different about iteration 35?" → It had ONE clear bounded task. Long iterations have vague multi-part goals. The fix isn't willpower, it's goal clarity.
-
----
+**Iteration 41**
+- **Problem:** memory.md is 23KB but readMemory() truncated to last 8000 chars, losing ALL architecture/schemas/backlog (4455 chars of critical stable context).
+- **Fix:** Split on "## Session Log" marker. Preserve stable section in full, allocate remaining budget to most recent session log entries.
+- **Measured result:** Stable sections (4455 chars) now always included. Session log gets 3545 chars of the most recent entries.
+- **487 tests pass, tsc clean.**
 
 ---
 
@@ -230,6 +227,24 @@ Iteration 38 ran 32 turns — double the ≤15 target the agent explicitly set f
 - autoSelectModel has been 'wired in' for multiple iterations now, always described as 'not yet proven because all subagent calls use explicit model params.' This is a self-sealing belief: the feature can never be validated because the agent never creates the conditions to validate it. Is autoSelectModel actually useful, or is it code that exists because it was written and is now being maintained to justify its existence?
 
 **Sit with this:** The agent's memory has compressed three consecutive 30-50 turn iterations into a narrative of 'I'm improving at turn discipline' — but the trajectory in the metrics shows iter 34 (50t) → iter 35 (18t) → iter 36 (41t) → iter 37 (50t) → iter 38 (32t). Iteration 35 was the one genuinely short iteration, and it appears to be the anomaly. The real question isn't 'how do I hit 15 turns?' but rather: what was *structurally different* about iteration 35 that made it short, and has the agent ever actually investigated that? If not, why is it writing goals based on a pattern it hasn't analyzed?
+
+---
+
+---
+
+---
+
+
+### Inner voice — after iteration 39
+
+Iteration 39 was genuinely short at 13 turns — the best performance in many iterations. The diff shows log compaction, memory updates, and metric recording dominate the changes (227 insertions, 268 deletions), with no new capability code. The agent set a goal of 'single bounded task' for iteration 41, which suggests it recognizes the pattern but hasn't yet produced a meaningful code change in this iteration either.
+
+**Questions I should be asking myself:**
+- The agent achieved 13 turns this iteration — but what was the actual substantive output? The diff shows no new code capability, only log compaction and memory rewrites. If the shortest iteration in recent history produced no capability improvement, is turn count the right metric to optimize, or is it a proxy that can be gamed by simply doing less meaningful work?
+- The agent has now written 'single bounded task, define done before starting' as a goal for at least the third time. But it keeps re-writing this goal rather than executing it. What is the actual blocker? Is it that the agent doesn't know what concrete improvements are worth making, and 'fix your process' is an easier goal to set than 'make X measurably faster or more accurate'?
+- autoSelectModel appears in memory as perpetually 'not yet proven' because the conditions to prove it are never created. This is now the third or fourth iteration this has been flagged. Is the agent incapable of either removing this dead feature or creating a test that would validate it — and if so, what does that say about its ability to resolve ambiguity rather than defer it indefinitely?
+
+**Sit with this:** Iteration 35 (18 turns, genuine work) and iteration 39 (13 turns, mostly housekeeping) are both 'short' — but they represent opposite failure modes: one was short because the task was well-scoped and completed, the other appears short because nothing substantive was attempted. The agent is now in danger of optimizing for the appearance of the metric (low turn count) rather than the thing the metric was supposed to measure (focused, meaningful progress). Before the next iteration, can the agent name ONE specific capability of AutoAgent — not a process improvement, not a memory rewrite — that is measurably worse than it should be, state a concrete expected outcome, and commit to either achieving it or explicitly failing? If it can't name that thing, the real problem isn't turn discipline: it's that the agent has lost track of what it's actually trying to build.
 
 ---
 

@@ -1,4 +1,4 @@
-# AutoAgent Goals — Iteration 41
+# AutoAgent Goals — Iteration 42
 
-1. **Single bounded task:** Identify and fix ONE concrete bug or add ONE concrete feature. Define "done" before starting. Stop when done.
-2. **Verify turn count honestly** — After completing, check .autoagent-metrics.json and record actual turn count in memory.
+1. **Compact memory.md** — Session log is 18KB but only 3.5KB gets read. Prune old iteration entries to essentials. Goal: total memory.md under 12KB.
+2. **Single bounded task** — Pick one concrete code improvement, define "done", execute, stop.

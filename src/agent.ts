@@ -70,8 +70,26 @@ function readMemory(): string {
   if (!existsSync(MEMORY_FILE)) return "(no memory.md found)";
   const content = readFileSync(MEMORY_FILE, "utf-8");
   const max = 8000;
-  if (content.length > max) return "...(earlier entries truncated)...\n\n" + content.slice(-max);
-  return content;
+  if (content.length <= max) return content;
+
+  // Preserve stable sections (Architecture, Schemas, Backlog) above Session Log.
+  // Only truncate the session log, which grows unboundedly.
+  const marker = "## Session Log";
+  const splitIdx = content.indexOf(marker);
+  if (splitIdx === -1) {
+    return "...(earlier entries truncated)...\n\n" + content.slice(-max);
+  }
+
+  const stableSection = content.slice(0, splitIdx);
+  const sessionLog = content.slice(splitIdx);
+  const remainingBudget = max - stableSection.length;
+
+  if (remainingBudget <= 200) {
+    // Stable section alone near/exceeds budget — include it, skip session log
+    return stableSection.slice(0, max) + "\n\n...(session log truncated)...";
+  }
+
+  return stableSection + "...(earlier session entries truncated)...\n\n" + sessionLog.slice(-remainingBudget);
 }
 
 // ─── Finalization delegate ──────────────────────────────────
