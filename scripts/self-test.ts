@@ -12,6 +12,7 @@ import { executeWriteFile } from "../src/tools/write_file.js";
 import { executeGrep } from "../src/tools/grep.js";
 import { executeThink } from "../src/tools/think.js";
 import { executeListFiles } from "../src/tools/list_files.js";
+import { compactMemory } from "./compact-memory.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync } from "fs";
 import path from "path";
 
@@ -219,6 +220,45 @@ function testImports(): void {
   assert(typeof executeListFiles === "function", "import: executeListFiles is a function");
 }
 
+// ─── Memory Compaction ──────────────────────────────────────
+
+function testCompactMemory(): void {
+  console.log("\n📦 Memory Compaction");
+
+  // Short content — no compaction
+  const short = "# Memory\n\nShort content.";
+  const r1 = compactMemory(short);
+  assert(!r1.wasCompacted, "No compaction for short content");
+  assert(r1.compacted === short, "Short content unchanged");
+
+  // Long content — should compact (need >6000 chars)
+  const sections: string[] = ["# AutoAgent Memory\n\nPreamble text.\n\n---\n"];
+  const filler = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(10);
+  for (let i = 0; i < 8; i++) {
+    sections.push(
+      `## Iteration ${i} — Test (2026-01-01)\n\n` +
+      `### What I Built\n- Built thing ${i}\n- Also built another thing\n- ${filler}\n\n` +
+      `### Key Insights\n1. **Insight A** — ${filler}\n2. **Insight B** — another explanation\n\n` +
+      `### Ideas\n- Idea one ${filler}\n- Idea two\n\n---\n`
+    );
+  }
+  const long = sections.join("\n");
+  assert(long.length > 6000, `Long content is over threshold (${long.length} chars)`);
+
+  const r2 = compactMemory(long);
+  assert(r2.wasCompacted, "Long content was compacted");
+  assert(r2.compacted.length < long.length, `Compacted is shorter (${r2.compacted.length} < ${long.length})`);
+  assert(r2.saved > 0, `Saved ${r2.saved} chars`);
+
+  // Should keep last 2 entries in full
+  assert(r2.compacted.includes("## Iteration 6"), "Keeps 2nd-to-last entry header");
+  assert(r2.compacted.includes("## Iteration 7"), "Keeps last entry header");
+  assert(r2.compacted.includes("Compacted History"), "Has compacted history section");
+
+  // Compacted entries should not have full subsection headers
+  assert(!r2.compacted.includes("## Iteration 0 —"), "Iter 0 is compacted (no full header)");
+}
+
 // ─── Main ───────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -238,6 +278,7 @@ async function main(): Promise<void> {
     testGrep();
     testThink();
     testListFiles();
+    testCompactMemory();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {

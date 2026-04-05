@@ -57,6 +57,8 @@ interface IterationMetrics {
   durationMs: number;
   inputTokens: number;
   outputTokens: number;
+  cacheCreationTokens?: number;
+  cacheReadTokens?: number;
 }
 
 function recordMetrics(m: IterationMetrics): void {
@@ -117,72 +119,78 @@ async function handleToolCall(
 ): Promise<{ result: string; isRestart: boolean }> {
   counts[toolUse.name] = (counts[toolUse.name] || 0) + 1;
 
-  switch (toolUse.name) {
-    case "bash": {
-      const input = toolUse.input as { command: string; timeout?: number };
-      log(iter, `$ ${input.command.slice(0, 200)}${input.command.length > 200 ? "..." : ""}`);
-      if (input.command.includes("AUTOAGENT_RESTART")) {
-        log(iter, "RESTART signal");
-        return { result: "RESTART acknowledged. Harness will validate, commit, restart.", isRestart: true };
+  try {
+    switch (toolUse.name) {
+      case "bash": {
+        const input = toolUse.input as { command: string; timeout?: number };
+        log(iter, `$ ${input.command.slice(0, 200)}${input.command.length > 200 ? "..." : ""}`);
+        if (input.command.includes("AUTOAGENT_RESTART")) {
+          log(iter, "RESTART signal");
+          return { result: "RESTART acknowledged. Harness will validate, commit, restart.", isRestart: true };
+        }
+        const r = await executeBash(input.command, input.timeout || 120, ROOT);
+        log(iter, `  -> exit=${r.exitCode} (${r.output.length} chars)`);
+        return { result: r.output, isRestart: false };
       }
-      const r = await executeBash(input.command, input.timeout || 120, ROOT);
-      log(iter, `  -> exit=${r.exitCode} (${r.output.length} chars)`);
-      return { result: r.output, isRestart: false };
+      case "read_file": {
+        const input = toolUse.input as { path: string; start_line?: number; end_line?: number };
+        log(iter, `read_file: ${input.path}`);
+        const r = executeReadFile(input.path, input.start_line, input.end_line, ROOT);
+        log(iter, `  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
+        return { result: r.content, isRestart: false };
+      }
+      case "write_file": {
+        const input = toolUse.input as {
+          path: string; content?: string; mode?: "write" | "append" | "patch";
+          old_string?: string; new_string?: string;
+        };
+        const mode = input.mode || "write";
+        log(iter, `write_file: ${input.path} (${mode})`);
+        const r = executeWriteFile(input.path, input.content || "", mode, ROOT, input.old_string, input.new_string);
+        log(iter, `  -> ${r.success ? "ok" : "err"}: ${r.message}`);
+        return { result: r.message, isRestart: false };
+      }
+      case "grep": {
+        const input = toolUse.input as {
+          pattern: string; path?: string; glob?: string; type?: string;
+          output_mode?: "content" | "files" | "count"; context?: number;
+          case_insensitive?: boolean; max_results?: number; multiline?: boolean;
+        };
+        log(iter, `grep: "${input.pattern}"${input.path ? ` in ${input.path}` : ""}`);
+        const r = executeGrep(
+          input.pattern, input.path, input.glob, input.type,
+          input.output_mode, input.context, input.case_insensitive,
+          input.max_results, input.multiline, ROOT
+        );
+        log(iter, `  -> ${r.matchCount} matches`);
+        return { result: r.content, isRestart: false };
+      }
+      case "web_fetch": {
+        const input = toolUse.input as { url: string; extract_text?: boolean; headers?: Record<string, string> };
+        log(iter, `web_fetch: ${input.url}`);
+        const r = await executeWebFetch(input.url, input.extract_text, input.headers);
+        log(iter, `  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
+        return { result: r.content, isRestart: false };
+      }
+      case "think": {
+        const input = toolUse.input as { thought: string };
+        log(iter, `think: ${input.thought.slice(0, 120)}...`);
+        return { result: `Thought recorded (${input.thought.length} chars). Continue.`, isRestart: false };
+      }
+      case "list_files": {
+        const input = toolUse.input as { path?: string; depth?: number; exclude?: string[] };
+        log(iter, `list_files: ${input.path || "."} (depth=${input.depth || 3})`);
+        const r = executeListFiles(input.path, input.depth, input.exclude, ROOT);
+        log(iter, `  -> ${r.success ? "ok" : "err"} (${r.dirCount} dirs, ${r.fileCount} files)`);
+        return { result: r.content, isRestart: false };
+      }
+      default:
+        return { result: `Unknown tool: ${toolUse.name}`, isRestart: false };
     }
-    case "read_file": {
-      const input = toolUse.input as { path: string; start_line?: number; end_line?: number };
-      log(iter, `read_file: ${input.path}`);
-      const r = executeReadFile(input.path, input.start_line, input.end_line, ROOT);
-      log(iter, `  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
-      return { result: r.content, isRestart: false };
-    }
-    case "write_file": {
-      const input = toolUse.input as {
-        path: string; content?: string; mode?: "write" | "append" | "patch";
-        old_string?: string; new_string?: string;
-      };
-      const mode = input.mode || "write";
-      log(iter, `write_file: ${input.path} (${mode})`);
-      const r = executeWriteFile(input.path, input.content || "", mode, ROOT, input.old_string, input.new_string);
-      log(iter, `  -> ${r.success ? "ok" : "err"}: ${r.message}`);
-      return { result: r.message, isRestart: false };
-    }
-    case "grep": {
-      const input = toolUse.input as {
-        pattern: string; path?: string; glob?: string; type?: string;
-        output_mode?: "content" | "files" | "count"; context?: number;
-        case_insensitive?: boolean; max_results?: number; multiline?: boolean;
-      };
-      log(iter, `grep: "${input.pattern}"${input.path ? ` in ${input.path}` : ""}`);
-      const r = executeGrep(
-        input.pattern, input.path, input.glob, input.type,
-        input.output_mode, input.context, input.case_insensitive,
-        input.max_results, input.multiline, ROOT
-      );
-      log(iter, `  -> ${r.matchCount} matches`);
-      return { result: r.content, isRestart: false };
-    }
-    case "web_fetch": {
-      const input = toolUse.input as { url: string; extract_text?: boolean; headers?: Record<string, string> };
-      log(iter, `web_fetch: ${input.url}`);
-      const r = await executeWebFetch(input.url, input.extract_text, input.headers);
-      log(iter, `  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
-      return { result: r.content, isRestart: false };
-    }
-    case "think": {
-      const input = toolUse.input as { thought: string };
-      log(iter, `think: ${input.thought.slice(0, 120)}...`);
-      return { result: `Thought recorded (${input.thought.length} chars). Continue.`, isRestart: false };
-    }
-    case "list_files": {
-      const input = toolUse.input as { path?: string; depth?: number; exclude?: string[] };
-      log(iter, `list_files: ${input.path || "."} (depth=${input.depth || 3})`);
-      const r = executeListFiles(input.path, input.depth, input.exclude, ROOT);
-      log(iter, `  -> ${r.success ? "ok" : "err"} (${r.dirCount} dirs, ${r.fileCount} files)`);
-      return { result: r.content, isRestart: false };
-    }
-    default:
-      return { result: `Unknown tool: ${toolUse.name}`, isRestart: false };
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    log(iter, `TOOL ERROR (${toolUse.name}): ${errMsg}`);
+    return { result: `Error executing ${toolUse.name}: ${errMsg}`, isRestart: false };
   }
 }
 
@@ -214,7 +222,7 @@ async function runIteration(state: IterationState): Promise<void> {
   const startTime = new Date();
   const toolCounts: Record<string, number> = {};
   const iter = state.iteration;
-  let totalIn = 0, totalOut = 0;
+  let totalIn = 0, totalOut = 0, totalCacheCreate = 0, totalCacheRead = 0;
 
   console.log(`\n${"=".repeat(60)}`);
   console.log(`  AutoAgent — Iteration ${iter}`);
@@ -241,15 +249,22 @@ async function runIteration(state: IterationState): Promise<void> {
 
     const response = await client.messages.create({
       model, max_tokens: maxTokens,
-      system: buildSystemPrompt(state),
+      system: [{
+        type: "text" as const,
+        text: buildSystemPrompt(state),
+        cache_control: { type: "ephemeral" as const },
+      }],
       tools: allTools,
       messages,
     });
 
-    // Track tokens
+    // Track tokens (including cache metrics)
     if (response.usage) {
       totalIn += response.usage.input_tokens;
       totalOut += response.usage.output_tokens;
+      const usage = response.usage as unknown as Record<string, unknown>;
+      if (typeof usage.cache_creation_input_tokens === "number") totalCacheCreate += usage.cache_creation_input_tokens;
+      if (typeof usage.cache_read_input_tokens === "number") totalCacheRead += usage.cache_read_input_tokens;
     }
 
     const content = response.content;
@@ -298,10 +313,12 @@ async function runIteration(state: IterationState): Promise<void> {
         turns, toolCalls: toolCounts, success: true,
         durationMs: Date.now() - startTime.getTime(),
         inputTokens: totalIn, outputTokens: totalOut,
+        cacheCreationTokens: totalCacheCreate || undefined,
+        cacheReadTokens: totalCacheRead || undefined,
       });
 
       const sha = await commitIteration(iter);
-      log(iter, `Committed: ${sha.slice(0, 8)} (${totalIn} in / ${totalOut} out tokens)`);
+      log(iter, `Committed: ${sha.slice(0, 8)} (${totalIn} in / ${totalOut} out, cache: ${totalCacheCreate} created, ${totalCacheRead} read)`);
 
       state.lastSuccessfulIteration = iter;
       state.lastFailedCommit = null;
@@ -334,6 +351,8 @@ async function runIteration(state: IterationState): Promise<void> {
     turns, toolCalls: toolCounts, success: true,
     durationMs: Date.now() - startTime.getTime(),
     inputTokens: totalIn, outputTokens: totalOut,
+    cacheCreationTokens: totalCacheCreate || undefined,
+    cacheReadTokens: totalCacheRead || undefined,
   });
 
   const sha = await commitIteration(iter);
