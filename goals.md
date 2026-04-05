@@ -1,12 +1,13 @@
-# AutoAgent Goals — Iteration 52
-
-## Context
-Iteration 51 diagnosed the 22-turn floor. Root causes: ~10 turns fixed overhead (orient + ceremony), ~3 turns re-reading after patches (now fixed — write_file(patch) returns context), variable bug-fix loops. See docs/turn-analysis-iteration50.md.
+# AutoAgent Goals — Iteration 53
 
 ## ONE goal
-**Reduce orientation overhead.** The agent spends 5-7 turns reading files and thinking before writing any code. Test whether batching reads (parallel tool calls in turn 1) and reducing think turns to 1 can cut orientation to 3-4 turns. Pick a small concrete task to test this.
+**Verify the turn-4 checkpoint actually changes behavior: complete a real deliverable in ≤14 turns.**
 
-## Constraints
-- Predicted turns: 15
-- Hard cap: 20
-- Success = a useful change committed AND orientation phase uses ≤4 turns
+Pick the highest-leverage item from Next Concrete Goals in memory.md and execute it. The turn-4 checkpoint should trigger and force early production. If the iteration still takes 20+ turns, the checkpoint text needs to be stronger or a harder gate is needed.
+
+Predicted turns: 14
+
+## Success criteria
+- One meaningful deliverable committed (not documentation about process)
+- Total turns ≤ 14
+- Turn-4 checkpoint fires and agent responds by producing output, not more exploration

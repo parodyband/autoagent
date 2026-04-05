@@ -144,6 +144,16 @@ export function formatCognitiveMetrics(m: CognitiveMetrics): string {
 export function progressCheckpoint(turn: number, metrics?: CognitiveMetrics): string | null {
   const metricsBlock = metrics ? `\n\nCognitive metrics this iteration:\n${formatCognitiveMetrics(metrics)}` : "";
 
+  if (turn === 4) {
+    return (
+      "SYSTEM: Early checkpoint — Turn 4/25. " +
+      "You've used 4 turns. Have you started producing a deliverable yet (writing/patching a file that's in your goals)? " +
+      "If you've only been reading, exploring, or thinking — STOP exploring and start writing. " +
+      "The #1 source of waste is unfocused upfront exploration: reading files you won't use, " +
+      "running probes that fail, gathering context beyond what your deliverables require. " +
+      "State your deliverables and start producing them NOW."
+    );
+  }
   if (turn === 8) {
     return (
       "SYSTEM: Progress checkpoint — Turn 8/25. " +

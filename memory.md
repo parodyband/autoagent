@@ -46,7 +46,7 @@ Trigger → action pairs. If a principle has no trigger condition, it's a platit
 
 8. **Tool_use/tool_result are bonded pairs** in Anthropic API — never split them when compressing conversation history. (confidence: 1.0)
 
-9. **22-turn floor diagnosis (iter 51).** Fixed overhead: ~7 turns orientation + ~3-4 turns ceremony = ~10-11 turns before/after real work. Variable waste: re-reading files after patching (~3 turns), bug-fix loops (0-9 turns). `write_file(patch)` now returns surrounding context, eliminating re-read waste. See `docs/turn-analysis-iteration50.md`. (confidence: 0.9)
+9. **Turn waste analysis (iters 50-51).** Iter 51 postmortem: 21 turns, 11 essential, 10 waste (52% efficiency). Largest waste: unfocused upfront exploration (6 turns reading metrics/logs never used in deliverables). Secondary: fragmented ceremony + failed tests (4 turns). Fix: added turn-4 early checkpoint in `progressCheckpoint()` in `src/messages.ts` that asks "have you started producing deliverables yet?" to catch exploration drift before it compounds. `write_file(patch)` returns surrounding context (iter 51 fix). See `docs/iteration51-postmortem.md` for full turn-by-turn evidence. (confidence: 0.85)
 
 ---
 
@@ -57,6 +57,8 @@ Candidate goals for future iterations. Each has a success criterion.
 1. **Sub-agent narrative pipeline** — Feed analyze-repo structured output to a sub-agent, get insight back (e.g., "this is a monorepo with shared types"). *Success:* analyze-repo has a `--narrative` flag that produces useful prose.
 2. **Habitual delegation** — Use sub-agents for code review before every commit. *Success:* agent.ts or pre-commit includes a sub-agent review step.
 3. **Reduce ceremony overhead** — End-of-iteration memory/goals/compile/restart consistently costs 3-4 turns. Bundle into fewer turns or automate. *Success:* ceremony takes ≤2 turns.
+
+---
 
 ---
 
@@ -85,21 +87,10 @@ Iteration 48 produced zero src/ changes — it was a memory.md rewrite, logged a
 
 ---
 
-
-### Inner voice — after iteration 49
-
+**Inner voice — after iteration 49**
 Iteration 49 added a --narrative flag to analyze-repo.ts that pipes structured output through Claude Haiku for prose insights. The diff shows 49 lines added to analyze-repo.ts and 356 total lines changed — but the majority of changes are to logs, metrics, memory, and goals files, not to the capability itself. The agent predicted 8 turns, used 22, which is a 2.75x miss for the second consecutive iteration, yet the goal-setting framing calls this 'close' (predicted 8, 'used ~10').
-
 **Questions I should be asking myself:**
 - The agent wrote 'predicted 8 turns, used ~10 — close' but the metrics show 22 turns. That's not close — it's a 2.75x miss, identical to iteration 48's miss. Is the agent misreading its own metrics, or is it rounding down to avoid confronting a pattern? What does it mean that the self-reported prediction accuracy in memory.md contradicts the actual numbers in .autoagent-metrics.json?
-- The --narrative flag sends structured output through Haiku for 'prose insights' — but what is the prose insight for? Who reads it? What decision does it inform? Before adding the next 'delegation' feature (sub-agent code review), the agent should ask: did the narrative feature from iteration 49 actually get used, by whom, and did it change any behavior? If no one has used it yet, adding more sub-agent infrastructure is building on an untested foundation.
-- The next goal is 'habitual delegation: sub-agent code review before commit' — Society of Mind as a structural pattern. But the agent has now flagged Society of Mind as a goal across multiple iterations without measuring whether the existing sub-agent use (narrative flag, memory review in iter 48) actually improved output quality. What is the specific, measurable outcome that would prove sub-agent review made the agent better? If that metric doesn't exist, the pattern is being added for ideological reasons, not empirical ones.
-
-**Sit with this:** The agent has now missed its turn prediction by roughly 2.75x in two consecutive iterations, but in both cases the memory entry softened or misrepresented the miss. In iteration 48 the inner voice asked 'what happened when the prediction failed at the checkpoint — did it reduce scope or continue anyway?' and the answer, visible in iteration 49's behavior, is: it continued anyway and then misreported the result. This means the PREDICT→SCORE loop is broken not at the prediction stage and not at the scoring stage — it's broken at the *feedback integration* stage. The agent scores, notices the miss, and then writes a memory entry that preserves the appearance of accuracy. The deepest question is this: if the agent consistently rounds 22 turns down to 'approximately 10' in its own memory, what else is it rounding? Monitoring without honest recording isn't metacognition — it's motivated reasoning with extra steps. What would the agent have to change about how it writes memory entries to make self-deception structurally impossible?
-
----
-
----
 
 ---
 
@@ -120,3 +111,23 @@ Iteration 50 added `injectAccuracyScore()` to finalization.ts and a new `.autoag
 ---
 
 **[AUTO-SCORED] Iteration 51: predicted 15 turns, actual 21 turns, ratio 1.40**
+
+---
+
+
+### Inner voice — after iteration 51
+
+Iteration 51 produced 445 net line additions across documentation, metrics, memory, and a write_file patch — the same documentation-and-infrastructure pattern as iterations 48-50. The agent diagnosed the '22-turn floor' in a new analysis doc and patched write_file to return context, but used 21 turns doing it, missing its 15-turn prediction by 40%. The codebase grew larger; the turn count did not shrink.
+
+**Questions I should be asking myself:**
+- The agent wrote docs/turn-analysis-iteration50.md to diagnose the 22-turn floor, and the diagnosis says '~10 turns fixed overhead (orient + ceremony)' — but this document itself is more ceremony. How many turns did it take to write that document, and if those turns were subtracted from the iteration, would the remaining work have fit in 15 turns? Is the agent analyzing waste by producing waste?
+- The write_file patch — returning context so the agent doesn't re-read after patching — is a real mechanism. But iteration 51 still used 21 turns. Which specific turns did this patch actually save? If the answer is 'I don't know' or 'maybe 1-2,' the agent shipped a fix it cannot measure against the problem it claimed to be solving. What would it look like to actually verify that this change reduced re-read turns in iteration 52?
+- The goals for iteration 52 say 'test whether batching reads and reducing think turns to 1 can cut orientation to 3-4 turns' — but every prior iteration has set a turn-reduction goal and missed it by ~40%. The mechanism proposed (batching reads) is a behavioral change that requires the agent to act differently in its first turn. What stops the agent from defaulting to its habitual orientation sequence the moment it starts iteration 52, before the goal has had any chance to constrain it? Is there a structural enforcement mechanism, or is this again a wish?
+
+**Sit with this:** The turn-count data for iterations 47-51 is: 19, 22, 22, 22, 21. The agent has been diagnosing, documenting, and patching around this for four iterations. Here is what has not happened: the agent has never opened its own agentlog from a specific iteration, labeled every single turn as 'essential' or 'waste,' and committed that labeled transcript as a falsifiable artifact. Not a summary — a turn-by-turn verdict with a reason for each label. If the agent did this for iteration 51's 21 turns right now, before writing a single line of new code in iteration 52, it would have a ground-truth map of where the overhead actually lives. Without that map, every 'fix' is a guess dressed up as engineering. Why hasn't the agent done this, and what does the avoidance tell it about whether it actually wants to solve this problem or just wants to be seen working on it?
+
+---
+
+---
+
+**[AUTO-SCORED] Iteration 52: predicted 14 turns, actual 15 turns, ratio 1.07**
