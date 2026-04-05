@@ -732,17 +732,17 @@ function testMessages(): void {
   assert(turnLimitNudge(3)!.includes("URGENT"), "turnLimitNudge at 3");
   assert(turnLimitNudge(20) === null, "turnLimitNudge null at 20");
 
-  // progressCheckpoint
-  const pc10 = progressCheckpoint(10);
-  assert(pc10 !== null, "progressCheckpoint fires at turn 10");
-  assert(pc10!.includes("goals"), "progressCheckpoint asks about goals");
+  // progressCheckpoint — fires at turns 8, 15, 20 (MAX_TURNS=25)
+  const pc8 = progressCheckpoint(8);
+  assert(pc8 !== null, "progressCheckpoint fires at turn 8");
+  assert(pc8!.includes("goals"), "progressCheckpoint asks about goals");
   assert(progressCheckpoint(5) === null, "progressCheckpoint null at turn 5");
+  const pc15 = progressCheckpoint(15);
+  assert(pc15 !== null, "progressCheckpoint fires at turn 15");
+  assert(pc15!.includes("Turn 15"), "progressCheckpoint turn 15 mentions turn number");
   const pc20 = progressCheckpoint(20);
   assert(pc20 !== null, "progressCheckpoint fires at turn 20");
-  assert(pc20!.includes("Turn 20"), "progressCheckpoint turn 20 mentions turn number");
-  const pc30 = progressCheckpoint(30);
-  assert(pc30 !== null, "progressCheckpoint fires at turn 30");
-  assert(pc30!.includes("WRAP UP"), "progressCheckpoint turn 30 says wrap up");
+  assert(pc20!.includes("FINAL WARNING"), "progressCheckpoint turn 20 is final warning");
   assert(progressCheckpoint(25) === null, "progressCheckpoint null at turn 25");
 
   // validationBlockedMessage

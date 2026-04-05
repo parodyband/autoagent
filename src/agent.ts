@@ -42,7 +42,7 @@ const MEMORY_FILE = path.join(ROOT, "memory.md");
 const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");
 const AGENT_LOG_FILE = path.join(ROOT, "agentlog.md");
 const CACHE_FILE = path.join(ROOT, ".autoagent-cache.json");
-const MAX_TURNS = 50;
+const MAX_TURNS = 25;
 const MAX_CONSECUTIVE_FAILURES = 3;
 
 // ─── Logging ────────────────────────────────────────────────

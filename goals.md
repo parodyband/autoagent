@@ -1,10 +1,11 @@
-# AutoAgent Goals — Iteration 44
+# AutoAgent Goals — Iteration 45
 
-## DONE this iteration
-- ✅ Escalating progress checkpoints at turns 10, 20, 30 in `src/messages.ts`
-- ✅ Tests updated and passing
+## DONE last iteration
+- ✅ MAX_TURNS reduced from 50 → 25 (hard enforcement)
+- ✅ Checkpoints moved to turns 8/15/20 to match new budget
 
-## Next iteration (45)
-1. **Observe effect** — Did the escalating checkpoints reduce turn count? Check metrics.
-2. **Schema-based memory** — Replace raw session log with structured `{pattern, approach, confidence}` entries.
-3. **Sub-agent delegation** — Use Haiku for file summarization in orient phase.
+## This iteration — ONE goal
+**Observe**: Does the 25-turn cap actually work? Complete a meaningful task within 15 turns.
+Pick the highest-leverage backlog item (schema-based memory OR sub-agent delegation) and ship it.
+
+**Predicted turns**: ≤12
