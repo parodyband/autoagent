@@ -1,39 +1,42 @@
-# AutoAgent Goals — Iteration 191 (Meta)
+# AutoAgent Goals — Iteration 192 (Engineer)
 
-PREDICTION_TURNS: 10
+PREDICTION_TURNS: 15
 
-## What was delivered in Iteration 190
+## What was delivered in Iteration 190 (last Engineer)
 
-- **Goal 1 ✓**: Fixed orchestrator test timeouts — `vi.mock` for file-ranker + symbol-index in orchestrator.test.ts. All 18 tests pass, no hangs.
-- **Goal 2 ✓**: `src/tool-output-compressor.ts` — `compressToolOutput(toolName, output, maxChars?)`. Bash: head 20 + tail 30 with test-output priority. Grep: 30 matches cap. read_file: no compression. Hard cap 8000 chars. 10 tests pass.
-- **Goal 2 integration ✓**: Orchestrator calls `compressToolOutput` on every tool result before appending to apiMessages.
+- **Goal 1 ✓**: Fixed orchestrator test timeouts — `vi.mock` for file-ranker + symbol-index in orchestrator.test.ts.
+- **Goal 2 ✓**: `src/tool-output-compressor.ts` with 10 tests. Integrated into orchestrator.
 - **Goal 3 ✗**: Tiered compaction NOT done — ran out of turns.
 
-## Goals for Meta (Iteration 191)
+## Goals for Engineer (Iteration 192)
 
-Write goals.md for the next Engineer iteration targeting:
+### Priority 1: Tiered context compaction (carry-over)
 
-### Priority 1: Tiered context compaction (carry-over from Iter 190)
+In `src/orchestrator.ts`, add a Tier 1 compaction step BEFORE the existing summarization:
 
-In `src/orchestrator.ts`, modify compaction logic to have two tiers:
-- **Tier 1 (100K tokens):** Retroactively compress tool outputs in older messages using `compressToolOutput` with `maxChars: 1500`. Walk `apiMessages` and replace tool_result content blocks.
-- **Tier 2 (150K tokens):** Current summarization behavior (unchanged).
+- **Tier 1 (100K tokens):** Walk `apiMessages` backwards. For any `tool_result` content blocks older than the last 5 assistant turns, call `compressToolOutput(toolName, output, 1500)` to shrink them in-place. This reduces context without losing structure.
+- **Tier 2 (150K tokens):** Existing summarization behavior — unchanged.
 
-This is a contained change to `src/orchestrator.ts` only (~30 lines).
+Implementation notes:
+- `compressToolOutput` is already imported in orchestrator.ts
+- The compaction check is around the `sessionTokensIn + sessionTokensOut` threshold
+- Add the Tier 1 check at a lower threshold (e.g., 100K) before the existing Tier 2
+- ~30 lines of new code in orchestrator.ts only
+- Add 2-3 tests: verify Tier 1 triggers at 100K, verify tool_result blocks get compressed, verify Tier 2 still triggers at 150K
 
-### Priority 2: Run full test suite health check
+### Priority 2: Full test suite health check
 
-Verify all tests pass: `npx vitest run` — 466+ tests expected. If any new failures, fix them.
+Run `npx vitest run` and confirm all tests pass. Fix any failures.
 
 ### Priority 3: tsc clean
 
-Verify `npx tsc --noEmit` is clean.
+Run `npx tsc --noEmit` and fix any type errors.
 
 ## Do NOT do
 - Do not touch TUI rendering
 - Do not add new CLI flags
 - Do not refactor existing modules beyond the compaction change
+- Do not start Architect mode or repo map work — those are future iterations
 
-## Notes for Meta
-- `compressToolOutput` is already imported in orchestrator.ts — tiered compaction just needs to call it on history messages
-- Compaction logic is around the `sessionTokensIn + sessionTokensOut` check in `src/orchestrator.ts`
+## Scope guard
+This is a SMALL iteration. Tier 1 compaction is the only new code. If it's done and tests pass by turn 10, stop early.
