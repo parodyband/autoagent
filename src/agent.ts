@@ -143,6 +143,7 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
     cache: ctx.cache,
     timing: ctx.timing,
     rootDir: ROOT,
+    agentHome: ROOT,
     metricsFile: METRICS_FILE,
     log: (msg: string) => log(ctx.iter, msg),
     logger,
@@ -241,8 +242,8 @@ async function runIteration(state: IterationState, workDir: string = ROOT): Prom
   await tagPreIteration(ctx.iter);
   saveExpertState(ROOT, expert.name, ctx.iter);
 
-  // Orient: detect changes since last iteration
-  const orientReport = await orient();
+  // Orient: detect changes since last iteration (run in target repo if --repo)
+  const orientReport = await orient(1000, true, workDir);
   const orientationText = formatOrientation(orientReport);
 
   // Expert gets its own system prompt

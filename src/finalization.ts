@@ -66,6 +66,8 @@ export interface FinalizationCtx {
   cache: ToolCache;
   timing: ToolTimingTracker;
   rootDir: string;
+  /** AutoAgent's own directory (where memory.md, goals.md, metrics live). Defaults to rootDir. */
+  agentHome?: string;
   metricsFile: string;
   log: (msg: string) => void;
   logger?: Logger;
@@ -97,11 +99,11 @@ export function parsePredictedTurns(rootDir: string): number | null {
   return null;
 }
 
-function getRecentAccuracyRatios(metricsFile: string, goalsDir: string): number[] {
+function getRecentAccuracyRatios(metricsFile: string, agentHome: string): number[] {
   // We can only check the current iteration's ratio since goals.md changes each iteration.
   // For consecutive-miss detection, we store ratios in the accuracy lines already in memory.
   // This function reads the last N auto-scored lines from memory.md.
-  const memFile = path.join(goalsDir, "memory.md");
+  const memFile = path.join(agentHome, "memory.md");
   if (!existsSync(memFile)) return [];
   const content = readFileSync(memFile, "utf-8");
   const ratios: number[] = [];
@@ -116,9 +118,10 @@ function getRecentAccuracyRatios(metricsFile: string, goalsDir: string): number[
 function injectAccuracyScore(ctx: FinalizationCtx): void {
   // Prefer pre-captured prediction (set at iteration start, before goals.md gets rewritten)
   // Fall back to parsing current goals.md (which may already contain next iteration's goals)
-  const predicted = ctx.predictedTurns ?? parsePredictedTurns(ctx.rootDir);
+  const stateDir = ctx.agentHome ?? ctx.rootDir;
+  const predicted = ctx.predictedTurns ?? parsePredictedTurns(stateDir);
   const actual = ctx.turns;
-  const memFile = path.join(ctx.rootDir, "memory.md");
+  const memFile = path.join(stateDir, "memory.md");
   if (!existsSync(memFile)) return;
 
   let content = readFileSync(memFile, "utf-8");
@@ -130,7 +133,7 @@ function injectAccuracyScore(ctx: FinalizationCtx): void {
     line = `**[AUTO-SCORED] Iteration ${ctx.iter}: predicted ${predicted} turns, actual ${actual} turns, ratio ${ratio}**`;
 
     // Check for consecutive misses (including this one)
-    const pastRatios = getRecentAccuracyRatios(ctx.metricsFile, ctx.rootDir);
+    const pastRatios = getRecentAccuracyRatios(ctx.metricsFile, stateDir);
     const allRatios = [...pastRatios, actual / predicted];
     const recentMisses = allRatios.slice(-3).filter(r => r > 1.5);
     if (recentMisses.length >= 2) {

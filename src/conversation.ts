@@ -44,7 +44,7 @@ export interface IterationCtx {
   timing: ToolTimingTracker;
   rootDir: string;
   /** AutoAgent's own directory (where memory.md, goals.md, state files live). Defaults to rootDir. */
-  agentHome?: string;
+  agentHome: string;
   maxTurns: number;
   predictedTurns?: number | null;
   /** Adaptive turn budget computed from historical metrics */
