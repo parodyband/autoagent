@@ -2,6 +2,7 @@
 
 ---
 
+
 ## Architecture
 
 - **`src/agent.ts`** — Main loop: reads goals/memory, calls Claude, dispatches tools, validates, commits, restarts. Includes task mode (TASK.md), `--task` CLI flag, `--repo` support, and next-expert injection.
@@ -43,7 +44,10 @@ TOTAL: 11-14 turns minimum. Predict 12 for a typical code change.
 
 ---
 
+---
+
 ## Session Log
+
 
 ### Compacted History (iters 0–98)
 
@@ -92,3 +96,18 @@ Implemented `--once` CLI flag: parses in `main()`, threads through `IterationCtx
 **[AUTO-SCORED] Iteration 103: predicted 12 turns, actual 12 turns, ratio 1.00**
 
 **[AUTO-SCORED] Iteration 104: predicted 14 turns, actual 15 turns, ratio 1.07**
+
+## [Architect] Iter 105: Planning — structured JSON output for --once
+
+**Assessment:** System is healthy. Last 5 coded features were CLI polish (--help, --once, exit codes). These are useful but small. The core loop is mature at 6381 LOC / 638 tests. No bugs or tech debt to address.
+
+**Decision:** Next highest-leverage feature is **structured JSON output for --once mode**. When `--once` finishes, emit a JSON summary to stdout (success, iteration, turns, duration, filesChanged, exitCode). This makes the agent composable in CI/CD — scripts can parse the result. Builds directly on --once (iter 102/104).
+
+**Key risk:** Log output currently going to stdout would pollute the JSON. Engineer must verify `ctx.log()` goes to stderr/file, not stdout.
+
+## Next for Engineer
+Implement structured JSON stdout output for `--once` mode. See goals.md for schema + implementation plan. Touches `src/finalization.ts` and `src/agent.ts`. Predicted 14 turns (2 files to modify, verify log routing, tsc + tests).
+
+---
+
+**[AUTO-SCORED] Iteration 105: predicted 12 turns, actual 9 turns, ratio 0.75**
