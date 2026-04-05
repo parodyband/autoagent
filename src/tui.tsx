@@ -23,6 +23,15 @@ import { execSync } from "child_process";
 import { runInit } from "./init-command.js";
 import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
 import { shouldShowWelcome } from "./welcome.js";
+import {
+  createPlan,
+  executePlan,
+  formatPlan,
+  loadPlan,
+  savePlan,
+  type Task,
+  type TaskPlan,
+} from "./task-planner.js";
 
 // Parse args
 let workDir = process.cwd();
@@ -265,6 +274,42 @@ function PlanDisplay({ plan }: { plan: EditPlan }) {
           <Text color="gray" dimColor>Read first: {plan.contextFiles.join(", ")}</Text>
         </Box>
       )}
+    </Box>
+  );
+}
+
+const TASK_STATUS_ICON: Record<Task["status"], string> = {
+  pending: "⏳",
+  "in-progress": "🔄",
+  done: "✅",
+  failed: "❌",
+};
+
+/** Task plan display — shows plan tasks with live status. */
+function TaskPlanDisplay({ plan }: { plan: TaskPlan }) {
+  const done = plan.tasks.filter((t) => t.status === "done").length;
+  const failed = plan.tasks.filter((t) => t.status === "failed").length;
+  return (
+    <Box flexDirection="column" marginTop={1} borderStyle="round" borderColor="blue" paddingX={1}>
+      <Text bold color="blue">📋 Plan: {plan.goal}</Text>
+      <Text color="gray">  {done}/{plan.tasks.length} done{failed > 0 ? `, ${failed} failed` : ""}</Text>
+      {plan.tasks.map((task) => {
+        const icon = TASK_STATUS_ICON[task.status];
+        const color =
+          task.status === "done" ? "green" :
+          task.status === "failed" ? "red" :
+          task.status === "in-progress" ? "yellow" : "gray";
+        const deps = task.dependsOn.length > 0 ? ` (deps: ${task.dependsOn.join(", ")})` : "";
+        return (
+          <Box key={task.id} flexDirection="column" marginLeft={1}>
+            <Text>
+              {icon} <Text color={color}>[{task.id}]</Text> {task.title}{deps}
+            </Text>
+            <Text color="gray" dimColor>    {task.description}</Text>
+            {task.error ? <Text color="red">    Error: {task.error}</Text> : null}
+          </Box>
+        );
+      })}
     </Box>
   );
 }
@@ -562,6 +607,9 @@ function App() {
           "  /compact  — Manually compact conversation context",
           "  /diff     — Show uncommitted git changes",
           "  /undo     — Revert the last autoagent commit",
+          "  /plan Q   — Create and execute a task plan for Q",
+          "  /plan list — Show saved plans",
+          "  /plan resume — Resume the most recent incomplete plan",
           "  /export   — Export conversation to markdown (optional filename arg)",
           "  /exit     — Quit AutoAgent",
         ].join("\n"),
@@ -767,6 +815,85 @@ function App() {
       } else {
         setMessages(prev => [...prev, { role: "assistant", content: "Invalid session number." }]);
       }
+      return;
+    }
+
+    // /plan commands
+    if (trimmed === "/plan" || trimmed === "/plan help") {
+      setMessages(prev => [...prev, { role: "assistant", content: "Usage:\n  /plan <description> — Create and execute a task plan\n  /plan list — Show saved plans\n  /plan resume — Resume most recent incomplete plan" }]);
+      return;
+    }
+    if (trimmed === "/plan list") {
+      const saved = loadPlan(workDir);
+      if (!saved) {
+        setMessages(prev => [...prev, { role: "assistant", content: "No saved plans. Use /plan <description> to create one." }]);
+      } else {
+        const done = saved.tasks.filter(t => t.status === "done").length;
+        const failed = saved.tasks.filter(t => t.status === "failed").length;
+        const status = done === saved.tasks.length ? "complete" : `${done}/${saved.tasks.length} done${failed ? `, ${failed} failed` : ""}`;
+        setMessages(prev => [...prev, { role: "assistant", content: `Saved plan: "${saved.goal}" — ${status}\nCreated: ${new Date(saved.createdAt).toLocaleString()}\n\n${formatPlan(saved)}` }]);
+      }
+      return;
+    }
+    if (trimmed === "/plan resume") {
+      const saved = loadPlan(workDir);
+      if (!saved) {
+        setMessages(prev => [...prev, { role: "assistant", content: "No saved plans to resume. Use /plan <description> to create one." }]);
+        return;
+      }
+      const pending = saved.tasks.filter(t => t.status === "pending" || t.status === "failed");
+      if (pending.length === 0) {
+        setMessages(prev => [...prev, { role: "assistant", content: "Plan is already complete. Use /plan <description> to create a new one." }]);
+        return;
+      }
+      // Reset failed tasks to pending for retry
+      saved.tasks.forEach(t => { if (t.status === "failed") t.status = "pending"; });
+      setMessages(prev => [...prev, { role: "assistant", content: `Resuming plan: "${saved.goal}" (${pending.length} tasks remaining)` }]);
+      setLoading(true);
+      setStatus("Executing plan...");
+      try {
+        const result = await executePlan(saved, async (task) => {
+          const res = await orchestratorRef.current!.send(task.description);
+          return res.text ?? "done";
+        }, (_task, plan) => {
+          setMessages(prev => [...prev, { role: "assistant", content: formatPlan(plan) }]);
+        });
+        savePlan(result, workDir);
+        setMessages(prev => [...prev, { role: "assistant", content: `Plan complete.\n\n${formatPlan(result)}` }]);
+      } catch (err) {
+        setMessages(prev => [...prev, { role: "assistant", content: `Plan execution error: ${err instanceof Error ? err.message : String(err)}` }]);
+      }
+      setLoading(false);
+      setStatus("");
+      return;
+    }
+    if (trimmed.startsWith("/plan ")) {
+      const description = trimmed.slice(6).trim();
+      if (!description) {
+        setMessages(prev => [...prev, { role: "assistant", content: "Usage: /plan <description>" }]);
+        return;
+      }
+      setLoading(true);
+      setStatus("Creating plan...");
+      try {
+        const projectContext = `Working directory: ${workDir}`;
+        const plan = await createPlan(description, projectContext);
+        setMessages(prev => [...prev, { role: "assistant", content: `Created plan:\n\n${formatPlan(plan)}` }]);
+        savePlan(plan, workDir);
+        setStatus("Executing plan...");
+        const result = await executePlan(plan, async (task) => {
+          const res = await orchestratorRef.current!.send(task.description);
+          return res.text ?? "done";
+        }, (_task, updatedPlan) => {
+          setMessages(prev => [...prev, { role: "assistant", content: formatPlan(updatedPlan) }]);
+        });
+        savePlan(result, workDir);
+        setMessages(prev => [...prev, { role: "assistant", content: `Plan complete.\n\n${formatPlan(result)}` }]);
+      } catch (err) {
+        setMessages(prev => [...prev, { role: "assistant", content: `Plan error: ${err instanceof Error ? err.message : String(err)}` }]);
+      }
+      setLoading(false);
+      setStatus("");
       return;
     }
 
