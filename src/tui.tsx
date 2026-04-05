@@ -14,6 +14,7 @@ import path from "path";
 import "dotenv/config";
 import { Orchestrator } from "./orchestrator.js";
 import { listSessions, type SessionInfo } from "./session-store.js";
+import type { EditPlan } from "./architect-mode.js";
 
 // Parse args
 let workDir = process.cwd();
@@ -188,6 +189,16 @@ function App() {
       onText: (delta) => {
         // Append delta to streaming buffer for real-time display
         setStreamBuffer(prev => prev + delta);
+      },
+      onPlan: (plan: EditPlan) => {
+        const steps = plan.steps
+          .map((s, i) => {
+            const icon = s.action === "create" ? "✚" : s.action === "delete" ? "✖" : "✎";
+            return `  ${i + 1}. ${icon} ${s.file}: ${s.description}`;
+          })
+          .join("\n");
+        const content = `📋 Plan: ${plan.summary}\n${steps}`;
+        setMessages(prev => [...prev, { role: "assistant", content, model: "haiku" }]);
       },
     });
     orchestratorRef.current = orch;

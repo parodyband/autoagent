@@ -26,6 +26,12 @@ import {
   loadSession,
   cleanOldSessions,
 } from "./session-store.js";
+import {
+  needsArchitectMode,
+  generateEditPlan,
+  formatPlanForEditor,
+  type EditPlan,
+} from "./architect-mode.js";
 
 // ─── Constants ────────────────────────────────────────────────
 
@@ -68,6 +74,8 @@ export interface OrchestratorOptions {
   onText?: (delta: string) => void;
   /** If provided, resume an existing session instead of creating a new one */
   resumeSessionPath?: string;
+  /** Called when an architect plan is generated */
+  onPlan?: (plan: EditPlan) => void;
 }
 
 export interface OrchestratorResult {
@@ -428,10 +436,31 @@ export class Orchestrator {
       }
     }
 
+    // 3b. Architect mode: generate plan for complex tasks
+    let planInjection: Anthropic.MessageParam | undefined;
+    if (needsArchitectMode(userMessage)) {
+      this.opts.onStatus?.("Planning...");
+      const caller = makeSimpleCaller(this.client);
+      const plan = await generateEditPlan(userMessage, this.repoFingerprint, caller);
+      if (plan.steps.length > 0) {
+        this.opts.onPlan?.(plan);
+        const planText = formatPlanForEditor(plan);
+        if (planText) {
+          // Inject as prefilled assistant message so the agent sees its own plan
+          planInjection = { role: "assistant", content: planText };
+        }
+      }
+    }
+
     // 4. Add user message to history and persist
     const userMsg: Anthropic.MessageParam = { role: "user", content: effectiveMessage };
     this.apiMessages.push(userMsg);
     if (this.sessionPath) saveMessage(this.sessionPath, userMsg);
+
+    // 4b. Inject plan as prefilled assistant message if architect mode generated one
+    if (planInjection) {
+      this.apiMessages.push(planInjection);
+    }
 
     this.opts.onStatus?.("Thinking...");
 

@@ -73,3 +73,5 @@ System is healthy. 4 product features shipped in 6 iterations since mission chan
 - After that: rich repo map (tree-sitter), then TUI windowed rendering.
 
 **[AUTO-SCORED] Iteration 185: predicted 8 turns, actual 12 turns, ratio 1.50**
+
+**[AUTO-SCORED] Iteration 186: predicted 18 turns, actual 25 turns, ratio 1.39**
