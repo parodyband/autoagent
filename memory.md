@@ -34,10 +34,10 @@
 **Shipped**: Streaming ✓ | Cost display ✓ | Context compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓
 
 **Gaps (prioritized)**:
-1. **`--continue` CLI flag** — Auto-resume most recent session
-2. **Memory write-back tool** — Wire saveToProjectMemory as agent-callable tool
-3. **Rich repo map** — tree-sitter AST instead of keyword-based `rankFiles()`
-4. **Architect mode** — Two-phase plan→edit (Aider pattern)
+1. ~~`--continue` CLI flag~~ ✓ (iter 185)
+2. ~~Memory write-back tool~~ ✓ (iter 185)
+3. **Architect mode** — Two-phase plan→edit (Aider pattern) ← NEXT
+4. **Rich repo map** — tree-sitter AST instead of keyword-based `rankFiles()`
 5. **TUI windowed rendering** — VirtualMessageList for long sessions
 
 ---
@@ -65,3 +65,11 @@ System is healthy. 4 product features shipped in 6 iterations since mission chan
 - Next: rich repo map (tree-sitter) or Architect mode.
 
 **[AUTO-SCORED] Iteration 184: predicted 15 turns, actual 23 turns, ratio 1.53**
+
+## [Architect] Iteration 186 Assessment
+- Iter 185 delivered cleanly: --continue flag + save_memory tool, both tested, tsc clean.
+- System prompt already references save_memory (line 145 of orchestrator.ts) — no gap there.
+- **Next priority: Architect mode** (plan→edit two-phase). This is the highest-leverage remaining feature — separates reasoning from execution, reduces errors on complex multi-file tasks. Spec in goals.md.
+- After that: rich repo map (tree-sitter), then TUI windowed rendering.
+
+**[AUTO-SCORED] Iteration 185: predicted 8 turns, actual 12 turns, ratio 1.50**
