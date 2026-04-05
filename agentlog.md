@@ -1,106 +1,3 @@
-[2026-04-05T19:04:51.716Z] iter=322 turn=1 INFO: Turn 1/25
-[2026-04-05T19:04:54.238Z] iter=322 turn=1 INFO: Agent: I'll start by reading the current state of the codebase and goals.
-[2026-04-05T19:04:54.239Z] iter=322 turn=1 INFO: read_scratchpad: 7 chars
-[2026-04-05T19:04:54.239Z] iter=322 turn=1 INFO: read_file: goals.md
-[2026-04-05T19:04:54.240Z] iter=322 turn=1 INFO:   -> ok (3023 chars)
-[2026-04-05T19:04:54.240Z] iter=322 turn=2 INFO: Turn 2/25
-[2026-04-05T19:04:57.305Z] iter=322 turn=2 INFO: read_file: src/tree-sitter-map.ts
-[2026-04-05T19:04:57.306Z] iter=322 turn=2 INFO:   -> ok (20871 chars)
-[2026-04-05T19:04:57.306Z] iter=322 turn=2 INFO: $ grep -n "compact\|compaction\|TIER\|tier2\|T2\|summarize\|summarization" src/orchestrator.ts | head -60
-[2026-04-05T19:04:57.320Z] iter=322 turn=2 INFO:   -> exit=0 (3526 chars)
-[2026-04-05T19:04:57.320Z] iter=322 turn=3 INFO: Turn 3/25
-[2026-04-05T19:05:01.401Z] iter=322 turn=3 INFO: $ grep -n "private async compact\|compact():\|SUMMARIZE\|You are a helpful\|Summarize\|summarize\|compaction prompt\|messages to summarize\|old messages" src/orchestrator.ts | head -40
-[2026-04-05T19:05:01.404Z] iter=322 turn=3 INFO: $ grep -n "loadRepoMapCache\|saveRepoMapCache\|updateRepoMapIncremental\|repo-map.json\|autoagent-cache" src/*.ts 2>/dev/null | head -20
-[2026-04-05T19:05:01.418Z] iter=322 turn=3 INFO:   -> exit=0 (687 chars)
-[2026-04-05T19:05:01.437Z] iter=322 turn=3 INFO:   -> exit=0 (77 chars)
-[2026-04-05T19:05:01.437Z] iter=322 turn=4 INFO: Turn 4/25
-[2026-04-05T19:05:06.215Z] iter=322 turn=4 INFO: think: I have enough context. Let me plan my deliverables:
-
-1. **Goal 1**: Add `saveRepoMapCache`, `loadRepoMapCache`, `updateR...
-[2026-04-05T19:05:06.216Z] iter=322 turn=5 INFO: Turn 5/25
-[2026-04-05T19:05:10.003Z] iter=322 turn=5 INFO: read_file: src/orchestrator.ts
-[2026-04-05T19:05:10.004Z] iter=322 turn=5 INFO:   -> ok (1794 chars)
-[2026-04-05T19:05:10.005Z] iter=322 turn=5 INFO: $ grep -n "repoMap\|buildRepoMap\|formatRepoMap\|rankSymbols\|fileWatcher\|onFileChange\|reindex" src/orchestrator.ts | head -40
-[2026-04-05T19:05:10.019Z] iter=322 turn=5 INFO:   -> exit=0 (1416 chars)
-[2026-04-05T19:05:10.020Z] iter=322 turn=6 INFO: Turn 6/25
-[2026-04-05T19:05:12.051Z] iter=322 turn=6 INFO: read_file: src/orchestrator.ts
-[2026-04-05T19:05:12.052Z] iter=322 turn=6 INFO:   -> ok (2324 chars)
-[2026-04-05T19:05:12.053Z] iter=322 turn=7 INFO: Turn 7/25
-[2026-04-05T19:05:15.915Z] iter=322 turn=7 INFO: Agent: **Goal 1 (Repo map cache): NOT STARTED**
-**Goal 2 (Structured compaction): NOT STARTED**
-
-I've been reading too much. Starting implementation now.
-[2026-04-05T19:05:15.915Z] iter=322 turn=7 INFO: write_file: src/tree-sitter-map.ts (patch)
-[2026-04-05T19:05:15.916Z] iter=322 turn=7 INFO:   -> ok: Patched src/tree-sitter-map.ts: -2 +2 lines
-
-Context after patch:
-8 |  * Companion to: symbol-index.ts (regex-based, kept for non-TS files)
-9 |  */
-10 | 
-11 | import { readFileSync, writeFileSync, mkdirSync, statSync } from "fs";
-12 | import path from "path";
-13 | import { createRequire } from "module";
-14 | 
-15 | const require = createRequire(import.meta.url);
-[2026-04-05T19:05:15.917Z] iter=322 turn=8 INFO: Turn 8/25
-[2026-04-05T19:05:18.398Z] iter=322 turn=8 INFO: Agent: Now add the cache interface and functions to `tree-sitter-map.ts` (at the end):
-[2026-04-05T19:05:18.399Z] iter=322 turn=8 INFO: read_file: src/tree-sitter-map.ts
-[2026-04-05T19:05:18.399Z] iter=322 turn=8 INFO:   -> ok (154 chars)
-[2026-04-05T19:05:18.400Z] iter=322 turn=9 INFO: Turn 9/25
-[2026-04-05T19:05:22.752Z] iter=322 turn=9 INFO: write_file: src/tree-sitter-map.ts (patch)
-[2026-04-05T19:05:22.754Z] iter=322 turn=9 INFO:   -> ok: Patched src/tree-sitter-map.ts: -4 +9 lines
-
-Context after patch:
-37 |   parseError?: string;
-38 | }
-39 | 
-40 | export interface RepoMap {
-41 |   files: ParsedFile[];
-42 |   builtAt: number; // Date.now()
-43 | }
-44 | 
-45 | export interface RepoMapCache {
-46 |   generatedAt: number;           // Date.now() when cache was written
-47 |   files: Array<ParsedFile & { lastModified: number }>; // mtime per file
-48 | }
-49 | 
-50 | // ─── Tree-sitter setup ───────────────────────────────────────
-51 | 
-[2026-04-05T19:05:22.755Z] iter=322 turn=10 INFO: Turn 10/25
-[2026-04-05T19:05:24.543Z] iter=322 turn=10 INFO: Agent: Now append the cache functions at the end of the file:
-[2026-04-05T19:05:24.543Z] iter=322 turn=10 INFO: $ tail -5 src/tree-sitter-map.ts
-[2026-04-05T19:05:24.550Z] iter=322 turn=10 INFO:   -> exit=0 (125 chars)
-[2026-04-05T19:05:24.551Z] iter=322 turn=11 INFO: Turn 11/25
-[2026-04-05T19:05:41.491Z] iter=322 turn=11 INFO: write_file: src/tree-sitter-map.ts (append)
-[2026-04-05T19:05:41.492Z] iter=322 turn=11 INFO:   -> ok: Appended 3960 chars to src/tree-sitter-map.ts
-[2026-04-05T19:05:41.492Z] iter=322 turn=12 INFO: Turn 12/25
-[2026-04-05T19:05:44.805Z] iter=322 turn=12 INFO: Agent: Now wire the cache into `orchestrator.ts`. First update the import:
-[2026-04-05T19:05:44.805Z] iter=322 turn=12 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T19:05:44.806Z] iter=322 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
-
-Context after patch:
-17 | import { compressToolOutput } from "./tool-output-compressor.js";
-18 | import { fingerprintRepo } from "./repo-context.js";
-19 | import { rankFiles } from "./file-ranker.js";
-20 | import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap, saveRepoMapCache, loadRepoMapCache, getStaleFiles, updateRepoMapIncremental, cacheToRepoMap } from "./tree-sitter-map.js";
-21 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
-22 | import { runVerification, formatVerificationResults } from "./verification.js";
-23 | import { createDefaultRegistry } from "./tool-registry.js";
-[2026-04-05T19:05:44.807Z] iter=322 turn=13 INFO: Turn 13/25
-[2026-04-05T19:05:49.324Z] iter=322 turn=13 INFO: Agent: I've patched `tree-sitter-map.ts` (added cache types + functions) and updated the import in `orchestrator.ts`. Now finishing the wiring quickly.
-[2026-04-05T19:05:49.325Z] iter=322 turn=13 INFO: read_file: src/orchestrator.ts
-[2026-04-05T19:05:49.325Z] iter=322 turn=13 INFO:   -> ok (2447 chars)
-[2026-04-05T19:05:49.325Z] iter=322 turn=14 INFO: Turn 14/25
-[2026-04-05T19:05:56.384Z] iter=322 turn=14 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T19:05:56.386Z] iter=322 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -15 +29 lines
-
-Context after patch:
-232 |   // Only run on source-like dirs (skip /tmp and similar system paths)
-233 |   let repoMapBlock = "";
-234 |   const isSourceDir = rankedFiles.some(f => f.reason.includes("entry point") || f.reason.includes("large module") || f.reason.includes("recently modified"));
-235 |   if (isSourceDir) {
-236 |     try {
-237 |       const rankedPaths = rankedFiles.map(f => f.path);
 238 |       // Try incremental cache first
 239 |       const cache = loadRepoMapCache(workDir);
 240 |       let repoMap: import("./tree-sitter-map.js").RepoMap;
@@ -1099,3 +996,57 @@ Context after patch:
 [2026-04-05T19:20:42.180Z] iter=328 turn=19 INFO: Tool timing stats
 [2026-04-05T19:20:48.444Z] iter=328 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 328: predicted 20 turns, actual 19 turns, ratio 0.95**
 [2026-04-05T19:20:48.466Z] iter=328 turn=19 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T19:20:48.501Z] iter=328 turn=19 INFO: Committed: 30362f91 (31 in / 11202 out, cache: 22097 created, 320078 read)
+[2026-04-05T19:20:48.501Z] iter=328 turn=19 INFO: Restarting as iteration 329...
+[2026-04-05T19:20:48.709Z] iter=329 INFO: Cache restored: 53/53 entries (0 stale)
+[2026-04-05T19:20:48.712Z] iter=329 INFO: Turn budget: 11/25 (calibration=0.95x, predicted=8)
+[2026-04-05T19:20:48.712Z] iter=329 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T19:20:48.886Z] iter=329 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T19:20:48.887Z] iter=329 turn=1 INFO: Turn 1/25
+[2026-04-05T19:20:52.810Z] iter=329 turn=1 INFO: Agent: 
+
+I'll start by reviewing the current state of the product, then research what other coding agents are doing, and finally write goals for the next Engineer iteration.
+[2026-04-05T19:20:52.811Z] iter=329 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -80
+[2026-04-05T19:20:52.813Z] iter=329 turn=1 INFO: list_files: src (depth=2)
+[2026-04-05T19:20:52.815Z] iter=329 turn=1 INFO:   -> ok (2 dirs, 117 files)
+[2026-04-05T19:20:52.816Z] iter=329 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -30
+[2026-04-05T19:20:52.819Z] iter=329 turn=1 INFO:   -> exit=0 (1679 chars)
+[2026-04-05T19:21:05.086Z] iter=329 turn=1 INFO:   -> exit=0 (2549 chars)
+[2026-04-05T19:21:05.086Z] iter=329 turn=2 INFO: Turn 2/25
+[2026-04-05T19:21:10.522Z] iter=329 turn=2 INFO: Agent: 
+
+You're right. My deliverable is `goals.md` for the next Engineer iteration. Let me do focused research and write it.
+[2026-04-05T19:21:10.522Z] iter=329 turn=2 INFO: web_search: "Claude Code coding agent 2025 streaming tool results UX techniques"
+[2026-04-05T19:21:10.537Z] iter=329 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'streaming\|onChunk\|onToken\|partial' src/tui.tsx | head -20
+[2026-04-05T19:21:10.538Z] iter=329 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'timeout\|stall\|heartbeat\|abort' src/orchestrator.ts | head -20
+[2026-04-05T19:21:10.543Z] iter=329 turn=2 INFO:   -> exit=0 (820 chars)
+[2026-04-05T19:21:10.545Z] iter=329 turn=2 INFO:   -> exit=0 (38 chars)
+[2026-04-05T19:21:11.621Z] iter=329 turn=2 INFO:   -> 5 results
+[2026-04-05T19:21:11.622Z] iter=329 turn=3 INFO: Turn 3/25
+[2026-04-05T19:21:22.144Z] iter=329 turn=3 INFO: think: Let me look at that Medium article about 5 techniques from Claude Code for ideas, and also check what capabilities we're...
+[2026-04-05T19:21:22.144Z] iter=329 turn=4 INFO: Turn 4/25
+[2026-04-05T19:21:25.676Z] iter=329 turn=4 INFO: Agent: 
+
+Goals.md is NOT STARTED. Writing it now.
+[2026-04-05T19:21:25.676Z] iter=329 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'timeout\|TIMEOUT\|kill\|abort\|signal' src/tools/bash.ts | head -15
+[2026-04-05T19:21:25.678Z] iter=329 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'abort\|cancel\|interrupt\|ctrl.c\|SIGINT' src/orchestrator.ts | head -15
+[2026-04-05T19:21:25.682Z] iter=329 turn=4 INFO:   -> exit=0 (609 chars)
+[2026-04-05T19:21:25.687Z] iter=329 turn=4 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:21:25.687Z] iter=329 turn=5 INFO: Turn 5/25
+[2026-04-05T19:21:30.167Z] iter=329 turn=5 INFO: Agent: Good — bash tool already has timeout/stall protection. The orchestrator itself has no abort/cancel. Let me check for another high-value gap.
+[2026-04-05T19:21:30.167Z] iter=329 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'retry\|RETRY\|retryCount\|maxRetries' src/orchestrator.ts | head -15
+[2026-04-05T19:21:30.169Z] iter=329 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'cost\|usage\|inputTokens\|outputTokens\|totalCost' src/tui.tsx | head -20
+[2026-04-05T19:21:30.180Z] iter=329 turn=5 INFO:   -> exit=0 (419 chars)
+[2026-04-05T19:21:30.180Z] iter=329 turn=5 INFO:   -> exit=0 (1160 chars)
+[2026-04-05T19:21:30.180Z] iter=329 turn=6 INFO: Turn 6/25
+[2026-04-05T19:21:53.411Z] iter=329 turn=6 INFO: Agent: 
+
+Writing goals.md now — this is an Architect iteration, my deliverable is goals not src changes.
+[2026-04-05T19:21:53.411Z] iter=329 turn=6 INFO: write_file: goals.md (write)
+[2026-04-05T19:21:53.412Z] iter=329 turn=6 INFO:   -> ok: Updated goals.md (3434 chars, +22 lines delta)
+[2026-04-05T19:21:53.413Z] iter=329 turn=7 INFO: Turn 7/25
+[2026-04-05T19:21:58.137Z] iter=329 turn=7 INFO: save_memory: "[Architect] Iteration 329 priorities"
+[2026-04-05T19:21:58.137Z] iter=329 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T19:21:58.137Z] iter=329 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
+[2026-04-05T19:21:59.183Z] iter=329 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:21:59.183Z] iter=329 turn=8 INFO: Turn 8/25

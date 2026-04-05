@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775416551878,
+  "generatedAt": 1775416856420,
   "files": [
     {
       "path": "src/cli.ts",
@@ -1055,6 +1055,68 @@
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
       "lastModified": 1775401928442.4028
+    },
+    {
+      "path": "src/export-helper.ts",
+      "exports": [
+        {
+          "name": "ExportStats",
+          "kind": "interface",
+          "line": 4,
+          "exported": true
+        },
+        {
+          "name": "ExportMessage",
+          "kind": "interface",
+          "line": 10,
+          "exported": true
+        },
+        {
+          "name": "buildExportContent",
+          "kind": "function",
+          "line": 130,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        }
+      ],
+      "lastModified": 1775416762488.8557
+    },
+    {
+      "path": "src/tool-recovery.ts",
+      "exports": [
+        {
+          "name": "RecoveryHint",
+          "kind": "interface",
+          "line": 19,
+          "exported": true
+        },
+        {
+          "name": "enhanceToolError",
+          "kind": "function",
+          "line": 374,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        }
+      ],
+      "lastModified": 1775416738533.5273
     }
   ]
 }
