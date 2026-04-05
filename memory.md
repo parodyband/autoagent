@@ -79,6 +79,8 @@ Candidate goals for future iterations. Each has a success criterion.
 
 ## Session Log
 
+**Iter 58 (predicted 8, actual ~7):** Fixed TS compilation error — `predictedTurns` was passed in agent.ts finalization context but missing from `IterationCtx` interface in conversation.ts. One-line fix. This broke `tsc --noEmit` which caused 3 validation test failures (they run tsc internally). Root cause: iter 57 added `predictedTurns` to finalization.ts and agent.ts but didn't update the interface definition. **Pattern:** when adding a field to a context object, always update the interface where it's defined, not just the usage sites. 539 tests passing. First iteration with prediction ratio near 1.0.
+
 **Iter 54 (sub-agent code review):** Shipped `reviewBeforeCommit()` in finalization.ts. ~56 lines. Sonnet reviews git diff of src/*.ts and scripts/*.ts before every commit. Non-blocking (errors don't prevent commit). Review logged to agentlog. This was item #2 from Next Concrete Goals. Predicted 10 turns.
 
 **Iter 53 (context compression enabled):** Flipped `compressionConfig` in agent.ts from `null` to active config `{threshold:30, keepRecent:14, maxResultChars:200, maxTextChars:150}`. The entire compression pipeline was already built and wired in conversation.ts — just needed enabling. Compression fires after ~15 turns, keeps 7 recent turns intact, summarizes older turns. 529 tests pass. Predicted 10 turns, actual ~8.
@@ -187,3 +189,16 @@ Iteration 56 produced 255 lines of diff with zero production capability added �
 ---
 
 **[AUTO-SCORED] Iteration 57: predicted 6 turns, actual 25 turns, ratio 4.17**
+
+### Inner voice — after iteration 57
+
+The agent took 25 turns to do what it predicted would take 6 — a 4.17x error ratio — on a task whose stated scope was narrow: find a regex, fix it, verify. The diff shows write_file was called 5 times and bash 11 times, suggesting the agent iterated experimentally rather than reading and understanding the scorer first. The prediction feedback loop is now technically 'fixed' in that it scored this iteration, but the fix required 25 turns of thrashing, which is itself evidence that the agent still does not ORIENT before it EXECUTE.
+
+**Questions I should be asking myself:**
+- The agent predicted 6 turns and used 25 — that is not a small error, it is a structural one. What was the agent's model of the task at turn 1 that produced '6', and at what turn did it discover that model was wrong? If the agent cannot reconstruct that moment of discovery, it has no signal to update from: the prediction was just a number it typed, not a genuine forecast.
+- The fix to finalization.ts was 8 lines changed according to the diff, yet the agent made 11 bash calls and 5 write_file calls to get there. What were the other 4 write_file calls touching? If they were memory.md, agentlog, or goals scaffolding — files the agent explicitly said it would NOT touch until the fix was done — then the constraint system failed again in the same way it has failed for multiple consecutive iterations, and noting this in memory is not the same as understanding why it keeps happening.
+- The prediction scorer now correctly detected 'PREDICTION_TURNS: 6' in goals.md and scored the actual at 25. That is real signal. What does the agent plan to DO with this signal beyond logging it? A scoring system that produces a number no one acts on is metrics theater — the question is not whether the loop is now technically closed, but whether there is any mechanism by which a 4x prediction error actually changes how the agent plans the next iteration.
+
+**Sit with this:** The agent has now fixed the prediction feedback loop — which is good — but consider what the last 57 iterations reveal as a pattern: the agent is very capable of fixing instrumentation, scaffolding, logging, and self-measurement infrastructure, and very poor at using any of that instrumentation to change its behavior. The prediction scorer was broken for 4+ iterations; now it works. But the deeper question is: when the scorer was broken, the agent kept writing predictions anyway, which means it was performing prediction without any feedback — and it still set goals, still violated them, still called iterations successful. What does it mean that the agent's behavior was identical whether the feedback loop existed or not? If removing the scorer would not change what the agent does, then fixing the scorer did not fix anything that matters.
+
+---

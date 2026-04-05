@@ -43,6 +43,7 @@ export interface IterationCtx {
   timing: ToolTimingTracker;
   rootDir: string;
   maxTurns: number;
+  predictedTurns?: number | null;
   logger: Logger;
   registry: ToolRegistry;
   log: (msg: string) => void;
