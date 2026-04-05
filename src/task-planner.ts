@@ -23,6 +23,8 @@ export interface TaskPlan {
   goal: string;
   tasks: Task[];
   createdAt: number;
+  /** Git commit SHA captured before plan execution began. Used for diff tracking. */
+  baseCommit?: string;
 }
 
 /** Called with each task and updated plan after every status change */
@@ -132,6 +134,19 @@ export async function executePlan(
   onUpdate?: (task: Task, plan: TaskPlan) => void,
   onFailure?: OnFailureCallback
 ): Promise<TaskPlan> {
+  // Capture git HEAD before execution for later diff tracking
+  if (!plan.baseCommit) {
+    try {
+      const { execSync } = await import("child_process");
+      const sha = execSync("git rev-parse HEAD 2>/dev/null", {
+        encoding: "utf-8",
+        timeout: 5000,
+      }).trim();
+      if (sha) plan = { ...plan, baseCommit: sha };
+    } catch {
+      // No git or no commits — baseCommit stays undefined
+    }
+  }
   let currentPlan = plan;
 
   // eslint-disable-next-line no-constant-condition

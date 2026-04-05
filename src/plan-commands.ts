@@ -15,6 +15,7 @@ import {
   savePlan,
 } from "./task-planner.js";
 import { detectProject } from "./project-detector.js";
+import { generatePlanSummary, formatPlanSummary } from "./plan-summary.js";
 
 export interface PlanCommandContext {
   workDir: string;
@@ -95,6 +96,7 @@ export async function handlePlanCommand(
     setStatus?.("Executing plan...");
     try {
       const executor = execute ?? (() => Promise.resolve("done"));
+      const resumeStartedAt = Date.now();
       const result = await executePlan(
         saved,
         async (task) => executor(task.description),
@@ -104,6 +106,9 @@ export async function handlePlanCommand(
       );
       savePlan(result, workDir);
       addMessage(`Plan complete.\n\n${formatPlan(result)}`);
+      setStatus?.("Generating summary...");
+      const summary = await generatePlanSummary(result, workDir, resumeStartedAt);
+      addMessage(formatPlanSummary(summary));
     } catch (err) {
       addMessage(
         `Plan execution error: ${err instanceof Error ? err.message : String(err)}`
@@ -147,6 +152,7 @@ export async function handlePlanCommand(
     savePlan(plan, workDir);
     setStatus?.("Executing plan...");
     const executor = execute ?? (() => Promise.resolve("done"));
+    const execStartedAt = Date.now();
     const result = await executePlan(
       plan,
       async (task) => executor(task.description),
@@ -156,6 +162,9 @@ export async function handlePlanCommand(
     );
     savePlan(result, workDir);
     addMessage(`Plan complete.\n\n${formatPlan(result)}`);
+    setStatus?.("Generating summary...");
+    const summary = await generatePlanSummary(result, workDir, execStartedAt);
+    addMessage(formatPlanSummary(summary));
   } catch (err) {
     addMessage(
       `Plan error: ${err instanceof Error ? err.message : String(err)}`

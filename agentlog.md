@@ -1,75 +1,3 @@
-347 | 
-348 |       // ── /plan <goal> ─────────────────────────────────────────
-349 |       const description = trimmed.slice(6).trim();
-350 |       if (!description) {
-351 |         console.log("Usage: /plan <description>  |  /plan resume\n");
-352 |         prompt();
-353 |         return;
-354 |       }
-355 |       console.log("Planning...");
-356 |       try {
-357 |         const plan = await createPlan(description, workDir);
-358 |         planRef.plan = plan;
-359 |         savePlan(plan, workDir);
-360 |         console.log("\n" + formatPlan(plan) + "\n");
-361 |         console.log(`Plan saved to ${workDir}/.autoagent-plan.json`);
-362 | 
-363 |         // Ask whether to execute the plan
-364 |         const answer = await new Promise<string>((resolve) => {
-365 |           rl.question("Execute this plan? (y/n) ", resolve);
-366 |         });
-367 | 
-368 |         if (answer.trim().toLowerCase() === "y") {
-369 |           console.log("");
-370 |           const finalPlan = await executePlan(plan, makePlanExecutor(), onUpdate, onFailure);
-371 |           // Persist updated statuses/results after execution
-372 |           savePlan(finalPlan, workDir);
-373 |           console.log("\n" + formatPlan(finalPlan) + "\n");
-374 |         }
-375 |       } catch (err) {
-376 |         console.error(`Plan error: ${err instanceof Error ? err.message : String(err)}\n`);
-377 |       }
-378 |       prompt();
-379 |       return;
-380 |     }
-381 | 
-382 |     // ─── Send to orchestrator ────────────────────────────
-383 | 
-[2026-04-05T20:01:46.150Z] iter=350 turn=8 INFO: Turn 8/25
-[2026-04-05T20:01:48.898Z] iter=350 turn=8 INFO: Agent: Good. I've updated both source files. Now I need to write the tests, run TSC, and wrap up.
-[2026-04-05T20:01:48.900Z] iter=350 turn=8 INFO: $ ls src/tests/
-[2026-04-05T20:01:48.931Z] iter=350 turn=8 INFO:   -> exit=1 (42 chars)
-[2026-04-05T20:01:48.932Z] iter=350 turn=9 INFO: Turn 9/25
-[2026-04-05T20:01:50.866Z] iter=350 turn=9 INFO: $ ls tests/
-[2026-04-05T20:01:50.876Z] iter=350 turn=9 INFO:   -> exit=0 (414 chars)
-[2026-04-05T20:01:50.876Z] iter=350 turn=10 INFO: Turn 10/25
-[2026-04-05T20:02:22.871Z] iter=350 turn=10 INFO: Agent: Writing tests now, then TSC, then wrap up.
-[2026-04-05T20:02:22.871Z] iter=350 turn=10 INFO: write_file: tests/task-planner-context.test.ts (write)
-[2026-04-05T20:02:22.872Z] iter=350 turn=10 INFO:   -> ok: Created tests/task-planner-context.test.ts (7507 chars)
-[2026-04-05T20:02:22.873Z] iter=350 turn=11 INFO: Turn 11/25
-[2026-04-05T20:02:24.748Z] iter=350 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T20:02:25.817Z] iter=350 turn=11 INFO:   -> exit=0 (11 chars)
-[2026-04-05T20:02:25.817Z] iter=350 turn=12 INFO: Turn 12/25
-[2026-04-05T20:02:27.878Z] iter=350 turn=12 INFO: Agent: TSC clean. Running tests, then wrapping up.
-[2026-04-05T20:02:27.879Z] iter=350 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/task-planner-context.test.ts 2>&1 | tail -30
-[2026-04-05T20:02:28.899Z] iter=350 turn=12 INFO:   -> exit=0 (1428 chars)
-[2026-04-05T20:02:28.899Z] iter=350 turn=13 INFO: Turn 13/25
-[2026-04-05T20:02:40.878Z] iter=350 turn=13 INFO: Agent: The vi.mock hoisting issue — `mockNewPlan` isn't defined when `vi.mock` runs. Fix with `vi.hoisted`:
-[2026-04-05T20:02:40.878Z] iter=350 turn=13 INFO: write_file: tests/task-planner-context.test.ts (patch)
-[2026-04-05T20:02:40.879Z] iter=350 turn=13 INFO:   -> ok: Patched tests/task-planner-context.test.ts: -41 +40 lines
-
-Context after patch:
-73 |     vi.clearAllMocks();
-74 |   });
-75 | 
-76 |   it("calls createPlan with error context and returns new plan", async () => {
-77 |     const mockResponsePlan = {
-78 |       goal: "Recovery goal",
-79 |       tasks: [{ id: "r1", title: "Recovery step", description: "Fix the issue", status: "pending", dependsOn: [] }],
-80 |       createdAt: 2000,
-81 |     };
-82 | 
-83 |     // Use hoisted mock to avoid ESM hoisting issues
 84 |     const { createAnthropicMock } = vi.hoisted(() => ({
 85 |       createAnthropicMock: vi.fn().mockImplementation(() => ({
 86 |         messages: {
@@ -1068,3 +996,245 @@ TSC is clean, goals.md written, memory saved. Done.
 [2026-04-05T20:17:05.511Z] iter=357 turn=7 INFO: Tool timing stats
 [2026-04-05T20:17:12.554Z] iter=357 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 357: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T20:17:12.577Z] iter=357 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T20:17:12.611Z] iter=357 turn=7 INFO: Committed: 4b5f463b (17 in / 2648 out, cache: 29277 created, 103880 read)
+[2026-04-05T20:17:12.611Z] iter=357 turn=7 INFO: Restarting as iteration 358...
+[2026-04-05T20:17:12.795Z] iter=358 INFO: Cache restored: 57/57 entries (0 stale)
+[2026-04-05T20:17:12.798Z] iter=358 INFO: Turn budget: 17/25 (calibration=0.88x, predicted=20)
+[2026-04-05T20:17:12.798Z] iter=358 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T20:17:12.956Z] iter=358 turn=1 INFO: Turn 1/25
+[2026-04-05T20:17:15.793Z] iter=358 turn=1 INFO: Agent: I'll start by reading the scratchpad and current state of the relevant files to plan my implementation.
+[2026-04-05T20:17:15.794Z] iter=358 turn=1 INFO: read_scratchpad: 1755 chars
+[2026-04-05T20:17:15.794Z] iter=358 turn=1 INFO: $ cat src/task-planner.ts | head -100
+[2026-04-05T20:17:15.797Z] iter=358 turn=1 INFO: $ cat src/plan-commands.ts
+[2026-04-05T20:17:15.805Z] iter=358 turn=1 INFO:   -> exit=0 (3011 chars)
+[2026-04-05T20:17:15.806Z] iter=358 turn=1 INFO:   -> exit=0 (5239 chars)
+[2026-04-05T20:17:15.806Z] iter=358 turn=2 INFO: Turn 2/25
+[2026-04-05T20:17:18.708Z] iter=358 turn=2 INFO: $ cat src/task-planner.ts | grep -n "executePlan\|Plan\|baseCommit" | head -50
+[2026-04-05T20:17:18.713Z] iter=358 turn=2 INFO: $ cat src/diagnostics.ts | head -60
+[2026-04-05T20:17:18.717Z] iter=358 turn=2 INFO: $ cat src/test-runner.ts | head -60
+[2026-04-05T20:17:18.736Z] iter=358 turn=2 INFO:   -> exit=0 (1868 chars)
+[2026-04-05T20:17:18.736Z] iter=358 turn=2 INFO:   -> exit=0 (2321 chars)
+[2026-04-05T20:17:18.740Z] iter=358 turn=2 INFO:   -> exit=0 (2342 chars)
+[2026-04-05T20:17:18.740Z] iter=358 turn=3 INFO: Turn 3/25
+[2026-04-05T20:17:21.363Z] iter=358 turn=3 INFO: $ cat src/test-runner.ts | grep -n "findRelatedTests\|runRelatedTests\|TestResult" | head -30
+[2026-04-05T20:17:21.365Z] iter=358 turn=3 INFO: $ grep -n "runDiagnostics" src/diagnostics.ts | head -20
+[2026-04-05T20:17:21.376Z] iter=358 turn=3 INFO:   -> exit=0 (132 chars)
+[2026-04-05T20:17:21.377Z] iter=358 turn=3 INFO:   -> exit=0 (41 chars)
+[2026-04-05T20:17:21.378Z] iter=358 turn=4 INFO: Turn 4/25
+[2026-04-05T20:17:25.561Z] iter=358 turn=4 INFO: think: I have enough context. Let me implement the two goals:
+
+1. Goal 2 (smaller): Add `baseCommit?: string` to TaskPlan in ta...
+[2026-04-05T20:17:25.562Z] iter=358 turn=5 INFO: Turn 5/25
+[2026-04-05T20:17:27.699Z] iter=358 turn=5 INFO: $ sed -n '69,100p' src/test-runner.ts && echo "---" && sed -n '172,220p' src/test-runner.ts && echo "---" && sed -n '94,130p' src/diagnostics.ts
+[2026-04-05T20:17:27.717Z] iter=358 turn=5 INFO:   -> exit=0 (3166 chars)
+[2026-04-05T20:17:27.718Z] iter=358 turn=6 INFO: Turn 6/25
+[2026-04-05T20:17:49.665Z] iter=358 turn=6 INFO: Agent: Now I have everything I need. Let me write all files:
+[2026-04-05T20:17:49.665Z] iter=358 turn=6 INFO: write_file: src/plan-summary.ts (write)
+[2026-04-05T20:17:49.666Z] iter=358 turn=6 INFO:   -> ok: Created src/plan-summary.ts (5674 chars)
+[2026-04-05T20:17:49.667Z] iter=358 turn=7 INFO: Turn 7/25
+[2026-04-05T20:17:53.012Z] iter=358 turn=7 INFO: Agent: **Status:**
+- Goal 1 (plan-summary.ts): IN PROGRESS — file created, need tests + wire into plan-commands.ts
+- Goal 2 (baseCommit in task-planner.ts): NOT STARTED
+
+Let me do all remaining work now:
+[2026-04-05T20:17:53.013Z] iter=358 turn=7 INFO: $ grep -n "baseCommit\|interface TaskPlan\|createdAt" src/task-planner.ts | head -20
+[2026-04-05T20:17:53.040Z] iter=358 turn=7 INFO:   -> exit=0 (153 chars)
+[2026-04-05T20:17:53.042Z] iter=358 turn=8 INFO: Turn 8/25
+[2026-04-05T20:17:56.016Z] iter=358 turn=8 INFO: write_file: src/task-planner.ts (patch)
+[2026-04-05T20:17:56.019Z] iter=358 turn=8 INFO:   -> ok: Patched src/task-planner.ts: -5 +7 lines
+
+Context after patch:
+19 |   error?: string;      // Error message on failure
+20 | }
+21 | 
+22 | export interface TaskPlan {
+23 |   goal: string;
+24 |   tasks: Task[];
+25 |   createdAt: number;
+26 |   /** Git commit SHA captured before plan execution began. Used for diff tracking. */
+27 |   baseCommit?: string;
+28 | }
+29 | 
+30 | /** Called with each task and updated plan after every status change */
+31 | export type TaskExecutor = (task: Task) => Promise<string>;
+[2026-04-05T20:17:56.019Z] iter=358 turn=9 INFO: Turn 9/25
+[2026-04-05T20:17:58.104Z] iter=358 turn=9 INFO: Agent: Now add baseCommit capture in executePlan:
+[2026-04-05T20:17:58.105Z] iter=358 turn=9 INFO: $ sed -n '120,145p' src/task-planner.ts
+[2026-04-05T20:17:58.113Z] iter=358 turn=9 INFO:   -> exit=0 (960 chars)
+[2026-04-05T20:17:58.114Z] iter=358 turn=10 INFO: Turn 10/25
+[2026-04-05T20:18:02.646Z] iter=358 turn=10 INFO: write_file: src/task-planner.ts (patch)
+[2026-04-05T20:18:02.648Z] iter=358 turn=10 INFO:   -> ok: Patched src/task-planner.ts: -7 +20 lines
+
+Context after patch:
+128 |  * @param onUpdate   Optional callback after each status change
+129 |  * @param onFailure  Optional callback when a task fails — return a new plan to switch to it
+130 |  */
+131 | export async function executePlan(
+132 |   plan: TaskPlan,
+133 |   executor: TaskExecutor,
+134 |   onUpdate?: (task: Task, plan: TaskPlan) => void,
+135 |   onFailure?: OnFailureCallback
+136 | ): Promise<TaskPlan> {
+137 |   // Capture git HEAD before execution for later diff tracking
+138 |   if (!plan.baseCommit) {
+139 |     try {
+140 |       const { execSync } = await import("child_process");
+141 |       const sha = execSync("git rev-parse HEAD 2>/dev/null", {
+142 |         encoding: "utf-8",
+143 |         timeout: 5000,
+144 |       }).trim();
+145 |       if (sha) plan = { ...plan, baseCommit: sha };
+146 |     } catch {
+147 |       // No git or no commits — baseCommit stays undefined
+148 |     }
+149 |   }
+150 |   let currentPlan = plan;
+151 | 
+152 |   // eslint-disable-next-line no-constant-condition
+153 |   while (true) {
+[2026-04-05T20:18:02.648Z] iter=358 turn=11 INFO: Turn 11/25
+[2026-04-05T20:18:06.113Z] iter=358 turn=11 INFO: Agent: Now wire generatePlanSummary into plan-commands.ts:
+[2026-04-05T20:18:06.113Z] iter=358 turn=11 INFO: write_file: src/plan-commands.ts (patch)
+[2026-04-05T20:18:06.114Z] iter=358 turn=11 INFO:   -> ok: Patched src/plan-commands.ts: -8 +9 lines
+
+Context after patch:
+7 | 
+8 | import fs from "fs";
+9 | import path from "path";
+10 | import {
+11 |   createPlan,
+12 |   executePlan,
+13 |   formatPlan,
+14 |   loadPlan,
+15 |   savePlan,
+16 | } from "./task-planner.js";
+17 | import { detectProject } from "./project-detector.js";
+18 | import { generatePlanSummary, formatPlanSummary } from "./plan-summary.js";
+19 | 
+20 | export interface PlanCommandContext {
+21 |   workDir: string;
+[2026-04-05T20:18:06.114Z] iter=358 turn=12 INFO: Turn 12/25
+[2026-04-05T20:18:08.643Z] iter=358 turn=12 INFO: Agent: Now wire the summary into plan execution — after each `executePlan()` call in plan-commands.ts:
+[2026-04-05T20:18:08.644Z] iter=358 turn=12 INFO: $ grep -n "executePlan\|savePlan(result\|Plan complete" src/plan-commands.ts
+[2026-04-05T20:18:08.656Z] iter=358 turn=12 INFO:   -> exit=0 (303 chars)
+[2026-04-05T20:18:08.657Z] iter=358 turn=13 INFO: Turn 13/25
+[2026-04-05T20:18:11.272Z] iter=358 turn=13 INFO: Agent: I've made real src/ changes. Let me finish the remaining work (wiring summary into plan-commands.ts + tests) and then wrap up.
+[2026-04-05T20:18:11.274Z] iter=358 turn=13 INFO: $ sed -n '90,165p' src/plan-commands.ts
+[2026-04-05T20:18:11.290Z] iter=358 turn=13 INFO:   -> exit=0 (2414 chars)
+[2026-04-05T20:18:11.290Z] iter=358 turn=14 INFO: Turn 14/25
+[2026-04-05T20:18:16.424Z] iter=358 turn=14 INFO: write_file: src/plan-commands.ts (patch)
+[2026-04-05T20:18:16.425Z] iter=358 turn=14 INFO:   -> ok: Patched src/plan-commands.ts: -18 +22 lines
+
+Context after patch:
+95 |     setLoading?.(true);
+96 |     setStatus?.("Executing plan...");
+97 |     try {
+98 |       const executor = execute ?? (() => Promise.resolve("done"));
+99 |       const resumeStartedAt = Date.now();
+100 |       const result = await executePlan(
+101 |         saved,
+102 |         async (task) => executor(task.description),
+103 |         (_task, updatedPlan) => {
+104 |           addMessage(formatPlan(updatedPlan));
+105 |         }
+106 |       );
+107 |       savePlan(result, workDir);
+108 |       addMessage(`Plan complete.\n\n${formatPlan(result)}`);
+109 |       setStatus?.("Generating summary...");
+110 |       const summary = await generatePlanSummary(result, workDir, resumeStartedAt);
+111 |       addMessage(formatPlanSummary(summary));
+112 |     } catch (err) {
+113 |       addMessage(
+114 |         `Plan execution error: ${err instanceof Error ? err.message : String(err)}`
+115 |       );
+116 |     }
+117 |     setLoading?.(false);
+118 |     setStatus?.("");
+119 |     return;
+120 |   }
+121 | 
+122 |   // /plan <description> — unknown single-word subcommands fall through to create
+[2026-04-05T20:18:16.425Z] iter=358 turn=15 INFO: Turn 15/25
+[2026-04-05T20:18:21.209Z] iter=358 turn=15 INFO: Agent: Wrapping up now. Wire summary into the create path, write tests, then validate.
+[2026-04-05T20:18:21.211Z] iter=358 turn=15 INFO: write_file: src/plan-commands.ts (patch)
+[2026-04-05T20:18:21.212Z] iter=358 turn=15 INFO:   -> ok: Patched src/plan-commands.ts: -10 +14 lines
+
+Context after patch:
+151 |     addMessage(`Created plan:\n\n${formatPlan(plan)}`);
+152 |     savePlan(plan, workDir);
+153 |     setStatus?.("Executing plan...");
+154 |     const executor = execute ?? (() => Promise.resolve("done"));
+155 |     const execStartedAt = Date.now();
+156 |     const result = await executePlan(
+157 |       plan,
+158 |       async (task) => executor(task.description),
+159 |       (_task, updatedPlan) => {
+160 |         addMessage(formatPlan(updatedPlan));
+161 |       }
+162 |     );
+163 |     savePlan(result, workDir);
+164 |     addMessage(`Plan complete.\n\n${formatPlan(result)}`);
+165 |     setStatus?.("Generating summary...");
+166 |     const summary = await generatePlanSummary(result, workDir, execStartedAt);
+167 |     addMessage(formatPlanSummary(summary));
+168 |   } catch (err) {
+169 |     addMessage(
+170 |       `Plan error: ${err instanceof Error ? err.message : String(err)}`
+[2026-04-05T20:18:21.213Z] iter=358 turn=16 INFO: Turn 16/25
+[2026-04-05T20:18:47.820Z] iter=358 turn=16 INFO: Agent: Write tests, run tsc, wrap up:
+[2026-04-05T20:18:47.822Z] iter=358 turn=16 INFO: write_file: src/__tests__/plan-summary.test.ts (write)
+[2026-04-05T20:18:47.824Z] iter=358 turn=16 INFO:   -> ok: Created src/__tests__/plan-summary.test.ts (6089 chars)
+[2026-04-05T20:18:47.825Z] iter=358 turn=17 INFO: Turn 17/25
+[2026-04-05T20:18:49.448Z] iter=358 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T20:18:50.533Z] iter=358 turn=17 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:18:50.533Z] iter=358 turn=18 INFO: Turn 18/25
+[2026-04-05T20:18:52.900Z] iter=358 turn=18 INFO: Agent: TSC clean. Running tests quickly then wrapping up.
+[2026-04-05T20:18:52.901Z] iter=358 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/plan-summary.test.ts 2>&1 | tail -20
+[2026-04-05T20:18:53.960Z] iter=358 turn=18 INFO:   -> exit=0 (628 chars)
+[2026-04-05T20:18:53.961Z] iter=358 turn=19 INFO: Turn 19/25
+[2026-04-05T20:18:55.689Z] iter=358 turn=19 INFO: $ grep -n "Diagnostics:" src/plan-summary.ts
+[2026-04-05T20:18:55.700Z] iter=358 turn=19 INFO:   -> exit=0 (104 chars)
+[2026-04-05T20:18:55.701Z] iter=358 turn=20 INFO: Turn 20/25
+[2026-04-05T20:18:58.723Z] iter=358 turn=20 INFO: Agent: The test expects `"Diagnostics: ❌"` (no `**`). Fix the tests to match actual output:
+[2026-04-05T20:18:58.724Z] iter=358 turn=20 INFO: write_file: src/__tests__/plan-summary.test.ts (patch)
+[2026-04-05T20:18:58.727Z] iter=358 turn=20 INFO:   -> ok: Patched src/__tests__/plan-summary.test.ts: -1 +1 lines
+
+Context after patch:
+106 | 
+107 |   it("shows diagnostics passed", () => {
+108 |     const out = formatPlanSummary(base);
+109 |     expect(out).toContain("**Diagnostics:** ✅ passed");
+110 |   });
+111 | 
+112 |   it("shows diagnostics errors", () => {
+[2026-04-05T20:18:58.728Z] iter=358 turn=21 INFO: Turn 21/25
+[2026-04-05T20:19:00.739Z] iter=358 turn=21 INFO: write_file: src/__tests__/plan-summary.test.ts (patch)
+[2026-04-05T20:19:00.741Z] iter=358 turn=21 INFO:   -> ok: Patched src/__tests__/plan-summary.test.ts: -1 +1 lines
+
+Context after patch:
+111 | 
+112 |   it("shows diagnostics errors", () => {
+113 |     const out = formatPlanSummary({ ...base, diagnosticsPassed: false, diagnosticsOutput: "TS2345 error" });
+114 |     expect(out).toContain("**Diagnostics:** ❌ errors found");
+115 |     expect(out).toContain("TS2345 error");
+116 |   });
+117 | 
+[2026-04-05T20:19:00.742Z] iter=358 turn=22 INFO: Turn 22/25
+[2026-04-05T20:19:02.546Z] iter=358 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/plan-summary.test.ts 2>&1 | tail -8
+[2026-04-05T20:19:03.624Z] iter=358 turn=22 INFO:   -> exit=0 (235 chars)
+[2026-04-05T20:19:03.624Z] iter=358 turn=23 INFO: Turn 23/25
+[2026-04-05T20:19:07.995Z] iter=358 turn=23 INFO: save_memory: "[Engineer 358] Plan summary + baseCommit"
+[2026-04-05T20:19:07.996Z] iter=358 turn=23 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:19:07.996Z] iter=358 turn=24 INFO: Turn 24/25
+[2026-04-05T20:19:16.923Z] iter=358 turn=24 INFO: write_file: goals.md (write)
+[2026-04-05T20:19:16.924Z] iter=358 turn=24 INFO:   -> ok: Updated goals.md (1114 chars, -24 lines delta)
+[2026-04-05T20:19:16.924Z] iter=358 turn=25 INFO: Turn 25/25
+[2026-04-05T20:19:18.132Z] iter=358 turn=25 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:19:18.133Z] iter=358 turn=25 INFO: RESTART signal
+[2026-04-05T20:19:18.133Z] iter=358 turn=25 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:19:19.208Z] iter=358 turn=25 INFO: Compilation OK
+[2026-04-05T20:19:27.264Z] iter=358 turn=25 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T20:19:27.264Z] iter=358 turn=25 INFO: Tool timing: bash: 17x, avg=203ms, total=3443ms; write_file: 10x, avg=2ms, total=20ms; read_scratchpad: 1x, avg=5ms, total=5ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T20:19:27.264Z] iter=358 turn=25 INFO: Tool timing stats
+[2026-04-05T20:19:34.624Z] iter=358 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 358: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T20:19:37.164Z] iter=358 turn=25 INFO: Pre-commit review (3006in/61out): **LGTM** — The tests are well-structured with proper ESM imports, `.js` extensions throughout, correct `vi.mock` hoisting, and the integration in `plan-commands.ts` is straightforward with no obvious 
