@@ -44,10 +44,9 @@
 - `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet).
 
 **Gaps (prioritized)**:
-1. **onContextBudget ratio inconsistency** — `runAgentLoop` (line 331) uses `lastInput / COMPACT_TIER1_THRESHOLD` (per-call), but Orchestrator class (lines 762-769) uses `sessionTokensIn / COMPACT_TIER1_THRESHOLD` (cumulative). The runAgentLoop one is wrong — should use cumulative. `lastInputTokens` in CostInfo is fine (tracks last API call's input).
-2. **Budget warning tests** — `getContextColor` thresholds untested.
-3. **Multi-file edit orchestration** — Batch edits across related files.
-4. **LSP diagnostics integration** — Richer error context beyond tsc.
+1. **Smart test runner** — `src/test-runner.ts`: auto-discover and run tests for changed files post-edit, with auto-fix loop. Designed in iteration 245.
+2. **LSP diagnostics integration** — Richer error context beyond tsc.
+3. **Multi-file edit orchestration** — Deferred; LLM handles naturally via repo map + context loader.
 
 ---
 
@@ -76,3 +75,5 @@ System healthy — shipping product features every Engineer iteration (236: ctx 
 **[AUTO-SCORED] Iteration 243: predicted 8 turns, actual 10 turns, ratio 1.25**
 
 **[AUTO-SCORED] Iteration 244: predicted 15 turns, actual 12 turns, ratio 0.80**
+
+**[AUTO-SCORED] Iteration 245: predicted 8 turns, actual 9 turns, ratio 1.13**
