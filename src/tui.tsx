@@ -26,6 +26,7 @@ import { shouldShowWelcome } from "./welcome.js";
 import type { Task, TaskPlan } from "./task-planner.js";
 import { handlePlanCommand } from "./plan-commands.js";
 import { runDream } from "./dream.js";
+import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
 import Anthropic from "@anthropic-ai/sdk";
 import { Markdown } from "./markdown-renderer.js";
 
@@ -605,6 +606,7 @@ function App() {
           "  /init     — Analyze repo and generate/update .autoagent.md",
           "  /status   — Show session stats (turns, tokens, cost, model)",
           "  /find Q   — Fuzzy search files & symbols in the repo",
+          "  /search Q — BM25 semantic code search (concept-based)",
           "  /model    — Show current model (or /model haiku|sonnet to switch)",
           "  /clear    — Clear the conversation history",
           "  /reindex  — Re-index the repository files",
@@ -723,6 +725,34 @@ function App() {
         }
       } catch {
         setMessages(prev => [...prev, { role: "assistant", content: "Search failed — could not build repo map." }]);
+      }
+      return;
+    }
+    if (trimmed.startsWith("/search")) {
+      const query = trimmed.slice(7).trim();
+      if (!query) {
+        setMessages(prev => [...prev, { role: "assistant", content: "Usage: /search <query>" }]);
+        return;
+      }
+      try {
+        if (_searchIndexHolder.index.fileCount === 0) {
+          setMessages(prev => [...prev, { role: "assistant", content: "Building search index…" }]);
+          await buildSearchIndex(workDir);
+        }
+        const results = _searchIndexHolder.index.search(query, 5);
+        if (results.length === 0) {
+          setMessages(prev => [...prev, { role: "assistant", content: `No results for "${query}"` }]);
+        } else {
+          const lines = results.map((r, i) =>
+            `${i + 1}. ${r.file}:${r.lineStart}-${r.lineEnd}  score=${r.score.toFixed(2)}\n   ${r.snippet.replace(/\n/g, " ").slice(0, 120)}`
+          );
+          setMessages(prev => [...prev, {
+            role: "assistant",
+            content: `🔍 Semantic results for "${query}":\n\n${lines.join("\n\n")}`,
+          }]);
+        }
+      } catch (err) {
+        setMessages(prev => [...prev, { role: "assistant", content: `Search failed: ${String(err)}` }]);
       }
       return;
     }

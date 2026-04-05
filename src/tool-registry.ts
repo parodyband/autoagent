@@ -23,6 +23,49 @@ import {
   executeSaveScratchpad,
   executeReadScratchpad,
 } from "./tools/scratchpad.js";
+import { CodeSearchIndex } from "./semantic-search.js";
+import * as fs from "fs";
+import { glob } from "glob";
+
+// ─── Semantic search index (shared across registry instances) ─
+
+/** Lazily populated BM25 index — rebuilt by buildSearchIndex() */
+export const codeSearchIndex = new CodeSearchIndex();
+let indexBuilt = false;
+
+/**
+ * (Re)build the BM25 code search index from .ts/.js/.md files in rootDir.
+ * Safe to call multiple times — clears old state each time.
+ */
+export async function buildSearchIndex(rootDir: string): Promise<number> {
+  // Reset index by creating a fresh instance reference isn't possible since it's const,
+  // so we track a separate fresh index and replace the contents.
+  const freshIndex = new CodeSearchIndex();
+  const patterns = ["**/*.ts", "**/*.js", "**/*.md"];
+  const ignore = ["**/node_modules/**", "**/.git/**", "**/dist/**", "**/*.d.ts"];
+  const files: string[] = [];
+  for (const pattern of patterns) {
+    const found = await glob(pattern, { cwd: rootDir, ignore, absolute: true });
+    files.push(...found);
+  }
+  const unique = [...new Set(files)];
+  for (const file of unique) {
+    try {
+      const content = fs.readFileSync(file, "utf-8");
+      freshIndex.addFile(file, content);
+    } catch {
+      // skip unreadable files
+    }
+  }
+  // Copy fresh index data into the shared instance by rebuilding from scratch
+  // We re-export via a mutable holder so orchestrator can swap it
+  _searchIndexHolder.index = freshIndex;
+  indexBuilt = true;
+  return freshIndex.fileCount;
+}
+
+/** Mutable holder so orchestrator and TUI can share the latest index */
+export const _searchIndexHolder: { index: CodeSearchIndex } = { index: codeSearchIndex };
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -267,6 +310,52 @@ export function createDefaultRegistry(): ToolRegistry {
     ctx.log(`read_scratchpad: ${result.length} chars`);
     return { result };
   }, { defaultTimeout: 5 });
+
+  // ── semantic_search ───────────────────────────────────
+  registry.register(
+    {
+      name: "semantic_search",
+      description:
+        "BM25 full-text code search over the project's .ts/.js/.md files. " +
+        "Returns ranked chunks with file path, line range, score, and snippet. " +
+        "Use this to find relevant code by concept (e.g. 'error handling', 'token counting') " +
+        "when you don't know the exact symbol or file name.",
+      input_schema: {
+        type: "object" as const,
+        properties: {
+          query: {
+            type: "string",
+            description: "Natural language or code concept to search for",
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum results to return (default: 5)",
+          },
+        },
+        required: ["query"],
+      },
+    },
+    async (input, ctx) => {
+      const { query, max_results } = input as { query: string; max_results?: number };
+      const maxR = max_results ?? 5;
+      ctx.log(`semantic_search: "${query}" (max=${maxR})`);
+      // Auto-build index on first use
+      if (_searchIndexHolder.index.fileCount === 0) {
+        ctx.log(`  building index...`);
+        await buildSearchIndex(ctx.rootDir);
+      }
+      const results = _searchIndexHolder.index.search(query, maxR);
+      if (results.length === 0) {
+        return { result: "No results found." };
+      }
+      const lines = results.map((r, i) =>
+        `${i + 1}. ${r.file}:${r.lineStart}-${r.lineEnd} (score=${r.score.toFixed(2)})\n   ${r.snippet.replace(/\n/g, " ").slice(0, 120)}`
+      );
+      ctx.log(`  -> ${results.length} results`);
+      return { result: lines.join("\n\n") };
+    },
+    { defaultTimeout: 30 },
+  );
 
   return registry;
 }

@@ -282,7 +282,7 @@ export function buildSystemPrompt(
 
 Working directory: ${workDir}
 
-You have these tools: bash, read_file, write_file, grep, web_search.
+You have these tools: bash, read_file, write_file, grep, web_search, semantic_search.
 
 Rules:
 - Be concise and action-oriented. Do the thing, show the result.

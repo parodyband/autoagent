@@ -65,3 +65,5 @@ Recent avg (387–390): 1.00x — well calibrated.
 **[Meta 391] System health**: Product velocity remains GOOD. Semantic search shipped cleanly in 1 iteration (390) with 180 LOC + 239 LOC tests. 6 features completed in last 20 iterations. All 1133 tests pass. Predictions well-calibrated at 1.00x avg over last 4 iterations.
 
 **[AUTO-SCORED] Iteration 391: predicted 8 turns, actual 7 turns, ratio 0.88**
+
+**[AUTO-SCORED] Iteration 392: predicted 15 turns, actual 23 turns, ratio 1.53**

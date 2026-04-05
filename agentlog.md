@@ -1,61 +1,3 @@
-[2026-04-05T21:00:55.000Z] iter=382 turn=5 INFO: Turn 5/25
-[2026-04-05T21:01:28.559Z] iter=382 turn=5 INFO: Agent: Writing both deliverables now:
-[2026-04-05T21:01:28.560Z] iter=382 turn=5 INFO: write_file: tests/task-planner.test.ts (write)
-[2026-04-05T21:01:28.561Z] iter=382 turn=5 INFO:   -> ok: Created tests/task-planner.test.ts (8510 chars)
-[2026-04-05T21:01:28.562Z] iter=382 turn=6 INFO: Turn 6/25
-[2026-04-05T21:01:30.753Z] iter=382 turn=6 INFO: Agent: Now let's run the tests to see if they pass before writing the src changes:
-[2026-04-05T21:01:30.754Z] iter=382 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/task-planner.test.ts 2>&1
-[2026-04-05T21:01:31.879Z] iter=382 turn=6 INFO:   -> exit=0 (277 chars)
-[2026-04-05T21:01:31.879Z] iter=382 turn=7 INFO: Turn 7/25
-[2026-04-05T21:01:34.989Z] iter=382 turn=7 INFO: Agent: **Goal 1: Task Planner Tests** — DONE (23/23 passing)
-**Goal 2: Wire Real Executor (`runSingleTask` + `createOrchestratorExecutor`)** — NOT STARTED
-
-Writing Goal 2 now:
-[2026-04-05T21:01:34.990Z] iter=382 turn=7 INFO: $ grep -n "export async function\|export function\|^export " src/orchestrator.ts | tail -20
-[2026-04-05T21:01:35.007Z] iter=382 turn=7 INFO:   -> exit=0 (1164 chars)
-[2026-04-05T21:01:35.008Z] iter=382 turn=8 INFO: Turn 8/25
-[2026-04-05T21:01:36.033Z] iter=382 turn=8 INFO: $ tail -30 src/orchestrator.ts
-[2026-04-05T21:01:36.041Z] iter=382 turn=8 INFO:   -> exit=0 (1364 chars)
-[2026-04-05T21:01:36.041Z] iter=382 turn=9 INFO: Turn 9/25
-[2026-04-05T21:01:37.374Z] iter=382 turn=9 INFO: $ grep -n "^async function runAgentLoop" src/orchestrator.ts
-[2026-04-05T21:01:37.388Z] iter=382 turn=9 INFO:   -> exit=0 (33 chars)
-[2026-04-05T21:01:37.388Z] iter=382 turn=10 INFO: Turn 10/25
-[2026-04-05T21:01:38.698Z] iter=382 turn=10 INFO: $ sed -n '532,560p' src/orchestrator.ts
-[2026-04-05T21:01:38.712Z] iter=382 turn=10 INFO:   -> exit=0 (1127 chars)
-[2026-04-05T21:01:38.713Z] iter=382 turn=11 INFO: Turn 11/25
-[2026-04-05T21:01:41.216Z] iter=382 turn=11 INFO: Agent: Now I have enough context. Let me add `runSingleTask` to orchestrator.ts and `createOrchestratorExecutor` to task-planner.ts:
-[2026-04-05T21:01:41.218Z] iter=382 turn=11 INFO: $ grep -n "^import\|createDefaultRegistry\|buildSystemPrompt" src/orchestrator.ts | head -20
-[2026-04-05T21:01:41.246Z] iter=382 turn=11 INFO:   -> exit=0 (1340 chars)
-[2026-04-05T21:01:41.246Z] iter=382 turn=12 INFO: Turn 12/25
-[2026-04-05T21:01:43.835Z] iter=382 turn=12 INFO: think: I've been reading too much. I have Goal 1 done (tests pass). I need to write Goal 2 NOW - add runSingleTask to orchestra...
-[2026-04-05T21:01:43.836Z] iter=382 turn=13 INFO: Turn 13/25
-[2026-04-05T21:01:52.460Z] iter=382 turn=13 INFO: Agent: src/ changes so far: **zero**. Writing Goal 2 now immediately.
-[2026-04-05T21:01:52.461Z] iter=382 turn=13 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T21:01:52.467Z] iter=382 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -4 +46 lines
-
-Context after patch:
-1745 |       }
-1746 |     }
-1747 | 
-1748 |     this.opts.onStatus?.("");
-1749 |     return { text, tokensIn, tokensOut, model, verificationPassed, commitResult };
-1750 |   }
-1751 | }
-1752 | 
-1753 | /**
-1754 |  * Runs a single task description through a minimal agent loop (up to 5 turns).
-1755 |  * Designed for use by the task-planner executor.
-1756 |  *
-1757 |  * @param client          Anthropic client
-1758 |  * @param workDir         Working directory for tool execution
-1759 |  * @param taskDescription The task to execute
-1760 |  * @returns               Concatenated assistant text response
-1761 |  */
-1762 | export async function runSingleTask(
-1763 |   client: Anthropic,
-1764 |   workDir: string,
-1765 |   taskDescription: string,
-1766 | ): Promise<string> {
 1767 |   const model = "claude-sonnet-4-20250514";
 1768 |   const registry = createDefaultRegistry();
 1769 |   const systemPrompt = buildSystemPrompt({ workDir });
@@ -1054,3 +996,305 @@ TSC is clean, memory.md is compacted, goals.md is written for Engineer iteration
 [2026-04-05T21:17:37.177Z] iter=391 turn=7 INFO: Tool timing stats
 [2026-04-05T21:17:44.578Z] iter=391 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 391: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T21:17:44.603Z] iter=391 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T21:17:44.639Z] iter=391 turn=7 INFO: Committed: a3fb4435 (17 in / 3020 out, cache: 11484 created, 51854 read)
+[2026-04-05T21:17:44.640Z] iter=391 turn=7 INFO: Restarting as iteration 392...
+[2026-04-05T21:17:44.817Z] iter=392 INFO: Cache restored: 56/56 entries (0 stale)
+[2026-04-05T21:17:44.820Z] iter=392 INFO: Turn budget: 15/25 (calibration=1.00x, predicted=15)
+[2026-04-05T21:17:44.820Z] iter=392 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T21:17:44.989Z] iter=392 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-05T21:17:44.990Z] iter=392 turn=1 INFO: Turn 1/25
+[2026-04-05T21:17:48.122Z] iter=392 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be modified.
+[2026-04-05T21:17:48.123Z] iter=392 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T21:17:48.124Z] iter=392 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && head -50 src/semantic-search.ts
+[2026-04-05T21:17:48.137Z] iter=392 turn=1 INFO:   -> exit=0 (1959 chars)
+[2026-04-05T21:17:48.138Z] iter=392 turn=2 INFO: Turn 2/25
+[2026-04-05T21:17:51.011Z] iter=392 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat src/semantic-search.ts
+[2026-04-05T21:17:51.016Z] iter=392 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "web_search\|semantic_search\|CodeSearchIndex\|file.watcher\|fileWatcher" src/orchestrator.ts | head -40
+[2026-04-05T21:17:51.028Z] iter=392 turn=2 INFO:   -> exit=0 (5670 chars)
+[2026-04-05T21:17:51.036Z] iter=392 turn=2 INFO:   -> exit=0 (492 chars)
+[2026-04-05T21:17:51.036Z] iter=392 turn=3 INFO: Turn 3/25
+[2026-04-05T21:17:55.380Z] iter=392 turn=3 INFO: think: I have enough context. Let me look at the key lines in orchestrator.ts to understand where to add the semantic_search to...
+[2026-04-05T21:17:55.380Z] iter=392 turn=4 INFO: Turn 4/25
+[2026-04-05T21:17:58.249Z] iter=392 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '45,75p' src/orchestrator.ts
+[2026-04-05T21:17:58.252Z] iter=392 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '278,295p' src/orchestrator.ts && echo "---" && sed -n '915,955p' src/orchestrator.ts
+[2026-04-05T21:17:58.262Z] iter=392 turn=4 INFO:   -> exit=0 (1021 chars)
+[2026-04-05T21:17:58.271Z] iter=392 turn=4 INFO:   -> exit=0 (2631 chars)
+[2026-04-05T21:17:58.272Z] iter=392 turn=5 INFO: Turn 5/25
+[2026-04-05T21:18:01.696Z] iter=392 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "web_search\|web_fetch\|\"name\":" src/orchestrator.ts | grep -A2 -B2 "web_search" | head -40
+[2026-04-05T21:18:01.699Z] iter=392 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "tool_use\|case \"web_search\"\|case \"bash\"\|case \"grep\"\|inputSchema\|\"web_search\"" src/orchestrator.ts | head -40
+[2026-04-05T21:18:01.713Z] iter=392 turn=5 INFO:   -> exit=0 (110 chars)
+[2026-04-05T21:18:01.719Z] iter=392 turn=5 INFO:   -> exit=0 (2411 chars)
+[2026-04-05T21:18:01.720Z] iter=392 turn=6 INFO: Turn 6/25
+[2026-04-05T21:18:07.189Z] iter=392 turn=6 INFO: Agent: Goal 1 (orchestrator): NOT STARTED. Goal 2 (TUI /search): NOT STARTED.
+
+I need to find the tools array and handler. Let me look at the specific sections quickly then write all changes.
+[2026-04-05T21:18:07.189Z] iter=392 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "inputSchema\|\"name\": \"web" src/orchestrator.ts | head -20
+[2026-04-05T21:18:07.192Z] iter=392 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "case \"web_search\"\|case \"bash\"\|executeTool\|async.*tool" src/orchestrator.ts | head -20
+[2026-04-05T21:18:07.203Z] iter=392 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-05T21:18:07.206Z] iter=392 turn=6 INFO:   -> exit=0 (295 chars)
+[2026-04-05T21:18:07.207Z] iter=392 turn=7 INFO: Turn 7/25
+[2026-04-05T21:18:08.683Z] iter=392 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '650,800p' src/orchestrator.ts
+[2026-04-05T21:18:08.695Z] iter=392 turn=7 INFO:   -> exit=0 (6848 chars)
+[2026-04-05T21:18:08.695Z] iter=392 turn=8 INFO: Turn 8/25
+[2026-04-05T21:18:12.797Z] iter=392 turn=8 INFO: Agent: Now I have enough context. Let me find where `execTool` is defined and the tools array:
+[2026-04-05T21:18:12.797Z] iter=392 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "execTool\|\"web_search\"\|webSearch\|web_fetch\|subagent\|save_memory" src/orchestrator.ts | grep -v "//\|import\|PARALLEL_SAFE" | head -30
+[2026-04-05T21:18:12.799Z] iter=392 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "function execTool\|const execTool\|execTool =" src/orchestrator.ts
+[2026-04-05T21:18:12.814Z] iter=392 turn=8 INFO:   -> exit=0 (94 chars)
+[2026-04-05T21:18:12.817Z] iter=392 turn=8 INFO:   -> exit=0 (785 chars)
+[2026-04-05T21:18:12.817Z] iter=392 turn=9 INFO: Turn 9/25
+[2026-04-05T21:18:15.389Z] iter=392 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "makeExecTool\|createDefaultRegistry\|registry\." src/orchestrator.ts | head -20
+[2026-04-05T21:18:15.393Z] iter=392 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "makeExecTool\|createDefaultRegistry" src/orchestrator.ts src/tools/*.ts 2>/dev/null | head -20
+[2026-04-05T21:18:15.410Z] iter=392 turn=9 INFO:   -> exit=0 (552 chars)
+[2026-04-05T21:18:15.413Z] iter=392 turn=9 INFO:   -> exit=0 (624 chars)
+[2026-04-05T21:18:15.414Z] iter=392 turn=10 INFO: Turn 10/25
+[2026-04-05T21:18:17.895Z] iter=392 turn=10 INFO: Agent: I have changed NOTHING in src/. I've been reading too much. Let me look at the tool-registry and write the changes NOW.
+[2026-04-05T21:18:17.895Z] iter=392 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && cat src/tool-registry.ts
+[2026-04-05T21:18:17.911Z] iter=392 turn=10 INFO:   -> exit=0 (10566 chars)
+[2026-04-05T21:18:17.911Z] iter=392 turn=11 INFO: Turn 11/25
+[2026-04-05T21:18:22.518Z] iter=392 turn=11 INFO: Agent: Now I have the full picture. The tool registry is where I add the `semantic_search` tool. Now I'll make all changes:
+[2026-04-05T21:18:22.519Z] iter=392 turn=11 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-05T21:18:22.521Z] iter=392 turn=11 INFO:   -> ok: Patched src/tool-registry.ts: -6 +9 lines
+
+Context after patch:
+17 | import { webSearchToolDefinition, executeWebSearch } from "./tools/web_search.js";
+18 | import { autoSelectModel } from "./model-selection.js";
+19 | import { saveToProjectMemory } from "./project-memory.js";
+20 | import {
+21 |   saveScratchpadToolDefinition,
+22 |   readScratchpadToolDefinition,
+23 |   executeSaveScratchpad,
+24 |   executeReadScratchpad,
+25 | } from "./tools/scratchpad.js";
+26 | import { CodeSearchIndex } from "./semantic-search.js";
+27 | import * as fs from "fs";
+28 | import { glob } from "glob";
+29 | 
+30 | // ─── Types ──────────────────────────────────────────────────
+31 | 
+[2026-04-05T21:18:22.521Z] iter=392 turn=12 INFO: Turn 12/25
+[2026-04-05T21:18:32.895Z] iter=392 turn=12 INFO: Agent: Now add a module-level index and a `buildSearchIndex` function, plus the tool registration:
+[2026-04-05T21:18:32.895Z] iter=392 turn=12 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-05T21:18:32.896Z] iter=392 turn=12 INFO:   -> ok: Patched src/tool-registry.ts: -1 +41 lines
+
+Context after patch:
+27 | import * as fs from "fs";
+28 | import { glob } from "glob";
+29 | 
+30 | // ─── Semantic search index (shared across registry instances) ─
+31 | 
+32 | /** Lazily populated BM25 index — rebuilt by buildSearchIndex() */
+33 | export const codeSearchIndex = new CodeSearchIndex();
+34 | let indexBuilt = false;
+35 | 
+36 | /**
+37 |  * (Re)build the BM25 code search index from .ts/.js/.md files in rootDir.
+38 |  * Safe to call multiple times — clears old state each time.
+39 |  */
+40 | export async function buildSearchIndex(rootDir: string): Promise<number> {
+41 |   // Reset index by creating a fresh instance reference isn't possible since it's const,
+42 |   // so we track a separate fresh index and replace the contents.
+43 |   const freshIndex = new CodeSearchIndex();
+44 |   const patterns = ["**/*.ts", "**/*.js", "**/*.md"];
+45 |   const ignore = ["**/node_modules/**", "**/.git/**", "**/dist/**", "**/*.d.ts"];
+46 |   const files: string[] = [];
+47 |   for (const pattern of patterns) {
+48 |     const found = await glob(pattern, { cwd: rootDir, ignore, absolute: true });
+49 |     files.push(...found);
+50 |   }
+51 |   const unique = [...new Set(files)];
+52 |   for (const file of unique) {
+53 |     try {
+54 |       const content = fs.readFileSync(file, "utf-8");
+55 |       freshIndex.addFile(file, content);
+56 |     } catch {
+57 |       // skip unreadable files
+58 |     }
+59 |   }
+60 |   // Copy fresh index data into the shared instance by rebuilding from scratch
+61 |   // We re-export via a mutable holder so orchestrator can swap it
+62 |   _searchIndexHolder.index = freshIndex;
+63 |   indexBuilt = true;
+64 |   return freshIndex.fileCount;
+65 | }
+66 | 
+67 | /** Mutable holder so orchestrator and TUI can share the latest index */
+68 | export const _searchIndexHolder: { index: CodeSearchIndex } = { index: codeSearchIndex };
+69 | 
+70 | // ─── Types ──────────────────────────────────────────────────
+71 | 
+72 | export interface ToolContext {
+73 |   rootDir: string;
+[2026-04-05T21:18:32.897Z] iter=392 turn=13 INFO: Turn 13/25
+[2026-04-05T21:18:44.273Z] iter=392 turn=13 INFO: Agent: Let me add the semantic_search tool registration and finish both goals now.
+[2026-04-05T21:18:44.274Z] iter=392 turn=13 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-05T21:18:44.275Z] iter=392 turn=13 INFO:   -> ok: Patched src/tool-registry.ts: -9 +55 lines
+
+Context after patch:
+304 |     return { result };
+305 |   }, { defaultTimeout: 5 });
+306 | 
+307 |   // ── read_scratchpad ──────────────────────────────────
+308 |   registry.register(readScratchpadToolDefinition, async (_input, ctx) => {
+309 |     const result = executeReadScratchpad(ctx.rootDir);
+310 |     ctx.log(`read_scratchpad: ${result.length} chars`);
+311 |     return { result };
+312 |   }, { defaultTimeout: 5 });
+313 | 
+314 |   // ── semantic_search ───────────────────────────────────
+315 |   registry.register(
+316 |     {
+317 |       name: "semantic_search",
+318 |       description:
+319 |         "BM25 full-text code search over the project's .ts/.js/.md files. " +
+320 |         "Returns ranked chunks with file path, line range, score, and snippet. " +
+321 |         "Use this to find relevant code by concept (e.g. 'error handling', 'token counting') " +
+322 |         "when you don't know the exact symbol or file name.",
+323 |       input_schema: {
+324 |         type: "object" as const,
+325 |         properties: {
+326 |           query: {
+327 |             type: "string",
+328 |             description: "Natural language or code concept to search for",
+329 |           },
+330 |           max_results: {
+331 |             type: "number",
+332 |             description: "Maximum results to return (default: 5)",
+333 |           },
+334 |         },
+335 |         required: ["query"],
+336 |       },
+337 |     },
+338 |     async (input, ctx) => {
+339 |       const { query, max_results } = input as { query: string; max_results?: number };
+340 |       const maxR = max_results ?? 5;
+341 |       ctx.log(`semantic_search: "${query}" (max=${maxR})`);
+342 |       // Auto-build index on first use
+343 |       if (_searchIndexHolder.index.fileCount === 0) {
+344 |         ctx.log(`  building index...`);
+345 |         await buildSearchIndex(ctx.rootDir);
+346 |       }
+347 |       const results = _searchIndexHolder.index.search(query, maxR);
+348 |       if (results.length === 0) {
+349 |         return { result: "No results found." };
+350 |       }
+351 |       const lines = results.map((r, i) =>
+352 |         `${i + 1}. ${r.file}:${r.lineStart}-${r.lineEnd} (score=${r.score.toFixed(2)})\n   ${r.snippet.replace(/\n/g, " ").slice(0, 120)}`
+353 |       );
+354 |       ctx.log(`  -> ${results.length} results`);
+355 |       return { result: lines.join("\n\n") };
+356 |     },
+357 |     { defaultTimeout: 30 },
+358 |   );
+359 | 
+360 |   return registry;
+361 | }
+362 | 
+[2026-04-05T21:18:44.276Z] iter=392 turn=14 INFO: Turn 14/25
+[2026-04-05T21:18:47.418Z] iter=392 turn=14 INFO: Agent: Now update the system prompt in orchestrator.ts to mention `semantic_search`:
+[2026-04-05T21:18:47.419Z] iter=392 turn=14 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T21:18:47.422Z] iter=392 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+282 | 
+283 | Working directory: ${workDir}
+284 | 
+285 | You have these tools: bash, read_file, write_file, grep, web_search, semantic_search.
+286 | 
+287 | Rules:
+288 | - Be concise and action-oriented. Do the thing, show the result.
+[2026-04-05T21:18:47.423Z] iter=392 turn=15 INFO: Turn 15/25
+[2026-04-05T21:18:50.661Z] iter=392 turn=15 INFO: Agent: Now add the `/search` command to tui.tsx. Let me find the `/find` handler:
+[2026-04-05T21:18:50.662Z] iter=392 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "\/find\|\/help\|case.*find\|handleFind" src/tui.tsx | head -20
+[2026-04-05T21:18:50.674Z] iter=392 turn=15 INFO:   -> exit=0 (385 chars)
+[2026-04-05T21:18:50.674Z] iter=392 turn=16 INFO: Turn 16/25
+[2026-04-05T21:18:52.628Z] iter=392 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '694,730p' src/tui.tsx
+[2026-04-05T21:18:52.639Z] iter=392 turn=16 INFO:   -> exit=0 (1569 chars)
+[2026-04-05T21:18:52.639Z] iter=392 turn=17 INFO: Turn 17/25
+[2026-04-05T21:18:54.410Z] iter=392 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^import\|from.*tui\|_searchIndexHolder\|buildSearchIndex" src/tui.tsx | head -20
+[2026-04-05T21:18:54.440Z] iter=392 turn=17 INFO:   -> exit=0 (1063 chars)
+[2026-04-05T21:18:54.440Z] iter=392 turn=18 INFO: Turn 18/25
+[2026-04-05T21:18:58.173Z] iter=392 turn=18 INFO: Agent: Now I'll add the `/search` command to tui.tsx — import `_searchIndexHolder`/`buildSearchIndex` and add the handler:
+[2026-04-05T21:18:58.175Z] iter=392 turn=18 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T21:18:58.177Z] iter=392 turn=18 INFO:   -> ok: Patched src/tui.tsx: -1 +2 lines
+
+Context after patch:
+25 | import { shouldShowWelcome } from "./welcome.js";
+26 | import type { Task, TaskPlan } from "./task-planner.js";
+27 | import { handlePlanCommand } from "./plan-commands.js";
+28 | import { runDream } from "./dream.js";
+29 | import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
+30 | import Anthropic from "@anthropic-ai/sdk";
+31 | import { Markdown } from "./markdown-renderer.js";
+32 | 
+[2026-04-05T21:18:58.180Z] iter=392 turn=19 INFO: Turn 19/25
+[2026-04-05T21:19:01.840Z] iter=392 turn=19 INFO: Agent: Now add the `/search` handler after the `/find` block, and add `/search` to `/help`:
+[2026-04-05T21:19:01.841Z] iter=392 turn=19 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T21:19:01.842Z] iter=392 turn=19 INFO:   -> ok: Patched src/tui.tsx: -1 +2 lines
+
+Context after patch:
+605 |           "  /help     — Show this help message",
+606 |           "  /init     — Analyze repo and generate/update .autoagent.md",
+607 |           "  /status   — Show session stats (turns, tokens, cost, model)",
+608 |           "  /find Q   — Fuzzy search files & symbols in the repo",
+609 |           "  /search Q — BM25 semantic code search (concept-based)",
+610 |           "  /model    — Show current model (or /model haiku|sonnet to switch)",
+611 |           "  /clear    — Clear the conversation history",
+612 |           "  /reindex  — Re-index the repository files",
+[2026-04-05T21:19:01.842Z] iter=392 turn=20 INFO: Turn 20/25
+[2026-04-05T21:19:07.793Z] iter=392 turn=20 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T21:19:07.795Z] iter=392 turn=20 INFO:   -> ok: Patched src/tui.tsx: -1 +29 lines
+
+Context after patch:
+728 |       }
+729 |       return;
+730 |     }
+731 |     if (trimmed.startsWith("/search")) {
+732 |       const query = trimmed.slice(7).trim();
+733 |       if (!query) {
+734 |         setMessages(prev => [...prev, { role: "assistant", content: "Usage: /search <query>" }]);
+735 |         return;
+736 |       }
+737 |       try {
+738 |         if (_searchIndexHolder.index.fileCount === 0) {
+739 |           setMessages(prev => [...prev, { role: "assistant", content: "Building search index…" }]);
+740 |           await buildSearchIndex(workDir);
+741 |         }
+742 |         const results = _searchIndexHolder.index.search(query, 5);
+743 |         if (results.length === 0) {
+744 |           setMessages(prev => [...prev, { role: "assistant", content: `No results for "${query}"` }]);
+745 |         } else {
+746 |           const lines = results.map((r, i) =>
+747 |             `${i + 1}. ${r.file}:${r.lineStart}-${r.lineEnd}  score=${r.score.toFixed(2)}\n   ${r.snippet.replace(/\n/g, " ").slice(0, 120)}`
+748 |           );
+749 |           setMessages(prev => [...prev, {
+750 |             role: "assistant",
+751 |             content: `🔍 Semantic results for "${query}":\n\n${lines.join("\n\n")}`,
+752 |           }]);
+753 |         }
+754 |       } catch (err) {
+755 |         setMessages(prev => [...prev, { role: "assistant", content: `Search failed: ${String(err)}` }]);
+756 |       }
+757 |       return;
+758 |     }
+759 |     if (trimmed === "/diff") {
+760 |       try {
+761 |         const isRepo = execSync("git rev-parse --is-inside-work-tree", {
+762 |           cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"],
+[2026-04-05T21:19:07.797Z] iter=392 turn=21 INFO: Turn 21/25
+[2026-04-05T21:19:10.187Z] iter=392 turn=21 INFO: Agent: Now run TSC:
+[2026-04-05T21:19:10.189Z] iter=392 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T21:19:11.303Z] iter=392 turn=21 INFO:   -> exit=2 (109 chars)
+[2026-04-05T21:19:11.303Z] iter=392 turn=22 INFO: Turn 22/25
+[2026-04-05T21:19:12.880Z] iter=392 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && grep -r "glob" src/ --include="*.ts" | grep "import.*glob" | head -5
+[2026-04-05T21:19:12.912Z] iter=392 turn=22 INFO:   -> exit=0 (388 chars)
+[2026-04-05T21:19:12.912Z] iter=392 turn=23 INFO: Turn 23/25
+[2026-04-05T21:19:14.472Z] iter=392 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && grep -r "glob\|fast-glob\|globby" package.json
+[2026-04-05T21:19:14.489Z] iter=392 turn=23 INFO:   -> exit=1 (11 chars)
+[2026-04-05T21:19:14.490Z] iter=392 turn=23 INFO: HARD TURN CAP REACHED: 23 turns (predicted 15, cap 23). Forcing commit.
+[2026-04-05T21:19:14.494Z] iter=392 turn=23 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-05T21:19:14.496Z] iter=392 turn=23 INFO: Tool timing: bash: 21x, avg=70ms, total=1478ms; write_file: 7x, avg=2ms, total=17ms; read_scratchpad: 1x, avg=5ms, total=5ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T21:19:14.496Z] iter=392 turn=23 INFO: Tool timing stats
+[2026-04-05T21:19:14.864Z] iter=392 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 392: predicted 15 turns, actual 23 turns, ratio 1.53**
+[2026-04-05T21:19:24.217Z] iter=392 turn=23 INFO: Pre-commit review (1607in/353out): **Issues:**
+
+- **Stale shared index on rebuild**: `codeSearchIndex` is exported as `const` and initialized once, but `buildSearchIndex()` swaps `_searchIndexHolder.index` to a `freshIndex` — any code 
