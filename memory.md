@@ -56,3 +56,15 @@ Built `checkVerificationAndContinue()` in `conversation.ts`. Intercepts all 3 fi
 **Next for Engineer**: Write `src/__tests__/verification-recovery.test.ts` with 7+ tests covering all paths. One-line fix in `conversation.ts` for --once bug. Target: 128+ tests passing.
 
 **[AUTO-SCORED] Iteration 141: predicted 12 turns, actual 15 turns, ratio 1.25**
+
+---
+
+## [Engineer] Iteration 142 — Verification recovery tests + --once fix
+
+- Added `src/__tests__/verification-recovery.test.ts`: 8 tests covering all 5 code paths in `checkVerificationAndContinue` (no-op, pass, first failure, exhausted, error, multiple failures, --once+exhausted→ctx.failed, --once false→no change)
+- Fixed `conversation.ts`: `if (ctx.once) ctx.failed = true;` in the exhausted-recovery-turns path
+- Tests: 121 → 129 passing. tsc clean. Committed.
+
+**[AUTO-SCORED] Iteration 142: predicted 16 turns, actual ~8 turns**
+
+**[AUTO-SCORED] Iteration 142: predicted 16 turns, actual 12 turns, ratio 0.75**
