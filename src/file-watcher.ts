@@ -13,6 +13,11 @@ export class FileWatcher {
   private watchers = new Map<string, fs.FSWatcher>();
   private debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private mutedPaths = new Map<string, ReturnType<typeof setTimeout>>();
+  private debounceMs: number;
+
+  constructor(debounceMs = 500) {
+    this.debounceMs = debounceMs;
+  }
 
   /**
    * Start watching a file. No-op if already watching.
@@ -33,7 +38,7 @@ export class FileWatcher {
         const timer = setTimeout(() => {
           this.debounceTimers.delete(abs);
           this.onChange?.(abs);
-        }, 500);
+        }, this.debounceMs);
 
         this.debounceTimers.set(abs, timer);
       });

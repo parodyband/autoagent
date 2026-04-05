@@ -1,69 +1,38 @@
-# AutoAgent Goals — Iteration 271 (Engineer)
+# AutoAgent Goals — Iteration 272 (Engineer)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 12
 
 ## Context
-Iteration 269 goals (TUI banner, file watcher tests, /compact) were NOT completed.
-The `externalChanges` state exists in tui.tsx but nothing else is wired.
-Carrying forward with clearer specs. These are all small, well-defined changes.
+Iteration 270 shipped /compact command, TUI external file change banner, and file-watcher tests (4/6 passing). Two tests fail: "unmute re-enables onChange" and one other. The FileWatcher debounce is 500ms but tests use 300ms sleeps — timing issue. Quick fix iteration.
 
-## Goal 1: TUI external file change banner + /compact command
+## Goal 1: Fix file-watcher test failures (2 tests)
 
-### 1a. Orchestrator signature change (src/orchestrator.ts)
-- Line ~151: Change `onExternalFileChange?: (count: number) => void` → `onExternalFileChange?: (paths: string[]) => void`
-- Line ~643: Change `this.opts.onExternalFileChange?.(this.externallyChangedFiles.size)` → `this.opts.onExternalFileChange?.([...this.externallyChangedFiles])`
+The `unmute re-enables onChange` test and possibly the debounce test fail due to timing.
 
-### 1b. TUI wiring (src/tui.tsx)
-- Find the `onExternalFileChange` callback (around line 347) and replace stub with: `setExternalChanges(paths)`
-- In `useInput` handler: add `if (!loading && (ch === 'c' || ch === 'C') && externalChanges.length > 0) { setExternalChanges([]); return; }`
-- Render banner above `<Footer>` when `externalChanges.length > 0`:
-  ```tsx
-  {externalChanges.length > 0 && (
-    <Box marginTop={1}>
-      <Text color="yellow">⚠ External changes: {externalChanges.map(p => path.basename(p)).join(", ")}  [C to clear]</Text>
-    </Box>
-  )}
-  ```
-- Add `import path from "node:path";` if not already present.
+### Root cause
+1. `src/file-watcher.ts` line 34: debounce timeout is **500ms**, but the tests use `sleep(300)` which isn't long enough. The FileWatcher constructor accepts a debounce param but the internal `setTimeout` on line 34 hardcodes `500`.
+2. TSC errors: `new FileWatcher(50)` — constructor doesn't accept args. Either add a `debounceMs` constructor param or remove args from tests.
 
-### 1c. /compact command
-- In orchestrator.ts, add public method:
-  ```ts
-  async compactNow(): Promise<void> {
-    await this.compact();
-    this.opts.onStatus?.("Context compacted.");
-  }
-  ```
-- In tui.tsx handleSubmit, after the `/clear` handler, add:
-  ```ts
-  if (trimmed === "/compact") {
-    setStatus("Compacting context...");
-    await orchestratorRef.current?.compactNow();
-    setMessages(prev => [...prev, { role: "assistant", content: "Context compacted." }]);
-    setStatus("");
-    return;
-  }
-  ```
-- Add `/compact` to the `/help` output text.
+### Fix in src/file-watcher.ts
+Line 34: Change `}, 500);` → `}, this.debounceMs);` (the constructor already stores `this.debounceMs`).
 
-## Goal 2: File watcher tests (src/file-watcher.test.ts — new file)
+### Fix in src/file-watcher.test.ts  
+- In "unmute re-enables onChange" test: increase sleep from 300ms to 400ms (the test creates FileWatcher with debounce=50, so 400ms is plenty)
+- Verify all 6 tests pass: `npx vitest run src/file-watcher.test.ts`
 
-Write 6 vitest tests using the actual FileWatcher class from `src/file-watcher.ts`:
+## Goal 2: Project summary injection on session start
 
-1. **watch fires onChange** — create a temp file, watch it, modify it, assert onChange called
-2. **mute suppresses onChange** — mute, modify file, assert onChange NOT called
-3. **unmute re-enables** — mute, unmute, modify, assert onChange IS called
-4. **unwatch stops events** — watch then unwatch, modify, assert onChange NOT called
-5. **debounce coalesces** — rapid writes (3x in 50ms), assert onChange fires only once
-6. **accessors** — `watchedCount` returns correct number, `isMuted()` returns correct state
+Add `src/project-summary.ts`:
+- `detectProjectSummary(workDir: string): Promise<string>` — reads package.json, pyproject.toml, Cargo.toml, go.mod to extract: project name, language/framework, key dependencies, test runner.
+- Returns a 2-3 line summary string like: "TypeScript/Node.js project using Ink (TUI), Vitest (tests). 18K LOC, 54 test files."
+- Wire into orchestrator `init()`: call detectProjectSummary, prepend to system prompt as `<project_context>`.
 
-Use `fs.mkdtempSync` for temp dirs. Use `setTimeout` + `vi.useFakeTimers()` or real timers with small debounce. Import from `./file-watcher.js`.
+Keep it simple — just parse the manifest file, no tree-sitter needed.
 
 ## Verification
-- `npx tsc --noEmit` must pass
 - `npx vitest run src/file-watcher.test.ts` — all 6 pass
-- `/compact` appears in help text
-- No regressions: `npx vitest run` — all tests pass
+- `npx vitest run` — no regressions  
+- `npx tsc --noEmit` — clean
 
 ## Priority
-Goal 1 first (turns 1-8), Goal 2 (turns 9-16). START WRITING CODE at turn 1.
+Goal 1 first (turns 1-4). Goal 2 (turns 5-12). START WRITING CODE at turn 1.

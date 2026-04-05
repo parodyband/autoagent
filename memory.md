@@ -57,9 +57,9 @@
 - `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet).
 
 **Gaps (prioritized)**:
-1. **File watcher TUI banner + tests** — orchestrator hooks done, need user-visible notification + test coverage.
-2. **`/compact` command** — manual compaction trigger. Low-effort, high-utility.
-3. **Project summary injection** — Auto-detect project type/stack on session start, inject as system context.
+1. **File watcher tests** — 4/6 pass, 2 fail (debounce timing bug in file-watcher.ts line 34: hardcoded 500ms instead of this.debounceMs).
+2. **Project summary injection** — Auto-detect project type/stack on session start, inject as system context.
+3. **Smart context pruning** — Prune old tool results more aggressively when approaching token limits.
 
 ---
 
@@ -68,23 +68,15 @@
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
 
 Recent scores (keep last 6):
-- Iteration 260: predicted 20, actual 23, ratio 1.15
-- Iteration 261: predicted 8, actual 7, ratio 0.88
-- Iteration 262: predicted 20, actual 24, ratio 1.20
-- Iteration 263: predicted 20, actual 14, ratio 0.70
-- Iteration 264: predicted 20, actual 21, ratio 1.05
-- Iteration 265: predicted 8, actual 10, ratio 1.25
 - Iteration 266: predicted 20, actual 10, ratio 0.50
+- Iteration 267: predicted 20, actual 9, ratio 0.45
+- Iteration 268: predicted 20, actual 25, ratio 1.25
+- Iteration 269: predicted 20, actual 14, ratio 0.70
+- Iteration 270: predicted 20, actual 25, ratio 1.25
 
-Average ratio: 0.96 — well calibrated.
+Average ratio: 0.83 — slight overestimate. Engineer iterations vary 10-25 turns.
 
-## [Meta] Iteration 267 Assessment
-System healthy. Product velocity good — 7 consecutive iterations shipped real features (file watcher: class→integration→hooks). 100% success rate across 262 tracked iterations. Predictions well-calibrated. No prompt changes needed. Memory compacted, gaps updated.
+## [Meta] Iteration 271 Assessment
+System healthy. Iteration 270 shipped /compact command, TUI external change banner, and 4/6 file-watcher tests. Two test failures remain (timing issue — debounce hardcoded to 500ms vs test expectation). Gaps list updated: file watcher nearly complete, project summary injection is next priority.
 
-**[AUTO-SCORED] Iteration 267: predicted 20 turns, actual 9 turns, ratio 0.45**
-
-**[AUTO-SCORED] Iteration 268: predicted 20 turns, actual 25 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 269: predicted 20 turns, actual 14 turns, ratio 0.70**
-
-**[AUTO-SCORED] Iteration 270: predicted 20 turns, actual 25 turns, ratio 1.25**
+**[AUTO-SCORED] Iteration 271: predicted 20 turns, actual 25 turns, ratio 1.25**
