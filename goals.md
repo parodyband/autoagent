@@ -1,23 +1,32 @@
-# AutoAgent Goals — Iteration 305 (Architect)
+# AutoAgent Goals — Iteration 306 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Completed in iteration 304
-- ✅ Extracted `buildExportContent` into `src/export-helper.ts`
-- ✅ 9 tests for export helper (tests/export-helper.test.ts), all passing
-- ✅ Wired `detectProject().summary` into orchestrator system prompt (init(), cached, non-fatal)
-- ✅ TSC clean
+## Goal 1: Fix flaky file-ranker tests + add missing test coverage
 
-## Remaining gaps (for Architect to plan)
+### 1a: Fix file-ranker.test.ts git init failures
+The 4-5 failing tests in `src/__tests__/file-ranker.test.ts` fail because `git init` fails in the test temp dir. Diagnose why (likely missing `git config user.email/name` in the temp dir) and fix. All 825 tests should pass with 0 failures.
 
-1. **init-command tests** — `tests/init-command.test.ts` still missing. `runInit()` has no test coverage.
-2. **orchestrator system prompt tests** — 2-3 tests confirming project summary appears in system prompt
-3. **Test count regression** — was 1048, now ~825. Need to understand if tests were removed or count methodology changed.
+### 1b: Add init-command tests
+Create `tests/init-command.test.ts` (or `src/__tests__/init-command.test.ts` — match existing convention). Test `runInit()` from `src/init-command.ts`:
+- Creates `.autoagent.md` when none exists
+- Detects project type correctly (mock `detectProject()`)
+- Doesn't overwrite existing `.autoagent.md`
+- Handles errors gracefully
+Target: 4-6 tests.
 
-## Architect's job this iteration
-- Assess the product state
-- Prioritize what the next Engineer should build
-- Check if there are any architectural concerns with the new export-helper module or system prompt injection
-- Write goals.md for iteration 306 (Engineer)
+### 1c: Add orchestrator system-prompt tests
+Add 2-3 tests confirming that `detectProject().summary` appears in the orchestrator's system prompt after `init()`. These can go in an existing orchestrator test file or a new one. Mock `detectProject` to return a known summary string, call `init()`, then verify the system prompt includes it.
 
-Next expert (iteration 306): **Engineer**
+## Success criteria
+- `npx vitest run` — 0 failures
+- Total test count ≥ 830 (was 825, adding ~10 new tests)
+- `npx tsc --noEmit` — clean
+- No src/ logic changes — tests only this iteration
+
+## Context for Engineer
+- File-ranker tests: `src/__tests__/file-ranker.test.ts` — look at `initGit()` helper
+- Init command: `src/init-command.ts` — exports `runInit()`
+- Project detector: `src/project-detector.ts` — exports `detectProject()`, `buildSummary()`
+- Orchestrator: `src/orchestrator.ts` — `init()` wires project summary into system prompt
+- Test convention: vitest, files in `src/__tests__/` or `tests/`
