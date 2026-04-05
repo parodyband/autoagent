@@ -15,7 +15,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import { readFileSync, existsSync, appendFileSync, writeFileSync } from "fs";
+import { readFileSync, existsSync, appendFileSync, writeFileSync, unlinkSync } from "fs";
 import { Logger, createLogger } from "./logging.js";
 import { spawn as spawnProcess } from "child_process";
 import path from "path";
@@ -64,15 +64,15 @@ function log(iter: number, msg: string): void {
 
 // ─── File readers ───────────────────────────────────────────
 
-function readGoals(): string {
+function readGoals(iteration: number): string {
   // Task mode: if TASK.md exists, use it as the goal for this iteration.
   // Create TASK.md with a plain-text description of what you want done.
   // The agent will execute it and delete TASK.md when complete.
   if (existsSync(TASK_FILE)) {
     const taskContent = readFileSync(TASK_FILE, "utf-8").trim();
-    log(0, `[TASK MODE] Running user task from TASK.md`);
+    log(iteration, `[TASK MODE] Running user task from TASK.md`);
     return [
-      `# AutoAgent Task Mode — Iteration ${Date.now()}`,
+      `# AutoAgent Task Mode — Iteration ${iteration}`,
       ``,
       `PREDICTION_TURNS: 11`,
       ``,
@@ -149,6 +149,12 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
     restart,
     predictedTurns: ctx.predictedTurns,
   }, doRestart);
+
+  // Task mode: delete TASK.md after successful iteration
+  if (ctx.taskMode && existsSync(TASK_FILE)) {
+    unlinkSync(TASK_FILE);
+    ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
+  }
 }
 
 // ─── Restart ────────────────────────────────────────────────
@@ -181,10 +187,18 @@ async function runIteration(state: IterationState): Promise<void> {
 
   // Pick which expert runs this iteration
   const experts = loadExperts(ROOT);
-  const expert = pickExpert(state.iteration, experts);
+  let expert = pickExpert(state.iteration, experts);
+
+  // Task mode: force Engineer expert so user tasks always get code execution
+  const taskMode = existsSync(TASK_FILE);
+  if (taskMode) {
+    const engineerExpert = experts.find(e => e.name === "Engineer") ?? expert;
+    expert = engineerExpert;
+    log(state.iteration, `[TASK MODE] Expert overridden to Engineer`);
+  }
 
   // Parse predicted turns from goals before they get rewritten
-  const goalsContent = readGoals();
+  const goalsContent = readGoals(state.iteration);
   const predMatch = goalsContent.match(/PREDICTION_TURNS:\s*(\d+)/);
   const predictedTurns = predMatch ? parseInt(predMatch[1], 10) : null;
 
@@ -209,6 +223,7 @@ async function runIteration(state: IterationState): Promise<void> {
     onFinalize: doFinalize,
     compressionConfig: null, // Disabled — prompt caching handles token cost
     predictedTurns,
+    taskMode,
   };
 
   console.log(`\n${"=".repeat(60)}`);

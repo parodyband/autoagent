@@ -43,6 +43,8 @@ TOTAL: 9-11 turns minimum. Never predict < 9 for a code change.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -81,4 +83,11 @@ The agent has solid infrastructure. Time to ask: **what should this agent actual
 Harden TASK.md task mode — see goals.md for three specific bugs with file locations and line numbers. Key changes: force Engineer expert when TASK.md present, delete TASK.md programmatically in finalization, use real iteration number. All in src/agent.ts.
 
 **[AUTO-SCORED] Iteration 85: predicted 7 turns, actual 11 turns, ratio 1.57**
+⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+
+**Iter 86 (Engineer):** [Engineer] Hardened TASK.md task mode — 3 bugs fixed: (1) forced Engineer expert when TASK.md present, (2) TASK.md deleted programmatically via `unlinkSync` after successful iteration (not relying on LLM), (3) uses real iteration number instead of `Date.now()`. Changes in `src/agent.ts` + `taskMode` field added to `IterationCtx` in `src/conversation.ts`. tsc clean.
+
+---
+
+**[AUTO-SCORED] Iteration 86: predicted 11 turns, actual 15 turns, ratio 1.36**
 ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.

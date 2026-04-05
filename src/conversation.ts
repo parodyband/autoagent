@@ -57,6 +57,8 @@ export interface IterationCtx {
   compressionConfig?: CompressionConfig | null;
   /** Optional custom system prompt builder. Defaults to buildSystemPrompt from messages.ts. */
   systemPromptBuilder?: (state: IterationState, rootDir: string) => string;
+  /** True when running a user task from TASK.md */
+  taskMode?: boolean;
 }
 
 export type TurnResult = "continue" | "break" | "restarted";

@@ -1,90 +1,3 @@
-75 | - Question assumptions. Is the current architecture right? Should something be deleted?
-76 | 
-77 | ## Turn Budget (for setting PREDICTION_TURNS in goals.md)
-78 | \`prediction = READ(1-2) + WRITE(1-2) + VERIFY(2) + META(3) + BUFFER(1-2)\`
-79 | **Minimum for any code change: 9 turns.** Never predict less.
-80 | 
-81 | ## Your superpower
-82 | You have subagent — use it to delegate research, analysis, or code review to cheaper models.
-83 | Read files and have Haiku summarize them. Ask Sonnet to review a design. Don't do everything yourself.
-84 | 
-85 | ## Rules
-86 | - ESM project: use import, never require(). Use .js extensions in imports.
-[2026-04-05T10:37:30.793Z] iter=75 turn=15 INFO: Turn 15/25
-[2026-04-05T10:37:33.904Z] iter=75 turn=15 INFO: Agent: Now verify everything compiles and tests pass:
-[2026-04-05T10:37:33.905Z] iter=75 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T10:37:34.617Z] iter=75 turn=15 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:37:34.617Z] iter=75 turn=16 INFO: Turn 16/25
-[2026-04-05T10:37:38.325Z] iter=75 turn=16 INFO: Agent: 
-
-Good — compilation passes. Let me run self-tests to verify the write_file.ts change doesn't break anything, then wrap up.
-[2026-04-05T10:37:38.326Z] iter=75 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -10
-[2026-04-05T10:37:42.838Z] iter=75 turn=16 INFO:   -> exit=0 (224 chars)
-[2026-04-05T10:37:42.838Z] iter=75 turn=17 INFO: Turn 17/25
-[2026-04-05T10:37:45.845Z] iter=75 turn=17 INFO: Agent: 3 failures. Let me check which:
-[2026-04-05T10:37:45.845Z] iter=75 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | grep "FAIL\|❌"
-[2026-04-05T10:37:49.555Z] iter=75 turn=17 INFO:   -> exit=0 (204 chars)
-[2026-04-05T10:37:49.556Z] iter=75 turn=18 INFO: Turn 18/25
-[2026-04-05T10:37:54.649Z] iter=75 turn=18 INFO: Agent: The tests expect the old behavior where *all* non-append writes are rejected. My change allows shorter writes (compaction). The test writes "Completely new content" (shorter than existing), which now passes instead of being rejected. I need to update the tests to use content that's *longer* (non-compaction rewrite) to trigger the guard:
-[2026-04-05T10:37:54.649Z] iter=75 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "Completely new content\|Rewritten log" scripts/self-test.ts
-[2026-04-05T10:37:54.661Z] iter=75 turn=18 INFO:   -> exit=0 (192 chars)
-[2026-04-05T10:37:54.662Z] iter=75 turn=19 INFO: Turn 19/25
-[2026-04-05T10:38:01.410Z] iter=75 turn=19 INFO: Agent: The existing content is `"# Memory\n\nExisting content.\n"` (26 chars). "Completely new content" is 21 chars — shorter, so now allowed. I need the test content to be longer than existing to trigger the guard:
-[2026-04-05T10:38:01.411Z] iter=75 turn=19 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T10:38:01.413Z] iter=75 turn=19 INFO:   -> ok: Patched scripts/self-test.ts: -3 +3 lines
-
-Context after patch:
-147 |   const memFile = path.join(TEMP_DIR, "memory.md");
-148 |   writeFileSync(memFile, "# Memory\n\nExisting content.\n", "utf-8");
-149 | 
-150 |   // Non-append write to memory.md should be rejected when content is longer and doesn't start with existing
-151 |   const rewrite = executeWriteFile("memory.md", "Completely rewritten content that is definitely longer than the original content above", "write", TEMP_DIR);
-152 |   assert(!rewrite.success && rewrite.message.includes("append-only"), "write_file: rejects non-append write to memory.md");
-153 |   // Verify file unchanged
-154 |   assert(readFileSync(memFile, "utf-8") === "# Memory\n\nExisting content.\n", "write_file: memory.md unchanged after rejected write");
-155 | 
-[2026-04-05T10:38:01.413Z] iter=75 turn=20 INFO: Turn 20/25
-[2026-04-05T10:38:05.402Z] iter=75 turn=20 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T10:38:05.404Z] iter=75 turn=20 INFO:   -> ok: Patched scripts/self-test.ts: -2 +2 lines
-
-Context after patch:
-166 |   // Same enforcement for agentlog.md
-167 |   const logFile = path.join(TEMP_DIR, "agentlog.md");
-168 |   writeFileSync(logFile, "# Log\n\nEntry 1.\n", "utf-8");
-169 |   const logRewrite = executeWriteFile("agentlog.md", "Rewritten log content that is longer than the original log entry above here", "write", TEMP_DIR);
-170 |   assert(!logRewrite.success && logRewrite.message.includes("append-only"), "write_file: rejects non-append write to agentlog.md");
-171 | 
-172 |   // Verify subpath/memory.md is NOT protected (basename check is gone)
-173 |   mkdirSync(path.join(TEMP_DIR, "subdir"), { recursive: true });
-[2026-04-05T10:38:05.404Z] iter=75 turn=21 INFO: Turn 21/25
-[2026-04-05T10:38:08.553Z] iter=75 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -5
-[2026-04-05T10:38:08.558Z] iter=75 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T10:38:09.281Z] iter=75 turn=21 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:38:12.092Z] iter=75 turn=21 INFO:   -> exit=0 (100 chars)
-[2026-04-05T10:38:12.092Z] iter=75 turn=22 INFO: Turn 22/25
-[2026-04-05T10:38:18.054Z] iter=75 turn=22 INFO: Agent: All 580 tests pass, compilation clean. Update goals and commit:
-[2026-04-05T10:38:18.055Z] iter=75 turn=22 INFO: $ cat > goals.md << 'EOF'
-# AutoAgent Goals — Iteration 76
-
-PREDICTION_TURNS: 10
-
-## Goal: Architect — evaluate post-compaction state, set next Engineer task
-
-Memory compacted from 44KB to 3.4KB. Engine...
-[2026-04-05T10:38:18.065Z] iter=75 turn=22 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:38:18.066Z] iter=75 turn=23 INFO: Turn 23/25
-[2026-04-05T10:38:20.294Z] iter=75 turn=23 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T10:38:20.294Z] iter=75 turn=23 INFO: RESTART signal
-[2026-04-05T10:38:20.294Z] iter=75 turn=23 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T10:38:20.999Z] iter=75 turn=23 INFO: Compilation OK
-[2026-04-05T10:38:25.123Z] iter=75 turn=23 INFO: Cache persisted: 25 entries to .autoagent-cache.json
-[2026-04-05T10:38:25.123Z] iter=75 turn=23 INFO: Cache stats: 0 hits, 2 misses, 25 entries, 7 invalidations (2 entries removed)
-[2026-04-05T10:38:25.123Z] iter=75 turn=23 INFO: Tool cache stats
-[2026-04-05T10:38:25.123Z] iter=75 turn=23 INFO: Tool timing: bash: 17x, avg=786ms, total=13359ms; write_file: 7x, avg=2ms, total=12ms; read_file: 2x, avg=2ms, total=3ms; think: 4x, avg=1ms, total=3ms
-[2026-04-05T10:38:25.123Z] iter=75 turn=23 INFO: Tool timing stats
-[2026-04-05T10:38:28.539Z] iter=75 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 75: predicted 10 turns, actual 23 turns, ratio 2.30**
-[2026-04-05T10:38:36.226Z] iter=75 turn=23 INFO: Pre-commit review (1486in/267out): **Logic bug in append-only enforcement:**
-
 The compaction exception (`content.length < oldContent.length`) allows completely replacing protected files with arbitrary shorter content. An agent could wr
 [2026-04-05T10:38:36.277Z] iter=75 turn=23 INFO: Committed: c143ff5a (35 in / 9053 out, cache: 42544 created, 717149 read)
 [2026-04-05T10:38:36.278Z] iter=75 turn=23 INFO: Restarting as iteration 76...
@@ -1083,3 +996,211 @@ The "high output ratio" warning is expected for an Architect iteration — I rea
 [2026-04-05T10:52:45.972Z] iter=85 turn=11 INFO: Tool timing stats
 [2026-04-05T10:52:49.554Z] iter=85 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 85: predicted 7 turns, actual 11 turns, ratio 1.57**
 [2026-04-05T10:52:49.573Z] iter=85 turn=11 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T10:52:49.604Z] iter=85 turn=11 INFO: Committed: c3449811 (17 in / 2895 out, cache: 14610 created, 96930 read)
+[2026-04-05T10:52:49.604Z] iter=85 turn=11 INFO: Restarting as iteration 86...
+[2026-04-05T10:52:49.800Z] iter=86 INFO: Cache restored: 26/26 entries (0 stale)
+[2026-04-05T10:52:49.801Z] iter=86 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T10:52:49.828Z] iter=86 INFO: Hard turn cap: 17 (1.5x prediction of 11)
+[2026-04-05T10:52:49.828Z] iter=86 turn=1 INFO: Turn 1/25
+[2026-04-05T10:52:51.387Z] iter=86 turn=1 INFO: think: Let me read the relevant files to understand what needs to be changed before making modifications....
+[2026-04-05T10:52:51.388Z] iter=86 turn=2 INFO: Turn 2/25
+[2026-04-05T10:52:52.619Z] iter=86 turn=2 INFO: read_file: src/agent.ts
+[2026-04-05T10:52:52.620Z] iter=86 turn=2 INFO:   -> ok (9759 chars)
+[2026-04-05T10:52:52.620Z] iter=86 turn=3 INFO: Turn 3/25
+[2026-04-05T10:52:54.870Z] iter=86 turn=3 INFO: read_file: src/finalization.ts
+[2026-04-05T10:52:54.871Z] iter=86 turn=3 INFO:   -> ok (10748 chars)
+[2026-04-05T10:52:54.871Z] iter=86 turn=3 INFO: read_file: src/conversation.ts
+[2026-04-05T10:52:54.872Z] iter=86 turn=3 INFO:   -> ok (1694 chars)
+[2026-04-05T10:52:54.873Z] iter=86 turn=4 INFO: Turn 4/25
+[2026-04-05T10:52:57.730Z] iter=86 turn=4 INFO: read_file: src/conversation.ts
+[2026-04-05T10:52:57.732Z] iter=86 turn=4 INFO:   -> ok (1297 chars)
+[2026-04-05T10:52:57.733Z] iter=86 turn=4 INFO: read_file: CACHE HIT
+[2026-04-05T10:52:57.734Z] iter=86 turn=5 INFO: Turn 5/25
+[2026-04-05T10:53:10.825Z] iter=86 turn=5 INFO: think: I have all the context I need. Let me implement the three changes:
+
+1. Force Engineer expert when TASK.md exists - in `r...
+[2026-04-05T10:53:10.826Z] iter=86 turn=6 INFO: Turn 6/25
+[2026-04-05T10:53:14.314Z] iter=86 turn=6 INFO: Agent: Three changes, all in `src/agent.ts` and `src/conversation.ts`. Writing now.
+[2026-04-05T10:53:14.316Z] iter=86 turn=6 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T10:53:14.318Z] iter=86 turn=6 INFO:   -> ok: Patched src/agent.ts: -3 +3 lines
+
+Context after patch:
+14 |  * - tool-registry.ts — tool definitions and handlers
+15 |  */
+16 | 
+17 | import Anthropic from "@anthropic-ai/sdk";
+18 | import { readFileSync, existsSync, appendFileSync, writeFileSync, unlinkSync } from "fs";
+19 | import { Logger, createLogger } from "./logging.js";
+20 | import { spawn as spawnProcess } from "child_process";
+21 | import path from "path";
+22 | import "dotenv/config";
+[2026-04-05T10:53:14.319Z] iter=86 turn=7 INFO: Turn 7/25
+[2026-04-05T10:53:20.076Z] iter=86 turn=7 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T10:53:20.078Z] iter=86 turn=7 INFO:   -> ok: Patched src/agent.ts: -9 +9 lines
+
+Context after patch:
+64 | 
+65 | // ─── File readers ───────────────────────────────────────────
+66 | 
+67 | function readGoals(iteration: number): string {
+68 |   // Task mode: if TASK.md exists, use it as the goal for this iteration.
+69 |   // Create TASK.md with a plain-text description of what you want done.
+70 |   // The agent will execute it and delete TASK.md when complete.
+71 |   if (existsSync(TASK_FILE)) {
+72 |     const taskContent = readFileSync(TASK_FILE, "utf-8").trim();
+73 |     log(iteration, `[TASK MODE] Running user task from TASK.md`);
+74 |     return [
+75 |       `# AutoAgent Task Mode — Iteration ${iteration}`,
+76 |       ``,
+77 |       `PREDICTION_TURNS: 11`,
+78 |       ``,
+[2026-04-05T10:53:20.079Z] iter=86 turn=8 INFO: Turn 8/25
+[2026-04-05T10:53:25.681Z] iter=86 turn=8 INFO: Agent: Now fix the call site and add task mode logic:
+[2026-04-05T10:53:25.682Z] iter=86 turn=8 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T10:53:25.683Z] iter=86 turn=8 INFO:   -> ok: Patched src/agent.ts: -6 +14 lines
+
+Context after patch:
+179 |     log(state.iteration, `Cache restore error (non-fatal): ${err instanceof Error ? err.message : err}`);
+180 |   }
+181 | 
+182 |   // Pick which expert runs this iteration
+183 |   const experts = loadExperts(ROOT);
+184 |   let expert = pickExpert(state.iteration, experts);
+185 | 
+186 |   // Task mode: force Engineer expert so user tasks always get code execution
+187 |   const taskMode = existsSync(TASK_FILE);
+188 |   if (taskMode) {
+189 |     const engineerExpert = experts.find(e => e.name === "Engineer") ?? expert;
+190 |     expert = engineerExpert;
+191 |     log(state.iteration, `[TASK MODE] Expert overridden to Engineer`);
+192 |   }
+193 | 
+194 |   // Parse predicted turns from goals before they get rewritten
+195 |   const goalsContent = readGoals(state.iteration);
+196 |   const predMatch = goalsContent.match(/PREDICTION_TURNS:\s*(\d+)/);
+197 |   const predictedTurns = predMatch ? parseInt(predMatch[1], 10) : null;
+198 | 
+[2026-04-05T10:53:25.684Z] iter=86 turn=9 INFO: Turn 9/25
+[2026-04-05T10:53:35.545Z] iter=86 turn=9 INFO: Agent: **Goal status:**
+1. Force Engineer in task mode — DONE
+2. Delete TASK.md programmatically — IN PROGRESS (added `unlinkSync` import, need to wire `taskMode` flag and delete call)
+3. Use real iteration number — DONE
+
+Finishing #2 now — add `taskMode` to `IterationCtx` and delete in `doFinalize`:
+[2026-04-05T10:53:35.546Z] iter=86 turn=9 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T10:53:35.548Z] iter=86 turn=9 INFO:   -> ok: Patched src/agent.ts: -22 +23 lines
+
+Context after patch:
+196 |   const predMatch = goalsContent.match(/PREDICTION_TURNS:\s*(\d+)/);
+197 |   const predictedTurns = predMatch ? parseInt(predMatch[1], 10) : null;
+198 | 
+199 |   const ctx: IterationCtx = {
+200 |     client: new Anthropic(),
+201 |     model: expert.model,
+202 |     maxTokens: parseInt(process.env.MAX_TOKENS || "16384", 10),
+203 |     startTime: new Date(),
+204 |     toolCounts: {},
+205 |     iter: state.iteration,
+206 |     state,
+207 |     tokens: { in: 0, out: 0, cacheCreate: 0, cacheRead: 0 },
+208 |     messages: [],
+209 |     turns: 0,
+210 |     cache,
+211 |     timing: new ToolTimingTracker(),
+212 |     rootDir: ROOT,
+213 |     maxTurns: MAX_TURNS,
+214 |     logger,
+215 |     registry: toolRegistry,
+216 |     log: (msg: string) => log(state.iteration, msg),
+217 |     onFinalize: doFinalize,
+218 |     compressionConfig: null, // Disabled — prompt caching handles token cost
+219 |     predictedTurns,
+220 |     taskMode,
+221 |   };
+222 | 
+223 |   console.log(`\n${"=".repeat(60)}`);
+224 |   console.log(`  AutoAgent — Iteration ${ctx.iter}`);
+[2026-04-05T10:53:35.549Z] iter=86 turn=10 INFO: Turn 10/25
+[2026-04-05T10:53:41.964Z] iter=86 turn=10 INFO: Agent: Now add `taskMode` to `doFinalize` to delete TASK.md after success:
+[2026-04-05T10:53:41.965Z] iter=86 turn=10 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T10:53:41.966Z] iter=86 turn=10 INFO:   -> ok: Patched src/agent.ts: -16 +22 lines
+
+Context after patch:
+133 |     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
+134 |   }
+135 | 
+136 |   await runFinalization({
+137 |     iter: ctx.iter,
+138 |     state: ctx.state,
+139 |     startTime: ctx.startTime,
+140 |     turns: ctx.turns,
+141 |     toolCounts: ctx.toolCounts,
+142 |     tokens: ctx.tokens,
+143 |     cache: ctx.cache,
+144 |     timing: ctx.timing,
+145 |     rootDir: ROOT,
+146 |     metricsFile: METRICS_FILE,
+147 |     log: (msg: string) => log(ctx.iter, msg),
+148 |     logger,
+149 |     restart,
+150 |     predictedTurns: ctx.predictedTurns,
+151 |   }, doRestart);
+152 | 
+153 |   // Task mode: delete TASK.md after successful iteration
+154 |   if (ctx.taskMode && existsSync(TASK_FILE)) {
+155 |     unlinkSync(TASK_FILE);
+156 |     ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
+157 |   }
+158 | }
+159 | 
+160 | // ─── Restart ────────────────────────────────────────────────
+[2026-04-05T10:53:41.967Z] iter=86 turn=11 INFO: Turn 11/25
+[2026-04-05T10:53:45.640Z] iter=86 turn=11 INFO: Agent: Now add `taskMode` to `IterationCtx` in `conversation.ts`:
+[2026-04-05T10:53:45.640Z] iter=86 turn=11 INFO: write_file: src/conversation.ts (patch)
+[2026-04-05T10:53:45.641Z] iter=86 turn=11 INFO:   -> ok: Patched src/conversation.ts: -3 +5 lines
+
+Context after patch:
+55 |   validate?: (rootDir: string, log: (msg: string) => void) => Promise<{ ok: boolean; output: string }>;
+56 |   /** Optional compression config. Set to null to disable compression. */
+57 |   compressionConfig?: CompressionConfig | null;
+58 |   /** Optional custom system prompt builder. Defaults to buildSystemPrompt from messages.ts. */
+59 |   systemPromptBuilder?: (state: IterationState, rootDir: string) => string;
+60 |   /** True when running a user task from TASK.md */
+61 |   taskMode?: boolean;
+62 | }
+63 | 
+64 | export type TurnResult = "continue" | "break" | "restarted";
+65 | 
+[2026-04-05T10:53:45.641Z] iter=86 turn=12 INFO: Turn 12/25
+[2026-04-05T10:53:49.517Z] iter=86 turn=12 INFO: Agent: Now verify:
+[2026-04-05T10:53:49.518Z] iter=86 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T10:53:50.183Z] iter=86 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T10:53:50.183Z] iter=86 turn=13 INFO: Turn 13/25
+[2026-04-05T10:53:54.864Z] iter=86 turn=13 INFO: Agent: Clean. Now write memory and goals:
+[2026-04-05T10:53:54.865Z] iter=86 turn=13 INFO: write_file: goals.md (write)
+[2026-04-05T10:53:54.866Z] iter=86 turn=13 INFO:   -> ok: Updated goals.md (349 chars, -19 lines delta)
+[2026-04-05T10:53:54.866Z] iter=86 turn=14 INFO: Turn 14/25
+[2026-04-05T10:54:01.114Z] iter=86 turn=14 INFO: write_file: memory.md (patch)
+[2026-04-05T10:54:01.115Z] iter=86 turn=14 INFO:   -> ok: Patched memory.md: -2 +4 lines
+
+Context after patch:
+80 | ## Next for Engineer
+81 | Harden TASK.md task mode — see goals.md for three specific bugs with file locations and line numbers. Key changes: force Engineer expert when TASK.md present, delete TASK.md programmatically in finalization, use real iteration number. All in src/agent.ts.
+82 | 
+83 | **[AUTO-SCORED] Iteration 85: predicted 7 turns, actual 11 turns, ratio 1.57**
+84 | ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+85 | 
+86 | **Iter 86 (Engineer):** [Engineer] Hardened TASK.md task mode — 3 bugs fixed: (1) forced Engineer expert when TASK.md present, (2) TASK.md deleted programmatically via `unlinkSync` after successful iteration (not relying on LLM), (3) uses real iteration number instead of `Date.now()`. Changes in `src/agent.ts` + `taskMode` field added to `IterationCtx` in `src/conversation.ts`. tsc clean.
+87 | 
+[2026-04-05T10:54:01.115Z] iter=86 turn=15 INFO: Turn 15/25
+[2026-04-05T10:54:03.160Z] iter=86 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && echo "AUTOAGENT_RESTART"
+[2026-04-05T10:54:03.160Z] iter=86 turn=15 INFO: RESTART signal
+[2026-04-05T10:54:03.160Z] iter=86 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T10:54:03.826Z] iter=86 turn=15 INFO: Compilation OK
+[2026-04-05T10:54:08.017Z] iter=86 turn=15 INFO: Cache persisted: 25 entries to .autoagent-cache.json
+[2026-04-05T10:54:08.018Z] iter=86 turn=15 INFO: Cache stats: 1 hits, 4 misses, 25 entries, 8 invalidations (5 entries removed)
+[2026-04-05T10:54:08.018Z] iter=86 turn=15 INFO: Tool cache stats
+[2026-04-05T10:54:08.018Z] iter=86 turn=15 INFO: Tool timing: bash: 2x, avg=333ms, total=665ms; write_file: 8x, avg=2ms, total=13ms; read_file: 4x, avg=3ms, total=10ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T10:54:08.018Z] iter=86 turn=15 INFO: Tool timing stats
+[2026-04-05T10:54:12.215Z] iter=86 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 86: predicted 11 turns, actual 15 turns, ratio 1.36**
+[2026-04-05T10:54:14.599Z] iter=86 turn=15 INFO: Pre-commit review (1337in/79out): LGTM. The changes are clean and well-scoped: `taskMode` is correctly threaded through the context, TASK.md deletion is safely guarded with `existsSync`, the Engineer expert fallback is sensible, and p
