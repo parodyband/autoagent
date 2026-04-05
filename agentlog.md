@@ -1,129 +1,3 @@
-414 |   const onlyExported = opts?.onlyExported ?? true;
-415 |   const maxFiles = opts?.maxFiles ?? 200;
-416 |   const ranked = opts?.ranked;
-417 | 
-418 |   const lines: string[] = ["# Repo Map"];
-419 | 
-420 |   let files = repoMap.files.filter((file) => {
-421 |     const relevantExports = onlyExported ? file.exports.filter((s) => s.exported) : file.exports;
-422 |     return relevantExports.length > 0 || file.imports.length > 0;
-423 |   });
-424 | 
-425 |   // Sort files by aggregate rank score (highest first) when ranked map is provided
-426 |   if (ranked) {
-427 |     files = [...files].sort((a, b) => {
-428 |       const sa = fileAggregateScore(a, ranked);
-429 |       const sb = fileAggregateScore(b, ranked);
-430 |       if (sb !== sa) return sb - sa;
-431 |       return a.path.localeCompare(b.path); // stable tie-break
-432 |     });
-433 |   }
-434 | 
-435 |   for (const file of files.slice(0, maxFiles)) {
-436 |     let relevantExports = onlyExported ? file.exports.filter((s) => s.exported) : file.exports;
-437 | 
-438 |     lines.push(file.path);
-439 | 
-440 |     if (relevantExports.length > 0) {
-441 |       // Sort by rank (highest first) if ranked map provided
-442 |       if (ranked) {
-443 |         relevantExports = [...relevantExports].sort((a, b) => {
-444 |           const sa = ranked.get(a.name) ?? 0;
-445 |           const sb = ranked.get(b.name) ?? 0;
-446 |           if (sb !== sa) return sb - sa;
-447 |           return a.name.localeCompare(b.name); // stable tie-break
-448 |         });
-449 |       }
-450 | 
-451 |       const symStr = relevantExports
-452 |         .map((s) => {
-453 |           const score = ranked?.get(s.name) ?? 0;
-454 |           const suffix = ranked && score >= 2 ? ` (×${score})` : "";
-455 |           return `${s.name}${suffix} (${s.kind}:${s.line})`;
-456 |         })
-457 |         .join(", ");
-458 |       lines.push(`  exports: ${symStr}`);
-459 |     }
-460 | 
-461 |     if (file.imports.length > 0) {
-462 |       const fromList = [...new Set(file.imports.map((i) => i.from))].join(", ");
-463 |       lines.push(`  imports: ${fromList}`);
-464 |     }
-465 |   }
-466 | 
-467 |   return lines.join("\n");
-468 | }
-469 | 
-470 | /**
-471 |  * Truncate a formatted repo map string to fit within a token budget.
-472 |  *
-473 |  * Uses the heuristic: 1 token ≈ 4 characters.
-474 |  * Drops complete file sections from the bottom (lowest-ranked appear last
-475 |  * when formatRepoMap is called with `ranked`), so the highest-value symbols
-476 |  * are preserved.
-477 |  *
-478 |  * @param map       - formatted repo map string (output of formatRepoMap)
-479 |  * @param maxTokens - token budget (default 4000 → ~16K chars)
-480 |  * @returns         - truncated map string, with trailing note if cut
-481 |  */
-482 | export function truncateRepoMap(map: string, maxTokens = 4000): string {
-483 |   const maxChars = maxTokens * 4;
-484 |   if (map.length <= maxChars) return map;
-485 | 
-486 |   // Split into header + file sections
-487 |   // Each file section starts with a line that doesn't begin with whitespace or '#'
-488 |   const allLines = map.split("\n");
-489 |   const header: string[] = [];
-490 |   const sections: string[][] = [];
-491 |   let current: string[] | null = null;
-492 | 
-493 |   for (const line of allLines) {
-494 |     if (line.startsWith("#")) {
-495 |       header.push(line);
-496 |     } else if (line.length > 0 && !line.startsWith(" ") && !line.startsWith("\t")) {
-497 |       // New file section
-498 |       current = [line];
-499 |       sections.push(current);
-500 |     } else if (current) {
-501 |       current.push(line);
-502 |     } else {
-503 |       header.push(line);
-504 |     }
-505 |   }
-506 | 
-507 |   // Greedily include sections until we hit the budget
-508 |   const headerStr = header.join("\n");
-509 |   let result = headerStr;
-510 |   let included = 0;
-511 | 
-512 |   for (const section of sections) {
-513 |     const sectionStr = "\n" + section.join("\n");
-514 |     if (result.length + sectionStr.length > maxChars) break;
-515 |     result += sectionStr;
-516 |     included++;
-517 |   }
-518 | 
-519 |   const omitted = sections.length - included;
-520 |   if (omitted > 0) {
-521 |     result += `\n… (${omitted} more file${omitted === 1 ? "" : "s"} omitted — token budget ${maxTokens})`;
-522 |   }
-523 | 
-524 |   return result;
-525 | }
-526 | 
-527 | // ─── Fuzzy Search ─────────────────────────────────────────────
-528 | 
-[2026-04-05T15:47:42.703Z] iter=216 turn=8 INFO: Turn 8/25
-[2026-04-05T15:47:44.656Z] iter=216 turn=8 INFO: Agent: Now wire `truncateRepoMap` into the orchestrator and add it to the import:
-[2026-04-05T15:47:44.656Z] iter=216 turn=8 INFO: $ sed -n '18:22p' src/orchestrator.ts
-[2026-04-05T15:47:44.664Z] iter=216 turn=8 INFO:   -> exit=1 (65 chars)
-[2026-04-05T15:47:44.665Z] iter=216 turn=9 INFO: Turn 9/25
-[2026-04-05T15:47:46.020Z] iter=216 turn=9 INFO: $ sed -n '18,22p' src/orchestrator.ts
-[2026-04-05T15:47:46.036Z] iter=216 turn=9 INFO:   -> exit=0 (348 chars)
-[2026-04-05T15:47:46.037Z] iter=216 turn=10 INFO: Turn 10/25
-[2026-04-05T15:47:48.683Z] iter=216 turn=10 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:47:48.684Z] iter=216 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
-
 Context after patch:
 17 | import { compressToolOutput } from "./tool-output-compressor.js";
 18 | import { fingerprintRepo } from "./repo-context.js";
@@ -1122,3 +996,66 @@ Context after patch:
 [2026-04-05T16:00:05.346Z] iter=222 turn=22 INFO: Pre-commit review (1795in/417out): **Issues:**
 
 - **Logic bug in `parseFindArg`**: `trimmed.slice(5)` hardcodes the length of `"/find"` (5 chars). If the input is `"/find"` with no trailing space, `slice(5)` correctly gives `""`, but t
+[2026-04-05T16:00:05.424Z] iter=222 turn=22 INFO: Committed: ef6af5c1 (36 in / 4652 out, cache: 19284 created, 310255 read)
+[2026-04-05T16:00:05.424Z] iter=222 turn=22 INFO: Restarting as iteration 223...
+[2026-04-05T16:00:05.609Z] iter=223 INFO: Cache restored: 45/45 entries (0 stale)
+[2026-04-05T16:00:05.610Z] iter=223 INFO: Turn budget: 12/25 (calibration=1.10x, predicted=8)
+[2026-04-05T16:00:05.611Z] iter=223 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T16:00:05.723Z] iter=223 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T16:00:05.724Z] iter=223 turn=1 INFO: Turn 1/25
+[2026-04-05T16:00:09.752Z] iter=223 turn=1 INFO: Agent: 
+
+I'll start by assessing the current state of the system — what's been happening, whether we're building product or building ourselves, and what needs tuning.
+[2026-04-05T16:00:09.753Z] iter=223 turn=1 INFO: $ cat goals.md
+[2026-04-05T16:00:09.755Z] iter=223 turn=1 INFO: $ cat .autoagent-metrics.json
+[2026-04-05T16:00:09.757Z] iter=223 turn=1 INFO: $ cat .expert-rotation.json
+[2026-04-05T16:00:09.760Z] iter=223 turn=1 INFO: $ cat .autoagent-state.json
+[2026-04-05T16:00:09.765Z] iter=223 turn=1 INFO:   -> exit=0 (1460 chars)
+[2026-04-05T16:00:09.765Z] iter=223 turn=1 INFO:   -> exit=0 (100036 chars)
+[2026-04-05T16:00:09.766Z] iter=223 turn=1 INFO:   -> exit=0 (1310 chars)
+[2026-04-05T16:00:09.769Z] iter=223 turn=1 INFO:   -> exit=0 (113 chars)
+[2026-04-05T16:00:09.770Z] iter=223 turn=2 INFO: Turn 2/25
+[2026-04-05T16:00:23.467Z] iter=223 turn=2 INFO: think: Let me assess what I need to do as Meta expert for iteration 223:
+
+1. Assess system health — is it building product or b...
+[2026-04-05T16:00:23.468Z] iter=223 turn=3 INFO: Turn 3/25
+[2026-04-05T16:00:27.462Z] iter=223 turn=3 INFO: Agent: Let me check memory and recent test status, then produce my deliverables.
+[2026-04-05T16:00:27.462Z] iter=223 turn=3 INFO: $ cat memory.md
+[2026-04-05T16:00:27.464Z] iter=223 turn=3 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T16:00:27.466Z] iter=223 turn=3 INFO: $ npx vitest run 2>&1 | tail -5
+[2026-04-05T16:00:27.472Z] iter=223 turn=3 INFO:   -> exit=0 (5197 chars)
+[2026-04-05T16:00:28.536Z] iter=223 turn=3 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:00:35.307Z] iter=223 turn=3 INFO:   -> exit=0 (190 chars)
+[2026-04-05T16:00:35.307Z] iter=223 turn=4 INFO: Turn 4/25
+[2026-04-05T16:00:55.717Z] iter=223 turn=4 INFO: Agent: 
+
+Good — tsc clean, 586 tests passing. Let me now produce my deliverables.
+
+**Meta Assessment:**
+- System IS building product. Iterations 218→222 shipped: context-loader.ts, /find command, /model command, tui-commands tests. All user-facing.
+- Predictions well-calibrated (avg 1.10x). No structural issues.
+- Memory needs compacting: gaps list is stale (/find and /model are DONE), milestones need up...
+[2026-04-05T16:00:55.718Z] iter=223 turn=4 INFO: write_file: memory.md (write)
+[2026-04-05T16:00:55.720Z] iter=223 turn=4 INFO:   -> ok: Updated memory.md (4384 chars, -11 lines delta)
+[2026-04-05T16:00:55.721Z] iter=223 turn=5 INFO: Turn 5/25
+[2026-04-05T16:01:07.147Z] iter=223 turn=5 INFO: write_file: goals.md (write)
+[2026-04-05T16:01:07.148Z] iter=223 turn=5 INFO:   -> ok: Updated goals.md (1623 chars, +3 lines delta)
+[2026-04-05T16:01:07.148Z] iter=223 turn=6 INFO: Turn 6/25
+[2026-04-05T16:01:13.587Z] iter=223 turn=6 INFO: Agent: 
+
+Meta iterations don't change src/ — they assess the system and set direction. Deliverables are done: memory compacted, goals written. Wrapping up now.
+[2026-04-05T16:01:13.588Z] iter=223 turn=6 INFO: $ npx tsc --noEmit 2>&1 | tail -3
+[2026-04-05T16:01:14.540Z] iter=223 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:01:14.540Z] iter=223 turn=7 INFO: Turn 7/25
+[2026-04-05T16:01:17.460Z] iter=223 turn=7 INFO: Agent: 
+
+tsc clean. Memory and goals already written. Done.
+[2026-04-05T16:01:17.461Z] iter=223 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T16:01:17.461Z] iter=223 turn=7 INFO: RESTART signal
+[2026-04-05T16:01:17.462Z] iter=223 turn=7 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T16:01:18.360Z] iter=223 turn=7 INFO: Compilation OK
+[2026-04-05T16:01:23.881Z] iter=223 turn=7 INFO: Cache persisted: 45 entries to .autoagent-cache.json
+[2026-04-05T16:01:23.881Z] iter=223 turn=7 INFO: Tool timing: bash: 9x, avg=1102ms, total=9916ms; write_file: 2x, avg=2ms, total=3ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T16:01:23.881Z] iter=223 turn=7 INFO: Tool timing stats
+[2026-04-05T16:01:28.868Z] iter=223 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 223: predicted 8 turns, actual 7 turns, ratio 0.88**
+[2026-04-05T16:01:28.888Z] iter=223 turn=7 INFO: Pre-commit review: no significant code changes to review

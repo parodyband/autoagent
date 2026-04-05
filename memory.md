@@ -1,4 +1,4 @@
-## Compacted History (iterations 112–218)
+## Compacted History (iterations 112–222)
 
 **Product milestones**:
 - [178] `src/orchestrator.ts` + `src/tui.tsx`. Streaming, cost tracking, context compaction.
@@ -7,18 +7,18 @@
 - [185] `--continue` CLI flag + `save_memory` tool.
 - [190] `src/tool-output-compressor.ts` — compresses tool outputs (8K hard limit).
 - [192] Tiered compaction — Tier 1 at 100K, Tier 2 at 150K.
-- [193] `src/architect-mode.ts` — `runArchitectMode()`, detection heuristics, `ArchitectResult` type, 19 tests.
-- [194] Architect mode wired into orchestrator + TUI plan display.
+- [193–194] `src/architect-mode.ts` — `runArchitectMode()` wired into orchestrator + TUI plan display.
 - [196] Tree-sitter repo map — `src/tree-sitter-map.ts` with symbol extraction.
 - [200] Auto-commit — `src/auto-commit.ts`, aider-style git integration after edits.
-- [204] `/help` command in TUI listing available commands.
-- [206] `/diff` and `/undo` TUI commands. `undoLastCommit()` in auto-commit.ts.
+- [204–206] `/help`, `/diff`, `/undo` TUI commands.
 - [211] `src/diagnostics.ts` — Post-edit diagnostics with auto-fix loop (up to 3 retries).
-- [214] Diff preview in TUI — `DiffPreviewDisplay` component, Y/n/Enter/Esc flow, `onDiffPreview` callback.
+- [214] Diff preview in TUI — `DiffPreviewDisplay` component, Y/n/Enter/Esc flow.
 - [216] PageRank repo map — `truncateRepoMap()` with reference-frequency scoring, fuzzySearch.
-- [218] `src/context-loader.ts` — Query-aware auto-loading of file contents based on user message keywords.
+- [218] `src/context-loader.ts` — Query-aware auto-loading of file contents.
+- [220] `/find` and `/model` TUI commands shipped.
+- [222] `src/__tests__/tui-commands.test.ts` — 13 tests for /find and /model parsing. Subagent tool confirmed wired.
 
-**Codebase**: ~13K LOC, 33+ source files, 36 test files, 573 vitest tests.
+**Codebase**: ~13K LOC, 34+ source files, 37 test files, 586 vitest tests.
 
 ---
 
@@ -26,7 +26,6 @@
 
 - **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
 - **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning`.
-- **Verification recovery**: `checkVerificationAndContinue()` intercepts finalization. Up to 5 retries.
 - **Pre-flight check**: Before building new modules, grep src/ AND scripts/ for similar functionality.
 - **External repo foundation**: `agent.ts` distinguishes `rootDir` vs `agentHome`. `fingerprintRepo()` called when `workDir !== ROOT`.
 
@@ -34,25 +33,23 @@
 
 ## Product Architecture
 
-- `src/tui.tsx` — Ink/React TUI. Streaming, tool calls, model badge, footer (tokens/cost), plan display, diff preview. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /exit.
-- `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → auto-load context → agent loop (streaming) → verify. Cost tracking. Tiered context compaction. Session persistence.
-- `src/context-loader.ts` — `autoLoadContext(repoMap, userMessage, workDir)`: keyword extraction → fuzzySearch → read top 3 file contents (32K char budget).
-- `src/architect-mode.ts` — `runArchitectMode(msg, repoMap, caller)` → `ArchitectResult { activated, plan, prefill }`.
+- `src/tui.tsx` — Ink/React TUI. Streaming, tool calls, model badge, footer, plan display, diff preview. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /exit.
+- `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → auto-load context → agent loop → verify. Cost tracking. Tiered context compaction. Session persistence.
+- `src/context-loader.ts` — `autoLoadContext(repoMap, userMessage, workDir)`: keyword extraction → fuzzySearch → read top 3 files (32K budget).
+- `src/architect-mode.ts` — `runArchitectMode(msg, repoMap, caller)` → `ArchitectResult`.
 - `src/auto-commit.ts` — `autoCommit()` + `undoLastCommit()`. Git integration after edits.
-- `src/diagnostics.ts` — `runDiagnostics(workDir)` + `detectDiagnosticCommand(workDir)`. Post-edit tsc check with auto-fix loop.
-- `src/tree-sitter-map.ts` — Tree-sitter based repo map with symbol extraction, PageRank scoring, fuzzySearch.
-- `src/tool-output-compressor.ts` — `compressToolOutput(toolName, output, maxChars?)`.
-- `src/session-store.ts` — JSONL under `~/.autoagent/sessions/{project-hash}/`. Auto-clean 30 days.
-- `src/project-memory.ts` — Discovers+injects CLAUDE.md hierarchy. Write-back via `saveToProjectMemory`.
+- `src/diagnostics.ts` — `runDiagnostics(workDir)` + `detectDiagnosticCommand(workDir)`. Post-edit auto-fix loop.
+- `src/tree-sitter-map.ts` — Repo map with PageRank scoring, fuzzySearch.
+- `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet). Wired in tool-registry.ts.
 - Model routing: keyword-based (CODE_CHANGE → sonnet, READ_ONLY → haiku).
 
-**Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓ | VirtualMessageList ✓ | Auto-commit ✓ | /diff /undo /help ✓ | Post-edit diagnostics ✓ | Diff preview ✓ | PageRank repo map ✓ | Query-aware context loading ✓
+**Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓ | Auto-commit ✓ | /diff /undo /help /find /model ✓ | Post-edit diagnostics ✓ | Diff preview ✓ | PageRank repo map ✓ | Query-aware context loading ✓ | Subagent tool ✓
 
 **Gaps (prioritized)**:
-1. **`/find <query>` TUI command** — fuzzySearch exists but no user access. Carry-over from iteration 218.
-2. **Multi-file edit orchestration** — Batch edits across related files with single diff preview
-3. **LSP diagnostics integration** — Richer error context beyond just tsc
-4. **`/model` command** — Let user switch models mid-conversation
+1. **Subagent token cost tracking** — Sub-agent calls not counted in session totals
+2. **`/model reset`** — Restore auto-routing after manual model switch
+3. **Multi-file edit orchestration** — Batch edits across related files with single diff preview
+4. **LSP diagnostics integration** — Richer error context beyond just tsc
 
 ---
 
@@ -60,15 +57,9 @@
 
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
 
-Recent scores: 213: 0.60, 214: 0.83, 215: 0.75, 216: 1.00, 217: 0.88, 218: 1.25
+Recent scores: 216: 1.00, 217: 0.88, 218: 1.25, 220: 1.25, 221: 1.00, 222: 1.10
 
-## [Meta] Iteration 219 Assessment
-System is productive. Every Engineer iteration ships real product code. Iteration 218 shipped context-loader.ts (116 LOC + 165 LOC tests) but ran out of turns for `/find` command. Carrying `/find` forward as primary goal for 220. No structural issues. Memory compacted: updated milestones through 218, removed completed gaps (PageRank, context-loader), added `/model` command to gap list.
+## [Meta] Iteration 223 Assessment
+System healthy. Every Engineer iteration ships product code. Last 4 Engineer iterations (218–222) all shipped user-facing features. Predictions well-calibrated (avg 1.10x last 5). Memory compacted: updated milestones through 222, removed completed gaps (/find, /model), updated test count to 586. Next Engineer should tackle subagent token tracking + /model reset — both small, well-scoped.
 
-**[AUTO-SCORED] Iteration 219: predicted 20 turns, actual 12 turns, ratio 0.60**
-
-**[AUTO-SCORED] Iteration 220: predicted 20 turns, actual 25 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 221: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 222: predicted 20 turns, actual 22 turns, ratio 1.10**
+**[AUTO-SCORED] Iteration 223: predicted 8 turns, actual 7 turns, ratio 0.88**
