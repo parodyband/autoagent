@@ -21139,5 +21139,102 @@
       "totalMs": 2332
     },
     "predictedTurns": 20
+  },
+  {
+    "iteration": 325,
+    "startTime": "2026-04-05T19:10:50.936Z",
+    "endTime": "2026-04-05T19:13:02.012Z",
+    "turns": 17,
+    "toolCalls": {
+      "read_scratchpad": 1,
+      "save_scratchpad": 1,
+      "bash": 9,
+      "web_search": 1,
+      "web_fetch": 1,
+      "think": 1,
+      "save_memory": 2,
+      "write_file": 1
+    },
+    "success": true,
+    "durationMs": 131076,
+    "inputTokens": 29,
+    "outputTokens": 3803,
+    "cacheCreationTokens": 33482,
+    "cacheReadTokens": 312155,
+    "codeQuality": {
+      "totalLOC": 21032,
+      "codeLOC": 15588,
+      "fileCount": 113,
+      "functionCount": 931,
+      "complexity": 2195,
+      "testCount": 348
+    },
+    "benchmarks": {
+      "testDurationMs": 6463,
+      "testCount": 1102
+    },
+    "toolTimings": {
+      "tools": {
+        "read_scratchpad": {
+          "calls": 1,
+          "totalMs": 1,
+          "minMs": 1,
+          "maxMs": 1,
+          "avgMs": 1
+        },
+        "save_scratchpad": {
+          "calls": 1,
+          "totalMs": 1,
+          "minMs": 1,
+          "maxMs": 1,
+          "avgMs": 1
+        },
+        "bash": {
+          "calls": 9,
+          "totalMs": 14638,
+          "minMs": 3,
+          "maxMs": 12495,
+          "avgMs": 1626
+        },
+        "web_search": {
+          "calls": 1,
+          "totalMs": 1205,
+          "minMs": 1205,
+          "maxMs": 1205,
+          "avgMs": 1205
+        },
+        "web_fetch": {
+          "calls": 1,
+          "totalMs": 479,
+          "minMs": 479,
+          "maxMs": 479,
+          "avgMs": 479
+        },
+        "think": {
+          "calls": 1,
+          "totalMs": 2,
+          "minMs": 2,
+          "maxMs": 2,
+          "avgMs": 2
+        },
+        "save_memory": {
+          "calls": 2,
+          "totalMs": 4,
+          "minMs": 1,
+          "maxMs": 3,
+          "avgMs": 2
+        },
+        "write_file": {
+          "calls": 1,
+          "totalMs": 2,
+          "minMs": 2,
+          "maxMs": 2,
+          "avgMs": 2
+        }
+      },
+      "totalCalls": 17,
+      "totalMs": 16332
+    },
+    "predictedTurns": 20
   }
 ]

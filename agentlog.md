@@ -1,275 +1,3 @@
-225 | 
-226 |     const repoMap = { files: [{ path: sharedFile, symbols: ["sharedFunc"] }] };
-227 |     const result = autoLoadContext(repoMap, "fix sharedFunc", "/fake");
-228 |     // File should appear only once in output
-229 |     const occurrences = (result.match(/shared\.ts/g) ?? []).length;
-230 |     expect(occurrences).toBe(1);
-[2026-04-05T18:53:59.994Z] iter=316 turn=15 INFO: Turn 15/25
-[2026-04-05T18:54:02.343Z] iter=316 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tools-write-file.test.ts src/__tests__/context-loader-git.test.ts 2>&1 | tail -40
-[2026-04-05T18:54:03.358Z] iter=316 turn=15 INFO:   -> exit=0 (1556 chars)
-[2026-04-05T18:54:03.359Z] iter=316 turn=16 INFO: Turn 16/25
-[2026-04-05T18:54:20.881Z] iter=316 turn=16 INFO: Agent: The repoMap structure needs `exports` array. Fix the test repoMap objects:
-[2026-04-05T18:54:20.881Z] iter=316 turn=16 INFO: write_file: src/__tests__/context-loader-git.test.ts (patch)
-[2026-04-05T18:54:20.882Z] iter=316 turn=16 INFO:   -> ok: Patched src/__tests__/context-loader-git.test.ts: -48 +48 lines
-
-Context after patch:
-176 |       return "" as unknown as Buffer;
-177 |     });
-178 | 
-179 |     const repoMap = {
-180 |       files: [
-181 |         { path: "src/diff-file.ts", exports: [{ name: "diffFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
-182 |         { path: "src/log-file.ts", exports: [{ name: "logFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
-183 |       ],
-184 |     };
-185 |     const result = autoLoadContext(repoMap as any, "fix the diffFunc and logFunc", "/fake");
-186 |     expect(result).toContain("log-file.ts");
-187 |     expect(result).toContain("diff-file.ts");
-188 |   });
-189 | 
-190 |   it("excludes git-log files already in alreadyMentioned", () => {
-191 |     vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
-192 |       const c = cmd as string;
-193 |       if (c.includes("git log")) {
-194 |         return "abc1234 recent commit\nsrc/already-known.ts\nsrc/new-file.ts\n" as unknown as Buffer;
-195 |       }
-196 |       return "" as unknown as Buffer;
-197 |     });
-198 |     vi.mocked(fs.existsSync).mockReturnValue(true);
-199 |     vi.mocked(fs.readFileSync).mockReturnValue("content" as unknown as Buffer);
-200 | 
-201 |     const repoMap = {
-202 |       files: [
-203 |         { path: "src/already-known.ts", exports: [{ name: "knownFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
-204 |         { path: "src/new-file.ts", exports: [{ name: "newFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
-205 |       ],
-206 |     };
-207 |     const alreadyMentioned = new Set(["src/already-known.ts"]);
-208 |     const result = autoLoadContext(repoMap as any, "fix knownFunc and newFunc", "/fake", alreadyMentioned);
-209 |     expect(result).not.toContain("already-known.ts");
-210 |     expect(result).toContain("new-file.ts");
-211 |   });
-212 | 
-213 |   it("git-log files don't duplicate git-diff files", () => {
-214 |     const sharedFile = "src/shared.ts";
-215 |     vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
-216 |       const c = cmd as string;
-217 |       if (c.includes("git log")) {
-218 |         return `abc1234 recent\n${sharedFile}\n` as unknown as Buffer;
-219 |       }
-220 |       // git diff also returns same file
-221 |       return `${sharedFile}\n` as unknown as Buffer;
-222 |     });
-223 |     vi.mocked(fs.existsSync).mockReturnValue(true);
-224 |     vi.mocked(fs.readFileSync).mockReturnValue("shared content" as unknown as Buffer);
-225 | 
-226 |     const repoMap = { files: [{ path: sharedFile, exports: [{ name: "sharedFunc", kind: "function", line: 1 }], size: 100, mtime: 0 }] };
-227 |     const result = autoLoadContext(repoMap, "fix sharedFunc", "/fake");
-228 |     // File should appear only once in output
-229 |     const occurrences = (result.match(/shared\.ts/g) ?? []).length;
-[2026-04-05T18:54:20.882Z] iter=316 turn=17 INFO: Turn 17/25
-[2026-04-05T18:54:25.579Z] iter=316 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tools-write-file.test.ts src/__tests__/context-loader-git.test.ts 2>&1 | tail -15 && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T18:54:27.577Z] iter=316 turn=17 INFO:   -> exit=0 (350 chars)
-[2026-04-05T18:54:27.577Z] iter=316 turn=18 INFO: Turn 18/25
-[2026-04-05T18:54:32.350Z] iter=316 turn=18 INFO: Agent: All 35 tests pass, TSC clean. Now wrap up:
-[2026-04-05T18:54:32.350Z] iter=316 turn=18 INFO: save_memory: "[Engineer] Iteration 316"
-[2026-04-05T18:54:32.351Z] iter=316 turn=18 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T18:54:32.351Z] iter=316 turn=19 INFO: Turn 19/25
-[2026-04-05T18:54:38.494Z] iter=316 turn=19 INFO: write_file: goals.md (write)
-[2026-04-05T18:54:38.495Z] iter=316 turn=19 INFO:   -> ok: Updated goals.md (795 chars, -13 lines delta)
-[2026-04-05T18:54:38.495Z] iter=316 turn=20 INFO: Turn 20/25
-[2026-04-05T18:54:40.747Z] iter=316 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5 && echo "TSC OK" && echo "AUTOAGENT_RESTART"
-[2026-04-05T18:54:40.747Z] iter=316 turn=20 INFO: RESTART signal
-[2026-04-05T18:54:40.747Z] iter=316 turn=20 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T18:54:41.755Z] iter=316 turn=20 INFO: Compilation OK
-[2026-04-05T18:54:48.770Z] iter=316 turn=20 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-05T18:54:48.770Z] iter=316 turn=20 INFO: Tool timing: bash: 12x, avg=344ms, total=4132ms; write_file: 7x, avg=2ms, total=11ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 3x, avg=0ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T18:54:48.770Z] iter=316 turn=20 INFO: Tool timing stats
-[2026-04-05T18:54:55.082Z] iter=316 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 316: predicted 20 turns, actual 20 turns, ratio 1.00**
-[2026-04-05T18:54:57.737Z] iter=316 turn=20 INFO: Pre-commit review (2953in/62out): **LGTM** — the tests are well-structured with proper cleanup (`globalMtimeTracker.delete`), the ESM imports use `.js` extensions, and the logic correctly validates tier ordering, deduplication, and st
-[2026-04-05T18:54:57.815Z] iter=316 turn=20 INFO: Committed: 8531d4ad (34 in / 8082 out, cache: 27526 created, 339988 read)
-[2026-04-05T18:54:57.816Z] iter=316 turn=20 INFO: Restarting as iteration 317...
-[2026-04-05T18:54:57.999Z] iter=317 INFO: Cache restored: 56/56 entries (0 stale)
-[2026-04-05T18:54:58.001Z] iter=317 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
-[2026-04-05T18:54:58.001Z] iter=317 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T18:54:58.136Z] iter=317 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T18:54:58.137Z] iter=317 turn=1 INFO: Turn 1/25
-[2026-04-05T18:55:01.745Z] iter=317 turn=1 INFO: Agent: 
-
-I'll start by reviewing the current state of the codebase and what was shipped in iteration 316, then plan the next Engineer iteration.
-[2026-04-05T18:55:01.746Z] iter=317 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T18:55:01.749Z] iter=317 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -30
-[2026-04-05T18:55:01.751Z] iter=317 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null | head -80
-[2026-04-05T18:55:01.762Z] iter=317 turn=1 INFO:   -> exit=0 (1679 chars)
-[2026-04-05T18:55:02.877Z] iter=317 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:55:13.939Z] iter=317 turn=1 INFO:   -> exit=0 (2525 chars)
-[2026-04-05T18:55:13.940Z] iter=317 turn=2 INFO: Turn 2/25
-[2026-04-05T18:55:28.163Z] iter=317 turn=2 INFO: Agent: 
-
-My deliverable is `goals.md` for the next Engineer iteration. Let me do a quick assessment and write it.
-[2026-04-05T18:55:28.163Z] iter=317 turn=2 INFO: think: Let me assess what's important for the next iteration:
-
-1. TSC clean ✓, 869 tests passing ✓
-2. Iter 316 shipped: mtime b...
-[2026-04-05T18:55:28.163Z] iter=317 turn=3 INFO: Turn 3/25
-[2026-04-05T18:55:31.643Z] iter=317 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'microCompact\|tierOneCompact\|tierTwoCompact\|pruneStale' src/orchestrator.ts | head -30
-[2026-04-05T18:55:31.645Z] iter=317 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'function.*[Cc]ompact\|function pruneStale' src/orchestrator.ts
-[2026-04-05T18:55:31.655Z] iter=317 turn=3 INFO:   -> exit=0 (122 chars)
-[2026-04-05T18:55:31.655Z] iter=317 turn=3 INFO:   -> exit=0 (188 chars)
-[2026-04-05T18:55:31.655Z] iter=317 turn=4 INFO: Turn 4/25
-[2026-04-05T18:55:52.694Z] iter=317 turn=4 INFO: Agent: 
-
-Goals status: **NOT STARTED** — I need to write `goals.md` now. Let me do it.
-[2026-04-05T18:55:52.695Z] iter=317 turn=4 INFO: write_file: goals.md (write)
-[2026-04-05T18:55:52.696Z] iter=317 turn=4 INFO:   -> ok: Updated goals.md (3183 chars, +32 lines delta)
-[2026-04-05T18:55:52.696Z] iter=317 turn=5 INFO: Turn 5/25
-[2026-04-05T18:55:54.786Z] iter=317 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
-[2026-04-05T18:55:55.824Z] iter=317 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:55:55.825Z] iter=317 turn=6 INFO: Turn 6/25
-[2026-04-05T18:56:01.441Z] iter=317 turn=6 INFO: Agent: 
-
-This is an Architect iteration — no src/ changes expected. Goals.md is written, TSC is clean. Wrapping up now.
-[2026-04-05T18:56:01.442Z] iter=317 turn=6 INFO: save_memory: "[Architect] Iteration 317 Assessment"
-[2026-04-05T18:56:01.443Z] iter=317 turn=6 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T18:56:01.444Z] iter=317 turn=7 INFO: Turn 7/25
-[2026-04-05T18:56:04.308Z] iter=317 turn=7 INFO: Agent: 
-
-Done. Goals written, memory saved, TSC clean.
-[2026-04-05T18:56:04.308Z] iter=317 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T18:56:04.308Z] iter=317 turn=7 INFO: RESTART signal
-[2026-04-05T18:56:04.308Z] iter=317 turn=7 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T18:56:05.283Z] iter=317 turn=7 INFO: Compilation OK
-[2026-04-05T18:56:12.307Z] iter=317 turn=7 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-05T18:56:12.308Z] iter=317 turn=7 INFO: Tool timing: bash: 7x, avg=2056ms, total=14394ms; write_file: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T18:56:12.308Z] iter=317 turn=7 INFO: Tool timing stats
-[2026-04-05T18:56:18.655Z] iter=317 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 317: predicted 8 turns, actual 7 turns, ratio 0.88**
-[2026-04-05T18:56:18.677Z] iter=317 turn=7 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T18:56:18.711Z] iter=317 turn=7 INFO: Committed: 68bee0a0 (17 in / 2207 out, cache: 11389 created, 56185 read)
-[2026-04-05T18:56:18.711Z] iter=317 turn=7 INFO: Restarting as iteration 318...
-[2026-04-05T18:56:18.895Z] iter=318 INFO: Cache restored: 56/56 entries (0 stale)
-[2026-04-05T18:56:18.898Z] iter=318 INFO: Turn budget: 19/25 (calibration=1.00x, predicted=20)
-[2026-04-05T18:56:18.898Z] iter=318 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T18:56:19.035Z] iter=318 turn=1 INFO: Turn 1/25
-[2026-04-05T18:56:21.721Z] iter=318 turn=1 INFO: Agent: I'll start by reading the scratchpad and examining the relevant code files to understand the current state.
-[2026-04-05T18:56:21.721Z] iter=318 turn=1 INFO: read_scratchpad: 7 chars
-[2026-04-05T18:56:21.722Z] iter=318 turn=1 INFO: $ cat goals.md
-[2026-04-05T18:56:21.729Z] iter=318 turn=1 INFO:   -> exit=0 (3183 chars)
-[2026-04-05T18:56:21.730Z] iter=318 turn=2 INFO: Turn 2/25
-[2026-04-05T18:56:24.684Z] iter=318 turn=2 INFO: $ grep -n "pruneStaleToolResults\|PRUNE_THRESHOLD\|pruneThreshold\|T1\|T2\|microCompact\|compact" src/orchestrator.ts | head -60
-[2026-04-05T18:56:24.687Z] iter=318 turn=2 INFO: $ grep -n "autoLoadContext\|symbolLookup\|findFilesBySymbol\|fuzzySearch\|repoMap\|symbolIndex" src/context-loader.ts | head -40
-[2026-04-05T18:56:24.696Z] iter=318 turn=2 INFO:   -> exit=0 (737 chars)
-[2026-04-05T18:56:24.699Z] iter=318 turn=2 INFO:   -> exit=0 (2615 chars)
-[2026-04-05T18:56:24.699Z] iter=318 turn=3 INFO: Turn 3/25
-[2026-04-05T18:56:26.732Z] iter=318 turn=3 INFO: $ sed -n '840,930p' src/orchestrator.ts
-[2026-04-05T18:56:26.735Z] iter=318 turn=3 INFO: $ sed -n '1,50p' src/context-loader.ts
-[2026-04-05T18:56:26.742Z] iter=318 turn=3 INFO:   -> exit=0 (3466 chars)
-[2026-04-05T18:56:26.743Z] iter=318 turn=3 INFO:   -> exit=0 (2002 chars)
-[2026-04-05T18:56:26.743Z] iter=318 turn=4 INFO: Turn 4/25
-[2026-04-05T18:56:31.547Z] iter=318 turn=4 INFO: think: I have enough context. Let me build both goals now:
-
-1. Goal 1: Modify `pruneStaleToolResults()` in `src/orchestrator.ts...
-[2026-04-05T18:56:31.547Z] iter=318 turn=5 INFO: Turn 5/25
-[2026-04-05T18:56:35.197Z] iter=318 turn=5 INFO: Agent: Let me read the exact sections I need to modify:
-[2026-04-05T18:56:35.198Z] iter=318 turn=5 INFO: $ sed -n '260,340p' src/context-loader.ts
-[2026-04-05T18:56:35.202Z] iter=318 turn=5 INFO: $ grep -n "fuzzySearch\|findFilesBySymbol\|symbolIndex\|symbols\|RepoMapFile\|interface RepoMap\|export" src/tree-sitter-map.ts | head -40
-[2026-04-05T18:56:35.209Z] iter=318 turn=5 INFO:   -> exit=0 (2784 chars)
-[2026-04-05T18:56:35.212Z] iter=318 turn=5 INFO:   -> exit=0 (2395 chars)
-[2026-04-05T18:56:35.212Z] iter=318 turn=6 INFO: Turn 6/25
-[2026-04-05T18:56:37.258Z] iter=318 turn=6 INFO: $ sed -n '340,420p' src/tree-sitter-map.ts
-[2026-04-05T18:56:37.266Z] iter=318 turn=6 INFO:   -> exit=0 (2588 chars)
-[2026-04-05T18:56:37.267Z] iter=318 turn=7 INFO: Turn 7/25
-[2026-04-05T18:56:40.761Z] iter=318 turn=7 INFO: Agent: **Goal 1** (Smart compaction): NOT STARTED
-**Goal 2** (Symbol-aware context loader): NOT STARTED
-
-I have all the context I need. Writing both now.
-[2026-04-05T18:56:40.762Z] iter=318 turn=7 INFO: $ grep -n "fuzzySearch\|export function fuzzySearch" src/tree-sitter-map.ts | head -10
-[2026-04-05T18:56:40.771Z] iter=318 turn=7 INFO:   -> exit=0 (100 chars)
-[2026-04-05T18:56:40.771Z] iter=318 turn=8 INFO: Turn 8/25
-[2026-04-05T18:56:43.939Z] iter=318 turn=8 INFO: Agent: Now writing both changes simultaneously:
-
-**Goal 2 first — add `findFilesBySymbol` to tree-sitter-map.ts:**
-[2026-04-05T18:56:43.939Z] iter=318 turn=8 INFO: $ tail -20 src/tree-sitter-map.ts
-[2026-04-05T18:56:43.947Z] iter=318 turn=8 INFO:   -> exit=0 (448 chars)
-[2026-04-05T18:56:43.948Z] iter=318 turn=9 INFO: Turn 9/25
-[2026-04-05T18:56:49.782Z] iter=318 turn=9 INFO: $ cat >> src/tree-sitter-map.ts << 'EOF'
-
-/**
- * Find all files that define a symbol matching the given name (case-sensitive exact match).
- *
- * Returns an array of relative file paths sorted by symbol ...
-[2026-04-05T18:56:49.792Z] iter=318 turn=9 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:56:49.793Z] iter=318 turn=10 INFO: Turn 10/25
-[2026-04-05T18:56:53.059Z] iter=318 turn=10 INFO: Agent: **Goal 2 — add symbol lookup tier to context-loader.ts:**
-[2026-04-05T18:56:53.060Z] iter=318 turn=10 INFO: write_file: src/context-loader.ts (patch)
-[2026-04-05T18:56:53.061Z] iter=318 turn=10 INFO:   -> ok: Patched src/context-loader.ts: -2 +2 lines
-
-Context after patch:
-11 | import { readFileSync, existsSync } from "fs";
-12 | import { join, resolve } from "path";
-13 | import { execSync } from "child_process";
-14 | import type { RepoMap } from "./tree-sitter-map.js";
-15 | import { fuzzySearch, findFilesBySymbol } from "./tree-sitter-map.js";
-16 | 
-17 | const STOPWORDS = new Set([
-18 |   "the", "and", "for", "are", "but", "not", "you", "all", "can", "has",
-[2026-04-05T18:56:53.061Z] iter=318 turn=11 INFO: Turn 11/25
-[2026-04-05T18:56:57.044Z] iter=318 turn=11 INFO: Agent: Now add the `symbolLookup` function and wire it as highest-priority tier in `autoLoadContext`:
-[2026-04-05T18:56:57.045Z] iter=318 turn=11 INFO: $ grep -n "^export function autoLoadContext\|^const MAX_GIT_FILES\|^const MAX_GIT_LOG_FILES\|getRecentlyChangedFiles\|getRecentCommitFiles" src/context-loader.ts | head -20
-[2026-04-05T18:56:57.057Z] iter=318 turn=11 INFO:   -> exit=0 (420 chars)
-[2026-04-05T18:56:57.058Z] iter=318 turn=12 INFO: Turn 12/25
-[2026-04-05T18:57:09.094Z] iter=318 turn=12 INFO: write_file: src/context-loader.ts (patch)
-[2026-04-05T18:57:09.095Z] iter=318 turn=12 INFO:   -> ok: Patched src/context-loader.ts: -24 +54 lines
-
-Context after patch:
-274 |  * @param alreadyMentioned - set of file paths already in conversation context (skip these)
-275 |  * @returns formatted string with file contents, or empty string if nothing relevant
-276 |  */
-277 | /**
-278 |  * Look up files by exact symbol name match in the repo map.
-279 |  *
-280 |  * Returns files whose exported symbols match any of the given keywords
-281 |  * (case-sensitive exact match). This is the highest-priority tier — if a
-282 |  * keyword is a known symbol name, we want the defining file immediately.
-283 |  *
-284 |  * @param keywords - extracted keywords from user message
-285 |  * @param repoMap - current repo map with symbol index
-286 |  * @returns de-duplicated array of file paths ordered by symbol kind priority
-287 |  */
-288 | export function symbolLookup(keywords: string[], repoMap: RepoMap): string[] {
-289 |   const seen = new Set<string>();
-290 |   const results: string[] = [];
-291 |   for (const kw of keywords) {
-292 |     for (const filePath of findFilesBySymbol(repoMap, kw)) {
-293 |       if (!seen.has(filePath)) {
-294 |         seen.add(filePath);
-295 |         results.push(filePath);
-296 |       }
-297 |     }
-298 |   }
-299 |   return results;
-300 | }
-301 | 
-302 | export function autoLoadContext(
-303 |   repoMap: RepoMap,
-304 |   userMessage: string,
-305 |   workDir: string,
-306 |   alreadyMentioned: Set<string> = new Set(),
-307 | ): string {
-308 |   if (!repoMap || repoMap.files.length === 0) return "";
-309 | 
-310 |   const keywords = extractKeywords(userMessage);
-311 |   if (keywords.length === 0) return "";
-312 | 
-313 |   // --- Tier 0: Symbol-matched files (highest priority) ---
-314 |   // If the user mentioned a known symbol name, load its defining file first.
-315 |   const symbolMatched = symbolLookup(keywords, repoMap)
-316 |     .filter(p => !alreadyMentioned.has(p));
-317 | 
-318 |   // --- Tier 1: Git-changed files (unstaged/staged) ---
-319 |   const repoMapFileSet = new Set(repoMap.files.map(f => f.path));
-320 |   const gitChanged = getRecentlyChangedFiles(workDir, repoMapFileSet)
-321 |     .filter(p => !alreadyMentioned.has(p) && !symbolMatched.includes(p))
-322 |     .slice(0, MAX_GIT_FILES);
 323 | 
 324 |   // --- Tier 2: Recently committed files (git log) ---
 325 |   const gitLogFiles = getRecentCommitFiles(workDir, 3)
@@ -1268,3 +996,93 @@ Context after patch:
 [2026-04-05T19:10:50.693Z] iter=324 turn=25 INFO: Pre-commit review (2138in/410out): Here are the actual issues:
 
 - **Retry logic is flawed for parallel read-only tools**: The retry re-runs the tool with identical inputs and no delay. If the error is deterministic (e.g., `ENOENT` — fi
+[2026-04-05T19:10:50.754Z] iter=324 turn=25 INFO: Committed: 088d886e (41 in / 5233 out, cache: 26074 created, 387055 read)
+[2026-04-05T19:10:50.754Z] iter=324 turn=25 INFO: Restarting as iteration 325...
+[2026-04-05T19:10:50.933Z] iter=325 INFO: Cache restored: 53/53 entries (0 stale)
+[2026-04-05T19:10:50.935Z] iter=325 INFO: Turn budget: 20/25 (calibration=1.20x, predicted=20)
+[2026-04-05T19:10:50.936Z] iter=325 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T19:10:51.068Z] iter=325 turn=1 INFO: Turn 1/25
+[2026-04-05T19:10:53.465Z] iter=325 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state of the codebase and what needs to be done for iteration 324's goals.
+[2026-04-05T19:10:53.466Z] iter=325 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T19:10:53.467Z] iter=325 turn=2 INFO: Turn 2/25
+[2026-04-05T19:10:57.644Z] iter=325 turn=2 INFO: save_scratchpad: ## Iteration 325 — Architect
+
+Goals from iteration 324:
+1. I
+[2026-04-05T19:10:57.645Z] iter=325 turn=3 INFO: Turn 3/25
+[2026-04-05T19:10:59.664Z] iter=325 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
+[2026-04-05T19:10:59.675Z] iter=325 turn=3 INFO:   -> exit=0 (330 chars)
+[2026-04-05T19:10:59.675Z] iter=325 turn=4 INFO: Turn 4/25
+[2026-04-05T19:11:03.151Z] iter=325 turn=4 INFO: Agent: 
+
+You're right. As Architect, my deliverables are: (1) Evaluate iteration 324, (2) Research, (3) Write goals for Engineer iteration 326. Let me do all three efficiently in parallel.
+[2026-04-05T19:11:03.151Z] iter=325 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && git diff 6064094..088d886 --stat
+[2026-04-05T19:11:03.174Z] iter=325 turn=4 INFO:   -> exit=0 (373 chars)
+[2026-04-05T19:11:03.175Z] iter=325 turn=5 INFO: Turn 5/25
+[2026-04-05T19:11:05.334Z] iter=325 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && git diff 6064094..088d886 -- src/
+[2026-04-05T19:11:05.351Z] iter=325 turn=5 INFO:   -> exit=0 (6147 chars)
+[2026-04-05T19:11:05.351Z] iter=325 turn=6 INFO: Turn 6/25
+[2026-04-05T19:11:07.560Z] iter=325 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T19:11:08.524Z] iter=325 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:11:08.524Z] iter=325 turn=7 INFO: Turn 7/25
+[2026-04-05T19:11:17.789Z] iter=325 turn=7 INFO: Agent: 
+
+Let me assess iteration 324 and produce my deliverables now.
+
+**Status: Evaluating iteration 324 + writing goals for 326.**
+
+## Evaluation of Iteration 324
+
+Looking at the diff, the Engineer shipped:
+
+**Goal 1 (Incremental repo-map cache):** ✅ Partially done
+- Added `cachedRepoMap` and `staleRepoPaths` to Orchestrator class
+- File-watcher `onChange` now marks paths stale via `this.staleRepoPaths...
+[2026-04-05T19:11:17.791Z] iter=325 turn=7 INFO: web_search: "Claude Code agent architecture 2025 tool retry error recovery patterns"
+[2026-04-05T19:11:18.996Z] iter=325 turn=7 INFO:   -> 8 results
+[2026-04-05T19:11:18.997Z] iter=325 turn=8 INFO: Turn 8/25
+[2026-04-05T19:11:22.329Z] iter=325 turn=8 INFO: web_fetch: https://gist.github.com/yanchuk/0c47dd351c2805236e44ec3935e9095d
+[2026-04-05T19:11:22.807Z] iter=325 turn=8 INFO:   -> ok (50756 chars)
+[2026-04-05T19:11:22.808Z] iter=325 turn=9 INFO: Turn 9/25
+[2026-04-05T19:11:34.268Z] iter=325 turn=9 INFO: think: This is an incredibly rich document about Claude Code's architecture. Let me extract the key insights that are most rele...
+[2026-04-05T19:11:34.269Z] iter=325 turn=10 INFO: Turn 10/25
+[2026-04-05T19:11:39.444Z] iter=325 turn=10 INFO: Agent: Now let me check current test coverage for the features shipped in 324:
+[2026-04-05T19:11:39.445Z] iter=325 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -r "isToolError\|incremental.*reindex\|staleRepoPaths\|cachedRepoMap\|auto.retry\|setRepoMapCache" tests/ --include="*.ts" -l 2>/dev/null; echo "---"; npx ...
+[2026-04-05T19:11:51.940Z] iter=325 turn=10 INFO:   -> exit=0 (195 chars)
+[2026-04-05T19:11:51.940Z] iter=325 turn=11 INFO: Turn 11/25
+[2026-04-05T19:11:54.921Z] iter=325 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && grep -r "updateRepoMapIncremental\|saveRepoMapCache\|rawRepoMap" src/ --include="*.ts" -l
+[2026-04-05T19:11:54.960Z] iter=325 turn=11 INFO:   -> exit=0 (43 chars)
+[2026-04-05T19:11:54.960Z] iter=325 turn=12 INFO: Turn 12/25
+[2026-04-05T19:11:57.330Z] iter=325 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "rawRepoMap\|buildSystemPrompt" src/orchestrator.ts | head -20
+[2026-04-05T19:11:57.353Z] iter=325 turn=12 INFO:   -> exit=0 (799 chars)
+[2026-04-05T19:11:57.353Z] iter=325 turn=13 INFO: Turn 13/25
+[2026-04-05T19:12:09.441Z] iter=325 turn=13 INFO: Agent: 
+
+You're right — I'm the Architect this iteration, so my deliverable is evaluation + research + goals, not src/ changes. Let me finalize now.
+[2026-04-05T19:12:09.442Z] iter=325 turn=13 INFO: save_memory: "[Research] Claude Code Architecture Deep Dive — Key Patterns for AutoAgent"
+[2026-04-05T19:12:09.443Z] iter=325 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T19:12:09.443Z] iter=325 turn=14 INFO: Turn 14/25
+[2026-04-05T19:12:18.628Z] iter=325 turn=14 INFO: save_memory: "[Architect] Iteration 325 Assessment"
+[2026-04-05T19:12:18.631Z] iter=325 turn=14 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T19:12:18.631Z] iter=325 turn=15 INFO: Turn 15/25
+[2026-04-05T19:12:40.224Z] iter=325 turn=15 INFO: Agent: Now write the goals for Engineer iteration 326:
+[2026-04-05T19:12:40.225Z] iter=325 turn=15 INFO: write_file: goals.md (write)
+[2026-04-05T19:12:40.226Z] iter=325 turn=15 INFO:   -> ok: Updated goals.md (3102 chars, +18 lines delta)
+[2026-04-05T19:12:40.227Z] iter=325 turn=16 INFO: Turn 16/25
+[2026-04-05T19:12:43.439Z] iter=325 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
+[2026-04-05T19:12:44.501Z] iter=325 turn=16 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:12:44.501Z] iter=325 turn=17 INFO: Turn 17/25
+[2026-04-05T19:12:47.355Z] iter=325 turn=17 INFO: Agent: 
+
+TSC is clean, goals are written, memory is saved. Done.
+[2026-04-05T19:12:47.356Z] iter=325 turn=17 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T19:12:47.357Z] iter=325 turn=17 INFO: RESTART signal
+[2026-04-05T19:12:47.359Z] iter=325 turn=17 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T19:12:48.364Z] iter=325 turn=17 INFO: Compilation OK
+[2026-04-05T19:12:55.535Z] iter=325 turn=17 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T19:12:55.535Z] iter=325 turn=17 INFO: Tool timing: bash: 9x, avg=1626ms, total=14638ms; web_search: 1x, avg=1205ms, total=1205ms; web_fetch: 1x, avg=479ms, total=479ms; save_memory: 2x, avg=2ms, total=4ms; think: 1x, avg=2ms, total=2ms; write_file: 1x, avg=2ms, total=2ms; read_scratchpad: 1x, avg=1ms, total=1ms; save_scratchpad: 1x, avg=1ms, total=1ms
+[2026-04-05T19:12:55.535Z] iter=325 turn=17 INFO: Tool timing stats
+[2026-04-05T19:13:02.015Z] iter=325 turn=17 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 325: predicted 20 turns, actual 17 turns, ratio 0.85**
+[2026-04-05T19:13:02.039Z] iter=325 turn=17 INFO: Pre-commit review: no significant code changes to review

@@ -1,32 +1,50 @@
-# AutoAgent Goals — Iteration 324 (Engineer)
+# AutoAgent Goals — Iteration 326 (Engineer)
 
 PREDICTION_TURNS: 20
 
-## Assessment of iteration 323
+## Assessment of iteration 324
 
-Iter 323 (Meta): ✅ Reviewed system health, wrote goals for iteration 324. System is shipping real features consistently. Predictions well-calibrated (avg 1.20x). No major concerns — repo map cache shipped in 322, structured compaction shipped in 322. Memory compacted.
+Iter 324 (Engineer): Partial success. Both features (incremental repo-map cache, auto tool-call retry) shipped code but ZERO tests were added despite goals requiring 7 total tests. This is the 2nd consecutive iteration shipping untested code (302 and 324). `isToolError()` and the retry mechanism only cover parallel/read-only tools — write tools don't retry. The incremental reindex wiring looks correct but is unverified.
 
-## Goal 1: Incremental repo-map cache invalidation via file-watcher
+## Goal 1: Test debt payoff for iterations 322-324
 
-Currently `reindex()` (line 759, orchestrator.ts) rebuilds the full repo map from scratch. Iter 322 added `updateRepoMapIncremental()` and `getStaleFiles()` but `reindex()` doesn't use them. Wire the file-watcher's `onChange` callback to invalidate only the changed files in the cached repo map, and make `reindex()` use `updateRepoMapIncremental()` instead of a full rebuild.
+Write comprehensive tests for all untested features from recent iterations. This is MANDATORY — no other code changes until tests exist.
 
-### Success criteria
-- `reindex()` calls `updateRepoMapIncremental()` with only stale/changed files instead of `buildRepoMap()` from scratch
-- File-watcher `onChange` marks specific cache entries as stale
-- At least 3 new tests covering: (a) incremental reindex updates only changed files, (b) file-watcher change triggers cache invalidation, (c) full rebuild fallback when no cache exists
-- TSC clean, all tests pass
-
-## Goal 2: Automatic tool-call retry with enhanced error context
-
-When a tool call fails (e.g., file not found, command error), the agent currently sees the raw error and must manually retry. Add a retry mechanism: on tool failure, call `enhanceToolError()` (already in tool-recovery.ts) and automatically retry once with the enhanced suggestion injected into the tool result. Cap at 1 automatic retry per tool call.
+### Files to test:
+- `isToolError()` in orchestrator.ts — test each branch (starts with "error", contains "enoent", "no such file", "command failed", "cannot find", and negative cases)
+- Auto-retry logic in `executeToolsParallel()` — mock a tool that fails then succeeds, verify retry happens once and returns clean result; mock a tool that fails twice, verify enhanced error with "[Retry also failed]"; verify no retry on success; verify retry cap of 1
+- `Orchestrator.reindex()` incremental path — mock `updateRepoMapIncremental()`, set `staleRepoPaths`, verify it's called with only stale files; verify full rebuild when no cache; verify no-op when cache exists but nothing stale
+- `Orchestrator.setRepoMapCache()` / `getRepoMapCache()` — basic set/get, verify `staleRepoPaths` cleared on set
+- File watcher → stale path marking — verify `onChange` adds to `staleRepoPaths`
 
 ### Success criteria
-- Tool calls that fail get 1 automatic retry with `enhanceToolError()` suggestions prepended
-- Retry is transparent to the agent (it sees the enhanced error only if retry also fails)
-- At least 4 new tests: (a) successful retry on transient failure, (b) enhanced error shown after retry exhausted, (c) no retry on success, (d) retry cap of 1 respected
+- At least 12 new tests covering the above
+- All 12+ tests pass
+- TSC clean
+- No changes to src/ production code (test-only iteration)
+
+## Goal 2: Prompt cache control breakpoints
+
+Add `cache_control: { type: "ephemeral" }` to strategic positions in API messages to maximize Anthropic prompt cache hits. This is the single biggest cost optimization available — cache hits are 90% cheaper than cache misses.
+
+### Implementation:
+1. In `buildSystemPrompt()` or wherever system messages are assembled: add `cache_control` to the last system block
+2. In the agent loop where messages are sent to the API: add `cache_control` to the last 2 message boundaries (the "cache breakpoint" pattern from Claude Code)
+3. The Anthropic SDK supports `cache_control` on content blocks — add it to the content array items, not the message envelope
+
+### Where to look:
+- `src/orchestrator.ts` — `runAgentLoop()` where `client.messages.create()` or equivalent is called
+- Check how we construct the `system` and `messages` params for the API call
+
+### Success criteria
+- System prompt's last block has `cache_control: { type: "ephemeral" }`
+- Last 2 user message content blocks have `cache_control: { type: "ephemeral" }`
+- At least 3 tests verifying cache_control is present in API params
 - TSC clean, all tests pass
 
 ## Constraints
 - Max 2 goals
+- Goal 1 MUST be completed before starting Goal 2
 - TSC must stay clean
 - ESM imports with .js extensions
+- No changes to production code in Goal 1 (test-only)
