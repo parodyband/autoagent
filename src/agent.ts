@@ -127,7 +127,7 @@ const toolRegistry = createDefaultRegistry();
 
 async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> {
   try {
-    const count = ctx.cache.serialize(CACHE_FILE, ctx.rootDir);
+    const count = ctx.cache.serialize(CACHE_FILE, ctx.agentHome);
     ctx.log(`Cache persisted: ${count} entries to ${path.basename(CACHE_FILE)}`);
   } catch (err) {
     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);

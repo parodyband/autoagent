@@ -1,90 +1,3 @@
-66 | 
-67 | function readGoals(iteration: number): string {
-68 |   // Task mode: if TASK.md exists, use it as the goal for this iteration.
-69 |   // Create TASK.md with a plain-text description of what you want done.
-70 |   // The agent will execute it and delete TASK.md when complete.
-71 |   if (existsSync(TASK_FILE)) {
-72 |     const taskContent = readFileSync(TASK_FILE, "utf-8").trim();
-73 |     log(iteration, `[TASK MODE] Running user task from TASK.md`);
-74 |     return [
-75 |       `# AutoAgent Task Mode — Iteration ${iteration}`,
-76 |       ``,
-77 |       `PREDICTION_TURNS: 11`,
-78 |       ``,
-[2026-04-05T10:53:20.079Z] iter=86 turn=8 INFO: Turn 8/25
-[2026-04-05T10:53:25.681Z] iter=86 turn=8 INFO: Agent: Now fix the call site and add task mode logic:
-[2026-04-05T10:53:25.682Z] iter=86 turn=8 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T10:53:25.683Z] iter=86 turn=8 INFO:   -> ok: Patched src/agent.ts: -6 +14 lines
-
-Context after patch:
-179 |     log(state.iteration, `Cache restore error (non-fatal): ${err instanceof Error ? err.message : err}`);
-180 |   }
-181 | 
-182 |   // Pick which expert runs this iteration
-183 |   const experts = loadExperts(ROOT);
-184 |   let expert = pickExpert(state.iteration, experts);
-185 | 
-186 |   // Task mode: force Engineer expert so user tasks always get code execution
-187 |   const taskMode = existsSync(TASK_FILE);
-188 |   if (taskMode) {
-189 |     const engineerExpert = experts.find(e => e.name === "Engineer") ?? expert;
-190 |     expert = engineerExpert;
-191 |     log(state.iteration, `[TASK MODE] Expert overridden to Engineer`);
-192 |   }
-193 | 
-194 |   // Parse predicted turns from goals before they get rewritten
-195 |   const goalsContent = readGoals(state.iteration);
-196 |   const predMatch = goalsContent.match(/PREDICTION_TURNS:\s*(\d+)/);
-197 |   const predictedTurns = predMatch ? parseInt(predMatch[1], 10) : null;
-198 | 
-[2026-04-05T10:53:25.684Z] iter=86 turn=9 INFO: Turn 9/25
-[2026-04-05T10:53:35.545Z] iter=86 turn=9 INFO: Agent: **Goal status:**
-1. Force Engineer in task mode — DONE
-2. Delete TASK.md programmatically — IN PROGRESS (added `unlinkSync` import, need to wire `taskMode` flag and delete call)
-3. Use real iteration number — DONE
-
-Finishing #2 now — add `taskMode` to `IterationCtx` and delete in `doFinalize`:
-[2026-04-05T10:53:35.546Z] iter=86 turn=9 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T10:53:35.548Z] iter=86 turn=9 INFO:   -> ok: Patched src/agent.ts: -22 +23 lines
-
-Context after patch:
-196 |   const predMatch = goalsContent.match(/PREDICTION_TURNS:\s*(\d+)/);
-197 |   const predictedTurns = predMatch ? parseInt(predMatch[1], 10) : null;
-198 | 
-199 |   const ctx: IterationCtx = {
-200 |     client: new Anthropic(),
-201 |     model: expert.model,
-202 |     maxTokens: parseInt(process.env.MAX_TOKENS || "16384", 10),
-203 |     startTime: new Date(),
-204 |     toolCounts: {},
-205 |     iter: state.iteration,
-206 |     state,
-207 |     tokens: { in: 0, out: 0, cacheCreate: 0, cacheRead: 0 },
-208 |     messages: [],
-209 |     turns: 0,
-210 |     cache,
-211 |     timing: new ToolTimingTracker(),
-212 |     rootDir: ROOT,
-213 |     maxTurns: MAX_TURNS,
-214 |     logger,
-215 |     registry: toolRegistry,
-216 |     log: (msg: string) => log(state.iteration, msg),
-217 |     onFinalize: doFinalize,
-218 |     compressionConfig: null, // Disabled — prompt caching handles token cost
-219 |     predictedTurns,
-220 |     taskMode,
-221 |   };
-222 | 
-223 |   console.log(`\n${"=".repeat(60)}`);
-224 |   console.log(`  AutoAgent — Iteration ${ctx.iter}`);
-[2026-04-05T10:53:35.549Z] iter=86 turn=10 INFO: Turn 10/25
-[2026-04-05T10:53:41.964Z] iter=86 turn=10 INFO: Agent: Now add `taskMode` to `doFinalize` to delete TASK.md after success:
-[2026-04-05T10:53:41.965Z] iter=86 turn=10 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T10:53:41.966Z] iter=86 turn=10 INFO:   -> ok: Patched src/agent.ts: -16 +22 lines
-
-Context after patch:
-133 |     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
-134 |   }
 135 | 
 136 |   await runFinalization({
 137 |     iter: ctx.iter,
@@ -1083,3 +996,195 @@ Context after patch:
 [2026-04-05T11:05:03.926Z] iter=93 turn=12 INFO: Tool timing stats
 [2026-04-05T11:05:09.872Z] iter=93 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 93: predicted 12 turns, actual 12 turns, ratio 1.00**
 [2026-04-05T11:05:09.891Z] iter=93 turn=12 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T11:05:09.922Z] iter=93 turn=12 INFO: Committed: 0cbebb78 (18 in / 3464 out, cache: 17965 created, 118800 read)
+[2026-04-05T11:05:09.922Z] iter=93 turn=12 INFO: Restarting as iteration 94...
+[2026-04-05T11:05:10.121Z] iter=94 INFO: Cache restored: 31/31 entries (0 stale)
+[2026-04-05T11:05:10.122Z] iter=94 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T11:05:10.150Z] iter=94 INFO: Hard turn cap: 14 (1.5x prediction of 9)
+[2026-04-05T11:05:10.151Z] iter=94 turn=1 INFO: Turn 1/25
+[2026-04-05T11:05:14.541Z] iter=94 turn=1 INFO: think: Let me read the current state of phases.ts and agent.ts to understand exactly what needs to be changed....
+[2026-04-05T11:05:14.544Z] iter=94 turn=2 INFO: Turn 2/25
+[2026-04-05T11:05:16.475Z] iter=94 turn=2 INFO: read_file: CACHE HIT
+[2026-04-05T11:05:16.475Z] iter=94 turn=2 INFO: read_file: src/agent.ts
+[2026-04-05T11:05:16.477Z] iter=94 turn=2 INFO:   -> ok (12345 chars)
+[2026-04-05T11:05:16.478Z] iter=94 turn=3 INFO: Turn 3/25
+[2026-04-05T11:05:27.106Z] iter=94 turn=3 INFO: think: Now I understand the current state. Let me identify exactly what needs to change:
+
+### phases.ts changes:
+
+1. **PlannerI...
+[2026-04-05T11:05:27.108Z] iter=94 turn=4 INFO: Turn 4/25
+[2026-04-05T11:05:30.194Z] iter=94 turn=4 INFO: $ grep -n "runPlanner\|runReviewer\|phases" src/agent.ts src/finalization.ts src/conversation.ts 2>/dev/null | head -40
+[2026-04-05T11:05:30.197Z] iter=94 turn=4 INFO: read_file: src/finalization.ts
+[2026-04-05T11:05:30.198Z] iter=94 turn=4 INFO:   -> ok (1573 chars)
+[2026-04-05T11:05:30.206Z] iter=94 turn=4 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:05:30.207Z] iter=94 turn=5 INFO: Turn 5/25
+[2026-04-05T11:05:33.802Z] iter=94 turn=5 INFO: Agent: I have all the context I need. Making the changes now.
+[2026-04-05T11:05:33.803Z] iter=94 turn=5 INFO: write_file: src/phases.ts (patch)
+[2026-04-05T11:05:33.804Z] iter=94 turn=5 INFO:   -> ok: Patched src/phases.ts: -7 +8 lines
+
+Context after patch:
+19 | 
+20 | // ─── Planner ────────────────────────────────────────────────
+21 | 
+22 | interface PlannerInput {
+23 |   iteration: number;
+24 |   rootDir: string;
+25 |   agentHome: string;
+26 |   memory: string;
+27 |   orientation: string;
+28 |   log: (msg: string) => void;
+29 | }
+30 | 
+31 | interface PlannerResult {
+32 |   plan: string;
+[2026-04-05T11:05:33.805Z] iter=94 turn=6 INFO: Turn 6/25
+[2026-04-05T11:05:37.568Z] iter=94 turn=6 INFO: write_file: src/phases.ts (patch)
+[2026-04-05T11:05:37.569Z] iter=94 turn=6 INFO:   -> ok: Patched src/phases.ts: -7 +7 lines
+
+Context after patch:
+34 |   outputTokens: number;
+35 | }
+36 | 
+37 | export async function runPlanner(input: PlannerInput): Promise<PlannerResult> {
+38 |   const { iteration, rootDir, agentHome, memory, orientation, log } = input;
+39 | 
+40 |   log("Planner (Opus) starting...");
+41 | 
+42 |   // Gather metrics
+43 |   const metricsPath = path.join(agentHome, ".autoagent-metrics.json");
+44 |   let metricsSummary = "No metrics yet.";
+45 |   if (existsSync(metricsPath)) {
+46 |     try {
+[2026-04-05T11:05:37.570Z] iter=94 turn=7 INFO: Turn 7/25
+[2026-04-05T11:05:39.719Z] iter=94 turn=7 INFO: write_file: src/phases.ts (patch)
+[2026-04-05T11:05:39.721Z] iter=94 turn=7 INFO:   -> ok: Patched src/phases.ts: -2 +2 lines
+
+Context after patch:
+61 |     );
+62 |   } catch {}
+63 | 
+64 |   // Current goals (for continuity)
+65 |   const goalsPath = path.join(agentHome, "goals.md");
+66 |   const currentGoals = existsSync(goalsPath) ? readFileSync(goalsPath, "utf-8") : "(none)";
+67 | 
+68 |   const prompt = `You are the Planner for AutoAgent, iteration ${iteration}.
+[2026-04-05T11:05:39.722Z] iter=94 turn=8 INFO: Turn 8/25
+[2026-04-05T11:05:45.151Z] iter=94 turn=8 INFO: Agent: Now fix the writeFileSync calls for .plan.md and goals.md in runPlanner:
+[2026-04-05T11:05:45.151Z] iter=94 turn=8 INFO: write_file: src/phases.ts (patch)
+[2026-04-05T11:05:45.152Z] iter=94 turn=8 INFO:   -> ok: Patched src/phases.ts: -6 +6 lines
+
+Context after patch:
+119 |       .map((b) => b.text)
+120 |       .join("\n");
+121 | 
+122 |     const planPath = path.join(agentHome, ".plan.md");
+123 |     writeFileSync(planPath, text, "utf-8");
+124 |     log(`Planner wrote .plan.md (${text.length} chars)`);
+125 | 
+126 |     // Also update goals.md to reflect the plan
+127 |     writeFileSync(goalsPath, `# AutoAgent Goals — Iteration ${iteration}\n\n(Set by Planner — see .plan.md for full plan)\n\n${text.slice(0, 500)}`, "utf-8");
+128 | 
+129 |     return {
+130 |       plan: text,
+[2026-04-05T11:05:45.152Z] iter=94 turn=9 INFO: Turn 9/25
+[2026-04-05T11:05:49.042Z] iter=94 turn=9 INFO: Agent: Status:
+- phases.ts PlannerInput + runPlanner: **DONE**
+- phases.ts ReviewerInput + runReviewer: **IN PROGRESS**
+- agent.ts cache serialization: **NOT STARTED**
+- agent.ts pass agentHome to phases: **NOT STARTED**
+
+Continuing with Reviewer changes and fallback plan.md path:
+[2026-04-05T11:05:49.043Z] iter=94 turn=9 INFO: write_file: src/phases.ts (patch)
+[2026-04-05T11:05:49.044Z] iter=94 turn=9 INFO:   -> ok: Patched src/phases.ts: -1 +1 lines
+
+Context after patch:
+136 |     log(`Planner error: ${msg}`);
+137 |     // Write a fallback plan
+138 |     const fallback = `# Plan — Iteration ${iteration}\n\n## Objective\nFix whatever broke last iteration.\n\n## Steps\n1. Read memory.md for context\n2. Check if tsc compiles\n3. Fix any issues\n4. Restart\n\n## Success criteria\n- tsc --noEmit passes\n- No regressions\n`;
+139 |     writeFileSync(path.join(agentHome, ".plan.md"), fallback, "utf-8");
+140 |     return { plan: fallback, inputTokens: 0, outputTokens: 0 };
+141 |   }
+142 | }
+[2026-04-05T11:05:49.045Z] iter=94 turn=10 INFO: Turn 10/25
+[2026-04-05T11:05:52.611Z] iter=94 turn=10 INFO: write_file: src/phases.ts (patch)
+[2026-04-05T11:05:52.612Z] iter=94 turn=10 INFO:   -> ok: Patched src/phases.ts: -5 +6 lines
+
+Context after patch:
+143 | 
+144 | // ─── Reviewer ───────────────────────────────────────────────
+145 | 
+146 | interface ReviewerInput {
+147 |   iteration: number;
+148 |   rootDir: string;
+149 |   agentHome: string;
+150 |   log: (msg: string) => void;
+151 | }
+152 | 
+153 | interface ReviewerResult {
+154 |   review: string;
+[2026-04-05T11:05:52.613Z] iter=94 turn=11 INFO: Turn 11/25
+[2026-04-05T11:05:55.947Z] iter=94 turn=11 INFO: write_file: src/phases.ts (patch)
+[2026-04-05T11:05:55.948Z] iter=94 turn=11 INFO:   -> ok: Patched src/phases.ts: -7 +7 lines
+
+Context after patch:
+156 |   outputTokens: number;
+157 | }
+158 | 
+159 | export async function runReviewer(input: ReviewerInput): Promise<ReviewerResult> {
+160 |   const { iteration, rootDir, agentHome, log } = input;
+161 | 
+162 |   log("Reviewer (Opus) starting...");
+163 | 
+164 |   // Read the plan
+165 |   const planPath = path.join(agentHome, ".plan.md");
+166 |   const plan = existsSync(planPath) ? readFileSync(planPath, "utf-8") : "(no plan found)";
+167 | 
+168 |   // Get the diff
+[2026-04-05T11:05:55.948Z] iter=94 turn=12 INFO: Turn 12/25
+[2026-04-05T11:05:58.186Z] iter=94 turn=12 INFO: write_file: src/phases.ts (patch)
+[2026-04-05T11:05:58.187Z] iter=94 turn=12 INFO:   -> ok: Patched src/phases.ts: -2 +2 lines
+
+Context after patch:
+171 |     30, rootDir, true
+172 |   );
+173 | 
+174 |   // Read current memory
+175 |   const memoryPath = path.join(agentHome, "memory.md");
+176 |   const memory = existsSync(memoryPath) ? readFileSync(memoryPath, "utf-8") : "";
+177 |   const recentMemory = memory.length > 3000 ? memory.slice(-3000) : memory;
+178 | 
+[2026-04-05T11:05:58.187Z] iter=94 turn=13 INFO: Turn 13/25
+[2026-04-05T11:06:00.604Z] iter=94 turn=13 INFO: write_file: src/phases.ts (patch)
+[2026-04-05T11:06:00.605Z] iter=94 turn=13 INFO:   -> ok: Patched src/phases.ts: -2 +2 lines
+
+Context after patch:
+176 |   const memory = existsSync(memoryPath) ? readFileSync(memoryPath, "utf-8") : "";
+177 |   const recentMemory = memory.length > 3000 ? memory.slice(-3000) : memory;
+178 | 
+179 |   // Metrics for this iteration
+180 |   const metricsPath = path.join(agentHome, ".autoagent-metrics.json");
+181 |   let thisIterMetrics = "";
+182 |   if (existsSync(metricsPath)) {
+183 |     try {
+[2026-04-05T11:06:00.605Z] iter=94 turn=14 INFO: Turn 14/25
+[2026-04-05T11:06:03.848Z] iter=94 turn=14 INFO: Agent: Now fix agent.ts cache serialization and the appendFileSync for memory in reviewer:
+[2026-04-05T11:06:03.849Z] iter=94 turn=14 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:06:03.849Z] iter=94 turn=14 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
+
+Context after patch:
+127 | 
+128 | async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> {
+129 |   try {
+130 |     const count = ctx.cache.serialize(CACHE_FILE, ctx.agentHome);
+131 |     ctx.log(`Cache persisted: ${count} entries to ${path.basename(CACHE_FILE)}`);
+132 |   } catch (err) {
+133 |     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
+[2026-04-05T11:06:03.850Z] iter=94 turn=14 INFO: HARD TURN CAP REACHED: 14 turns (predicted 9, cap 14). Forcing commit.
+[2026-04-05T11:06:03.853Z] iter=94 turn=14 INFO: Cache persisted: 27 entries to .autoagent-cache.json
+[2026-04-05T11:06:03.854Z] iter=94 turn=14 INFO: Cache stats: 1 hits, 2 misses, 27 entries, 10 invalidations (6 entries removed)
+[2026-04-05T11:06:03.854Z] iter=94 turn=14 INFO: Tool cache stats
+[2026-04-05T11:06:03.854Z] iter=94 turn=14 INFO: Tool timing: bash: 1x, avg=13ms, total=13ms; write_file: 10x, avg=1ms, total=13ms; think: 2x, avg=2ms, total=4ms; read_file: 2x, avg=2ms, total=4ms
+[2026-04-05T11:06:03.855Z] iter=94 turn=14 INFO: Tool timing stats
+[2026-04-05T11:06:07.931Z] iter=94 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 94: predicted 9 turns, actual 14 turns, ratio 1.56**
+[2026-04-05T11:06:10.542Z] iter=94 turn=14 INFO: Pre-commit review (1714in/78out): LGTM. This diff consistently migrates agent-internal files (`.plan.md`, `memory.md`, `.autoagent-metrics.json`, cache) from `rootDir` (the project being modified) to `agentHome` (the agent's own direc

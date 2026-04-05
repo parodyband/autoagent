@@ -22,6 +22,7 @@ const REVIEWER_MODEL = "claude-opus-4-6";
 interface PlannerInput {
   iteration: number;
   rootDir: string;
+  agentHome: string;
   memory: string;
   orientation: string;
   log: (msg: string) => void;
@@ -34,12 +35,12 @@ interface PlannerResult {
 }
 
 export async function runPlanner(input: PlannerInput): Promise<PlannerResult> {
-  const { iteration, rootDir, memory, orientation, log } = input;
+  const { iteration, rootDir, agentHome, memory, orientation, log } = input;
 
   log("Planner (Opus) starting...");
 
   // Gather metrics
-  const metricsPath = path.join(rootDir, ".autoagent-metrics.json");
+  const metricsPath = path.join(agentHome, ".autoagent-metrics.json");
   let metricsSummary = "No metrics yet.";
   if (existsSync(metricsPath)) {
     try {
@@ -61,7 +62,7 @@ export async function runPlanner(input: PlannerInput): Promise<PlannerResult> {
   } catch {}
 
   // Current goals (for continuity)
-  const goalsPath = path.join(rootDir, "goals.md");
+  const goalsPath = path.join(agentHome, "goals.md");
   const currentGoals = existsSync(goalsPath) ? readFileSync(goalsPath, "utf-8") : "(none)";
 
   const prompt = `You are the Planner for AutoAgent, iteration ${iteration}.
@@ -118,7 +119,7 @@ Output ONLY the plan content as markdown. No JSON wrapping. No code blocks aroun
       .map((b) => b.text)
       .join("\n");
 
-    const planPath = path.join(rootDir, ".plan.md");
+    const planPath = path.join(agentHome, ".plan.md");
     writeFileSync(planPath, text, "utf-8");
     log(`Planner wrote .plan.md (${text.length} chars)`);
 
@@ -135,7 +136,7 @@ Output ONLY the plan content as markdown. No JSON wrapping. No code blocks aroun
     log(`Planner error: ${msg}`);
     // Write a fallback plan
     const fallback = `# Plan — Iteration ${iteration}\n\n## Objective\nFix whatever broke last iteration.\n\n## Steps\n1. Read memory.md for context\n2. Check if tsc compiles\n3. Fix any issues\n4. Restart\n\n## Success criteria\n- tsc --noEmit passes\n- No regressions\n`;
-    writeFileSync(path.join(rootDir, ".plan.md"), fallback, "utf-8");
+    writeFileSync(path.join(agentHome, ".plan.md"), fallback, "utf-8");
     return { plan: fallback, inputTokens: 0, outputTokens: 0 };
   }
 }
@@ -145,6 +146,7 @@ Output ONLY the plan content as markdown. No JSON wrapping. No code blocks aroun
 interface ReviewerInput {
   iteration: number;
   rootDir: string;
+  agentHome: string;
   log: (msg: string) => void;
 }
 
@@ -155,12 +157,12 @@ interface ReviewerResult {
 }
 
 export async function runReviewer(input: ReviewerInput): Promise<ReviewerResult> {
-  const { iteration, rootDir, log } = input;
+  const { iteration, rootDir, agentHome, log } = input;
 
   log("Reviewer (Opus) starting...");
 
   // Read the plan
-  const planPath = path.join(rootDir, ".plan.md");
+  const planPath = path.join(agentHome, ".plan.md");
   const plan = existsSync(planPath) ? readFileSync(planPath, "utf-8") : "(no plan found)";
 
   // Get the diff
@@ -170,12 +172,12 @@ export async function runReviewer(input: ReviewerInput): Promise<ReviewerResult>
   );
 
   // Read current memory
-  const memoryPath = path.join(rootDir, "memory.md");
+  const memoryPath = path.join(agentHome, "memory.md");
   const memory = existsSync(memoryPath) ? readFileSync(memoryPath, "utf-8") : "";
   const recentMemory = memory.length > 3000 ? memory.slice(-3000) : memory;
 
   // Metrics for this iteration
-  const metricsPath = path.join(rootDir, ".autoagent-metrics.json");
+  const metricsPath = path.join(agentHome, ".autoagent-metrics.json");
   let thisIterMetrics = "";
   if (existsSync(metricsPath)) {
     try {
