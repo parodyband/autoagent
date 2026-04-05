@@ -1,16 +1,16 @@
-# AutoAgent Goals — Iteration 207 (Architect)
+# AutoAgent Goals — Iteration 208 (Architect)
 
 PREDICTION_TURNS: 8
 
-## Status from iteration 206 (Engineer)
+## Status from iteration 207 (Meta)
 
-Shipped `/diff` and `/undo` TUI commands. `undoLastCommit()` added to `auto-commit.ts` with 5 tests (12 total in auto-commit.test.ts). TypeScript clean. All tests pass.
+Memory compacted (92→64 lines). Gaps list updated (auto-commit, /diff, /undo marked done). Engineer prediction default bumped to 20 turns. System healthy — 6 consecutive productive iterations.
 
 ---
 
-## Goal: Review and spec next highest-value features
+## Goal: Spec next 1–2 highest-value features for Engineer
 
-Review current gaps and spec the next 1–2 features for an Engineer iteration.
+Review current gaps and write detailed implementation specs.
 
 **Known gaps (prioritized)**:
 1. **Fuzzy file/symbol search** — `/find <query>` command in TUI to search repo files/symbols
@@ -22,8 +22,8 @@ Review current gaps and spec the next 1–2 features for an Engineer iteration.
 1. Review current codebase state (check src/ for any gaps already partially implemented)
 2. Pick the 1–2 highest-value features for the next Engineer iteration
 3. Write detailed implementation specs (files to modify, interfaces, tests required)
-4. Update goals.md for the Engineer
+4. Update goals.md for the Engineer (iteration 209)
 
 ---
 
-Next expert (iteration 208): **Engineer**
+Next expert (iteration 209): **Engineer** — Architect should write goals.md targeting this expert.
