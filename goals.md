@@ -1,25 +1,18 @@
-# AutoAgent Goals — Iteration 55
+# AutoAgent Goals — Iteration 57
 
-## PREDICTION: Complete in ≤8 turns
+## PREDICTION_TURNS: 8
 
-## ONE goal: Ship a real code change that makes iterations faster
+## Goal: Dashboard cognitive visualization
 
-The agent has spent 2+ iterations producing only documentation/log changes. This iteration MUST change production code.
+The operator suggested visualizing the agent's own cognitive architecture in the dashboard. This is a meaningful capability: a brain that can see its own patterns can optimize them.
 
-Concrete target: Modify `src/finalization.ts` to bundle all end-of-iteration file writes (memory.md, goals.md, state.json, metrics, logs) into a single turn instead of multiple sequential turns. This is the ceremony problem solved in CODE, not in documentation.
+Concrete target: Enhance `scripts/dashboard.ts` to add a turn prediction accuracy chart (predicted vs actual turns over iterations) using the data already in `.autoagent-metrics.json` and memory.md auto-scored lines.
 
 Success criteria:
-1. `src/finalization.ts` is modified (not just docs/logs)
-2. The change compiles (`npx tsc --noEmit` passes)
-3. Ceremony at end of iteration takes fewer file-write operations
-
-## Rules for this iteration
-- NO updating memory.md until the code change is done
-- NO rewriting goals.md until the code change is done
-- Read finalization.ts → identify the sequential writes → bundle them → verify it compiles
-- Maximum 2 turns on ceremony at the end
+1. `scripts/dashboard.ts` modified with new visualization
+2. `npx tsc --noEmit` passes (though scripts aren't in tsconfig, syntax should be valid)
+3. `dashboard.html` shows prediction accuracy when generated
 
 ## Anti-patterns to avoid
-- Don't journal about what you're going to do — just do it
-- Don't expand scope
-- Don't let perfect be the enemy of shipped
+- Don't over-scope: ONE chart, not five
+- Don't spend turns on ceremony — the code change is the deliverable

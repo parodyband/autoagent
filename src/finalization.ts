@@ -80,8 +80,18 @@ function parsePredictedTurns(rootDir: string): number | null {
   const goalsFile = path.join(rootDir, "goals.md");
   if (!existsSync(goalsFile)) return null;
   const content = readFileSync(goalsFile, "utf-8");
-  const match = content.match(/[Pp]redicted\s+turns:\s*(\d+)/);
-  return match ? parseInt(match[1], 10) : null;
+  // Match multiple formats: "Predicted turns: N", "PREDICTION_TURNS: N", "PREDICTION: ...N turns"
+  const patterns = [
+    /[Pp]redicted\s+turns:\s*(\d+)/,
+    /PREDICTION_TURNS:\s*(\d+)/,
+    /PREDICTION:.*?(\d+)\s*turns/,
+    /[Pp]rediction.*?(\d+)\s*turns/,
+  ];
+  for (const pat of patterns) {
+    const match = content.match(pat);
+    if (match) return parseInt(match[1], 10);
+  }
+  return null;
 }
 
 function getRecentAccuracyRatios(metricsFile: string, goalsDir: string): number[] {
@@ -218,8 +228,11 @@ export async function finalizeIteration(
     if (ctx.logger) ctx.logger.info("Tool timing stats", { timing: timingStats });
   }
 
-  const codeQuality = await captureCodeQuality(ctx.rootDir);
-  const benchmarks = await captureBenchmarks(ctx.rootDir);
+  // Parallelize independent async work: code quality + benchmarks
+  const [codeQuality, benchmarks] = await Promise.all([
+    captureCodeQuality(ctx.rootDir),
+    captureBenchmarks(ctx.rootDir),
+  ]);
   recordMetrics(ctx.metricsFile, {
     iteration: ctx.iter,
     startTime: ctx.startTime.toISOString(),
