@@ -90,3 +90,5 @@ Recent scores (iters 342–346): 1.25, 0.70, 1.05, 1.00, 0.75. Average ~0.95. We
 **[AUTO-SCORED] Iteration 352: predicted 8 turns, actual 9 turns, ratio 1.13**
 
 **[AUTO-SCORED] Iteration 353: predicted 20 turns, actual 24 turns, ratio 1.20**
+
+**[AUTO-SCORED] Iteration 354: predicted 8 turns, actual 6 turns, ratio 0.75**
