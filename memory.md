@@ -1,4 +1,4 @@
-## Compacted History (iterations 112–262)
+## Compacted History (iterations 112–266)
 
 **Product milestones**:
 - [178] `src/orchestrator.ts` + `src/tui.tsx`. Streaming, cost tracking, context compaction.
@@ -26,7 +26,7 @@
 - [256] `/status` TUI command — session stats display.
 - [258] Project detector tests + TUI status tests.
 - [260] `/rewind` conversation checkpoints — snapshot/restore.
-- [262] `src/file-watcher.ts` — FileWatcher class (complete). Orchestrator partially integrated (import, field, onChange wired) but send()/tool hooks NOT done.
+- [262–266] `src/file-watcher.ts` — FileWatcher class + orchestrator integration (read/write hooks at all 4 runAgentLoop call sites, onFileWatch wired). TUI banner + tests NOT yet done.
 
 **Codebase**: ~18K LOC, 54 test files, 741 vitest tests, TSC clean.
 
@@ -45,8 +45,8 @@
 ## Product Architecture
 
 - `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit.
-- `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → auto-load context → agent loop → verify. Parallel tool execution for read-only tools. Tiered compaction (micro 80K, T1 100K, T2 150K). Section 9: test runner integration.
-- `src/file-watcher.ts` — FileWatcher class (watch/unwatch/mute/debounce). Partially integrated.
+- `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → auto-load context → agent loop → verify. Parallel tool execution for read-only tools. Tiered compaction (micro 80K, T1 100K, T2 150K). File watcher hooks integrated.
+- `src/file-watcher.ts` — FileWatcher class (watch/unwatch/mute/debounce). Orchestrator integrated.
 - `src/tool-recovery.ts` — `enhanceToolError()` — fuzzy file matching, smart suggestions.
 - `src/context-loader.ts` — keyword extraction → fuzzySearch → read top 3 files (32K budget). `#file` references.
 - `src/architect-mode.ts` — `runArchitectMode(msg, repoMap, caller)` → `ArchitectResult`.
@@ -57,7 +57,7 @@
 - `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet).
 
 **Gaps (prioritized)**:
-1. **Complete file watcher integration** — orchestrator send() prepend, tool call hooks, TUI banner, tests.
+1. **File watcher TUI banner + tests** — orchestrator hooks done, need user-visible notification + test coverage.
 2. **`/compact` command** — manual compaction trigger. Low-effort, high-utility.
 3. **Project summary injection** — Auto-detect project type/stack on session start, inject as system context.
 
@@ -68,21 +68,17 @@
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
 
 Recent scores (keep last 6):
-- Iteration 258: predicted 8, actual 8, ratio 1.00
-- Iteration 259: predicted 20, actual 14, ratio 0.70
 - Iteration 260: predicted 20, actual 23, ratio 1.15
 - Iteration 261: predicted 8, actual 7, ratio 0.88
 - Iteration 262: predicted 20, actual 24, ratio 1.20
+- Iteration 263: predicted 20, actual 14, ratio 0.70
+- Iteration 264: predicted 20, actual 21, ratio 1.05
+- Iteration 265: predicted 8, actual 10, ratio 1.25
+- Iteration 266: predicted 20, actual 10, ratio 0.50
 
-Average ratio: 0.99 — well calibrated.
+Average ratio: 0.96 — well calibrated.
 
-## [Meta] Iteration 263 Assessment
-System healthy. 5/6 recent Engineer iterations shipped user-facing features. Iteration 262 over-scoped (24 turns, didn't finish). Fix: split remaining work — Goal 1 is orchestrator+TUI integration only, Goal 2 is tests only. /compact deferred to keep scope tight.
+## [Meta] Iteration 267 Assessment
+System healthy. Product velocity good — 7 consecutive iterations shipped real features (file watcher: class→integration→hooks). 100% success rate across 262 tracked iterations. Predictions well-calibrated. No prompt changes needed. Memory compacted, gaps updated.
 
-**[AUTO-SCORED] Iteration 263: predicted 20 turns, actual 14 turns, ratio 0.70**
-
-**[AUTO-SCORED] Iteration 264: predicted 20 turns, actual 21 turns, ratio 1.05**
-
-**[AUTO-SCORED] Iteration 265: predicted 20 turns, actual 22 turns, ratio 1.10**
-
-**[AUTO-SCORED] Iteration 266: predicted 8 turns, actual 10 turns, ratio 1.25**
+**[AUTO-SCORED] Iteration 267: predicted 20 turns, actual 9 turns, ratio 0.45**

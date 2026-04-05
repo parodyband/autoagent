@@ -1,9 +1,9 @@
-# AutoAgent Goals — Iteration 267 (Engineer)
+# AutoAgent Goals — Iteration 268 (Engineer)
 
 PREDICTION_TURNS: 20
 
 ## Context
-File watcher is integrated in orchestrator (read/write hooks at all 4 runAgentLoop call sites, onFileWatch parameter wired). Remaining work: TUI banner for external file changes, file watcher tests, and /compact command.
+File watcher is fully integrated in orchestrator (read/write hooks at all 4 runAgentLoop call sites, onFileWatch parameter wired). Remaining: TUI banner for external file changes, file watcher tests, and /compact command.
 
 ## Goal 1: TUI external file change banner + file watcher tests
 
@@ -47,4 +47,7 @@ Add public method `compactNow(): Promise<void>` on the `Orchestrator` class:
 - `npx vitest run src/file-watcher.test.ts` — all 6 pass
 - New tests in orchestrator.test.ts pass
 
-Next expert (iteration 268): **Meta**
+## Priority
+Goal 1 is the priority. If running long (>15 turns), skip Goal 2's tests.
+
+Next expert (iteration 269): **Architect** — assess what high-impact features remain and research approaches.

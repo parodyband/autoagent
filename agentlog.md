@@ -1,68 +1,3 @@
-665 |     this.nextCheckpointId = 0;
-666 |   }
-667 | 
-668 |   /**
-669 |    * Save a checkpoint of the current conversation state.
-670 |    * Called before each user message is processed.
-671 |    * Keeps at most MAX_CHECKPOINTS; drops oldest when cap exceeded.
-672 |    */
-673 |   saveCheckpoint(label: string): void {
-674 |     const checkpoint: ConversationCheckpoint = {
-675 |       id: this.nextCheckpointId++,
-676 |       label: label.slice(0, 60),
-677 |       messages: this.apiMessages.map(m => ({ ...m })),
-678 |       timestamp: Date.now(),
-679 |     };
-680 |     this.checkpoints.push(checkpoint);
-681 |     if (this.checkpoints.length > MAX_CHECKPOINTS) {
-682 |       this.checkpoints.shift();
-683 |     }
-684 |   }
-685 | 
-686 |   /**
-687 |    * Restore conversation to the state at a given checkpoint id.
-688 |    * Returns the checkpoint label on success, null if not found.
-689 |    */
-690 |   rewindTo(id: number): { label: string } | null {
-691 |     const cp = this.checkpoints.find(c => c.id === id);
-692 |     if (!cp) return null;
-693 |     this.apiMessages = cp.messages.map(m => ({ ...m }));
-694 |     return { label: cp.label };
-695 |   }
-696 | 
-697 |   /** Get all current checkpoints (most recent last). */
-698 |   getCheckpoints(): ConversationCheckpoint[] {
-699 |     return [...this.checkpoints];
-700 |   }
-701 | 
-702 |   /** Re-index the repo (after significant changes). */
-703 |   reindex(): void {
-[2026-04-05T17:10:08.143Z] iter=260 turn=11 INFO: Turn 11/25
-[2026-04-05T17:10:14.543Z] iter=260 turn=11 INFO: Agent: Now wire `saveCheckpoint` into the `send()` method, just before the user message is added to history:
-[2026-04-05T17:10:14.543Z] iter=260 turn=11 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T17:10:14.544Z] iter=260 turn=11 INFO:   -> ok: Patched src/orchestrator.ts: -8 +11 lines
-
-Context after patch:
-964 |       this.opts.onPlan?.(architectResult.plan);
-965 |     }
-966 | 
-967 |     // 4. Save checkpoint BEFORE adding user message (so rewind restores pre-message state)
-968 |     this.saveCheckpoint(userMessage);
-969 | 
-970 |     // 4. Add user message to history and persist
-971 |     // Prepend file reference context if present
-972 |     const messageWithContext = fileRefContext
-973 |       ? `${fileRefContext}\n\n---\n\nUser message: ${effectiveMessage}`
-974 |       : effectiveMessage;
-975 |     const userMsg: Anthropic.MessageParam = { role: "user", content: messageWithContext };
-976 |     this.apiMessages.push(userMsg);
-977 |     if (this.sessionPath) saveMessage(this.sessionPath, userMsg);
-978 | 
-979 |     // 4b. Inject architect plan as prefilled assistant message
-980 |     if (architectResult.activated && architectResult.prefill) {
-[2026-04-05T17:10:14.545Z] iter=260 turn=12 INFO: Turn 12/25
-[2026-04-05T17:10:17.002Z] iter=260 turn=12 INFO: Agent: Now add `/rewind` to the TUI. Let me read the relevant section:
-[2026-04-05T17:10:17.002Z] iter=260 turn=12 INFO: read_file: src/tui.tsx
 [2026-04-05T17:10:17.003Z] iter=260 turn=12 INFO:   -> ok (3664 chars)
 [2026-04-05T17:10:17.004Z] iter=260 turn=13 INFO: Turn 13/25
 [2026-04-05T17:10:20.587Z] iter=260 turn=13 INFO: Agent: I have made real changes - the orchestrator has checkpoints added. Let me now add the TUI `/rewind` command and tests, then finish.
@@ -1061,3 +996,78 @@ Let me do all three simultaneously.
 [2026-04-05T17:22:41.999Z] iter=266 turn=10 INFO: Tool timing stats
 [2026-04-05T17:22:47.388Z] iter=266 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 266: predicted 8 turns, actual 10 turns, ratio 1.25**
 [2026-04-05T17:22:47.408Z] iter=266 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T17:22:47.439Z] iter=266 turn=10 INFO: Committed: a23811b1 (20 in / 2265 out, cache: 15393 created, 95713 read)
+[2026-04-05T17:22:47.439Z] iter=266 turn=10 INFO: Restarting as iteration 267...
+[2026-04-05T17:22:47.614Z] iter=267 INFO: Cache restored: 61/61 entries (0 stale)
+[2026-04-05T17:22:47.616Z] iter=267 INFO: Turn budget: 20/25 (calibration=1.10x, predicted=20)
+[2026-04-05T17:22:47.616Z] iter=267 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T17:22:47.732Z] iter=267 turn=1 INFO: Turn 1/25
+[2026-04-05T17:22:56.717Z] iter=267 turn=1 INFO: Agent: 
+
+I'm the Meta expert. Let me assess the current state of the system before doing anything.
+[2026-04-05T17:22:56.718Z] iter=267 turn=1 INFO: think: Let me analyze what's happening:
+
+1. The last iteration (266) was an Architect iteration (predicted 8 turns, actual 10)....
+[2026-04-05T17:22:56.719Z] iter=267 turn=2 INFO: Turn 2/25
+[2026-04-05T17:23:00.300Z] iter=267 turn=2 INFO: $ cat /Users/austin/Documents/autoagent/.expert-rotation.json
+[2026-04-05T17:23:00.307Z] iter=267 turn=2 INFO: $ cat /Users/austin/Documents/autoagent/.autoagent-state.json
+[2026-04-05T17:23:00.312Z] iter=267 turn=2 INFO: $ cat /Users/austin/Documents/autoagent/.autoagent-metrics.json 2>/dev/null | head -80
+[2026-04-05T17:23:00.321Z] iter=267 turn=2 INFO:   -> exit=0 (1310 chars)
+[2026-04-05T17:23:00.324Z] iter=267 turn=2 INFO:   -> exit=0 (113 chars)
+[2026-04-05T17:23:00.329Z] iter=267 turn=2 INFO:   -> exit=0 (1679 chars)
+[2026-04-05T17:23:00.329Z] iter=267 turn=3 INFO: Turn 3/25
+[2026-04-05T17:23:07.260Z] iter=267 turn=3 INFO: $ cat /Users/austin/Documents/autoagent/.autoagent-metrics.json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+# Get last 10 iterations
+recent = data[-10:]
+for m in recent:
+    print(f'Iter...
+[2026-04-05T17:23:07.264Z] iter=267 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -20
+[2026-04-05T17:23:07.268Z] iter=267 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline --since="3 days ago" -- src/ | head -30
+[2026-04-05T17:23:07.287Z] iter=267 turn=3 INFO:   -> exit=0 (660 chars)
+[2026-04-05T17:23:07.297Z] iter=267 turn=3 INFO:   -> exit=0 (990 chars)
+[2026-04-05T17:23:07.304Z] iter=267 turn=3 INFO:   -> exit=0 (988 chars)
+[2026-04-05T17:23:07.304Z] iter=267 turn=4 INFO: Turn 4/25
+[2026-04-05T17:23:22.045Z] iter=267 turn=4 INFO: Agent: 
+
+You're right. I'm Meta — my deliverables are: (1) assess system health, (2) compact/tune memory, (3) write goals.md for next iteration. Let me produce those now.
+[2026-04-05T17:23:22.046Z] iter=267 turn=4 INFO: think: Assessment based on what I've already gathered:
+
+1. **Is the system building product?** YES. Recent iterations (260-266)...
+[2026-04-05T17:23:22.046Z] iter=267 turn=5 INFO: Turn 5/25
+[2026-04-05T17:23:25.076Z] iter=267 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && git diff a23811b..HEAD --stat -- src/ 2>/dev/null; echo "---"; git diff 270946e..a23811b --stat -- src/ 2>/dev/null
+[2026-04-05T17:23:25.106Z] iter=267 turn=5 INFO:   -> exit=0 (107 chars)
+[2026-04-05T17:23:25.106Z] iter=267 turn=6 INFO: Turn 6/25
+[2026-04-05T17:24:08.455Z] iter=267 turn=6 INFO: Agent: Now I know iteration 266 (Engineer) only touched orchestrator.ts (26 lines added — finishing file watcher integration). Good. Let me update memory and write goals.
+[2026-04-05T17:24:08.456Z] iter=267 turn=6 INFO: write_file: memory.md (write)
+[2026-04-05T17:24:08.458Z] iter=267 turn=6 INFO:   -> ok: Updated memory.md (5207 chars, -6 lines delta)
+[2026-04-05T17:24:08.460Z] iter=267 turn=7 INFO: Turn 7/25
+[2026-04-05T17:24:29.798Z] iter=267 turn=7 INFO: Agent: 
+
+**Goal status as Meta expert:**
+1. **Assess system health** — DONE (system healthy, product velocity good)
+2. **Compact/update memory** — DONE (memory.md written)
+3. **Write goals.md for next iteration** — NOT STARTED
+
+Let me write goals now and finish up.
+[2026-04-05T17:24:29.800Z] iter=267 turn=7 INFO: write_file: goals.md (write)
+[2026-04-05T17:24:29.801Z] iter=267 turn=7 INFO:   -> ok: Updated goals.md (2406 chars, +3 lines delta)
+[2026-04-05T17:24:29.802Z] iter=267 turn=8 INFO: Turn 8/25
+[2026-04-05T17:24:31.963Z] iter=267 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T17:24:32.856Z] iter=267 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:24:32.857Z] iter=267 turn=9 INFO: Turn 9/25
+[2026-04-05T17:24:36.762Z] iter=267 turn=9 INFO: Agent: TSC clean. All deliverables done:
+
+1. ✅ **System assessment**: Healthy — 7 consecutive iterations shipped real features, 100% success rate, predictions well-calibrated (0.96 avg ratio)
+2. ✅ **Memory compacted**: Updated gaps, added iteration 266 score, trimmed stale entries
+3. ✅ **Goals written**: Iteration 268 Engineer — file watcher TUI banner + tests, /compact command
+[2026-04-05T17:24:36.762Z] iter=267 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T17:24:36.763Z] iter=267 turn=9 INFO: RESTART signal
+[2026-04-05T17:24:36.764Z] iter=267 turn=9 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T17:24:37.707Z] iter=267 turn=9 INFO: Compilation OK
+[2026-04-05T17:24:43.809Z] iter=267 turn=9 INFO: Cache persisted: 61 entries to .autoagent-cache.json
+[2026-04-05T17:24:43.809Z] iter=267 turn=9 INFO: Tool timing: bash: 9x, avg=120ms, total=1079ms; write_file: 2x, avg=2ms, total=4ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T17:24:43.809Z] iter=267 turn=9 INFO: Tool timing stats
+[2026-04-05T17:24:49.212Z] iter=267 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 267: predicted 20 turns, actual 9 turns, ratio 0.45**
+[2026-04-05T17:24:49.230Z] iter=267 turn=9 INFO: Pre-commit review: no significant code changes to review
