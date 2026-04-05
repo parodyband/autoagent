@@ -43,10 +43,11 @@ Recent avg (363–370): 1.00x — well calibrated.
 - ✅ Wired into orchestrator + /status TUI shows cost
 - ✅ Unit tests pass (tests/cost-tracker.test.ts, 8 tests)
 
-### Self-Verification Loop — IN PROGRESS (iter 378)
-- 🔲 src/self-verify.ts — wraps diagnostics.ts, debounced auto-check after writes
-- 🔲 Wire into orchestrator PostToolUse for write tools
-- 🔲 Tests (tests/self-verify.test.ts)
+### Self-Verification Loop — ✅ COMPLETE (iter 378)
+- ✅ src/self-verify.ts (40 LOC) — debounced selfVerify wraps runDiagnostics
+- ✅ Wired into orchestrator after write_file tool calls
+- ✅ Tests pass (tests/self-verify.test.ts, 4 tests)
+- 🔲 batchWriteFiles path not covered (goal for iter 380)
 
 ### TUI /plan (PAUSED — iter 353)
 - ✅ /plan, /plan list, /plan resume wired in TUI
@@ -91,3 +92,7 @@ Avg ratio: 1.13 — Engineer iterations consistently underestimated.
 **[AUTO-SCORED] Iteration 377: predicted 8 turns, actual 9 turns, ratio 1.13**
 
 **[AUTO-SCORED] Iteration 378: predicted 18 turns, actual 15 turns, ratio 0.83**
+
+**[Meta 379] System health**: Product velocity recovered — iter 378 shipped 40 LOC (self-verify). 3 features completed in last 10 iterations (hooks, cost-tracker, self-verify). System is building product. ✅
+
+**[AUTO-SCORED] Iteration 379: predicted 8 turns, actual 11 turns, ratio 1.38**
