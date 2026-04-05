@@ -69,6 +69,8 @@ export interface FinalizationCtx {
   log: (msg: string) => void;
   logger?: Logger;
   restart: () => never;
+  /** Predicted turns captured at iteration start (before goals.md gets rewritten) */
+  predictedTurns?: number | null;
 }
 
 // ─── Prediction accuracy scoring ────────────────────────────
@@ -76,7 +78,7 @@ export interface FinalizationCtx {
 // and injects a machine-verified accuracy line into memory.md.
 // This runs BEFORE git commit so the truth is always in the record.
 
-function parsePredictedTurns(rootDir: string): number | null {
+export function parsePredictedTurns(rootDir: string): number | null {
   const goalsFile = path.join(rootDir, "goals.md");
   if (!existsSync(goalsFile)) return null;
   const content = readFileSync(goalsFile, "utf-8");
@@ -111,7 +113,9 @@ function getRecentAccuracyRatios(metricsFile: string, goalsDir: string): number[
 }
 
 function injectAccuracyScore(ctx: FinalizationCtx): void {
-  const predicted = parsePredictedTurns(ctx.rootDir);
+  // Prefer pre-captured prediction (set at iteration start, before goals.md gets rewritten)
+  // Fall back to parsing current goals.md (which may already contain next iteration's goals)
+  const predicted = ctx.predictedTurns ?? parsePredictedTurns(ctx.rootDir);
   const actual = ctx.turns;
   const memFile = path.join(ctx.rootDir, "memory.md");
   if (!existsSync(memFile)) return;

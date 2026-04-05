@@ -28,7 +28,7 @@ import { orient, formatOrientation } from "./orientation.js";
 import { parseMemory, getSection, serializeMemory } from "./memory.js";
 import { ToolCache } from "./tool-cache.js";
 import { ToolTimingTracker } from "./tool-timing.js";
-import { finalizeIteration as runFinalization } from "./finalization.js";
+import { finalizeIteration as runFinalization, parsePredictedTurns } from "./finalization.js";
 import { runConversation, type IterationCtx } from "./conversation.js";
 import { runSelfReflection } from "./self-reflection.js";
 import {
@@ -125,6 +125,7 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
     log: (msg: string) => log(ctx.iter, msg),
     logger,
     restart,
+    predictedTurns: ctx.predictedTurns,
   }, doRestart);
 }
 
