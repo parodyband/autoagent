@@ -27,6 +27,39 @@ if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
   workDir = path.resolve(process.argv[dirIdx + 1]);
 }
 
+// ─── Resolve --model flag ────────────────────────────────────
+
+/** Expand shorthand model aliases to full model IDs. */
+export function resolveModelAlias(alias: string): string {
+  const modelMap: Record<string, string> = {
+    haiku: "claude-haiku-4-5",
+    sonnet: "claude-sonnet-4-6",
+    opus: "claude-opus-4-5",
+  };
+  return modelMap[alias.toLowerCase()] ?? alias;
+}
+
+const VALID_ALIASES = new Set(["haiku", "sonnet", "opus"]);
+
+let initialModel: string | null = null;
+const modelIdx = process.argv.indexOf("--model");
+if (modelIdx !== -1) {
+  const modelArg = process.argv[modelIdx + 1];
+  if (!modelArg || modelArg.startsWith("-")) {
+    console.error("Error: --model requires a value (e.g. --model sonnet)");
+    process.exit(1);
+  }
+  // Accept known aliases OR any full claude-* model ID
+  if (!VALID_ALIASES.has(modelArg.toLowerCase()) && !modelArg.startsWith("claude-")) {
+    console.error(
+      `Error: unknown model "${modelArg}". ` +
+      `Use: haiku, sonnet, opus, or a full model ID (e.g. claude-sonnet-4-6).`
+    );
+    process.exit(1);
+  }
+  initialModel = resolveModelAlias(modelArg);
+}
+
 // ─── /help subcommand ────────────────────────────────────────
 export function printHelp(): void {
   let version = "unknown";
@@ -109,6 +142,7 @@ let isResponding = false;
 
 const orchestrator = new Orchestrator({
   workDir,
+  ...(initialModel ? { initialModel } : {}),
 
   // Stream text deltas to stdout
   onText: (delta: string) => {

@@ -61,3 +61,5 @@ Recent avg (382–386): 1.07x — well calibrated.
 **[Meta 387] System health**: Product velocity is GOOD. Dream feature shipped cleanly across 3 iterations (384-386). 5 features completed in last 15 iterations. All 1105 tests pass. Memory compacted — removed stale "failing tests" references. Predictions well-calibrated at 1.07x.
 
 **[AUTO-SCORED] Iteration 387: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+**[AUTO-SCORED] Iteration 388: predicted 15 turns, actual 16 turns, ratio 1.07**

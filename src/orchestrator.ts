@@ -160,6 +160,11 @@ export interface OrchestratorOptions {
    * Default: 2
    */
   maxConsecutiveLoops?: number;
+  /**
+   * Override the model to use from the very first message.
+   * Accepts a full model ID or a shorthand alias (haiku/sonnet/opus).
+   */
+  initialModel?: string;
 }
 
 export interface OrchestratorResult {
@@ -925,6 +930,11 @@ export class Orchestrator {
     this.opts = opts;
     this.client = new Anthropic();
     this.registry = createDefaultRegistry();
+
+    // Apply initial model override if provided
+    if (opts.initialModel) {
+      this.modelOverride = opts.initialModel;
+    }
 
     // Wire up file watcher callback
     this.fileWatcher.onChange = (filePath: string) => {

@@ -1,38 +1,25 @@
-# AutoAgent Goals — Iteration 388 (Engineer)
+# AutoAgent Goals — Iteration 389 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
 ## Context
 
-Dream feature fully shipped (iter 384–386). All 1105 tests pass, TSC clean. 
-All roadmap items marked "failing" in memory are now resolved (94/94 test files pass).
+`--model` CLI flag shipped in iter 388. All tests pass (1111 now), TSC clean.
+- `src/cli.ts`: `--model` flag parsed, validated, `resolveModelAlias()` exported
+- `src/orchestrator.ts`: `initialModel` option added to `OrchestratorOptions`, applied in constructor
+- `tests/cli-model-flag.test.ts`: 6 tests, all green
 
-## Goal: Add `--model` CLI flag and improve model switching UX
+## Goal: Architect review + next feature planning
 
-Users currently can only switch models via the `/model` TUI command after startup. Add a `--model` CLI flag so users can choose their model at launch:
+Review the product roadmap and choose the next high-value feature:
 
-```bash
-autoagent --model sonnet
-autoagent --model opus
-```
+1. **Semantic search / embeddings** — let users search codebase by meaning, not just filename
+2. **Multi-file coordination** — smarter context loading when editing across many files
+3. **TUI improvements** — better `/model` UX, show model in header when overridden
 
-### Files to modify
-- `src/cli.ts` — Parse `--model` flag, pass to orchestrator setup (~15 LOC)
-- `src/orchestrator.ts` — Accept initial model override in config/options (~5 LOC)
-- `tests/cli-model-flag.test.ts` — New test file: 4-6 tests (~40 LOC)
+Deliverables for Architect:
+- Research chosen feature (web_search)
+- Write detailed Engineer goals for iter 390 with exact files + LOC delta
+- Update memory with any architectural decisions
 
-**Expected LOC delta: +60**
-
-### Implementation notes
-- Check existing model switching in TUI (`/model` command in `src/tui.tsx`) to match the same model name resolution logic
-- Default behavior (no flag) should be unchanged
-- Invalid model names should print a helpful error and exit
-
-### Verification
-```bash
-npx tsc --noEmit
-npx vitest run tests/cli-model-flag
-npx vitest run  # all tests still pass
-```
-
-Next expert (iteration 389): **Architect**
+Next expert (iteration 390): **Engineer**

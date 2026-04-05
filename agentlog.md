@@ -1,89 +1,3 @@
-51 | ### TUI /plan (PAUSED — iter 353)
-52 | - ✅ /plan, /plan list, /plan resume wired in TUI
-[2026-04-05T20:54:23.632Z] iter=377 turn=8 INFO: Turn 8/25
-[2026-04-05T20:54:26.043Z] iter=377 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T20:54:27.093Z] iter=377 turn=8 INFO:   -> exit=0 (11 chars)
-[2026-04-05T20:54:27.093Z] iter=377 turn=9 INFO: Turn 9/25
-[2026-04-05T20:54:29.548Z] iter=377 turn=9 INFO: Agent: TSC clean.
-[2026-04-05T20:54:29.549Z] iter=377 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T20:54:29.549Z] iter=377 turn=9 INFO: RESTART signal
-[2026-04-05T20:54:29.550Z] iter=377 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T20:54:30.646Z] iter=377 turn=9 INFO: Compilation OK
-[2026-04-05T20:54:38.504Z] iter=377 turn=9 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-05T20:54:38.505Z] iter=377 turn=9 INFO: Tool timing: bash: 8x, avg=281ms, total=2244ms; write_file: 2x, avg=2ms, total=4ms; think: 2x, avg=0ms, total=0ms
-[2026-04-05T20:54:38.505Z] iter=377 turn=9 INFO: Tool timing stats
-[2026-04-05T20:54:45.666Z] iter=377 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 377: predicted 8 turns, actual 9 turns, ratio 1.13**
-[2026-04-05T20:54:45.689Z] iter=377 turn=9 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T20:54:45.726Z] iter=377 turn=9 INFO: Committed: 948b4038 (19 in / 2939 out, cache: 12891 created, 76514 read)
-[2026-04-05T20:54:45.726Z] iter=377 turn=9 INFO: Restarting as iteration 378...
-[2026-04-05T20:54:45.925Z] iter=378 INFO: Cache restored: 55/55 entries (0 stale)
-[2026-04-05T20:54:45.928Z] iter=378 INFO: Turn budget: 18/25 (calibration=1.13x, predicted=18)
-[2026-04-05T20:54:45.928Z] iter=378 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T20:54:46.111Z] iter=378 turn=1 INFO: Turn 1/25
-[2026-04-05T20:54:47.736Z] iter=378 turn=1 INFO: read_scratchpad: 2526 chars
-[2026-04-05T20:54:47.737Z] iter=378 turn=1 INFO: read_file: CACHE HIT
-[2026-04-05T20:54:47.738Z] iter=378 turn=2 INFO: Turn 2/25
-[2026-04-05T20:54:50.409Z] iter=378 turn=2 INFO: $ grep -n "PostToolUse\|write\|Write\|workDir" src/orchestrator.ts | grep -i "write\|PostTool" | head -40
-[2026-04-05T20:54:50.412Z] iter=378 turn=2 INFO: $ grep -n "workDir\|this\.workDir" src/orchestrator.ts | head -20
-[2026-04-05T20:54:50.427Z] iter=378 turn=2 INFO:   -> exit=0 (2911 chars)
-[2026-04-05T20:54:50.429Z] iter=378 turn=2 INFO:   -> exit=0 (993 chars)
-[2026-04-05T20:54:50.430Z] iter=378 turn=3 INFO: Turn 3/25
-[2026-04-05T20:54:52.273Z] iter=378 turn=3 INFO: read_file: src/orchestrator.ts
-[2026-04-05T20:54:52.274Z] iter=378 turn=3 INFO:   -> ok (2883 chars)
-[2026-04-05T20:54:52.275Z] iter=378 turn=4 INFO: Turn 4/25
-[2026-04-05T20:55:09.623Z] iter=378 turn=4 INFO: think: I have enough context. Let me build the two deliverables:
-1. Create `src/self-verify.ts` (~40 LOC)
-2. Create `tests/self...
-[2026-04-05T20:55:09.624Z] iter=378 turn=5 INFO: Turn 5/25
-[2026-04-05T20:55:17.375Z] iter=378 turn=5 INFO: Agent: Creating both files now:
-[2026-04-05T20:55:17.375Z] iter=378 turn=5 INFO: write_file: src/self-verify.ts (write)
-[2026-04-05T20:55:17.376Z] iter=378 turn=5 INFO:   -> ok: Created src/self-verify.ts (1160 chars)
-[2026-04-05T20:55:17.377Z] iter=378 turn=6 INFO: Turn 6/25
-[2026-04-05T20:55:26.310Z] iter=378 turn=6 INFO: write_file: tests/self-verify.test.ts (write)
-[2026-04-05T20:55:26.311Z] iter=378 turn=6 INFO:   -> ok: Created tests/self-verify.test.ts (2170 chars)
-[2026-04-05T20:55:26.312Z] iter=378 turn=7 INFO: Turn 7/25
-[2026-04-05T20:55:31.338Z] iter=378 turn=7 INFO: Agent: **Goal 1 (self-verify.ts + tests)**: DONE
-**Goal 2 (wire into orchestrator)**: NOT STARTED
-
-Wiring now:
-[2026-04-05T20:55:31.339Z] iter=378 turn=7 INFO: read_file: src/orchestrator.ts
-[2026-04-05T20:55:31.341Z] iter=378 turn=7 INFO:   -> ok (990 chars)
-[2026-04-05T20:55:31.341Z] iter=378 turn=8 INFO: Turn 8/25
-[2026-04-05T20:55:33.131Z] iter=378 turn=8 INFO: $ grep -n "^import" src/orchestrator.ts | tail -20
-[2026-04-05T20:55:33.142Z] iter=378 turn=8 INFO:   -> exit=0 (1332 chars)
-[2026-04-05T20:55:33.142Z] iter=378 turn=9 INFO: Turn 9/25
-[2026-04-05T20:55:35.237Z] iter=378 turn=9 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T20:55:35.238Z] iter=378 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
-
-Context after patch:
-41 | import { enhanceToolError } from "./tool-recovery.js";
-42 | import { detectProject } from "./project-detector.js";
-43 | import { detectLoop } from "./loop-detector.js";
-44 | import { loadHooksConfig, runHooks, type HooksConfig } from "./hooks.js";
-45 | import { selfVerify } from "./self-verify.js";
-46 | import * as fs from "fs";
-47 | import { FileWatcher } from "./file-watcher.js";
-48 | import { scoredPrune } from "./context-pruner.js";
-[2026-04-05T20:55:35.239Z] iter=378 turn=10 INFO: Turn 10/25
-[2026-04-05T20:55:41.355Z] iter=378 turn=10 INFO: Agent: Now add the selfVerify call after the write tool result is collected:
-[2026-04-05T20:55:41.356Z] iter=378 turn=10 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T20:55:41.358Z] iter=378 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -9 +17 lines
-
-Context after patch:
-731 |         if (postWriteResult.additionalContext) {
-732 |           rawResult += "\n\n[Hook context]: " + postWriteResult.additionalContext;
-733 |         }
-734 |         if (onFileWatch) {
-735 |           onFileWatch("write", (tu.input as { path?: string }).path ?? "");
-736 |         }
-737 |         const result = compressToolOutput(tu.name, rawResult);
-738 |         results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
-739 |       }
-740 |     }
-741 | 
-742 |     // Self-verification: after any write_file calls, run diagnostics and inject errors
-743 |     if (writeTools.length > 0) {
-744 |       const verifyResult = await selfVerify(workDir);
 745 |       if (verifyResult) {
 746 |         results.push({ type: "text", text: verifyResult } as unknown as typeof results[0]);
 747 |       }
@@ -1082,3 +996,185 @@ Now compact memory and finish up.
 [2026-04-05T21:10:59.235Z] iter=387 turn=9 INFO: Tool timing stats
 [2026-04-05T21:11:06.982Z] iter=387 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 387: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-05T21:11:07.006Z] iter=387 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T21:11:07.042Z] iter=387 turn=9 INFO: Committed: 4040875b (19 in / 4002 out, cache: 14104 created, 74983 read)
+[2026-04-05T21:11:07.043Z] iter=387 turn=9 INFO: Restarting as iteration 388...
+[2026-04-05T21:11:07.223Z] iter=388 INFO: Cache restored: 56/56 entries (0 stale)
+[2026-04-05T21:11:07.225Z] iter=388 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=15)
+[2026-04-05T21:11:07.226Z] iter=388 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T21:11:07.389Z] iter=388 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-05T21:11:07.390Z] iter=388 turn=1 INFO: Turn 1/25
+[2026-04-05T21:11:09.688Z] iter=388 turn=1 INFO: Agent: I'll start by reading the scratchpad and examining the relevant files to implement the `--model` CLI flag.
+[2026-04-05T21:11:09.692Z] iter=388 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T21:11:09.693Z] iter=388 turn=1 INFO: $ cat src/cli.ts
+[2026-04-05T21:11:09.711Z] iter=388 turn=1 INFO:   -> exit=0 (14852 chars)
+[2026-04-05T21:11:09.712Z] iter=388 turn=2 INFO: Turn 2/25
+[2026-04-05T21:11:12.989Z] iter=388 turn=2 INFO: $ grep -n "setModel\|_modelOverride\|modelOverride\|initialModel" src/orchestrator.ts | head -30
+[2026-04-05T21:11:12.994Z] iter=388 turn=2 INFO: $ grep -n "setModel\|_modelOverride\|model" src/tui.tsx | head -30
+[2026-04-05T21:11:13.009Z] iter=388 turn=2 INFO:   -> exit=0 (1878 chars)
+[2026-04-05T21:11:13.011Z] iter=388 turn=2 INFO:   -> exit=0 (323 chars)
+[2026-04-05T21:11:13.012Z] iter=388 turn=3 INFO: Turn 3/25
+[2026-04-05T21:11:19.326Z] iter=388 turn=3 INFO: think: I have enough context. Let me implement the --model CLI flag now.
+
+From what I've read:
+1. `src/orchestrator.ts` has `se...
+[2026-04-05T21:11:19.326Z] iter=388 turn=4 INFO: Turn 4/25
+[2026-04-05T21:11:21.398Z] iter=388 turn=4 INFO: Agent: I have enough context. Implementing now.
+[2026-04-05T21:11:21.399Z] iter=388 turn=4 INFO: $ grep -n "modelMap\|opus\|haiku\|sonnet" src/tui.tsx | grep -i "map\|resolve\|opus" | head -20
+[2026-04-05T21:11:21.412Z] iter=388 turn=4 INFO:   -> exit=0 (142 chars)
+[2026-04-05T21:11:21.412Z] iter=388 turn=5 INFO: Turn 5/25
+[2026-04-05T21:11:29.747Z] iter=388 turn=5 INFO: Agent: Now I have everything. Let me patch `src/cli.ts` and write the test file:
+[2026-04-05T21:11:29.749Z] iter=388 turn=5 INFO: write_file: src/cli.ts (patch)
+[2026-04-05T21:11:29.752Z] iter=388 turn=5 INFO:   -> ok: Patched src/cli.ts: -5 +38 lines
+
+Context after patch:
+21 | 
+22 | // ─── Parse args ─────────────────────────────────────────────
+23 | 
+24 | let workDir = process.cwd();
+25 | const dirIdx = process.argv.indexOf("--dir");
+26 | if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
+27 |   workDir = path.resolve(process.argv[dirIdx + 1]);
+28 | }
+29 | 
+30 | // ─── Resolve --model flag ────────────────────────────────────
+31 | 
+32 | /** Expand shorthand model aliases to full model IDs. */
+33 | export function resolveModelAlias(alias: string): string {
+34 |   const modelMap: Record<string, string> = {
+35 |     haiku: "claude-haiku-4-5",
+36 |     sonnet: "claude-sonnet-4-6",
+37 |     opus: "claude-opus-4-5",
+38 |   };
+39 |   return modelMap[alias.toLowerCase()] ?? alias;
+40 | }
+41 | 
+42 | const VALID_ALIASES = new Set(["haiku", "sonnet", "opus"]);
+43 | 
+44 | let initialModel: string | null = null;
+45 | const modelIdx = process.argv.indexOf("--model");
+46 | if (modelIdx !== -1) {
+47 |   const modelArg = process.argv[modelIdx + 1];
+48 |   if (!modelArg || modelArg.startsWith("-")) {
+49 |     console.error("Error: --model requires a value (e.g. --model sonnet)");
+50 |     process.exit(1);
+51 |   }
+52 |   // Accept known aliases OR any full claude-* model ID
+53 |   if (!VALID_ALIASES.has(modelArg.toLowerCase()) && !modelArg.startsWith("claude-")) {
+54 |     console.error(
+55 |       `Error: unknown model "${modelArg}". ` +
+56 |       `Use: haiku, sonnet, opus, or a full model ID (e.g. claude-sonnet-4-6).`
+57 |     );
+58 |     process.exit(1);
+59 |   }
+60 |   initialModel = resolveModelAlias(modelArg);
+61 | }
+62 | 
+63 | // ─── /help subcommand ────────────────────────────────────────
+64 | export function printHelp(): void {
+[2026-04-05T21:11:29.754Z] iter=388 turn=6 INFO: Turn 6/25
+[2026-04-05T21:11:33.744Z] iter=388 turn=6 INFO: Agent: **Goal status:**
+- `src/cli.ts` — `--model` flag parsing + `resolveModelAlias`: **DONE**
+- Apply `initialModel` to orchestrator after creation: **NOT STARTED**
+- `tests/cli-model-flag.test.ts`: **NOT STARTED**
+
+Finishing now:
+[2026-04-05T21:11:33.745Z] iter=388 turn=6 INFO: write_file: src/cli.ts (patch)
+[2026-04-05T21:11:33.748Z] iter=388 turn=6 INFO:   -> ok: Patched src/cli.ts: -2 +3 lines
+
+Context after patch:
+140 | 
+141 | let isResponding = false;
+142 | 
+143 | const orchestrator = new Orchestrator({
+144 |   workDir,
+145 |   ...(initialModel ? { initialModel } : {}),
+146 | 
+147 |   // Stream text deltas to stdout
+148 |   onText: (delta: string) => {
+[2026-04-05T21:11:33.749Z] iter=388 turn=7 INFO: Turn 7/25
+[2026-04-05T21:11:36.245Z] iter=388 turn=7 INFO: Agent: Now check the Orchestrator constructor options type and add `initialModel` support:
+[2026-04-05T21:11:36.247Z] iter=388 turn=7 INFO: $ grep -n "OrchestratorOptions\|interface.*Options\|initialModel\|workDir" src/orchestrator.ts | head -30
+[2026-04-05T21:11:36.279Z] iter=388 turn=7 INFO:   -> exit=0 (1645 chars)
+[2026-04-05T21:11:36.279Z] iter=388 turn=8 INFO: Turn 8/25
+[2026-04-05T21:11:37.440Z] iter=388 turn=8 INFO: $ sed -n '125,180p' src/orchestrator.ts
+[2026-04-05T21:11:37.454Z] iter=388 turn=8 INFO:   -> exit=0 (1943 chars)
+[2026-04-05T21:11:37.454Z] iter=388 turn=9 INFO: Turn 9/25
+[2026-04-05T21:11:41.137Z] iter=388 turn=9 INFO: Agent: Now add `initialModel` to the interface and wire it into the constructor:
+[2026-04-05T21:11:41.137Z] iter=388 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T21:11:41.138Z] iter=388 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -6 +11 lines
+
+Context after patch:
+155 |    * Receives the count of changed files since last send().
+156 |    */
+157 |   onExternalFileChange?: (paths: string[]) => void;
+158 |   /**
+159 |    * Maximum consecutive loop detections before stopping the agent loop.
+160 |    * Default: 2
+161 |    */
+162 |   maxConsecutiveLoops?: number;
+163 |   /**
+164 |    * Override the model to use from the very first message.
+165 |    * Accepts a full model ID or a shorthand alias (haiku/sonnet/opus).
+166 |    */
+167 |   initialModel?: string;
+168 | }
+169 | 
+170 | export interface OrchestratorResult {
+171 |   text: string;
+[2026-04-05T21:11:41.139Z] iter=388 turn=10 INFO: Turn 10/25
+[2026-04-05T21:11:43.567Z] iter=388 turn=10 INFO: Agent: I've made real changes. Let me wire up `initialModel` in the Orchestrator constructor, write the test, then wrap up.
+[2026-04-05T21:11:43.568Z] iter=388 turn=10 INFO: $ grep -n "constructor\|this\.modelOverride\|options\." src/orchestrator.ts | head -20
+[2026-04-05T21:11:43.582Z] iter=388 turn=10 INFO:   -> exit=0 (237 chars)
+[2026-04-05T21:11:43.582Z] iter=388 turn=11 INFO: Turn 11/25
+[2026-04-05T21:11:45.653Z] iter=388 turn=11 INFO: $ sed -n '929,960p' src/orchestrator.ts
+[2026-04-05T21:11:45.662Z] iter=388 turn=11 INFO:   -> exit=0 (1334 chars)
+[2026-04-05T21:11:45.662Z] iter=388 turn=12 INFO: Turn 12/25
+[2026-04-05T21:11:49.048Z] iter=388 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T21:11:49.050Z] iter=388 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -6 +11 lines
+
+Context after patch:
+926 |   /** Paths that have been changed externally and need incremental re-parse. */
+927 |   private staleRepoPaths = new Set<string>();
+928 | 
+929 |   constructor(opts: OrchestratorOptions) {
+930 |     this.opts = opts;
+931 |     this.client = new Anthropic();
+932 |     this.registry = createDefaultRegistry();
+933 | 
+934 |     // Apply initial model override if provided
+935 |     if (opts.initialModel) {
+936 |       this.modelOverride = opts.initialModel;
+937 |     }
+938 | 
+939 |     // Wire up file watcher callback
+940 |     this.fileWatcher.onChange = (filePath: string) => {
+941 |       this.externallyChangedFiles.add(filePath);
+942 |       // Mark this path stale in the incremental repo map cache
+[2026-04-05T21:11:49.051Z] iter=388 turn=13 INFO: Turn 13/25
+[2026-04-05T21:11:54.352Z] iter=388 turn=13 INFO: Agent: Writing the test file now, then TSC check and restart.
+[2026-04-05T21:11:54.353Z] iter=388 turn=13 INFO: write_file: tests/cli-model-flag.test.ts (write)
+[2026-04-05T21:11:54.354Z] iter=388 turn=13 INFO:   -> ok: Created tests/cli-model-flag.test.ts (983 chars)
+[2026-04-05T21:11:54.354Z] iter=388 turn=14 INFO: Turn 14/25
+[2026-04-05T21:11:56.203Z] iter=388 turn=14 INFO: $ npx tsc --noEmit 2>&1 | head -30 && npx vitest run tests/cli-model-flag 2>&1 | tail -20
+[2026-04-05T21:11:58.455Z] iter=388 turn=14 INFO:   -> exit=0 (497 chars)
+[2026-04-05T21:11:58.455Z] iter=388 turn=15 INFO: Turn 15/25
+[2026-04-05T21:12:09.594Z] iter=388 turn=15 INFO: Agent: TSC clean, all 6 tests pass. Now write memory, update goals, restart.
+[2026-04-05T21:12:09.597Z] iter=388 turn=15 INFO: save_memory: "[Engineer 388] --model CLI flag"
+[2026-04-05T21:12:09.599Z] iter=388 turn=15 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T21:12:09.601Z] iter=388 turn=15 INFO: write_file: goals.md (write)
+[2026-04-05T21:12:09.604Z] iter=388 turn=15 INFO:   -> ok: Updated goals.md (1013 chars, -13 lines delta)
+[2026-04-05T21:12:09.605Z] iter=388 turn=16 INFO: Turn 16/25
+[2026-04-05T21:12:11.656Z] iter=388 turn=16 INFO: Agent: TSC already passed. All done.
+[2026-04-05T21:12:11.657Z] iter=388 turn=16 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T21:12:11.657Z] iter=388 turn=16 INFO: RESTART signal
+[2026-04-05T21:12:11.658Z] iter=388 turn=16 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T21:12:12.774Z] iter=388 turn=16 INFO: Compilation OK
+[2026-04-05T21:12:21.127Z] iter=388 turn=16 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-05T21:12:21.127Z] iter=388 turn=16 INFO: Tool timing: bash: 10x, avg=239ms, total=2393ms; write_file: 6x, avg=3ms, total=17ms; save_memory: 1x, avg=9ms, total=9ms; read_scratchpad: 1x, avg=8ms, total=8ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T21:12:21.127Z] iter=388 turn=16 INFO: Tool timing stats
+[2026-04-05T21:12:28.973Z] iter=388 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 388: predicted 15 turns, actual 16 turns, ratio 1.07**
+[2026-04-05T21:12:32.918Z] iter=388 turn=16 INFO: Pre-commit review (1102in/133out): **LGTM** — the feature is straightforward, validation is reasonable, and the conditional spread for `initialModel` is clean.
+
+One minor note worth flagging:
+
+- **Alias resolution happens in `cli.ts` b
