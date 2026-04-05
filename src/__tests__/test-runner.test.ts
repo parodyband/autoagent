@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { findRelatedTests, runRelatedTests, detectTestRunner } from "../test-runner.js";
+import { findRelatedTests, findTestFile, runRelatedTests, detectTestRunner } from "../test-runner.js";
 
 let tmp: string;
 
@@ -89,6 +89,68 @@ describe("findRelatedTests", () => {
     write("src/features/auth/auth.test.ts", 'import { auth } from "./auth.js";');
     const results = findRelatedTests(tmp, ["src/features/auth/auth.ts"]);
     expect(results.some(r => r.includes("auth.test.ts"))).toBe(true);
+  });
+
+  // tests/ directory (plural)
+  it("finds test in root tests/ dir (plural)", () => {
+    write("tests/utils.test.ts", 'import { utils } from "../src/utils.js";');
+    const results = findRelatedTests(tmp, ["src/utils.ts"]);
+    expect(results.some(r => r.includes("utils.test.ts"))).toBe(true);
+  });
+
+  // Monorepo layouts
+  it("finds test in monorepo packages/pkg/src/__tests__", () => {
+    write("packages/core/src/__tests__/engine.test.ts", 'import { engine } from "../engine.js";');
+    const results = findRelatedTests(tmp, ["packages/core/src/engine.ts"]);
+    expect(results.some(r => r.includes("engine.test.ts"))).toBe(true);
+  });
+
+  it("finds co-located test inside monorepo package", () => {
+    write("packages/utils/src/string.test.ts", 'import { str } from "./string.js";');
+    const results = findRelatedTests(tmp, ["packages/utils/src/string.ts"]);
+    expect(results.some(r => r.includes("string.test.ts"))).toBe(true);
+  });
+
+  it("finds test in monorepo packages/pkg/test dir", () => {
+    write("packages/api/test/client.test.ts", 'import { client } from "../src/client.js";');
+    const results = findRelatedTests(tmp, ["packages/api/src/client.ts"]);
+    expect(results.some(r => r.includes("client.test.ts"))).toBe(true);
+  });
+});
+
+describe("findTestFile", () => {
+  it("returns co-located candidate", () => {
+    const candidates = findTestFile("src/foo.ts", tmp);
+    expect(candidates).toContain(path.join("src", "foo.test.ts"));
+    expect(candidates).toContain(path.join("src", "foo.spec.ts"));
+  });
+
+  it("returns __tests__ subdir candidate", () => {
+    const candidates = findTestFile("src/bar.ts", tmp);
+    expect(candidates).toContain(path.join("src", "__tests__", "bar.test.ts"));
+  });
+
+  it("returns src/__tests__ candidate", () => {
+    const candidates = findTestFile("src/baz.ts", tmp);
+    expect(candidates).toContain(path.join("src", "__tests__", "baz.test.ts"));
+  });
+
+  it("returns root test/ and tests/ candidates", () => {
+    const candidates = findTestFile("src/qux.ts", tmp);
+    expect(candidates).toContain(path.join("test", "qux.test.ts"));
+    expect(candidates).toContain(path.join("tests", "qux.test.ts"));
+  });
+
+  it("returns monorepo candidates for packages/* source", () => {
+    const candidates = findTestFile("packages/core/src/engine.ts", tmp);
+    expect(candidates).toContain(path.join("packages", "core", "src", "__tests__", "engine.test.ts"));
+    expect(candidates).toContain(path.join("packages", "core", "test", "engine.test.ts"));
+  });
+
+  it("returns tsx variants", () => {
+    const candidates = findTestFile("src/Button.tsx", tmp);
+    expect(candidates).toContain(path.join("src", "Button.test.tsx"));
+    expect(candidates).toContain(path.join("src", "Button.spec.tsx"));
   });
 });
 

@@ -20,6 +20,48 @@ export function detectTestRunner(workDir: string): "vitest" | "jest" | null {
 }
 
 /**
+ * Given a source file path (absolute or relative to workDir), return all candidate
+ * test file paths (relative to workDir) — without checking if they exist.
+ * Covers: co-located, __tests__ subdir, src/__tests__, test/, tests/, __tests__/,
+ * and monorepo packages-star-src-__tests__ patterns.
+ */
+export function findTestFile(sourceFile: string, workDir: string): string[] {
+  const rel = path.relative(workDir, path.resolve(workDir, sourceFile));
+  const dir = path.dirname(rel);
+  const base = path.basename(rel, path.extname(rel));
+  const exts = [".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx"];
+
+  const candidates: string[] = [];
+
+  for (const ext of exts) {
+    // Co-located (same directory)
+    candidates.push(path.join(dir, `${base}${ext}`));
+    // __tests__ subdir of same directory
+    candidates.push(path.join(dir, "__tests__", `${base}${ext}`));
+    // src/__tests__
+    candidates.push(path.join("src", "__tests__", `${base}${ext}`));
+    // top-level test/ and tests/ dirs
+    candidates.push(path.join("test", `${base}${ext}`));
+    candidates.push(path.join("tests", `${base}${ext}`));
+    // top-level __tests__
+    candidates.push(path.join("__tests__", `${base}${ext}`));
+  }
+
+  // Monorepo: if source is under packages/PKG/..., also check packages/PKG/src/__tests__
+  const parts = rel.split(path.sep);
+  if (parts[0] === "packages" && parts.length >= 3) {
+    const pkgRoot = path.join(parts[0], parts[1]);
+    for (const ext of exts) {
+      candidates.push(path.join(pkgRoot, "src", "__tests__", `${base}${ext}`));
+      candidates.push(path.join(pkgRoot, "__tests__", `${base}${ext}`));
+      candidates.push(path.join(pkgRoot, "test", `${base}${ext}`));
+    }
+  }
+
+  return candidates;
+}
+
+/**
  * Find test files related to the given changed source files.
  * Strategy: direct name match (co-located + conventional dirs) + import-based scan.
  * Supports .test.ts, .test.tsx, .spec.ts, .spec.tsx patterns.
@@ -28,39 +70,7 @@ export function findRelatedTests(workDir: string, changedFiles: string[]): strin
   const found = new Set<string>();
 
   for (const file of changedFiles) {
-    const base = path.basename(file, path.extname(file));
-    const rel = path.relative(workDir, path.resolve(workDir, file));
-    const dir = path.dirname(rel);
-
-    // Direct match candidates — co-located + conventional dirs, .test + .spec variants
-    const candidates = [
-      // Co-located (same directory as source file)
-      path.join(dir, `${base}.test.ts`),
-      path.join(dir, `${base}.test.tsx`),
-      path.join(dir, `${base}.spec.ts`),
-      path.join(dir, `${base}.spec.tsx`),
-      // __tests__ subdir of same directory
-      path.join(dir, "__tests__", `${base}.test.ts`),
-      path.join(dir, "__tests__", `${base}.test.tsx`),
-      path.join(dir, "__tests__", `${base}.spec.ts`),
-      path.join(dir, "__tests__", `${base}.spec.tsx`),
-      // src/__tests__ (conventional monorepo location)
-      path.join("src", "__tests__", `${base}.test.ts`),
-      path.join("src", "__tests__", `${base}.test.tsx`),
-      path.join("src", "__tests__", `${base}.spec.ts`),
-      path.join("src", "__tests__", `${base}.spec.tsx`),
-      // top-level test dir
-      path.join("test", `${base}.test.ts`),
-      path.join("test", `${base}.test.tsx`),
-      path.join("test", `${base}.spec.ts`),
-      path.join("test", `${base}.spec.tsx`),
-      // top-level __tests__ dir
-      path.join("__tests__", `${base}.test.ts`),
-      path.join("__tests__", `${base}.test.tsx`),
-      path.join("__tests__", `${base}.spec.ts`),
-      path.join("__tests__", `${base}.spec.tsx`),
-    ];
-
+    const candidates = findTestFile(file, workDir);
     for (const c of candidates) {
       const abs = path.resolve(workDir, c);
       if (fs.existsSync(abs)) found.add(c);
@@ -88,8 +98,9 @@ export function findRelatedTests(workDir: string, changedFiles: string[]): strin
 
 /**
  * Collect all test files under workDir:
- * - Conventional dirs: src/__tests__, test, __tests__
+ * - Conventional dirs: src/__tests__, test, tests, __tests__
  * - Co-located: any *.test.ts / *.spec.ts files anywhere in src/
+ * - Monorepo: packages/*/src/__tests__, packages/*/__tests__, packages/*/test
  */
 function collectTestFiles(workDir: string): string[] {
   const files: string[] = [];
@@ -129,11 +140,28 @@ function collectTestFiles(workDir: string): string[] {
   // Walk the full src/ tree to catch co-located and nested test files
   walkDir(path.join(workDir, "src"));
 
-  // Also scan top-level test and __tests__ dirs
-  for (const td of ["test", "__tests__"]) {
+  // Also scan top-level test, tests, and __tests__ dirs
+  for (const td of ["test", "tests", "__tests__"]) {
     const dir = path.join(workDir, td);
     if (fs.existsSync(dir)) {
       walkDir(dir);
+    }
+  }
+
+  // Monorepo: scan packages/*/src/__tests__, packages/*/__tests__, packages/*/test
+  const packagesDir = path.join(workDir, "packages");
+  if (fs.existsSync(packagesDir)) {
+    let pkgDirs: fs.Dirent[];
+    try {
+      pkgDirs = fs.readdirSync(packagesDir, { withFileTypes: true });
+    } catch { pkgDirs = []; }
+    for (const pkg of pkgDirs) {
+      if (!pkg.isDirectory()) continue;
+      const pkgRoot = path.join(packagesDir, pkg.name);
+      walkDir(path.join(pkgRoot, "src"));
+      for (const td of ["test", "tests", "__tests__"]) {
+        walkDir(path.join(pkgRoot, td));
+      }
     }
   }
 

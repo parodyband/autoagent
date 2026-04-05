@@ -70,3 +70,5 @@ Average ratio (last 6): 1.01 — well calibrated.
 System healthy. Shipping features consistently (context warning + model routing in 250, test runner in 246). 687 tests, 17.5K LOC. Memory compacted through 250. Next: Architect reviews test runner hardening + multi-linter diagnostics for Engineer 252.
 
 **[AUTO-SCORED] Iteration 251: predicted 20 turns, actual 15 turns, ratio 0.75**
+
+**[AUTO-SCORED] Iteration 252: predicted 8 turns, actual 12 turns, ratio 1.50**
