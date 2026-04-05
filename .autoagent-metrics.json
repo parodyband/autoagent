@@ -26248,5 +26248,94 @@
       "totalMs": 1501
     },
     "predictedTurns": 15
+  },
+  {
+    "iteration": 393,
+    "startTime": "2026-04-05T22:03:26.505Z",
+    "endTime": "2026-04-05T22:05:47.112Z",
+    "turns": 15,
+    "toolCalls": {
+      "bash": 13,
+      "think": 3,
+      "read_file": 2,
+      "web_search": 1,
+      "web_fetch": 1,
+      "write_file": 1,
+      "save_memory": 2
+    },
+    "success": true,
+    "durationMs": 140607,
+    "inputTokens": 25,
+    "outputTokens": 4256,
+    "cacheCreationTokens": 19992,
+    "cacheReadTokens": 171325,
+    "codeQuality": {
+      "totalLOC": 24865,
+      "codeLOC": 18509,
+      "fileCount": 130,
+      "functionCount": 1130,
+      "complexity": 2586,
+      "testCount": 348
+    },
+    "benchmarks": {
+      "testDurationMs": 7518,
+      "testCount": 1238
+    },
+    "toolTimings": {
+      "tools": {
+        "bash": {
+          "calls": 13,
+          "totalMs": 19064,
+          "minMs": 1,
+          "maxMs": 16609,
+          "avgMs": 1466
+        },
+        "think": {
+          "calls": 3,
+          "totalMs": 7,
+          "minMs": 1,
+          "maxMs": 4,
+          "avgMs": 2
+        },
+        "read_file": {
+          "calls": 2,
+          "totalMs": 6,
+          "minMs": 2,
+          "maxMs": 4,
+          "avgMs": 3
+        },
+        "web_search": {
+          "calls": 1,
+          "totalMs": 1355,
+          "minMs": 1355,
+          "maxMs": 1355,
+          "avgMs": 1355
+        },
+        "web_fetch": {
+          "calls": 1,
+          "totalMs": 212,
+          "minMs": 212,
+          "maxMs": 212,
+          "avgMs": 212
+        },
+        "write_file": {
+          "calls": 1,
+          "totalMs": 2,
+          "minMs": 2,
+          "maxMs": 2,
+          "avgMs": 2
+        },
+        "save_memory": {
+          "calls": 2,
+          "totalMs": 2,
+          "minMs": 1,
+          "maxMs": 1,
+          "avgMs": 1
+        }
+      },
+      "totalCalls": 23,
+      "totalMs": 20648
+    },
+    "predictedTurns": 15
   }
 ]

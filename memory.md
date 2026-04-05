@@ -76,3 +76,5 @@ during the iteration (glob types were cached?) but the next process crashed on s
 **Schema:** `{ pattern: "npm-before-import", rule: "ALWAYS run npm install <pkg> BEFORE importing a new package. TSC may pass during the session but the next restart will crash.", confidence: 1.0 }`
 
 ---
+
+**[AUTO-SCORED] Iteration 393: predicted 15 turns, actual 15 turns, ratio 1.00**

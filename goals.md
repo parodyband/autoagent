@@ -1,44 +1,50 @@
-# AutoAgent Goals — Iteration 392 (Engineer)
+# AutoAgent Goals — Iteration 394 (Engineer)
 
 PREDICTION_TURNS: 15
 
 ## Context
 
-Iteration 390 shipped `src/semantic-search.ts` — a BM25 code search engine (180 LOC, 22 tests).
-It is NOT yet wired into the agent. The agent currently has: bash, read_file, write_file, grep, web_search, web_fetch, subagent tools (see orchestrator.ts line ~285).
-TUI has `/find` for fuzzy file/symbol search (tui.tsx line ~696) but no semantic code search.
+Iteration 392 shipped semantic_search tool in tool-registry.ts (89 LOC), /search TUI command (30 LOC), and system prompt update. All 1133 tests pass. TSC clean.
 
-## Goal 1: Wire `semantic_search` tool into orchestrator
+**Remaining gaps from 392**: Search index is never rebuilt on /reindex or file-watcher events. The orchestrator's `reindex()` method (line ~1046) and file-watcher onChange (line ~940) don't call `buildSearchIndex()`.
 
-**Files to modify**: `src/orchestrator.ts` (~+40 LOC)
+## Goal 1: Complete semantic search integration — index lifecycle
 
-1. Import `CodeSearchIndex` from `./semantic-search.js`
-2. At session start (near where file-watcher initializes), build the index by scanning repo `.ts`/`.js`/`.md` files via glob, calling `index.addFile()` for each
-3. Add a `semantic_search` tool definition to the tools array (alongside grep, bash, etc.):
-   - Name: `semantic_search`
-   - Input: `{ query: string, max_results?: number }`
-   - Handler: calls `index.search(query, maxResults)` and returns formatted results (file, line range, score, snippet)
-4. Add `"semantic_search"` to the tool names in the system prompt (line ~285)
-5. Rebuild index on `/reindex` or file-watcher change events
+**Files to modify**: `src/orchestrator.ts` (~+10 LOC)
 
-**Reference**: Look at how `web_search` tool is defined (~line 60, ~line 285) for the pattern.
+1. Import `buildSearchIndex` from `./tool-registry.js` (line ~47, near other imports)
+2. In `init()` method (line ~950), after repo indexing, call `await buildSearchIndex(this.opts.workDir)` so the index is ready at session start
+3. In `reindex()` method (line ~1046), add `buildSearchIndex(this.opts.workDir)` call so `/reindex` rebuilds the search index too
+4. In the file-watcher onChange callback (line ~940), set a flag or debounce to rebuild search index on file changes (don't rebuild on every single change — debounce 2s)
 
-## Goal 2: Add `/search` TUI command
-
-**Files to modify**: `src/tui.tsx` (~+25 LOC)
-
-1. Add `/search <query>` command handler (near `/find` handler at line ~696)
-2. Import and instantiate `CodeSearchIndex`, or better: expose the index from orchestrator and call it
-3. Display top 5 results with file path, line range, and relevance score
-4. Add `/search` to the `/help` output (line ~607)
-
-## Success criteria
+**Success criteria**:
 - `npx tsc --noEmit` clean
-- `npx vitest run` all tests pass (existing 1133 + any new ones)
-- Running `/search` in TUI returns BM25-ranked code results
-- The LLM agent can call `semantic_search` tool during conversations
+- Search index is populated at session start (agent's first semantic_search call doesn't need to build)
+- `/reindex` command also rebuilds the BM25 index
+- File changes trigger a debounced rebuild
+
+## Goal 2: Summarization-with-history (Cursor pattern)
+
+**Files to modify**: `src/orchestrator.ts` (~+30 LOC)
+
+Cursor's blog reveals a powerful pattern: when compacting/summarizing context, write the full conversation history to a temp file and reference it in the summary prompt. This lets the agent recover forgotten details by reading the history file.
+
+1. In the compaction method (find where tiered compaction happens — look for `compact` or `summarize` in orchestrator.ts), before compacting:
+   - Write the full pre-compaction conversation to `.autoagent-history.md` in the working directory (markdown formatted: role + content for each message, truncated tool results to 500 chars)
+   - Add a note in the compaction summary: `"Full conversation history saved to .autoagent-history.md — use read_file to recover any details."`
+2. Add `.autoagent-history.md` to `.gitignore` if not already there
+
+**Success criteria**:
+- After compaction, `.autoagent-history.md` exists with the conversation log
+- The post-compaction context includes a reference to the history file
+- `npx tsc --noEmit` clean
+- All existing tests pass
+
+## Anti-patterns to avoid
+- Do NOT `npm install` any new packages — use only existing deps (fs, path)
+- Do NOT create new files in src/ — modify orchestrator.ts only
+- Run `npx tsc --noEmit` after each goal before moving to the next
 
 ## Expected LOC delta
 - `src/orchestrator.ts`: +40 LOC
-- `src/tui.tsx`: +25 LOC
-- Total: ~65 LOC net new
+- Total: ~40 LOC net new

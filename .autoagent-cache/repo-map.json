@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775423799054,
+  "generatedAt": 1775426645973,
   "files": [
     {
       "path": "src/context-loader.ts",
@@ -1280,176 +1280,6 @@
       "lastModified": 1775422919845.6897
     },
     {
-      "path": "src/tui.tsx",
-      "exports": [
-        {
-          "name": "Message",
-          "kind": "interface",
-          "line": 72,
-          "exported": true
-        },
-        {
-          "name": "getContextColor",
-          "kind": "function",
-          "line": 99,
-          "exported": true
-        },
-        {
-          "name": "extractFileQuery",
-          "kind": "function",
-          "line": 113,
-          "exported": true
-        },
-        {
-          "name": "getFileSuggestions",
-          "kind": "function",
-          "line": 126,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [
-            "React",
-            "useState",
-            "useCallback",
-            "useEffect",
-            "useRef"
-          ],
-          "from": "react"
-        },
-        {
-          "names": [
-            "render",
-            "Box",
-            "Text",
-            "useInput",
-            "useApp"
-          ],
-          "from": "ink"
-        },
-        {
-          "names": [
-            "Spinner"
-          ],
-          "from": "ink-spinner"
-        },
-        {
-          "names": [
-            "TextInput"
-          ],
-          "from": "ink-text-input"
-        },
-        {
-          "names": [
-            "path"
-          ],
-          "from": "path"
-        },
-        {
-          "names": [
-            "fs"
-          ],
-          "from": "fs"
-        },
-        {
-          "names": [
-            "Orchestrator"
-          ],
-          "from": "./orchestrator.js"
-        },
-        {
-          "names": [
-            "listSessions",
-            "type SessionInfo"
-          ],
-          "from": "./session-store.js"
-        },
-        {
-          "names": [
-            "EditPlan"
-          ],
-          "from": "./architect-mode.js"
-        },
-        {
-          "names": [
-            "VirtualMessageList"
-          ],
-          "from": "./virtual-message-list.js"
-        },
-        {
-          "names": [
-            "undoLastCommit"
-          ],
-          "from": "./auto-commit.js"
-        },
-        {
-          "names": [
-            "buildRepoMap",
-            "fuzzySearch"
-          ],
-          "from": "./tree-sitter-map.js"
-        },
-        {
-          "names": [
-            "execSync"
-          ],
-          "from": "child_process"
-        },
-        {
-          "names": [
-            "runInit"
-          ],
-          "from": "./init-command.js"
-        },
-        {
-          "names": [
-            "buildExportContent"
-          ],
-          "from": "./export-helper.js"
-        },
-        {
-          "names": [
-            "shouldShowWelcome"
-          ],
-          "from": "./welcome.js"
-        },
-        {
-          "names": [
-            "Task",
-            "TaskPlan"
-          ],
-          "from": "./task-planner.js"
-        },
-        {
-          "names": [
-            "handlePlanCommand"
-          ],
-          "from": "./plan-commands.js"
-        },
-        {
-          "names": [
-            "runDream"
-          ],
-          "from": "./dream.js"
-        },
-        {
-          "names": [
-            "Anthropic"
-          ],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [
-            "Markdown"
-          ],
-          "from": "./markdown-renderer.js"
-        }
-      ],
-      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775423278131.9907
-    },
-    {
       "path": "src/self-verify.ts",
       "exports": [
         {
@@ -1539,6 +1369,46 @@
         }
       ],
       "lastModified": 1775423493746.9644
+    },
+    {
+      "path": "src/semantic-search.ts",
+      "exports": [
+        {
+          "name": "tokenize",
+          "kind": "function",
+          "line": 36,
+          "exported": true
+        },
+        {
+          "name": "SearchResult",
+          "kind": "interface",
+          "line": 72,
+          "exported": true
+        },
+        {
+          "name": "CodeSearchIndex",
+          "kind": "class",
+          "line": 82,
+          "exported": true
+        }
+      ],
+      "imports": [],
+      "lastModified": 1775423719728.1152
+    },
+    {
+      "path": "tests/semantic-search.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "../src/semantic-search.js"
+        }
+      ],
+      "lastModified": 1775423723491.85
     },
     {
       "path": "src/orchestrator.ts",
@@ -1835,47 +1705,316 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775423509050.3474
+      "lastModified": 1775423927421.7385
     },
     {
-      "path": "src/semantic-search.ts",
+      "path": "src/tool-registry.ts",
       "exports": [
         {
-          "name": "tokenize",
-          "kind": "function",
-          "line": 36,
+          "name": "codeSearchIndex",
+          "kind": "const",
+          "line": 33,
           "exported": true
         },
         {
-          "name": "SearchResult",
+          "name": "buildSearchIndex",
+          "kind": "function",
+          "line": 40,
+          "exported": true
+        },
+        {
+          "name": "_searchIndexHolder",
+          "kind": "const",
+          "line": 68,
+          "exported": true
+        },
+        {
+          "name": "ToolContext",
           "kind": "interface",
           "line": 72,
           "exported": true
         },
         {
-          "name": "CodeSearchIndex",
+          "name": "ToolResult",
+          "kind": "interface",
+          "line": 81,
+          "exported": true
+        },
+        {
+          "name": "ToolHandler",
+          "kind": "type",
+          "line": 86,
+          "exported": true
+        },
+        {
+          "name": "ToolOptions",
+          "kind": "interface",
+          "line": 91,
+          "exported": true
+        },
+        {
+          "name": "RegisteredTool",
+          "kind": "interface",
+          "line": 96,
+          "exported": true
+        },
+        {
+          "name": "ToolRegistry",
           "kind": "class",
-          "line": 82,
+          "line": 104,
+          "exported": true
+        },
+        {
+          "name": "createDefaultRegistry",
+          "kind": "function",
+          "line": 143,
           "exported": true
         }
       ],
-      "imports": [],
-      "lastModified": 1775423719728.1152
-    },
-    {
-      "path": "tests/semantic-search.test.ts",
-      "exports": [],
       "imports": [
         {
           "names": [],
-          "from": "vitest"
+          "from": "@anthropic-ai/sdk"
         },
         {
           "names": [],
-          "from": "../src/semantic-search.js"
+          "from": "./tools/bash.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/read_file.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/write_file.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/grep.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/web_fetch.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/think.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/list_files.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/subagent.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/web_search.js"
+        },
+        {
+          "names": [],
+          "from": "./model-selection.js"
+        },
+        {
+          "names": [],
+          "from": "./project-memory.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/scratchpad.js"
+        },
+        {
+          "names": [],
+          "from": "./semantic-search.js"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "glob"
         }
       ],
-      "lastModified": 1775423723491.85
+      "lastModified": 1775423924274.961
+    },
+    {
+      "path": "src/tui.tsx",
+      "exports": [
+        {
+          "name": "Message",
+          "kind": "interface",
+          "line": 73,
+          "exported": true
+        },
+        {
+          "name": "getContextColor",
+          "kind": "function",
+          "line": 100,
+          "exported": true
+        },
+        {
+          "name": "extractFileQuery",
+          "kind": "function",
+          "line": 114,
+          "exported": true
+        },
+        {
+          "name": "getFileSuggestions",
+          "kind": "function",
+          "line": 127,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [
+            "React",
+            "useState",
+            "useCallback",
+            "useEffect",
+            "useRef"
+          ],
+          "from": "react"
+        },
+        {
+          "names": [
+            "render",
+            "Box",
+            "Text",
+            "useInput",
+            "useApp"
+          ],
+          "from": "ink"
+        },
+        {
+          "names": [
+            "Spinner"
+          ],
+          "from": "ink-spinner"
+        },
+        {
+          "names": [
+            "TextInput"
+          ],
+          "from": "ink-text-input"
+        },
+        {
+          "names": [
+            "path"
+          ],
+          "from": "path"
+        },
+        {
+          "names": [
+            "fs"
+          ],
+          "from": "fs"
+        },
+        {
+          "names": [
+            "Orchestrator"
+          ],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [
+            "listSessions",
+            "type SessionInfo"
+          ],
+          "from": "./session-store.js"
+        },
+        {
+          "names": [
+            "EditPlan"
+          ],
+          "from": "./architect-mode.js"
+        },
+        {
+          "names": [
+            "VirtualMessageList"
+          ],
+          "from": "./virtual-message-list.js"
+        },
+        {
+          "names": [
+            "undoLastCommit"
+          ],
+          "from": "./auto-commit.js"
+        },
+        {
+          "names": [
+            "buildRepoMap",
+            "fuzzySearch"
+          ],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [
+            "execSync"
+          ],
+          "from": "child_process"
+        },
+        {
+          "names": [
+            "runInit"
+          ],
+          "from": "./init-command.js"
+        },
+        {
+          "names": [
+            "buildExportContent"
+          ],
+          "from": "./export-helper.js"
+        },
+        {
+          "names": [
+            "shouldShowWelcome"
+          ],
+          "from": "./welcome.js"
+        },
+        {
+          "names": [
+            "Task",
+            "TaskPlan"
+          ],
+          "from": "./task-planner.js"
+        },
+        {
+          "names": [
+            "handlePlanCommand"
+          ],
+          "from": "./plan-commands.js"
+        },
+        {
+          "names": [
+            "runDream"
+          ],
+          "from": "./dream.js"
+        },
+        {
+          "names": [
+            "_searchIndexHolder",
+            "buildSearchIndex"
+          ],
+          "from": "./tool-registry.js"
+        },
+        {
+          "names": [
+            "Anthropic"
+          ],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [
+            "Markdown"
+          ],
+          "from": "./markdown-renderer.js"
+        }
+      ],
+      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
+      "lastModified": 1775423947795.2505
     }
   ]
 }
