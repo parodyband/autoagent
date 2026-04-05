@@ -61,6 +61,8 @@ export interface IterationCtx {
   systemPromptBuilder?: (state: IterationState, rootDir: string) => string;
   /** True when running a user task from TASK.md */
   taskMode?: boolean;
+  /** When true, run exactly one iteration and exit cleanly (no restart) */
+  once?: boolean;
 }
 
 export type TurnResult = "continue" | "break" | "restarted";

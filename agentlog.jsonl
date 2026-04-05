@@ -1,54 +1,3 @@
-{"timestamp":"2026-04-05T11:03:32.329Z","iteration":92,"level":"info","message":"Agent: The `orient()` signature has `maxDiffChars` as first param, not `cwd`. Fix the call:","turn":18}
-{"timestamp":"2026-04-05T11:03:32.330Z","iteration":92,"level":"info","message":"write_file: src/agent.ts (patch)","turn":18}
-{"timestamp":"2026-04-05T11:03:32.331Z","iteration":92,"level":"info","message":"  -> ok: Patched src/agent.ts: -2 +2 lines\n\nContext after patch:\n242 |   await tagPreIteration(ctx.iter);\n243 |   saveExpertState(ROOT, expert.name, ctx.iter);\n244 | \n245 |   // Orient: detect changes since last iteration (run in target repo if --repo)\n246 |   const orientReport = await orient(1000, true, workDir);\n247 |   const orientationText = formatOrientation(orientReport);\n248 | \n249 |   // Expert gets its own system prompt","turn":18}
-{"timestamp":"2026-04-05T11:03:32.331Z","iteration":92,"level":"info","message":"HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.","turn":18}
-{"timestamp":"2026-04-05T11:03:32.333Z","iteration":92,"level":"info","message":"Cache persisted: 27 entries to .autoagent-cache.json","turn":18}
-{"timestamp":"2026-04-05T11:03:32.334Z","iteration":92,"level":"info","message":"Cache stats: 1 hits, 5 misses, 27 entries, 8 invalidations (8 entries removed)","turn":18}
-{"timestamp":"2026-04-05T11:03:32.334Z","iteration":92,"level":"info","message":"Tool cache stats","turn":18,"metadata":{"cacheHits":1,"cacheMisses":5,"cacheEntries":27,"invalidations":8,"invalidatedEntries":8,"toolStats":{"read_file":{"hits":1,"misses":4},"grep":{"hits":0,"misses":1}}}}
-{"timestamp":"2026-04-05T11:03:32.334Z","iteration":92,"level":"info","message":"Tool timing: bash: 4x, avg=185ms, total=739ms; grep: 1x, avg=21ms, total=21ms; write_file: 8x, avg=2ms, total=16ms; think: 3x, avg=2ms, total=5ms; read_file: 4x, avg=1ms, total=5ms","turn":18}
-{"timestamp":"2026-04-05T11:03:32.335Z","iteration":92,"level":"info","message":"Tool timing stats","turn":18,"metadata":{"timing":{"tools":{"think":{"calls":3,"totalMs":5,"minMs":1,"maxMs":3,"avgMs":2},"read_file":{"calls":4,"totalMs":5,"minMs":0,"maxMs":3,"avgMs":1},"bash":{"calls":4,"totalMs":739,"minMs":15,"maxMs":662,"avgMs":185},"write_file":{"calls":8,"totalMs":16,"minMs":1,"maxMs":4,"avgMs":2},"grep":{"calls":1,"totalMs":21,"minMs":21,"maxMs":21,"avgMs":21}},"totalCalls":20,"totalMs":786}}}
-{"timestamp":"2026-04-05T11:03:36.441Z","iteration":92,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 92: predicted 12 turns, actual 18 turns, ratio 1.50**","turn":18}
-{"timestamp":"2026-04-05T11:03:40.727Z","iteration":92,"level":"info","message":"Pre-commit review (1528in/137out): **LGTM** — the changes consistently thread `agentHome` through finalization and orient contexts so that memory/goals files are resolved against the agent's own directory rather than the target repo's ","turn":18}
-{"timestamp":"2026-04-05T11:03:40.779Z","iteration":92,"level":"info","message":"Committed: 9b7f4992 (26 in / 4333 out, cache: 24809 created, 356520 read)","turn":18}
-{"timestamp":"2026-04-05T11:03:40.780Z","iteration":92,"level":"info","message":"Restarting as iteration 93...","turn":18}
-{"timestamp":"2026-04-05T11:03:40.989Z","iteration":93,"level":"info","message":"Cache restored: 27/27 entries (0 stale)"}
-{"timestamp":"2026-04-05T11:03:40.990Z","iteration":93,"level":"info","message":"Starting. Expert=Architect Model=claude-opus-4-6"}
-{"timestamp":"2026-04-05T11:03:41.019Z","iteration":93,"level":"info","message":"Hard turn cap: 18 (1.5x prediction of 12)"}
-{"timestamp":"2026-04-05T11:03:41.019Z","iteration":93,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-05T11:03:44.628Z","iteration":93,"level":"info","message":"Agent: \n\nI'll start by understanding what happened in iteration 92 and assessing the current state.","turn":1}
-{"timestamp":"2026-04-05T11:03:44.630Z","iteration":93,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git log --oneline -5","turn":1}
-{"timestamp":"2026-04-05T11:03:44.633Z","iteration":93,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git diff HEAD~1 --stat","turn":1}
-{"timestamp":"2026-04-05T11:03:44.635Z","iteration":93,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null | head -80","turn":1}
-{"timestamp":"2026-04-05T11:03:44.649Z","iteration":93,"level":"info","message":"  -> exit=0 (1679 chars)","turn":1}
-{"timestamp":"2026-04-05T11:03:44.652Z","iteration":93,"level":"info","message":"  -> exit=0 (160 chars)","turn":1}
-{"timestamp":"2026-04-05T11:03:44.657Z","iteration":93,"level":"info","message":"  -> exit=0 (430 chars)","turn":1}
-{"timestamp":"2026-04-05T11:03:44.657Z","iteration":93,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-05T11:03:47.122Z","iteration":93,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git diff HEAD~1 -- src/","turn":2}
-{"timestamp":"2026-04-05T11:03:47.152Z","iteration":93,"level":"info","message":"  -> exit=0 (4009 chars)","turn":2}
-{"timestamp":"2026-04-05T11:03:47.153Z","iteration":93,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-05T11:03:55.090Z","iteration":93,"level":"info","message":"think: Let me assess what happened in iteration 92:\n\nThe Engineer was supposed to finish the `--repo` wiring. The goals had 6 s...","turn":3}
-{"timestamp":"2026-04-05T11:03:55.091Z","iteration":93,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-05T11:03:58.708Z","iteration":93,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n 'rootDir' src/phases.ts | head -30","turn":4}
-{"timestamp":"2026-04-05T11:03:58.714Z","iteration":93,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n 'rootDir' src/finalization.ts | head -30","turn":4}
-{"timestamp":"2026-04-05T11:03:58.718Z","iteration":93,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n 'rootDir' src/agent.ts | head -30","turn":4}
-{"timestamp":"2026-04-05T11:03:58.731Z","iteration":93,"level":"info","message":"  -> exit=0 (693 chars)","turn":4}
-{"timestamp":"2026-04-05T11:03:58.732Z","iteration":93,"level":"info","message":"  -> exit=0 (386 chars)","turn":4}
-{"timestamp":"2026-04-05T11:03:58.739Z","iteration":93,"level":"info","message":"  -> exit=0 (117 chars)","turn":4}
-{"timestamp":"2026-04-05T11:03:58.739Z","iteration":93,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-05T11:04:13.908Z","iteration":93,"level":"info","message":"think: The checkpoint is right. Let me be concrete about what I need to deliver as Architect:\n\n1. Assess what happened in iter ...","turn":5}
-{"timestamp":"2026-04-05T11:04:13.909Z","iteration":93,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-05T11:04:17.492Z","iteration":93,"level":"info","message":"Agent: Let me look at the exact remaining gaps so I can write a razor-sharp spec.","turn":6}
-{"timestamp":"2026-04-05T11:04:17.495Z","iteration":93,"level":"info","message":"read_file: src/phases.ts","turn":6}
-{"timestamp":"2026-04-05T11:04:17.495Z","iteration":93,"level":"info","message":"  -> ok (1016 chars)","turn":6}
-{"timestamp":"2026-04-05T11:04:17.496Z","iteration":93,"level":"info","message":"read_file: src/phases.ts","turn":6}
-{"timestamp":"2026-04-05T11:04:17.496Z","iteration":93,"level":"info","message":"  -> ok (1577 chars)","turn":6}
-{"timestamp":"2026-04-05T11:04:17.497Z","iteration":93,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-05T11:04:20.927Z","iteration":93,"level":"info","message":"read_file: src/finalization.ts","turn":7}
-{"timestamp":"2026-04-05T11:04:20.927Z","iteration":93,"level":"info","message":"  -> ok (548 chars)","turn":7}
-{"timestamp":"2026-04-05T11:04:20.928Z","iteration":93,"level":"info","message":"read_file: src/agent.ts","turn":7}
-{"timestamp":"2026-04-05T11:04:20.928Z","iteration":93,"level":"info","message":"  -> ok (763 chars)","turn":7}
-{"timestamp":"2026-04-05T11:04:20.928Z","iteration":93,"level":"info","message":"Turn 8/25","turn":8}
-{"timestamp":"2026-04-05T11:04:38.894Z","iteration":93,"level":"info","message":"Agent: Now I have a complete picture. Let me write the goals and memory.","turn":8}
 {"timestamp":"2026-04-05T11:04:38.895Z","iteration":93,"level":"info","message":"write_file: goals.md (write)","turn":8}
 {"timestamp":"2026-04-05T11:04:38.897Z","iteration":93,"level":"info","message":"  -> ok: Updated goals.md (2647 chars, +11 lines delta)","turn":8}
 {"timestamp":"2026-04-05T11:04:38.898Z","iteration":93,"level":"info","message":"Turn 9/25","turn":9}
@@ -547,3 +496,76 @@
 {"timestamp":"2026-04-05T11:14:36.880Z","iteration":101,"level":"info","message":"Tool timing stats","turn":8,"metadata":{"timing":{"tools":{"list_files":{"calls":1,"totalMs":34,"minMs":34,"maxMs":34,"avgMs":34},"bash":{"calls":5,"totalMs":744,"minMs":2,"maxMs":672,"avgMs":149},"read_file":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"grep":{"calls":2,"totalMs":49,"minMs":12,"maxMs":37,"avgMs":25},"write_file":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2}},"totalCalls":13,"totalMs":834}}}
 {"timestamp":"2026-04-05T11:14:40.834Z","iteration":101,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 101: predicted 12 turns, actual 8 turns, ratio 0.67**","turn":8}
 {"timestamp":"2026-04-05T11:14:40.853Z","iteration":101,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":8}
+{"timestamp":"2026-04-05T11:14:40.884Z","iteration":101,"level":"info","message":"Committed: 8a2abc90 (12 in / 2444 out, cache: 18187 created, 87000 read)","turn":8}
+{"timestamp":"2026-04-05T11:14:40.884Z","iteration":101,"level":"info","message":"Restarting as iteration 102...","turn":8}
+{"timestamp":"2026-04-05T11:14:41.087Z","iteration":102,"level":"info","message":"Cache restored: 28/29 entries (1 stale)"}
+{"timestamp":"2026-04-05T11:14:41.088Z","iteration":102,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
+{"timestamp":"2026-04-05T11:14:41.113Z","iteration":102,"level":"info","message":"Hard turn cap: 18 (1.5x prediction of 12)"}
+{"timestamp":"2026-04-05T11:14:41.114Z","iteration":102,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-05T11:14:43.476Z","iteration":102,"level":"info","message":"think: Let me read the key files first to understand the current state before making changes....","turn":1}
+{"timestamp":"2026-04-05T11:14:43.478Z","iteration":102,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-05T11:14:45.623Z","iteration":102,"level":"info","message":"read_file: CACHE HIT","turn":2}
+{"timestamp":"2026-04-05T11:14:45.624Z","iteration":102,"level":"info","message":"read_file: src/conversation.ts","turn":2}
+{"timestamp":"2026-04-05T11:14:45.625Z","iteration":102,"level":"info","message":"  -> ok (13064 chars)","turn":2}
+{"timestamp":"2026-04-05T11:14:45.626Z","iteration":102,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-05T11:15:03.386Z","iteration":102,"level":"info","message":"think: Now I understand the codebase. Let me plan the changes:\n\n1. **`src/conversation.ts`**: Add `once?: boolean` to `Iteratio...","turn":3}
+{"timestamp":"2026-04-05T11:15:03.387Z","iteration":102,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-05T11:15:06.003Z","iteration":102,"level":"info","message":"$ grep -n \"once\\|--once\\|tool count\\|toolCount\\|tools.length\\|\\.length.*7\\|7.*tools\" scripts/self-test.ts | head -30","turn":4}
+{"timestamp":"2026-04-05T11:15:06.022Z","iteration":102,"level":"info","message":"  -> exit=0 (312 chars)","turn":4}
+{"timestamp":"2026-04-05T11:15:06.023Z","iteration":102,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-05T11:15:09.789Z","iteration":102,"level":"info","message":"Agent: I have all the context I need. Making the changes now.","turn":5}
+{"timestamp":"2026-04-05T11:15:09.790Z","iteration":102,"level":"info","message":"write_file: src/conversation.ts (patch)","turn":5}
+{"timestamp":"2026-04-05T11:15:09.792Z","iteration":102,"level":"info","message":"  -> ok: Patched src/conversation.ts: -3 +5 lines\n\nContext after patch:\n59 |   compressionConfig?: CompressionConfig | null;\n60 |   /** Optional custom system prompt builder. Defaults to buildSystemPrompt from messages.ts. */\n61 |   systemPromptBuilder?: (state: IterationState, rootDir: string) => string;\n62 |   /** True when running a user task from TASK.md */\n63 |   taskMode?: boolean;\n64 |   /** When true, run exactly one iteration and exit cleanly (no restart) */\n65 |   once?: boolean;\n66 | }\n67 | \n68 | export type TurnResult = \"continue\" | \"break\" | \"restarted\";\n69 | ","turn":5}
+{"timestamp":"2026-04-05T11:15:09.793Z","iteration":102,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-05T11:15:24.175Z","iteration":102,"level":"info","message":"Agent: Now patch `src/agent.ts` — `doFinalize`, `printHelp`, `main`, and `IterationCtx` construction:","turn":6}
+{"timestamp":"2026-04-05T11:15:24.175Z","iteration":102,"level":"info","message":"write_file: src/agent.ts (patch)","turn":6}
+{"timestamp":"2026-04-05T11:15:24.176Z","iteration":102,"level":"info","message":"  -> ok: Patched src/agent.ts: -32 +41 lines\n\nContext after patch:\n125 | \n126 | const toolRegistry = createDefaultRegistry();\n127 | \n128 | async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> {\n129 |   try {\n130 |     const count = ctx.cache.serialize(CACHE_FILE, ctx.agentHome);\n131 |     ctx.log(`Cache persisted: ${count} entries to ${path.basename(CACHE_FILE)}`);\n132 |   } catch (err) {\n133 |     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);\n134 |   }\n135 | \n136 |   // --once mode: never restart regardless of what callers request\n137 |   const effectiveRestart = ctx.once ? false : doRestart;\n138 | \n139 |   await runFinalization({\n140 |     iter: ctx.iter,\n141 |     state: ctx.state,\n142 |     startTime: ctx.startTime,\n143 |     turns: ctx.turns,\n144 |     toolCounts: ctx.toolCounts,\n145 |     tokens: ctx.tokens,\n146 |     cache: ctx.cache,\n147 |     timing: ctx.timing,\n148 |     rootDir: ROOT,\n149 |     agentHome: ROOT,\n150 |     metricsFile: METRICS_FILE,\n151 |     log: (msg: string) => log(ctx.iter, msg),\n152 |     logger,\n153 |     restart,\n154 |     predictedTurns: ctx.predictedTurns,\n155 |   }, effectiveRestart);\n156 | \n157 |   // Task mode: delete TASK.md after successful iteration\n158 |   if (ctx.taskMode && existsSync(TASK_FILE)) {\n159 |     unlinkSync(TASK_FILE);\n160 |     ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);\n161 |   }\n162 | \n163 |   // --once mode: exit cleanly after finalization (no restart)\n164 |   if (ctx.once) {\n165 |     ctx.log(\"--once mode: exiting after single iteration\");\n166 |     process.exit(0);\n167 |   }\n168 | }\n169 | \n170 | // ─── Restart ────────────────────────────────────────────────\n171 | ","turn":6}
+{"timestamp":"2026-04-05T11:15:24.177Z","iteration":102,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-05T11:15:29.859Z","iteration":102,"level":"info","message":"Agent: Now update `printHelp()` and parse `--once` in `main()`:","turn":7}
+{"timestamp":"2026-04-05T11:15:29.859Z","iteration":102,"level":"info","message":"write_file: src/agent.ts (patch)","turn":7}
+{"timestamp":"2026-04-05T11:15:29.860Z","iteration":102,"level":"info","message":"  -> ok: Patched src/agent.ts: -6 +8 lines\n\nContext after patch:\n288 | USAGE\n289 |   npx tsx src/agent.ts [OPTIONS]\n290 | \n291 | OPTIONS\n292 |   -h, --help              Print this help message and exit\n293 |   --once                  Run exactly one iteration and exit (no restart)\n294 |                           Exits 0 on success, 1 on failure. Useful for CI/CD.\n295 |   --repo <path>           Operate on an external repository at <path>\n296 |                           (agent state stays in the current directory)\n297 |   --task \"<description>\"  Run a one-shot task described inline\n298 |                           (writes a temporary TASK.md and starts the agent)\n299 | \n300 | TASK.MD MODE\n301 |   Create a file named TASK.md in the project root with a plain-text","turn":7}
+{"timestamp":"2026-04-05T11:15:29.860Z","iteration":102,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-05T11:15:33.877Z","iteration":102,"level":"info","message":"Agent: Now parse `--once` in `main()` and thread it into `IterationCtx`:","turn":8}
+{"timestamp":"2026-04-05T11:15:33.878Z","iteration":102,"level":"info","message":"write_file: src/agent.ts (patch)","turn":8}
+{"timestamp":"2026-04-05T11:15:33.880Z","iteration":102,"level":"info","message":"  -> ok: Patched src/agent.ts: -2 +5 lines\n\nContext after patch:\n316 |     process.exit(0);\n317 |   }\n318 | \n319 |   // Parse --once flag (run single iteration, no restart)\n320 |   const onceMode = process.argv.includes(\"--once\");\n321 | \n322 |   // Parse --repo /path flag (external repo to operate on)\n323 |   let WORK_DIR = ROOT; // defaults to AGENT_HOME\n324 |   const repoFlagIdx = process.argv.indexOf(\"--repo\");\n325 |   if (repoFlagIdx !== -1) {\n326 |     const repoPath = process.argv[repoFlagIdx + 1];","turn":8}
+{"timestamp":"2026-04-05T11:15:33.881Z","iteration":102,"level":"info","message":"Turn 9/25","turn":9}
+{"timestamp":"2026-04-05T11:15:38.976Z","iteration":102,"level":"info","message":"Agent: Status:\n- `once?: boolean` in `IterationCtx` — DONE\n- `doFinalize()` respects `--once` — DONE  \n- `printHelp()` updated — DONE\n- `--once` parsed in `main()` — DONE\n- Thread `once` into `IterationCtx` construction — **IN PROGRESS** (need to add `once: onceMode` to the ctx object)\n\nLet me do that last piece and verify:","turn":9}
+{"timestamp":"2026-04-05T11:15:38.977Z","iteration":102,"level":"info","message":"grep: \"taskMode,\\s*\\n\\s*\\}\" in src/agent.ts","turn":9}
+{"timestamp":"2026-04-05T11:15:39.002Z","iteration":102,"level":"info","message":"  -> 0 matches","turn":9}
+{"timestamp":"2026-04-05T11:15:39.002Z","iteration":102,"level":"info","message":"Turn 10/25","turn":10}
+{"timestamp":"2026-04-05T11:15:41.636Z","iteration":102,"level":"info","message":"grep: \"taskMode,\" context=\"2\" in src/agent.ts","turn":10}
+{"timestamp":"2026-04-05T11:15:41.653Z","iteration":102,"level":"info","message":"  -> 0 matches","turn":10}
+{"timestamp":"2026-04-05T11:15:41.654Z","iteration":102,"level":"info","message":"Turn 11/25","turn":11}
+{"timestamp":"2026-04-05T11:15:44.153Z","iteration":102,"level":"info","message":"grep: \"taskMode\" in src/agent.ts","turn":11}
+{"timestamp":"2026-04-05T11:15:44.170Z","iteration":102,"level":"info","message":"  -> 4 matches","turn":11}
+{"timestamp":"2026-04-05T11:15:44.171Z","iteration":102,"level":"info","message":"Turn 12/25","turn":12}
+{"timestamp":"2026-04-05T11:15:45.833Z","iteration":102,"level":"info","message":"read_file: src/agent.ts","turn":12}
+{"timestamp":"2026-04-05T11:15:45.835Z","iteration":102,"level":"info","message":"  -> ok (526 chars)","turn":12}
+{"timestamp":"2026-04-05T11:15:45.835Z","iteration":102,"level":"info","message":"Turn 13/25","turn":13}
+{"timestamp":"2026-04-05T11:15:47.885Z","iteration":102,"level":"info","message":"write_file: src/agent.ts (patch)","turn":13}
+{"timestamp":"2026-04-05T11:15:47.888Z","iteration":102,"level":"info","message":"  -> ok: Patched src/agent.ts: -3 +4 lines\n\nContext after patch:\n243 |     log: (msg: string) => log(state.iteration, msg),\n244 |     onFinalize: doFinalize,\n245 |     compressionConfig: null, // Disabled — prompt caching handles token cost\n246 |     predictedTurns,\n247 |     taskMode,\n248 |     once: onceMode,\n249 |   };\n250 | \n251 |   console.log(`\\n${\"=\".repeat(60)}`);\n252 |   console.log(`  AutoAgent — Iteration ${ctx.iter}`);","turn":13}
+{"timestamp":"2026-04-05T11:15:47.889Z","iteration":102,"level":"info","message":"Turn 14/25","turn":14}
+{"timestamp":"2026-04-05T11:15:50.395Z","iteration":102,"level":"info","message":"Agent: Now verify — tsc and help output:","turn":14}
+{"timestamp":"2026-04-05T11:15:50.396Z","iteration":102,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1","turn":14}
+{"timestamp":"2026-04-05T11:15:51.082Z","iteration":102,"level":"info","message":"  -> exit=2 (65 chars)","turn":14}
+{"timestamp":"2026-04-05T11:15:51.083Z","iteration":102,"level":"info","message":"Turn 15/25","turn":15}
+{"timestamp":"2026-04-05T11:15:54.947Z","iteration":102,"level":"info","message":"think: `onceMode` is defined in `main()` but `runIteration()` is a separate function. I need to either pass `onceMode` as a par...","turn":15}
+{"timestamp":"2026-04-05T11:15:54.949Z","iteration":102,"level":"info","message":"Turn 16/25","turn":16}
+{"timestamp":"2026-04-05T11:15:58.173Z","iteration":102,"level":"info","message":"Agent: `onceMode` is out of scope in `runIteration`. Fix: pass it as a parameter.","turn":16}
+{"timestamp":"2026-04-05T11:15:58.174Z","iteration":102,"level":"info","message":"write_file: src/agent.ts (patch)","turn":16}
+{"timestamp":"2026-04-05T11:15:58.175Z","iteration":102,"level":"info","message":"  -> ok: Patched src/agent.ts: -1 +1 lines\n\nContext after patch:\n186 | \n187 | // ─── Main iteration ─────────────────────────────────────────\n188 | \n189 | async function runIteration(state: IterationState, workDir: string = ROOT, onceMode = false): Promise<void> {\n190 |   logger = createLogger(state.iteration, ROOT);\n191 | \n192 |   const cache = new ToolCache();","turn":16}
+{"timestamp":"2026-04-05T11:15:58.176Z","iteration":102,"level":"info","message":"Turn 17/25","turn":17}
+{"timestamp":"2026-04-05T11:16:01.339Z","iteration":102,"level":"info","message":"Agent: Now pass `onceMode` from `main()` to `runIteration()`:","turn":17}
+{"timestamp":"2026-04-05T11:16:01.339Z","iteration":102,"level":"info","message":"write_file: src/agent.ts (patch)","turn":17}
+{"timestamp":"2026-04-05T11:16:01.340Z","iteration":102,"level":"info","message":"  -> ok: Patched src/agent.ts: -5 +5 lines\n\nContext after patch:\n380 |     return;\n381 |   }\n382 | \n383 |   try {\n384 |     await runIteration(state, WORK_DIR, onceMode);\n385 |   } catch (err) {\n386 |     await handleIterationFailure(state, err, resusConfig);\n387 |   }\n388 | }\n389 | \n390 | main().catch(async (err) => {","turn":17}
+{"timestamp":"2026-04-05T11:16:01.340Z","iteration":102,"level":"info","message":"Turn 18/25","turn":18}
+{"timestamp":"2026-04-05T11:16:02.831Z","iteration":102,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo \"TSC_OK\"","turn":18}
+{"timestamp":"2026-04-05T11:16:03.566Z","iteration":102,"level":"info","message":"  -> exit=0 (7 chars)","turn":18}
+{"timestamp":"2026-04-05T11:16:03.566Z","iteration":102,"level":"info","message":"HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.","turn":18}
+{"timestamp":"2026-04-05T11:16:03.567Z","iteration":102,"level":"info","message":"Cache persisted: 26 entries to .autoagent-cache.json","turn":18}
+{"timestamp":"2026-04-05T11:16:03.567Z","iteration":102,"level":"info","message":"Cache stats: 1 hits, 5 misses, 26 entries, 7 invalidations (7 entries removed)","turn":18}
+{"timestamp":"2026-04-05T11:16:03.567Z","iteration":102,"level":"info","message":"Tool cache stats","turn":18,"metadata":{"cacheHits":1,"cacheMisses":5,"cacheEntries":26,"invalidations":7,"invalidatedEntries":7,"toolStats":{"read_file":{"hits":1,"misses":2},"grep":{"hits":0,"misses":3}}}}
+{"timestamp":"2026-04-05T11:16:03.567Z","iteration":102,"level":"info","message":"Tool timing: bash: 3x, avg=481ms, total=1442ms; grep: 3x, avg=20ms, total=61ms; write_file: 7x, avg=2ms, total=14ms; think: 3x, avg=1ms, total=4ms; read_file: 2x, avg=2ms, total=4ms","turn":18}
+{"timestamp":"2026-04-05T11:16:03.567Z","iteration":102,"level":"info","message":"Tool timing stats","turn":18,"metadata":{"timing":{"tools":{"think":{"calls":3,"totalMs":4,"minMs":1,"maxMs":2,"avgMs":1},"read_file":{"calls":2,"totalMs":4,"minMs":2,"maxMs":2,"avgMs":2},"bash":{"calls":3,"totalMs":1442,"minMs":20,"maxMs":735,"avgMs":481},"write_file":{"calls":7,"totalMs":14,"minMs":1,"maxMs":4,"avgMs":2},"grep":{"calls":3,"totalMs":61,"minMs":18,"maxMs":25,"avgMs":20}},"totalCalls":18,"totalMs":1525}}}
+{"timestamp":"2026-04-05T11:16:07.554Z","iteration":102,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 102: predicted 12 turns, actual 18 turns, ratio 1.50**","turn":18}
+{"timestamp":"2026-04-05T11:16:16.967Z","iteration":102,"level":"info","message":"Pre-commit review (1317in/302out): **Issues found:**\n\n- **`process.exit(0)` inside `doFinalize` bypasses cleanup**: If callers of `doFinalize` have `finally` blocks, pending promises, or cleanup logic after the call, `process.exit(0)` ","turn":18}

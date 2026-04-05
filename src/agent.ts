@@ -133,6 +133,9 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
   }
 
+  // --once mode: never restart regardless of what callers request
+  const effectiveRestart = ctx.once ? false : doRestart;
+
   await runFinalization({
     iter: ctx.iter,
     state: ctx.state,
@@ -149,12 +152,18 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
     logger,
     restart,
     predictedTurns: ctx.predictedTurns,
-  }, doRestart);
+  }, effectiveRestart);
 
   // Task mode: delete TASK.md after successful iteration
   if (ctx.taskMode && existsSync(TASK_FILE)) {
     unlinkSync(TASK_FILE);
     ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
+  }
+
+  // --once mode: exit cleanly after finalization (no restart)
+  if (ctx.once) {
+    ctx.log("--once mode: exiting after single iteration");
+    process.exit(0);
   }
 }
 
@@ -177,7 +186,7 @@ function restart(): never {
 
 // ─── Main iteration ─────────────────────────────────────────
 
-async function runIteration(state: IterationState, workDir: string = ROOT): Promise<void> {
+async function runIteration(state: IterationState, workDir: string = ROOT, onceMode = false): Promise<void> {
   logger = createLogger(state.iteration, ROOT);
 
   const cache = new ToolCache();
@@ -236,6 +245,7 @@ async function runIteration(state: IterationState, workDir: string = ROOT): Prom
     compressionConfig: null, // Disabled — prompt caching handles token cost
     predictedTurns,
     taskMode,
+    once: onceMode,
   };
 
   console.log(`\n${"=".repeat(60)}`);
@@ -281,6 +291,8 @@ USAGE
 
 OPTIONS
   -h, --help              Print this help message and exit
+  --once                  Run exactly one iteration and exit (no restart)
+                          Exits 0 on success, 1 on failure. Useful for CI/CD.
   --repo <path>           Operate on an external repository at <path>
                           (agent state stays in the current directory)
   --task "<description>"  Run a one-shot task described inline
@@ -304,6 +316,9 @@ async function main(): Promise<void> {
     printHelp();
     process.exit(0);
   }
+
+  // Parse --once flag (run single iteration, no restart)
+  const onceMode = process.argv.includes("--once");
 
   // Parse --repo /path flag (external repo to operate on)
   let WORK_DIR = ROOT; // defaults to AGENT_HOME
@@ -366,7 +381,7 @@ async function main(): Promise<void> {
   }
 
   try {
-    await runIteration(state, WORK_DIR);
+    await runIteration(state, WORK_DIR, onceMode);
   } catch (err) {
     await handleIterationFailure(state, err, resusConfig);
   }

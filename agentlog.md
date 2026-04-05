@@ -1,91 +1,3 @@
-108 |   const content = readFileSync(memFile, "utf-8");
-109 |   const ratios: number[] = [];
-[2026-04-05T11:03:03.967Z] iter=92 turn=10 INFO: Turn 10/25
-[2026-04-05T11:03:08.881Z] iter=92 turn=10 INFO: write_file: src/finalization.ts (patch)
-[2026-04-05T11:03:08.882Z] iter=92 turn=10 INFO:   -> ok: Patched src/finalization.ts: -6 +7 lines
-
-Context after patch:
-115 |   return ratios;
-116 | }
-117 | 
-118 | function injectAccuracyScore(ctx: FinalizationCtx): void {
-119 |   // Prefer pre-captured prediction (set at iteration start, before goals.md gets rewritten)
-120 |   // Fall back to parsing current goals.md (which may already contain next iteration's goals)
-121 |   const stateDir = ctx.agentHome ?? ctx.rootDir;
-122 |   const predicted = ctx.predictedTurns ?? parsePredictedTurns(stateDir);
-123 |   const actual = ctx.turns;
-124 |   const memFile = path.join(stateDir, "memory.md");
-125 |   if (!existsSync(memFile)) return;
-126 | 
-127 |   let content = readFileSync(memFile, "utf-8");
-[2026-04-05T11:03:08.883Z] iter=92 turn=11 INFO: Turn 11/25
-[2026-04-05T11:03:11.036Z] iter=92 turn=11 INFO: Agent: Now fix the `getRecentAccuracyRatios` call inside `injectAccuracyScore` to use `stateDir`:
-[2026-04-05T11:03:11.036Z] iter=92 turn=11 INFO: grep: "getRecentAccuracyRatios" in src/finalization.ts
-[2026-04-05T11:03:11.057Z] iter=92 turn=11 INFO:   -> 2 matches
-[2026-04-05T11:03:11.057Z] iter=92 turn=12 INFO: Turn 12/25
-[2026-04-05T11:03:13.180Z] iter=92 turn=12 INFO: write_file: src/finalization.ts (patch)
-[2026-04-05T11:03:13.181Z] iter=92 turn=12 INFO:   -> ok: Patched src/finalization.ts: -1 +1 lines
-
-Context after patch:
-133 |     line = `**[AUTO-SCORED] Iteration ${ctx.iter}: predicted ${predicted} turns, actual ${actual} turns, ratio ${ratio}**`;
-134 | 
-135 |     // Check for consecutive misses (including this one)
-136 |     const pastRatios = getRecentAccuracyRatios(ctx.metricsFile, stateDir);
-137 |     const allRatios = [...pastRatios, actual / predicted];
-138 |     const recentMisses = allRatios.slice(-3).filter(r => r > 1.5);
-139 |     if (recentMisses.length >= 2) {
-[2026-04-05T11:03:13.181Z] iter=92 turn=13 INFO: Turn 13/25
-[2026-04-05T11:03:16.703Z] iter=92 turn=13 INFO: Agent: Now fix `agent.ts` — pass `workDir` to `orient()` and pass `agentHome` to `doFinalize`/`runFinalization`:
-[2026-04-05T11:03:16.705Z] iter=92 turn=13 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:03:16.707Z] iter=92 turn=13 INFO:   -> ok: Patched src/agent.ts: -2 +2 lines
-
-Context after patch:
-241 |   await tagPreIteration(ctx.iter);
-242 |   saveExpertState(ROOT, expert.name, ctx.iter);
-243 | 
-244 |   // Orient: detect changes since last iteration (run in target repo if --repo)
-245 |   const orientReport = await orient(workDir);
-246 |   const orientationText = formatOrientation(orientReport);
-247 | 
-248 |   // Expert gets its own system prompt
-[2026-04-05T11:03:16.707Z] iter=92 turn=14 INFO: Turn 14/25
-[2026-04-05T11:03:20.883Z] iter=92 turn=14 INFO: Agent: Now pass `agentHome` to `runFinalization` in `doFinalize`:
-[2026-04-05T11:03:20.884Z] iter=92 turn=14 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:03:20.885Z] iter=92 turn=14 INFO:   -> ok: Patched src/agent.ts: -11 +12 lines
-
-Context after patch:
-133 |     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
-134 |   }
-135 | 
-136 |   await runFinalization({
-137 |     iter: ctx.iter,
-138 |     state: ctx.state,
-139 |     startTime: ctx.startTime,
-140 |     turns: ctx.turns,
-141 |     toolCounts: ctx.toolCounts,
-142 |     tokens: ctx.tokens,
-143 |     cache: ctx.cache,
-144 |     timing: ctx.timing,
-145 |     rootDir: ROOT,
-146 |     agentHome: ROOT,
-147 |     metricsFile: METRICS_FILE,
-148 |     log: (msg: string) => log(ctx.iter, msg),
-149 |     logger,
-150 |     restart,
-[2026-04-05T11:03:20.886Z] iter=92 turn=15 INFO: Turn 15/25
-[2026-04-05T11:03:24.009Z] iter=92 turn=15 INFO: Agent: Now run tsc to verify:
-[2026-04-05T11:03:24.009Z] iter=92 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T11:03:24.671Z] iter=92 turn=15 INFO:   -> exit=2 (111 chars)
-[2026-04-05T11:03:24.671Z] iter=92 turn=16 INFO: Turn 16/25
-[2026-04-05T11:03:26.496Z] iter=92 turn=16 INFO: Agent: Let me fix the tsc error and wrap up:
-[2026-04-05T11:03:26.497Z] iter=92 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "orient(" src/orientation.ts | head -5
-[2026-04-05T11:03:26.512Z] iter=92 turn=16 INFO:   -> exit=0 (33 chars)
-[2026-04-05T11:03:26.512Z] iter=92 turn=17 INFO: Turn 17/25
-[2026-04-05T11:03:28.539Z] iter=92 turn=17 INFO: read_file: src/orientation.ts
-[2026-04-05T11:03:28.540Z] iter=92 turn=17 INFO:   -> ok (309 chars)
-[2026-04-05T11:03:28.540Z] iter=92 turn=18 INFO: Turn 18/25
-[2026-04-05T11:03:32.329Z] iter=92 turn=18 INFO: Agent: The `orient()` signature has `maxDiffChars` as first param, not `cwd`. Fix the call:
-[2026-04-05T11:03:32.330Z] iter=92 turn=18 INFO: write_file: src/agent.ts (patch)
 [2026-04-05T11:03:32.331Z] iter=92 turn=18 INFO:   -> ok: Patched src/agent.ts: -2 +2 lines
 
 Context after patch:
@@ -1084,3 +996,212 @@ Context after patch:
 [2026-04-05T11:14:36.880Z] iter=101 turn=8 INFO: Tool timing stats
 [2026-04-05T11:14:40.834Z] iter=101 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 101: predicted 12 turns, actual 8 turns, ratio 0.67**
 [2026-04-05T11:14:40.853Z] iter=101 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T11:14:40.884Z] iter=101 turn=8 INFO: Committed: 8a2abc90 (12 in / 2444 out, cache: 18187 created, 87000 read)
+[2026-04-05T11:14:40.884Z] iter=101 turn=8 INFO: Restarting as iteration 102...
+[2026-04-05T11:14:41.087Z] iter=102 INFO: Cache restored: 28/29 entries (1 stale)
+[2026-04-05T11:14:41.088Z] iter=102 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T11:14:41.113Z] iter=102 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T11:14:41.114Z] iter=102 turn=1 INFO: Turn 1/25
+[2026-04-05T11:14:43.476Z] iter=102 turn=1 INFO: think: Let me read the key files first to understand the current state before making changes....
+[2026-04-05T11:14:43.478Z] iter=102 turn=2 INFO: Turn 2/25
+[2026-04-05T11:14:45.623Z] iter=102 turn=2 INFO: read_file: CACHE HIT
+[2026-04-05T11:14:45.624Z] iter=102 turn=2 INFO: read_file: src/conversation.ts
+[2026-04-05T11:14:45.625Z] iter=102 turn=2 INFO:   -> ok (13064 chars)
+[2026-04-05T11:14:45.626Z] iter=102 turn=3 INFO: Turn 3/25
+[2026-04-05T11:15:03.386Z] iter=102 turn=3 INFO: think: Now I understand the codebase. Let me plan the changes:
+
+1. **`src/conversation.ts`**: Add `once?: boolean` to `Iteratio...
+[2026-04-05T11:15:03.387Z] iter=102 turn=4 INFO: Turn 4/25
+[2026-04-05T11:15:06.003Z] iter=102 turn=4 INFO: $ grep -n "once\|--once\|tool count\|toolCount\|tools.length\|\.length.*7\|7.*tools" scripts/self-test.ts | head -30
+[2026-04-05T11:15:06.022Z] iter=102 turn=4 INFO:   -> exit=0 (312 chars)
+[2026-04-05T11:15:06.023Z] iter=102 turn=5 INFO: Turn 5/25
+[2026-04-05T11:15:09.789Z] iter=102 turn=5 INFO: Agent: I have all the context I need. Making the changes now.
+[2026-04-05T11:15:09.790Z] iter=102 turn=5 INFO: write_file: src/conversation.ts (patch)
+[2026-04-05T11:15:09.792Z] iter=102 turn=5 INFO:   -> ok: Patched src/conversation.ts: -3 +5 lines
+
+Context after patch:
+59 |   compressionConfig?: CompressionConfig | null;
+60 |   /** Optional custom system prompt builder. Defaults to buildSystemPrompt from messages.ts. */
+61 |   systemPromptBuilder?: (state: IterationState, rootDir: string) => string;
+62 |   /** True when running a user task from TASK.md */
+63 |   taskMode?: boolean;
+64 |   /** When true, run exactly one iteration and exit cleanly (no restart) */
+65 |   once?: boolean;
+66 | }
+67 | 
+68 | export type TurnResult = "continue" | "break" | "restarted";
+69 | 
+[2026-04-05T11:15:09.793Z] iter=102 turn=6 INFO: Turn 6/25
+[2026-04-05T11:15:24.175Z] iter=102 turn=6 INFO: Agent: Now patch `src/agent.ts` — `doFinalize`, `printHelp`, `main`, and `IterationCtx` construction:
+[2026-04-05T11:15:24.175Z] iter=102 turn=6 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:15:24.176Z] iter=102 turn=6 INFO:   -> ok: Patched src/agent.ts: -32 +41 lines
+
+Context after patch:
+125 | 
+126 | const toolRegistry = createDefaultRegistry();
+127 | 
+128 | async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> {
+129 |   try {
+130 |     const count = ctx.cache.serialize(CACHE_FILE, ctx.agentHome);
+131 |     ctx.log(`Cache persisted: ${count} entries to ${path.basename(CACHE_FILE)}`);
+132 |   } catch (err) {
+133 |     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
+134 |   }
+135 | 
+136 |   // --once mode: never restart regardless of what callers request
+137 |   const effectiveRestart = ctx.once ? false : doRestart;
+138 | 
+139 |   await runFinalization({
+140 |     iter: ctx.iter,
+141 |     state: ctx.state,
+142 |     startTime: ctx.startTime,
+143 |     turns: ctx.turns,
+144 |     toolCounts: ctx.toolCounts,
+145 |     tokens: ctx.tokens,
+146 |     cache: ctx.cache,
+147 |     timing: ctx.timing,
+148 |     rootDir: ROOT,
+149 |     agentHome: ROOT,
+150 |     metricsFile: METRICS_FILE,
+151 |     log: (msg: string) => log(ctx.iter, msg),
+152 |     logger,
+153 |     restart,
+154 |     predictedTurns: ctx.predictedTurns,
+155 |   }, effectiveRestart);
+156 | 
+157 |   // Task mode: delete TASK.md after successful iteration
+158 |   if (ctx.taskMode && existsSync(TASK_FILE)) {
+159 |     unlinkSync(TASK_FILE);
+160 |     ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
+161 |   }
+162 | 
+163 |   // --once mode: exit cleanly after finalization (no restart)
+164 |   if (ctx.once) {
+165 |     ctx.log("--once mode: exiting after single iteration");
+166 |     process.exit(0);
+167 |   }
+168 | }
+169 | 
+170 | // ─── Restart ────────────────────────────────────────────────
+171 | 
+[2026-04-05T11:15:24.177Z] iter=102 turn=7 INFO: Turn 7/25
+[2026-04-05T11:15:29.859Z] iter=102 turn=7 INFO: Agent: Now update `printHelp()` and parse `--once` in `main()`:
+[2026-04-05T11:15:29.859Z] iter=102 turn=7 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:15:29.860Z] iter=102 turn=7 INFO:   -> ok: Patched src/agent.ts: -6 +8 lines
+
+Context after patch:
+288 | USAGE
+289 |   npx tsx src/agent.ts [OPTIONS]
+290 | 
+291 | OPTIONS
+292 |   -h, --help              Print this help message and exit
+293 |   --once                  Run exactly one iteration and exit (no restart)
+294 |                           Exits 0 on success, 1 on failure. Useful for CI/CD.
+295 |   --repo <path>           Operate on an external repository at <path>
+296 |                           (agent state stays in the current directory)
+297 |   --task "<description>"  Run a one-shot task described inline
+298 |                           (writes a temporary TASK.md and starts the agent)
+299 | 
+300 | TASK.MD MODE
+301 |   Create a file named TASK.md in the project root with a plain-text
+[2026-04-05T11:15:29.860Z] iter=102 turn=8 INFO: Turn 8/25
+[2026-04-05T11:15:33.877Z] iter=102 turn=8 INFO: Agent: Now parse `--once` in `main()` and thread it into `IterationCtx`:
+[2026-04-05T11:15:33.878Z] iter=102 turn=8 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:15:33.880Z] iter=102 turn=8 INFO:   -> ok: Patched src/agent.ts: -2 +5 lines
+
+Context after patch:
+316 |     process.exit(0);
+317 |   }
+318 | 
+319 |   // Parse --once flag (run single iteration, no restart)
+320 |   const onceMode = process.argv.includes("--once");
+321 | 
+322 |   // Parse --repo /path flag (external repo to operate on)
+323 |   let WORK_DIR = ROOT; // defaults to AGENT_HOME
+324 |   const repoFlagIdx = process.argv.indexOf("--repo");
+325 |   if (repoFlagIdx !== -1) {
+326 |     const repoPath = process.argv[repoFlagIdx + 1];
+[2026-04-05T11:15:33.881Z] iter=102 turn=9 INFO: Turn 9/25
+[2026-04-05T11:15:38.976Z] iter=102 turn=9 INFO: Agent: Status:
+- `once?: boolean` in `IterationCtx` — DONE
+- `doFinalize()` respects `--once` — DONE  
+- `printHelp()` updated — DONE
+- `--once` parsed in `main()` — DONE
+- Thread `once` into `IterationCtx` construction — **IN PROGRESS** (need to add `once: onceMode` to the ctx object)
+
+Let me do that last piece and verify:
+[2026-04-05T11:15:38.977Z] iter=102 turn=9 INFO: grep: "taskMode,\s*\n\s*\}" in src/agent.ts
+[2026-04-05T11:15:39.002Z] iter=102 turn=9 INFO:   -> 0 matches
+[2026-04-05T11:15:39.002Z] iter=102 turn=10 INFO: Turn 10/25
+[2026-04-05T11:15:41.636Z] iter=102 turn=10 INFO: grep: "taskMode," context="2" in src/agent.ts
+[2026-04-05T11:15:41.653Z] iter=102 turn=10 INFO:   -> 0 matches
+[2026-04-05T11:15:41.654Z] iter=102 turn=11 INFO: Turn 11/25
+[2026-04-05T11:15:44.153Z] iter=102 turn=11 INFO: grep: "taskMode" in src/agent.ts
+[2026-04-05T11:15:44.170Z] iter=102 turn=11 INFO:   -> 4 matches
+[2026-04-05T11:15:44.171Z] iter=102 turn=12 INFO: Turn 12/25
+[2026-04-05T11:15:45.833Z] iter=102 turn=12 INFO: read_file: src/agent.ts
+[2026-04-05T11:15:45.835Z] iter=102 turn=12 INFO:   -> ok (526 chars)
+[2026-04-05T11:15:45.835Z] iter=102 turn=13 INFO: Turn 13/25
+[2026-04-05T11:15:47.885Z] iter=102 turn=13 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:15:47.888Z] iter=102 turn=13 INFO:   -> ok: Patched src/agent.ts: -3 +4 lines
+
+Context after patch:
+243 |     log: (msg: string) => log(state.iteration, msg),
+244 |     onFinalize: doFinalize,
+245 |     compressionConfig: null, // Disabled — prompt caching handles token cost
+246 |     predictedTurns,
+247 |     taskMode,
+248 |     once: onceMode,
+249 |   };
+250 | 
+251 |   console.log(`\n${"=".repeat(60)}`);
+252 |   console.log(`  AutoAgent — Iteration ${ctx.iter}`);
+[2026-04-05T11:15:47.889Z] iter=102 turn=14 INFO: Turn 14/25
+[2026-04-05T11:15:50.395Z] iter=102 turn=14 INFO: Agent: Now verify — tsc and help output:
+[2026-04-05T11:15:50.396Z] iter=102 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T11:15:51.082Z] iter=102 turn=14 INFO:   -> exit=2 (65 chars)
+[2026-04-05T11:15:51.083Z] iter=102 turn=15 INFO: Turn 15/25
+[2026-04-05T11:15:54.947Z] iter=102 turn=15 INFO: think: `onceMode` is defined in `main()` but `runIteration()` is a separate function. I need to either pass `onceMode` as a par...
+[2026-04-05T11:15:54.949Z] iter=102 turn=16 INFO: Turn 16/25
+[2026-04-05T11:15:58.173Z] iter=102 turn=16 INFO: Agent: `onceMode` is out of scope in `runIteration`. Fix: pass it as a parameter.
+[2026-04-05T11:15:58.174Z] iter=102 turn=16 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:15:58.175Z] iter=102 turn=16 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
+
+Context after patch:
+186 | 
+187 | // ─── Main iteration ─────────────────────────────────────────
+188 | 
+189 | async function runIteration(state: IterationState, workDir: string = ROOT, onceMode = false): Promise<void> {
+190 |   logger = createLogger(state.iteration, ROOT);
+191 | 
+192 |   const cache = new ToolCache();
+[2026-04-05T11:15:58.176Z] iter=102 turn=17 INFO: Turn 17/25
+[2026-04-05T11:16:01.339Z] iter=102 turn=17 INFO: Agent: Now pass `onceMode` from `main()` to `runIteration()`:
+[2026-04-05T11:16:01.339Z] iter=102 turn=17 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:16:01.340Z] iter=102 turn=17 INFO:   -> ok: Patched src/agent.ts: -5 +5 lines
+
+Context after patch:
+380 |     return;
+381 |   }
+382 | 
+383 |   try {
+384 |     await runIteration(state, WORK_DIR, onceMode);
+385 |   } catch (err) {
+386 |     await handleIterationFailure(state, err, resusConfig);
+387 |   }
+388 | }
+389 | 
+390 | main().catch(async (err) => {
+[2026-04-05T11:16:01.340Z] iter=102 turn=18 INFO: Turn 18/25
+[2026-04-05T11:16:02.831Z] iter=102 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC_OK"
+[2026-04-05T11:16:03.566Z] iter=102 turn=18 INFO:   -> exit=0 (7 chars)
+[2026-04-05T11:16:03.566Z] iter=102 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
+[2026-04-05T11:16:03.567Z] iter=102 turn=18 INFO: Cache persisted: 26 entries to .autoagent-cache.json
+[2026-04-05T11:16:03.567Z] iter=102 turn=18 INFO: Cache stats: 1 hits, 5 misses, 26 entries, 7 invalidations (7 entries removed)
+[2026-04-05T11:16:03.567Z] iter=102 turn=18 INFO: Tool cache stats
+[2026-04-05T11:16:03.567Z] iter=102 turn=18 INFO: Tool timing: bash: 3x, avg=481ms, total=1442ms; grep: 3x, avg=20ms, total=61ms; write_file: 7x, avg=2ms, total=14ms; think: 3x, avg=1ms, total=4ms; read_file: 2x, avg=2ms, total=4ms
+[2026-04-05T11:16:03.567Z] iter=102 turn=18 INFO: Tool timing stats
+[2026-04-05T11:16:07.554Z] iter=102 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 102: predicted 12 turns, actual 18 turns, ratio 1.50**
+[2026-04-05T11:16:16.967Z] iter=102 turn=18 INFO: Pre-commit review (1317in/302out): **Issues found:**
+
+- **`process.exit(0)` inside `doFinalize` bypasses cleanup**: If callers of `doFinalize` have `finally` blocks, pending promises, or cleanup logic after the call, `process.exit(0)` 
