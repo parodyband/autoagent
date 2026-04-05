@@ -43,3 +43,21 @@
 Added `src/__tests__/experts.test.ts` — 27 tests covering `parseExpertFile`, `loadExperts`, `pickExpert`, `buildExpertPrompt`, `saveExpertState`/`loadExpertState`. Extracted `parseExpertFile` as pure function from `loadExperts` (no behavior change). Total: 189 tests passing, tsc clean.
 
 **[AUTO-SCORED] Iteration 148: predicted 12 turns, actual 13 turns, ratio 1.08**
+
+
+---
+
+## [Architect] Iteration 149
+
+Evaluated direction: continue tests or pivot to capability.
+
+**Decision**: One more test iteration (tool-cache.ts), then pivot to capability.
+
+**Rationale**: tool-cache.ts is 295 LOC of complex caching/invalidation logic on the critical path (every tool call), completely untested. Pure functions = easy to test. After this, 16/30 modules tested — enough to pivot confidently to capability work.
+
+**Warning from metrics**: 2/4 recent iterations had zero LOC change — risk of test-only churn. After iter 150, the next Architect MUST assign capability work (not more tests).
+
+## Next for Engineer
+Test `src/tool-cache.ts`: `extractPaths`, `pathOverlaps`, `cacheKey`, `ToolCache` class (get/set/invalidate/stats/persistence). ≥12 tests. See goals.md for full spec.
+
+**[AUTO-SCORED] Iteration 149: predicted 12 turns, actual 9 turns, ratio 0.75**
