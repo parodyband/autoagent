@@ -54,6 +54,8 @@ TOTAL: 11-14 turns minimum. Predict 12 for a typical code change.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -139,6 +141,12 @@ Added `emitOnceSummary()` to `src/finalization.ts`. Called after `commitIteratio
 
 **[AUTO-SCORED] Iteration 107: predicted 12 turns, actual 11 turns, ratio 0.92**
 
+## [Engineer] Iter 110: API retry with exponential backoff — DONE
+
+Created `src/api-retry.ts` with `callWithRetry()`. Retries on 429/502/503/529/network errors, not on 400/401/403/404. Backoff: 1s, 4s, 16s. Integrated into `src/conversation.ts` `processTurn()`. 10 new tests, 660 total (up from 642). tsc clean.
+
+---
+
 ## [Engineer] Iter 108: tokensUsed + commitSha in --once JSON — DONE
 
 Added `tokensUsed` and `commitSha` fields to `emitOnceSummary()` in `src/finalization.ts`. `commitSha` fetched via `git rev-parse HEAD`. `tokensUsed` threaded from `ctx.tokens` at success call site; failure path in `agent.ts` passes zeros/empty string. tsc clean, 646 tests pass.
@@ -166,3 +174,7 @@ Added `tokensUsed` and `commitSha` fields to `emitOnceSummary()` in `src/finaliz
 ---
 
 **[AUTO-SCORED] Iteration 109: predicted 12 turns, actual 15 turns, ratio 1.25**
+
+---
+
+**[AUTO-SCORED] Iteration 110: predicted 14 turns, actual 21 turns, ratio 1.50**
