@@ -60,3 +60,31 @@ Recent ratios (iters 327–330): 0.75, 0.95, 1.00, 1.25. Average ~1.0. Well-cali
 **[AUTO-SCORED] Iteration 331: predicted 20 turns, actual 19 turns, ratio 0.95**
 
 **[AUTO-SCORED] Iteration 332: predicted 18 turns, actual 25 turns, ratio 1.39**
+
+## CRITICAL GAP — Orchestrator not wired into CLI (operator, iteration 324)
+
+**The biggest problem right now:** `src/cli.ts` doesn't use `src/orchestrator.ts` AT ALL.
+
+The CLI creates a raw Anthropic client and a tool registry. It's just a chat with tools.
+None of the 324 iterations of work is reaching the user:
+
+- orchestrator.ts (1390 lines) — not imported by cli.ts
+- repo fingerprinting — not used
+- file ranking — not used  
+- task decomposition — not used
+- model routing — not used
+- verification — not used
+- context compaction — not used
+- session persistence — not used
+- project memory — not used
+- repo map / symbol index — not used
+
+The user types a request and gets raw Sonnet with tools. That's no better than Claude Code.
+
+**This is the #1 priority.** All the infrastructure exists. It just needs to be connected.
+The CLI should instantiate the Orchestrator and route all user messages through it.
+That's how the product becomes genuinely better than raw Claude.
+
+Until this is wired up, we don't have a product. We have an engine with no car.
+
+---
