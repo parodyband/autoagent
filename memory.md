@@ -76,32 +76,8 @@ Recent ratios (iters 327–330): 0.75, 0.95, 1.00, 1.25. Average ~1.0. Well-cali
 ---
 
 
-## CRITICAL GAP — Orchestrator not wired into CLI (operator, iteration 324)
-**The biggest problem right now:** `src/cli.ts` doesn't use `src/orchestrator.ts` AT ALL.
-
-The CLI creates a raw Anthropic client and a tool registry. It's just a chat with tools.
-None of the 324 iterations of work is reaching the user:
-
-- orchestrator.ts (1390 lines) — not imported by cli.ts
-- repo fingerprinting — not used
-- file ranking — not used  
-- task decomposition — not used
-- model routing — not used
-- verification — not used
-- context compaction — not used
-- session persistence — not used
-- project memory — not used
-- repo map / symbol index — not used
-
-The user types a request and gets raw Sonnet with tools. That's no better than Claude Code.
-
-**This is the #1 priority.** All the infrastructure exists. It just needs to be connected.
-The CLI should instantiate the Orchestrator and route all user messages through it.
-That's how the product becomes genuinely better than raw Claude.
-
-Until this is wired up, we don't have a product. We have an engine with no car.
-
----
+## [RESOLVED] CLI→Orchestrator wiring (fixed iter 336)
+CLI now instantiates Orchestrator and routes all messages through it. Extended thinking enabled (iter 338).
 
 **[AUTO-SCORED] Iteration 333: predicted 8 turns, actual 10 turns, ratio 1.25**
 
@@ -131,37 +107,8 @@ Until this is wired up, we don't have a product. We have an engine with no car.
 ---
 
 
-## Extended thinking is not enabled ANYWHERE (operator, iteration 324)
-Neither the CLI nor the orchestrator uses extended thinking. Every API call is raw
-completion with no thinking budget. This is a massive missed opportunity.
-
-Extended thinking (passing `thinking: { type: "enabled", budget_tokens: N }` in the
-API call) lets the model reason through complex problems before responding. It's
-arguably the single most important feature for a coding agent:
-
-- **Better tool use decisions** — thinks about which files to read, what order to do things
-- **Better code generation** — reasons about edge cases before writing
-- **Better debugging** — traces through logic step by step
-- **Better task decomposition** — thinks about dependencies between subtasks
-
-The state of the art for coding agents is: use extended thinking for the planning/reasoning
-phase, then execute tools based on that reasoning. This is how you get quality that's
-actually better than raw Claude Code — Claude Code already has thinking mode.
-
-**Implementation:** In the `messages.create()` call, add:
-```typescript
-thinking: {
-  type: "enabled",
-  budget_tokens: 10000  // adjust based on task complexity
-}
-```
-
-Could also be adaptive — small budget (4K) for simple tool calls, large budget (16K+)
-for complex planning and code generation. This ties directly into the model routing /
-dual process architecture.
-
-**This should be in both the orchestrator AND the CLI.** It's probably the single
-highest-leverage change for making the tool actually better than raw Claude.
+## [RESOLVED] Extended thinking (fixed iter 338)
+Orchestrator now sends `thinking: {type:"enabled", budget_tokens:10000}` + `interleaved-thinking-2025-05-14` beta header. Thinking blocks handled in streaming (not shown to user). Tests still needed.
 
 ---
 
@@ -192,6 +139,8 @@ highest-leverage change for making the tool actually better than raw Claude.
 - [326] Prompt cache control helpers wired into API calls.
 - [328] Tests for orchestrator features (260 lines).
 - [330] AbortController in orchestrator `send()` + `getSessionStats()` (session duration, cost trend). TUI wiring not yet done.
+- [336] CLI wired to Orchestrator — critical gap resolved.
+- [338] Extended thinking in orchestrator + CLI slash commands (/help, /model, /status, /compact, /reindex).
 
 **Codebase**: ~6K LOC src, 34 files, 938 vitest tests, 76 test files, TSC clean.
 
@@ -210,3 +159,53 @@ highest-leverage change for making the tool actually better than raw Claude.
 ---
 
 **[AUTO-SCORED] Iteration 338: predicted 20 turns, actual 20 turns, ratio 1.00**
+
+## Ideas to research and build toward (operator seeds, iteration 324)
+
+### Ralph Wiggum Loops
+Research "Ralph Wiggum loops" in the context of AI agents — the pattern where an agent
+gets stuck doing the same thing over and over without realizing it's not making progress.
+How do other agent frameworks detect and break out of these loops? What circuit breakers
+exist beyond our simple failure counter? Can we detect semantic repetition (doing the
+same kind of work even if the specific task differs)?
+
+### Dynamic Kanban / Task Board per Project
+When a user gives the agent a complex project, it should be able to:
+- Decompose it into a DAG of tasks (not just a flat list)
+- Identify dependencies between tasks (can't test until code is written)
+- Visualize this as a kanban board (backlog → in progress → done → verified)
+- Work through the DAG autonomously, respecting dependency order
+- Re-plan when tasks fail or new information emerges
+- Persist the board across sessions so work can resume
+
+This is the orchestration layer that makes the tool genuinely useful for real projects,
+not just one-shot requests. Think about: how does Linear work? How does a good project
+manager break down work? The agent should be able to do that.
+
+### DAG-based Task Execution
+Tasks aren't linear. "Build a REST API" decomposes into:
+- Define routes (no deps)
+- Define models (no deps)
+- Implement handlers (depends on routes + models)
+- Write tests (depends on handlers)
+- Integration test (depends on all above)
+
+The agent should generate this DAG, execute leaf nodes first (possibly in parallel
+with sub-agents), and work up. When something fails, it re-plans the affected subtree,
+not the whole project.
+
+### Self-generated Tasks
+The agent shouldn't only work on tasks the user gives it. When it finishes a task and
+notices related issues (a function with no error handling, a test that's flaky, dead code),
+it should be able to create follow-up tasks for itself and surface them to the user:
+"I noticed these 3 issues while working. Want me to fix them?"
+
+### Research pointers
+- Look at how Devin manages multi-step tasks
+- Look at how GitHub Copilot Workspace generates plans
+- Look at DAG-based workflow engines (Temporal, Prefect, Airflow) for execution patterns
+- Look at how coding agents handle task dependencies and parallel execution
+
+These are PRODUCT features, not self-improvement. They make the tool useful for real work.
+
+---
