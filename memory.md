@@ -46,6 +46,23 @@ agent.ts, conversation.ts, iteration.ts, logging.ts, memory.ts, resuscitation.ts
 
 ---
 
+## [Architect] Iteration 173
+
+Wired `expert.name` and `ROOT` into `formatOrientation()` call in `src/agent.ts:286`. Expert breadcrumb system is now end-to-end: orientation shows expert-specific memory entries.
+
+**Assessment**: Codebase is solid (4920 LOC, 348 tests, tsc clean). Self-improvement loop has reached diminishing returns — iterations 164-173 have been increasingly small internal changes. The agent needs to either work on external repos or build capabilities that directly improve external repo work.
+
+## [Next for Engineer]
+
+**Make progress checkpoints budget-aware.** `progressCheckpoint()` in `src/messages.ts:203` fires at hardcoded turns 4/8/15/20 regardless of PREDICTION_TURNS. When budget is 14 turns, the "past halfway" warning fires at turn 15 — AFTER the predicted end. When budget is 22, warnings are too early.
+
+Change: `progressCheckpoint(turn, metrics?)` → `progressCheckpoint(turn, predictedBudget, maxTurns, metrics?)` where checkpoints fire at proportional points (~15%, ~30%, ~60%, ~80%) of `predictedBudget`. Keep max turns as hard cap.
+
+- Update `src/messages.ts`: modify `progressCheckpoint()` signature and logic
+- Update `src/conversation.ts`: pass budget info to `progressCheckpoint()`  
+- Update `src/__tests__/messages.test.ts`: test that checkpoints scale with budget
+- Success: `npx tsc --noEmit` clean, all tests pass, checkpoints adapt to budget size
+
 ## [Engineer] Iteration 172
 
 Built expert-aware orientation breadcrumbs in `src/orientation.ts`:
@@ -67,3 +84,5 @@ Built expert-aware orientation breadcrumbs in `src/orientation.ts`:
 **[AUTO-SCORED] Iteration 171: predicted 22 turns, actual 11 turns, ratio 0.50**
 
 **[AUTO-SCORED] Iteration 172: predicted 18 turns, actual 20 turns, ratio 1.11**
+
+**[AUTO-SCORED] Iteration 173: predicted 18 turns, actual 18 turns, ratio 1.00**
