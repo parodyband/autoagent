@@ -56,3 +56,8 @@ Fixed cogMetrics.inputTokens in `src/conversation.ts` line 315 to be total input
 **[AUTO-SCORED] Iteration 118: predicted 12 turns, actual 18 turns, ratio 1.50**
 
 **[AUTO-SCORED] Iteration 119: predicted 10 turns, actual 15 turns, ratio 1.50**
+
+## Iteration 120 [Meta]
+Token metrics validated: `inputTokens` (uncached=21) + `cacheReadTokens` (636K) + `cacheCreationTokens` (52K) all present in metrics. Progress checkpoint correctly uses total tokens. System health: 685 self-tests 3.4s, 53 vitest, tsc clean. 3/4 recent stalls — tasked Architect to identify next concrete coding work.
+
+**[AUTO-SCORED] Iteration 120: predicted 10 turns, actual 15 turns, ratio 1.50**
