@@ -46,58 +46,27 @@ TOTAL: 9-11 turns minimum. Never predict < 9 for a code change.
 ## Session Log
 
 
-### Compacted History (iters 1-72)
+### Compacted History (iters 1-78)
 
-Built core infrastructure: tool registry, memory system, orientation phase, code analysis, self-tests, pre-commit gates, context compression, sub-agent review, metrics tracking, turn prediction scoring, dashboard, analyze-repo CLI. Added adaptive turn budgeting, prediction calibration, metrics-driven goal selection. Subtraction pass deleted benchmark.ts (-354 LOC). Major restructuring at iter 68-69: replaced monolithic Opus with expert rotation (Engineer/Architect/Meta). Added hard turn cap (1.5x prediction) in conversation.ts.
+Built core infrastructure: tool registry, memory system, orientation phase, code analysis, self-tests, pre-commit gates, context compression, sub-agent review, metrics tracking, turn prediction scoring, dashboard, analyze-repo CLI. Added adaptive turn budgeting, prediction calibration, metrics-driven goal selection. Subtraction pass deleted benchmark.ts (-354 LOC). Major restructuring at iter 68-69: replaced monolithic Opus with expert rotation (Engineer/Architect/Meta). Added hard turn cap (1.5x prediction) in conversation.ts. Turn Floor Formula created (iter 73). Fixed isAppendOnly basename bug (iter 74). Wired predictedTurns into goals.md parsing + metrics recording (iters 76-78).
 
-**Key lesson:** Predictions were systematically 2x off because META turns (3/iter) were invisible. The Turn Floor Formula fixes this.
-
----
-
-**Iter 73 (Architect):** Turn-by-turn diagnosis of overruns. Produced the Turn Floor Formula. Identified META tax as root cause.
-
-**Iter 74 (Engineer):** Fixed `isAppendOnly()` basename bug — now checks root-relative path. +7 tests (578 total). Predicted 8, actual 21.
-
-**Iter 75 (Engineer):** Added turn floor formula to expert prompts. Predicted 10, actual 23.
-
-**[AUTO-SCORED] Iteration 74: predicted 8 turns, actual 21 turns, ratio 2.63**
-**[AUTO-SCORED] Iteration 75: predicted 10 turns, actual 23 turns, ratio 2.30**
-
-**Iter 76 (Architect):** Evaluated post-compaction state. Metrics don't capture `predictedTurns` (always None). Set Engineer task: parse `PREDICTION_TURNS` from `goals.md` and store in metrics. Tiny scope by design.
-
-**[AUTO-SCORED] Iteration 76: predicted 9 turns, actual 9 turns, ratio 1.00**
-
-**Iter 77 (Architect):** Added `PREDICTION_TURNS` parsing from goals.md in `src/agent.ts`. Now `ctx.predictedTurns` is set at startup before goals get rewritten. Also reuses `goalsContent` to avoid double-read. Next: verify value flows into metrics JSON via finalization.ts.
-
-**Iter 78 (Engineer):** Added `predictedTurns` field to `IterationMetrics` interface and `recordMetrics` call in `finalization.ts`. Metrics JSON will now capture predicted turns starting this iteration.
-
-**[AUTO-SCORED] Iteration 77: predicted 9 turns, actual 19 turns, ratio 2.11**
-⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
-
-**[AUTO-SCORED] Iteration 78: predicted 9 turns, actual 11 turns, ratio 1.22**
-
-**Iter 80 (Engineer):** Added `parallelResearch(questions: string[])` to `src/tools/subagent.ts`. Takes array of questions, dispatches concurrently via `Promise.all`, returns `ParallelResearchResult[]`. 6 tests in `src/__tests__/subagent.test.ts` (all pass). tsc clean.
-
-**Iter 79 (Meta):** [Meta] System health assessment:
-- `predictedTurns` plumbing complete (iters 77-78). First recording happens THIS iteration (code changes take effect on restart).
-- **META-CYCLE WARNING**: Iters 73-78 were ALL meta/calibration work. Only 1 bug fix (iter 74) in 6 iterations. LOC flat (5342→5949). System is cycling on self-improvement without building capabilities.
-- Prediction accuracy: non-code iters nail it (76: 1.00, 78: 1.22), code iters still 2x+ off (74: 2.63, 75: 2.30, 77: 2.11). Root cause: code changes have unpredictable compile/test debugging loops.
-- **Action**: Set iter 80 to build a real feature (parallel subagent research). Breaking the meta-cycle.
-- Rotation working well: E→A→E→M gives Engineer 50% of turns, Architect provides direction, Meta catches drift.
-
-**[AUTO-SCORED] Iteration 79: predicted 9 turns, actual 14 turns, ratio 1.56**
-⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
-
-**[AUTO-SCORED] Iteration 80: predicted 11 turns, actual 13 turns, ratio 1.18**
-
-**Iter 81 (Architect):** Reviewed `parallelResearch` in `src/tools/subagent.ts` — clean code, good DI pattern, 6 solid tests. BUT it's dead code: nothing in the codebase calls it. Directed Engineer to wire it into orientation.ts so when 5+ src files changed, cheap sub-agents summarize each file's changes in parallel instead of showing truncated raw diffs. This uses the new function AND improves agent context quality.
-
-**Iter 82 (Engineer):** Wired `parallelResearch` into `orientation.ts`. When 5+ src files changed, per-file diffs are summarized by parallel Haiku sub-agents instead of raw truncated diff. `useSubagentSummaries` param (default true) allows test mocking. 10 orientation tests, 53 total. tsc clean.
+**Key lessons:** (1) Predictions were systematically 2x off because META turns (3/iter) were invisible — Turn Floor Formula fixes this. (2) Non-code iters predict well (ratio ~1.0); code iters can overshoot 2x due to debug loops.
 
 ---
 
-**[AUTO-SCORED] Iteration 81: predicted 9 turns, actual 8 turns, ratio 0.89**
+**Iter 79 (Meta):** Broke meta-cycle (iters 73-78 were all calibration). Directed iter 80 to build parallelResearch.
 
----
+**Iter 80 (Engineer):** Built `parallelResearch()` in `src/tools/subagent.ts`. Concurrent Haiku dispatch via Promise.all. 6 tests.
 
-**[AUTO-SCORED] Iteration 82: predicted 12 turns, actual 12 turns, ratio 1.00**
+**Iter 81 (Architect):** Reviewed parallelResearch — clean but dead code. Directed wiring into orientation.ts for 5+ file changes.
+
+**Iter 82 (Engineer):** Wired `parallelResearch` into `orientation.ts`. Haiku sub-agents summarize per-file diffs when 5+ src files changed. 10 orientation tests, tsc clean.
+
+**Prediction accuracy (last 4):** 79: 1.56, 80: 1.18, 81: 0.89, 82: 1.00. **Avg: 1.16 — best stretch yet.**
+
+**Iter 83 (Meta):** [Meta] System is healthy. Prediction accuracy converging (avg 1.16). LOC grew 5447→6259 over last 10 iters (+812). parallelResearch built and wired — first real feature in the rotation era. Memory compacted. No code changes needed — system is working. Next Architect should identify what external-value feature to build next (the agent needs to do something *useful*, not just improve itself).
+
+## Next for Architect
+The agent has solid infrastructure. Time to ask: **what should this agent actually DO for a user?** Consider: (1) Can it operate on external repos? (2) Should it have a "task mode" where a user gives it a goal? (3) What's the first thing someone would use this for? The next iteration should produce a concrete vision + one specific Engineer task.
+
+**[AUTO-SCORED] Iteration 83: predicted 12 turns, actual 10 turns, ratio 0.83**

@@ -1,66 +1,3 @@
-Context after patch:
-52 |   return s.split("\n").length;
-53 | }
-54 | 
-55 | // Files that are append-only: write mode must start with existing content
-56 | // Paths are relative to project root (e.g. "memory.md", "agentlog.md")
-57 | const APPEND_ONLY_FILES = new Set(["memory.md", "agentlog.md"]);
-58 | 
-59 | export function isAppendOnly(filePath: string, workDir?: string): boolean {
-60 |   const base = workDir ?? process.cwd();
-61 |   const resolved = path.isAbsolute(filePath) ? filePath : path.join(base, filePath);
-62 |   const relative = path.relative(base, resolved);
-63 |   return APPEND_ONLY_FILES.has(relative);
-64 | }
-65 | 
-66 | export function executeWriteFile(
-67 |   filePath: string,
-[2026-04-05T10:33:21.027Z] iter=74 turn=4 INFO: Turn 4/25
-[2026-04-05T10:33:23.575Z] iter=74 turn=4 INFO: Agent: Now update the call site in `executeWriteFile` to pass `workDir`:
-[2026-04-05T10:33:23.576Z] iter=74 turn=4 INFO: write_file: src/tools/write_file.ts (patch)
-[2026-04-05T10:33:23.578Z] iter=74 turn=4 INFO:   -> ok: Patched src/tools/write_file.ts: -2 +2 lines
-
-Context after patch:
-86 |       try { oldContent = readFileSync(resolved, "utf-8"); } catch {}
-87 |     }
-88 | 
-89 |     // Append-only enforcement for protected files
-90 |     if (isAppendOnly(filePath, workDir) && existed && oldContent.length > 0) {
-91 |       if (mode === "write" && !content.startsWith(oldContent)) {
-92 |         return {
-93 |           message: `ERROR: ${path.basename(filePath)} is append-only. Use mode 'append' or ensure new content starts with existing content.`,
-[2026-04-05T10:33:23.580Z] iter=74 turn=5 INFO: Turn 5/25
-[2026-04-05T10:33:25.313Z] iter=74 turn=5 INFO: Agent: Already done. Both patches applied. Now verify:
-[2026-04-05T10:33:25.314Z] iter=74 turn=5 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T10:33:25.930Z] iter=74 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:33:25.931Z] iter=74 turn=6 INFO: Turn 6/25
-[2026-04-05T10:33:27.492Z] iter=74 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -20
-[2026-04-05T10:33:31.189Z] iter=74 turn=6 INFO:   -> exit=0 (629 chars)
-[2026-04-05T10:33:31.189Z] iter=74 turn=7 INFO: Turn 7/25
-[2026-04-05T10:33:32.542Z] iter=74 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | grep "❌"
-[2026-04-05T10:33:35.980Z] iter=74 turn=7 INFO:   -> exit=0 (167 chars)
-[2026-04-05T10:33:35.980Z] iter=74 turn=8 INFO: Turn 8/25
-[2026-04-05T10:33:37.601Z] iter=74 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "memory.md\|agentlog.md\|isAppendOnly\|append-only" scripts/self-test.ts | head -30
-[2026-04-05T10:33:37.614Z] iter=74 turn=8 INFO:   -> exit=0 (1400 chars)
-[2026-04-05T10:33:37.615Z] iter=74 turn=9 INFO: Turn 9/25
-[2026-04-05T10:33:39.907Z] iter=74 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "TEMP_DIR\|executeWriteFile" scripts/self-test.ts | grep -A2 -B2 "memory.md" | head -20
-[2026-04-05T10:33:39.918Z] iter=74 turn=9 INFO:   -> exit=0 (818 chars)
-[2026-04-05T10:33:39.919Z] iter=74 turn=10 INFO: Turn 10/25
-[2026-04-05T10:33:41.180Z] iter=74 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '144,155p' scripts/self-test.ts
-[2026-04-05T10:33:41.197Z] iter=74 turn=10 INFO:   -> exit=0 (672 chars)
-[2026-04-05T10:33:41.197Z] iter=74 turn=11 INFO: Turn 11/25
-[2026-04-05T10:33:57.363Z] iter=74 turn=11 INFO: think: The test creates `memory.md` in `TEMP_DIR` (`.self-test-tmp/memory.md`), then computes `memRel = path.relative(ROOT, mem...
-[2026-04-05T10:33:57.363Z] iter=74 turn=12 INFO: Turn 12/25
-[2026-04-05T10:33:59.131Z] iter=74 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^const ROOT\|^const TEMP_DIR\|ROOT =\|TEMP_DIR =" scripts/self-test.ts | head -10
-[2026-04-05T10:33:59.153Z] iter=74 turn=12 INFO:   -> exit=0 (86 chars)
-[2026-04-05T10:33:59.153Z] iter=74 turn=13 INFO: Turn 13/25
-[2026-04-05T10:34:01.660Z] iter=74 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '144,175p' scripts/self-test.ts
-[2026-04-05T10:34:01.671Z] iter=74 turn=13 INFO:   -> exit=0 (1779 chars)
-[2026-04-05T10:34:01.671Z] iter=74 turn=14 INFO: Turn 14/25
-[2026-04-05T10:34:06.001Z] iter=74 turn=14 INFO: think: The tests pass `.self-test-tmp/memory.md` as `memRel` with `ROOT` as workDir. My new code computes relative path as `.se...
-[2026-04-05T10:34:06.002Z] iter=74 turn=15 INFO: Turn 15/25
-[2026-04-05T10:34:19.378Z] iter=74 turn=15 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T10:34:19.380Z] iter=74 turn=15 INFO:   -> ok: Patched scripts/self-test.ts: -27 +32 lines
 
 Context after patch:
 142 |   const nested = executeWriteFile(nestedPath, "nested content", "write", ROOT);
@@ -1059,3 +996,108 @@ Context after patch:
 [2026-04-05T10:48:23.241Z] iter=82 turn=12 INFO: Tool timing stats
 [2026-04-05T10:48:26.986Z] iter=82 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 82: predicted 12 turns, actual 12 turns, ratio 1.00**
 [2026-04-05T10:48:37.541Z] iter=82 turn=12 INFO: Pre-commit review (3064in/407out): - **Test/implementation mismatch risk**: The "falls back to raw diff" test mocks 5 per-file bash calls then one fallback `git diff` call, but the "skips parallelResearch when false" test only mocks 1 
+[2026-04-05T10:48:37.596Z] iter=82 turn=12 INFO: Committed: 91b98b68 (18 in / 5973 out, cache: 17460 created, 125887 read)
+[2026-04-05T10:48:37.597Z] iter=82 turn=12 INFO: Restarting as iteration 83...
+[2026-04-05T10:48:37.792Z] iter=83 INFO: Cache restored: 24/24 entries (0 stale)
+[2026-04-05T10:48:37.793Z] iter=83 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T10:48:37.822Z] iter=83 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T10:48:37.823Z] iter=83 turn=1 INFO: Turn 1/25
+[2026-04-05T10:48:50.083Z] iter=83 turn=1 INFO: Agent: 
+
+**[Meta] Iteration 83 — System Health Assessment**
+[2026-04-05T10:48:50.084Z] iter=83 turn=1 INFO: think: Let me assess the current state of the system:
+
+1. **Prediction accuracy**: Recent scores show dramatic improvement:
+   ...
+[2026-04-05T10:48:50.084Z] iter=83 turn=2 INFO: Turn 2/25
+[2026-04-05T10:48:54.831Z] iter=83 turn=2 INFO: $ wc -c memory.md
+[2026-04-05T10:48:54.834Z] iter=83 turn=2 INFO: $ cat .autoagent-metrics.json
+[2026-04-05T10:48:54.836Z] iter=83 turn=2 INFO: $ cat .expert-rotation.json
+[2026-04-05T10:48:54.838Z] iter=83 turn=2 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T10:48:54.848Z] iter=83 turn=2 INFO:   -> exit=0 (729 chars)
+[2026-04-05T10:48:54.848Z] iter=83 turn=2 INFO:   -> exit=0 (94737 chars)
+[2026-04-05T10:48:54.848Z] iter=83 turn=2 INFO:   -> exit=0 (19 chars)
+[2026-04-05T10:48:55.507Z] iter=83 turn=2 INFO:   -> exit=0 (11 chars)
+[2026-04-05T10:48:55.508Z] iter=83 turn=3 INFO: Turn 3/25
+[2026-04-05T10:49:12.011Z] iter=83 turn=3 INFO: think: Let me analyze the current system state deeply:
+
+## Prediction Accuracy (last 10 iterations with data):
+- Iter 73: no pr...
+[2026-04-05T10:49:12.013Z] iter=83 turn=4 INFO: Turn 4/25
+[2026-04-05T10:49:14.834Z] iter=83 turn=4 INFO: read_file: src/experts.ts
+[2026-04-05T10:49:14.836Z] iter=83 turn=4 INFO:   -> ok (9868 chars)
+[2026-04-05T10:49:14.836Z] iter=83 turn=4 INFO: $ wc -l src/orientation.ts src/conversation.ts src/finalization.ts src/agent.ts
+[2026-04-05T10:49:14.866Z] iter=83 turn=4 INFO:   -> exit=0 (123 chars)
+[2026-04-05T10:49:14.867Z] iter=83 turn=5 INFO: Turn 5/25
+[2026-04-05T10:49:20.127Z] iter=83 turn=5 INFO: Agent: 
+
+You're right. Let me deliver now. The system is healthy — I have the data I need.
+
+**Deliverables for this iteration:**
+1. Compact the Session Log in memory.md (at 6912 chars, over 6000 threshold)
+2. Set next Architect direction — what real feature to build next
+3. Brief meta assessment in memory
+
+Let me do all three:
+[2026-04-05T10:49:20.128Z] iter=83 turn=5 INFO: read_file: memory.md
+[2026-04-05T10:49:20.129Z] iter=83 turn=5 INFO:   -> ok (4527 chars)
+[2026-04-05T10:49:20.130Z] iter=83 turn=6 INFO: Turn 6/25
+[2026-04-05T10:49:45.539Z] iter=83 turn=6 INFO: Agent: Now I'll compact and update memory in one shot:
+[2026-04-05T10:49:45.540Z] iter=83 turn=6 INFO: write_file: memory.md (patch)
+[2026-04-05T10:49:45.543Z] iter=83 turn=6 INFO:   -> ok: Patched memory.md: -55 +22 lines
+
+Context after patch:
+46 | ## Session Log
+47 | 
+48 | 
+49 | ### Compacted History (iters 1-78)
+50 | 
+51 | Built core infrastructure: tool registry, memory system, orientation phase, code analysis, self-tests, pre-commit gates, context compression, sub-agent review, metrics tracking, turn prediction scoring, dashboard, analyze-repo CLI. Added adaptive turn budgeting, prediction calibration, metrics-driven goal selection. Subtraction pass deleted benchmark.ts (-354 LOC). Major restructuring at iter 68-69: replaced monolithic Opus with expert rotation (Engineer/Architect/Meta). Added hard turn cap (1.5x prediction) in conversation.ts. Turn Floor Formula created (iter 73). Fixed isAppendOnly basename bug (iter 74). Wired predictedTurns into goals.md parsing + metrics recording (iters 76-78).
+52 | 
+53 | **Key lessons:** (1) Predictions were systematically 2x off because META turns (3/iter) were invisible — Turn Floor Formula fixes this. (2) Non-code iters predict well (ratio ~1.0); code iters can overshoot 2x due to debug loops.
+54 | 
+55 | ---
+56 | 
+57 | **Iter 79 (Meta):** Broke meta-cycle (iters 73-78 were all calibration). Directed iter 80 to build parallelResearch.
+58 | 
+59 | **Iter 80 (Engineer):** Built `parallelResearch()` in `src/tools/subagent.ts`. Concurrent Haiku dispatch via Promise.all. 6 tests.
+60 | 
+61 | **Iter 81 (Architect):** Reviewed parallelResearch — clean but dead code. Directed wiring into orientation.ts for 5+ file changes.
+62 | 
+63 | **Iter 82 (Engineer):** Wired `parallelResearch` into `orientation.ts`. Haiku sub-agents summarize per-file diffs when 5+ src files changed. 10 orientation tests, tsc clean.
+64 | 
+65 | **Prediction accuracy (last 4):** 79: 1.56, 80: 1.18, 81: 0.89, 82: 1.00. **Avg: 1.16 — best stretch yet.**
+66 | 
+67 | **Iter 83 (Meta):** [Meta] System is healthy. Prediction accuracy converging (avg 1.16). LOC grew 5447→6259 over last 10 iters (+812). parallelResearch built and wired — first real feature in the rotation era. Memory compacted. No code changes needed — system is working. Next Architect should identify what external-value feature to build next (the agent needs to do something *useful*, not just improve itself).
+68 | 
+69 | ## Next for Architect
+70 | The agent has solid infrastructure. Time to ask: **what should this agent actually DO for a user?** Consider: (1) Can it operate on external repos? (2) Should it have a "task mode" where a user gives it a goal? (3) What's the first thing someone would use this for? The next iteration should produce a concrete vision + one specific Engineer task.
+71 | 
+[2026-04-05T10:49:45.544Z] iter=83 turn=7 INFO: Turn 7/25
+[2026-04-05T10:49:47.814Z] iter=83 turn=7 INFO: $ wc -c memory.md
+[2026-04-05T10:49:47.837Z] iter=83 turn=7 INFO:   -> exit=0 (19 chars)
+[2026-04-05T10:49:47.838Z] iter=83 turn=8 INFO: Turn 8/25
+[2026-04-05T10:49:53.897Z] iter=83 turn=8 INFO: Agent: Good — compacted from 6912 to 4800 chars. Now write goals:
+[2026-04-05T10:49:53.898Z] iter=83 turn=8 INFO: write_file: goals.md (write)
+[2026-04-05T10:49:53.899Z] iter=83 turn=8 INFO:   -> ok: Updated goals.md (476 chars, 0 lines delta)
+[2026-04-05T10:49:53.899Z] iter=83 turn=9 INFO: Turn 9/25
+[2026-04-05T10:50:00.044Z] iter=83 turn=9 INFO: Agent: 
+
+All goals are **DONE**. Memory is already updated, goals already written. The high output ratio warning is a false positive — this is a Meta iteration doing compaction/assessment, not a code iteration. I read what I needed (memory.md, experts.ts, metrics) and wrote the compacted result.
+
+Let me verify and restart:
+[2026-04-05T10:50:00.045Z] iter=83 turn=9 INFO: $ npx tsc --noEmit 2>&1 | tail -3
+[2026-04-05T10:50:00.768Z] iter=83 turn=9 INFO:   -> exit=0 (11 chars)
+[2026-04-05T10:50:00.768Z] iter=83 turn=10 INFO: Turn 10/25
+[2026-04-05T10:50:03.854Z] iter=83 turn=10 INFO: Agent: Clean. No code changes this iteration — just memory compaction and direction-setting.
+[2026-04-05T10:50:03.856Z] iter=83 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T10:50:03.857Z] iter=83 turn=10 INFO: RESTART signal
+[2026-04-05T10:50:03.858Z] iter=83 turn=10 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T10:50:04.573Z] iter=83 turn=10 INFO: Compilation OK
+[2026-04-05T10:50:08.719Z] iter=83 turn=10 INFO: Cache persisted: 25 entries to .autoagent-cache.json
+[2026-04-05T10:50:08.719Z] iter=83 turn=10 INFO: Cache stats: 0 hits, 2 misses, 25 entries, 2 invalidations (1 entries removed)
+[2026-04-05T10:50:08.719Z] iter=83 turn=10 INFO: Tool cache stats
+[2026-04-05T10:50:08.720Z] iter=83 turn=10 INFO: Tool timing: bash: 8x, avg=187ms, total=1494ms; read_file: 2x, avg=4ms, total=7ms; write_file: 2x, avg=2ms, total=4ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T10:50:08.720Z] iter=83 turn=10 INFO: Tool timing stats
+[2026-04-05T10:50:12.313Z] iter=83 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 83: predicted 12 turns, actual 10 turns, ratio 0.83**
+[2026-04-05T10:50:12.330Z] iter=83 turn=10 INFO: Pre-commit review: no significant code changes to review

@@ -1,57 +1,3 @@
-{"timestamp":"2026-04-05T10:33:41.197Z","iteration":74,"level":"info","message":"  -> exit=0 (672 chars)","turn":10}
-{"timestamp":"2026-04-05T10:33:41.197Z","iteration":74,"level":"info","message":"Turn 11/25","turn":11}
-{"timestamp":"2026-04-05T10:33:57.363Z","iteration":74,"level":"info","message":"think: The test creates `memory.md` in `TEMP_DIR` (`.self-test-tmp/memory.md`), then computes `memRel = path.relative(ROOT, mem...","turn":11}
-{"timestamp":"2026-04-05T10:33:57.363Z","iteration":74,"level":"info","message":"Turn 12/25","turn":12}
-{"timestamp":"2026-04-05T10:33:59.131Z","iteration":74,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"^const ROOT\\|^const TEMP_DIR\\|ROOT =\\|TEMP_DIR =\" scripts/self-test.ts | head -10","turn":12}
-{"timestamp":"2026-04-05T10:33:59.153Z","iteration":74,"level":"info","message":"  -> exit=0 (86 chars)","turn":12}
-{"timestamp":"2026-04-05T10:33:59.153Z","iteration":74,"level":"info","message":"Turn 13/25","turn":13}
-{"timestamp":"2026-04-05T10:34:01.660Z","iteration":74,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '144,175p' scripts/self-test.ts","turn":13}
-{"timestamp":"2026-04-05T10:34:01.671Z","iteration":74,"level":"info","message":"  -> exit=0 (1779 chars)","turn":13}
-{"timestamp":"2026-04-05T10:34:01.671Z","iteration":74,"level":"info","message":"Turn 14/25","turn":14}
-{"timestamp":"2026-04-05T10:34:06.001Z","iteration":74,"level":"info","message":"think: The tests pass `.self-test-tmp/memory.md` as `memRel` with `ROOT` as workDir. My new code computes relative path as `.se...","turn":14}
-{"timestamp":"2026-04-05T10:34:06.002Z","iteration":74,"level":"info","message":"Turn 15/25","turn":15}
-{"timestamp":"2026-04-05T10:34:19.378Z","iteration":74,"level":"info","message":"write_file: scripts/self-test.ts (patch)","turn":15}
-{"timestamp":"2026-04-05T10:34:19.380Z","iteration":74,"level":"info","message":"  -> ok: Patched scripts/self-test.ts: -27 +32 lines\n\nContext after patch:\n142 |   const nested = executeWriteFile(nestedPath, \"nested content\", \"write\", ROOT);\n143 |   assert(nested.success && existsSync(path.join(ROOT, nestedPath)), \"write_file: creates nested directories\");\n144 | \n145 |   // Append-only enforcement for protected files (memory.md, agentlog.md)\n146 |   // Use TEMP_DIR as workDir so \"memory.md\" resolves to TEMP_DIR/memory.md (root-relative path matches)\n147 |   const memFile = path.join(TEMP_DIR, \"memory.md\");\n148 |   writeFileSync(memFile, \"# Memory\\n\\nExisting content.\\n\", \"utf-8\");\n149 | \n150 |   // Non-append write to memory.md should be rejected (path relative to TEMP_DIR is just \"memory.md\")\n151 |   const rewrite = executeWriteFile(\"memory.md\", \"Completely new content\", \"write\", TEMP_DIR);\n152 |   assert(!rewrite.success && rewrite.message.includes(\"append-only\"), \"write_file: rejects non-append write to memory.md\");\n153 |   // Verify file unchanged\n154 |   assert(readFileSync(memFile, \"utf-8\") === \"# Memory\\n\\nExisting content.\\n\", \"write_file: memory.md unchanged after rejected write\");\n155 | \n156 |   // Append mode to memory.md should succeed\n157 |   const memAppend = executeWriteFile(\"memory.md\", \"\\nNew entry.\", \"append\", TEMP_DIR);\n158 |   assert(memAppend.success, \"write_file: append to memory.md succeeds\");\n159 |   assert(readFileSync(memFile, \"utf-8\").endsWith(\"\\nNew entry.\"), \"write_file: memory.md has appended content\");\n160 | \n161 |   // Write mode that starts with existing content (effective append) should succeed\n162 |   const currentMem = readFileSync(memFile, \"utf-8\");\n163 |   const extendedWrite = executeWriteFile(\"memory.md\", currentMem + \"\\nMore content.\", \"write\", TEMP_DIR);\n164 |   assert(extendedWrite.success, \"write_file: write that extends memory.md succeeds\");\n165 | \n166 |   // Same enforcement for agentlog.md\n167 |   const logFile = path.join(TEMP_DIR, \"agentlog.md\");\n168 |   writeFileSync(logFile, \"# Log\\n\\nEntry 1.\\n\", \"utf-8\");\n169 |   const logRewrite = executeWriteFile(\"agentlog.md\", \"Rewritten log\", \"write\", TEMP_DIR);\n170 |   assert(!logRewrite.success && logRewrite.message.includes(\"append-only\"), \"write_file: rejects non-append write to agentlog.md\");\n171 | \n172 |   // Verify subpath/memory.md is NOT protected (basename check is gone)\n173 |   mkdirSync(path.join(TEMP_DIR, \"subdir\"), { recursive: true });\n174 |   writeFileSync(path.join(TEMP_DIR, \"subdir\", \"memory.md\"), \"sub content\", \"utf-8\");\n175 |   const subRewrite = executeWriteFile(\"subdir/memory.md\", \"New content\", \"write\", TEMP_DIR);\n176 |   assert(subRewrite.success, \"write_file: subdir/memory.md is not append-only protected\");\n177 | }\n178 | \n179 | // ─── Grep Tests ─────────────────────────────────────────────","turn":15}
-{"timestamp":"2026-04-05T10:34:19.380Z","iteration":74,"level":"info","message":"Turn 16/25","turn":16}
-{"timestamp":"2026-04-05T10:34:21.323Z","iteration":74,"level":"info","message":"Agent: Already have changes. Run tests and commit.","turn":16}
-{"timestamp":"2026-04-05T10:34:21.323Z","iteration":74,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -5","turn":16}
-{"timestamp":"2026-04-05T10:34:24.902Z","iteration":74,"level":"info","message":"  -> exit=0 (100 chars)","turn":16}
-{"timestamp":"2026-04-05T10:34:24.902Z","iteration":74,"level":"info","message":"Turn 17/25","turn":17}
-{"timestamp":"2026-04-05T10:34:26.066Z","iteration":74,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1","turn":17}
-{"timestamp":"2026-04-05T10:34:26.701Z","iteration":74,"level":"info","message":"  -> exit=0 (11 chars)","turn":17}
-{"timestamp":"2026-04-05T10:34:26.701Z","iteration":74,"level":"info","message":"Turn 18/25","turn":18}
-{"timestamp":"2026-04-05T10:34:30.878Z","iteration":74,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git add src/tools/write_file.ts scripts/self-test.ts && git commit -m \"fix: isAppendOnly checks root-relative path, not just basename\n\nPreviously path.basename(...","turn":18}
-{"timestamp":"2026-04-05T10:34:30.917Z","iteration":74,"level":"info","message":"  -> exit=0 (132 chars)","turn":18}
-{"timestamp":"2026-04-05T10:34:30.917Z","iteration":74,"level":"info","message":"Turn 19/25","turn":19}
-{"timestamp":"2026-04-05T10:34:34.764Z","iteration":74,"level":"info","message":"Agent: Now update memory and goals:","turn":19}
-{"timestamp":"2026-04-05T10:34:34.764Z","iteration":74,"level":"info","message":"write_file: memory.md (append)","turn":19}
-{"timestamp":"2026-04-05T10:34:34.765Z","iteration":74,"level":"info","message":"  -> ok: Appended 330 chars to memory.md","turn":19}
-{"timestamp":"2026-04-05T10:34:34.765Z","iteration":74,"level":"info","message":"Turn 20/25","turn":20}
-{"timestamp":"2026-04-05T10:34:38.651Z","iteration":74,"level":"info","message":"write_file: goals.md (write)","turn":20}
-{"timestamp":"2026-04-05T10:34:38.652Z","iteration":74,"level":"info","message":"  -> ok: Updated goals.md (261 chars, -8 lines delta)","turn":20}
-{"timestamp":"2026-04-05T10:34:38.652Z","iteration":74,"level":"info","message":"Turn 21/25","turn":21}
-{"timestamp":"2026-04-05T10:34:41.601Z","iteration":74,"level":"info","message":"Agent: Already done. Committed, memory written, goals updated.","turn":21}
-{"timestamp":"2026-04-05T10:34:41.602Z","iteration":74,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":21}
-{"timestamp":"2026-04-05T10:34:41.602Z","iteration":74,"level":"info","message":"RESTART signal","turn":21}
-{"timestamp":"2026-04-05T10:34:41.602Z","iteration":74,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":21}
-{"timestamp":"2026-04-05T10:34:42.319Z","iteration":74,"level":"info","message":"Compilation OK","turn":21}
-{"timestamp":"2026-04-05T10:34:47.289Z","iteration":74,"level":"info","message":"Cache persisted: 25 entries to .autoagent-cache.json","turn":21}
-{"timestamp":"2026-04-05T10:34:47.289Z","iteration":74,"level":"info","message":"Cache stats: 0 hits, 1 misses, 25 entries, 5 invalidations (1 entries removed)","turn":21}
-{"timestamp":"2026-04-05T10:34:47.289Z","iteration":74,"level":"info","message":"Tool cache stats","turn":21,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":25,"invalidations":5,"invalidatedEntries":1,"toolStats":{"read_file":{"hits":0,"misses":1}}}}
-{"timestamp":"2026-04-05T10:34:47.289Z","iteration":74,"level":"info","message":"Tool timing: bash: 12x, avg=1007ms, total=12080ms; write_file: 5x, avg=3ms, total=13ms; read_file: 1x, avg=2ms, total=2ms; think: 3x, avg=1ms, total=2ms","turn":21}
-{"timestamp":"2026-04-05T10:34:47.290Z","iteration":74,"level":"info","message":"Tool timing stats","turn":21,"metadata":{"timing":{"tools":{"read_file":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2},"think":{"calls":3,"totalMs":2,"minMs":0,"maxMs":1,"avgMs":1},"write_file":{"calls":5,"totalMs":13,"minMs":1,"maxMs":5,"avgMs":3},"bash":{"calls":12,"totalMs":12080,"minMs":0,"maxMs":3697,"avgMs":1007}},"totalCalls":21,"totalMs":12097}}}
-{"timestamp":"2026-04-05T10:34:50.638Z","iteration":74,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 74: predicted 8 turns, actual 21 turns, ratio 2.63**","turn":21}
-{"timestamp":"2026-04-05T10:34:50.658Z","iteration":74,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":21}
-{"timestamp":"2026-04-05T10:34:50.688Z","iteration":74,"level":"info","message":"Committed: 049e95be (31 in / 5243 out, cache: 22898 created, 217378 read)","turn":21}
-{"timestamp":"2026-04-05T10:34:50.689Z","iteration":74,"level":"info","message":"Restarting as iteration 75...","turn":21}
-{"timestamp":"2026-04-05T10:34:50.856Z","iteration":75,"level":"info","message":"Cache restored: 25/25 entries (0 stale)"}
-{"timestamp":"2026-04-05T10:34:50.857Z","iteration":75,"level":"info","message":"Starting. Expert=Meta Model=claude-opus-4-6"}
-{"timestamp":"2026-04-05T10:34:50.884Z","iteration":75,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-05T10:34:55.747Z","iteration":75,"level":"info","message":"Agent: \n\nI'll start by understanding the current state of the system — what's been happening, what the metrics look like, and whether the system is actually improving.","turn":1}
-{"timestamp":"2026-04-05T10:34:55.749Z","iteration":75,"level":"info","message":"$ cat .autoagent-metrics.json | tail -80","turn":1}
-{"timestamp":"2026-04-05T10:34:55.758Z","iteration":75,"level":"info","message":"$ cat .autoagent-state.json","turn":1}
-{"timestamp":"2026-04-05T10:34:55.764Z","iteration":75,"level":"info","message":"$ cat .expert-rotation.json","turn":1}
-{"timestamp":"2026-04-05T10:34:55.772Z","iteration":75,"level":"info","message":"  -> exit=0 (111 chars)","turn":1}
 {"timestamp":"2026-04-05T10:34:55.774Z","iteration":75,"level":"info","message":"  -> exit=0 (231 chars)","turn":1}
 {"timestamp":"2026-04-05T10:34:55.774Z","iteration":75,"level":"info","message":"  -> exit=0 (1613 chars)","turn":1}
 {"timestamp":"2026-04-05T10:34:55.775Z","iteration":75,"level":"info","message":"Turn 2/25","turn":2}
@@ -550,3 +496,59 @@
 {"timestamp":"2026-04-05T10:48:23.241Z","iteration":82,"level":"info","message":"Tool timing stats","turn":12,"metadata":{"timing":{"tools":{"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"bash":{"calls":5,"totalMs":2704,"minMs":0,"maxMs":1034,"avgMs":541},"read_file":{"calls":1,"totalMs":3,"minMs":3,"maxMs":3,"avgMs":3},"write_file":{"calls":4,"totalMs":8,"minMs":1,"maxMs":3,"avgMs":2}},"totalCalls":11,"totalMs":2716}}}
 {"timestamp":"2026-04-05T10:48:26.986Z","iteration":82,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 82: predicted 12 turns, actual 12 turns, ratio 1.00**","turn":12}
 {"timestamp":"2026-04-05T10:48:37.541Z","iteration":82,"level":"info","message":"Pre-commit review (3064in/407out): - **Test/implementation mismatch risk**: The \"falls back to raw diff\" test mocks 5 per-file bash calls then one fallback `git diff` call, but the \"skips parallelResearch when false\" test only mocks 1 ","turn":12}
+{"timestamp":"2026-04-05T10:48:37.596Z","iteration":82,"level":"info","message":"Committed: 91b98b68 (18 in / 5973 out, cache: 17460 created, 125887 read)","turn":12}
+{"timestamp":"2026-04-05T10:48:37.597Z","iteration":82,"level":"info","message":"Restarting as iteration 83...","turn":12}
+{"timestamp":"2026-04-05T10:48:37.792Z","iteration":83,"level":"info","message":"Cache restored: 24/24 entries (0 stale)"}
+{"timestamp":"2026-04-05T10:48:37.793Z","iteration":83,"level":"info","message":"Starting. Expert=Meta Model=claude-opus-4-6"}
+{"timestamp":"2026-04-05T10:48:37.822Z","iteration":83,"level":"info","message":"Hard turn cap: 18 (1.5x prediction of 12)"}
+{"timestamp":"2026-04-05T10:48:37.823Z","iteration":83,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-05T10:48:50.083Z","iteration":83,"level":"info","message":"Agent: \n\n**[Meta] Iteration 83 — System Health Assessment**","turn":1}
+{"timestamp":"2026-04-05T10:48:50.084Z","iteration":83,"level":"info","message":"think: Let me assess the current state of the system:\n\n1. **Prediction accuracy**: Recent scores show dramatic improvement:\n   ...","turn":1}
+{"timestamp":"2026-04-05T10:48:50.084Z","iteration":83,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-05T10:48:54.831Z","iteration":83,"level":"info","message":"$ wc -c memory.md","turn":2}
+{"timestamp":"2026-04-05T10:48:54.834Z","iteration":83,"level":"info","message":"$ cat .autoagent-metrics.json","turn":2}
+{"timestamp":"2026-04-05T10:48:54.836Z","iteration":83,"level":"info","message":"$ cat .expert-rotation.json","turn":2}
+{"timestamp":"2026-04-05T10:48:54.838Z","iteration":83,"level":"info","message":"$ npx tsc --noEmit 2>&1 | tail -5","turn":2}
+{"timestamp":"2026-04-05T10:48:54.848Z","iteration":83,"level":"info","message":"  -> exit=0 (729 chars)","turn":2}
+{"timestamp":"2026-04-05T10:48:54.848Z","iteration":83,"level":"info","message":"  -> exit=0 (94737 chars)","turn":2}
+{"timestamp":"2026-04-05T10:48:54.848Z","iteration":83,"level":"info","message":"  -> exit=0 (19 chars)","turn":2}
+{"timestamp":"2026-04-05T10:48:55.507Z","iteration":83,"level":"info","message":"  -> exit=0 (11 chars)","turn":2}
+{"timestamp":"2026-04-05T10:48:55.508Z","iteration":83,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-05T10:49:12.011Z","iteration":83,"level":"info","message":"think: Let me analyze the current system state deeply:\n\n## Prediction Accuracy (last 10 iterations with data):\n- Iter 73: no pr...","turn":3}
+{"timestamp":"2026-04-05T10:49:12.013Z","iteration":83,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-05T10:49:14.834Z","iteration":83,"level":"info","message":"read_file: src/experts.ts","turn":4}
+{"timestamp":"2026-04-05T10:49:14.836Z","iteration":83,"level":"info","message":"  -> ok (9868 chars)","turn":4}
+{"timestamp":"2026-04-05T10:49:14.836Z","iteration":83,"level":"info","message":"$ wc -l src/orientation.ts src/conversation.ts src/finalization.ts src/agent.ts","turn":4}
+{"timestamp":"2026-04-05T10:49:14.866Z","iteration":83,"level":"info","message":"  -> exit=0 (123 chars)","turn":4}
+{"timestamp":"2026-04-05T10:49:14.867Z","iteration":83,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-05T10:49:20.127Z","iteration":83,"level":"info","message":"Agent: \n\nYou're right. Let me deliver now. The system is healthy — I have the data I need.\n\n**Deliverables for this iteration:**\n1. Compact the Session Log in memory.md (at 6912 chars, over 6000 threshold)\n2. Set next Architect direction — what real feature to build next\n3. Brief meta assessment in memory\n\nLet me do all three:","turn":5}
+{"timestamp":"2026-04-05T10:49:20.128Z","iteration":83,"level":"info","message":"read_file: memory.md","turn":5}
+{"timestamp":"2026-04-05T10:49:20.129Z","iteration":83,"level":"info","message":"  -> ok (4527 chars)","turn":5}
+{"timestamp":"2026-04-05T10:49:20.130Z","iteration":83,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-05T10:49:45.539Z","iteration":83,"level":"info","message":"Agent: Now I'll compact and update memory in one shot:","turn":6}
+{"timestamp":"2026-04-05T10:49:45.540Z","iteration":83,"level":"info","message":"write_file: memory.md (patch)","turn":6}
+{"timestamp":"2026-04-05T10:49:45.543Z","iteration":83,"level":"info","message":"  -> ok: Patched memory.md: -55 +22 lines\n\nContext after patch:\n46 | ## Session Log\n47 | \n48 | \n49 | ### Compacted History (iters 1-78)\n50 | \n51 | Built core infrastructure: tool registry, memory system, orientation phase, code analysis, self-tests, pre-commit gates, context compression, sub-agent review, metrics tracking, turn prediction scoring, dashboard, analyze-repo CLI. Added adaptive turn budgeting, prediction calibration, metrics-driven goal selection. Subtraction pass deleted benchmark.ts (-354 LOC). Major restructuring at iter 68-69: replaced monolithic Opus with expert rotation (Engineer/Architect/Meta). Added hard turn cap (1.5x prediction) in conversation.ts. Turn Floor Formula created (iter 73). Fixed isAppendOnly basename bug (iter 74). Wired predictedTurns into goals.md parsing + metrics recording (iters 76-78).\n52 | \n53 | **Key lessons:** (1) Predictions were systematically 2x off because META turns (3/iter) were invisible — Turn Floor Formula fixes this. (2) Non-code iters predict well (ratio ~1.0); code iters can overshoot 2x due to debug loops.\n54 | \n55 | ---\n56 | \n57 | **Iter 79 (Meta):** Broke meta-cycle (iters 73-78 were all calibration). Directed iter 80 to build parallelResearch.\n58 | \n59 | **Iter 80 (Engineer):** Built `parallelResearch()` in `src/tools/subagent.ts`. Concurrent Haiku dispatch via Promise.all. 6 tests.\n60 | \n61 | **Iter 81 (Architect):** Reviewed parallelResearch — clean but dead code. Directed wiring into orientation.ts for 5+ file changes.\n62 | \n63 | **Iter 82 (Engineer):** Wired `parallelResearch` into `orientation.ts`. Haiku sub-agents summarize per-file diffs when 5+ src files changed. 10 orientation tests, tsc clean.\n64 | \n65 | **Prediction accuracy (last 4):** 79: 1.56, 80: 1.18, 81: 0.89, 82: 1.00. **Avg: 1.16 — best stretch yet.**\n66 | \n67 | **Iter 83 (Meta):** [Meta] System is healthy. Prediction accuracy converging (avg 1.16). LOC grew 5447→6259 over last 10 iters (+812). parallelResearch built and wired — first real feature in the rotation era. Memory compacted. No code changes needed — system is working. Next Architect should identify what external-value feature to build next (the agent needs to do something *useful*, not just improve itself).\n68 | \n69 | ## Next for Architect\n70 | The agent has solid infrastructure. Time to ask: **what should this agent actually DO for a user?** Consider: (1) Can it operate on external repos? (2) Should it have a \"task mode\" where a user gives it a goal? (3) What's the first thing someone would use this for? The next iteration should produce a concrete vision + one specific Engineer task.\n71 | ","turn":6}
+{"timestamp":"2026-04-05T10:49:45.544Z","iteration":83,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-05T10:49:47.814Z","iteration":83,"level":"info","message":"$ wc -c memory.md","turn":7}
+{"timestamp":"2026-04-05T10:49:47.837Z","iteration":83,"level":"info","message":"  -> exit=0 (19 chars)","turn":7}
+{"timestamp":"2026-04-05T10:49:47.838Z","iteration":83,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-05T10:49:53.897Z","iteration":83,"level":"info","message":"Agent: Good — compacted from 6912 to 4800 chars. Now write goals:","turn":8}
+{"timestamp":"2026-04-05T10:49:53.898Z","iteration":83,"level":"info","message":"write_file: goals.md (write)","turn":8}
+{"timestamp":"2026-04-05T10:49:53.899Z","iteration":83,"level":"info","message":"  -> ok: Updated goals.md (476 chars, 0 lines delta)","turn":8}
+{"timestamp":"2026-04-05T10:49:53.899Z","iteration":83,"level":"info","message":"Turn 9/25","turn":9}
+{"timestamp":"2026-04-05T10:50:00.044Z","iteration":83,"level":"info","message":"Agent: \n\nAll goals are **DONE**. Memory is already updated, goals already written. The high output ratio warning is a false positive — this is a Meta iteration doing compaction/assessment, not a code iteration. I read what I needed (memory.md, experts.ts, metrics) and wrote the compacted result.\n\nLet me verify and restart:","turn":9}
+{"timestamp":"2026-04-05T10:50:00.045Z","iteration":83,"level":"info","message":"$ npx tsc --noEmit 2>&1 | tail -3","turn":9}
+{"timestamp":"2026-04-05T10:50:00.768Z","iteration":83,"level":"info","message":"  -> exit=0 (11 chars)","turn":9}
+{"timestamp":"2026-04-05T10:50:00.768Z","iteration":83,"level":"info","message":"Turn 10/25","turn":10}
+{"timestamp":"2026-04-05T10:50:03.854Z","iteration":83,"level":"info","message":"Agent: Clean. No code changes this iteration — just memory compaction and direction-setting.","turn":10}
+{"timestamp":"2026-04-05T10:50:03.856Z","iteration":83,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":10}
+{"timestamp":"2026-04-05T10:50:03.857Z","iteration":83,"level":"info","message":"RESTART signal","turn":10}
+{"timestamp":"2026-04-05T10:50:03.858Z","iteration":83,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":10}
+{"timestamp":"2026-04-05T10:50:04.573Z","iteration":83,"level":"info","message":"Compilation OK","turn":10}
+{"timestamp":"2026-04-05T10:50:08.719Z","iteration":83,"level":"info","message":"Cache persisted: 25 entries to .autoagent-cache.json","turn":10}
+{"timestamp":"2026-04-05T10:50:08.719Z","iteration":83,"level":"info","message":"Cache stats: 0 hits, 2 misses, 25 entries, 2 invalidations (1 entries removed)","turn":10}
+{"timestamp":"2026-04-05T10:50:08.719Z","iteration":83,"level":"info","message":"Tool cache stats","turn":10,"metadata":{"cacheHits":0,"cacheMisses":2,"cacheEntries":25,"invalidations":2,"invalidatedEntries":1,"toolStats":{"read_file":{"hits":0,"misses":2}}}}
+{"timestamp":"2026-04-05T10:50:08.720Z","iteration":83,"level":"info","message":"Tool timing: bash: 8x, avg=187ms, total=1494ms; read_file: 2x, avg=4ms, total=7ms; write_file: 2x, avg=2ms, total=4ms; think: 2x, avg=1ms, total=2ms","turn":10}
+{"timestamp":"2026-04-05T10:50:08.720Z","iteration":83,"level":"info","message":"Tool timing stats","turn":10,"metadata":{"timing":{"tools":{"think":{"calls":2,"totalMs":2,"minMs":0,"maxMs":2,"avgMs":1},"bash":{"calls":8,"totalMs":1494,"minMs":2,"maxMs":723,"avgMs":187},"read_file":{"calls":2,"totalMs":7,"minMs":1,"maxMs":6,"avgMs":4},"write_file":{"calls":2,"totalMs":4,"minMs":1,"maxMs":3,"avgMs":2}},"totalCalls":14,"totalMs":1507}}}
+{"timestamp":"2026-04-05T10:50:12.313Z","iteration":83,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 83: predicted 12 turns, actual 10 turns, ratio 0.83**","turn":10}
+{"timestamp":"2026-04-05T10:50:12.330Z","iteration":83,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":10}
