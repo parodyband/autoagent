@@ -1,92 +1,3 @@
-[2026-04-05T20:07:35.106Z] iter=353 turn=2 INFO: Turn 2/25
-[2026-04-05T20:07:38.789Z] iter=353 turn=2 INFO: Agent: Good — TSC clean, 991 tests passing, and no `loadPlan`/`listPlans` exists yet. Let me examine the current task-planner and TUI:
-[2026-04-05T20:07:38.791Z] iter=353 turn=2 INFO: read_file: src/task-planner.ts
-[2026-04-05T20:07:38.793Z] iter=353 turn=2 INFO:   -> ok (9823 chars)
-[2026-04-05T20:07:38.794Z] iter=353 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/tui.tsx
-[2026-04-05T20:07:38.823Z] iter=353 turn=2 INFO:   -> exit=0 (21 chars)
-[2026-04-05T20:07:38.824Z] iter=353 turn=3 INFO: Turn 3/25
-[2026-04-05T20:07:42.322Z] iter=353 turn=3 INFO: think: Great - `savePlan` and `loadPlan` already exist in task-planner.ts! The goals.md pre-flight check said to look for these...
-[2026-04-05T20:07:42.323Z] iter=353 turn=4 INFO: Turn 4/25
-[2026-04-05T20:07:46.402Z] iter=353 turn=4 INFO: Agent: 
-
-You're right. Let me read the TUI command handler and start writing immediately.
-[2026-04-05T20:07:46.402Z] iter=353 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "handleSubmit\|/clear\|/reindex\|/resume\|/diff\|/undo\|/help\|/find\|/model\|/status\|/rewind\|/exit\|/export\|/init\|/compact\|slash.*command\|startsW...
-[2026-04-05T20:07:46.415Z] iter=353 turn=4 INFO:   -> exit=0 (2532 chars)
-[2026-04-05T20:07:46.416Z] iter=353 turn=5 INFO: Turn 5/25
-[2026-04-05T20:07:48.916Z] iter=353 turn=5 INFO: read_file: src/tui.tsx
-[2026-04-05T20:07:48.917Z] iter=353 turn=5 INFO:   -> ok (2854 chars)
-[2026-04-05T20:07:48.917Z] iter=353 turn=6 INFO: Turn 6/25
-[2026-04-05T20:07:52.162Z] iter=353 turn=6 INFO: Agent: Now I have the pattern. Let me also check what imports I need and the PlanDisplay component:
-[2026-04-05T20:07:52.163Z] iter=353 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "PlanDisplay\|task-planner\|TaskPlan" src/tui.tsx
-[2026-04-05T20:07:52.165Z] iter=353 turn=6 INFO: read_file: src/tui.tsx
-[2026-04-05T20:07:52.165Z] iter=353 turn=6 INFO:   -> ok (1216 chars)
-[2026-04-05T20:07:52.173Z] iter=353 turn=6 INFO:   -> exit=0 (57 chars)
-[2026-04-05T20:07:52.174Z] iter=353 turn=7 INFO: Turn 7/25
-[2026-04-05T20:07:56.141Z] iter=353 turn=7 INFO: Agent: 
-
-**Status:**
-- Goal 1 (`/plan <description>` in TUI): NOT STARTED
-- Goal 2 (`/plan list` / `/plan resume`): NOT STARTED
-
-I've gathered enough context. Starting implementation now — both goals in one patch.
-[2026-04-05T20:07:56.141Z] iter=353 turn=7 INFO: read_file: src/tui.tsx
-[2026-04-05T20:07:56.142Z] iter=353 turn=7 INFO:   -> ok (1234 chars)
-[2026-04-05T20:07:56.142Z] iter=353 turn=8 INFO: Turn 8/25
-[2026-04-05T20:08:01.750Z] iter=353 turn=8 INFO: Agent: Now let me implement everything. I'll add the import, the `TaskPlanDisplay` component, and the `/plan` command handler:
-[2026-04-05T20:08:01.751Z] iter=353 turn=8 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T20:08:01.753Z] iter=353 turn=8 INFO:   -> ok: Patched src/tui.tsx: -8 +17 lines
-
-Context after patch:
-15 | import "dotenv/config";
-16 | import { Orchestrator } from "./orchestrator.js";
-17 | import { listSessions, type SessionInfo } from "./session-store.js";
-18 | import type { EditPlan } from "./architect-mode.js";
-19 | import { VirtualMessageList } from "./virtual-message-list.js";
-20 | import { undoLastCommit } from "./auto-commit.js";
-21 | import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
-22 | import { execSync } from "child_process";
-23 | import { runInit } from "./init-command.js";
-24 | import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
-25 | import { shouldShowWelcome } from "./welcome.js";
-26 | import {
-27 |   createPlan,
-28 |   executePlan,
-29 |   formatPlan,
-30 |   loadPlan,
-31 |   savePlan,
-32 |   type Task,
-33 |   type TaskPlan,
-34 | } from "./task-planner.js";
-35 | 
-36 | // Parse args
-37 | let workDir = process.cwd();
-[2026-04-05T20:08:01.754Z] iter=353 turn=9 INFO: Turn 9/25
-[2026-04-05T20:08:05.223Z] iter=353 turn=9 INFO: Agent: Now add the `TaskPlanDisplay` component right after the existing `PlanDisplay`:
-[2026-04-05T20:08:05.224Z] iter=353 turn=9 INFO: read_file: src/tui.tsx
-[2026-04-05T20:08:05.224Z] iter=353 turn=9 INFO:   -> ok (466 chars)
-[2026-04-05T20:08:05.225Z] iter=353 turn=10 INFO: Turn 10/25
-[2026-04-05T20:08:13.523Z] iter=353 turn=10 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T20:08:13.525Z] iter=353 turn=10 INFO:   -> ok: Patched src/tui.tsx: -2 +38 lines
-
-Context after patch:
-278 |   );
-279 | }
-280 | 
-281 | const TASK_STATUS_ICON: Record<Task["status"], string> = {
-282 |   pending: "⏳",
-283 |   "in-progress": "🔄",
-284 |   done: "✅",
-285 |   failed: "❌",
-286 | };
-287 | 
-288 | /** Task plan display — shows plan tasks with live status. */
-289 | function TaskPlanDisplay({ plan }: { plan: TaskPlan }) {
-290 |   const done = plan.tasks.filter((t) => t.status === "done").length;
-291 |   const failed = plan.tasks.filter((t) => t.status === "failed").length;
-292 |   return (
-293 |     <Box flexDirection="column" marginTop={1} borderStyle="round" borderColor="blue" paddingX={1}>
-294 |       <Text bold color="blue">📋 Plan: {plan.goal}</Text>
-295 |       <Text color="gray">  {done}/{plan.tasks.length} done{failed > 0 ? `, ${failed} failed` : ""}</Text>
 296 |       {plan.tasks.map((task) => {
 297 |         const icon = TASK_STATUS_ICON[task.status];
 298 |         const color =
@@ -1085,3 +996,173 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T20:20:29.835Z] iter=359 turn=6 INFO: Tool timing stats
 [2026-04-05T20:20:36.659Z] iter=359 turn=6 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 359: predicted 8 turns, actual 6 turns, ratio 0.75**
 [2026-04-05T20:20:36.681Z] iter=359 turn=6 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T20:20:36.719Z] iter=359 turn=6 INFO: Committed: e5f7658f (14 in / 1993 out, cache: 11331 created, 39574 read)
+[2026-04-05T20:20:36.719Z] iter=359 turn=6 INFO: Restarting as iteration 360...
+[2026-04-05T20:20:36.917Z] iter=360 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T20:20:36.919Z] iter=360 INFO: Turn budget: 18/25 (calibration=0.88x, predicted=20)
+[2026-04-05T20:20:36.919Z] iter=360 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T20:20:37.073Z] iter=360 turn=1 INFO: Turn 1/25
+[2026-04-05T20:20:39.192Z] iter=360 turn=1 INFO: read_scratchpad: 1755 chars
+[2026-04-05T20:20:39.193Z] iter=360 turn=1 INFO: read_file: goals.md
+[2026-04-05T20:20:39.195Z] iter=360 turn=1 INFO:   -> ok (1382 chars)
+[2026-04-05T20:20:39.196Z] iter=360 turn=2 INFO: Turn 2/25
+[2026-04-05T20:20:41.082Z] iter=360 turn=2 INFO: $ cat src/task-planner.ts | head -100
+[2026-04-05T20:20:41.086Z] iter=360 turn=2 INFO: $ cat src/plan-commands.ts 2>/dev/null || echo "FILE NOT FOUND"
+[2026-04-05T20:20:41.095Z] iter=360 turn=2 INFO:   -> exit=0 (3085 chars)
+[2026-04-05T20:20:41.096Z] iter=360 turn=2 INFO:   -> exit=0 (5733 chars)
+[2026-04-05T20:20:41.097Z] iter=360 turn=3 INFO: Turn 3/25
+[2026-04-05T20:20:51.084Z] iter=360 turn=3 INFO: think: Let me understand the current state:
+
+1. `src/plan-commands.ts` has a `handlePlanCommand` function with a `PlanCommandCo...
+[2026-04-05T20:20:51.085Z] iter=360 turn=4 INFO: Turn 4/25
+[2026-04-05T20:20:54.869Z] iter=360 turn=4 INFO: Agent: Let me look at the orchestrator signature quickly, then start writing.
+[2026-04-05T20:20:54.870Z] iter=360 turn=4 INFO: $ grep -n "^export.*runOrchestrator\|^export.*OrchestratResult\|^export.*OrchestratorResult\|export interface OrchestratorResult\|export interface RunOrchestratorOptions" src/orchestrator.ts | head -20
+[2026-04-05T20:20:54.874Z] iter=360 turn=4 INFO: $ grep -n "buildTaskContext" src/task-planner.ts | head -10
+[2026-04-05T20:20:54.897Z] iter=360 turn=4 INFO:   -> exit=0 (42 chars)
+[2026-04-05T20:20:54.898Z] iter=360 turn=4 INFO:   -> exit=0 (74 chars)
+[2026-04-05T20:20:54.898Z] iter=360 turn=5 INFO: Turn 5/25
+[2026-04-05T20:20:57.315Z] iter=360 turn=5 INFO: $ grep -n "^export.*function runOrchestrator\|export interface OrchestratorResult\|^export async function run" src/orchestrator.ts | head -10
+[2026-04-05T20:20:57.320Z] iter=360 turn=5 INFO: $ grep -n "runOrchestrator" src/orchestrator.ts | head -5
+[2026-04-05T20:20:57.341Z] iter=360 turn=5 INFO:   -> exit=0 (42 chars)
+[2026-04-05T20:20:57.344Z] iter=360 turn=5 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:20:57.344Z] iter=360 turn=6 INFO: Turn 6/25
+[2026-04-05T20:20:59.395Z] iter=360 turn=6 INFO: $ grep -n "^export async function\|^export function" src/orchestrator.ts | head -20
+[2026-04-05T20:20:59.398Z] iter=360 turn=6 INFO: $ sed -n '162,185p' src/orchestrator.ts
+[2026-04-05T20:20:59.406Z] iter=360 turn=6 INFO:   -> exit=0 (601 chars)
+[2026-04-05T20:20:59.407Z] iter=360 turn=6 INFO:   -> exit=0 (444 chars)
+[2026-04-05T20:20:59.408Z] iter=360 turn=7 INFO: Turn 7/25
+[2026-04-05T20:21:03.236Z] iter=360 turn=7 INFO: think: Goal 1: Wire orchestrator as /plan executor - NOT STARTED
+Goal 2: Tests for orchestrator executor wiring - NOT STARTED
+
+...
+[2026-04-05T20:21:03.236Z] iter=360 turn=8 INFO: Turn 8/25
+[2026-04-05T20:21:04.422Z] iter=360 turn=8 INFO: $ grep -n "from.*orchestrator\|orchestrator\." src/tui.tsx | head -20
+[2026-04-05T20:21:04.452Z] iter=360 turn=8 INFO:   -> exit=0 (104 chars)
+[2026-04-05T20:21:04.453Z] iter=360 turn=9 INFO: Turn 9/25
+[2026-04-05T20:21:06.909Z] iter=360 turn=9 INFO: $ grep -n "^export class Orchestrator\|new Orchestrator\|\.run(" src/orchestrator.ts | head -10
+[2026-04-05T20:21:06.912Z] iter=360 turn=9 INFO: $ grep -n "new Orchestrator\|orchestrator\.run\|\.run(" src/tui.tsx | head -10
+[2026-04-05T20:21:06.927Z] iter=360 turn=9 INFO:   -> exit=0 (32 chars)
+[2026-04-05T20:21:06.928Z] iter=360 turn=9 INFO:   -> exit=0 (40 chars)
+[2026-04-05T20:21:06.929Z] iter=360 turn=10 INFO: Turn 10/25
+[2026-04-05T20:21:08.541Z] iter=360 turn=10 INFO: $ sed -n '761,820p' src/orchestrator.ts
+[2026-04-05T20:21:08.550Z] iter=360 turn=10 INFO: $ sed -n '385,430p' src/tui.tsx
+[2026-04-05T20:21:08.570Z] iter=360 turn=10 INFO:   -> exit=0 (2462 chars)
+[2026-04-05T20:21:08.573Z] iter=360 turn=10 INFO:   -> exit=0 (1461 chars)
+[2026-04-05T20:21:08.574Z] iter=360 turn=11 INFO: Turn 11/25
+[2026-04-05T20:21:10.292Z] iter=360 turn=11 INFO: $ grep -n "send(" src/orchestrator.ts | head -5; grep -n "async send\|async run\b" src/orchestrator.ts | head -5
+[2026-04-05T20:21:10.310Z] iter=360 turn=11 INFO:   -> exit=0 (407 chars)
+[2026-04-05T20:21:10.311Z] iter=360 turn=12 INFO: Turn 12/25
+[2026-04-05T20:21:15.995Z] iter=360 turn=12 INFO: Agent: Now I have everything I need. The plan:
+
+1. **`src/plan-commands.ts`**: Change `execute` callback signature to accept `(task: Task, context: string) => Promise<string>`, update the executor calls to pass `buildTaskContext(plan, task)`, and update the internal `executePlan` callback accordingly.
+
+2. **`src/plan-executor.ts`**: New small file that exports `createOrchestratorExecutor()` — creates an ...
+[2026-04-05T20:21:15.996Z] iter=360 turn=12 INFO: $ grep -n "execute\?" src/plan-commands.ts
+[2026-04-05T20:21:16.001Z] iter=360 turn=12 INFO: $ grep -n "OrchestratorOptions" src/orchestrator.ts | head -5; sed -n '140,165p' src/orchestrator.ts
+[2026-04-05T20:21:16.016Z] iter=360 turn=12 INFO:   -> exit=0 (648 chars)
+[2026-04-05T20:21:16.024Z] iter=360 turn=12 INFO:   -> exit=0 (1061 chars)
+[2026-04-05T20:21:16.024Z] iter=360 turn=13 INFO: Turn 13/25
+[2026-04-05T20:21:18.090Z] iter=360 turn=13 INFO: Agent: I've written nothing yet. Starting immediately.
+[2026-04-05T20:21:18.091Z] iter=360 turn=13 INFO: $ sed -n '122,160p' src/orchestrator.ts
+[2026-04-05T20:21:18.111Z] iter=360 turn=13 INFO:   -> exit=0 (1559 chars)
+[2026-04-05T20:21:18.112Z] iter=360 turn=14 INFO: Turn 14/25
+[2026-04-05T20:21:26.998Z] iter=360 turn=14 INFO: Agent: Now writing the executor file and updating plan-commands.ts:
+[2026-04-05T20:21:26.999Z] iter=360 turn=14 INFO: write_file: src/plan-executor.ts (write)
+[2026-04-05T20:21:27.000Z] iter=360 turn=14 INFO:   -> ok: Created src/plan-executor.ts (1823 chars)
+[2026-04-05T20:21:27.001Z] iter=360 turn=15 INFO: Turn 15/25
+[2026-04-05T20:21:31.617Z] iter=360 turn=15 INFO: Agent: Now update `plan-commands.ts` to use `createPlanExecutor` when no `execute` is provided:
+[2026-04-05T20:21:31.618Z] iter=360 turn=15 INFO: write_file: src/plan-commands.ts (patch)
+[2026-04-05T20:21:31.619Z] iter=360 turn=15 INFO:   -> ok: Patched src/plan-commands.ts: -9 +10 lines
+
+Context after patch:
+7 | 
+8 | import fs from "fs";
+9 | import path from "path";
+10 | import {
+11 |   createPlan,
+12 |   executePlan,
+13 |   formatPlan,
+14 |   loadPlan,
+15 |   savePlan,
+16 | } from "./task-planner.js";
+17 | import { createPlanExecutor } from "./plan-executor.js";
+18 | import { detectProject } from "./project-detector.js";
+19 | import { generatePlanSummary, formatPlanSummary } from "./plan-summary.js";
+20 | 
+21 | export interface PlanCommandContext {
+22 |   workDir: string;
+[2026-04-05T20:21:31.620Z] iter=360 turn=16 INFO: Turn 16/25
+[2026-04-05T20:21:33.750Z] iter=360 turn=16 INFO: Agent: Now update plan-commands.ts to use the real executor when `execute` is not provided:
+[2026-04-05T20:21:33.751Z] iter=360 turn=16 INFO: read_file: src/plan-commands.ts
+[2026-04-05T20:21:33.752Z] iter=360 turn=16 INFO:   -> ok (2731 chars)
+[2026-04-05T20:21:33.753Z] iter=360 turn=17 INFO: Turn 17/25
+[2026-04-05T20:21:38.133Z] iter=360 turn=17 INFO: Agent: Now patch plan-commands.ts to use the real executor, write the test, run tsc, and wrap up.
+[2026-04-05T20:21:38.134Z] iter=360 turn=17 INFO: write_file: src/plan-commands.ts (patch)
+[2026-04-05T20:21:38.136Z] iter=360 turn=17 INFO:   -> ok: Patched src/plan-commands.ts: -5 +7 lines
+
+Context after patch:
+96 |     setLoading?.(true);
+97 |     setStatus?.("Executing plan...");
+98 |     try {
+99 |       const executor = execute
+100 |         ? async (task: import("./task-planner.js").Task) => execute(task.description)
+101 |         : createPlanExecutor(saved, { workDir, onStatus: setStatus });
+102 |       const resumeStartedAt = Date.now();
+103 |       const result = await executePlan(
+104 |         saved,
+105 |         executor,
+106 |         (_task, updatedPlan) => {
+107 |           addMessage(formatPlan(updatedPlan));
+108 |         }
+[2026-04-05T20:21:38.136Z] iter=360 turn=18 INFO: Turn 18/25
+[2026-04-05T20:21:40.880Z] iter=360 turn=18 INFO: write_file: src/plan-commands.ts (patch)
+[2026-04-05T20:21:40.881Z] iter=360 turn=18 INFO:   -> ok: Patched src/plan-commands.ts: -5 +7 lines
+
+Context after patch:
+154 |     addMessage(`Created plan:\n\n${formatPlan(plan)}`);
+155 |     savePlan(plan, workDir);
+156 |     setStatus?.("Executing plan...");
+157 |     const executor = execute
+158 |       ? async (task: import("./task-planner.js").Task) => execute(task.description)
+159 |       : createPlanExecutor(plan, { workDir, onStatus: setStatus });
+160 |     const execStartedAt = Date.now();
+161 |     const result = await executePlan(
+162 |       plan,
+163 |       executor,
+164 |       (_task, updatedPlan) => {
+165 |         addMessage(formatPlan(updatedPlan));
+166 |       }
+[2026-04-05T20:21:40.882Z] iter=360 turn=19 INFO: Turn 19/25
+[2026-04-05T20:21:42.664Z] iter=360 turn=19 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T20:21:43.778Z] iter=360 turn=19 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:21:43.778Z] iter=360 turn=20 INFO: Turn 20/25
+[2026-04-05T20:21:58.225Z] iter=360 turn=20 INFO: Agent: TSC clean. Now write test, memory, goals, restart.
+[2026-04-05T20:21:58.226Z] iter=360 turn=20 INFO: write_file: tests/plan-executor.test.ts (write)
+[2026-04-05T20:21:58.228Z] iter=360 turn=20 INFO:   -> ok: Created tests/plan-executor.test.ts (3731 chars)
+[2026-04-05T20:21:58.229Z] iter=360 turn=21 INFO: Turn 21/25
+[2026-04-05T20:22:00.520Z] iter=360 turn=21 INFO: $ npx vitest run tests/plan-executor.test.ts 2>&1 | tail -20
+[2026-04-05T20:22:01.639Z] iter=360 turn=21 INFO:   -> exit=0 (275 chars)
+[2026-04-05T20:22:01.639Z] iter=360 turn=22 INFO: Turn 22/25
+[2026-04-05T20:22:03.446Z] iter=360 turn=22 INFO: Agent: All 4 tests pass.
+[2026-04-05T20:22:03.446Z] iter=360 turn=22 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T20:22:04.522Z] iter=360 turn=22 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:22:04.523Z] iter=360 turn=23 INFO: Turn 23/25
+[2026-04-05T20:22:08.170Z] iter=360 turn=23 INFO: save_memory: "[Engineer 360] Plan executor wiring"
+[2026-04-05T20:22:08.171Z] iter=360 turn=23 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:22:08.171Z] iter=360 turn=24 INFO: Turn 24/25
+[2026-04-05T20:22:15.219Z] iter=360 turn=24 INFO: write_file: goals.md (write)
+[2026-04-05T20:22:15.220Z] iter=360 turn=24 INFO:   -> ok: Updated goals.md (928 chars, -11 lines delta)
+[2026-04-05T20:22:15.220Z] iter=360 turn=25 INFO: Turn 25/25
+[2026-04-05T20:22:16.663Z] iter=360 turn=25 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:22:16.663Z] iter=360 turn=25 INFO: RESTART signal
+[2026-04-05T20:22:16.664Z] iter=360 turn=25 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:22:17.741Z] iter=360 turn=25 INFO: Compilation OK
+[2026-04-05T20:22:25.971Z] iter=360 turn=25 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T20:22:25.971Z] iter=360 turn=25 INFO: Cache stats: 0 hits, 2 misses, 55 entries, 6 invalidations (2 entries removed)
+[2026-04-05T20:22:25.971Z] iter=360 turn=25 INFO: Tool cache stats
+[2026-04-05T20:22:25.971Z] iter=360 turn=25 INFO: Tool timing: bash: 21x, avg=174ms, total=3659ms; write_file: 6x, avg=2ms, total=12ms; read_scratchpad: 1x, avg=4ms, total=4ms; read_file: 2x, avg=2ms, total=4ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T20:22:25.971Z] iter=360 turn=25 INFO: Tool timing stats
+[2026-04-05T20:22:33.166Z] iter=360 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 360: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T20:22:44.642Z] iter=360 turn=25 INFO: Pre-commit review (1384in/508out): ## Issues
+
+- **Missing `orch.cleanup()` / resource leak**: Each task spawns a `new Orchestrator` and calls `orch.init()`, but there's no `finally` block to call any teardown method. If `orch.send()` t

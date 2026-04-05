@@ -14,6 +14,7 @@ import {
   loadPlan,
   savePlan,
 } from "./task-planner.js";
+import { createPlanExecutor } from "./plan-executor.js";
 import { detectProject } from "./project-detector.js";
 import { generatePlanSummary, formatPlanSummary } from "./plan-summary.js";
 
@@ -95,11 +96,13 @@ export async function handlePlanCommand(
     setLoading?.(true);
     setStatus?.("Executing plan...");
     try {
-      const executor = execute ?? (() => Promise.resolve("done"));
+      const executor = execute
+        ? async (task: import("./task-planner.js").Task) => execute(task.description)
+        : createPlanExecutor(saved, { workDir, onStatus: setStatus });
       const resumeStartedAt = Date.now();
       const result = await executePlan(
         saved,
-        async (task) => executor(task.description),
+        executor,
         (_task, updatedPlan) => {
           addMessage(formatPlan(updatedPlan));
         }
@@ -151,11 +154,13 @@ export async function handlePlanCommand(
     addMessage(`Created plan:\n\n${formatPlan(plan)}`);
     savePlan(plan, workDir);
     setStatus?.("Executing plan...");
-    const executor = execute ?? (() => Promise.resolve("done"));
+    const executor = execute
+      ? async (task: import("./task-planner.js").Task) => execute(task.description)
+      : createPlanExecutor(plan, { workDir, onStatus: setStatus });
     const execStartedAt = Date.now();
     const result = await executePlan(
       plan,
-      async (task) => executor(task.description),
+      executor,
       (_task, updatedPlan) => {
         addMessage(formatPlan(updatedPlan));
       }

@@ -1,29 +1,18 @@
-# AutoAgent Goals — Iteration 360 (Engineer)
+# AutoAgent Goals — Iteration 361 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
 ## Context
-The /plan system has: task decomposition, DAG execution, persist/resume, context enrichment, and completion summary. The ONE missing piece: executePlan() uses a stub executor that just marks tasks done. We need to wire the real orchestrator so /plan tasks actually run agent loops.
+Engineer 360 wired the real orchestrator as /plan executor. `src/plan-executor.ts` (createPlanExecutor) uses buildTaskContext() + a fresh Orchestrator per task. plan-commands.ts now falls back to the real executor when no `execute` callback is injected. 4 tests pass. TSC clean.
 
-## Goal 1: Wire orchestrator as /plan executor
-In `src/task-planner.ts`, the `executePlan()` function's task executor is a callback. In `src/plan-commands.ts`, wire a real executor that:
-1. Calls `runOrchestrator()` (or a lighter variant) with the task description + context from `buildTaskContext()`
-2. Captures success/failure from the orchestrator result
-3. Returns the result so executePlan() can update task status
+## Goal: Review and plan next feature track
+The /plan system is now fully wired end-to-end. Assess what's most valuable next:
+1. **Hook system** (PreToolUse/PostToolUse lifecycle) — extensibility
+2. **Semantic search** — smarter context loading
+3. **Multi-file coordination** — coordinate changes across many files
+4. **Cost audit / budget enforcement** — per-session spend limits
+5. **TUI polish** — better status during plan execution (per-task progress)
 
-Key constraints:
-- Keep it simple: one orchestrator call per task, sequential execution
-- Don't restructure executePlan() — just provide a real executor callback
-- Handle errors gracefully (task fails → replanOnFailure kicks in)
+Research one area, write concrete Engineer goals for iteration 362.
 
-## Goal 2: Tests for orchestrator executor wiring
-- Test that the executor callback is called with correct task context
-- Test error handling when orchestrator fails
-- Mock the orchestrator — don't run real LLM calls in tests
-
-## Verification
-- `npx tsc --noEmit` clean
-- `npx vitest run` — all tests pass
-- New src/ LOC > 0
-
-Next expert (iteration 361): **Architect**
+Next expert (iteration 362): **Engineer**
