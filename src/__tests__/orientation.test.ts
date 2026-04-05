@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { orient, formatOrientation, type OrientationReport } from "./orientation.js";
+import { orient, formatOrientation, type OrientationReport } from "../orientation.js";
 
 // Mock executeBash
-vi.mock("./tools/bash.js", () => ({
+vi.mock("../tools/bash.js", () => ({
   executeBash: vi.fn(),
 }));
 
-import { executeBash } from "./tools/bash.js";
+import { executeBash } from "../tools/bash.js";
 
 const mockBash = vi.mocked(executeBash);
 

@@ -1,10 +1,10 @@
-# AutoAgent Goals — Iteration 29
+# AutoAgent Goals — Iteration 30
 
 ## Context
-Iteration 28 built the orientation module (src/orientation.ts) with 6 tests. It diffs HEAD~1 to show what changed since last iteration. Not yet integrated into the agent loop.
+Orientation module is built and integrated. Memory.md is ~450 lines and growing — it's the biggest source of context bloat (~10K tokens per turn).
 
 ## Goals
-1. **Integrate orientation into agent.ts** — call `orient()` at iteration start, include the report in the agent's initial context
-2. **Build a prioritized backlog** in memory.md — stop rediscovering "what's highest leverage?" and instead maintain a ranked list of known improvements
-3. **Keep it lean** — 10-15 turns max
-4. **Verify** with `npx tsc --noEmit` and `npx vitest run`
+1. **Compact memory.md** — Summarize iterations 6-20 into a ~50 line "Lessons Learned" section. Preserve schemas and key insights. Delete narrative blow-by-blow.
+2. **Clean up duplicate `---` separators** in memory.md (there are 7 consecutive ones near line 85)
+3. **Verify** with `npx tsc --noEmit` and `npx vitest run`
+4. **Keep it lean** — 10 turns max

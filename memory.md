@@ -13,6 +13,7 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 - **`src/agent.ts`** — Main loop: reads goals/memory, calls Claude, dispatches tools via registry, validates, commits, restarts. Includes circuit breaker, resuscitation, prompt caching, token budget warnings (turns 15/25/35), code quality snapshots.
 - **`src/tool-registry.ts`** — Registry pattern for tool dispatch. `ToolRegistry` class + `createDefaultRegistry()`. Handlers receive `ToolContext` with rootDir and log function.
 - **`src/code-analysis.ts`** — Codebase analysis: LOC, functions, cyclomatic complexity per file. Used by agent.ts (direct import) and dashboard. `scripts/code-analysis.ts` is a thin re-export + CLI wrapper.
+- **`src/orientation.ts`** — OODA Orient phase: diffs HEAD~1 to show what changed since last iteration. Called at iteration start; report included in first user message. `orient()` + `formatOrientation()`.
 - **`src/iteration.ts`** — Git tag management, commit, rollback helpers.
 - **`src/tools/`** — 7 tool modules: bash, read_file, write_file, grep, web_fetch, think, list_files.
 - **`scripts/self-test.ts`** — Runtime test suite. Pre-commit gate.
@@ -27,57 +28,18 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
----
+## Prioritized Backlog
 
----
+Ranked list of known improvements. Execute top items first. Update rankings as understanding deepens.
 
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
+| # | Item | Leverage | Status |
+|---|------|----------|--------|
+| 1 | **Reduce context budget** — memory.md is ~15K chars; agent reads it + goals.md + system-prompt.md every turn. Compress memory aggressively. Consider: structured JSON schemas instead of prose. | HIGH — context is THE bottleneck (127K+ tokens/iter for trivial work) | Open |
+| 2 | **Smart memory compaction** — Replace append-only session log with structured sections. Auto-summarize entries older than 5 iterations into 1-2 lines each. | HIGH — directly reduces context load | Open |
+| 3 | **Anthropic prompt caching optimization** — Verify cache_control headers are actually working. Measure cache hit rates from API response headers. | MEDIUM — could save 50% on repeated context | Open |
+| 4 | **Sub-agent delegation** — Use cheaper model (Haiku) for research, summarization, code review via separate API calls within tools. | MEDIUM — reduces cost per cognitive task | Open |
+| 5 | **Alignment.ts → behavioral control** — Currently reflects but doesn't change behavior. Make it produce actionable directives. | LOW — nice-to-have, not blocking capability | Open |
+| 6 | **Dead code audit** — Periodically check for unused exports/modules. iteration-diff.ts was dead for multiple iterations before removal. | LOW — hygiene | Done (iter 29) |
 
 ---
 
@@ -370,4 +332,30 @@ Created `src/orientation.ts` — an OODA Orient phase module that diffs the code
 - Integrate orientation into agent.ts loop start
 - Consider: should orientation report go in system prompt or as first user message?
 - Address inner voice challenge: build a real prioritized backlog instead of rediscovering "what's highest leverage?" each iteration
+
+
+
+---
+
+### Iteration 29 — Orientation Integration Verified (2026-04-05)
+
+#### What I Did
+Confirmed that the orientation module built in iter 28 was already integrated into agent.ts (lines 164-173) — likely by the operator between iterations. The orient() call feeds into buildInitialMessage() as the first section of the initial user message. Verified all 23 tests pass and tsc is clean.
+
+#### Architecture Snapshot
+- `orient()` runs at iteration start in `runAgent()` (agent.ts:164)
+- `formatOrientation()` produces a "## Orientation" block
+- `buildInitialMessage(goals, memory, orientation?)` puts orientation FIRST, before goals and memory
+- This means every iteration now starts with a diff of what changed since last commit
+
+#### Prioritized Backlog (ranked by leverage)
+1. **Compact memory.md** — Currently ~400 lines. Old entries (iter 6-20) could be summarized to ~50 lines. This directly reduces the ~10K tokens/turn context load.
+2. **Reduce agentlog.md loading** — If it's being read every iteration, truncate or stop loading it. Orientation replaces most of its value.
+3. **Schema-based memory** — Replace narrative entries with structured `{pattern, approach, confidence}` objects that can be selectively loaded.
+4. **Sub-agent delegation** — Use cheaper model for research/summarization tasks.
+5. **Smarter compression** — Current compression is string truncation. Could preserve key insights while dropping boilerplate.
+
+#### Schema
+- Orientation goes in the initial user message, not the system prompt. System prompt is static identity; user message is per-iteration context.
+- When something is "already done" (operator integrated it), confirming it works IS the iteration's value. Don't feel compelled to add unnecessary changes.
 

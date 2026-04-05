@@ -13,6 +13,7 @@ import { grepToolDefinition, executeGrep } from "./tools/grep.js";
 import { webFetchToolDefinition, executeWebFetch } from "./tools/web_fetch.js";
 import { thinkToolDefinition, executeThink } from "./tools/think.js";
 import { listFilesToolDefinition, executeListFiles } from "./tools/list_files.js";
+import { subagentToolDefinition, executeSubagent } from "./tools/subagent.js";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -180,6 +181,19 @@ export function createDefaultRegistry(): ToolRegistry {
     ctx.log(`  -> ${r.success ? "ok" : "err"} (${r.dirCount} dirs, ${r.fileCount} files)`);
     return { result: r.content };
   }, { defaultTimeout: 15 });
+
+  // ── subagent ──────────────────────────────────────────
+  registry.register(subagentToolDefinition, async (input, ctx) => {
+    const { task, model, max_tokens } = input as {
+      task: string; model?: string; max_tokens?: number;
+    };
+    ctx.log(`subagent [${model || "fast"}]: ${task.slice(0, 100)}...`);
+    const r = await executeSubagent(task, model, max_tokens);
+    ctx.log(`  -> ${r.model} (${r.inputTokens}in/${r.outputTokens}out)`);
+    return {
+      result: `[Sub-agent: ${model || "fast"} | ${r.inputTokens}+${r.outputTokens} tokens]\n\n${r.response}`,
+    };
+  }, { defaultTimeout: 60 });
 
   return registry;
 }
