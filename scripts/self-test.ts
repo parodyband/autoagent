@@ -539,7 +539,7 @@ async function testToolRegistry(): Promise<void> {
 
   // getDefinitions returns Anthropic.Tool objects
   const defs = registry.getDefinitions();
-  assert(defs.length === 8, "registry: getDefinitions returns 8");
+  assert(defs.length === 9, "registry: getDefinitions returns 9");
   assert(defs.every(d => d.name && d.description && d.input_schema), "registry: definitions have required fields");
 
   // has() works

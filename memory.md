@@ -1,4 +1,4 @@
-## Compacted History (iterations 112–174)
+## Compacted History (iterations 112–178)
 
 **Key milestones**:
 - [113] Fixed TASK.md lifecycle bug. Self-test guards it.
@@ -8,30 +8,66 @@
 - [137] Built `src/task-decomposer.ts`. 13 tests.
 - [138-142] Built `src/verification.ts` + recovery loop in conversation.ts. 23 tests.
 - [144-162] Test coverage push: 16→23 test files, 245→338 tests.
-- [152] Integrated `rankFiles()` into `orientation.ts`.
-- [164-170] Dead code removal, export audit, wired `calibrationSuggestion()` into orientation.
-- [172] Expert breadcrumbs in orientation — each expert sees relevant memory entries.
-- [174] Budget-aware `progressCheckpoint()` — fires at ~15%/32%/60%/80% of predicted budget.
+- [172] Expert breadcrumbs in orientation.
+- [174] Budget-aware `progressCheckpoint()`.
+- [177] **MISSION CHANGE**: Building a coding agent product, not self-improving.
+- [178] Built `src/orchestrator.ts` (334 LOC) + updated `src/tui.tsx` (235 LOC). Model routing, context injection, task decomposition, verification. 10 new tests.
 
-**Codebase**: ~4950 LOC (src), 30 source files, 23 test files, 359 vitest tests, tsc clean.
+**Codebase**: ~5100 LOC (src), 31 source files, 24 test files, 369 vitest tests, tsc clean.
 
 ---
 
 ## Key Patterns
 
 - **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
-- **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning` → `calibrationSuggestion` (shown in orientation).
+- **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning` → `calibrationSuggestion`.
 - **Verification recovery**: `checkVerificationAndContinue()` intercepts finalization. Up to 5 retries.
 - **Pre-flight check**: Before building new modules, grep src/ AND scripts/ for similar functionality.
-- **Test guards**: Many "dead" exports are used in tests — always check __tests__/ AND scripts/ before removing.
-- **External repo foundation**: `agent.ts` already distinguishes `rootDir` (work target) vs `agentHome` (where autoagent lives). `fingerprintRepo()` called when `workDir !== ROOT` (line 289). CLI just needs `--target` flag.
+- **External repo foundation**: `agent.ts` distinguishes `rootDir` vs `agentHome`. `fingerprintRepo()` called when `workDir !== ROOT`.
 
 ---
 
-## Untested Source Files (~9 of 30)
+## Product Architecture (TUI + Orchestrator)
 
-agent.ts, conversation.ts, iteration.ts, logging.ts, memory.ts, resuscitation.ts, tool-timing.ts, tools/read_file.ts, tools/web_fetch.ts
-*(All require API mocks — diminishing test ROI.)*
+**Current state (post-178):**
+- `src/tui.tsx` — Ink/React TUI. Shows messages, tool calls, model used, verification status. Commands: /clear, /reindex, /exit.
+- `src/orchestrator.ts` — Orchestrator class. `send()` method runs full pipeline: route model → decompose tasks → agent loop → verify.
+- Agent loop: `client.messages.create()` → process tool_use → loop up to 30 rounds.
+- Model routing: keyword-based (CODE_CHANGE_KEYWORDS → sonnet, READ_ONLY_KEYWORDS → haiku).
+
+**Key gaps (prioritized):**
+1. **No streaming** — TUI waits for full response. #1 UX problem.
+2. **No cost tracking** — Users can't see token usage or cost.
+3. **No context compaction** — Long sessions will blow 200K context window.
+4. **No project memory** — Doesn't read project-level config files (like CLAUDE.md).
+5. **No session persistence** — History lost on restart.
+
+---
+
+## [Architect] Research Notes — Iteration 179
+
+**[Research] Claude Code Architecture** (from leaked source analysis):
+- **Streaming-first**: Generator-based agent loop yields events as they arrive. API responses stream via SSE. Tool calls detected mid-stream.
+- **4-tier compaction**: (1) Micro-compact: clear old tool results. (2) Auto-compact: summarize old messages at ~167K tokens. (3) Session memory: extract to persistent storage. (4) Reactive: truncate on API error.
+- **Fork subagent cache sharing**: Multiple sub-agents share message prefix for prompt cache hits.
+- **Deferred tool loading**: Only tool names in system prompt; schemas fetched on demand via ToolSearch.
+- **CLAUDE.md hierarchy**: Reads memory files from multiple levels (global, user, project, local).
+- **VirtualMessageList**: Windowed rendering — only renders visible messages.
+- **40+ tools**, feature-gated. Permission pipeline with escalation (static rules → mode check → LLM classifier → user prompt).
+
+**[Research] Aider Architecture**:
+- **Repo map**: Tree-sitter AST-based map of entire repo. Identifies key symbols/functions.
+- **Architect mode**: Two-phase — planning model proposes changes, editor model applies them. Improves accuracy.
+- **SEARCH/REPLACE format**: Precise edit blocks with multi-stage fallback matching (exact → whitespace-tolerant → ellipsis).
+- **Edit strategy per model**: Different LLMs get different edit formats (diff, whole-file, udiff).
+- **Auto-commit**: Every successful edit auto-committed with attribution.
+
+**[Research] Key takeaways for AutoAgent**:
+1. Streaming is table-stakes. Every serious agent does it. Must add immediately.
+2. Context compaction is essential for real use. Start with summary-based (tier 2).
+3. Project memory files are low-hanging fruit for repo-specific intelligence.
+4. Aider's repo map (tree-sitter) is much richer than our `rankFiles()` — future upgrade.
+5. Architect mode (plan → edit) is a proven pattern — consider after streaming works.
 
 ---
 
@@ -39,56 +75,11 @@ agent.ts, conversation.ts, iteration.ts, logging.ts, memory.ts, resuscitation.ts
 
 | Iter | Predicted | Actual | Ratio |
 |------|-----------|--------|-------|
-| 171  | 22        | 11     | 0.50  |
-| 172  | 18        | 20     | 1.11  |
 | 173  | 18        | 18     | 1.00  |
 | 174  | 16        | 15     | 0.94  |
+| 175  | 18        | 11     | 0.61  |
+| 176  | 18        | 25     | 1.39  |
 
-Calibration well-tuned. No action needed.
+Average ratio: 0.99. Variance is high (0.61–1.39). Predicted 22 for next iteration (engineering-heavy streaming work).
 
----
-
-## [Meta] Iteration 175
-
-**Diagnosis: still cycling.** Iterations 172-174 continued internal polish (breadcrumbs, budget-aware checkpoints). Useful but marginal. The Architect diagnosed this at 173 but the system didn't act on it.
-
-**Decision**: Redirecting toward external repo support — the highest-value capability the agent lacks. Foundation already exists in agent.ts (`rootDir` vs `agentHome`, conditional `fingerprintRepo`). Engineer at 176 should add `--target <dir>` CLI support and wire it through.
-
-**System health**: Prediction accuracy excellent (last 2 iters: 1.00, 0.94). Expert rotation working (E→A→E→M cycle). Memory stays compact. No structural changes needed to prompts or rotation.
-
-**[AUTO-SCORED] Iteration 175: predicted 18 turns, actual 11 turns, ratio 0.61**
-
-## [Engineer] Iteration 178
-
-Built `src/orchestrator.ts` — sits between TUI and Claude API. Provides model routing (haiku for read-only, sonnet for code changes), repo context injection (fingerprintRepo + rankFiles), task decomposition for complex requests, and self-verification after code changes. Updated `src/tui.tsx` to use Orchestrator class — cleaner, adds `/reindex` command, shows which model was used. 10 new tests passing.
-
-**Next**: Wire `--target <dir>` CLI flag through agent.ts for external repo support. Then improve TUI UX: scrollable history, token cost display, session persistence.
-
-## MISSION CHANGE — Building a coding agent product (operator, iteration 177)
-
-**The mission has fundamentally changed.** Self-improvement for its own sake is over.
-
-New mission: **Build the best possible AI coding agent tool** — one that's measurably
-better than talking to Claude directly.
-
-What this means:
-- The TUI (src/tui.tsx) is the user interface. Make it great.
-- The orchestration underneath is the product. Build it.
-- The self-improvement loop exists to make the PRODUCT better, not itself.
-- Research what other coding agents do (Cursor, Aider, SWE-Agent, Devin, OpenHands).
-- You now have web_search (DuckDuckGo) — USE IT to research techniques.
-
-What "better than raw Claude" means:
-- Smart context management (pre-index repos, load only relevant files)
-- Task decomposition (break complex requests into steps)
-- Model routing (cheap models for cheap work)
-- Persistent repo knowledge (remember across sessions)
-- Self-verification (run tests, check compilation)
-- Great UX (show progress, handle errors gracefully)
-
-The Architect should research before designing. The Engineer should build product features.
-The Meta expert should ensure the system is serving the product mission.
-
----
-
-**[AUTO-SCORED] Iteration 176: predicted 18 turns, actual 25 turns, ratio 1.39**
+**[AUTO-SCORED] Iteration 177: predicted 16 turns, actual 22 turns, ratio 1.38**
