@@ -1,55 +1,3 @@
-[2026-04-05T15:01:23.475Z] iter=191 turn=15 INFO: Committed: 362165b0 (25 in / 4249 out, cache: 16972 created, 183248 read)
-[2026-04-05T15:01:23.476Z] iter=191 turn=15 INFO: Restarting as iteration 192...
-[2026-04-05T15:01:23.683Z] iter=192 INFO: Cache restored: 44/44 entries (0 stale)
-[2026-04-05T15:01:23.685Z] iter=192 INFO: Turn budget: 20/25 (calibration=1.00x, predicted=15)
-[2026-04-05T15:01:23.686Z] iter=192 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T15:01:23.802Z] iter=192 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-05T15:01:23.802Z] iter=192 turn=1 INFO: Turn 1/25
-[2026-04-05T15:01:26.691Z] iter=192 turn=1 INFO: think: Let me start by reading the current state of orchestrator.ts and tool-output-compressor.ts to understand what I'm workin...
-[2026-04-05T15:01:26.693Z] iter=192 turn=2 INFO: Turn 2/25
-[2026-04-05T15:01:29.343Z] iter=192 turn=2 INFO: $ grep -n "compressToolOutput\|sessionTokens\|compaction\|summariz\|150\|100K\|150K" src/orchestrator.ts | head -60
-[2026-04-05T15:01:29.350Z] iter=192 turn=2 INFO: $ wc -l src/orchestrator.ts && head -50 src/orchestrator.ts
-[2026-04-05T15:01:29.363Z] iter=192 turn=2 INFO:   -> exit=0 (1249 chars)
-[2026-04-05T15:01:29.366Z] iter=192 turn=2 INFO:   -> exit=0 (1868 chars)
-[2026-04-05T15:01:29.366Z] iter=192 turn=3 INFO: Turn 3/25
-[2026-04-05T15:01:31.759Z] iter=192 turn=3 INFO: Agent: Let me read the specific section I need to patch, then write immediately.
-[2026-04-05T15:01:31.761Z] iter=192 turn=3 INFO: read_file: src/orchestrator.ts
-[2026-04-05T15:01:31.763Z] iter=192 turn=3 INFO:   -> ok (2398 chars)
-[2026-04-05T15:01:31.763Z] iter=192 turn=4 INFO: Turn 4/25
-[2026-04-05T15:01:36.124Z] iter=192 turn=4 INFO: Agent: Now I have everything I need. Let me implement Tier 1 compaction:
-[2026-04-05T15:01:36.124Z] iter=192 turn=4 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:01:36.126Z] iter=192 turn=4 INFO:   -> ok: Patched src/orchestrator.ts: -2 +4 lines
-
-Context after patch:
-42 | const MAX_TOKENS = 16384;
-43 | const MAX_ROUNDS = 30;
-44 | 
-45 | /** Token threshold for Tier 1 compaction: compress old tool outputs (~100K). */
-46 | const COMPACT_TIER1_THRESHOLD = 100_000;
-47 | /** Token threshold for Tier 2 compaction: summarize old messages (~150K). */
-48 | const COMPACT_THRESHOLD = 150_000;
-49 | 
-50 | /** Pricing per million tokens: [input, output] */
-51 | export const MODEL_PRICING: Record<string, [number, number]> = {
-[2026-04-05T15:01:36.126Z] iter=192 turn=5 INFO: Turn 5/25
-[2026-04-05T15:01:46.048Z] iter=192 turn=5 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:01:46.049Z] iter=192 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -4 +57 lines
-
-Context after patch:
-380 |     };
-381 |   }
-382 | 
-383 |   /** Check if Tier 1 compaction is needed (compress old tool outputs). */
-384 |   private shouldCompactTier1(): boolean {
-385 |     return this.sessionTokensIn >= COMPACT_TIER1_THRESHOLD && this.sessionTokensIn < COMPACT_THRESHOLD;
-386 |   }
-387 | 
-388 |   /** Check if Tier 2 compaction is needed (summarize old messages). */
-389 |   private shouldCompact(): boolean {
-390 |     return this.sessionTokensIn >= COMPACT_THRESHOLD;
-391 |   }
-392 | 
-393 |   /**
 394 |    * Tier 1 compaction: walk apiMessages backwards, compress tool_result blocks
 395 |    * older than the last 5 assistant turns to reduce context without losing structure.
 396 |    */
@@ -1048,3 +996,112 @@ This is an Architect iteration — the deliverable is `goals.md`, not src/ chang
 [2026-04-05T15:15:51.689Z] iter=197 turn=6 INFO: Tool timing stats
 [2026-04-05T15:16:18.937Z] iter=197 turn=6 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 197: predicted 8 turns, actual 6 turns, ratio 0.75**
 [2026-04-05T15:16:18.957Z] iter=197 turn=6 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T15:16:18.989Z] iter=197 turn=6 INFO: Committed: ec5653c9 (14 in / 1861 out, cache: 13321 created, 54519 read)
+[2026-04-05T15:16:18.990Z] iter=197 turn=6 INFO: Restarting as iteration 198...
+[2026-04-05T15:16:19.173Z] iter=198 INFO: Cache restored: 44/44 entries (0 stale)
+[2026-04-05T15:16:19.175Z] iter=198 INFO: Turn budget: 16/25 (calibration=0.80x, predicted=15)
+[2026-04-05T15:16:19.175Z] iter=198 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T15:16:19.267Z] iter=198 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-05T15:16:19.267Z] iter=198 turn=1 INFO: Turn 1/25
+[2026-04-05T15:16:22.712Z] iter=198 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to change.
+[2026-04-05T15:16:22.713Z] iter=198 turn=1 INFO: $ head -30 src/orchestrator.ts
+[2026-04-05T15:16:22.718Z] iter=198 turn=1 INFO: $ ls src/__tests__/orchestrator* src/__tests__/architect-mode* 2>/dev/null
+[2026-04-05T15:16:22.729Z] iter=198 turn=1 INFO:   -> exit=0 (1261 chars)
+[2026-04-05T15:16:22.733Z] iter=198 turn=1 INFO:   -> exit=0 (118 chars)
+[2026-04-05T15:16:22.733Z] iter=198 turn=2 INFO: Turn 2/25
+[2026-04-05T15:16:25.671Z] iter=198 turn=2 INFO: $ sed -n '130,165p' src/orchestrator.ts
+[2026-04-05T15:16:25.676Z] iter=198 turn=2 INFO: $ grep -n "symbol-index\|buildSymbolIndex\|formatRepoMap\|repoMapBlock\|buildRepoMap" src/__tests__/orchestrator.test.ts src/__tests__/orchestrator-compaction.test.ts src/__tests__/architect-mode.test.t...
+[2026-04-05T15:16:25.690Z] iter=198 turn=2 INFO:   -> exit=0 (1432 chars)
+[2026-04-05T15:16:25.696Z] iter=198 turn=2 INFO:   -> exit=0 (787 chars)
+[2026-04-05T15:16:25.696Z] iter=198 turn=3 INFO: Turn 3/25
+[2026-04-05T15:16:28.845Z] iter=198 turn=3 INFO: think: I have all the info I need. Let me make the changes:
+
+1. Update orchestrator.ts: replace symbol-index import with tree-s...
+[2026-04-05T15:16:28.845Z] iter=198 turn=4 INFO: Turn 4/25
+[2026-04-05T15:16:32.019Z] iter=198 turn=4 INFO: Agent: Making all three changes now:
+[2026-04-05T15:16:32.021Z] iter=198 turn=4 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:16:32.024Z] iter=198 turn=4 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+17 | import { compressToolOutput } from "./tool-output-compressor.js";
+18 | import { fingerprintRepo } from "./repo-context.js";
+19 | import { rankFiles } from "./file-ranker.js";
+20 | import { buildRepoMap, formatRepoMap } from "./tree-sitter-map.js";
+21 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
+22 | import { runVerification, formatVerificationResults } from "./verification.js";
+23 | import { createDefaultRegistry } from "./tool-registry.js";
+[2026-04-05T15:16:32.025Z] iter=198 turn=5 INFO: Turn 5/25
+[2026-04-05T15:16:36.349Z] iter=198 turn=5 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:16:36.350Z] iter=198 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -13 +12 lines
+
+Context after patch:
+146 |   // Only run on source-like dirs (skip /tmp and similar system paths)
+147 |   let repoMapBlock = "";
+148 |   const isSourceDir = rankedFiles.some(f => f.reason.includes("entry point") || f.reason.includes("large module") || f.reason.includes("recently modified"));
+149 |   if (isSourceDir) {
+150 |     try {
+151 |       const rankedPaths = rankedFiles.map(f => f.path);
+152 |       const repoMap = buildRepoMap(workDir, rankedPaths);
+153 |       const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 20 });
+154 |       if (raw.length > 50) {
+155 |         repoMapBlock = "\n\n" + (raw.length > 3000 ? raw.slice(0, 3000) + "\n…" : raw);
+156 |       }
+157 |     } catch {
+158 |       // Non-fatal
+159 |     }
+160 |   }
+161 | 
+162 |   const projectMemory = getProjectMemoryBlock(workDir);
+163 | 
+[2026-04-05T15:16:36.350Z] iter=198 turn=6 INFO: Turn 6/25
+[2026-04-05T15:16:39.188Z] iter=198 turn=6 INFO: Agent: Updating tests now:
+[2026-04-05T15:16:39.190Z] iter=198 turn=6 INFO: write_file: src/__tests__/orchestrator.test.ts (patch)
+[2026-04-05T15:16:39.192Z] iter=198 turn=6 INFO:   -> ok: Patched src/__tests__/orchestrator.test.ts: -3 +3 lines
+
+Context after patch:
+5 |   rankFiles: () => [],
+6 | }));
+7 | 
+8 | vi.mock("../tree-sitter-map.js", () => ({
+9 |   buildRepoMap: () => ({}),
+10 |   formatRepoMap: () => "",
+11 | }));
+12 | 
+13 | const MODEL_COMPLEX = "claude-sonnet-4-6";
+[2026-04-05T15:16:39.193Z] iter=198 turn=7 INFO: Turn 7/25
+[2026-04-05T15:16:42.086Z] iter=198 turn=7 INFO: write_file: src/__tests__/orchestrator-compaction.test.ts (patch)
+[2026-04-05T15:16:42.086Z] iter=198 turn=7 INFO:   -> ok: Patched src/__tests__/orchestrator-compaction.test.ts: -3 +3 lines
+
+Context after patch:
+4 | vi.mock("../file-ranker.js", () => ({
+5 |   rankFiles: vi.fn().mockResolvedValue([]),
+6 | }));
+7 | vi.mock("../tree-sitter-map.js", () => ({
+8 |   buildRepoMap: vi.fn().mockReturnValue({}),
+9 |   formatRepoMap: vi.fn().mockReturnValue(""),
+10 | }));
+11 | 
+12 | import { vi } from "vitest";
+[2026-04-05T15:16:42.087Z] iter=198 turn=8 INFO: Turn 8/25
+[2026-04-05T15:16:44.396Z] iter=198 turn=8 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T15:16:45.321Z] iter=198 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:16:45.321Z] iter=198 turn=9 INFO: Turn 9/25
+[2026-04-05T15:16:46.968Z] iter=198 turn=9 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -20
+[2026-04-05T15:16:53.711Z] iter=198 turn=9 INFO:   -> exit=0 (1652 chars)
+[2026-04-05T15:16:53.712Z] iter=198 turn=10 INFO: Turn 10/25
+[2026-04-05T15:16:58.741Z] iter=198 turn=10 INFO: Agent: All goals DONE. 505/505 tests pass, tsc clean. Wrapping up.
+[2026-04-05T15:16:58.741Z] iter=198 turn=10 INFO: save_memory: "[Engineer] Iteration 198"
+[2026-04-05T15:16:58.742Z] iter=198 turn=10 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T15:16:58.743Z] iter=198 turn=11 INFO: Turn 11/25
+[2026-04-05T15:17:06.723Z] iter=198 turn=11 INFO: write_file: goals.md (write)
+[2026-04-05T15:17:06.724Z] iter=198 turn=11 INFO:   -> ok: Updated goals.md (829 chars, -41 lines delta)
+[2026-04-05T15:17:06.725Z] iter=198 turn=12 INFO: Turn 12/25
+[2026-04-05T15:17:08.678Z] iter=198 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T15:17:08.678Z] iter=198 turn=12 INFO: RESTART signal
+[2026-04-05T15:17:08.678Z] iter=198 turn=12 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T15:17:09.541Z] iter=198 turn=12 INFO: Compilation OK
+[2026-04-05T15:17:14.875Z] iter=198 turn=12 INFO: Cache persisted: 44 entries to .autoagent-cache.json
+[2026-04-05T15:17:14.875Z] iter=198 turn=12 INFO: Tool timing: bash: 7x, avg=1106ms, total=7741ms; write_file: 5x, avg=2ms, total=10ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T15:17:14.875Z] iter=198 turn=12 INFO: Tool timing stats
+[2026-04-05T15:17:20.365Z] iter=198 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 198: predicted 15 turns, actual 12 turns, ratio 0.80**
+[2026-04-05T15:17:22.364Z] iter=198 turn=12 INFO: Pre-commit review (1197in/70out): LGTM. The diff is a clean module rename from `symbol-index`/`buildSymbolIndex` to `tree-sitter-map`/`buildRepoMap`, with consistent updates across source and both test files, and a minor threshold/tru

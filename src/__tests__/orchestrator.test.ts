@@ -5,8 +5,8 @@ vi.mock("../file-ranker.js", () => ({
   rankFiles: () => [],
 }));
 
-vi.mock("../symbol-index.js", () => ({
-  buildSymbolIndex: () => ({ symbols: [], files: [] }),
+vi.mock("../tree-sitter-map.js", () => ({
+  buildRepoMap: () => ({}),
   formatRepoMap: () => "",
 }));
 

@@ -17,7 +17,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { compressToolOutput } from "./tool-output-compressor.js";
 import { fingerprintRepo } from "./repo-context.js";
 import { rankFiles } from "./file-ranker.js";
-import { buildSymbolIndex, formatRepoMap } from "./symbol-index.js";
+import { buildRepoMap, formatRepoMap } from "./tree-sitter-map.js";
 import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
 import { runVerification, formatVerificationResults } from "./verification.js";
 import { createDefaultRegistry } from "./tool-registry.js";
@@ -148,12 +148,11 @@ export function buildSystemPrompt(
   const isSourceDir = rankedFiles.some(f => f.reason.includes("entry point") || f.reason.includes("large module") || f.reason.includes("recently modified"));
   if (isSourceDir) {
     try {
-      const topFiles = rankedFiles.map(f => f.path);
-      const symIndex = buildSymbolIndex(workDir, topFiles);
-      const raw = formatRepoMap(symIndex, 20);
-      if (raw) {
-        // Truncate to ~2K chars
-        repoMapBlock = "\n\n" + (raw.length > 2000 ? raw.slice(0, 2000) + "\n…" : raw);
+      const rankedPaths = rankedFiles.map(f => f.path);
+      const repoMap = buildRepoMap(workDir, rankedPaths);
+      const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 20 });
+      if (raw.length > 50) {
+        repoMapBlock = "\n\n" + (raw.length > 3000 ? raw.slice(0, 3000) + "\n…" : raw);
       }
     } catch {
       // Non-fatal

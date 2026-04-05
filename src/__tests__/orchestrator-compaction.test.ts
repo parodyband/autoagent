@@ -4,8 +4,8 @@ import { COMPACT_TIER1_THRESHOLD, COMPACT_THRESHOLD } from "../orchestrator.js";
 vi.mock("../file-ranker.js", () => ({
   rankFiles: vi.fn().mockResolvedValue([]),
 }));
-vi.mock("../symbol-index.js", () => ({
-  buildSymbolIndex: vi.fn().mockResolvedValue({}),
+vi.mock("../tree-sitter-map.js", () => ({
+  buildRepoMap: vi.fn().mockReturnValue({}),
   formatRepoMap: vi.fn().mockReturnValue(""),
 }));
 
