@@ -1009,3 +1009,11 @@ I have enough ...
 [2026-04-05T13:46:31.480Z] iter=176 turn=2 INFO:   -> exit=0 (18757 chars)
 [2026-04-05T13:46:31.485Z] iter=176 turn=2 INFO:   -> exit=0 (3420 chars)
 [2026-04-05T13:46:31.485Z] iter=176 turn=3 INFO: Turn 3/25
+[2026-04-05T13:56:41.051Z] iter=176 turn=3 INFO: think: Looking at the agent.ts code, I can see:
+
+1. There's already a `--repo` flag that does exactly what `--target` should do...
+[2026-04-05T13:56:41.052Z] iter=176 turn=4 INFO: Turn 4/25
+[2026-04-05T13:56:46.481Z] iter=176 turn=4 INFO: think: Looking at the code, `--repo` flag already exists and does exactly what `--target` should do. The task says to add `--ta...
+[2026-04-05T13:56:46.481Z] iter=176 turn=5 INFO: Turn 5/25
+[2026-04-05T13:56:50.677Z] iter=176 turn=5 INFO: $ ls src/__tests__/ | grep -E "(agent|repo|target|cli)"
+[2026-04-05T13:56:50.680Z] iter=176 turn=5 INFO: $ grep -n "repo\|target\|workDir\|WORK_DIR" src/agent.ts | head -40
