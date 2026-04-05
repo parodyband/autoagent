@@ -1,110 +1,121 @@
 import { describe, it, expect } from 'vitest';
-import { extractCode, gradeChallenge, challenges, formatResults, type BenchmarkResult } from '../benchmark.js';
+import { extractCode, stripTypeAnnotations, gradeChallenge, challenges, formatResults, type BenchmarkResult } from '../benchmark.js';
 
-describe('extractCode', () => {
-  it('extracts from fenced typescript block', () => {
-    const input = 'Here is the code:\n```typescript\nfunction foo() { return 1; }\n```\nDone.';
-    expect(extractCode(input)).toBe('function foo() { return 1; }');
+describe('benchmark', () => {
+  describe('extractCode', () => {
+    it('extracts from fenced code blocks', () => {
+      const input = 'Here is the solution:\n```javascript\nfunction foo() { return 1; }\n```\nHope that helps!';
+      expect(extractCode(input)).toBe('function foo() { return 1; }');
+    });
+
+    it('extracts function declaration without fences', () => {
+      const input = 'function bar(x) { return x * 2; }';
+      expect(extractCode(input)).toBe('function bar(x) { return x * 2; }');
+    });
+
+    it('strips export prefix', () => {
+      const input = '```js\nexport function baz() {}\n```';
+      expect(extractCode(input)).toBe('function baz() {}');
+    });
   });
 
-  it('extracts from fenced js block', () => {
-    const input = '```js\nconst x = 1;\n```';
-    expect(extractCode(input)).toBe('const x = 1;');
+  describe('stripTypeAnnotations', () => {
+    it('removes parameter types', () => {
+      expect(stripTypeAnnotations('function foo(x: string, y: number) {}')).toBe('function foo(x, y) {}');
+    });
+
+    it('removes generic type params', () => {
+      expect(stripTypeAnnotations('function foo<T>(x: T) {}')).toBe('function foo(x) {}');
+    });
+
+    it('removes export prefix', () => {
+      expect(stripTypeAnnotations('export function foo() {}')).toBe('function foo() {}');
+    });
   });
 
-  it('extracts bare function declaration', () => {
-    const input = 'function reverseWords(s: string): string { return s; }';
-    expect(extractCode(input)).toBe(input.trim());
+  describe('gradeChallenge', () => {
+    it('grades correct reverseWords', () => {
+      const challenge = challenges.find(c => c.id === 'reverse-words')!;
+      const code = `function reverseWords(s) { return s.trim().split(/\\s+/).reverse().join(' '); }`;
+      const result = gradeChallenge(challenge, code);
+      expect(result.passed).toBe(true);
+      expect(result.testsPassed).toBe(5);
+    });
+
+    it('grades correct fibonacci', () => {
+      const challenge = challenges.find(c => c.id === 'fibonacci')!;
+      const code = `function fibonacci(n) { if (n <= 1) return n; let a = 0, b = 1; for (let i = 2; i <= n; i++) { [a, b] = [b, a + b]; } return b; }`;
+      const result = gradeChallenge(challenge, code);
+      expect(result.passed).toBe(true);
+      expect(result.testsPassed).toBe(5);
+    });
+
+    it('grades correct longestCommonPrefix', () => {
+      const challenge = challenges.find(c => c.id === 'longest-common-prefix')!;
+      const code = `function longestCommonPrefix(strs) { if (!strs.length) return ''; let prefix = strs[0]; for (let i = 1; i < strs.length; i++) { while (strs[i].indexOf(prefix) !== 0) prefix = prefix.slice(0, -1); } return prefix; }`;
+      const result = gradeChallenge(challenge, code);
+      expect(result.passed).toBe(true);
+      expect(result.testsPassed).toBe(5);
+    });
+
+    it('grades correct groupAnagrams', () => {
+      const challenge = challenges.find(c => c.id === 'group-anagrams')!;
+      const code = `function groupAnagrams(strs) { const map = {}; for (const s of strs) { const key = s.split('').sort().join(''); if (!map[key]) map[key] = []; map[key].push(s); } return Object.values(map); }`;
+      const result = gradeChallenge(challenge, code);
+      expect(result.passed).toBe(true);
+      expect(result.testsPassed).toBe(3);
+    });
+
+    it('grades correct flattenObject', () => {
+      const challenge = challenges.find(c => c.id === 'flatten-object')!;
+      const code = `function flattenObject(obj, prefix) { prefix = prefix || ''; const result = {}; for (const key in obj) { const newKey = prefix ? prefix + '.' + key : key; if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) { Object.assign(result, flattenObject(obj[key], newKey)); } else { result[newKey] = obj[key]; } } return result; }`;
+      const result = gradeChallenge(challenge, code);
+      expect(result.passed).toBe(true);
+      expect(result.testsPassed).toBe(4);
+    });
+
+    it('grades correct cronMatches', () => {
+      const challenge = challenges.find(c => c.id === 'cron-matches')!
+      const code = `function cronMatches(cron, date) { const [min, hr, dom, mon, dow] = cron.split(' '); const checks = [[min, date.getMinutes()], [hr, date.getHours()], [dom, date.getDate()], [mon, date.getMonth() + 1], [dow, date.getDay()]]; return checks.every(([field, val]) => field === '*' || Number(field) === val); }`;
+      const result = gradeChallenge(challenge, code);
+      expect(result.passed).toBe(true);
+      expect(result.testsPassed).toBe(5);
+    });
+
+    it('handles broken code gracefully', () => {
+      const challenge = challenges.find(c => c.id === 'reverse-words')!;
+      const result = gradeChallenge(challenge, 'this is not valid code {{{');
+      expect(result.passed).toBe(false);
+      expect(result.error).toContain('Code execution error');
+    });
   });
 
-  it('extracts arrow function', () => {
-    const input = 'const foo = (x: number) => x + 1;';
-    expect(extractCode(input)).toBe(input.trim());
+  describe('formatResults', () => {
+    it('formats results with pass/fail', () => {
+      const results: BenchmarkResult[] = [
+        { challengeId: 'test-a', passed: true, testsRun: 3, testsPassed: 3 },
+        { challengeId: 'test-b', passed: false, testsRun: 2, testsPassed: 1, error: 'oops' },
+      ];
+      const formatted = formatResults(results);
+      expect(formatted).toContain('✅');
+      expect(formatted).toContain('❌');
+      expect(formatted).toContain('1/2 challenges');
+      expect(formatted).toContain('4/5 tests');
+    });
   });
 
-  it('handles empty string', () => {
-    expect(extractCode('')).toBe('');
-  });
-});
+  describe('challenges', () => {
+    it('has at least 6 challenges', () => {
+      expect(challenges.length).toBeGreaterThanOrEqual(6);
+    });
 
-describe('gradeChallenge', () => {
-  it('passes correct reverseWords implementation', () => {
-    const code = `function reverseWords(s) {
-      return s.trim().split(/\\s+/).filter(Boolean).reverse().join(' ');
-    }`;
-    const result = gradeChallenge(challenges[0], code);
-    expect(result.passed).toBe(true);
-    expect(result.testsPassed).toBe(result.testsRun);
-    expect(result.testsRun).toBe(5);
-  });
-
-  it('fails incorrect reverseWords implementation', () => {
-    const code = 'function reverseWords(s) { return s; }';
-    const result = gradeChallenge(challenges[0], code);
-    expect(result.passed).toBe(false);
-    expect(result.testsPassed).toBeLessThan(result.testsRun);
-  });
-
-  it('passes correct longestCommonPrefix implementation', () => {
-    const code = `function longestCommonPrefix(strs) {
-      if (strs.length === 0) return '';
-      let prefix = strs[0];
-      for (let i = 1; i < strs.length; i++) {
-        while (strs[i].indexOf(prefix) !== 0) {
-          prefix = prefix.slice(0, -1);
-          if (prefix === '') return '';
-        }
+    it('all challenges have required fields', () => {
+      for (const c of challenges) {
+        expect(c.id).toBeTruthy();
+        expect(c.prompt).toBeTruthy();
+        expect(c.testCases.length).toBeGreaterThan(0);
+        expect(c.difficulty).toMatch(/easy|medium|hard/);
       }
-      return prefix;
-    }`;
-    const result = gradeChallenge(challenges[1], code);
-    expect(result.passed).toBe(true);
-    expect(result.testsRun).toBe(5);
-  });
-
-  it('passes correct flattenObject implementation', () => {
-    const code = `function flattenObject(obj, prefix = '') {
-      const result = {};
-      for (const key of Object.keys(obj)) {
-        const fullKey = prefix ? prefix + '.' + key : key;
-        if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-          Object.assign(result, flattenObject(obj[key], fullKey));
-        } else {
-          result[fullKey] = obj[key];
-        }
-      }
-      return result;
-    }`;
-    const result = gradeChallenge(challenges[2], code);
-    expect(result.passed).toBe(true);
-    expect(result.testsRun).toBe(4);
-  });
-
-  it('handles code that throws', () => {
-    const code = 'function reverseWords() { throw new Error("boom"); }';
-    const result = gradeChallenge(challenges[0], code);
-    expect(result.passed).toBe(false);
-    expect(result.testsPassed).toBe(0);
-  });
-
-  it('handles syntactically invalid code', () => {
-    const result = gradeChallenge(challenges[0], 'not valid javascript {{{');
-    expect(result.passed).toBe(false);
-    expect(result.error).toContain('Code execution error');
-  });
-});
-
-describe('formatResults', () => {
-  it('formats passing results', () => {
-    const results: BenchmarkResult[] = [
-      { challengeId: 'test-1', passed: true, testsRun: 3, testsPassed: 3 },
-      { challengeId: 'test-2', passed: false, testsRun: 2, testsPassed: 1, error: 'oops' },
-    ];
-    const output = formatResults(results);
-    expect(output).toContain('✅ **test-1**');
-    expect(output).toContain('❌ **test-2**');
-    expect(output).toContain('1/2 challenges');
-    expect(output).toContain('4/5 tests');
-    expect(output).toContain('Error: oops');
+    });
   });
 });

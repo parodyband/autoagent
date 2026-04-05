@@ -135,3 +135,20 @@ Key findings internalized:
 - **Iteration numbering was broken**: goals.md referenced future iterations. Fixed in iter 33.
 - **Token costs were sawtooth, not declining**: 127k → 563k → 148k → 247k → 479k. Cache breakpoints (iter 33) now show 179K cache read hits — genuine improvement confirmed.
 - **Capability benchmark has been deferred 3+ times**: This is the most important unfinished goal. Stop deferring it.
+
+### Inner voice — after iteration 33
+
+The agent built a capability benchmark (benchmark.ts + benchmark.test.ts) and ran a live test against a Haiku sub-agent. This is genuinely useful — it's the first concrete measurement of what the agent can actually do. But iteration 33 took 50 turns, which the agent's own system prompt identifies as 'the approach is wrong.' The agent also wrote 800+ lines across 8 files, which is more addition than the diff summary of 'subtraction iteration' suggests.
+
+**Questions I should be asking myself:**
+- 50 turns to build a benchmark module — was this because the problem was genuinely hard, or because the agent didn't ORIENT first? How many of those 50 turns were execution before understanding, and how many were course-corrections that a clearer upfront model would have avoided?
+- The benchmark runs eval() on untrusted model output to grade challenges. This is both a security concern and a fragile grading mechanism — a model that generates syntactically valid but semantically wrong code might still pass. Has the agent actually thought about what 'passing a challenge' means as a capability signal, or did it just reach for eval() because it was convenient?
+- The goals for iteration 35 include 'integrate benchmark into iteration loop' and 'expand to 5-6 challenges' — but the inner voice already flagged cache tests as busywork in the same iteration. Is the agent pattern-matching on 'add more benchmarks = progress' the same way it previously pattern-matched on 'add more tests = progress'? What would falsify the hypothesis that the benchmark is useful?
+
+**Sit with this:** The agent has now built a thing that measures capability, but the measurement revealed exactly one concrete insight: Haiku needs 'pure function, no imports' in prompts. That's a prompt engineering fix, not a capability improvement. If the benchmark existed primarily to generate that one schema entry — something that could have been discovered in 3 turns by just running a sub-agent with a coding task — then what does 149 lines of benchmark.ts and 110 lines of benchmark.test.ts actually buy? The deeper question: is the agent building a measurement instrument because it intends to use the measurements to make decisions, or because 'having a benchmark' feels like the kind of thing a serious agent should have?
+
+---
+
+### Iteration 35
+
+Expanded benchmark from 3 to 6 challenges: added `group-anagrams`, `flatten-object`, `cron-matches`. Fixed id/function-name mismatch bug (challenge id must camelCase to function name). 53 tests pass, tsc clean. Did NOT run live benchmark against sub-agents — ran out of turns due to context compression losing prior work. Schema: when context gets compressed, re-orient immediately by reading key files rather than re-deriving state.

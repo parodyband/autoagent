@@ -21,12 +21,16 @@ export interface BenchmarkResult {
   error?: string;
 }
 
+// Shared prompt suffix to ensure clean JavaScript output
+const JS_SUFFIX = `\n\nIMPORTANT: Write plain JavaScript only. No TypeScript, no type annotations, no imports. Return ONLY the function as a pure function. No console.log, no module.exports.`;
+
 export const challenges: Challenge[] = [
+  // --- EASY ---
   {
     id: 'reverse-words',
     description: 'Reverse words in a string',
     difficulty: 'easy',
-    prompt: 'Write a TypeScript function called `reverseWords` that takes a string and returns it with the words in reverse order. Words are separated by spaces. Trim extra spaces. Return ONLY the function, no explanation.\n\nExample: reverseWords("hello world") => "world hello"',
+    prompt: `Write a JavaScript function called \`reverseWords\` that takes a string and returns it with the words in reverse order. Words are separated by spaces. Trim extra spaces.${JS_SUFFIX}\n\nExample: reverseWords("hello world") => "world hello"`,
     testCases: [
       { input: ['hello world'], expected: 'world hello' },
       { input: ['the sky is blue'], expected: 'blue is sky the' },
@@ -36,10 +40,25 @@ export const challenges: Challenge[] = [
     ],
   },
   {
+    id: 'fibonacci',
+    description: 'Return the nth Fibonacci number',
+    difficulty: 'easy',
+    prompt: `Write a JavaScript function called \`fibonacci\` that takes a non-negative integer n and returns the nth Fibonacci number. fib(0)=0, fib(1)=1, fib(2)=1, fib(3)=2, etc.${JS_SUFFIX}\n\nExample: fibonacci(6) => 8`,
+    testCases: [
+      { input: [0], expected: 0 },
+      { input: [1], expected: 1 },
+      { input: [2], expected: 1 },
+      { input: [6], expected: 8 },
+      { input: [10], expected: 55 },
+    ],
+  },
+
+  // --- MEDIUM ---
+  {
     id: 'longest-common-prefix',
     description: 'Find longest common prefix of string array',
     difficulty: 'medium',
-    prompt: 'Write a TypeScript function called `longestCommonPrefix` that takes an array of strings and returns their longest common prefix. Return ONLY the function, no explanation.\n\nExample: longestCommonPrefix(["flower","flow","flight"]) => "fl"',
+    prompt: `Write a JavaScript function called \`longestCommonPrefix\` that takes an array of strings and returns their longest common prefix. Return empty string if no common prefix.${JS_SUFFIX}\n\nExample: longestCommonPrefix(["flower","flow","flight"]) => "fl"`,
     testCases: [
       { input: [['flower', 'flow', 'flight']], expected: 'fl' },
       { input: [['dog', 'racecar', 'car']], expected: '' },
@@ -49,10 +68,24 @@ export const challenges: Challenge[] = [
     ],
   },
   {
+    id: 'group-anagrams',
+    description: 'Group strings that are anagrams of each other',
+    difficulty: 'medium',
+    prompt: `Write a JavaScript function called \`groupAnagrams\` that takes an array of strings and returns an array of groups where each group contains strings that are anagrams of each other. Order within groups and order of groups does not matter.${JS_SUFFIX}\n\nExample: groupAnagrams(["eat","tea","tan","ate","nat","bat"]) => [["eat","tea","ate"],["tan","nat"],["bat"]]`,
+    testCases: [
+      // We'll use a custom comparator in grading for this one since order doesn't matter
+      { input: [['eat', 'tea', 'tan', 'ate', 'nat', 'bat']], expected: [['ate', 'eat', 'tea'], ['nat', 'tan'], ['bat']] },
+      { input: [['a']], expected: [['a']] },
+      { input: [['']], expected: [['']] },
+    ],
+  },
+
+  // --- HARD ---
+  {
     id: 'flatten-object',
     description: 'Flatten a nested object with dot notation keys',
     difficulty: 'hard',
-    prompt: 'Write a TypeScript function called `flattenObject` that takes a nested object and returns a flat object with dot-notation keys. Return ONLY the function, no explanation.\n\nExample: flattenObject({a: {b: 1, c: {d: 2}}}) => {"a.b": 1, "a.c.d": 2}',
+    prompt: `Write a JavaScript function called \`flattenObject\` that takes a nested object and returns a flat object with dot-notation keys. Arrays should NOT be flattened — treat them as leaf values.${JS_SUFFIX}\n\nExample: flattenObject({a: {b: 1, c: {d: 2}}}) => {"a.b": 1, "a.c.d": 2}`,
     testCases: [
       { input: [{ a: 1, b: 2 }], expected: { a: 1, b: 2 } },
       { input: [{ a: { b: 1 } }], expected: { 'a.b': 1 } },
@@ -60,26 +93,76 @@ export const challenges: Challenge[] = [
       { input: [{}], expected: {} },
     ],
   },
+  {
+    id: 'cron-matches',
+    description: 'Parse a simple cron expression and check if a time matches',
+    difficulty: 'hard',
+    prompt: `Write a JavaScript function called \`cronMatches\` that takes a simplified cron string and a Date object, and returns true if the date matches the cron pattern. The cron string has 5 fields: "minute hour dayOfMonth month dayOfWeek". Each field is either a number or "*" (wildcard, matches any). Months are 1-12, dayOfWeek is 0-6 (Sunday=0).${JS_SUFFIX}\n\nExample: cronMatches("30 9 * * 1", new Date("2024-01-08T09:30:00")) => true (Monday at 9:30)`,
+    testCases: [
+      { input: ['* * * * *', new Date('2024-01-01T00:00:00')], expected: true },
+      { input: ['0 0 * * *', new Date('2024-01-01T00:00:00')], expected: true },
+      { input: ['0 0 * * *', new Date('2024-01-01T12:30:00')], expected: false },
+      { input: ['30 9 * * 1', new Date('2024-01-08T09:30:00')], expected: true }, // Monday
+      { input: ['30 9 * * 1', new Date('2024-01-09T09:30:00')], expected: false }, // Tuesday
+    ],
+  },
 ];
 
 /**
  * Extract a function from LLM response text.
- * Tries to find code between ```typescript or ``` blocks, falls back to raw text.
+ * Tries to find code between ``` blocks, falls back to raw text.
  */
 export function extractCode(response: string): string {
   // Try fenced code block first
   const fenced = response.match(/```(?:typescript|ts|javascript|js)?\s*\n([\s\S]*?)```/);
-  if (fenced) return fenced[1].trim();
+  if (fenced) return stripTypeAnnotations(fenced[1].trim());
   
   // Try to find function declaration directly
   const funcMatch = response.match(/((?:export\s+)?function\s+\w+[\s\S]*)/);
-  if (funcMatch) return funcMatch[1].trim();
+  if (funcMatch) return stripTypeAnnotations(funcMatch[1].trim());
   
   // Try arrow function
   const arrowMatch = response.match(/((?:export\s+)?(?:const|let)\s+\w+\s*=[\s\S]*)/);
-  if (arrowMatch) return arrowMatch[1].trim();
+  if (arrowMatch) return stripTypeAnnotations(arrowMatch[1].trim());
   
-  return response.trim();
+  return stripTypeAnnotations(response.trim());
+}
+
+/**
+ * Strip TypeScript type annotations as a safety net (prompts request plain JS).
+ * This is a best-effort fallback, not the primary mechanism.
+ */
+export function stripTypeAnnotations(code: string): string {
+  let result = code;
+  // Remove 'export ' prefix
+  result = result.replace(/^export\s+/, '');
+  // Remove interface/type declarations (whole lines)
+  result = result.replace(/^\s*(?:interface|type)\s+\w+[\s\S]*?^}/gm, '');
+  // Remove generic type params: function foo<T>(...) → function foo(...)
+  result = result.replace(/function\s+(\w+)\s*<[^>]+>/g, 'function $1');
+  // Remove parameter type annotations: (x: string, y: number) → (x, y)
+  // Uses negative lookbehind to avoid matching object keys
+  result = result.replace(/(\(|,\s*)(\w+)\s*:\s*\w+(?:<[^>]*>)?(?:\[\])?\s*(?=[,)=])/g, '$1$2');
+  // Remove 'as Type' assertions
+  result = result.replace(/\s+as\s+\w+(?:<[^>]*>)?/g, '');
+  return result;
+}
+
+/**
+ * Normalize for order-independent comparison (for challenges like group-anagrams).
+ */
+function normalizeForComparison(val: unknown): string {
+  if (Array.isArray(val)) {
+    // If it's an array of arrays, sort inner arrays then sort outer
+    if (val.length > 0 && Array.isArray(val[0])) {
+      const sorted = val.map((inner: unknown[]) => 
+        [...inner].sort()
+      ).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+      return JSON.stringify(sorted);
+    }
+    return JSON.stringify([...val].sort());
+  }
+  return JSON.stringify(val);
 }
 
 /**
@@ -95,9 +178,7 @@ export function gradeChallenge(challenge: Challenge, code: string): BenchmarkRes
 
   let fn: Function;
   try {
-    // Create the function from code string
-    // We wrap it to extract the named function
-    const fnName = challenge.testCases.length > 0 ? challenge.id.replace(/-./g, x => x[1].toUpperCase()) : '';
+    const fnName = challenge.id.replace(/-./g, x => x[1].toUpperCase());
     const wrapped = `${code}\nreturn ${fnName};`;
     fn = new Function(wrapped)();
     if (typeof fn !== 'function') {
@@ -109,12 +190,15 @@ export function gradeChallenge(challenge: Challenge, code: string): BenchmarkRes
     return result;
   }
 
+  // Determine if this challenge needs order-independent comparison
+  const orderIndependent = challenge.id === 'group-anagrams';
+
   for (const tc of challenge.testCases) {
     result.testsRun++;
     try {
       const actual = fn(...tc.input);
-      const actualStr = JSON.stringify(actual);
-      const expectedStr = JSON.stringify(tc.expected);
+      const actualStr = orderIndependent ? normalizeForComparison(actual) : JSON.stringify(actual);
+      const expectedStr = orderIndependent ? normalizeForComparison(tc.expected) : JSON.stringify(tc.expected);
       if (actualStr === expectedStr) {
         result.testsPassed++;
       }

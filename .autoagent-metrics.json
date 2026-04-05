@@ -1336,5 +1336,77 @@
       "totalCalls": 62,
       "totalMs": 15849
     }
+  },
+  {
+    "iteration": 34,
+    "startTime": "2026-04-05T08:31:35.453Z",
+    "endTime": "2026-04-05T08:36:51.940Z",
+    "turns": 50,
+    "toolCalls": {
+      "think": 12,
+      "read_file": 2,
+      "bash": 29,
+      "subagent": 6,
+      "write_file": 8
+    },
+    "success": true,
+    "durationMs": 316487,
+    "inputTokens": 62,
+    "outputTokens": 17506,
+    "cacheCreationTokens": 71525,
+    "cacheReadTokens": 508904,
+    "codeQuality": {
+      "totalLOC": 4682,
+      "codeLOC": 3493,
+      "fileCount": 29,
+      "functionCount": 257,
+      "complexity": 563,
+      "testCount": 314
+    },
+    "benchmarks": {
+      "testDurationMs": 3610,
+      "testCount": 471
+    },
+    "toolTimings": {
+      "tools": {
+        "think": {
+          "calls": 12,
+          "totalMs": 11,
+          "minMs": 0,
+          "maxMs": 1,
+          "avgMs": 1
+        },
+        "read_file": {
+          "calls": 2,
+          "totalMs": 14,
+          "minMs": 1,
+          "maxMs": 13,
+          "avgMs": 7
+        },
+        "bash": {
+          "calls": 29,
+          "totalMs": 10945,
+          "minMs": 9,
+          "maxMs": 1002,
+          "avgMs": 377
+        },
+        "subagent": {
+          "calls": 6,
+          "totalMs": 9770,
+          "minMs": 718,
+          "maxMs": 2915,
+          "avgMs": 1628
+        },
+        "write_file": {
+          "calls": 8,
+          "totalMs": 12,
+          "minMs": 1,
+          "maxMs": 2,
+          "avgMs": 2
+        }
+      },
+      "totalCalls": 57,
+      "totalMs": 20752
+    }
   }
 ]
