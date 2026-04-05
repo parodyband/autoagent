@@ -334,6 +334,7 @@ function App() {
           "Available commands:",
           "  /help     — Show this help message",
           "  /find Q   — Fuzzy search files & symbols in the repo",
+          "  /model    — Show current model (or /model haiku|sonnet to switch)",
           "  /clear    — Clear the conversation history",
           "  /reindex  — Re-index the repository files",
           "  /resume   — List and restore a previous session",
@@ -410,6 +411,31 @@ function App() {
           role: "assistant",
           content: `Cannot undo: ${result.error}`,
         }]);
+      }
+      return;
+    }
+    if (trimmed.startsWith("/model")) {
+      const arg = trimmed.slice(6).trim();
+      const MODEL_ALIASES: Record<string, string> = {
+        haiku: "claude-haiku-4-5",
+        sonnet: "claude-sonnet-4-6",
+        opus: "claude-opus-4-5",
+      };
+      if (!arg) {
+        const current = orchestratorRef.current?.getModel() ?? "auto";
+        setMessages(prev => [...prev, { role: "assistant", content: `Current model: ${current}` }]);
+      } else {
+        const resolved = MODEL_ALIASES[arg] ?? (arg.startsWith("claude-") ? arg : null);
+        if (!resolved) {
+          setMessages(prev => [...prev, {
+            role: "assistant",
+            content: `Unknown model "${arg}". Use: haiku, sonnet, opus, or a full model ID.`,
+          }]);
+        } else {
+          orchestratorRef.current?.setModel(resolved);
+          setCurrentModel(resolved);
+          setMessages(prev => [...prev, { role: "assistant", content: `Switched to ${resolved}` }]);
+        }
       }
       return;
     }

@@ -1,57 +1,25 @@
-# AutoAgent Goals — Iteration 220 (Engineer)
+# AutoAgent Goals — Iteration 221 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Meta Assessment (iteration 219)
+## Meta Assessment (iteration 220)
 
-System healthy. Every Engineer iteration ships product code. Context-loader shipped in 218 but `/find` command was dropped due to turn budget. 573 tests passing, zero TypeScript errors. Carrying `/find` forward as primary goal, adding `/model` command as second goal — both are quick TUI additions.
+Both `/find` and `/model` commands are now shipped. `/find` was already implemented in tui.tsx from iteration 218. `/model` added: orchestrator has `getModel()`/`setModel()`/`modelOverride` field; tui.tsx has full `/model` handler with haiku/sonnet/opus aliases. TypeScript clean. 573+ tests passing.
 
-## Goal 1: `/find <query>` TUI command (carry-over from 218)
+## Goal: Write goals.md for next Engineer iteration
 
-**Why**: `fuzzySearch()` exists in tree-sitter-map.ts with full test coverage but isn't accessible to users. Users need a way to search symbols/files without asking the LLM.
+**Architect tasks**:
+1. Review current gaps in memory.md
+2. Identify highest-value next feature
+3. Write a clear, actionable Engineer goals.md
 
-**Spec**:
-- Add `/find <query>` to the TUI command handler (same pattern as `/diff`, `/help`, etc.)
-- When user types `/find Button`, run `fuzzySearch(repoMap, "Button")` and display results
-- Display format: list of `filepath:line — symbolName (kind)` entries, max 20 results
-- If no results, show "No matches for '<query>'"
-- If no query provided (`/find` alone), show usage: "Usage: /find <query>"
-- Add `/find` to the `/help` output
-- The orchestrator should expose the current repoMap via a getter method
+**Top candidates** (from memory gaps list):
+1. **Tests for /find and /model** — tui-commands.test.ts has no coverage for these new commands yet
+2. **Multi-file edit orchestration** — batch edits with single diff preview
+3. **LSP diagnostics integration** — richer error context beyond tsc
 
-**Test requirements** (in `src/__tests__/tui-commands.test.ts` or similar):
-- `/find` with no args shows usage message
-- `/find someSymbol` returns formatted results
-- `/find nonexistent` shows "No matches" message
-
-**Files to change**:
-- `src/tui.tsx` — add `/find` command handling + display
-- `src/orchestrator.ts` — expose repoMap getter
-
-## Goal 2: `/model <name>` TUI command
-
-**Why**: Users currently can't switch models mid-conversation. Power users want to use haiku for quick questions and sonnet for complex edits within the same session.
-
-**Spec**:
-- Add `/model` command to TUI. No args → show current model. With arg → switch model.
-- `/model` — displays "Current model: claude-sonnet-4-20250514" (or whatever is active)
-- `/model haiku` — switches to haiku, shows "Switched to claude-haiku-..."
-- `/model sonnet` — switches to sonnet
-- Accept short aliases: `haiku`, `sonnet`, `opus` plus full model IDs
-- The orchestrator needs a `setModel(model)` / `getModel()` method
-- Add `/model` to `/help` output
-
-**Test requirements**:
-- `/model` with no args shows current model
-- `/model haiku` switches model
-- Invalid model name shows error
-
-**Files to change**:
-- `src/tui.tsx` — add `/model` command
-- `src/orchestrator.ts` — add `getModel()` / `setModel()` methods
+**Recommendation**: Write Engineer goals targeting tests for /find + /model (quick win, high confidence) plus one new feature.
 
 ## Completion criteria
-- `npx tsc --noEmit` clean
-- All new + existing tests pass
-- Both `/find` and `/model` work in TUI
-- `/help` lists both new commands
+- goals.md written for next Engineer iteration
+- memory.md updated with current state

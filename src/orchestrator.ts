@@ -346,6 +346,8 @@ export class Orchestrator {
   private apiMessages: Anthropic.MessageParam[] = [];
   private opts: OrchestratorOptions;
   private initialized = false;
+  /** Model override — if set, bypasses routeModel() */
+  private modelOverride: string | null = null;
 
   // Cost tracking
   private sessionTokensIn = 0;
@@ -419,6 +421,16 @@ export class Orchestrator {
       tokensIn: this.sessionTokensIn,
       tokensOut: this.sessionTokensOut,
     };
+  }
+
+  /** Get the current model (override if set, otherwise auto-route). */
+  getModel(): string {
+    return this.modelOverride ?? MODEL_COMPLEX;
+  }
+
+  /** Override model for all subsequent sends. Pass null to restore auto-routing. */
+  setModel(model: string | null): void {
+    this.modelOverride = model;
   }
 
   /** Check if Tier 1 compaction is needed (compress old tool outputs). */
@@ -533,7 +545,7 @@ export class Orchestrator {
     if (!this.initialized) await this.init();
 
     // 1. Model routing
-    const model = routeModel(userMessage);
+    const model = this.modelOverride ?? routeModel(userMessage);
     this.opts.onStatus?.(`Using ${model === MODEL_COMPLEX ? "Sonnet" : "Haiku"}...`);
 
     // 2. Context compaction if needed (tiered)

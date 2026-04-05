@@ -1,107 +1,3 @@
-- **Incorrect new-file hunk header when content doesn't end with newline**: The hunk header uses `newLines.length` as the count, but `newLines` is derived from `split("\n")`. If `newC
-[2026-04-05T15:42:08.258Z] iter=212 turn=25 INFO: Committed: 21904930 (41 in / 9915 out, cache: 32932 created, 644952 read)
-[2026-04-05T15:42:08.259Z] iter=212 turn=25 INFO: Restarting as iteration 213...
-[2026-04-05T15:42:08.436Z] iter=213 INFO: Cache restored: 45/45 entries (0 stale)
-[2026-04-05T15:42:08.437Z] iter=213 INFO: Turn budget: 18/25 (calibration=1.05x, predicted=20)
-[2026-04-05T15:42:08.438Z] iter=213 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T15:42:08.538Z] iter=213 turn=1 INFO: Turn 1/25
-[2026-04-05T15:42:13.190Z] iter=213 turn=1 INFO: Agent: 
-
-I'm the Architect for iteration 214. Let me evaluate what the Engineer built in iteration 212, assess current state, and plan the next steps.
-[2026-04-05T15:42:13.191Z] iter=213 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
-[2026-04-05T15:42:13.194Z] iter=213 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -60
-[2026-04-05T15:42:13.198Z] iter=213 turn=1 INFO: read_file: src/diff-preview.ts
-[2026-04-05T15:42:13.198Z] iter=213 turn=1 INFO:   -> ok (5940 chars)
-[2026-04-05T15:42:13.199Z] iter=213 turn=1 INFO: read_file: src/__tests__/diff-preview.test.ts
-[2026-04-05T15:42:13.199Z] iter=213 turn=1 INFO:   -> ok (3238 chars)
-[2026-04-05T15:42:13.205Z] iter=213 turn=1 INFO:   -> exit=0 (1267 chars)
-[2026-04-05T15:42:13.210Z] iter=213 turn=1 INFO:   -> exit=0 (330 chars)
-[2026-04-05T15:42:13.210Z] iter=213 turn=2 INFO: Turn 2/25
-[2026-04-05T15:42:17.848Z] iter=213 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/diff-preview.test.ts 2>&1 | tail -30
-[2026-04-05T15:42:17.850Z] iter=213 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "pendingDiff\|PendingDiff\|DiffPreview\|onDiffPreview\|noConfirm" src/tui.tsx | head -30
-[2026-04-05T15:42:17.852Z] iter=213 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onDiffPreview\|diffPreview" src/orchestrator.ts | head -20
-[2026-04-05T15:42:17.862Z] iter=213 turn=2 INFO:   -> exit=0 (87 chars)
-[2026-04-05T15:42:17.864Z] iter=213 turn=2 INFO:   -> exit=0 (376 chars)
-[2026-04-05T15:42:18.835Z] iter=213 turn=2 INFO:   -> exit=0 (874 chars)
-[2026-04-05T15:42:18.835Z] iter=213 turn=3 INFO: Turn 3/25
-[2026-04-05T15:42:21.613Z] iter=213 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '50,70p' src/tui.tsx
-[2026-04-05T15:42:21.623Z] iter=213 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '290,340p' src/orchestrator.ts
-[2026-04-05T15:42:21.631Z] iter=213 turn=3 INFO:   -> exit=0 (401 chars)
-[2026-04-05T15:42:21.633Z] iter=213 turn=3 INFO:   -> exit=0 (2035 chars)
-[2026-04-05T15:42:21.634Z] iter=213 turn=4 INFO: Turn 4/25
-[2026-04-05T15:42:31.446Z] iter=213 turn=4 INFO: Agent: 
-
-You're right. My deliverables are clear: evaluate iteration 212, research, and write goals.md for the next Engineer iteration. Let me produce now.
-[2026-04-05T15:42:31.447Z] iter=213 turn=4 INFO: think: Let me assess what I know:
-
-1. Iteration 212 shipped: diff-preview.ts (computeUnifiedDiff + getDiffStats), onDiffPreview...
-[2026-04-05T15:42:31.447Z] iter=213 turn=5 INFO: Turn 5/25
-[2026-04-05T15:42:34.690Z] iter=213 turn=5 INFO: web_search: "Claude Code diff preview confirmation UX 2025 coding agent"
-[2026-04-05T15:42:34.710Z] iter=213 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/tui.tsx src/orchestrator.ts src/diff-preview.ts
-[2026-04-05T15:42:34.719Z] iter=213 turn=5 INFO:   -> exit=0 (94 chars)
-[2026-04-05T15:42:35.754Z] iter=213 turn=5 INFO:   -> 8 results
-[2026-04-05T15:42:35.755Z] iter=213 turn=6 INFO: Turn 6/25
-[2026-04-05T15:42:39.440Z] iter=213 turn=6 INFO: web_fetch: https://www.eesel.ai/blog/ide-diff-viewer-claude-code
-[2026-04-05T15:42:39.774Z] iter=213 turn=6 INFO:   -> ok (15318 chars)
-[2026-04-05T15:42:39.774Z] iter=213 turn=7 INFO: Turn 7/25
-[2026-04-05T15:43:01.503Z] iter=213 turn=7 INFO: Agent: 
-
-**Goal status:**
-- Evaluate iteration 212: DONE (assessed what shipped, what's incomplete, the test bug)
-- Research: DONE (searched Claude Code diff UX, read article on IDE diff viewers)
-- Write goals.md for next Engineer iteration: NOT STARTED
-
-Let me produce the deliverable now.
-[2026-04-05T15:43:01.504Z] iter=213 turn=7 INFO: think: Key findings from my evaluation:
-
-1. Iteration 212 was partially successful - diff-preview.ts is solid (LCS-based unifie...
-[2026-04-05T15:43:01.504Z] iter=213 turn=8 INFO: Turn 8/25
-[2026-04-05T15:43:25.292Z] iter=213 turn=8 INFO: write_file: goals.md (write)
-[2026-04-05T15:43:25.293Z] iter=213 turn=8 INFO:   -> ok: Updated goals.md (3289 chars, +41 lines delta)
-[2026-04-05T15:43:25.294Z] iter=213 turn=9 INFO: Turn 9/25
-[2026-04-05T15:43:33.398Z] iter=213 turn=9 INFO: save_memory: "[Architect] Iteration 214 assessment"
-[2026-04-05T15:43:33.399Z] iter=213 turn=9 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T15:43:33.399Z] iter=213 turn=9 INFO: save_memory: "[Research] Diff preview UX in coding agents (iter 214)"
-[2026-04-05T15:43:33.400Z] iter=213 turn=9 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T15:43:33.401Z] iter=213 turn=10 INFO: Turn 10/25
-[2026-04-05T15:43:35.959Z] iter=213 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -20
-[2026-04-05T15:43:36.835Z] iter=213 turn=10 INFO:   -> exit=0 (11 chars)
-[2026-04-05T15:43:36.836Z] iter=213 turn=11 INFO: Turn 11/25
-[2026-04-05T15:43:39.742Z] iter=213 turn=11 INFO: Agent: TypeScript clean. Let me verify the goals file and commit.
-[2026-04-05T15:43:39.743Z] iter=213 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status
-[2026-04-05T15:43:39.777Z] iter=213 turn=11 INFO:   -> exit=0 (267 chars)
-[2026-04-05T15:43:39.777Z] iter=213 turn=12 INFO: Turn 12/25
-[2026-04-05T15:43:47.368Z] iter=213 turn=12 INFO: Agent: Good. Everything staged.
-
-## Summary — Iteration 214 (Architect)
-
-**Evaluation of iteration 212:**
-- ✅ `src/diff-preview.ts` — Clean LCS-based unified diff engine with hunk grouping
-- ✅ Orchestrator intercept — reads old content, computes diff, calls `onDiffPreview` callback before writes
-- ✅ `--no-confirm` flag and `PendingDiff` type scaffolded in TUI
-- ❌ TUI rendering not completed — the feature...
-[2026-04-05T15:43:47.368Z] iter=213 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T15:43:47.368Z] iter=213 turn=12 INFO: RESTART signal
-[2026-04-05T15:43:47.369Z] iter=213 turn=12 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T15:43:48.231Z] iter=213 turn=12 INFO: Compilation OK
-[2026-04-05T15:43:53.731Z] iter=213 turn=12 INFO: Cache persisted: 47 entries to .autoagent-cache.json
-[2026-04-05T15:43:53.732Z] iter=213 turn=12 INFO: Cache stats: 0 hits, 2 misses, 47 entries, 1 invalidations (0 entries removed)
-[2026-04-05T15:43:53.732Z] iter=213 turn=12 INFO: Tool cache stats
-[2026-04-05T15:43:53.732Z] iter=213 turn=12 INFO: Tool timing: bash: 11x, avg=181ms, total=1992ms; web_search: 1x, avg=1065ms, total=1065ms; web_fetch: 1x, avg=334ms, total=334ms; read_file: 2x, avg=2ms, total=4ms; save_memory: 2x, avg=2ms, total=3ms; write_file: 1x, avg=1ms, total=1ms; think: 2x, avg=0ms, total=0ms
-[2026-04-05T15:43:53.732Z] iter=213 turn=12 INFO: Tool timing stats
-[2026-04-05T15:43:59.398Z] iter=213 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 213: predicted 20 turns, actual 12 turns, ratio 0.60**
-[2026-04-05T15:43:59.418Z] iter=213 turn=12 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T15:43:59.449Z] iter=213 turn=12 INFO: Committed: f540f16a (18 in / 3855 out, cache: 20442 created, 159515 read)
-[2026-04-05T15:43:59.450Z] iter=213 turn=12 INFO: Restarting as iteration 214...
-[2026-04-05T15:43:59.640Z] iter=214 INFO: Cache restored: 47/47 entries (0 stale)
-[2026-04-05T15:43:59.641Z] iter=214 INFO: Turn budget: 19/25 (calibration=1.05x, predicted=18)
-[2026-04-05T15:43:59.642Z] iter=214 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T15:43:59.739Z] iter=214 turn=1 INFO: Turn 1/25
-[2026-04-05T15:44:02.687Z] iter=214 turn=1 INFO: Agent: I'll read the goals and current state, then execute the tasks.
-[2026-04-05T15:44:02.688Z] iter=214 turn=1 INFO: read_file: goals.md
-[2026-04-05T15:44:02.688Z] iter=214 turn=1 INFO:   -> ok (3289 chars)
-[2026-04-05T15:44:02.689Z] iter=214 turn=1 INFO: read_file: CACHE HIT
-[2026-04-05T15:44:02.689Z] iter=214 turn=2 INFO: Turn 2/25
 [2026-04-05T15:44:05.016Z] iter=214 turn=2 INFO: read_file: src/tui.tsx
 [2026-04-05T15:44:05.018Z] iter=214 turn=2 INFO:   -> ok (16948 chars)
 [2026-04-05T15:44:05.019Z] iter=214 turn=3 INFO: Turn 3/25
@@ -1100,3 +996,230 @@ if len(d['history']) > 20:
 [2026-04-05T15:54:34.264Z] iter=219 turn=12 INFO: Tool timing stats
 [2026-04-05T15:54:39.844Z] iter=219 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 219: predicted 20 turns, actual 12 turns, ratio 0.60**
 [2026-04-05T15:54:39.861Z] iter=219 turn=12 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T15:54:39.890Z] iter=219 turn=12 INFO: Committed: c0341dfe (18 in / 4743 out, cache: 56040 created, 524978 read)
+[2026-04-05T15:54:39.890Z] iter=219 turn=12 INFO: Restarting as iteration 220...
+[2026-04-05T15:54:40.069Z] iter=220 INFO: Cache restored: 46/46 entries (0 stale)
+[2026-04-05T15:54:40.071Z] iter=220 INFO: Turn budget: 19/25 (calibration=1.00x, predicted=20)
+[2026-04-05T15:54:40.071Z] iter=220 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T15:54:40.182Z] iter=220 turn=1 INFO: Turn 1/25
+[2026-04-05T15:54:43.403Z] iter=220 turn=1 INFO: Agent: I'll read the current state of the relevant files before building the `/find` and `/model` commands.
+[2026-04-05T15:54:43.404Z] iter=220 turn=1 INFO: $ grep -n "find\|model\|diff\|undo\|help\|exit\|clear\|reindex\|resume" src/tui.tsx | head -80
+[2026-04-05T15:54:43.406Z] iter=220 turn=1 INFO: $ grep -n "repoMap\|getModel\|setModel\|fuzzySearch" src/orchestrator.ts | head -40
+[2026-04-05T15:54:43.416Z] iter=220 turn=1 INFO:   -> exit=0 (3422 chars)
+[2026-04-05T15:54:43.417Z] iter=220 turn=1 INFO:   -> exit=0 (887 chars)
+[2026-04-05T15:54:43.418Z] iter=220 turn=2 INFO: Turn 2/25
+[2026-04-05T15:54:46.062Z] iter=220 turn=2 INFO: $ grep -n "rawRepoMap\|repoMap\|private model\|this\.model\|getModel\|setModel" src/orchestrator.ts | head -40
+[2026-04-05T15:54:46.067Z] iter=220 turn=2 INFO: $ sed -n '340,420p' src/orchestrator.ts
+[2026-04-05T15:54:46.082Z] iter=220 turn=2 INFO:   -> exit=0 (2594 chars)
+[2026-04-05T15:54:46.084Z] iter=220 turn=2 INFO:   -> exit=0 (963 chars)
+[2026-04-05T15:54:46.084Z] iter=220 turn=3 INFO: Turn 3/25
+[2026-04-05T15:54:48.862Z] iter=220 turn=3 INFO: $ grep -n "rawRepoMap\|private rawRepoMap\|opts\.model\|this\.opts\.model\|OrchestratorOptions" src/orchestrator.ts | head -30
+[2026-04-05T15:54:48.870Z] iter=220 turn=3 INFO: $ sed -n '280,345p' src/orchestrator.ts
+[2026-04-05T15:54:48.891Z] iter=220 turn=3 INFO:   -> exit=0 (724 chars)
+[2026-04-05T15:54:48.892Z] iter=220 turn=3 INFO:   -> exit=0 (2612 chars)
+[2026-04-05T15:54:48.892Z] iter=220 turn=4 INFO: Turn 4/25
+[2026-04-05T15:54:54.612Z] iter=220 turn=4 INFO: think: I have enough context. Let me build both features now:
+
+1. `/find` command - fuzzySearch exists in tree-sitter-map.ts, n...
+[2026-04-05T15:54:54.612Z] iter=220 turn=5 INFO: Turn 5/25
+[2026-04-05T15:54:56.885Z] iter=220 turn=5 INFO: $ sed -n '74,100p' src/orchestrator.ts && echo "---" && sed -n '347,380p' src/tui.tsx
+[2026-04-05T15:54:56.911Z] iter=220 turn=5 INFO:   -> exit=0 (2568 chars)
+[2026-04-05T15:54:56.912Z] iter=220 turn=6 INFO: Turn 6/25
+[2026-04-05T15:54:59.781Z] iter=220 turn=6 INFO: think: The `/find` command is already mostly implemented in tui.tsx! It builds a fresh repoMap each time. The goal says to expo...
+[2026-04-05T15:54:59.782Z] iter=220 turn=7 INFO: Turn 7/25
+[2026-04-05T15:55:01.646Z] iter=220 turn=7 INFO: Agent: Let me check the current state quickly:
+[2026-04-05T15:55:01.646Z] iter=220 turn=7 INFO: $ grep -n "import.*fuzzySearch\|import.*buildRepoMap\|/model\|/find" src/tui.tsx | head -20
+[2026-04-05T15:55:01.656Z] iter=220 turn=7 INFO:   -> exit=0 (284 chars)
+[2026-04-05T15:55:01.657Z] iter=220 turn=8 INFO: Turn 8/25
+[2026-04-05T15:55:05.620Z] iter=220 turn=8 INFO: Agent: **Status:**
+- **Goal 1 `/find`**: DONE — already fully implemented in tui.tsx (lines 347-379). It builds repoMap fresh, calls `fuzzySearch`, formats results. Just needs a test.
+- **Goal 2 `/model`**: NOT STARTED — no `/model` handler in tui.tsx, no `getModel()`/`setModel()` on orchestrator.
+
+Let me implement `/model` now and write the tests:
+[2026-04-05T15:55:05.620Z] iter=220 turn=8 INFO: $ sed -n '420,450p' src/orchestrator.ts
+[2026-04-05T15:55:05.628Z] iter=220 turn=8 INFO:   -> exit=0 (1153 chars)
+[2026-04-05T15:55:05.629Z] iter=220 turn=9 INFO: Turn 9/25
+[2026-04-05T15:55:07.881Z] iter=220 turn=9 INFO: $ grep -n "routeModel\|MODEL_ALIASES\|haiku\|sonnet\|claude-" src/orchestrator.ts | head -20
+[2026-04-05T15:55:07.900Z] iter=220 turn=9 INFO:   -> exit=0 (487 chars)
+[2026-04-05T15:55:07.902Z] iter=220 turn=10 INFO: Turn 10/25
+[2026-04-05T15:55:08.999Z] iter=220 turn=10 INFO: $ sed -n '530,560p' src/orchestrator.ts
+[2026-04-05T15:55:09.008Z] iter=220 turn=10 INFO:   -> exit=0 (1152 chars)
+[2026-04-05T15:55:09.009Z] iter=220 turn=11 INFO: Turn 11/25
+[2026-04-05T15:55:11.864Z] iter=220 turn=11 INFO: Agent: Now I have everything I need. Let me add `getModel()`/`setModel()` to orchestrator and the `/model` command to tui.tsx:
+[2026-04-05T15:55:11.865Z] iter=220 turn=11 INFO: read_file: src/orchestrator.ts
+[2026-04-05T15:55:11.866Z] iter=220 turn=11 INFO:   -> ok (789 chars)
+[2026-04-05T15:55:11.866Z] iter=220 turn=12 INFO: Turn 12/25
+[2026-04-05T15:55:18.315Z] iter=220 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:55:18.317Z] iter=220 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -9 +11 lines
+
+Context after patch:
+337 | 
+338 | // ─── Orchestrator class ───────────────────────────────────────
+339 | 
+340 | export class Orchestrator {
+341 |   private client: Anthropic;
+342 |   private registry: ReturnType<typeof createDefaultRegistry>;
+343 |   private repoFingerprint: string = "";
+344 |   private systemPrompt: string = "";
+345 |   private repoMapBlock: string = "";
+346 |   private apiMessages: Anthropic.MessageParam[] = [];
+347 |   private opts: OrchestratorOptions;
+348 |   private initialized = false;
+349 |   /** Model override — if set, bypasses routeModel() */
+350 |   private modelOverride: string | null = null;
+351 | 
+352 |   // Cost tracking
+353 |   private sessionTokensIn = 0;
+[2026-04-05T15:55:18.317Z] iter=220 turn=13 INFO: Turn 13/25
+[2026-04-05T15:55:20.842Z] iter=220 turn=13 INFO: Agent: I've only patched one line. Let me ship both features now, fast.
+[2026-04-05T15:55:20.843Z] iter=220 turn=13 INFO: $ grep -n "getCost\|reindex\|resumeSession\|clearHistory" src/orchestrator.ts | head -10
+[2026-04-05T15:55:20.853Z] iter=220 turn=13 INFO:   -> exit=0 (306 chars)
+[2026-04-05T15:55:20.853Z] iter=220 turn=14 INFO: Turn 14/25
+[2026-04-05T15:55:23.162Z] iter=220 turn=14 INFO: $ sed -n '418,425p' src/orchestrator.ts
+[2026-04-05T15:55:23.170Z] iter=220 turn=14 INFO:   -> exit=0 (157 chars)
+[2026-04-05T15:55:23.171Z] iter=220 turn=15 INFO: Turn 15/25
+[2026-04-05T15:55:27.431Z] iter=220 turn=15 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:55:27.433Z] iter=220 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -7 +17 lines
+
+Context after patch:
+415 |   }
+416 | 
+417 |   /** Get current session cost info. */
+418 |   getCost(): CostInfo {
+419 |     return {
+420 |       cost: this.sessionCost,
+421 |       tokensIn: this.sessionTokensIn,
+422 |       tokensOut: this.sessionTokensOut,
+423 |     };
+424 |   }
+425 | 
+426 |   /** Get the current model (override if set, otherwise auto-route). */
+427 |   getModel(): string {
+428 |     return this.modelOverride ?? MODEL_COMPLEX;
+429 |   }
+430 | 
+431 |   /** Override model for all subsequent sends. Pass null to restore auto-routing. */
+432 |   setModel(model: string | null): void {
+433 |     this.modelOverride = model;
+434 |   }
+435 | 
+436 |   /** Check if Tier 1 compaction is needed (compress old tool outputs). */
+437 |   private shouldCompactTier1(): boolean {
+[2026-04-05T15:55:27.434Z] iter=220 turn=16 INFO: Turn 16/25
+[2026-04-05T15:55:29.937Z] iter=220 turn=16 INFO: Agent: Now wire the model override into `send()` and add the `/model` command to tui.tsx:
+[2026-04-05T15:55:29.938Z] iter=220 turn=16 INFO: $ grep -n "const model = routeModel" src/orchestrator.ts
+[2026-04-05T15:55:29.956Z] iter=220 turn=16 INFO:   -> exit=0 (47 chars)
+[2026-04-05T15:55:29.957Z] iter=220 turn=17 INFO: Turn 17/25
+[2026-04-05T15:55:32.548Z] iter=220 turn=17 INFO: Agent: Let me finish the implementation and wrap up in one shot.
+[2026-04-05T15:55:32.548Z] iter=220 turn=17 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:55:32.549Z] iter=220 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+545 |     if (!this.initialized) await this.init();
+546 | 
+547 |     // 1. Model routing
+548 |     const model = this.modelOverride ?? routeModel(userMessage);
+549 |     this.opts.onStatus?.(`Using ${model === MODEL_COMPLEX ? "Sonnet" : "Haiku"}...`);
+550 | 
+551 |     // 2. Context compaction if needed (tiered)
+[2026-04-05T15:55:32.550Z] iter=220 turn=18 INFO: Turn 18/25
+[2026-04-05T15:55:34.816Z] iter=220 turn=18 INFO: Agent: Now add `/model` command to tui.tsx — insert after the `/undo` block:
+[2026-04-05T15:55:34.817Z] iter=220 turn=18 INFO: $ grep -n "MODEL_COMPLEX\|MODEL_SIMPLE\|MODEL_" src/orchestrator.ts | head -5
+[2026-04-05T15:55:34.837Z] iter=220 turn=18 INFO:   -> exit=0 (226 chars)
+[2026-04-05T15:55:34.838Z] iter=220 turn=19 INFO: Turn 19/25
+[2026-04-05T15:55:36.914Z] iter=220 turn=19 INFO: $ grep -n "\/undo\|return;" src/tui.tsx | head -20
+[2026-04-05T15:55:36.934Z] iter=220 turn=19 INFO:   -> exit=0 (400 chars)
+[2026-04-05T15:55:36.934Z] iter=220 turn=20 INFO: Turn 20/25
+[2026-04-05T15:55:38.691Z] iter=220 turn=20 INFO: Agent: Finishing now — writing `/model` command, then wrapping up.
+[2026-04-05T15:55:38.691Z] iter=220 turn=20 INFO: $ sed -n '398,416p' src/tui.tsx
+[2026-04-05T15:55:38.699Z] iter=220 turn=20 INFO:   -> exit=0 (500 chars)
+[2026-04-05T15:55:38.700Z] iter=220 turn=21 INFO: Turn 21/25
+[2026-04-05T15:55:46.378Z] iter=220 turn=21 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:55:46.380Z] iter=220 turn=21 INFO:   -> ok: Patched src/tui.tsx: -15 +40 lines
+
+Context after patch:
+398 |       }
+399 |       return;
+400 |     }
+401 |     if (trimmed === "/undo") {
+402 |       const result = await undoLastCommit(workDir);
+403 |       if (result.undone) {
+404 |         setMessages(prev => [...prev, {
+405 |           role: "assistant",
+406 |           content: `✓ Undid commit ${result.hash}: ${result.message}`,
+407 |         }]);
+408 |       } else {
+409 |         setMessages(prev => [...prev, {
+410 |           role: "assistant",
+411 |           content: `Cannot undo: ${result.error}`,
+412 |         }]);
+413 |       }
+414 |       return;
+415 |     }
+416 |     if (trimmed.startsWith("/model")) {
+417 |       const arg = trimmed.slice(6).trim();
+418 |       const MODEL_ALIASES: Record<string, string> = {
+419 |         haiku: "claude-haiku-4-5",
+420 |         sonnet: "claude-sonnet-4-6",
+421 |         opus: "claude-opus-4-5",
+422 |       };
+423 |       if (!arg) {
+424 |         const current = orchestratorRef.current?.getModel() ?? "auto";
+425 |         setMessages(prev => [...prev, { role: "assistant", content: `Current model: ${current}` }]);
+426 |       } else {
+427 |         const resolved = MODEL_ALIASES[arg] ?? (arg.startsWith("claude-") ? arg : null);
+428 |         if (!resolved) {
+429 |           setMessages(prev => [...prev, {
+430 |             role: "assistant",
+431 |             content: `Unknown model "${arg}". Use: haiku, sonnet, opus, or a full model ID.`,
+432 |           }]);
+433 |         } else {
+434 |           orchestratorRef.current?.setModel(resolved);
+435 |           setCurrentModel(resolved);
+436 |           setMessages(prev => [...prev, { role: "assistant", content: `Switched to ${resolved}` }]);
+437 |         }
+438 |       }
+439 |       return;
+440 |     }
+441 |     if (trimmed === "/resume") {
+442 |       const sessions = listSessions(workDir);
+443 |       if (sessions.length === 0) {
+[2026-04-05T15:55:46.380Z] iter=220 turn=22 INFO: Turn 22/25
+[2026-04-05T15:55:53.248Z] iter=220 turn=22 INFO: Agent: Now update `/help` to include `/model`:
+[2026-04-05T15:55:53.249Z] iter=220 turn=22 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:55:53.249Z] iter=220 turn=22 INFO:   -> ok: Patched src/tui.tsx: -7 +8 lines
+
+Context after patch:
+333 |         content: [
+334 |           "Available commands:",
+335 |           "  /help     — Show this help message",
+336 |           "  /find Q   — Fuzzy search files & symbols in the repo",
+337 |           "  /model    — Show current model (or /model haiku|sonnet to switch)",
+338 |           "  /clear    — Clear the conversation history",
+339 |           "  /reindex  — Re-index the repository files",
+340 |           "  /resume   — List and restore a previous session",
+341 |           "  /diff     — Show uncommitted git changes",
+342 |           "  /undo     — Revert the last autoagent commit",
+343 |           "  /exit     — Quit AutoAgent",
+344 |         ].join("\n"),
+345 |       }]);
+346 |       return;
+[2026-04-05T15:55:53.250Z] iter=220 turn=23 INFO: Turn 23/25
+[2026-04-05T15:55:56.823Z] iter=220 turn=23 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T15:55:57.711Z] iter=220 turn=23 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:55:57.711Z] iter=220 turn=24 INFO: Turn 24/25
+[2026-04-05T15:56:01.118Z] iter=220 turn=24 INFO: save_memory: "[Engineer] Iteration 220"
+[2026-04-05T15:56:01.120Z] iter=220 turn=24 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T15:56:01.121Z] iter=220 turn=25 INFO: Turn 25/25
+[2026-04-05T15:56:09.337Z] iter=220 turn=25 INFO: write_file: goals.md (write)
+[2026-04-05T15:56:09.338Z] iter=220 turn=25 INFO:   -> ok: Updated goals.md (1130 chars, -32 lines delta)
+[2026-04-05T15:56:09.338Z] iter=220 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T15:56:09.340Z] iter=220 turn=25 INFO: Cache persisted: 46 entries to .autoagent-cache.json
+[2026-04-05T15:56:09.341Z] iter=220 turn=25 INFO: Cache stats: 0 hits, 1 misses, 46 entries, 6 invalidations (1 entries removed)
+[2026-04-05T15:56:09.341Z] iter=220 turn=25 INFO: Tool cache stats
+[2026-04-05T15:56:09.341Z] iter=220 turn=25 INFO: Tool timing: bash: 18x, avg=65ms, total=1164ms; write_file: 6x, avg=2ms, total=11ms; save_memory: 1x, avg=2ms, total=2ms; read_file: 1x, avg=1ms, total=1ms; think: 2x, avg=0ms, total=0ms
+[2026-04-05T15:56:09.341Z] iter=220 turn=25 INFO: Tool timing stats
+[2026-04-05T15:56:14.406Z] iter=220 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 220: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T15:56:21.907Z] iter=220 turn=25 INFO: Pre-commit review (631in/269out): **Issue: `getModel()` doesn't reflect actual routing logic**
+
+`getModel()` returns `this.modelOverride ?? MODEL_COMPLEX`, but when no override is set, the real model is determined by `routeModel(userM

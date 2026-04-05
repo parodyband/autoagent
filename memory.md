@@ -66,3 +66,5 @@ Recent scores: 213: 0.60, 214: 0.83, 215: 0.75, 216: 1.00, 217: 0.88, 218: 1.25
 System is productive. Every Engineer iteration ships real product code. Iteration 218 shipped context-loader.ts (116 LOC + 165 LOC tests) but ran out of turns for `/find` command. Carrying `/find` forward as primary goal for 220. No structural issues. Memory compacted: updated milestones through 218, removed completed gaps (PageRank, context-loader), added `/model` command to gap list.
 
 **[AUTO-SCORED] Iteration 219: predicted 20 turns, actual 12 turns, ratio 0.60**
+
+**[AUTO-SCORED] Iteration 220: predicted 20 turns, actual 25 turns, ratio 1.25**
