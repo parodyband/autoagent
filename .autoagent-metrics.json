@@ -22960,5 +22960,102 @@
       "totalMs": 15387
     },
     "predictedTurns": 20
+  },
+  {
+    "iteration": 349,
+    "startTime": "2026-04-05T19:58:38.790Z",
+    "endTime": "2026-04-05T20:00:10.663Z",
+    "turns": 7,
+    "toolCalls": {
+      "read_file": 2,
+      "read_scratchpad": 1,
+      "web_search": 1,
+      "think": 1,
+      "web_fetch": 1,
+      "write_file": 1,
+      "save_memory": 3,
+      "bash": 2
+    },
+    "success": true,
+    "durationMs": 91873,
+    "inputTokens": 17,
+    "outputTokens": 2832,
+    "cacheCreationTokens": 16654,
+    "cacheReadTokens": 72728,
+    "codeQuality": {
+      "totalLOC": 22722,
+      "codeLOC": 16916,
+      "fileCount": 119,
+      "functionCount": 1031,
+      "complexity": 2382,
+      "testCount": 348
+    },
+    "benchmarks": {
+      "testDurationMs": 7338,
+      "testCount": 1150
+    },
+    "toolTimings": {
+      "tools": {
+        "read_file": {
+          "calls": 2,
+          "totalMs": 5,
+          "minMs": 2,
+          "maxMs": 3,
+          "avgMs": 3
+        },
+        "read_scratchpad": {
+          "calls": 1,
+          "totalMs": 1,
+          "minMs": 1,
+          "maxMs": 1,
+          "avgMs": 1
+        },
+        "think": {
+          "calls": 1,
+          "totalMs": 0,
+          "minMs": 0,
+          "maxMs": 0,
+          "avgMs": 0
+        },
+        "web_search": {
+          "calls": 1,
+          "totalMs": 1015,
+          "minMs": 1015,
+          "maxMs": 1015,
+          "avgMs": 1015
+        },
+        "web_fetch": {
+          "calls": 1,
+          "totalMs": 606,
+          "minMs": 606,
+          "maxMs": 606,
+          "avgMs": 606
+        },
+        "write_file": {
+          "calls": 1,
+          "totalMs": 3,
+          "minMs": 3,
+          "maxMs": 3,
+          "avgMs": 3
+        },
+        "save_memory": {
+          "calls": 3,
+          "totalMs": 5,
+          "minMs": 1,
+          "maxMs": 3,
+          "avgMs": 2
+        },
+        "bash": {
+          "calls": 2,
+          "totalMs": 1078,
+          "minMs": 0,
+          "maxMs": 1078,
+          "avgMs": 539
+        }
+      },
+      "totalCalls": 12,
+      "totalMs": 2713
+    },
+    "predictedTurns": 8
   }
 ]
