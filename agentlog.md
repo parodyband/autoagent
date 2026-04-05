@@ -1,67 +1,3 @@
-[2026-04-05T16:20:04.655Z] iter=233 turn=16 INFO: Restarting as iteration 234...
-[2026-04-05T16:20:04.854Z] iter=234 INFO: Cache restored: 52/52 entries (0 stale)
-[2026-04-05T16:20:04.856Z] iter=234 INFO: Turn budget: 19/25 (calibration=1.00x, predicted=20)
-[2026-04-05T16:20:04.856Z] iter=234 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T16:20:04.963Z] iter=234 turn=1 INFO: Turn 1/25
-[2026-04-05T16:20:08.348Z] iter=234 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be built.
-[2026-04-05T16:20:08.348Z] iter=234 turn=1 INFO: $ cat goals.md | head -5 && echo "---" && wc -l src/tui.tsx src/orchestrator.ts src/context-loader.ts
-[2026-04-05T16:20:08.351Z] iter=234 turn=1 INFO: $ grep -n "extractFileQuery\|handleSubmit\|#file\|#path\|fileRef" src/tui.tsx | head -40
-[2026-04-05T16:20:08.361Z] iter=234 turn=1 INFO:   -> exit=0 (210 chars)
-[2026-04-05T16:20:08.363Z] iter=234 turn=1 INFO:   -> exit=0 (439 chars)
-[2026-04-05T16:20:08.364Z] iter=234 turn=2 INFO: Turn 2/25
-[2026-04-05T16:20:11.176Z] iter=234 turn=2 INFO: read_file: src/tui.tsx
-[2026-04-05T16:20:11.177Z] iter=234 turn=2 INFO:   -> ok (1625 chars)
-[2026-04-05T16:20:11.177Z] iter=234 turn=2 INFO: read_file: src/tui.tsx
-[2026-04-05T16:20:11.178Z] iter=234 turn=2 INFO:   -> ok (2118 chars)
-[2026-04-05T16:20:11.179Z] iter=234 turn=3 INFO: Turn 3/25
-[2026-04-05T16:20:15.085Z] iter=234 turn=3 INFO: read_file: src/tui.tsx
-[2026-04-05T16:20:15.086Z] iter=234 turn=3 INFO:   -> ok (4879 chars)
-[2026-04-05T16:20:15.087Z] iter=234 turn=3 INFO: $ grep -n "microCompact\|compactMessages\|Tier\|tierCompact\|contextCompact\|CONTEXT_LIMIT\|TOKEN_LIMIT\|80K\|100K" src/orchestrator.ts | head -40
-[2026-04-05T16:20:15.108Z] iter=234 turn=3 INFO:   -> exit=0 (656 chars)
-[2026-04-05T16:20:15.109Z] iter=234 turn=4 INFO: Turn 4/25
-[2026-04-05T16:20:20.025Z] iter=234 turn=4 INFO: think: I have enough context. Let me build both deliverables:
-
-1. `extractAllFileRefs()` in tui.tsx + file injection in handleS...
-[2026-04-05T16:20:20.026Z] iter=234 turn=5 INFO: Turn 5/25
-[2026-04-05T16:20:23.358Z] iter=234 turn=5 INFO: Agent: Let me read the exact code sections I need to modify, then immediately write both deliverables.
-[2026-04-05T16:20:23.359Z] iter=234 turn=5 INFO: read_file: src/tui.tsx
-[2026-04-05T16:20:23.359Z] iter=234 turn=5 INFO:   -> ok (478 chars)
-[2026-04-05T16:20:23.359Z] iter=234 turn=5 INFO: read_file: src/orchestrator.ts
-[2026-04-05T16:20:23.360Z] iter=234 turn=5 INFO:   -> ok (613 chars)
-[2026-04-05T16:20:23.360Z] iter=234 turn=6 INFO: Turn 6/25
-[2026-04-05T16:20:26.167Z] iter=234 turn=6 INFO: read_file: src/orchestrator.ts
-[2026-04-05T16:20:26.169Z] iter=234 turn=6 INFO:   -> ok (1938 chars)
-[2026-04-05T16:20:26.169Z] iter=234 turn=6 INFO: read_file: src/tui.tsx
-[2026-04-05T16:20:26.170Z] iter=234 turn=6 INFO:   -> ok (1658 chars)
-[2026-04-05T16:20:26.172Z] iter=234 turn=7 INFO: Turn 7/25
-[2026-04-05T16:20:30.106Z] iter=234 turn=7 INFO: Agent: **Goal 1** (`extractAllFileRefs` + file injection): NOT STARTED
-**Goal 2** (microCompact): NOT STARTED
-
-Starting both now simultaneously.
-[2026-04-05T16:20:30.107Z] iter=234 turn=7 INFO: read_file: src/orchestrator.ts
-[2026-04-05T16:20:30.107Z] iter=234 turn=7 INFO:   -> ok (1307 chars)
-[2026-04-05T16:20:30.107Z] iter=234 turn=7 INFO: read_file: src/tui.tsx
-[2026-04-05T16:20:30.107Z] iter=234 turn=7 INFO:   -> ok (426 chars)
-[2026-04-05T16:20:30.108Z] iter=234 turn=8 INFO: Turn 8/25
-[2026-04-05T16:20:32.723Z] iter=234 turn=8 INFO: think: Interesting! The orchestrator already has `extractFileReferences`, `loadFileReferences`, and `stripFileReferences` funct...
-[2026-04-05T16:20:32.723Z] iter=234 turn=9 INFO: Turn 9/25
-[2026-04-05T16:20:35.595Z] iter=234 turn=9 INFO: $ grep -n "extractFileReferences\|loadFileReferences\|stripFileReferences\|microCompact\|MICRO_COMPACT" src/orchestrator.ts | head -30
-[2026-04-05T16:20:35.614Z] iter=234 turn=9 INFO:   -> exit=0 (377 chars)
-[2026-04-05T16:20:35.615Z] iter=234 turn=10 INFO: Turn 10/25
-[2026-04-05T16:20:38.849Z] iter=234 turn=10 INFO: $ grep -n "extractFileReferences\|loadFileReferences\|stripFileReferences" src/context-loader.ts
-[2026-04-05T16:20:38.858Z] iter=234 turn=10 INFO:   -> exit=0 (239 chars)
-[2026-04-05T16:20:38.858Z] iter=234 turn=11 INFO: Turn 11/25
-[2026-04-05T16:20:43.170Z] iter=234 turn=11 INFO: Agent: Goal 1 is already implemented in context-loader.ts and wired into orchestrator! Let me check if `extractAllFileRefs` exists in tui.tsx and verify the tests exist:
-[2026-04-05T16:20:43.171Z] iter=234 turn=11 INFO: $ grep -n "extractAllFileRefs\|extractFileReferences\|loadFileReferences" src/tui.tsx src/__tests__/*.test.ts 2>/dev/null | head -30
-[2026-04-05T16:20:43.173Z] iter=234 turn=11 INFO: read_file: src/context-loader.ts
-[2026-04-05T16:20:43.173Z] iter=234 turn=11 INFO:   -> ok (2066 chars)
-[2026-04-05T16:20:43.193Z] iter=234 turn=11 INFO:   -> exit=0 (1173 chars)
-[2026-04-05T16:20:43.193Z] iter=234 turn=12 INFO: Turn 12/25
-[2026-04-05T16:20:46.758Z] iter=234 turn=12 INFO: Agent: Goal 1 is **already fully implemented**! `extractFileReferences`, `loadFileReferences`, `stripFileReferences` in context-loader.ts with tests. Wired into orchestrator. 
-
-Now I need to check Goal 2 (microCompact). Let me check if it exists, then build it if not:
-[2026-04-05T16:20:46.760Z] iter=234 turn=12 INFO: $ grep -n "microCompact\|MICRO_COMPACT\|80_000\|80000" src/orchestrator.ts src/__tests__/*.test.ts 2>/dev/null | head -20
-[2026-04-05T16:20:46.799Z] iter=234 turn=12 INFO:   -> exit=0 (11 chars)
 [2026-04-05T16:20:46.800Z] iter=234 turn=13 INFO: Turn 13/25
 [2026-04-05T16:20:50.033Z] iter=234 turn=13 INFO: Agent: I've been reading, not writing. Goal 1 is already done (from a previous iteration). Goal 2 (microCompact) needs to be built NOW.
 [2026-04-05T16:20:50.034Z] iter=234 turn=13 INFO: read_file: src/orchestrator.ts
@@ -1060,3 +996,226 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T16:33:55.813Z] iter=241 turn=7 INFO: Tool timing stats
 [2026-04-05T16:34:01.302Z] iter=241 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 241: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T16:34:01.321Z] iter=241 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T16:34:01.352Z] iter=241 turn=7 INFO: Committed: 4d58fe8b (17 in / 2660 out, cache: 20447 created, 100915 read)
+[2026-04-05T16:34:01.353Z] iter=241 turn=7 INFO: Restarting as iteration 242...
+[2026-04-05T16:34:01.548Z] iter=242 INFO: Cache restored: 52/52 entries (0 stale)
+[2026-04-05T16:34:01.550Z] iter=242 INFO: Turn budget: 20/25 (calibration=1.00x, predicted=20)
+[2026-04-05T16:34:01.550Z] iter=242 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T16:34:01.649Z] iter=242 turn=1 INFO: Turn 1/25
+[2026-04-05T16:34:04.460Z] iter=242 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what needs to be built.
+[2026-04-05T16:34:04.461Z] iter=242 turn=1 INFO: $ cat src/orchestrator.ts | head -100
+[2026-04-05T16:34:04.463Z] iter=242 turn=1 INFO: $ grep -n "runAgentLoop\|microCompact\|MICRO_COMPACT\|COMPACT_THRESHOLD\|COMPACT_TIER" src/orchestrator.ts | head -50
+[2026-04-05T16:34:04.471Z] iter=242 turn=1 INFO:   -> exit=0 (4014 chars)
+[2026-04-05T16:34:04.475Z] iter=242 turn=1 INFO:   -> exit=0 (936 chars)
+[2026-04-05T16:34:04.476Z] iter=242 turn=2 INFO: Turn 2/25
+[2026-04-05T16:34:06.604Z] iter=242 turn=2 INFO: $ sed -n '259,400p' src/orchestrator.ts
+[2026-04-05T16:34:06.607Z] iter=242 turn=2 INFO: $ sed -n '700,900p' src/orchestrator.ts
+[2026-04-05T16:34:06.613Z] iter=242 turn=2 INFO:   -> exit=0 (5434 chars)
+[2026-04-05T16:34:06.615Z] iter=242 turn=2 INFO:   -> exit=0 (7932 chars)
+[2026-04-05T16:34:06.615Z] iter=242 turn=3 INFO: Turn 3/25
+[2026-04-05T16:34:27.774Z] iter=242 turn=3 INFO: think: Now I understand the codebase. Let me plan the implementation:
+
+## Goal 1: Mid-loop compaction in runAgentLoop
+
+I need t...
+[2026-04-05T16:34:27.774Z] iter=242 turn=4 INFO: Turn 4/25
+[2026-04-05T16:34:30.071Z] iter=242 turn=4 INFO: Agent: Let me check the compact method signature quickly, then start writing.
+[2026-04-05T16:34:30.072Z] iter=242 turn=4 INFO: $ grep -n "async compact\|compactTier1\|microCompact" src/orchestrator.ts | head -20
+[2026-04-05T16:34:30.092Z] iter=242 turn=4 INFO:   -> exit=0 (299 chars)
+[2026-04-05T16:34:30.093Z] iter=242 turn=5 INFO: Turn 5/25
+[2026-04-05T16:34:33.820Z] iter=242 turn=5 INFO: Agent: Good. Now I'll implement both goals. Starting with the orchestrator changes:
+[2026-04-05T16:34:33.821Z] iter=242 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:34:33.822Z] iter=242 turn=5 INFO:   -> ok (672 chars)
+[2026-04-05T16:34:33.822Z] iter=242 turn=6 INFO: Turn 6/25
+[2026-04-05T16:34:38.553Z] iter=242 turn=6 INFO: Agent: Now I'll make all the changes to orchestrator.ts:
+[2026-04-05T16:34:38.553Z] iter=242 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:34:38.556Z] iter=242 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -12 +14 lines
+
+Context after patch:
+256 | 
+257 | // ─── Streaming agent loop ─────────────────────────────────────
+258 | 
+259 | async function runAgentLoop(
+260 |   client: Anthropic,
+261 |   model: string,
+262 |   systemPrompt: string,
+263 |   apiMessages: Anthropic.MessageParam[],
+264 |   registry: ReturnType<typeof createDefaultRegistry>,
+265 |   workDir: string,
+266 |   onToolCall?: OrchestratorOptions["onToolCall"],
+267 |   onStatus?: OrchestratorOptions["onStatus"],
+268 |   onText?: OrchestratorOptions["onText"],
+269 |   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
+270 |   onCompact?: (inputTokens: number, messages: Anthropic.MessageParam[]) => Promise<void>,
+271 |   onContextBudget?: OrchestratorOptions["onContextBudget"],
+272 | ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number }> {
+273 |   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
+274 |     totalIn += tIn;
+275 |     totalOut += tOut;
+[2026-04-05T16:34:38.557Z] iter=242 turn=7 INFO: Turn 7/25
+[2026-04-05T16:34:42.547Z] iter=242 turn=7 INFO: think: Goal 1: IN PROGRESS - I've added the new parameters to runAgentLoop signature. I still need to:
+1. Add the mid-loop comp...
+[2026-04-05T16:34:42.547Z] iter=242 turn=8 INFO: Turn 8/25
+[2026-04-05T16:34:45.108Z] iter=242 turn=8 INFO: Agent: **Goal 1**: IN PROGRESS — signature updated, need to add mid-loop check + wire in send()  
+**Goal 2**: NOT STARTED — need selectCompactionTier + test file
+
+Continuing now:
+[2026-04-05T16:34:45.109Z] iter=242 turn=8 INFO: $ sed -n '315,335p' src/orchestrator.ts
+[2026-04-05T16:34:45.118Z] iter=242 turn=8 INFO:   -> exit=0 (888 chars)
+[2026-04-05T16:34:45.119Z] iter=242 turn=9 INFO: Turn 9/25
+[2026-04-05T16:34:50.332Z] iter=242 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:34:50.335Z] iter=242 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -8 +18 lines
+
+Context after patch:
+312 | 
+313 |     lastInput = finalMessage.usage?.input_tokens ?? 0;
+314 |     totalIn += lastInput;
+315 |     totalOut += finalMessage.usage?.output_tokens ?? 0;
+316 |     apiMessages.push({ role: "assistant", content: finalMessage.content });
+317 | 
+318 |     // Emit context budget ratio after each round so TUI footer updates live
+319 |     if (onContextBudget) {
+320 |       onContextBudget(lastInput / COMPACT_TIER1_THRESHOLD);
+321 |     }
+322 | 
+323 |     // Mid-loop compaction: if context is growing large, compact between rounds
+324 |     if (onCompact && lastInput >= MICRO_COMPACT_THRESHOLD) {
+325 |       await onCompact(lastInput, apiMessages);
+326 |     }
+327 | 
+328 |     const toolUses = finalMessage.content.filter(
+329 |       (b): b is Anthropic.ToolUseBlock => b.type === "tool_use"
+330 |     );
+331 | 
+332 |     if (toolUses.length === 0) break;
+333 | 
+334 |     // Separate write_file tools from non-write tools
+335 |     const writeTools = toolUses.filter(tu => tu.name === "write_file");
+[2026-04-05T16:34:50.336Z] iter=242 turn=10 INFO: Turn 10/25
+[2026-04-05T16:34:55.774Z] iter=242 turn=10 INFO: Agent: Now add `selectCompactionTier` export and wire callbacks in `send()`:
+[2026-04-05T16:34:55.775Z] iter=242 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:34:55.776Z] iter=242 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -2 +13 lines
+
+Context after patch:
+49 | export const MICRO_COMPACT_THRESHOLD = 80_000;
+50 | /** Token threshold for Tier 1 compaction: compress old tool outputs (~100K). */
+51 | export const COMPACT_TIER1_THRESHOLD = 100_000;
+52 | /** Token threshold for Tier 2 compaction: summarize old messages (~150K). */
+53 | export const COMPACT_THRESHOLD = 150_000;
+54 | 
+55 | /**
+56 |  * Pure function: select which compaction tier to apply based on input token count.
+57 |  * Used for mid-loop compaction decisions inside runAgentLoop.
+58 |  */
+59 | export function selectCompactionTier(inputTokens: number): 'none' | 'micro' | 'tier1' | 'tier2' {
+60 |   if (inputTokens >= COMPACT_THRESHOLD) return 'tier2';
+61 |   if (inputTokens >= COMPACT_TIER1_THRESHOLD) return 'tier1';
+62 |   if (inputTokens >= MICRO_COMPACT_THRESHOLD) return 'micro';
+63 |   return 'none';
+64 | }
+65 | 
+66 | /** Pricing per million tokens: [input, output] */
+67 | export const MODEL_PRICING: Record<string, [number, number]> = {
+[2026-04-05T16:34:55.776Z] iter=242 turn=11 INFO: Turn 11/25
+[2026-04-05T16:34:58.421Z] iter=242 turn=11 INFO: Agent: Now wire the callbacks in `send()`. Find where `runAgentLoop` is called in send():
+[2026-04-05T16:34:58.423Z] iter=242 turn=11 INFO: $ grep -n "await runAgentLoop" src/orchestrator.ts
+[2026-04-05T16:34:58.447Z] iter=242 turn=11 INFO:   -> exit=0 (167 chars)
+[2026-04-05T16:34:58.448Z] iter=242 turn=12 INFO: Turn 12/25
+[2026-04-05T16:35:00.264Z] iter=242 turn=12 INFO: $ sed -n '820,855p' src/orchestrator.ts
+[2026-04-05T16:35:00.287Z] iter=242 turn=12 INFO:   -> exit=0 (1272 chars)
+[2026-04-05T16:35:00.288Z] iter=242 turn=13 INFO: Turn 13/25
+[2026-04-05T16:35:06.225Z] iter=242 turn=13 INFO: Agent: I've made real changes. Let me finish wiring the callbacks and write the test file now.
+[2026-04-05T16:35:06.225Z] iter=242 turn=13 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:35:06.226Z] iter=242 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -13 +28 lines
+
+Context after patch:
+827 | 
+828 |     this.opts.onStatus?.("Thinking...");
+829 | 
+830 |     // 5. Run streaming agent loop
+831 |     // Build mid-loop compaction callback
+832 |     const onCompact = async (inputTokens: number, messages: Anthropic.MessageParam[]): Promise<void> => {
+833 |       const tier = selectCompactionTier(inputTokens);
+834 |       if (tier === 'tier2') {
+835 |         await this.compact();
+836 |       } else if (tier === 'tier1') {
+837 |         this.compactTier1();
+838 |       } else if (tier === 'micro') {
+839 |         this.microCompact(messages.length);
+840 |       }
+841 |       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
+842 |     };
+843 | 
+844 |     const { text, tokensIn, tokensOut, lastInputTokens } = await runAgentLoop(
+845 |       this.client,
+846 |       model,
+847 |       this.systemPrompt,
+848 |       this.apiMessages,
+849 |       this.registry,
+850 |       this.opts.workDir,
+851 |       this.opts.onToolCall,
+852 |       this.opts.onStatus,
+853 |       this.opts.onText,
+854 |       this.opts.onDiffPreview,
+855 |       onCompact,
+856 |       this.opts.onContextBudget,
+857 |     );
+858 | 
+859 |     // Persist assistant reply (last assistant message in history)
+860 |     if (this.sessionPath && text) {
+[2026-04-05T16:35:06.226Z] iter=242 turn=14 INFO: Turn 14/25
+[2026-04-05T16:35:24.941Z] iter=242 turn=14 INFO: Agent: Now write the test file:
+[2026-04-05T16:35:24.942Z] iter=242 turn=14 INFO: write_file: src/__tests__/mid-loop-compact.test.ts (write)
+[2026-04-05T16:35:24.943Z] iter=242 turn=14 INFO:   -> ok: Created src/__tests__/mid-loop-compact.test.ts (4810 chars)
+[2026-04-05T16:35:24.943Z] iter=242 turn=15 INFO: Turn 15/25
+[2026-04-05T16:35:26.886Z] iter=242 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T16:35:27.885Z] iter=242 turn=15 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:35:27.885Z] iter=242 turn=16 INFO: Turn 16/25
+[2026-04-05T16:35:30.084Z] iter=242 turn=16 INFO: Agent: TSC clean. Run the tests:
+[2026-04-05T16:35:30.085Z] iter=242 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/mid-loop-compact.test.ts 2>&1 | tail -30
+[2026-04-05T16:35:31.158Z] iter=242 turn=16 INFO:   -> exit=0 (1290 chars)
+[2026-04-05T16:35:31.158Z] iter=242 turn=17 INFO: Turn 17/25
+[2026-04-05T16:35:33.542Z] iter=242 turn=17 INFO: Agent: Let me check what `microCompact` actually sets and fix the test:
+[2026-04-05T16:35:33.542Z] iter=242 turn=17 INFO: $ sed -n '601,650p' src/orchestrator.ts
+[2026-04-05T16:35:33.550Z] iter=242 turn=17 INFO:   -> exit=0 (1850 chars)
+[2026-04-05T16:35:33.550Z] iter=242 turn=18 INFO: Turn 18/25
+[2026-04-05T16:35:38.303Z] iter=242 turn=18 INFO: Agent: The compacted text is `[Tool output cleared — turn X]` not `[compacted]`. Fix the test assertion:
+[2026-04-05T16:35:38.304Z] iter=242 turn=18 INFO: write_file: src/__tests__/mid-loop-compact.test.ts (patch)
+[2026-04-05T16:35:38.304Z] iter=242 turn=18 INFO:   -> ok: Patched src/__tests__/mid-loop-compact.test.ts: -6 +6 lines
+
+Context after patch:
+96 |     expect(toolResultMsgs.length).toBeGreaterThan(0);
+97 | 
+98 |     // Old tool results (not in recent window) should have cleared content
+99 |     const clearedResults = toolResultMsgs.filter(m =>
+100 |       (m.content as Array<{ type: string; content?: string | Array<{type:string;text?:string}> }>).some(
+101 |         b => b.type === "tool_result" && typeof b.content === "string" && b.content.startsWith("[Tool output cleared")
+102 |       )
+103 |     );
+104 |     expect(clearedResults.length).toBeGreaterThan(0);
+105 |   });
+106 | 
+107 |   it("does not clear tool_results in the most recent window", () => {
+[2026-04-05T16:35:38.305Z] iter=242 turn=19 INFO: Turn 19/25
+[2026-04-05T16:35:40.300Z] iter=242 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/mid-loop-compact.test.ts 2>&1 | tail -15 && npx tsc --noEmit 2>&1
+[2026-04-05T16:35:42.243Z] iter=242 turn=19 INFO:   -> exit=0 (288 chars)
+[2026-04-05T16:35:42.244Z] iter=242 turn=20 INFO: Turn 20/25
+[2026-04-05T16:35:58.425Z] iter=242 turn=20 INFO: Agent: 10 tests pass, TSC clean. Now memory, goals, restart:
+[2026-04-05T16:35:58.426Z] iter=242 turn=20 INFO: save_memory: "[Engineer] Iteration 242"
+[2026-04-05T16:35:58.426Z] iter=242 turn=20 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T16:35:58.426Z] iter=242 turn=20 INFO: write_file: goals.md (write)
+[2026-04-05T16:35:58.427Z] iter=242 turn=20 INFO:   -> ok: Updated goals.md (1523 chars, -38 lines delta)
+[2026-04-05T16:35:58.428Z] iter=242 turn=21 INFO: Turn 21/25
+[2026-04-05T16:36:01.452Z] iter=242 turn=21 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T16:36:01.452Z] iter=242 turn=21 INFO: RESTART signal
+[2026-04-05T16:36:01.453Z] iter=242 turn=21 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T16:36:02.391Z] iter=242 turn=21 INFO: Compilation OK
+[2026-04-05T16:36:08.392Z] iter=242 turn=21 INFO: Cache persisted: 51 entries to .autoagent-cache.json
+[2026-04-05T16:36:08.392Z] iter=242 turn=21 INFO: Cache stats: 0 hits, 1 misses, 51 entries, 7 invalidations (2 entries removed)
+[2026-04-05T16:36:08.392Z] iter=242 turn=21 INFO: Tool cache stats
+[2026-04-05T16:36:08.392Z] iter=242 turn=21 INFO: Tool timing: bash: 13x, avg=319ms, total=4146ms; write_file: 7x, avg=1ms, total=10ms; save_memory: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-05T16:36:08.392Z] iter=242 turn=21 INFO: Tool timing stats
+[2026-04-05T16:36:13.791Z] iter=242 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 242: predicted 20 turns, actual 21 turns, ratio 1.05**
+[2026-04-05T16:36:22.913Z] iter=242 turn=21 INFO: Pre-commit review (2976in/357out): ## Issues Found
+
+- **Logic bug in `onContextBudget` ratio**: The budget ratio is computed as `lastInput / COMPACT_TIER1_THRESHOLD` (100K), but the actual context limit is `COMPACT_THRESHOLD` (150K). T

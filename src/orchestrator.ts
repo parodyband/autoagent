@@ -52,6 +52,17 @@ export const COMPACT_TIER1_THRESHOLD = 100_000;
 /** Token threshold for Tier 2 compaction: summarize old messages (~150K). */
 export const COMPACT_THRESHOLD = 150_000;
 
+/**
+ * Pure function: select which compaction tier to apply based on input token count.
+ * Used for mid-loop compaction decisions inside runAgentLoop.
+ */
+export function selectCompactionTier(inputTokens: number): 'none' | 'micro' | 'tier1' | 'tier2' {
+  if (inputTokens >= COMPACT_THRESHOLD) return 'tier2';
+  if (inputTokens >= COMPACT_TIER1_THRESHOLD) return 'tier1';
+  if (inputTokens >= MICRO_COMPACT_THRESHOLD) return 'micro';
+  return 'none';
+}
+
 /** Pricing per million tokens: [input, output] */
 export const MODEL_PRICING: Record<string, [number, number]> = {
   [MODEL_COMPLEX]: [3.0, 15.0],
@@ -267,6 +278,8 @@ async function runAgentLoop(
   onStatus?: OrchestratorOptions["onStatus"],
   onText?: OrchestratorOptions["onText"],
   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
+  onCompact?: (inputTokens: number, messages: Anthropic.MessageParam[]) => Promise<void>,
+  onContextBudget?: OrchestratorOptions["onContextBudget"],
 ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number }> {
   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
     totalIn += tIn;
@@ -312,6 +325,16 @@ async function runAgentLoop(
     totalIn += lastInput;
     totalOut += finalMessage.usage?.output_tokens ?? 0;
     apiMessages.push({ role: "assistant", content: finalMessage.content });
+
+    // Emit context budget ratio after each round so TUI footer updates live
+    if (onContextBudget) {
+      onContextBudget(lastInput / COMPACT_TIER1_THRESHOLD);
+    }
+
+    // Mid-loop compaction: if context is growing large, compact between rounds
+    if (onCompact && lastInput >= MICRO_COMPACT_THRESHOLD) {
+      await onCompact(lastInput, apiMessages);
+    }
 
     const toolUses = finalMessage.content.filter(
       (b): b is Anthropic.ToolUseBlock => b.type === "tool_use"
@@ -805,6 +828,19 @@ export class Orchestrator {
     this.opts.onStatus?.("Thinking...");
 
     // 5. Run streaming agent loop
+    // Build mid-loop compaction callback
+    const onCompact = async (inputTokens: number, messages: Anthropic.MessageParam[]): Promise<void> => {
+      const tier = selectCompactionTier(inputTokens);
+      if (tier === 'tier2') {
+        await this.compact();
+      } else if (tier === 'tier1') {
+        this.compactTier1();
+      } else if (tier === 'micro') {
+        this.microCompact(messages.length);
+      }
+      this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
+    };
+
     const { text, tokensIn, tokensOut, lastInputTokens } = await runAgentLoop(
       this.client,
       model,
@@ -816,6 +852,8 @@ export class Orchestrator {
       this.opts.onStatus,
       this.opts.onText,
       this.opts.onDiffPreview,
+      onCompact,
+      this.opts.onContextBudget,
     );
 
     // Persist assistant reply (last assistant message in history)
