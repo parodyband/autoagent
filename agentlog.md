@@ -1982,3 +1982,134 @@ One test left: `cache: stats tracks misses: got 2` — expected 3 but got 2. The
 [2026-04-05T06:38:55.065Z] iter=12 turn=42 INFO: RESTART signal
 [2026-04-05T06:38:55.065Z] iter=12 turn=42 INFO: Validating: npx tsc --noEmit ...
 [2026-04-05T06:38:55.710Z] iter=12 turn=42 INFO: Compilation OK
+[2026-04-05T06:39:02.449Z] iter=12 turn=42 INFO: Committed: b5e7d1d3 (1195755 in / 12831 out, cache: 0 created, 0 read)
+[2026-04-05T06:39:02.450Z] iter=12 turn=42 INFO: Restarting as iteration 13...
+[2026-04-05T06:39:02.652Z] iter=13 INFO: Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T06:39:02.661Z] iter=13 turn=1 INFO: Turn 1/50
+[2026-04-05T06:39:05.930Z] iter=13 turn=1 INFO: Agent: 
+
+I'll start by understanding the current codebase structure, then execute the goals sequentially.
+[2026-04-05T06:39:05.931Z] iter=13 turn=1 INFO: read_file: src/agent.ts
+[2026-04-05T06:39:05.932Z] iter=13 turn=1 INFO:   -> ok (16467 chars)
+[2026-04-05T06:39:05.932Z] iter=13 turn=1 INFO: read_file: src/tool-cache.ts
+[2026-04-05T06:39:05.933Z] iter=13 turn=1 INFO:   -> ok (3616 chars)
+[2026-04-05T06:39:05.933Z] iter=13 turn=1 INFO: read_file: src/types.ts
+[2026-04-05T06:39:05.933Z] iter=13 turn=1 INFO:   -> err (69 chars)
+[2026-04-05T06:39:05.934Z] iter=13 turn=2 INFO: Turn 2/50
+[2026-04-05T06:39:19.847Z] iter=13 turn=2 INFO: think: Let me plan the two main goals:
+
+**Goal 1: Tool execution timing**
+- In `handleToolCall`, wrap the tool execution in tim...
+[2026-04-05T06:39:19.848Z] iter=13 turn=3 INFO: Turn 3/50
+[2026-04-05T06:39:22.409Z] iter=13 turn=3 INFO: read_file: scripts/dashboard.ts
+[2026-04-05T06:39:22.409Z] iter=13 turn=3 INFO:   -> ok (15736 chars)
+[2026-04-05T06:39:22.410Z] iter=13 turn=3 INFO: $ ls src/tests/
+[2026-04-05T06:39:22.419Z] iter=13 turn=3 INFO:   -> exit=1 (42 chars)
+[2026-04-05T06:39:22.419Z] iter=13 turn=4 INFO: Turn 4/50
+[2026-04-05T06:39:25.631Z] iter=13 turn=4 INFO: $ find src -name '*.test.ts' | head -20
+[2026-04-05T06:39:25.634Z] iter=13 turn=4 INFO: read_file: src/tool-registry.ts
+[2026-04-05T06:39:25.635Z] iter=13 turn=4 INFO:   -> ok (6770 chars)
+[2026-04-05T06:39:25.642Z] iter=13 turn=4 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:39:25.643Z] iter=13 turn=5 INFO: Turn 5/50
+[2026-04-05T06:39:28.718Z] iter=13 turn=5 INFO: $ find . -name '*.test.ts' -not -path './node_modules/*' | sort
+[2026-04-05T06:39:28.743Z] iter=13 turn=5 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:39:28.743Z] iter=13 turn=6 INFO: Turn 6/50
+[2026-04-05T06:39:31.830Z] iter=13 turn=6 INFO: $ find . -name '*.test.*' -not -path './node_modules/*' | sort
+[2026-04-05T06:39:31.864Z] iter=13 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:39:31.865Z] iter=13 turn=7 INFO: Turn 7/50
+[2026-04-05T06:39:37.665Z] iter=13 turn=7 INFO: $ find . -name 'self-test*' -not -path './node_modules/*' | sort
+[2026-04-05T06:39:37.688Z] iter=13 turn=7 INFO:   -> exit=0 (23 chars)
+[2026-04-05T06:39:37.688Z] iter=13 turn=8 INFO: Turn 8/50
+[2026-04-05T06:39:40.533Z] iter=13 turn=8 INFO: read_file: scripts/self-test.ts
+[2026-04-05T06:39:40.534Z] iter=13 turn=8 INFO:   -> ok (2486 chars)
+[2026-04-05T06:39:40.535Z] iter=13 turn=9 INFO: Turn 9/50
+[2026-04-05T06:39:42.887Z] iter=13 turn=9 INFO: $ wc -l scripts/self-test.ts
+[2026-04-05T06:39:42.895Z] iter=13 turn=9 INFO:   -> exit=0 (30 chars)
+[2026-04-05T06:39:42.895Z] iter=13 turn=10 INFO: Turn 10/50
+[2026-04-05T06:39:45.550Z] iter=13 turn=10 INFO: $ grep -n 'testCache\|Cache\|cache\|Tool Cache' scripts/self-test.ts | head -20
+[2026-04-05T06:39:45.561Z] iter=13 turn=10 INFO:   -> exit=0 (1484 chars)
+[2026-04-05T06:39:45.561Z] iter=13 turn=11 INFO: Turn 11/50
+[2026-04-05T06:39:48.316Z] iter=13 turn=11 INFO: read_file: scripts/self-test.ts
+[2026-04-05T06:39:48.317Z] iter=13 turn=11 INFO:   -> ok (5301 chars)
+[2026-04-05T06:39:48.318Z] iter=13 turn=12 INFO: Turn 12/50
+[2026-04-05T06:39:51.620Z] iter=13 turn=12 INFO: Agent: Now let me see how main() is structured in the test file:
+[2026-04-05T06:39:51.621Z] iter=13 turn=12 INFO: $ grep -n 'async function main\|await test' scripts/self-test.ts | head -30
+[2026-04-05T06:39:51.639Z] iter=13 turn=12 INFO:   -> exit=0 (239 chars)
+[2026-04-05T06:39:51.640Z] iter=13 turn=13 INFO: Turn 13/50
+[2026-04-05T06:39:54.255Z] iter=13 turn=13 INFO: read_file: scripts/self-test.ts
+[2026-04-05T06:39:54.256Z] iter=13 turn=13 INFO:   -> ok (2750 chars)
+[2026-04-05T06:39:54.257Z] iter=13 turn=14 INFO: Turn 14/50
+[2026-04-05T06:40:03.655Z] iter=13 turn=14 INFO: Agent: Now I have a good understanding of the codebase. Let me plan and implement the changes.
+[2026-04-05T06:40:03.656Z] iter=13 turn=14 INFO: think: Here's my plan:
+
+## Goal 1: Tool execution timing
+1. Create `src/tool-timing.ts` with a `ToolTimingTracker` class
+   - S...
+[2026-04-05T06:40:03.656Z] iter=13 turn=15 INFO: Turn 15/50
+[2026-04-05T06:40:14.274Z] iter=13 turn=15 INFO: Agent: ### Step 1: Create `src/tool-timing.ts`
+[2026-04-05T06:40:14.276Z] iter=13 turn=15 INFO: write_file: src/tool-timing.ts (write)
+[2026-04-05T06:40:14.278Z] iter=13 turn=15 INFO:   -> ok: Created src/tool-timing.ts (2380 chars)
+[2026-04-05T06:40:14.279Z] iter=13 turn=16 INFO: Turn 16/50
+[2026-04-05T06:40:39.618Z] iter=13 turn=16 INFO: Agent: 
+
+### Step 2: Update `src/tool-cache.ts` with smart invalidation
+[2026-04-05T06:40:39.618Z] iter=13 turn=16 INFO: write_file: src/tool-cache.ts (write)
+[2026-04-05T06:40:39.619Z] iter=13 turn=16 INFO:   -> ok: Updated src/tool-cache.ts (6287 chars, +76 lines delta)
+[2026-04-05T06:40:39.619Z] iter=13 turn=17 INFO: Turn 17/50
+[2026-04-05T06:40:43.226Z] iter=13 turn=17 INFO: Agent: ### Step 3: Wire timing + smart invalidation into `agent.ts`
+[2026-04-05T06:40:43.226Z] iter=13 turn=17 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:40:43.227Z] iter=13 turn=17 INFO:   -> ok: Patched src/agent.ts: -1 +2 lines
+[2026-04-05T06:40:43.227Z] iter=13 turn=18 INFO: Turn 18/50
+[2026-04-05T06:40:58.149Z] iter=13 turn=18 INFO: Agent: Now update `handleToolCall` to add timing and smart invalidation:
+[2026-04-05T06:40:58.151Z] iter=13 turn=18 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:40:58.152Z] iter=13 turn=18 INFO:   -> ok: Patched src/agent.ts: -45 +57 lines
+[2026-04-05T06:40:58.152Z] iter=13 turn=19 INFO: Turn 19/50
+[2026-04-05T06:41:05.560Z] iter=13 turn=19 INFO: Agent: Now add `timing` to `IterationCtx` and pass it through:
+[2026-04-05T06:41:05.561Z] iter=13 turn=19 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:41:05.563Z] iter=13 turn=19 INFO:   -> ok: Patched src/agent.ts: -13 +14 lines
+[2026-04-05T06:41:05.563Z] iter=13 turn=20 INFO: Turn 20/50
+[2026-04-05T06:41:10.541Z] iter=13 turn=20 INFO: Agent: Now update the tool execution in `processTurn` to pass timing:
+[2026-04-05T06:41:10.542Z] iter=13 turn=20 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:41:10.544Z] iter=13 turn=20 INFO:   -> ok: Patched src/agent.ts: -7 +7 lines
+[2026-04-05T06:41:10.544Z] iter=13 turn=21 INFO: Turn 21/50
+[2026-04-05T06:41:19.347Z] iter=13 turn=21 INFO: Agent: Now update `finalizeIteration` to log timing stats and add to metrics:
+[2026-04-05T06:41:19.348Z] iter=13 turn=21 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:41:19.349Z] iter=13 turn=21 INFO:   -> ok: Patched src/agent.ts: -6 +17 lines
+[2026-04-05T06:41:19.349Z] iter=13 turn=22 INFO: Turn 22/50
+[2026-04-05T06:41:27.974Z] iter=13 turn=22 INFO: Agent: Now add `toolTimings` to IterationMetrics and recordMetrics:
+[2026-04-05T06:41:27.975Z] iter=13 turn=22 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:41:27.976Z] iter=13 turn=22 INFO:   -> ok: Patched src/agent.ts: -3 +4 lines
+[2026-04-05T06:41:27.977Z] iter=13 turn=23 INFO: Turn 23/50
+[2026-04-05T06:41:31.842Z] iter=13 turn=23 INFO: Agent: Now wire `toolTimings` into the `recordMetrics` call in `finalizeIteration`:
+[2026-04-05T06:41:31.844Z] iter=13 turn=23 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:41:31.846Z] iter=13 turn=23 INFO:   -> ok: Patched src/agent.ts: -2 +3 lines
+[2026-04-05T06:41:31.847Z] iter=13 turn=24 INFO: Turn 24/50
+[2026-04-05T06:41:35.971Z] iter=13 turn=24 INFO: Agent: Now add the `timing` to `IterationCtx` initialization in `runIteration`:
+[2026-04-05T06:41:35.971Z] iter=13 turn=24 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:41:35.972Z] iter=13 turn=24 INFO:   -> ok: Patched src/agent.ts: -3 +4 lines
+[2026-04-05T06:41:35.972Z] iter=13 turn=25 INFO: Turn 25/50
+[2026-04-05T06:41:39.572Z] iter=13 turn=25 INFO: Agent: ### Step 4: Add "Tool Performance" section to dashboard
+[2026-04-05T06:41:39.573Z] iter=13 turn=25 INFO: read_file: scripts/dashboard.ts
+[2026-04-05T06:41:39.573Z] iter=13 turn=25 INFO:   -> ok (470 chars)
+[2026-04-05T06:41:39.574Z] iter=13 turn=26 INFO: Turn 26/50
+[2026-04-05T06:41:44.536Z] iter=13 turn=26 INFO: Agent: 
+
+Let me add the timing types to the dashboard and the new section, then add tests and verify.
+[2026-04-05T06:41:44.537Z] iter=13 turn=26 INFO: write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:41:44.538Z] iter=13 turn=26 INFO:   -> ok: Patched scripts/dashboard.ts: -2 +3 lines
+[2026-04-05T06:41:44.538Z] iter=13 turn=27 INFO: Turn 27/50
+[2026-04-05T06:41:47.828Z] iter=13 turn=27 INFO: write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:41:47.829Z] iter=13 turn=27 INFO:   -> ok: Patched scripts/dashboard.ts: -3 +4 lines
+[2026-04-05T06:41:47.829Z] iter=13 turn=28 INFO: Turn 28/50
+[2026-04-05T06:42:01.599Z] iter=13 turn=28 INFO: Agent: Now add the `generateToolPerformanceSection` function before `generateLogAnalysisSection`:
+[2026-04-05T06:42:01.601Z] iter=13 turn=28 INFO: write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:42:01.603Z] iter=13 turn=28 INFO:   -> ok: Patched scripts/dashboard.ts: -1 +58 lines
+[2026-04-05T06:42:01.604Z] iter=13 turn=29 INFO: Turn 29/50
+[2026-04-05T06:42:05.838Z] iter=13 turn=29 INFO: Agent: Now wire the new section into the HTML output:
+[2026-04-05T06:42:05.839Z] iter=13 turn=29 INFO: write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:42:05.840Z] iter=13 turn=29 INFO:   -> ok: Patched scripts/dashboard.ts: -3 +5 lines
+[2026-04-05T06:42:05.840Z] iter=13 turn=30 INFO: Turn 30/50
+[2026-04-05T06:42:08.808Z] iter=13 turn=30 INFO: Agent: ### Step 5: Type-check
+[2026-04-05T06:42:08.809Z] iter=13 turn=30 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T06:42:09.408Z] iter=13 turn=30 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:42:09.408Z] iter=13 turn=31 INFO: Turn 31/50

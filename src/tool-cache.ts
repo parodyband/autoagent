@@ -1,11 +1,15 @@
 /**
  * Tool Result Cache — caches idempotent tool results within a single iteration.
  *
- * Only caches read-only tools (read_file, grep) to avoid stale data issues.
+ * Only caches read-only tools (read_file, grep, list_files) to avoid stale data issues.
  * Cache lifetime is one iteration — create a new instance per iteration.
+ *
+ * Smart invalidation: write_file only invalidates entries whose path overlaps
+ * the written file, rather than clearing the entire cache.
  */
 
 import { createHash } from "crypto";
+import path from "path";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -13,6 +17,8 @@ export interface CacheStats {
   hits: number;
   misses: number;
   entries: number;
+  invalidations: number;
+  invalidatedEntries: number;
   /** Tool-level breakdown */
   toolStats: Record<string, { hits: number; misses: number }>;
 }
@@ -20,6 +26,8 @@ export interface CacheStats {
 export interface CacheEntry {
   result: string;
   cachedAt: number; // Date.now()
+  /** File path(s) this entry depends on — used for smart invalidation */
+  paths: string[];
 }
 
 // ─── Constants ──────────────────────────────────────────────
@@ -27,12 +35,57 @@ export interface CacheEntry {
 /** Tools whose results are safe to cache (read-only, idempotent) */
 export const CACHEABLE_TOOLS = new Set(["read_file", "grep", "list_files"]);
 
+// ─── Helpers ────────────────────────────────────────────────
+
+/**
+ * Extract the file path(s) that a cached tool result depends on.
+ * - read_file: depends on the exact file path
+ * - grep: depends on the search directory (any file within could affect results)
+ * - list_files: depends on the listed directory
+ */
+export function extractPaths(toolName: string, input: Record<string, unknown>): string[] {
+  const p = input.path as string | undefined;
+  if (!p) return [];
+
+  switch (toolName) {
+    case "read_file":
+      // Depends on the exact file
+      return [path.normalize(p)];
+    case "grep":
+    case "list_files":
+      // Depends on the directory — any file change under it could affect results
+      return [path.normalize(p)];
+    default:
+      return [];
+  }
+}
+
+/**
+ * Check if a written file path could affect a cached entry's paths.
+ * - For read_file: exact match
+ * - For grep/list_files: the written file is under the cached search directory
+ */
+export function pathOverlaps(writtenFile: string, cachedPaths: string[]): boolean {
+  const normalizedWrite = path.normalize(writtenFile);
+  for (const cachedPath of cachedPaths) {
+    // Exact match (read_file case)
+    if (normalizedWrite === cachedPath) return true;
+    // Written file is within cached directory (grep/list_files case)
+    if (normalizedWrite.startsWith(cachedPath + path.sep)) return true;
+    // Cached path is within or equal to written file's directory
+    if (cachedPath.startsWith(normalizedWrite + path.sep)) return true;
+  }
+  return false;
+}
+
 // ─── Cache ──────────────────────────────────────────────────
 
 export class ToolCache {
   private cache = new Map<string, CacheEntry>();
   private hits = 0;
   private misses = 0;
+  private invalidationCount = 0;
+  private invalidatedEntryCount = 0;
   private toolHits: Record<string, number> = {};
   private toolMisses: Record<string, number> = {};
 
@@ -75,17 +128,36 @@ export class ToolCache {
     if (!this.isCacheable(toolName)) return;
 
     const key = ToolCache.makeKey(toolName, input);
-    this.cache.set(key, { result, cachedAt: Date.now() });
+    const paths = extractPaths(toolName, input);
+    this.cache.set(key, { result, cachedAt: Date.now(), paths });
   }
 
-  /** Invalidate cache entries for a specific tool (e.g., after write_file) */
-  invalidate(toolName?: string): void {
-    if (!toolName) {
-      this.cache.clear();
-      return;
+  /**
+   * Invalidate cache entries affected by a file write.
+   * Only removes entries whose tracked paths overlap with the written file.
+   * Falls back to clearing everything if no path is provided.
+   */
+  invalidateForPath(writtenPath: string): number {
+    this.invalidationCount++;
+    const normalizedPath = path.normalize(writtenPath);
+    let removed = 0;
+
+    for (const [key, entry] of this.cache) {
+      // If entry has no tracked paths, conservatively remove it
+      if (entry.paths.length === 0 || pathOverlaps(normalizedPath, entry.paths)) {
+        this.cache.delete(key);
+        removed++;
+      }
     }
-    // For targeted invalidation, we'd need to track which keys belong to which tool.
-    // For now, clear everything — writes are rare relative to reads.
+
+    this.invalidatedEntryCount += removed;
+    return removed;
+  }
+
+  /** Invalidate all cache entries (full clear) */
+  invalidate(): void {
+    this.invalidationCount++;
+    this.invalidatedEntryCount += this.cache.size;
     this.cache.clear();
   }
 
@@ -104,6 +176,8 @@ export class ToolCache {
       hits: this.hits,
       misses: this.misses,
       entries: this.cache.size,
+      invalidations: this.invalidationCount,
+      invalidatedEntries: this.invalidatedEntryCount,
       toolStats,
     };
   }
@@ -113,6 +187,8 @@ export class ToolCache {
     this.cache.clear();
     this.hits = 0;
     this.misses = 0;
+    this.invalidationCount = 0;
+    this.invalidatedEntryCount = 0;
     this.toolHits = {};
     this.toolMisses = {};
   }

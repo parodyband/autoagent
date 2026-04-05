@@ -38,6 +38,7 @@ import {
   validationBlockedMessage,
 } from "./messages.js";
 import { ToolCache } from "./tool-cache.js";
+import { ToolTimingTracker, type TimingStats } from "./tool-timing.js";
 
 const ROOT = process.cwd();
 const GOALS_FILE = path.join(ROOT, "goals.md");
@@ -80,6 +81,7 @@ interface IterationMetrics {
   cacheReadTokens?: number;
   codeQuality?: CodeQualitySnapshot;
   benchmarks?: BenchmarkSnapshot;
+  toolTimings?: TimingStats;
 }
 
 function recordMetrics(m: IterationMetrics): void {
@@ -115,6 +117,7 @@ async function handleToolCall(
   toolUse: { type: "tool_use"; id: string; name: string; input: Record<string, unknown> },
   counts: Record<string, number>,
   cache?: ToolCache,
+  timing?: ToolTimingTracker,
 ): Promise<{ result: string; isRestart: boolean }> {
   counts[toolUse.name] = (counts[toolUse.name] || 0) + 1;
 
@@ -138,18 +141,29 @@ async function handleToolCall(
     defaultTimeout: tool.defaultTimeout,
   };
 
+  const startMs = Date.now();
   try {
     const { result, isRestart } = await tool.handler(toolUse.input, ctx);
+    const durationMs = Date.now() - startMs;
+    if (timing) timing.record(toolUse.name, durationMs);
+
     // Cache the result for idempotent tools
     if (cache) {
       cache.set(toolUse.name, toolUse.input, result);
     }
-    // Invalidate cache on writes (file content may have changed)
+    // Smart invalidation: only clear entries affected by written file
     if (cache && toolUse.name === "write_file") {
-      cache.invalidate();
+      const writtenPath = toolUse.input.path as string;
+      if (writtenPath) {
+        cache.invalidateForPath(writtenPath);
+      } else {
+        cache.invalidate();
+      }
     }
     return { result, isRestart: isRestart || false };
   } catch (err) {
+    const durationMs = Date.now() - startMs;
+    if (timing) timing.record(toolUse.name, durationMs);
     const errMsg = err instanceof Error ? err.message : String(err);
     log(iter, `TOOL ERROR (${toolUse.name}): ${errMsg}`);
     return { result: `Error executing ${toolUse.name}: ${errMsg}`, isRestart: false };
@@ -170,6 +184,7 @@ interface IterationCtx {
   startTime: Date;
   turns: number;
   cache: ToolCache;
+  timing: ToolTimingTracker;
 }
 
 type TurnResult = "continue" | "break" | "restarted";
@@ -223,7 +238,7 @@ async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
   // Execute independent tools concurrently
   const toolResults = await Promise.all(
     toolUses.map(async (tu) => {
-      const { result, isRestart } = await handleToolCall(ctx.iter, tu, ctx.toolCounts, ctx.cache);
+      const { result, isRestart } = await handleToolCall(ctx.iter, tu, ctx.toolCounts, ctx.cache, ctx.timing);
       return { id: tu.id, result, isRestart };
     })
   );
@@ -271,8 +286,19 @@ async function finalizeIteration(ctx: IterationCtx, doRestart: boolean): Promise
   // Log cache stats
   const cacheStats = ctx.cache.stats();
   if (cacheStats.hits > 0 || cacheStats.misses > 0) {
-    log(ctx.iter, `Cache stats: ${cacheStats.hits} hits, ${cacheStats.misses} misses, ${cacheStats.entries} entries`);
-    if (logger) logger.info("Tool cache stats", { cacheHits: cacheStats.hits, cacheMisses: cacheStats.misses, cacheEntries: cacheStats.entries, toolStats: cacheStats.toolStats });
+    log(ctx.iter, `Cache stats: ${cacheStats.hits} hits, ${cacheStats.misses} misses, ${cacheStats.entries} entries, ${cacheStats.invalidations} invalidations (${cacheStats.invalidatedEntries} entries removed)`);
+    if (logger) logger.info("Tool cache stats", { cacheHits: cacheStats.hits, cacheMisses: cacheStats.misses, cacheEntries: cacheStats.entries, invalidations: cacheStats.invalidations, invalidatedEntries: cacheStats.invalidatedEntries, toolStats: cacheStats.toolStats });
+  }
+
+  // Log timing stats
+  const timingStats = ctx.timing.stats();
+  if (timingStats.totalCalls > 0) {
+    const toolSummary = Object.entries(timingStats.tools)
+      .sort((a, b) => b[1].totalMs - a[1].totalMs)
+      .map(([name, t]) => `${name}: ${t.calls}x, avg=${t.avgMs}ms, total=${Math.round(t.totalMs)}ms`)
+      .join("; ");
+    log(ctx.iter, `Tool timing: ${toolSummary}`);
+    if (logger) logger.info("Tool timing stats", { timing: timingStats });
   }
 
   const codeQuality = await captureCodeQuality(ROOT);
@@ -285,6 +311,7 @@ async function finalizeIteration(ctx: IterationCtx, doRestart: boolean): Promise
     cacheCreationTokens: ctx.tokens.cacheCreate || undefined,
     cacheReadTokens: ctx.tokens.cacheRead || undefined,
     codeQuality, benchmarks,
+    toolTimings: timingStats.totalCalls > 0 ? timingStats : undefined,
   });
 
   const sha = await commitIteration(ctx.iter);
@@ -318,6 +345,7 @@ async function runIteration(state: IterationState): Promise<void> {
     messages: [],
     turns: 0,
     cache: new ToolCache(),
+    timing: new ToolTimingTracker(),
   };
 
   // Initialize structured logger for this iteration

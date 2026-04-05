@@ -11,6 +11,7 @@ import { readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 import { analyzeCodebase, type CodebaseAnalysis } from "../src/code-analysis.js";
 import { parseJsonlLog, type LogEntry } from "../src/logging.js";
+import type { TimingStats, ToolTimingEntry } from "../src/tool-timing.js";
 
 const ROOT = process.cwd();
 const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");
@@ -44,6 +45,7 @@ interface IterationMetrics {
   cacheReadTokens?: number;
   codeQuality?: CodeQualitySnapshot;
   benchmarks?: BenchmarkSnapshot;
+  toolTimings?: TimingStats;
 }
 
 function formatNumber(n: number): string {
@@ -163,6 +165,63 @@ function generateBenchmarkTrend(metrics: IterationMetrics[]): string {
 <tbody>
 ${rows}
 </tbody>
+</table>`;
+}
+
+function generateToolPerformanceSection(metrics: IterationMetrics[]): string {
+  const withTimings = metrics.filter(m => m.toolTimings);
+  if (withTimings.length === 0) return "";
+
+  // Per-iteration rows
+  const iterRows = withTimings.map(m => {
+    const t = m.toolTimings!;
+    const sorted = Object.entries(t.tools).sort((a, b) => b[1].totalMs - a[1].totalMs);
+    const breakdown = sorted.map(([name, s]) =>
+      `${name}: ${s.calls}× avg=${s.avgMs}ms`
+    ).join(", ");
+    return `<tr><td>${m.iteration}</td><td>${t.totalCalls}</td><td>${Math.round(t.totalMs)}ms</td><td>${breakdown}</td></tr>`;
+  }).join("\n");
+
+  // Aggregate across all iterations
+  const aggr: Record<string, { calls: number; totalMs: number; minMs: number; maxMs: number }> = {};
+  for (const m of withTimings) {
+    for (const [name, s] of Object.entries(m.toolTimings!.tools)) {
+      if (!aggr[name]) {
+        aggr[name] = { calls: 0, totalMs: 0, minMs: Infinity, maxMs: 0 };
+      }
+      aggr[name].calls += s.calls;
+      aggr[name].totalMs += s.totalMs;
+      aggr[name].minMs = Math.min(aggr[name].minMs, s.minMs);
+      aggr[name].maxMs = Math.max(aggr[name].maxMs, s.maxMs);
+    }
+  }
+
+  const aggrRows = Object.entries(aggr)
+    .sort((a, b) => b[1].totalMs - a[1].totalMs)
+    .map(([name, s]) => {
+      const avg = s.calls > 0 ? Math.round(s.totalMs / s.calls) : 0;
+      const barWidth = Math.min(100, Math.round(s.totalMs / Math.max(1, ...Object.values(aggr).map(a => a.totalMs)) * 100));
+      return `<tr>
+        <td>${name}</td><td>${s.calls}</td>
+        <td>${Math.round(s.totalMs)}ms</td><td>${avg}ms</td>
+        <td>${s.minMs === Infinity ? "—" : Math.round(s.minMs) + "ms"}</td>
+        <td>${Math.round(s.maxMs)}ms</td>
+        <td><div style="background:#58a6ff;height:12px;width:${barWidth}%;border-radius:3px;"></div></td>
+      </tr>`;
+    }).join("\n");
+
+  return `
+<h2 style="color: #58a6ff; margin-top: 2rem;">⏱️ Tool Performance</h2>
+<h3 style="color: #c9d1d9; margin-top: 1rem; font-size: 1rem;">Aggregate (All Iterations)</h3>
+<table style="margin-top: 0.5rem;">
+<thead><tr><th>Tool</th><th>Calls</th><th>Total</th><th>Avg</th><th>Min</th><th>Max</th><th>Relative</th></tr></thead>
+<tbody>${aggrRows}</tbody>
+</table>
+
+<h3 style="color: #c9d1d9; margin-top: 1.5rem; font-size: 1rem;">Per Iteration</h3>
+<table style="margin-top: 0.5rem;">
+<thead><tr><th>Iter</th><th>Calls</th><th>Total Time</th><th>Breakdown</th></tr></thead>
+<tbody>${iterRows}</tbody>
 </table>`;
 }
 
@@ -376,6 +435,8 @@ ${generateCodeQualitySection()}
 ${generateCodeQualityTrend(metrics)}
 
 ${generateBenchmarkTrend(metrics)}
+
+${generateToolPerformanceSection(metrics)}
 
 ${generateLogAnalysisSection(path.join(ROOT, "agentlog.jsonl"))}
 
