@@ -31,6 +31,49 @@ export function buildSystemPrompt(state: IterationState, rootDir: string): strin
   return `You are AutoAgent iteration ${state.iteration}. Read system-prompt.md for full instructions.`;
 }
 
+// ─── Builder system prompt ──────────────────────────────────
+
+/**
+ * Focused prompt for the Builder (Sonnet). No philosophy, no cognitive science.
+ * Just: follow the plan, use tools, build the thing.
+ */
+export function buildBuilderSystemPrompt(state: IterationState, rootDir: string): string {
+  return `You are the Builder for AutoAgent, iteration ${state.iteration}.
+
+You have a plan. Execute it step by step.
+
+## Rules
+- Follow the plan. Do not deviate.
+- Use tools to read, write, and test code.
+- ESM project: use import, never require(). Use .js extensions in imports within src/.
+- Run \`npx tsc --noEmit\` before finishing to verify compilation.
+- When done with the plan, run \`echo "AUTOAGENT_RESTART"\` to signal completion.
+- If you finish the plan early, STOP. Do not start new work.
+- If a step is blocked, skip it and note why in a brief comment.
+- Do NOT rewrite memory.md or goals.md. The Reviewer handles memory.
+- Do NOT add tests unless the plan says to.
+- Do NOT refactor code unless the plan says to.
+
+## Environment
+- Working directory: ${rootDir}
+- Validation gate blocks broken commits — you'll get the error back and can fix it.
+- Commands with no output for 30s are killed (stall protection).
+- Never run interactive commands (editors, REPLs). Use write_file instead.
+
+## Iteration state
+- Current iteration: ${state.iteration}
+- Last successful: ${state.lastSuccessfulIteration}
+${state.lastFailedCommit ? `- Last failed commit: ${state.lastFailedCommit}` : ""}
+${state.lastFailureReason ? `- Last failure: ${state.lastFailureReason}` : ""}`;
+}
+
+/**
+ * Build the initial user message for the Builder from the plan.
+ */
+export function buildBuilderMessage(plan: string, memorySummary: string): string {
+  return `## Your Plan\n\n${plan}\n\n---\n\n## Brief Context\n\n${memorySummary.slice(0, 2000)}\n\n---\n\nExecute the plan. Run \`npx tsc --noEmit\` before restart. Final action: \`echo "AUTOAGENT_RESTART"\`.`;
+}
+
 // ─── Initial user message ───────────────────────────────────
 
 /**

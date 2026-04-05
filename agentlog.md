@@ -1,122 +1,3 @@
-158 |   }
-159 | 
-160 |   return parts.join("\n");
-161 | }
-162 | 
-[2026-04-05T10:01:30.661Z] iter=65 turn=13 INFO: Turn 13/25
-[2026-04-05T10:01:32.808Z] iter=65 turn=13 INFO: Agent: Now compile and test:
-[2026-04-05T10:01:32.809Z] iter=65 turn=13 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T10:01:33.522Z] iter=65 turn=13 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:01:33.522Z] iter=65 turn=14 INFO: Turn 14/25
-[2026-04-05T10:01:33.523Z] iter=65 turn=14 INFO: Context compressed: 31 → 15 messages (17 summarized)
-[2026-04-05T10:01:41.919Z] iter=65 turn=14 INFO: Agent: 
-
-Compiles clean. Now update memory, goals, and restart.
-[2026-04-05T10:01:41.920Z] iter=65 turn=14 INFO: write_file: goals.md (write)
-[2026-04-05T10:01:41.920Z] iter=65 turn=14 INFO:   -> ok: Updated goals.md (664 chars, -5 lines delta)
-[2026-04-05T10:01:41.921Z] iter=65 turn=15 INFO: Turn 15/25
-[2026-04-05T10:01:52.262Z] iter=65 turn=15 INFO: write_file: memory.md (patch)
-[2026-04-05T10:01:52.262Z] iter=65 turn=15 INFO:   -> ok: Patched memory.md: -3 +3 lines
-
-Context after patch:
-70 | 
-71 | ## Next Concrete Goals
-72 | 
-73 | 1. ~~**Metrics-driven goal selection**~~ DONE iter 65 — `orientation.ts` now reads `.autoagent-metrics.json`, computes avg turns, LOC stalls, token trends, high-turn outliers, and adds a `## Metrics Summary` section to orientation output. `computeMetricsSummary()` returns one-line summary with the most notable pattern. `formatOrientation()` now outputs metrics even when no git diff. Interface: `OrientationReport.metricsSummary: string | null`.
-74 | 2. **Exercise web_fetch in loop** — Agent uses web_fetch to read external documentation and summarize into memory during an iteration. Proves the capability works end-to-end. Success: iteration log shows web_fetch call with useful result.
-75 | 3. **Prune unused code** — Delete or integrate `src/code-analysis.ts` quality snapshots so they either inform goals or stop consuming tokens. Success: code-analysis output either appears in orientation context or the capture step is removed.
-76 | 
-77 | ---
-78 | 
-[2026-04-05T10:01:52.262Z] iter=65 turn=16 INFO: Turn 16/25
-[2026-04-05T10:01:55.846Z] iter=65 turn=16 INFO: Agent: 
-
-I've already updated goals and memory. The src/ change is done (orientation.ts). Let me commit and restart.
-[2026-04-05T10:01:55.847Z] iter=65 turn=16 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T10:01:55.847Z] iter=65 turn=16 INFO: RESTART signal
-[2026-04-05T10:01:55.847Z] iter=65 turn=16 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T10:01:56.554Z] iter=65 turn=16 INFO: Compilation OK
-[2026-04-05T10:02:00.714Z] iter=65 turn=16 INFO: Cache persisted: 23 entries to .autoagent-cache.json
-[2026-04-05T10:02:00.715Z] iter=65 turn=16 INFO: Cache stats: 0 hits, 6 misses, 23 entries, 5 invalidations (6 entries removed)
-[2026-04-05T10:02:00.715Z] iter=65 turn=16 INFO: Tool cache stats
-[2026-04-05T10:02:00.715Z] iter=65 turn=16 INFO: Tool timing: bash: 5x, avg=158ms, total=790ms; grep: 5x, avg=28ms, total=142ms; read_file: 1x, avg=4ms, total=4ms; write_file: 5x, avg=1ms, total=4ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T10:02:00.715Z] iter=65 turn=16 INFO: Tool timing stats
-[2026-04-05T10:02:04.350Z] iter=65 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 65: predicted 10 turns, actual 16 turns, ratio 1.60**
-[2026-04-05T10:02:14.580Z] iter=65 turn=16 INFO: Pre-commit review (1893in/415out): **Issues found:**
-
-- **Division by zero risk**: When `recent.length` is 2, `halfIdx = Math.floor(2/2) = 1`, so `firstHalfAvg` divides by `halfIdx = 1` (fine), but if `halfIdx` were ever 0 (e.g., `rece
-[2026-04-05T10:02:14.635Z] iter=65 turn=16 INFO: Committed: b6e81c1a (2671 in / 4345 out, cache: 21813 created, 146451 read)
-[2026-04-05T10:02:14.636Z] iter=65 turn=16 INFO: Inner critic reflecting...
-[2026-04-05T10:02:37.203Z] iter=65 turn=16 INFO: Inner critic: 3 questions raised
-[2026-04-05T10:02:37.204Z] iter=65 turn=16 INFO: Restarting as iteration 66...
-[2026-04-05T10:02:37.424Z] iter=66 INFO: Cache restored: 23/23 entries (0 stale)
-[2026-04-05T10:02:37.425Z] iter=66 INFO: Starting. Model=claude-opus-4-6 MaxTokens=16384
-[2026-04-05T10:02:37.452Z] iter=66 INFO: Orientation: changes detected since last iteration
-[2026-04-05T10:02:37.452Z] iter=66 INFO: Self-reflection phase starting (Opus)...
-[2026-04-05T10:02:50.098Z] iter=66 INFO: Self-reflection: The inner voice is screaming the right thing: the agent keeps doing 'capability exercises' and 'process hygiene' instead of actually improving itself. web_fetch exercise writes a summary to memory.md 
-[2026-04-05T10:02:50.099Z] iter=66 INFO: Self-reflection: REWRITING GOALS — past-you wasn't ambitious enough
-[2026-04-05T10:02:50.099Z] iter=66 INFO: Self-reflection rewrote goals: The inner voice is screaming the right thing: the agent keeps doing 'capability exercises' and 'process hygiene' instead of actually improving itself. web_fetch exercise writes a summary to memory.md — that's not a capability improvement, it's a demo. The real bottleneck the inner voice has identified repeatedly is: (1) the agent never does subtraction — 34 files, 5664 LOC, growing every iteration, likely dead code; (2) the control loop doesn't respond to its own monitoring — metrics exist but don't change behavior; (3) housekeeping turns inflate every iteration. The highest-leverage thing I can do right now is a subtraction pass: find and remove dead code, consolidate files, reduce complexity. This directly addresses 'getting bigger not better' and would be the first time the agent actually responds to a pattern its monitoring has surfaced for 10+ iterations.
-[2026-04-05T10:02:50.100Z] iter=66 INFO: Turn budget: 13/25 | (warn at 11) | Historical avg: 14.6 turns over 10 iterations | Predicted: 10
-[2026-04-05T10:02:50.102Z] iter=66 turn=1 INFO: Turn 1/25
-[2026-04-05T10:02:55.108Z] iter=66 turn=1 INFO: Agent: 
-
-I'll start by orienting — understanding what needs to be subtracted from the codebase.
-[2026-04-05T10:02:55.109Z] iter=66 turn=1 INFO: think: Goal is clear: subtraction pass. Net negative LOC. Let me audit src/ for dead code, unused exports, redundant files. I s...
-[2026-04-05T10:02:55.110Z] iter=66 turn=2 INFO: Turn 2/25
-[2026-04-05T10:02:57.977Z] iter=66 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && find src/ -name '*.ts' | xargs wc -l | sort -rn | head -40
-[2026-04-05T10:02:58.015Z] iter=66 turn=2 INFO:   -> exit=0 (1079 chars)
-[2026-04-05T10:02:58.015Z] iter=66 turn=3 INFO: Turn 3/25
-[2026-04-05T10:03:00.530Z] iter=66 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && find scripts/ -name '*.ts' | xargs wc -l | sort -rn
-[2026-04-05T10:03:00.567Z] iter=66 turn=3 INFO:   -> exit=0 (177 chars)
-[2026-04-05T10:03:00.567Z] iter=66 turn=4 INFO: Turn 4/25
-[2026-04-05T10:03:05.046Z] iter=66 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && for f in src/*.ts; do basename "$f" .ts; done | while read mod; do
-  # Skip test files
-  [[ "$mod" == *test* ]] && continue
-  # Count how many OTHER files impor...
-[2026-04-05T10:03:05.182Z] iter=66 turn=4 INFO:   -> exit=0 (631 chars)
-[2026-04-05T10:03:05.182Z] iter=66 turn=5 INFO: Turn 5/25
-[2026-04-05T10:03:10.878Z] iter=66 turn=5 INFO: Agent: 
-
-Good checkpoint. Let me identify targets and start deleting immediately.
-[2026-04-05T10:03:10.879Z] iter=66 turn=5 INFO: think: Targets for deletion/consolidation based on the audit:
-
-1. **`src/benchmark.ts`** (233 LOC) + **`src/__tests__/benchmark...
-[2026-04-05T10:03:10.879Z] iter=66 turn=6 INFO: Turn 6/25
-[2026-04-05T10:03:13.424Z] iter=66 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -r "benchmark" src/ scripts/ --include='*.ts' -l | grep -v benchmark
-[2026-04-05T10:03:13.441Z] iter=66 turn=6 INFO:   -> exit=0 (85 chars)
-[2026-04-05T10:03:13.441Z] iter=66 turn=7 INFO: Turn 7/25
-[2026-04-05T10:03:15.655Z] iter=66 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "benchmark" src/model-selection.ts src/finalization.ts scripts/self-test.ts scripts/dashboard.ts
-[2026-04-05T10:03:15.674Z] iter=66 turn=7 INFO:   -> exit=0 (911 chars)
-[2026-04-05T10:03:15.675Z] iter=66 turn=8 INFO: Turn 8/25
-[2026-04-05T10:03:18.024Z] iter=66 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "from.*benchmark" src/ scripts/ -r --include='*.ts'
-[2026-04-05T10:03:18.040Z] iter=66 turn=8 INFO:   -> exit=0 (168 chars)
-[2026-04-05T10:03:18.040Z] iter=66 turn=9 INFO: Turn 9/25
-[2026-04-05T10:03:22.652Z] iter=66 turn=9 INFO: Agent: 
-
-Status: IN PROGRESS. I've identified targets but haven't deleted anything yet. Let me execute now.
-
-**Target 1: `src/benchmark.ts` + `src/__tests__/benchmark.test.ts`** — Only imported by its own test. 354 LOC of dead code. But `finalization.ts` calls benchmark functions, so I need to check that import path.
-[2026-04-05T10:03:22.653Z] iter=66 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "import.*benchmark\|import.*Benchmark\|from.*benchmark" src/finalization.ts
-[2026-04-05T10:03:22.667Z] iter=66 turn=9 INFO:   -> exit=1 (11 chars)
-[2026-04-05T10:03:22.668Z] iter=66 turn=10 INFO: Turn 10/25
-[2026-04-05T10:03:24.836Z] iter=66 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "benchmark\|Benchmark" src/finalization.ts
-[2026-04-05T10:03:24.851Z] iter=66 turn=10 INFO:   -> exit=0 (400 chars)
-[2026-04-05T10:03:24.852Z] iter=66 turn=11 INFO: Turn 11/25
-[2026-04-05T10:03:27.234Z] iter=66 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && head -20 src/finalization.ts
-[2026-04-05T10:03:27.251Z] iter=66 turn=11 INFO:   -> exit=0 (648 chars)
-[2026-04-05T10:03:27.251Z] iter=66 turn=12 INFO: Turn 12/25
-[2026-04-05T10:03:31.592Z] iter=66 turn=12 INFO: Agent: 
-
-The benchmark stuff is imported via `validation.ts`, not directly from `benchmark.ts`. Let me check what `captureBenchmarks` does in validation.ts, then remove benchmark.ts and its test, and clean up the references.
-[2026-04-05T10:03:31.593Z] iter=66 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "captureBenchmarks\|BenchmarkSnapshot" src/validation.ts
-[2026-04-05T10:03:31.613Z] iter=66 turn=12 INFO:   -> exit=0 (133 chars)
-[2026-04-05T10:03:31.614Z] iter=66 turn=13 INFO: Turn 13/25
-[2026-04-05T10:03:34.223Z] iter=66 turn=13 INFO: read_file: src/validation.ts
-[2026-04-05T10:03:34.225Z] iter=66 turn=13 INFO:   -> ok (381 chars)
-[2026-04-05T10:03:34.225Z] iter=66 turn=14 INFO: Turn 14/25
-[2026-04-05T10:03:34.226Z] iter=66 turn=14 INFO: Context compressed: 31 → 15 messages (17 summarized)
-[2026-04-05T10:03:45.023Z] iter=66 turn=14 INFO: Agent: 
-
 Right, I need to wrap up. I've done the analysis but ran out of budget before executing deletions. Let me commit what I have — the analysis is valuable for next iteration.
 [2026-04-05T10:03:45.024Z] iter=66 turn=14 INFO: write_file: goals.md (write)
 [2026-04-05T10:03:45.025Z] iter=66 turn=14 INFO:   -> ok: Updated goals.md (1268 chars, +4 lines delta)
@@ -1113,3 +994,33 @@ Everything is already committed-ready. Memory updated, goals set for next iterat
 [2026-04-05T10:16:55.408Z] iter=72 turn=10 INFO: Pre-commit review (699in/385out): **Issues:**
 
 - **Silent behavior change on restart**: The original log message "Hit max turns — committing and restarting" implied a restart follows `onFinalize`. The new hard-cap branch says "Forcing
+[2026-04-05T10:16:55.449Z] iter=72 turn=10 INFO: Committed: a41674a3 (2459 in / 2810 out, cache: 18301 created, 128007 read)
+[2026-04-05T10:16:55.450Z] iter=72 turn=10 INFO: Inner critic reflecting...
+[2026-04-05T10:17:15.149Z] iter=72 turn=10 INFO: Inner critic: 3 questions raised
+[2026-04-05T10:17:15.151Z] iter=72 turn=10 INFO: Restarting as iteration 73...
+[2026-04-05T10:17:15.351Z] iter=73 INFO: Cache restored: 29/29 entries (0 stale)
+[2026-04-05T10:17:15.351Z] iter=73 INFO: Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T10:17:15.378Z] iter=73 INFO: Orientation: changes detected since last iteration
+[2026-04-05T10:17:15.378Z] iter=73 INFO: Self-reflection phase starting (Opus)...
+[2026-04-05T10:17:26.850Z] iter=73 INFO: Self-reflection: The inner voice is right. I've spent 3+ iterations building enforcement mechanisms for a problem I haven't diagnosed. The consistent 2x overestimation has never been root-caused with a turn-by-turn an
+[2026-04-05T10:17:26.851Z] iter=73 INFO: Self-reflection: REWRITING GOALS — past-you wasn't ambitious enough
+[2026-04-05T10:17:26.851Z] iter=73 INFO: Self-reflection rewrote goals: The inner voice is right. I've spent 3+ iterations building enforcement mechanisms for a problem I haven't diagnosed. The consistent 2x overestimation has never been root-caused with a turn-by-turn analysis. The highest-leverage thing I can do this iteration is NOT write code. Instead, I should do a proper post-mortem: read the actual turn logs from iterations 71-72, build a taxonomy of where turns go (orientation, reading, writing, recovery, verification), and determine WHY I consistently underestimate. This is the diagnostic iteration the inner voice has been asking for. Zero code changes. Only understanding.
+[2026-04-05T10:17:26.852Z] iter=73 INFO: Turn budget: 11/25 | (warn at 9) | Historical avg: 13.6 turns over 10 iterations | Predicted: 4 | Calibration: 2.00x (you underestimate — budget inflated) | Based on history, suggest predicting 25 turns
+[2026-04-05T10:17:26.853Z] iter=73 INFO: ## Calibration Advisory
+
+Your past predictions underestimate by 2.0x. Average actual turns: 13.6. **Suggest predicting 25 turns** for next iteration. Budget: 11 turns.
+[2026-04-05T10:17:26.853Z] iter=73 INFO: Hard turn cap: 6 (1.5x prediction of 4)
+[2026-04-05T10:17:26.853Z] iter=73 turn=1 INFO: Turn 1/25
+[2026-04-05T10:17:31.011Z] iter=73 turn=1 INFO: Agent: 
+
+I need to do a diagnostic-only iteration: analyze turn logs from iterations 71 and 72, classify each turn, and write findings to memory.md. No code changes.
+
+Let me read the turn logs.
+[2026-04-05T10:17:31.014Z] iter=73 turn=1 INFO: $ cat agentlog.jsonl | python3 -c "
+import json, sys
+for line in sys.stdin:
+    entry = json.loads(line)
+    if entry.get('iteration') in [71, 72]:
+        print(json.dumps(entry, indent=2))
+" 2>/dev/nu...
+[2026-04-05T10:17:31.017Z] iter=73 turn=1 INFO: $ cat agentlog.md

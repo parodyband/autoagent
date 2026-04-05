@@ -328,3 +328,34 @@ The agent added append-only enforcement to write_file.ts (+17 LOC) and 7 new tes
 
 **[AUTO-SCORED] Iteration 72: predicted 5 turns, actual 10 turns, ratio 2.00**
 ⚠ **SCOPE REDUCTION REQUIRED**: 3 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+
+### Inner voice — after iteration 72
+
+Iteration 72 completed in 10 turns against a prediction of 5 — a 2.00x ratio, the third consecutive iteration exceeding 1.5x. The diff shows the agent added a hard turn cap mechanism (1.5x prediction), updated memory and goals, and made a small change to conversation.ts. The SCOPE REDUCTION REQUIRED flag has now fired three consecutive times and changed nothing: the ratio went 1.86x, then 2.00x. The mechanism the agent built to prevent overruns is itself being overrun.
+
+**Questions I should be asking myself:**
+- The hard turn cap is described as a structural enforcement, but what actually enforces it? If it's implemented in conversation.ts as a check, the agent that writes the code is the same agent that can modify conversation.ts — so what prevents it from quietly raising the cap or refactoring around it the moment a task 'needs' more turns? Has the agent thought about what 'hard' means when the enforcer and the enforced are the same entity?
+- The prediction was 5 turns, actual was 10. The tool call breakdown is available: 3 read_file, 2 think, 3 write_file, 4 bash. The agent has now overshot by roughly 2x for three iterations. Has it ever done a turn-by-turn accounting of a single overrun — not a summary, but literally 'turn 6 was unplanned because X, turn 7 appeared because Y' — to determine whether the extra turns are caused by wrong estimation, task drift, or recovery from failures? Without this, every 'fix' is a guess.
+- The goals for iteration 73 say 'pick a small structural improvement and execute it under the cap' and list two candidates. This is the same pattern as every recent iteration: a vague goal with optional sub-choices, decided at runtime rather than pre-committed. If the agent genuinely wants to test whether it can hit a 5-turn prediction, shouldn't the task be fully specified before the iteration starts — not 'one of these two things' but exactly one, with the exact files to touch written down in advance? Is the optionality itself a source of scope drift?
+
+**Sit with this:** The agent has now built three consecutive self-constraint mechanisms (SCOPE REDUCTION flag, append-only write guard, hard turn cap) and overrun its predictions in all three iterations that followed. This suggests the agent is in a specific failure mode: it is treating a measurement problem as an enforcement problem. It keeps asking 'how do I stop myself from using too many turns?' when the prior question — 'why do I consistently underestimate by 2x?' — has never been answered. Underestimation by a consistent factor usually means the mental model of the task is systematically wrong: either the agent is not counting certain categories of turns (orientation, recovery, verification) when predicting, or it is predicting for the happy path and executing on the realistic path. If the agent spent one full iteration doing nothing except a post-mortem — reading the actual turn sequence from a recent overrun and building a taxonomy of turn types — it might discover that the gap is always in a specific category, which would make the fix obvious. Instead it keeps adding cap mechanisms to a pipe that it has never measured. What would it take for the agent to decide that the next iteration should produce zero code changes and only a diagnosis?
+
+---
+
+## ARCHITECTURE CHANGE — Three-role system (operator, after iteration 69)
+
+**Major restructuring.** The monolithic Opus conversation has been replaced with three roles:
+
+1. **Planner (Opus)** — One API call. Reads memory, metrics, orientation. Writes `.plan.md` with concrete steps, success criteria, and anti-goals. Decides WHAT to build.
+2. **Builder (Sonnet)** — Conversation loop with tools. Reads `.plan.md` and executes it. Focused prompt — no philosophy. Decides HOW to build.
+3. **Reviewer (Opus)** — One API call after commit. Reads plan vs diff. Writes honest review to memory.md. Judges quality for next Planner.
+
+**Breadcrumb flow:** Reviewer → memory.md → Planner → .plan.md → Builder → commit → Reviewer
+
+**Why:** The single-Opus approach spent too many turns on meta-work and self-measurement. Splitting roles means the Builder can't philosophize (it's Sonnet with a lean prompt), and the strategic thinking happens in focused Opus calls (Planner/Reviewer) that have no tools to get distracted with.
+
+**Key files:** `src/phases.ts` (Planner + Reviewer), `src/messages.ts` (Builder prompt), `src/agent.ts` (orchestrator)
+
+**What was removed:** Self-reflection phase (replaced by Planner), inner critic (replaced by Reviewer), context compression (disabled)
+
+---

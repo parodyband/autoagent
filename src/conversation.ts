@@ -55,6 +55,8 @@ export interface IterationCtx {
   validate?: (rootDir: string, log: (msg: string) => void) => Promise<{ ok: boolean; output: string }>;
   /** Optional compression config. Set to null to disable compression. */
   compressionConfig?: CompressionConfig | null;
+  /** Optional custom system prompt builder. Defaults to buildSystemPrompt from messages.ts. */
+  systemPromptBuilder?: (state: IterationState, rootDir: string) => string;
 }
 
 export type TurnResult = "continue" | "break" | "restarted";
@@ -194,7 +196,7 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
     max_tokens: ctx.maxTokens,
     system: [{
       type: "text" as const,
-      text: buildSystemPrompt(ctx.state, ctx.rootDir),
+      text: (ctx.systemPromptBuilder ?? buildSystemPrompt)(ctx.state, ctx.rootDir),
       cache_control: { type: "ephemeral" as const },
     }],
     tools: addCacheBreakpoint(ctx.registry.getDefinitions()),

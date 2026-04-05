@@ -18,7 +18,7 @@ import {
   type BenchmarkSnapshot,
 } from "./validation.js";
 import { commitIteration, saveState, type IterationState } from "./iteration.js";
-import { reflectOnIteration, writeReflection } from "./alignment.js";
+import { runReviewer } from "./phases.js";
 import { executeSubagent } from "./tools/subagent.js";
 import { executeBash } from "./tools/bash.js";
 import type { ToolCache } from "./tool-cache.js";
@@ -274,29 +274,20 @@ export async function finalizeIteration(
   saveState(ctx.state);
 
   if (doRestart) {
-    // ─── Inner critic ───
-    // After commit, before restart. Sonnet reflects on what just happened and
-    // writes the questions the agent should be asking itself into memory.
-    // Over time, the agent internalizes these thinking patterns.
+    // ─── Phase 3: Reviewer (Opus) ───
+    // After commit, before restart. Reviews what was built vs what was planned.
+    // Writes structured feedback to memory.md for the next Planner.
     try {
-      let metrics: unknown[] | null = null;
-      if (existsSync(ctx.metricsFile)) {
-        try { metrics = JSON.parse(readFileSync(ctx.metricsFile, "utf-8")); } catch {}
-      }
-
-      const reflection = await reflectOnIteration({
+      const review = await runReviewer({
         iteration: ctx.iter,
         rootDir: ctx.rootDir,
-        metrics,
         log: ctx.log,
       });
-
-      if (reflection) {
-        const memoryFile = path.join(ctx.rootDir, "memory.md");
-        writeReflection(reflection, ctx.iter, memoryFile);
+      if (review.inputTokens > 0) {
+        ctx.log(`Reviewer: ${review.inputTokens} in / ${review.outputTokens} out tokens`);
       }
     } catch (err) {
-      ctx.log(`Inner critic error (non-fatal): ${err instanceof Error ? err.message : err}`);
+      ctx.log(`Reviewer error (non-fatal): ${err instanceof Error ? err.message : err}`);
     }
 
     ctx.log(`Restarting as iteration ${ctx.state.iteration}...`);

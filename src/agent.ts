@@ -23,15 +23,14 @@ import "dotenv/config";
 import { executeBash } from "./tools/bash.js";
 import { createDefaultRegistry } from "./tool-registry.js";
 import { loadState, tagPreIteration, type IterationState } from "./iteration.js";
-import { buildInitialMessage } from "./messages.js";
+import { buildBuilderSystemPrompt, buildBuilderMessage } from "./messages.js";
 import { orient, formatOrientation } from "./orientation.js";
 import { parseMemory, getSection, serializeMemory } from "./memory.js";
 import { ToolCache } from "./tool-cache.js";
 import { ToolTimingTracker } from "./tool-timing.js";
-import { finalizeIteration as runFinalization, parsePredictedTurns } from "./finalization.js";
+import { finalizeIteration as runFinalization } from "./finalization.js";
 import { runConversation, type IterationCtx } from "./conversation.js";
-import { runSelfReflection } from "./self-reflection.js";
-import { computeTurnBudget, formatTurnBudget, calibrationSuggestion, type TurnBudget } from "./turn-budget.js";
+import { runPlanner, runReviewer } from "./phases.js";
 import {
   countConsecutiveFailures,
   resuscitate,
@@ -160,7 +159,7 @@ async function runIteration(state: IterationState): Promise<void> {
 
   const ctx: IterationCtx = {
     client: new Anthropic(),
-    model: process.env.MODEL || "claude-opus-4-6",
+    model: "claude-sonnet-4-6", // Builder uses Sonnet — Planner/Reviewer use Opus
     maxTokens: parseInt(process.env.MAX_TOKENS || "16384", 10),
     startTime: new Date(),
     toolCounts: {},
@@ -177,62 +176,39 @@ async function runIteration(state: IterationState): Promise<void> {
     registry: toolRegistry,
     log: (msg: string) => log(state.iteration, msg),
     onFinalize: doFinalize,
-    compressionConfig: {
-      threshold: 30,   // Compress after ~15 turns (30 messages)
-      keepRecent: 14,  // Keep ~7 recent turns intact for immediate context
-      maxResultChars: 200,
-      maxTextChars: 150,
-    },
+    compressionConfig: null, // Disabled — prompt caching handles token cost
   };
 
   console.log(`\n${"=".repeat(60)}`);
   console.log(`  AutoAgent — Iteration ${ctx.iter}`);
-  console.log(`  Tools: ${toolRegistry.getNames().join(", ")}`);
+  console.log(`  Architecture: Planner (Opus) → Builder (Sonnet) → Reviewer (Opus)`);
   console.log(`${"=".repeat(60)}\n`);
 
-  logger.info(`Starting. Model=${ctx.model} MaxTokens=${ctx.maxTokens}`);
+  logger.info(`Starting. Builder model=${ctx.model} MaxTokens=${ctx.maxTokens}`);
   await tagPreIteration(ctx.iter);
 
-  // Orient: detect changes since last iteration
+  // ─── Phase 1: Planner (Opus) ───
   const orientReport = await orient();
   const orientationText = formatOrientation(orientReport);
-  if (orientReport.hasChanges) {
-    logger.info(`Orientation: changes detected since last iteration`);
-  }
 
-  // Self-reflection: Opus reviews goals before execution starts.
-  // May rewrite goals.md if they're too timid or misaligned.
-  try {
-    const reflection = await runSelfReflection({
-      iteration: ctx.iter,
-      rootDir: ROOT,
-      log: (msg: string) => log(ctx.iter, msg),
-    });
-    if (reflection.goalsRewritten) {
-      logger.info(`Self-reflection rewrote goals: ${reflection.reasoning}`);
-    }
-    // Track reflection tokens as overhead
-    ctx.tokens.in += reflection.inputTokens;
-    ctx.tokens.out += reflection.outputTokens;
-  } catch (err) {
-    log(ctx.iter, `Self-reflection error (non-fatal): ${err instanceof Error ? err.message : err}`);
-  }
+  const planResult = await runPlanner({
+    iteration: ctx.iter,
+    rootDir: ROOT,
+    memory: readMemory(),
+    orientation: orientationText || "",
+    log: (msg: string) => log(ctx.iter, msg),
+  });
 
-  // Parse predicted turns BEFORE goals get rewritten during the iteration
-  const predictedTurns = parsePredictedTurns(ROOT);
+  // Track planner tokens as overhead
+  ctx.tokens.in += planResult.inputTokens;
+  ctx.tokens.out += planResult.outputTokens;
+  logger.info(`Planner: ${planResult.inputTokens} in / ${planResult.outputTokens} out tokens`);
 
-  // Compute adaptive turn budget from historical metrics
-  const turnBudget = computeTurnBudget(METRICS_FILE, predictedTurns, MAX_TURNS);
-  logger.info(formatTurnBudget(turnBudget));
-  const calSuggestion = calibrationSuggestion(turnBudget);
-  if (calSuggestion) logger.info(calSuggestion);
-
-  // Read goals AFTER self-reflection (it may have rewritten them)
-  ctx.predictedTurns = predictedTurns;
-  ctx.turnBudget = turnBudget;
+  // ─── Phase 2: Builder (Sonnet) ───
+  ctx.systemPromptBuilder = buildBuilderSystemPrompt;
   ctx.messages.push({
     role: "user",
-    content: buildInitialMessage(readGoals(), readMemory(), orientationText || undefined),
+    content: buildBuilderMessage(planResult.plan, readMemory()),
   });
 
   await runConversation(ctx);
