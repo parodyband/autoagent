@@ -1,108 +1,3 @@
-955 |     return this.modelOverride ?? "auto";
-956 |   }
-957 | 
-958 |   /** Override model for all subsequent sends. Pass null to restore auto-routing. */
-959 |   setModel(model: string | null): void {
-[2026-04-05T19:23:40.744Z] iter=330 turn=22 INFO: Turn 22/25
-[2026-04-05T19:23:43.938Z] iter=330 turn=22 INFO: Agent: Now wire `_abortController` creation in `send()`:
-[2026-04-05T19:23:43.939Z] iter=330 turn=22 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T19:23:43.940Z] iter=330 turn=22 INFO:   -> ok: Patched src/orchestrator.ts: -2 +4 lines
-
-Context after patch:
-1255 |    * 4. Run streaming agent loop
-1256 |    * 5. Verify if code was changed
-1257 |    */
-1258 |   async send(userMessage: string): Promise<OrchestratorResult> {
-1259 |     if (!this.initialized) await this.init();
-1260 |     // Create fresh AbortController for this send() call
-1261 |     this._abortController = new AbortController();
-1262 | 
-1263 |     // 0. Project summary injection (once per session)
-1264 |     if (!this.projectSummaryInjected) {
-[2026-04-05T19:23:43.941Z] iter=330 turn=23 INFO: Turn 23/25
-[2026-04-05T19:23:45.963Z] iter=330 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
-[2026-04-05T19:23:46.987Z] iter=330 turn=23 INFO:   -> exit=0 (158 chars)
-[2026-04-05T19:23:46.987Z] iter=330 turn=24 INFO: Turn 24/25
-[2026-04-05T19:23:48.729Z] iter=330 turn=24 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "OrchestratorResult" src/orchestrator.ts | head -5
-[2026-04-05T19:23:48.737Z] iter=330 turn=24 INFO:   -> exit=0 (112 chars)
-[2026-04-05T19:23:48.738Z] iter=330 turn=25 INFO: Turn 25/25
-[2026-04-05T19:23:50.121Z] iter=330 turn=25 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '156,165p' src/orchestrator.ts
-[2026-04-05T19:23:50.127Z] iter=330 turn=25 INFO:   -> exit=0 (210 chars)
-[2026-04-05T19:23:50.127Z] iter=330 turn=25 INFO: Hit max turns — committing and restarting
-[2026-04-05T19:23:50.128Z] iter=330 turn=25 INFO: Cache persisted: 53 entries to .autoagent-cache.json
-[2026-04-05T19:23:50.128Z] iter=330 turn=25 INFO: Tool timing: bash: 20x, avg=60ms, total=1202ms; write_file: 8x, avg=2ms, total=13ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms
-[2026-04-05T19:23:50.129Z] iter=330 turn=25 INFO: Tool timing stats
-[2026-04-05T19:23:56.996Z] iter=330 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 330: predicted 20 turns, actual 25 turns, ratio 1.25**
-[2026-04-05T19:23:57.016Z] iter=330 turn=25 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T19:23:57.049Z] iter=330 turn=25 INFO: Committed: 9f10c77d (41 in / 5213 out, cache: 21547 created, 409887 read)
-[2026-04-05T19:23:57.049Z] iter=330 turn=25 INFO: Restarting as iteration 331...
-[2026-04-05T19:23:57.231Z] iter=331 INFO: Cache restored: 53/53 entries (0 stale)
-[2026-04-05T19:23:57.234Z] iter=331 INFO: Turn budget: 22/25 (calibration=1.00x, predicted=20)
-[2026-04-05T19:23:57.234Z] iter=331 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T19:23:57.374Z] iter=331 turn=1 INFO: Turn 1/25
-[2026-04-05T19:24:01.124Z] iter=331 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the system and what happened in recent iterations.
-[2026-04-05T19:24:01.124Z] iter=331 turn=1 INFO: read_scratchpad: 353 chars
-[2026-04-05T19:24:01.125Z] iter=331 turn=2 INFO: Turn 2/25
-[2026-04-05T19:24:04.292Z] iter=331 turn=2 INFO: $ cat .autoagent-metrics.json 2>/dev/null | head -80
-[2026-04-05T19:24:04.294Z] iter=331 turn=2 INFO: $ cat .autoagent-state.json 2>/dev/null
-[2026-04-05T19:24:04.296Z] iter=331 turn=2 INFO: $ cat .expert-rotation.json 2>/dev/null
-[2026-04-05T19:24:04.301Z] iter=331 turn=2 INFO:   -> exit=0 (1679 chars)
-[2026-04-05T19:24:04.301Z] iter=331 turn=2 INFO:   -> exit=0 (113 chars)
-[2026-04-05T19:24:04.302Z] iter=331 turn=2 INFO:   -> exit=0 (1310 chars)
-[2026-04-05T19:24:04.302Z] iter=331 turn=3 INFO: Turn 3/25
-[2026-04-05T19:24:16.223Z] iter=331 turn=3 INFO: think: Let me understand the current state:
-
-1. We're at iteration 331, this is a Meta iteration
-2. The rotation is E-A-E-M, wh...
-[2026-04-05T19:24:16.223Z] iter=331 turn=4 INFO: Turn 4/25
-[2026-04-05T19:24:21.731Z] iter=331 turn=4 INFO: Agent: 
-
-You're right. Let me focus on deliverables immediately.
-
-**My deliverables as Meta:**
-1. Assess why iter 330 shipped zero src code and fix the root cause
-2. Compact memory — it's growing
-3. Write goals.md for next Engineer iteration (332)
-4. Ensure TSC clean, restart
-
-The critical issue: iteration 330 hit 25 turns and produced **zero source code**. Let me check what went wrong and fix it.
-[2026-04-05T19:24:21.731Z] iter=331 turn=4 INFO: $ git log --oneline -10
-[2026-04-05T19:24:21.732Z] iter=331 turn=4 INFO: $ cat goals.md 2>/dev/null
-[2026-04-05T19:24:21.734Z] iter=331 turn=4 INFO: read_file: memory.md
-[2026-04-05T19:24:21.734Z] iter=331 turn=4 INFO:   -> ok (5205 chars)
-[2026-04-05T19:24:21.738Z] iter=331 turn=4 INFO:   -> exit=0 (3434 chars)
-[2026-04-05T19:24:21.741Z] iter=331 turn=4 INFO:   -> exit=0 (566 chars)
-[2026-04-05T19:24:21.741Z] iter=331 turn=5 INFO: Turn 5/25
-[2026-04-05T19:24:29.202Z] iter=331 turn=5 INFO: think: Critical finding: Iteration 330 was an Engineer iteration that hit 25 turns (cap) but produced ZERO src changes. The dif...
-[2026-04-05T19:24:29.202Z] iter=331 turn=6 INFO: Turn 6/25
-[2026-04-05T19:24:32.455Z] iter=331 turn=6 INFO: $ git diff d07b75d..9f10c77 --stat
-[2026-04-05T19:24:32.457Z] iter=331 turn=6 INFO: $ git diff 32d5961..9f10c77 -- 'src/' --stat
-[2026-04-05T19:24:32.470Z] iter=331 turn=6 INFO:   -> exit=0 (5368 chars)
-[2026-04-05T19:24:32.473Z] iter=331 turn=6 INFO:   -> exit=0 (801 chars)
-[2026-04-05T19:24:32.473Z] iter=331 turn=7 INFO: Turn 7/25
-[2026-04-05T19:24:41.877Z] iter=331 turn=7 INFO: Agent: 
-
-**Status check:**
-- My goals as Meta: (1) Diagnose iter 330 — DONE (it actually shipped real code! The orientation diff was misleading — it only showed non-src files, but `git diff src/` reveals ~80 lines of AbortController + session stats in orchestrator.ts), (2) Compact memory — NOT STARTED, (3) Write goals.md for iter 332 — NOT STARTED, (4) TSC + restart — NOT STARTED
-
-Good news: iter 330 was...
-[2026-04-05T19:24:41.878Z] iter=331 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -5
-[2026-04-05T19:24:41.880Z] iter=331 turn=7 INFO: $ wc -l src/orchestrator.ts src/tui.tsx 2>/dev/null
-[2026-04-05T19:24:41.889Z] iter=331 turn=7 INFO:   -> exit=0 (65 chars)
-[2026-04-05T19:24:54.417Z] iter=331 turn=7 INFO:   -> exit=0 (191 chars)
-[2026-04-05T19:24:54.418Z] iter=331 turn=8 INFO: Turn 8/25
-[2026-04-05T19:25:02.300Z] iter=331 turn=8 INFO: think: OK so iter 330 shipped real code: AbortController support + session stats in orchestrator.ts. But the TUI side wasn't wi...
-[2026-04-05T19:25:02.301Z] iter=331 turn=9 INFO: Turn 9/25
-[2026-04-05T19:25:37.754Z] iter=331 turn=9 INFO: Agent: Now let me compact memory and write goals. The key insight: iter 330 shipped orchestrator-side abort + session stats, but TUI wiring is incomplete. Next Engineer should finish wiring + write tests.
-[2026-04-05T19:25:37.755Z] iter=331 turn=9 INFO: write_file: memory.md (write)
-[2026-04-05T19:25:37.757Z] iter=331 turn=9 INFO:   -> ok: Updated memory.md (4326 chars, -14 lines delta)
-[2026-04-05T19:25:37.758Z] iter=331 turn=10 INFO: Turn 10/25
-[2026-04-05T19:25:56.313Z] iter=331 turn=10 INFO: write_file: goals.md (write)
-[2026-04-05T19:25:56.317Z] iter=331 turn=10 INFO:   -> ok: Updated goals.md (2829 chars, +1 lines delta)
-[2026-04-05T19:25:56.318Z] iter=331 turn=11 INFO: Turn 11/25
-[2026-04-05T19:25:58.594Z] iter=331 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
 [2026-04-05T19:25:59.607Z] iter=331 turn=11 INFO:   -> exit=2 (158 chars)
 [2026-04-05T19:25:59.608Z] iter=331 turn=12 INFO: Turn 12/25
 [2026-04-05T19:26:01.900Z] iter=331 turn=12 INFO: read_file: src/orchestrator.ts
@@ -1101,3 +996,127 @@ Context after patch:
 [2026-04-05T19:40:59.159Z] iter=339 turn=9 INFO: Tool timing stats
 [2026-04-05T19:41:05.926Z] iter=339 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 339: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-05T19:41:05.946Z] iter=339 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T19:41:05.979Z] iter=339 turn=9 INFO: Committed: 2eba070a (19 in / 2899 out, cache: 13851 created, 88167 read)
+[2026-04-05T19:41:05.979Z] iter=339 turn=9 INFO: Restarting as iteration 340...
+[2026-04-05T19:41:06.172Z] iter=340 INFO: Cache restored: 53/53 entries (0 stale)
+[2026-04-05T19:41:06.174Z] iter=340 INFO: Turn budget: 19/25 (calibration=1.00x, predicted=20)
+[2026-04-05T19:41:06.174Z] iter=340 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T19:41:06.334Z] iter=340 turn=1 INFO: Turn 1/25
+[2026-04-05T19:41:08.429Z] iter=340 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what needs to be done.
+[2026-04-05T19:41:08.430Z] iter=340 turn=1 INFO: read_scratchpad: 353 chars
+[2026-04-05T19:41:08.431Z] iter=340 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-05T19:41:08.441Z] iter=340 turn=1 INFO:   -> exit=0 (1371 chars)
+[2026-04-05T19:41:08.442Z] iter=340 turn=2 INFO: Turn 2/25
+[2026-04-05T19:41:10.838Z] iter=340 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '220,260p' src/cli.ts
+[2026-04-05T19:41:10.841Z] iter=340 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "compactHistory\|reindexRepoMap\|private\|public" src/orchestrator.ts | head -50
+[2026-04-05T19:41:10.850Z] iter=340 turn=2 INFO:   -> exit=0 (1312 chars)
+[2026-04-05T19:41:10.855Z] iter=340 turn=2 INFO:   -> exit=0 (1540 chars)
+[2026-04-05T19:41:10.855Z] iter=340 turn=3 INFO: Turn 3/25
+[2026-04-05T19:41:12.568Z] iter=340 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "compactHistory\|reindexRepoMap" src/orchestrator.ts
+[2026-04-05T19:41:12.586Z] iter=340 turn=3 INFO:   -> exit=1 (11 chars)
+[2026-04-05T19:41:12.586Z] iter=340 turn=4 INFO: Turn 4/25
+[2026-04-05T19:41:16.211Z] iter=340 turn=4 INFO: think: I have enough context. Let me act:
+
+1. `compactHistory()` and `reindexRepoMap()` don't exist as named methods - the orch...
+[2026-04-05T19:41:16.212Z] iter=340 turn=5 INFO: Turn 5/25
+[2026-04-05T19:41:18.256Z] iter=340 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "async compact\|reindexRepo\|staleRepoPaths\|cachedRepoMap\|repoFingerprint" src/orchestrator.ts | head -30
+[2026-04-05T19:41:18.282Z] iter=340 turn=5 INFO:   -> exit=0 (1489 chars)
+[2026-04-05T19:41:18.283Z] iter=340 turn=6 INFO: Turn 6/25
+[2026-04-05T19:41:20.485Z] iter=340 turn=6 INFO: Agent: Now I have what I need. I'll add public `compactHistory()` and `reindexRepoMap()` methods to the orchestrator, then fix cli.ts.
+[2026-04-05T19:41:20.485Z] iter=340 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1259,1275p' src/orchestrator.ts
+[2026-04-05T19:41:20.494Z] iter=340 turn=6 INFO:   -> exit=0 (598 chars)
+[2026-04-05T19:41:20.495Z] iter=340 turn=7 INFO: Turn 7/25
+[2026-04-05T19:41:23.152Z] iter=340 turn=7 INFO: Agent: Goal 1: IN PROGRESS (need to add public methods + fix cli.ts)
+Goal 2: NOT STARTED
+
+Let me execute both now:
+[2026-04-05T19:41:23.153Z] iter=340 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '880,935p' src/orchestrator.ts
+[2026-04-05T19:41:23.184Z] iter=340 turn=7 INFO:   -> exit=0 (2216 chars)
+[2026-04-05T19:41:23.185Z] iter=340 turn=8 INFO: Turn 8/25
+[2026-04-05T19:41:28.290Z] iter=340 turn=8 INFO: Agent: There's already a public `reindex()` method. Now I'll add `compactHistory()` and `reindexRepoMap()` as public aliases, then fix cli.ts:
+[2026-04-05T19:41:28.291Z] iter=340 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:41:28.295Z] iter=340 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -4 +15 lines
+
+Context after patch:
+1256 |   }
+1257 | 
+1258 |   /** Manually trigger context compaction (called from /compact TUI command). */
+1259 |   async compactNow(): Promise<void> {
+1260 |     await this.compact();
+1261 |     this.opts.onStatus?.("Context compacted.");
+1262 |   }
+1263 | 
+1264 |   /** Public alias for compact() — used by CLI /compact command. */
+1265 |   async compactHistory(): Promise<void> {
+1266 |     await this.compact();
+1267 |     this.opts.onStatus?.("Context compacted.");
+1268 |   }
+1269 | 
+1270 |   /** Public alias for reindex() — used by CLI /reindex command. */
+1271 |   async reindexRepoMap(): Promise<void> {
+1272 |     this.reindex();
+1273 |   }
+1274 | 
+1275 |   /**
+1276 |    * Process a user message through the full orchestration pipeline:
+[2026-04-05T19:41:28.296Z] iter=340 turn=9 INFO: Turn 9/25
+[2026-04-05T19:41:30.804Z] iter=340 turn=9 INFO: Agent: Now fix the unsafe casts in cli.ts:
+[2026-04-05T19:41:30.804Z] iter=340 turn=9 INFO: write_file: src/cli.ts (patch)
+[2026-04-05T19:41:30.805Z] iter=340 turn=9 INFO:   -> ok: Patched src/cli.ts: -1 +1 lines
+
+Context after patch:
+233 | 
+234 |     if (trimmed === "/compact") {
+235 |       console.log("Compacting history...");
+236 |       await orchestrator.compactHistory();
+237 |       console.log("Done.\n");
+238 |       prompt();
+239 |       return;
+[2026-04-05T19:41:30.805Z] iter=340 turn=10 INFO: Turn 10/25
+[2026-04-05T19:41:33.044Z] iter=340 turn=10 INFO: write_file: src/cli.ts (patch)
+[2026-04-05T19:41:33.046Z] iter=340 turn=10 INFO:   -> ok: Patched src/cli.ts: -1 +1 lines
+
+Context after patch:
+241 | 
+242 |     if (trimmed === "/reindex") {
+243 |       console.log("Re-indexing repo map...");
+244 |       await orchestrator.reindexRepoMap();
+245 |       console.log("Done.\n");
+246 |       prompt();
+247 |       return;
+[2026-04-05T19:41:33.047Z] iter=340 turn=11 INFO: Turn 11/25
+[2026-04-05T19:41:35.953Z] iter=340 turn=11 INFO: Agent: Goal 1 done. Now Goal 2 — extended thinking tests. Let me check what the orchestrator does with thinking:
+[2026-04-05T19:41:35.954Z] iter=340 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "thinking\|interleaved\|budget_tokens" src/orchestrator.ts | head -40
+[2026-04-05T19:41:35.971Z] iter=340 turn=11 INFO:   -> exit=0 (616 chars)
+[2026-04-05T19:41:35.972Z] iter=340 turn=12 INFO: Turn 12/25
+[2026-04-05T19:41:37.229Z] iter=340 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '485,560p' src/orchestrator.ts
+[2026-04-05T19:41:37.246Z] iter=340 turn=12 INFO:   -> exit=0 (3234 chars)
+[2026-04-05T19:41:37.246Z] iter=340 turn=13 INFO: Turn 13/25
+[2026-04-05T19:41:40.783Z] iter=340 turn=13 INFO: Agent: I've changed src/orchestrator.ts (added `compactHistory()` and `reindexRepoMap()`) and src/cli.ts (removed unsafe casts). Now I'll write the tests and finish.
+[2026-04-05T19:41:40.784Z] iter=340 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && ls tests/orchestrator* tests/extended* 2>/dev/null | head -5
+[2026-04-05T19:41:40.800Z] iter=340 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:41:40.801Z] iter=340 turn=14 INFO: Turn 14/25
+[2026-04-05T19:41:43.082Z] iter=340 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && ls tests/ | head -20
+[2026-04-05T19:41:43.106Z] iter=340 turn=14 INFO:   -> exit=0 (388 chars)
+[2026-04-05T19:41:43.108Z] iter=340 turn=15 INFO: Turn 15/25
+[2026-04-05T19:41:44.537Z] iter=340 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && head -60 tests/tool-retry-and-orchestrator.test.ts
+[2026-04-05T19:41:44.548Z] iter=340 turn=15 INFO:   -> exit=0 (2082 chars)
+[2026-04-05T19:41:44.548Z] iter=340 turn=16 INFO: Turn 16/25
+[2026-04-05T19:42:15.224Z] iter=340 turn=16 INFO: Agent: Let me write the extended thinking tests now, then wrap up.
+[2026-04-05T19:42:15.224Z] iter=340 turn=16 INFO: write_file: tests/extended-thinking.test.ts (write)
+[2026-04-05T19:42:15.225Z] iter=340 turn=16 INFO:   -> ok: Created tests/extended-thinking.test.ts (8642 chars)
+[2026-04-05T19:42:15.225Z] iter=340 turn=17 INFO: Turn 17/25
+[2026-04-05T19:42:17.154Z] iter=340 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T19:42:18.172Z] iter=340 turn=17 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:42:18.173Z] iter=340 turn=18 INFO: Turn 18/25
+[2026-04-05T19:42:20.439Z] iter=340 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/extended-thinking.test.ts 2>&1 | tail -30
+[2026-04-05T19:42:21.820Z] iter=340 turn=18 INFO:   -> exit=0 (283 chars)
+[2026-04-05T19:42:21.820Z] iter=340 turn=19 INFO: Turn 19/25
+[2026-04-05T19:42:25.738Z] iter=340 turn=19 INFO: Agent: All 9 tests pass, TSC clean. Now wrap up:
+[2026-04-05T19:42:25.739Z] iter=340 turn=19 INFO: save_memory: "[Engineer] Iteration 340"
+[2026-04-05T19:42:25.742Z] iter=340 turn=19 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T19:42:25.742Z] iter=340 turn=20 INFO: Turn 20/25
+[2026-04-05T19:42:31.996Z] iter=340 turn=20 INFO: write_file: goals.md (write)
+[2026-04-05T19:42:31.998Z] iter=340 turn=20 INFO:   -> ok: Updated goals.md (765 chars, -6 lines delta)
+[2026-04-05T19:42:31.999Z] iter=340 turn=21 INFO: Turn 21/25
+[2026-04-05T19:42:33.805Z] iter=340 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "iter 340: public compactHistory/reindexRepoMap, remove unsafe casts, extended thinking tests"

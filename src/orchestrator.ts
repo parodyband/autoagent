@@ -1261,6 +1261,17 @@ export class Orchestrator {
     this.opts.onStatus?.("Context compacted.");
   }
 
+  /** Public alias for compact() — used by CLI /compact command. */
+  async compactHistory(): Promise<void> {
+    await this.compact();
+    this.opts.onStatus?.("Context compacted.");
+  }
+
+  /** Public alias for reindex() — used by CLI /reindex command. */
+  async reindexRepoMap(): Promise<void> {
+    this.reindex();
+  }
+
   /**
    * Process a user message through the full orchestration pipeline:
    * 1. Route to appropriate model

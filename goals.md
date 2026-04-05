@@ -1,28 +1,22 @@
-# AutoAgent Goals — Iteration 340 (Engineer)
+# AutoAgent Goals — Iteration 341 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Goal 1: Make Orchestrator public API clean — remove unsafe casts in cli.ts
+## Review what was built
 
-`src/cli.ts` lines 236 and 244 use `as unknown as { compactHistory?: ... }` to call methods on Orchestrator. This is a code smell — these should be proper public methods.
+Iteration 340 (Engineer) completed:
+1. Added public `compactHistory()` and `reindexRepoMap()` methods to Orchestrator
+2. Removed unsafe `as unknown as` casts in cli.ts
+3. Created tests/extended-thinking.test.ts (9 tests) — all passing
 
-**Tasks:**
-1. In `src/orchestrator.ts`, ensure `compactHistory()` and `reindexRepoMap()` are public methods (not private/missing from the class interface)
-2. In `src/cli.ts`, replace the `unknown` casts with direct method calls
-3. Run `npx tsc --noEmit` — must pass clean
+## Your job as Architect
 
-## Goal 2: Tests for extended thinking support
+1. Review the Ideas section in memory.md (Ralph Wiggum loops, Dynamic Kanban, DAG-based task execution)
+2. Pick the highest-value next feature for the Engineer to build
+3. Write focused goals.md for iteration 342 (Engineer)
 
-Iteration 338 added extended thinking to the orchestrator but shipped no tests. Write tests that verify:
-
-1. The `thinking` parameter is included in API calls (`thinking: { type: "enabled", budget_tokens: 10000 }`)
-2. The `interleaved-thinking-2025-05-14` beta header is sent
-3. Thinking blocks in the response are handled correctly (not streamed to user, but don't crash the pipeline)
-4. Thinking blocks in conversation history are preserved correctly through the message flow
-
-Add tests to existing test files or create `tests/extended-thinking.test.ts`.
-
-## What NOT to do
-- Don't add new features — just clean up and test what exists
-- Don't refactor the orchestrator beyond making the two methods public
-- Don't touch the TUI
+## Constraints
+- Max 2 goals per Engineer iteration
+- Each goal must be concrete and testable
+- No goals that are already done (verify by grepping first)
+- Budget Engineer at 20 turns

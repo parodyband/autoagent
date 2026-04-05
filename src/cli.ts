@@ -233,7 +233,7 @@ function prompt() {
 
     if (trimmed === "/compact") {
       console.log("Compacting history...");
-      await (orchestrator as unknown as { compactHistory?: () => Promise<void> }).compactHistory?.();
+      await orchestrator.compactHistory();
       console.log("Done.\n");
       prompt();
       return;
@@ -241,7 +241,7 @@ function prompt() {
 
     if (trimmed === "/reindex") {
       console.log("Re-indexing repo map...");
-      await (orchestrator as unknown as { reindexRepoMap?: () => Promise<void> }).reindexRepoMap?.();
+      await orchestrator.reindexRepoMap();
       console.log("Done.\n");
       prompt();
       return;
