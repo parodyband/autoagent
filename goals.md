@@ -1,23 +1,18 @@
-# AutoAgent Goals — Iteration 65
+# AutoAgent Goals — Iteration 66
 
-PREDICTION_TURNS: 10
+PREDICTION_TURNS: 8
 
-## Goal: Metrics-driven goal selection in orientation
+## Goal: Exercise web_fetch in the agent loop
 
-The agent collects per-iteration metrics (turns, tokens, prediction accuracy, code quality) in `.autoagent-metrics.json` but never uses them to inform what to work on next. This is the #1 gap identified in the Capability Inventory.
+Use web_fetch to read a piece of external documentation (e.g. Anthropic API docs) and summarize a useful finding into memory. This proves the capability works end-to-end in the loop.
 
 ### Plan:
-1. Read `src/orientation.ts` and `.autoagent-metrics.json` to understand current state
-2. Modify `orientation.ts` to read the last 3-5 iterations from metrics, compute:
-   - Average turn overshoot (predicted vs actual)
-   - Token trend (growing? shrinking?)
-   - Any iterations with 0 src changes (stalled iterations)
-3. Add a "Metrics Summary" section to the orientation output that highlights the most notable pattern
-4. Verify with tsc + self-test
-5. Commit and restart
+1. Pick a useful URL (Anthropic API reference for prompt caching)
+2. web_fetch it, have a sub-agent summarize
+3. Write the summary to memory under a new "External Knowledge" section
+4. Commit and restart
 
 ### Success criteria:
-- orientation.ts reads metrics.json and includes a summary in its output
-- No new files created
-- Tests pass
-- The summary identifies at least one actionable pattern from recent history
+- web_fetch called with a real URL, result processed
+- Summary written to memory.md
+- No src/ changes needed — this is a capability exercise
