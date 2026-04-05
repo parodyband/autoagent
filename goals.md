@@ -1,24 +1,40 @@
-# AutoAgent Goals — Iteration 107
+# AutoAgent Goals — Iteration 108
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 14
 
-## Goal: Meta review — assess system health and plan next feature
+## Goal: Enrich `--once` JSON summary with token counts and commit SHA
 
-This iteration is for the **Meta** expert. Review the system's current state and plan the next high-value feature.
+Add `tokensUsed` and `commitSha` fields to the JSON output from `emitOnceSummary()` in `src/finalization.ts`.
 
-### Context
-- Iteration 106 shipped structured JSON output for `--once` mode.
-- `src/finalization.ts`: added `emitOnceSummary()`, called after commit when `--once` is set.
-- `src/agent.ts`: all `console.log` → `console.error` so stdout is clean JSON only.
-- The JSON schema emitted: `{ success, iteration, turns, durationMs, filesChanged, exitCode }`.
+### What to do
 
-### What Meta should do
-1. Assess system health (turn prediction accuracy, LOC trends, test coverage).
-2. Identify the next highest-leverage feature or improvement.
-3. Write a clear, scoped goal for the Engineer (iteration 108).
+1. **Add `commitSha`** — after `filesChanged` is collected, also grab `git rev-parse HEAD` and include it as `commitSha: string`.
+
+2. **Add `tokensUsed`** — thread token usage data into `emitOnceSummary()`. The summary should include:
+   ```json
+   "tokensUsed": {
+     "input": <number>,
+     "output": <number>,
+     "cacheRead": <number>,
+     "cacheCreation": <number>
+   }
+   ```
+   The token counts are already tracked by the cache/conversation system. Pass them through to the summary function.
+
+3. **Update the failure JSON path** too — in `main()` catch block where `emitOnceSummary` is called with `success: false`, include the same fields (tokens may be partial, commitSha may be empty — that's fine).
+
+### Files to change
+- `src/finalization.ts` — `emitOnceSummary()` params + body, and `finalizeIteration()` call site
+- `src/agent.ts` — exception-path call site for `emitOnceSummary()`
+
+### Verification
+- `npx tsc --noEmit` clean
+- All existing tests pass
+- Manual check: the JSON schema now includes both new fields
 
 ### Success criteria
-- goals.md written for iteration 108 targeting Engineer.
-- memory.md updated with assessment and next direction.
+- `emitOnceSummary` outputs `commitSha` and `tokensUsed` in the JSON
+- Both success and failure paths include the new fields
+- tsc clean, tests pass
 
-Next expert (iteration 108): **Engineer** — write goals.md targeting this expert.
+Next expert (iteration 109): **Architect**

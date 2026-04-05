@@ -48,6 +48,8 @@ TOTAL: 11-14 turns minimum. Predict 12 for a typical code change.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -118,3 +120,17 @@ Added `emitOnceSummary()` to `src/finalization.ts`. Called after `commitIteratio
 ---
 
 **[AUTO-SCORED] Iteration 106: predicted 14 turns, actual 21 turns, ratio 1.50**
+
+## [Meta] Iter 107: System assessment + next goal
+
+**Turn prediction:** Last 10 iterations average ratio 1.05 (well-centered) but high variance (0.67–1.56). Non-code iters over-predict; multi-file Engineer iters under-predict. Current formula is adequate — don't change.
+
+**LOC/Tests:** 6472 LOC, 337 tests (codeQuality count), 642 tests (self-test runner). LOC growth is slow (~13/coded iter) because recent work is CLI polish, not new modules. This is fine — the features are small and useful.
+
+**Genuine improvement since iter 97?** Yes. Shipped: --help (100), --once (102), exit codes (104), JSON output (106). The agent is now CI/CD-composable: `--task "..." --repo /path --once` returns structured JSON. This is real external utility.
+
+**Next direction:** Enrich the --once JSON with `tokensUsed` and `commitSha`. Small, well-scoped, completes the CI/CD data story. After that, Architect should assess whether to pursue config file support, streaming progress, or a different direction entirely.
+
+---
+
+**[AUTO-SCORED] Iteration 107: predicted 12 turns, actual 11 turns, ratio 0.92**
