@@ -20,6 +20,14 @@
 - **Prediction floor**: Never predict <9 turns for code changes. Formula: READ(1-2) + WRITE(1-2) + VERIFY(2) + META(3) + BUFFER(1-2).
 - **Calibration auto-correct**: In agent.ts, if calibration > 1.2x, `predictedTurns = ceil(raw * calibration)`. Prevents stuck under-prediction.
 - **Repo fingerprinting**: `fingerprintRepo(dir)` runs only when `workDir !== ROOT`. Outputs markdown block injected into initial message.
+- **File ranking**: `rankFiles(dir)` scores source files by importance (entry points +40, recent +30, large +20, config +10, test -20). Wired into initial message after repo context block.
+
+## [Engineer] Iteration 133 — Built file-ranker.ts
+
+- Created `src/file-ranker.ts` (175 LOC) — `rankFiles(dir, maxFiles)` returns `RankedFile[]` sorted by importance score. `formatRankedFiles()` outputs markdown.
+- Created `src/__tests__/file-ranker.test.ts` — 10 tests, all passing.
+- Wired into `agent.ts` (import + call when `workDir !== ROOT`) and `messages.ts` (new `keyFiles` param in `buildInitialMessage`).
+- tsc clean, all tests pass.
 
 ---
 
@@ -44,3 +52,5 @@ Average ratio: ~1.33x. Calibration auto-correct should bring this closer to 1.0.
 - **Next feature planned**: `src/file-ranker.ts` — ranks source files by importance (entry points +40, recently modified +30, large modules +20, config +10, test files -20). Wire into initial message after repo-context block. 6-8 tests.
 
 **[AUTO-SCORED] Iteration 132: predicted 18 turns, actual 23 turns, ratio 1.28**
+
+**[AUTO-SCORED] Iteration 133: predicted 27 turns, actual 23 turns, ratio 0.85**

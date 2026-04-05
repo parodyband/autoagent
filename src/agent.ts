@@ -26,6 +26,7 @@ import { loadState, tagPreIteration, type IterationState } from "./iteration.js"
 import { buildInitialMessage } from "./messages.js";
 import { orient, formatOrientation } from "./orientation.js";
 import { fingerprintRepo } from "./repo-context.js";
+import { rankFiles, formatRankedFiles } from "./file-ranker.js";
 import { parseMemory, getSection, serializeMemory } from "./memory.js";
 import { ToolCache } from "./tool-cache.js";
 import { ToolTimingTracker } from "./tool-timing.js";
@@ -287,13 +288,19 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
     log(state.iteration, `Repo fingerprint generated (${repoContextText.length} chars)`);
   }
 
+  // Rank files by importance (only for external repos)
+  const keyFilesText = workDir !== ROOT ? formatRankedFiles(rankFiles(workDir)) : undefined;
+  if (keyFilesText) {
+    log(state.iteration, `Key files ranked (${keyFilesText.length} chars)`);
+  }
+
   // Expert gets its own system prompt
   ctx.systemPromptBuilder = (s, r) => buildExpertPrompt(expert, s, r);
 
-  // Build initial message with goals, memory, orientation, and optional repo context
+  // Build initial message with goals, memory, orientation, repo context, and key files
   ctx.messages.push({
     role: "user",
-    content: buildInitialMessage(goalsWithRotation, readMemory(), orientationText || undefined, repoContextText || undefined),
+    content: buildInitialMessage(goalsWithRotation, readMemory(), orientationText || undefined, repoContextText || undefined, keyFilesText || undefined),
   });
 
   await runConversation(ctx);
