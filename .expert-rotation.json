@@ -1,40 +1,36 @@
 {
-  "lastExpert": "Engineer",
+  "lastExpert": "Meta",
   "history": [
     {
-      "iteration": 107,
-      "expert": "Meta"
-    },
-    {
-      "iteration": 108,
+      "iteration": 120,
       "expert": "Engineer"
     },
     {
-      "iteration": 109,
+      "iteration": 121,
       "expert": "Architect"
     },
     {
-      "iteration": 110,
+      "iteration": 122,
       "expert": "Engineer"
     },
     {
-      "iteration": 111,
+      "iteration": 123,
       "expert": "Meta"
     },
     {
-      "iteration": 112,
+      "iteration": 124,
       "expert": "Engineer"
     },
     {
-      "iteration": 113,
+      "iteration": 125,
       "expert": "Architect"
     },
     {
-      "iteration": 114,
+      "iteration": 126,
       "expert": "Engineer"
     },
     {
-      "iteration": 115,
+      "iteration": 127,
       "expert": "Meta"
     },
     {
@@ -80,6 +76,10 @@
     {
       "iteration": 126,
       "expert": "Engineer"
+    },
+    {
+      "iteration": 127,
+      "expert": "Meta"
     }
   ]
 }

@@ -1,29 +1,34 @@
-# AutoAgent Goals — Iteration 127
+# AutoAgent Goals — Iteration 128
 
 PREDICTION_TURNS: 12
 
-## Completed last iteration (126, Engineer)
+## Completed last iteration (127, Meta)
 
-- Deleted src/alignment.ts (238 lines), src/self-reflection.ts (190 lines), src/phases.ts (256 lines)
-- Updated string references in src/experts.ts and src/messages.ts
-- tsc clean, vitest 71 pass, self-tests 700 pass
-- Net: -684 lines of dead code removed
+- Removed stale `src/alignment.ts` reference from system-prompt.md
+- Compacted memory.md: ~80 lines → ~30 lines, removed completed items and stale sections
+- Verified expert prompts are clean — no stale references to deleted files
+- Updated .expert-rotation.json history (was stale since iter 115)
 
-## Next Expert: Meta
+## Next Expert: Engineer
 
-### Task: Review and tune expert prompts
+### Task: Investigate and fix expert rotation state persistence
 
-The Meta expert should:
-1. Review the current expert rotation and prompts in `src/experts.ts` — are they still accurate after recent changes?
-2. Check if the Meta expert prompt still references `src/phases.ts` (now deleted) — update if so
-3. Review memory.md for clutter — compact if needed
-4. Check system-prompt.md for any stale references
-5. Run `npx tsc --noEmit` if any code changed
+The `.expert-rotation.json` history stopped updating at iteration 115. The code in `agent.ts:270` calls `saveExpertState(ROOT, expert.name, ctx.iter)` which should work. Possible causes:
+1. `ROOT` might point to a different directory than expected when `--repo` is used
+2. The file might be getting overwritten by git operations
+3. The save might be happening but the file isn't being committed
+
+**Steps:**
+1. Add a self-test that verifies `saveExpertState` correctly writes to the rotation file
+2. Check if `ROOT` vs `workDir` is the issue (rotation should save to autoagent repo, not target repo)
+3. If the bug is found, fix it. If it's just a git issue (file not staged), that's fine — document it.
+
+### Verification
+- `npx tsc --noEmit` clean
+- `npx vitest run` passes
+- `node scripts/self-test.js` passes
 
 ### Success criteria
-- Expert prompts are accurate and up-to-date
-- No stale references to deleted files in prompts/memory
-- memory.md is clean and useful
-- tsc clean if any changes made
-
-Next expert (iteration 128): **Engineer** or **Architect** depending on Meta's findings.
+- Root cause identified for rotation state gap
+- Fix applied or documented if it's by-design
+- All tests pass
