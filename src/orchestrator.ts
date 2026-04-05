@@ -41,6 +41,7 @@ import { enhanceToolError } from "./tool-recovery.js";
 import { detectProject } from "./project-detector.js";
 import * as fs from "fs";
 import { FileWatcher } from "./file-watcher.js";
+import { scoredPrune } from "./context-pruner.js";
 
 // ─── Constants ────────────────────────────────────────────────
 
@@ -968,7 +969,7 @@ export class Orchestrator {
     } else if (this.shouldCompactTier1()) {
       this.compactTier1(); // Tier 1: compress old tool outputs
     } else if (this.shouldMicroCompact()) {
-      this.microCompact(this.apiMessages.length); // Micro: clear old tool result contents
+      scoredPrune(this.apiMessages, this.apiMessages.length, 10_000); // Scored prune: target 10K token savings
     }
 
     // 2b. Extract #file references from user message, inject as context
@@ -1037,7 +1038,7 @@ export class Orchestrator {
       } else if (tier === 'tier1') {
         this.compactTier1();
       } else if (tier === 'micro') {
-        this.microCompact(messages.length);
+        scoredPrune(messages, messages.length, 10_000);
       }
       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
     };

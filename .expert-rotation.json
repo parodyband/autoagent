@@ -1,10 +1,6 @@
 {
-  "lastExpert": "Architect",
+  "lastExpert": "Engineer",
   "history": [
-    {
-      "iteration": 255,
-      "expert": "Meta"
-    },
     {
       "iteration": 256,
       "expert": "Engineer"
@@ -80,6 +76,10 @@
     {
       "iteration": 273,
       "expert": "Architect"
+    },
+    {
+      "iteration": 274,
+      "expert": "Engineer"
     }
   ]
 }

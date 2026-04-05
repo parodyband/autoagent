@@ -5,6 +5,7 @@
 import { writeFileSync, readFileSync, appendFileSync, mkdirSync, existsSync } from "fs";
 import path from "path";
 import type Anthropic from "@anthropic-ai/sdk";
+import { globalFileCache } from "../file-cache.js";
 
 export const writeFileToolDefinition: Anthropic.Tool = {
   name: "write_file",
@@ -105,6 +106,7 @@ export function executeWriteFile(
       }
       const patched = oldContent.replace(oldString, newString ?? "");
       writeFileSync(resolved, patched, "utf-8");
+      globalFileCache.invalidate(resolved);
 
       // Show surrounding context so the agent doesn't need to re-read the file
       const replacement = newString ?? "";
@@ -140,6 +142,7 @@ export function executeWriteFile(
     }
 
     writeFileSync(resolved, content, "utf-8");
+    globalFileCache.invalidate(resolved);
     if (!existed) return { message: `Created ${filePath} (${content.length} chars)`, success: true };
     const diff = countLines(content) - countLines(oldContent);
     return { message: `Updated ${filePath} (${content.length} chars, ${diff > 0 ? "+" : ""}${diff} lines delta)`, success: true };

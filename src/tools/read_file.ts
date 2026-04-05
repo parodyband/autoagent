@@ -1,6 +1,7 @@
 import { readFileSync, existsSync, statSync } from "fs";
 import path from "path";
 import type Anthropic from "@anthropic-ai/sdk";
+import { globalFileCache } from "../file-cache.js";
 
 export const readFileToolDefinition: Anthropic.Tool = {
   name: "read_file",
@@ -61,7 +62,20 @@ export function executeReadFile(
       };
     }
 
+    // Check cache first (only for full-file reads, not line ranges)
+    if (startLine === undefined && endLine === undefined) {
+      const cached = globalFileCache.get(resolvedPath);
+      if (cached) {
+        return { content: cached.content + "\n[cached — file unchanged since last read]", success: true };
+      }
+    }
+
     const content = readFileSync(resolvedPath, "utf-8");
+
+    // Store in cache for full-file reads
+    if (startLine === undefined && endLine === undefined) {
+      globalFileCache.put(resolvedPath, content);
+    }
 
     if (startLine !== undefined || endLine !== undefined) {
       const lines = content.split("\n");

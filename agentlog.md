@@ -1,73 +1,3 @@
-1146 |           model,
-1147 |           this.systemPrompt,
-1148 |           this.apiMessages,
-1149 |           this.registry,
-1150 |           this.opts.workDir,
-1151 |           this.opts.onToolCall,
-1152 |           this.opts.onStatus,
-1153 |           this.opts.onText,
-1154 |           this.opts.onDiffPreview,
-1155 |           undefined,
-1156 |           undefined,
-1157 |           fileWatchCallback,
-1158 |         );
-1159 | 
-1160 |         this.sessionTokensIn += fixResult.tokensIn;
-1161 |         this.sessionTokensOut += fixResult.tokensOut;
-1162 |         this.sessionCost += computeCost(model, fixResult.tokensIn, fixResult.tokensOut);
-1163 | 
-1164 |         // Re-commit the fix
-[2026-04-05T17:20:58.747Z] iter=265 turn=18 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T17:20:58.749Z] iter=265 turn=18 INFO:   -> ok: Patched src/orchestrator.ts: -5 +6 lines
-
-Context after patch:
-1190 |               role: "user",
-1191 |               content: `${failLabel}:\n\`\`\`\n${output}\n\`\`\`\nPlease fix these test failures.`,
-1192 |             });
-1193 |             const fixResult = await runAgentLoop(
-1194 |               this.client, model, this.systemPrompt, this.apiMessages,
-1195 |               this.registry, this.opts.workDir, this.opts.onToolCall,
-1196 |               this.opts.onStatus, this.opts.onText, this.opts.onDiffPreview,
-1197 |               undefined, undefined, fileWatchCallback,
-1198 |             );
-1199 |             this.sessionTokensIn += fixResult.tokensIn;
-1200 |             this.sessionTokensOut += fixResult.tokensOut;
-1201 |             this.sessionCost += computeCost(model, fixResult.tokensIn, fixResult.tokensOut);
-[2026-04-05T17:20:58.750Z] iter=265 turn=19 INFO: Turn 19/25
-[2026-04-05T17:21:01.407Z] iter=265 turn=19 INFO: Agent: Now run tsc to check:
-[2026-04-05T17:21:01.407Z] iter=265 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
-[2026-04-05T17:21:02.304Z] iter=265 turn=19 INFO:   -> exit=0 (11 chars)
-[2026-04-05T17:21:02.305Z] iter=265 turn=20 INFO: Turn 20/25
-[2026-04-05T17:21:07.653Z] iter=265 turn=20 INFO: Agent: TSC clean. Now update memory and goals:
-[2026-04-05T17:21:07.654Z] iter=265 turn=20 INFO: save_memory: "[Architect] Iteration 265 status"
-[2026-04-05T17:21:07.654Z] iter=265 turn=20 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T17:21:07.654Z] iter=265 turn=21 INFO: Turn 21/25
-[2026-04-05T17:21:15.223Z] iter=265 turn=21 INFO: write_file: goals.md (write)
-[2026-04-05T17:21:15.226Z] iter=265 turn=21 INFO:   -> ok: Updated goals.md (807 chars, -70 lines delta)
-[2026-04-05T17:21:15.227Z] iter=265 turn=22 INFO: Turn 22/25
-[2026-04-05T17:21:17.427Z] iter=265 turn=22 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T17:21:17.428Z] iter=265 turn=22 INFO: RESTART signal
-[2026-04-05T17:21:17.429Z] iter=265 turn=22 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T17:21:18.423Z] iter=265 turn=22 INFO: Compilation OK
-[2026-04-05T17:21:24.866Z] iter=265 turn=22 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-05T17:21:24.866Z] iter=265 turn=22 INFO: Cache stats: 0 hits, 10 misses, 55 entries, 11 invalidations (10 entries removed)
-[2026-04-05T17:21:24.866Z] iter=265 turn=22 INFO: Tool cache stats
-[2026-04-05T17:21:24.866Z] iter=265 turn=22 INFO: Tool timing: bash: 8x, avg=124ms, total=995ms; write_file: 11x, avg=4ms, total=40ms; read_file: 10x, avg=3ms, total=29ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T17:21:24.866Z] iter=265 turn=22 INFO: Tool timing stats
-[2026-04-05T17:21:30.839Z] iter=265 turn=22 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 265: predicted 20 turns, actual 22 turns, ratio 1.10**
-[2026-04-05T17:21:42.675Z] iter=265 turn=22 INFO: Pre-commit review (1707in/450out): **Issues found:**
-
-- **Logic bug — mute without unmute**: `fileWatchCallback` calls `this.fileWatcher.mute(filePath)` on writes but never unmutes. If the file watcher is meant to suppress self-trigger
-[2026-04-05T17:21:42.727Z] iter=265 turn=22 INFO: Committed: 3e502992 (38 in / 6062 out, cache: 24176 created, 316762 read)
-[2026-04-05T17:21:42.728Z] iter=265 turn=22 INFO: Restarting as iteration 266...
-[2026-04-05T17:21:42.918Z] iter=266 INFO: Cache restored: 55/55 entries (0 stale)
-[2026-04-05T17:21:42.920Z] iter=266 INFO: Turn budget: 12/25 (calibration=1.05x, predicted=8)
-[2026-04-05T17:21:42.920Z] iter=266 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T17:21:43.049Z] iter=266 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T17:21:43.049Z] iter=266 turn=1 INFO: Turn 1/25
-[2026-04-05T17:21:45.149Z] iter=266 turn=1 INFO: think: Let me read the goals.md to understand what I need to build in this iteration....
-[2026-04-05T17:21:45.150Z] iter=266 turn=2 INFO: Turn 2/25
-[2026-04-05T17:21:47.695Z] iter=266 turn=2 INFO: Agent: Let me read goals.md and the relevant files simultaneously.
 [2026-04-05T17:21:47.696Z] iter=266 turn=2 INFO: read_file: goals.md
 [2026-04-05T17:21:47.697Z] iter=266 turn=2 INFO:   -> ok (807 chars)
 [2026-04-05T17:21:47.697Z] iter=266 turn=2 INFO: read_file: src/file-watcher.ts
@@ -1066,3 +996,213 @@ TSC is clean. Let me save memory and restart.
 [2026-04-05T17:36:06.723Z] iter=273 turn=8 INFO: Tool timing stats
 [2026-04-05T17:36:12.743Z] iter=273 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 273: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-05T17:36:12.764Z] iter=273 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T17:36:12.797Z] iter=273 turn=8 INFO: Committed: 957e9088 (18 in / 3446 out, cache: 42404 created, 198796 read)
+[2026-04-05T17:36:12.797Z] iter=273 turn=8 INFO: Restarting as iteration 274...
+[2026-04-05T17:36:12.990Z] iter=274 INFO: Cache restored: 57/57 entries (0 stale)
+[2026-04-05T17:36:12.992Z] iter=274 INFO: Turn budget: 22/25 (calibration=1.25x, predicted=20)
+[2026-04-05T17:36:12.992Z] iter=274 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T17:36:13.123Z] iter=274 turn=1 INFO: Turn 1/25
+[2026-04-05T17:36:15.554Z] iter=274 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what needs to be built.
+[2026-04-05T17:36:15.555Z] iter=274 turn=1 INFO: $ cat goals.md
+[2026-04-05T17:36:15.558Z] iter=274 turn=1 INFO: $ ls src/ | head -50
+[2026-04-05T17:36:15.564Z] iter=274 turn=1 INFO:   -> exit=0 (5070 chars)
+[2026-04-05T17:36:15.568Z] iter=274 turn=1 INFO:   -> exit=0 (683 chars)
+[2026-04-05T17:36:15.568Z] iter=274 turn=2 INFO: Turn 2/25
+[2026-04-05T17:36:18.617Z] iter=274 turn=2 INFO: $ grep -n "microCompact\|tool_result\|80[Kk]\|contextTokens" src/orchestrator.ts | head -40
+[2026-04-05T17:36:18.623Z] iter=274 turn=2 INFO: $ cat src/tools/ | head -5; ls src/tools/
+[2026-04-05T17:36:18.641Z] iter=274 turn=2 INFO:   -> exit=0 (1853 chars)
+[2026-04-05T17:36:18.645Z] iter=274 turn=2 INFO:   -> exit=0 (153 chars)
+[2026-04-05T17:36:18.645Z] iter=274 turn=3 INFO: Turn 3/25
+[2026-04-05T17:36:20.608Z] iter=274 turn=3 INFO: $ sed -n '760,840p' src/orchestrator.ts
+[2026-04-05T17:36:20.613Z] iter=274 turn=3 INFO: $ sed -n '960,980p' src/orchestrator.ts
+[2026-04-05T17:36:20.627Z] iter=274 turn=3 INFO:   -> exit=0 (2968 chars)
+[2026-04-05T17:36:20.628Z] iter=274 turn=3 INFO:   -> exit=0 (1039 chars)
+[2026-04-05T17:36:20.629Z] iter=274 turn=4 INFO: Turn 4/25
+[2026-04-05T17:36:24.552Z] iter=274 turn=4 INFO: think: I have enough context. Let me build both deliverables now:
+
+1. `src/context-pruner.ts` - scoredPrune() function
+2. `src/...
+[2026-04-05T17:36:24.552Z] iter=274 turn=5 INFO: Turn 5/25
+[2026-04-05T17:36:26.862Z] iter=274 turn=5 INFO: Agent: I have enough context. Building now.
+[2026-04-05T17:36:26.863Z] iter=274 turn=5 INFO: $ cat src/tools/read_file.ts
+[2026-04-05T17:36:26.865Z] iter=274 turn=5 INFO: $ cat src/tools/write_file.ts
+[2026-04-05T17:36:26.871Z] iter=274 turn=5 INFO:   -> exit=0 (2401 chars)
+[2026-04-05T17:36:26.872Z] iter=274 turn=5 INFO:   -> exit=0 (5634 chars)
+[2026-04-05T17:36:26.873Z] iter=274 turn=6 INFO: Turn 6/25
+[2026-04-05T17:36:56.349Z] iter=274 turn=6 INFO: Agent: Now I'll write all four files in parallel:
+[2026-04-05T17:36:56.349Z] iter=274 turn=6 INFO: write_file: src/context-pruner.ts (write)
+[2026-04-05T17:36:56.350Z] iter=274 turn=6 INFO:   -> ok: Created src/context-pruner.ts (6348 chars)
+[2026-04-05T17:36:56.351Z] iter=274 turn=7 INFO: Turn 7/25
+[2026-04-05T17:37:22.356Z] iter=274 turn=7 INFO: Agent: **Goal 1 (context-pruner.ts):** IN PROGRESS — core file written, need tests + wire into orchestrator  
+**Goal 2 (file-cache.ts):** NOT STARTED
+
+Continuing with all remaining files now (tests + file-cache + wiring):
+[2026-04-05T17:37:22.357Z] iter=274 turn=7 INFO: write_file: src/__tests__/context-pruner.test.ts (write)
+[2026-04-05T17:37:22.358Z] iter=274 turn=7 INFO:   -> ok: Created src/__tests__/context-pruner.test.ts (6314 chars)
+[2026-04-05T17:37:22.359Z] iter=274 turn=8 INFO: Turn 8/25
+[2026-04-05T17:37:38.411Z] iter=274 turn=8 INFO: write_file: src/file-cache.ts (write)
+[2026-04-05T17:37:38.411Z] iter=274 turn=8 INFO:   -> ok: Created src/file-cache.ts (3489 chars)
+[2026-04-05T17:37:38.412Z] iter=274 turn=9 INFO: Turn 9/25
+[2026-04-05T17:37:53.984Z] iter=274 turn=9 INFO: write_file: src/__tests__/file-cache.test.ts (write)
+[2026-04-05T17:37:53.985Z] iter=274 turn=9 INFO:   -> ok: Created src/__tests__/file-cache.test.ts (3448 chars)
+[2026-04-05T17:37:53.987Z] iter=274 turn=10 INFO: Turn 10/25
+[2026-04-05T17:37:57.516Z] iter=274 turn=10 INFO: Agent: Now wire `scoredPrune` into orchestrator.ts and `FileCache` into read_file/write_file tools:
+[2026-04-05T17:37:57.516Z] iter=274 turn=10 INFO: $ grep -n "microCompact\|import.*compac\|MICRO_COMPACT" src/orchestrator.ts | head -20
+[2026-04-05T17:37:57.527Z] iter=274 turn=10 INFO:   -> exit=0 (490 chars)
+[2026-04-05T17:37:57.528Z] iter=274 turn=11 INFO: Turn 11/25
+[2026-04-05T17:37:58.934Z] iter=274 turn=11 INFO: $ sed -n '1,15p' src/orchestrator.ts
+[2026-04-05T17:37:58.956Z] iter=274 turn=11 INFO:   -> exit=0 (592 chars)
+[2026-04-05T17:37:58.958Z] iter=274 turn=12 INFO: Turn 12/25
+[2026-04-05T17:38:00.347Z] iter=274 turn=12 INFO: $ sed -n '15,50p' src/orchestrator.ts
+[2026-04-05T17:38:00.366Z] iter=274 turn=12 INFO:   -> exit=0 (1528 chars)
+[2026-04-05T17:38:00.367Z] iter=274 turn=13 INFO: Turn 13/25
+[2026-04-05T17:38:04.754Z] iter=274 turn=13 INFO: Agent: I've written 4 new files. Now I need to wire things in and verify. Let me do the remaining wiring fast.
+[2026-04-05T17:38:04.754Z] iter=274 turn=13 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T17:38:04.755Z] iter=274 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
+
+Context after patch:
+40 | import { enhanceToolError } from "./tool-recovery.js";
+41 | import { detectProject } from "./project-detector.js";
+42 | import * as fs from "fs";
+43 | import { FileWatcher } from "./file-watcher.js";
+44 | import { scoredPrune } from "./context-pruner.js";
+45 | 
+46 | // ─── Constants ────────────────────────────────────────────────
+47 | 
+[2026-04-05T17:38:04.756Z] iter=274 turn=14 INFO: Turn 14/25
+[2026-04-05T17:38:08.194Z] iter=274 turn=14 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T17:38:08.195Z] iter=274 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+969 |     } else if (this.shouldCompactTier1()) {
+970 |       this.compactTier1(); // Tier 1: compress old tool outputs
+971 |     } else if (this.shouldMicroCompact()) {
+972 |       scoredPrune(this.apiMessages, this.apiMessages.length, 10_000); // Scored prune: target 10K token savings
+973 |     }
+974 | 
+975 |     // 2b. Extract #file references from user message, inject as context
+[2026-04-05T17:38:08.196Z] iter=274 turn=15 INFO: Turn 15/25
+[2026-04-05T17:38:10.177Z] iter=274 turn=15 INFO: Agent: Now find the second microCompact call:
+[2026-04-05T17:38:10.178Z] iter=274 turn=15 INFO: $ sed -n '1035,1045p' src/orchestrator.ts
+[2026-04-05T17:38:10.188Z] iter=274 turn=15 INFO:   -> exit=0 (360 chars)
+[2026-04-05T17:38:10.188Z] iter=274 turn=16 INFO: Turn 16/25
+[2026-04-05T17:38:12.384Z] iter=274 turn=16 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T17:38:12.385Z] iter=274 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -3 +3 lines
+
+Context after patch:
+1037 |         await this.compact();
+1038 |       } else if (tier === 'tier1') {
+1039 |         this.compactTier1();
+1040 |       } else if (tier === 'micro') {
+1041 |         scoredPrune(messages, messages.length, 10_000);
+1042 |       }
+1043 |       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
+1044 |     };
+1045 | 
+[2026-04-05T17:38:12.385Z] iter=274 turn=17 INFO: Turn 17/25
+[2026-04-05T17:38:16.029Z] iter=274 turn=17 INFO: Agent: Wire FileCache into read_file and write_file, then verify:
+[2026-04-05T17:38:16.030Z] iter=274 turn=17 INFO: write_file: src/tools/read_file.ts (patch)
+[2026-04-05T17:38:16.032Z] iter=274 turn=17 INFO:   -> ok: Patched src/tools/read_file.ts: -3 +4 lines
+
+Context after patch:
+1 | import { readFileSync, existsSync, statSync } from "fs";
+2 | import path from "path";
+3 | import type Anthropic from "@anthropic-ai/sdk";
+4 | import { globalFileCache } from "../file-cache.js";
+5 | 
+6 | export const readFileToolDefinition: Anthropic.Tool = {
+7 |   name: "read_file",
+[2026-04-05T17:38:16.032Z] iter=274 turn=18 INFO: Turn 18/25
+[2026-04-05T17:38:21.033Z] iter=274 turn=18 INFO: write_file: src/tools/read_file.ts (patch)
+[2026-04-05T17:38:21.034Z] iter=274 turn=18 INFO:   -> ok: Patched src/tools/read_file.ts: -3 +16 lines
+
+Context after patch:
+62 |       };
+63 |     }
+64 | 
+65 |     // Check cache first (only for full-file reads, not line ranges)
+66 |     if (startLine === undefined && endLine === undefined) {
+67 |       const cached = globalFileCache.get(resolvedPath);
+68 |       if (cached) {
+69 |         return { content: cached.content + "\n[cached — file unchanged since last read]", success: true };
+70 |       }
+71 |     }
+72 | 
+73 |     const content = readFileSync(resolvedPath, "utf-8");
+74 | 
+75 |     // Store in cache for full-file reads
+76 |     if (startLine === undefined && endLine === undefined) {
+77 |       globalFileCache.put(resolvedPath, content);
+78 |     }
+79 | 
+80 |     if (startLine !== undefined || endLine !== undefined) {
+81 |       const lines = content.split("\n");
+82 |       const start = (startLine ?? 1) - 1; // convert to 0-indexed
+83 |       const end = endLine ?? lines.length;
+[2026-04-05T17:38:21.034Z] iter=274 turn=19 INFO: Turn 19/25
+[2026-04-05T17:38:24.841Z] iter=274 turn=19 INFO: Agent: Wiring write_file cache invalidation, then TSC and wrap up:
+[2026-04-05T17:38:24.842Z] iter=274 turn=19 INFO: write_file: src/tools/write_file.ts (patch)
+[2026-04-05T17:38:24.845Z] iter=274 turn=19 INFO:   -> ok: Patched src/tools/write_file.ts: -3 +4 lines
+
+Context after patch:
+2 |  * Write file tool — create or overwrite files, with mkdir -p and diff reporting.
+3 |  */
+4 | 
+5 | import { writeFileSync, readFileSync, appendFileSync, mkdirSync, existsSync } from "fs";
+6 | import path from "path";
+7 | import type Anthropic from "@anthropic-ai/sdk";
+8 | import { globalFileCache } from "../file-cache.js";
+9 | 
+10 | export const writeFileToolDefinition: Anthropic.Tool = {
+11 |   name: "write_file",
+[2026-04-05T17:38:24.845Z] iter=274 turn=20 INFO: Turn 20/25
+[2026-04-05T17:38:27.215Z] iter=274 turn=20 INFO: write_file: src/tools/write_file.ts (patch)
+[2026-04-05T17:38:27.217Z] iter=274 turn=20 INFO:   -> ok: Patched src/tools/write_file.ts: -3 +4 lines
+
+Context after patch:
+105 |         return { message: `ERROR: old_string not found in ${filePath}. Must match exactly.`, success: false };
+106 |       }
+107 |       const patched = oldContent.replace(oldString, newString ?? "");
+108 |       writeFileSync(resolved, patched, "utf-8");
+109 |       globalFileCache.invalidate(resolved);
+110 | 
+111 |       // Show surrounding context so the agent doesn't need to re-read the file
+112 |       const replacement = newString ?? "";
+113 |       const patchStart = patched.indexOf(replacement);
+114 |       const contextLines = 3;
+[2026-04-05T17:38:27.218Z] iter=274 turn=21 INFO: Turn 21/25
+[2026-04-05T17:38:31.375Z] iter=274 turn=21 INFO: write_file: src/tools/write_file.ts (patch)
+[2026-04-05T17:38:31.377Z] iter=274 turn=21 INFO:   -> ok: Patched src/tools/write_file.ts: -4 +5 lines
+
+Context after patch:
+141 |       return { message: `Appended ${content.length} chars to ${filePath}`, success: true };
+142 |     }
+143 | 
+144 |     writeFileSync(resolved, content, "utf-8");
+145 |     globalFileCache.invalidate(resolved);
+146 |     if (!existed) return { message: `Created ${filePath} (${content.length} chars)`, success: true };
+147 |     const diff = countLines(content) - countLines(oldContent);
+148 |     return { message: `Updated ${filePath} (${content.length} chars, ${diff > 0 ? "+" : ""}${diff} lines delta)`, success: true };
+149 |   } catch (err) {
+150 |     const msg = err instanceof Error ? err.message : String(err);
+151 |     return { message: `ERROR: ${msg}`, success: false };
+[2026-04-05T17:38:31.378Z] iter=274 turn=22 INFO: Turn 22/25
+[2026-04-05T17:38:32.653Z] iter=274 turn=22 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T17:38:33.645Z] iter=274 turn=22 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:38:33.645Z] iter=274 turn=23 INFO: Turn 23/25
+[2026-04-05T17:38:36.799Z] iter=274 turn=23 INFO: Agent: TSC clean. Running tests then wrapping up.
+[2026-04-05T17:38:36.799Z] iter=274 turn=23 INFO: $ npx vitest run src/__tests__/context-pruner.test.ts src/__tests__/file-cache.test.ts 2>&1 | tail -20
+[2026-04-05T17:38:37.822Z] iter=274 turn=23 INFO:   -> exit=0 (337 chars)
+[2026-04-05T17:38:37.822Z] iter=274 turn=24 INFO: Turn 24/25
+[2026-04-05T17:38:43.431Z] iter=274 turn=24 INFO: Agent: All 19 tests pass. Now write memory, update goals, restart.
+[2026-04-05T17:38:43.432Z] iter=274 turn=24 INFO: save_memory: "[Engineer] Iteration 274"
+[2026-04-05T17:38:43.432Z] iter=274 turn=24 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T17:38:43.433Z] iter=274 turn=25 INFO: Turn 25/25
+[2026-04-05T17:38:54.189Z] iter=274 turn=25 INFO: write_file: goals.md (write)
+[2026-04-05T17:38:54.189Z] iter=274 turn=25 INFO:   -> ok: Updated goals.md (1422 chars, -73 lines delta)
+[2026-04-05T17:38:54.190Z] iter=274 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T17:38:54.193Z] iter=274 turn=25 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T17:38:54.194Z] iter=274 turn=25 INFO: Tool timing: bash: 14x, avg=157ms, total=2197ms; write_file: 13x, avg=2ms, total=20ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T17:38:54.194Z] iter=274 turn=25 INFO: Tool timing stats
+[2026-04-05T17:38:59.934Z] iter=274 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 274: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T17:39:02.196Z] iter=274 turn=25 INFO: Pre-commit review (3011in/56out): **LGTM** — the tests are well-structured, use proper ESM imports with `.js` extensions, cover the key behavioral contracts (scoring formula, protection window, early-stop, placeholder format), and hav
