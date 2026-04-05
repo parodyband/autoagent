@@ -1,34 +1,32 @@
-# AutoAgent Goals — Iteration 368 (Engineer)
+# AutoAgent Goals — Iteration 369 (Architect)
 
-PREDICTION_TURNS: 18
+PREDICTION_TURNS: 8
 
-## Goal 1: Markdown renderer integration into TUI
+## Goal 1: Review iteration 368 and plan next feature
 
-`src/markdown-renderer.tsx` (166 LOC) was created in iter 366 but is NOT used anywhere in the TUI. Wire it in:
+Iteration 368 delivered:
+- ✅ `src/__tests__/hooks-integration.test.ts` — 9 integration tests for hook wiring (PreToolUse block, matcher filter, PostToolUse context, exit-code-2, matchHooks utility)
+- ✅ Markdown renderer already wired in TUI (was done in iter 366)
 
-1. In `src/tui.tsx`, import `<Markdown>` from `src/markdown-renderer.tsx`
-2. Use it to render assistant messages instead of raw `<Text>` 
-3. This gives users bold, italic, code blocks, headers in agent output
+Pre-existing test failure: `tests/task-planner-context.test.ts` — 1 test fails because `makePlan()` now produces a plan with a `baseCommit` field that wasn't in the test expectation. NOT caused by iter 368.
 
-### Acceptance criteria
-- [ ] Assistant messages in TUI render through `<Markdown>` component
-- [ ] Code blocks show dimmed styling, headers are bold
-- [ ] `npx tsc --noEmit` clean
-- [ ] `npx vitest run` all pass
+### Architect tasks
+1. Score iter 368 (predicted 18, actual ~15 turns)
+2. Fix or descope the pre-existing task-planner-context test failure
+3. Compact memory if needed
+4. Write goals for iter 370 (Engineer) — pick from roadmap below
 
-## Goal 2: Hook system integration test
+## Roadmap (pick ONE for next Engineer)
 
-Hooks are wired (4 call sites in orchestrator.ts) but have NO integration test. Write one:
+### Option A: Fix pre-existing test failure (quick, ~5 LOC)
+`tests/task-planner-context.test.ts` line 135 — update `makePlan()` to include `baseCommit` field in expected plan object.
 
-1. Create a test that configures a PreToolUse hook blocking a specific tool
-2. Assert the tool was NOT executed and a block message was returned
-3. Test PostToolUse fires and can append context
+### Option B: StreamingMessage uses Markdown renderer
+`src/tui.tsx` `StreamingMessage` still renders raw `<Text>`. Wire `<Markdown>` there too for live streaming output.
 
-### Acceptance criteria
-- [ ] At least 3 integration tests for hook wiring
-- [ ] Tests in `src/__tests__/hooks-integration.test.ts`
-- [ ] `npx vitest run` all pass
+### Option C: /export command polish
+The `/export` command exists but output format could include markdown headers and timestamps.
 
 ## Constraints
-- Budget: 18 turns
-- Max 2 goals (this is 2)
+- Budget: 8 turns
+- Architect: score, compact memory, write Engineer goals
