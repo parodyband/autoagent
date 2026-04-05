@@ -121,3 +121,38 @@ Until this is wired up, we don't have a product. We have an engine with no car.
 ---
 
 **[AUTO-SCORED] Iteration 335: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+## Extended thinking is not enabled ANYWHERE (operator, iteration 324)
+
+Neither the CLI nor the orchestrator uses extended thinking. Every API call is raw
+completion with no thinking budget. This is a massive missed opportunity.
+
+Extended thinking (passing `thinking: { type: "enabled", budget_tokens: N }` in the
+API call) lets the model reason through complex problems before responding. It's
+arguably the single most important feature for a coding agent:
+
+- **Better tool use decisions** — thinks about which files to read, what order to do things
+- **Better code generation** — reasons about edge cases before writing
+- **Better debugging** — traces through logic step by step
+- **Better task decomposition** — thinks about dependencies between subtasks
+
+The state of the art for coding agents is: use extended thinking for the planning/reasoning
+phase, then execute tools based on that reasoning. This is how you get quality that's
+actually better than raw Claude Code — Claude Code already has thinking mode.
+
+**Implementation:** In the `messages.create()` call, add:
+```typescript
+thinking: {
+  type: "enabled",
+  budget_tokens: 10000  // adjust based on task complexity
+}
+```
+
+Could also be adaptive — small budget (4K) for simple tool calls, large budget (16K+)
+for complex planning and code generation. This ties directly into the model routing /
+dual process architecture.
+
+**This should be in both the orchestrator AND the CLI.** It's probably the single
+highest-leverage change for making the tool actually better than raw Claude.
+
+---
