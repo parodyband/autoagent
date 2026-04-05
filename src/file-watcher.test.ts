@@ -1,9 +1,10 @@
 // @vitest-environment node
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import fs from "fs";
 import os from "os";
 import path from "path";
 import { FileWatcher } from "./file-watcher.js";
+import { globalFileCache } from "./file-cache.js";
 
 let tmpDir: string;
 let watcher: FileWatcher;
@@ -97,6 +98,38 @@ describe("FileWatcher", () => {
     fs.writeFileSync(file, "v3");
     await sleep(600);
     expect(calls.length).toBe(1);
+  });
+
+  it("globalFileCache.invalidate is called when a watched file changes", async () => {
+    const dir = makeTmp();
+    const file = path.join(dir, "g.txt");
+    fs.writeFileSync(file, "init");
+    watcher = new FileWatcher(50);
+    const spy = vi.spyOn(globalFileCache, "invalidate");
+    watcher.watch(file);
+    await sleep(100);
+    fs.writeFileSync(file, "changed");
+    await sleep(300);
+    expect(spy).toHaveBeenCalledWith(file);
+    spy.mockRestore();
+  });
+
+  it("globalFileCache.invalidate fires before onChange callback", async () => {
+    const dir = makeTmp();
+    const file = path.join(dir, "h.txt");
+    fs.writeFileSync(file, "init");
+    watcher = new FileWatcher(50);
+    const order: string[] = [];
+    const spy = vi.spyOn(globalFileCache, "invalidate").mockImplementation(() => {
+      order.push("invalidate");
+    });
+    watcher.onChange = () => order.push("onChange");
+    watcher.watch(file);
+    await sleep(100);
+    fs.writeFileSync(file, "changed");
+    await sleep(300);
+    expect(order.indexOf("invalidate")).toBeLessThan(order.indexOf("onChange"));
+    spy.mockRestore();
   });
 
   it("accessors return correct state", () => {

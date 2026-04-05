@@ -96,3 +96,5 @@ System healthy. Iteration 270 shipped /compact command, TUI external change bann
 **[AUTO-SCORED] Iteration 278: predicted 20 turns, actual 24 turns, ratio 1.20**
 
 **[AUTO-SCORED] Iteration 279: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+**[AUTO-SCORED] Iteration 280: predicted 20 turns, actual 12 turns, ratio 0.60**
