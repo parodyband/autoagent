@@ -14,6 +14,7 @@ import { validateBeforeCommit } from "./validation.js";
 import {
   buildSystemPrompt,
   budgetWarning,
+  progressCheckpoint,
   turnLimitNudge,
   validationBlockedMessage,
 } from "./messages.js";
@@ -284,6 +285,9 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
     elapsedMs: Date.now() - ctx.startTime.getTime(),
   });
   if (bw) ctx.messages.push({ role: "user", content: bw });
+
+  const checkpoint = progressCheckpoint(ctx.turns);
+  if (checkpoint) ctx.messages.push({ role: "user", content: checkpoint });
 
   const nudge = turnLimitNudge(turnsLeft);
   if (nudge) ctx.messages.push({ role: "user", content: nudge });

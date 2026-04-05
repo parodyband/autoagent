@@ -19,7 +19,7 @@ import { compactMemory, smartCompactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
 import { selectModel, autoSelectModel } from "../src/model-selection.js";
-import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage } from "../src/messages.js";
+import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage, progressCheckpoint } from "../src/messages.js";
 import { Logger, createLogger, parseJsonlLog, rotateLogFile, LOG_ROTATION_LIMITS, type LogEntry } from "../src/logging.js";
 import { ToolCache, CACHEABLE_TOOLS, extractPaths, pathOverlaps } from "../src/tool-cache.js";
 import { ToolTimingTracker } from "../src/tool-timing.js";
@@ -729,6 +729,13 @@ function testMessages(): void {
   assert(turnLimitNudge(10)!.includes("10 turns left"), "turnLimitNudge at 10");
   assert(turnLimitNudge(3)!.includes("URGENT"), "turnLimitNudge at 3");
   assert(turnLimitNudge(20) === null, "turnLimitNudge null at 20");
+
+  // progressCheckpoint
+  const pc10 = progressCheckpoint(10);
+  assert(pc10 !== null, "progressCheckpoint fires at turn 10");
+  assert(pc10!.includes("goals"), "progressCheckpoint asks about goals");
+  assert(progressCheckpoint(5) === null, "progressCheckpoint null at turn 5");
+  assert(progressCheckpoint(20) === null, "progressCheckpoint null at turn 20");
 
   // validationBlockedMessage
   const vb = validationBlockedMessage("error: TS2345");

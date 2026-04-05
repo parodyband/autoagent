@@ -85,6 +85,23 @@ export function budgetWarning(
   );
 }
 
+// ─── Progress checkpoint ────────────────────────────────────
+
+/**
+ * At turn 10, inject a progress checkpoint that asks the agent to
+ * explicitly evaluate whether its goals are complete.
+ * This combats turn bloat by creating a natural "wrap up" decision point.
+ */
+export function progressCheckpoint(turn: number): string | null {
+  if (turn !== 10) return null;
+  return (
+    "SYSTEM: Progress checkpoint — Turn 10. " +
+    "Review your goals.md. For each goal, state: DONE, IN PROGRESS, or NOT STARTED. " +
+    "If all goals are DONE, write memory, update goals, run `npx tsc --noEmit`, and `echo \"AUTOAGENT_RESTART\"`. " +
+    "If goals remain, briefly state what's left and continue."
+  );
+}
+
 // ─── Turn limit nudges ──────────────────────────────────────
 
 /**
