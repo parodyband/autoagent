@@ -1,69 +1,3 @@
-238 |       // Try incremental cache first
-239 |       const cache = loadRepoMapCache(workDir);
-240 |       let repoMap: import("./tree-sitter-map.js").RepoMap;
-241 |       if (cache) {
-242 |         const stale = getStaleFiles(workDir, cache, rankedPaths);
-243 |         if (stale.length === 0) {
-244 |           repoMap = cacheToRepoMap(cache);
-245 |         } else {
-246 |           repoMap = updateRepoMapIncremental(workDir, cacheToRepoMap(cache), stale);
-247 |           saveRepoMapCache(workDir, repoMap);
-248 |         }
-249 |       } else {
-250 |         repoMap = buildRepoMap(workDir, rankedPaths);
-251 |         saveRepoMapCache(workDir, repoMap);
-252 |       }
-253 |       const ranked = rankSymbols(repoMap);
-254 |       const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 60, ranked });
-255 |       if (raw.length > 50) {
-256 |         // Truncate to 4000 token budget (~16K chars), keeping highest-ranked files first
-257 |         repoMapBlock = "\n\n" + truncateRepoMap(raw, 4000);
-258 |       }
-259 |       rawRepoMap = repoMap;
-260 |     } catch {
-261 |       // Non-fatal
-262 |     }
-263 |   }
-264 | 
-265 |   const projectMemory = getProjectMemoryBlock(workDir);
-266 | 
-[2026-04-05T19:05:56.386Z] iter=322 turn=15 INFO: Turn 15/25
-[2026-04-05T19:06:02.824Z] iter=322 turn=15 INFO: Agent: Now update the compaction prompt (Goal 2):
-[2026-04-05T19:06:02.824Z] iter=322 turn=15 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T19:06:02.825Z] iter=322 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -3 +3 lines
-
-Context after patch:
-1048 |       return `${role}: ${content}`;
-1049 |     }).join("\n\n");
-1050 | 
-1051 |     const summary = await caller(
-1052 |       `Summarize this conversation into the following structured format. Use exactly these section headers:\n\n## Current Task\nWhat the user is currently trying to accomplish.\n\n## Plan & Progress\nStep-by-step plan and which steps are done, in-progress, or pending.\n\n## Files Modified\nList of files that were created, edited, or deleted.\n\n## Key Decisions\nImportant choices made (libraries chosen, approaches taken, things ruled out).\n\n## Open Questions\nUnresolved issues, errors, or things that still need attention.\n\nConversation to summarize:\n\n${convText}`
-1053 |     );
-1054 | 
-1055 |     this.apiMessages = [
-1056 |       { role: "user", content: `[Conversation summary]\n${summary}` },
-[2026-04-05T19:06:02.825Z] iter=322 turn=16 INFO: Turn 16/25
-[2026-04-05T19:06:05.199Z] iter=322 turn=16 INFO: Agent: Now write the tests, run TSC, then wrap up.
-[2026-04-05T19:06:05.199Z] iter=322 turn=16 INFO: $ ls tests/ | grep -E "compact|repo-map|tree-sitter" | head -10
-[2026-04-05T19:06:05.209Z] iter=322 turn=16 INFO:   -> exit=0 (11 chars)
-[2026-04-05T19:06:05.209Z] iter=322 turn=17 INFO: Turn 17/25
-[2026-04-05T19:06:22.645Z] iter=322 turn=17 INFO: Agent: Writing tests now, then TSC and wrap.
-[2026-04-05T19:06:22.645Z] iter=322 turn=17 INFO: write_file: tests/repo-map-cache.test.ts (write)
-[2026-04-05T19:06:22.646Z] iter=322 turn=17 INFO:   -> ok: Created tests/repo-map-cache.test.ts (4423 chars)
-[2026-04-05T19:06:22.646Z] iter=322 turn=18 INFO: Turn 18/25
-[2026-04-05T19:06:41.955Z] iter=322 turn=18 INFO: write_file: tests/compaction-structured.test.ts (write)
-[2026-04-05T19:06:41.956Z] iter=322 turn=18 INFO:   -> ok: Created tests/compaction-structured.test.ts (3724 chars)
-[2026-04-05T19:06:41.956Z] iter=322 turn=19 INFO: Turn 19/25
-[2026-04-05T19:06:44.300Z] iter=322 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -40
-[2026-04-05T19:06:45.338Z] iter=322 turn=19 INFO:   -> exit=0 (11 chars)
-[2026-04-05T19:06:45.338Z] iter=322 turn=20 INFO: Turn 20/25
-[2026-04-05T19:06:47.591Z] iter=322 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/repo-map-cache.test.ts tests/compaction-structured.test.ts 2>&1 | tail -30
-[2026-04-05T19:06:48.664Z] iter=322 turn=20 INFO:   -> exit=0 (333 chars)
-[2026-04-05T19:06:48.664Z] iter=322 turn=21 INFO: Turn 21/25
-[2026-04-05T19:06:55.168Z] iter=322 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -10
-[2026-04-05T19:07:07.477Z] iter=322 turn=21 INFO:   -> exit=0 (460 chars)
-[2026-04-05T19:07:07.477Z] iter=322 turn=22 INFO: Turn 22/25
-[2026-04-05T19:07:12.987Z] iter=322 turn=22 INFO: Agent: All 894 tests pass. Now write memory, update goals, restart.
 [2026-04-05T19:07:12.987Z] iter=322 turn=22 INFO: save_memory: "[Engineer] Iteration 322"
 [2026-04-05T19:07:12.988Z] iter=322 turn=22 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
 [2026-04-05T19:07:12.988Z] iter=322 turn=23 INFO: Turn 23/25
@@ -1062,3 +996,150 @@ Writing goals.md now — this is an Architect iteration, my deliverable is goals
 [2026-04-05T19:22:12.638Z] iter=329 turn=8 INFO: Tool timing stats
 [2026-04-05T19:22:18.986Z] iter=329 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 329: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-05T19:22:19.007Z] iter=329 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T19:22:19.040Z] iter=329 turn=8 INFO: Committed: 32d5961a (18 in / 2581 out, cache: 14201 created, 75196 read)
+[2026-04-05T19:22:19.041Z] iter=329 turn=8 INFO: Restarting as iteration 330...
+[2026-04-05T19:22:19.243Z] iter=330 INFO: Cache restored: 54/54 entries (0 stale)
+[2026-04-05T19:22:19.245Z] iter=330 INFO: Turn budget: 22/25 (calibration=0.95x, predicted=20)
+[2026-04-05T19:22:19.246Z] iter=330 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T19:22:19.409Z] iter=330 turn=1 INFO: Turn 1/25
+[2026-04-05T19:22:21.514Z] iter=330 turn=1 INFO: Agent: I'll start by reading the scratchpad and understanding the current codebase state before implementing the two goals.
+[2026-04-05T19:22:21.515Z] iter=330 turn=1 INFO: read_scratchpad: 353 chars
+[2026-04-05T19:22:21.515Z] iter=330 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat src/orchestrator.ts | head -100
+[2026-04-05T19:22:21.522Z] iter=330 turn=1 INFO:   -> exit=0 (4110 chars)
+[2026-04-05T19:22:21.522Z] iter=330 turn=2 INFO: Turn 2/25
+[2026-04-05T19:22:26.258Z] iter=330 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "send\|AgentLoop\|agent loop\|AbortController\|AbortSignal\|sessionStart\|turnCosts\|getSessionStats\|getCost\|inputTokens\|costTotal" src/orchestrator....
+[2026-04-05T19:22:26.262Z] iter=330 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/orchestrator.ts && grep -n "async send\|export.*send\|function send" src/orchestrator.ts
+[2026-04-05T19:22:26.277Z] iter=330 turn=2 INFO:   -> exit=0 (99 chars)
+[2026-04-05T19:22:26.278Z] iter=330 turn=2 INFO:   -> exit=0 (1466 chars)
+[2026-04-05T19:22:26.279Z] iter=330 turn=3 INFO: Turn 3/25
+[2026-04-05T19:22:28.859Z] iter=330 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '454,560p' src/orchestrator.ts
+[2026-04-05T19:22:28.862Z] iter=330 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1218,1370p' src/orchestrator.ts
+[2026-04-05T19:22:28.869Z] iter=330 turn=3 INFO:   -> exit=0 (4633 chars)
+[2026-04-05T19:22:28.870Z] iter=330 turn=3 INFO:   -> exit=0 (6630 chars)
+[2026-04-05T19:22:28.870Z] iter=330 turn=4 INFO: Turn 4/25
+[2026-04-05T19:22:32.225Z] iter=330 turn=4 INFO: think: I have enough context. Let me implement both goals now:
+
+1. Goal 1: AbortController in orchestrator.send() + TUI Escape ...
+[2026-04-05T19:22:32.226Z] iter=330 turn=5 INFO: Turn 5/25
+[2026-04-05T19:22:35.652Z] iter=330 turn=5 INFO: Agent: I have enough context. Let me implement both goals now.
+[2026-04-05T19:22:35.652Z] iter=330 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '900,930p' src/orchestrator.ts
+[2026-04-05T19:22:35.655Z] iter=330 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getCost\|getStatus\|costTotal\|sessionTokens\|this\.cost\|this\.session" src/orchestrator.ts | head -40
+[2026-04-05T19:22:35.662Z] iter=330 turn=5 INFO:   -> exit=0 (954 chars)
+[2026-04-05T19:22:35.665Z] iter=330 turn=5 INFO:   -> exit=0 (2105 chars)
+[2026-04-05T19:22:35.665Z] iter=330 turn=6 INFO: Turn 6/25
+[2026-04-05T19:22:38.123Z] iter=330 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '710,760p' src/orchestrator.ts
+[2026-04-05T19:22:38.127Z] iter=330 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "status\|/status" src/tui.tsx | head -30
+[2026-04-05T19:22:38.135Z] iter=330 turn=6 INFO:   -> exit=0 (1952 chars)
+[2026-04-05T19:22:38.136Z] iter=330 turn=6 INFO:   -> exit=0 (346 chars)
+[2026-04-05T19:22:38.136Z] iter=330 turn=7 INFO: Turn 7/25
+[2026-04-05T19:22:41.682Z] iter=330 turn=7 INFO: Agent: **Goal 1 (AbortController)**: NOT STARTED
+**Goal 2 (Session stats)**: NOT STARTED
+
+I've been reading. Starting to write now.
+[2026-04-05T19:22:41.682Z] iter=330 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '608,650p' src/tui.tsx
+[2026-04-05T19:22:41.684Z] iter=330 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1370,1395p' src/orchestrator.ts
+[2026-04-05T19:22:41.688Z] iter=330 turn=7 INFO:   -> exit=0 (1955 chars)
+[2026-04-05T19:22:41.688Z] iter=330 turn=7 INFO:   -> exit=0 (981 chars)
+[2026-04-05T19:22:41.688Z] iter=330 turn=8 INFO: Turn 8/25
+[2026-04-05T19:22:49.128Z] iter=330 turn=8 INFO: Agent: Now I have enough. Let me implement both goals simultaneously.
+[2026-04-05T19:22:49.128Z] iter=330 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:22:49.129Z] iter=330 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -15 +16 lines
+
+Context after patch:
+451 |   return results;
+452 | }
+453 | 
+454 | async function runAgentLoop(
+455 |   client: Anthropic,
+456 |   model: string,
+457 |   systemPrompt: string,
+458 |   apiMessages: Anthropic.MessageParam[],
+459 |   registry: ReturnType<typeof createDefaultRegistry>,
+460 |   workDir: string,
+461 |   onToolCall?: OrchestratorOptions["onToolCall"],
+462 |   onStatus?: OrchestratorOptions["onStatus"],
+463 |   onText?: OrchestratorOptions["onText"],
+464 |   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
+465 |   onCompact?: (inputTokens: number, messages: Anthropic.MessageParam[]) => Promise<void>,
+466 |   onContextBudget?: OrchestratorOptions["onContextBudget"],
+467 |   onFileWatch?: (event: "read" | "write", filePath: string) => void,
+468 |   signal?: AbortSignal,
+469 | ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number; aborted?: boolean }> {
+470 |   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
+471 |     totalIn += tIn;
+472 |     totalOut += tOut;
+[2026-04-05T19:22:49.130Z] iter=330 turn=9 INFO: Turn 9/25
+[2026-04-05T19:22:51.330Z] iter=330 turn=9 INFO: Agent: Now add abort checks inside the agent loop — at the start of each round and before starting new tool calls:
+[2026-04-05T19:22:51.331Z] iter=330 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '478,492p' src/orchestrator.ts
+[2026-04-05T19:22:51.339Z] iter=330 turn=9 INFO:   -> exit=0 (558 chars)
+[2026-04-05T19:22:51.339Z] iter=330 turn=10 INFO: Turn 10/25
+[2026-04-05T19:22:54.826Z] iter=330 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:22:54.828Z] iter=330 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -3 +8 lines
+
+Context after patch:
+478 |   let cumulativeIn = 0;
+479 |   let fullText = "";
+480 | 
+481 |   for (let round = 0; round < MAX_ROUNDS; round++) {
+482 |     // Check abort signal before starting a new round
+483 |     if (signal?.aborted) {
+484 |       return { text: fullText, tokensIn: totalIn, tokensOut: totalOut, lastInputTokens: lastInput, aborted: true };
+485 |     }
+486 | 
+487 |     // Inject prompt cache breakpoints for cost reduction (90% cheaper cache hits)
+488 |     const cachedSystem = buildCachedSystem(systemPrompt);
+489 |     const cachedMessages = injectMessageCacheBreakpoints(apiMessages);
+490 | 
+491 |     // Use streaming API with prompt-cache breakpoints (system as content blocks)
+[2026-04-05T19:22:54.828Z] iter=330 turn=11 INFO: Turn 11/25
+[2026-04-05T19:22:57.121Z] iter=330 turn=11 INFO: Agent: Now find where toolUses is checked and add abort check before starting tool execution:
+[2026-04-05T19:22:57.122Z] iter=330 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "toolUses.length === 0\|Separate write_file\|Execute non-write" src/orchestrator.ts | head -10
+[2026-04-05T19:22:57.134Z] iter=330 turn=11 INFO:   -> exit=0 (194 chars)
+[2026-04-05T19:22:57.134Z] iter=330 turn=12 INFO: Turn 12/25
+[2026-04-05T19:23:00.270Z] iter=330 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:23:00.271Z] iter=330 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -3 +8 lines
+
+Context after patch:
+539 |       (b): b is Anthropic.ToolUseBlock => b.type === "tool_use"
+540 |     );
+541 | 
+542 |     if (toolUses.length === 0) break;
+543 | 
+544 |     // Check abort before starting tool calls (allow in-flight calls to complete, don't start new ones)
+545 |     if (signal?.aborted) {
+546 |       return { text: fullText, tokensIn: totalIn, tokensOut: totalOut, lastInputTokens: lastInput, aborted: true };
+547 |     }
+548 | 
+549 |     // Separate write_file tools from non-write tools
+550 |     const writeTools = toolUses.filter(tu => tu.name === "write_file");
+551 |     const nonWriteTools = toolUses.filter(tu => tu.name !== "write_file");
+552 | 
+[2026-04-05T19:23:00.271Z] iter=330 turn=13 INFO: Turn 13/25
+[2026-04-05T19:23:02.751Z] iter=330 turn=13 INFO: Agent: I've made 3 patches to `src/orchestrator.ts`. Let me finish implementation now - fast.
+[2026-04-05T19:23:02.752Z] iter=330 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "signal\|AbortSignal\|aborted" src/orchestrator.ts | head -20
+[2026-04-05T19:23:02.760Z] iter=330 turn=13 INFO:   -> exit=0 (504 chars)
+[2026-04-05T19:23:02.760Z] iter=330 turn=14 INFO: Turn 14/25
+[2026-04-05T19:23:06.893Z] iter=330 turn=14 INFO: Agent: Now wire `signal` through `send()` and add session stats. Let me do all remaining changes:
+[2026-04-05T19:23:06.893Z] iter=330 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "private sessionCost\|private lastInputTokens\|private contextWarningShown\|private projectSummaryInjected" src/orchestrator.ts
+[2026-04-05T19:23:06.900Z] iter=330 turn=14 INFO:   -> exit=0 (155 chars)
+[2026-04-05T19:23:06.900Z] iter=330 turn=15 INFO: Turn 15/25
+[2026-04-05T19:23:11.021Z] iter=330 turn=15 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:23:11.022Z] iter=330 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -5 +9 lines
+
+Context after patch:
+734 |   // Cost tracking
+735 |   private sessionTokensIn = 0;
+736 |   private sessionTokensOut = 0;
+737 |   private sessionCost = 0;
+738 |   private lastInputTokens = 0;
+739 |   /** Timestamp when this Orchestrator was constructed (session start). */
+740 |   private sessionStartTime = Date.now();
+741 |   /** Cost of each completed turn, for trend analysis. */
+742 |   private turnCosts: number[] = [];
+743 | 
+744 |   /** Prevents the 80% context warning from firing more than once per session. */
+745 |   private contextWarningShown = false;
+746 | 
+747 |   /** Whether project summary has been injected into the system prompt already. */
+748 |   private projectSummaryInjected = false;
+[2026-04-05T19:23:11.022Z] iter=330 turn=16 INFO: Turn 16/25

@@ -465,7 +465,8 @@ async function runAgentLoop(
   onCompact?: (inputTokens: number, messages: Anthropic.MessageParam[]) => Promise<void>,
   onContextBudget?: OrchestratorOptions["onContextBudget"],
   onFileWatch?: (event: "read" | "write", filePath: string) => void,
-): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number }> {
+  signal?: AbortSignal,
+): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number; aborted?: boolean }> {
   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
     totalIn += tIn;
     totalOut += tOut;
@@ -478,6 +479,11 @@ async function runAgentLoop(
   let fullText = "";
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
+    // Check abort signal before starting a new round
+    if (signal?.aborted) {
+      return { text: fullText, tokensIn: totalIn, tokensOut: totalOut, lastInputTokens: lastInput, aborted: true };
+    }
+
     // Inject prompt cache breakpoints for cost reduction (90% cheaper cache hits)
     const cachedSystem = buildCachedSystem(systemPrompt);
     const cachedMessages = injectMessageCacheBreakpoints(apiMessages);
@@ -534,6 +540,11 @@ async function runAgentLoop(
     );
 
     if (toolUses.length === 0) break;
+
+    // Check abort before starting tool calls (allow in-flight calls to complete, don't start new ones)
+    if (signal?.aborted) {
+      return { text: fullText, tokensIn: totalIn, tokensOut: totalOut, lastInputTokens: lastInput, aborted: true };
+    }
 
     // Separate write_file tools from non-write tools
     const writeTools = toolUses.filter(tu => tu.name === "write_file");
@@ -725,6 +736,10 @@ export class Orchestrator {
   private sessionTokensOut = 0;
   private sessionCost = 0;
   private lastInputTokens = 0;
+  /** Timestamp when this Orchestrator was constructed (session start). */
+  private sessionStartTime = Date.now();
+  /** Cost of each completed turn, for trend analysis. */
+  private turnCosts: number[] = [];
 
   /** Prevents the 80% context warning from firing more than once per session. */
   private contextWarningShown = false;
