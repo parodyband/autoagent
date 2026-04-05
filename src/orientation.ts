@@ -12,6 +12,7 @@
 import { readFileSync } from "fs";
 import { executeBash } from "./tools/bash.js";
 import { parallelResearch } from "./tools/subagent.js";
+import { readPredictionCalibration, computeCalibration } from "./turn-budget.js";
 
 export interface OrientationReport {
   /** Summary of files changed since last iteration commit */
@@ -70,12 +71,12 @@ export async function orient(
   );
 
   if (statResult.exitCode !== 0 || !statResult.output.trim()) {
-    return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary() };
+    return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary(cwd) };
   }
 
   const statOutput = statResult.output.trim();
   if (!statOutput) {
-    return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary() };
+    return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary(cwd) };
   }
 
   // Try parallel subagent summaries when 5+ src files changed
@@ -107,7 +108,7 @@ export async function orient(
           diffSummary,
           hasChanges: true,
           error: null,
-          metricsSummary: computeMetricsSummary(),
+          metricsSummary: computeMetricsSummary(cwd),
         };
       } catch {
         // Fall through to raw diff on any error
@@ -137,7 +138,7 @@ export async function orient(
     diffSummary: summary,
     hasChanges: true,
     error: null,
-    metricsSummary: computeMetricsSummary(),
+    metricsSummary: computeMetricsSummary(cwd),
   };
 }
 
@@ -145,9 +146,9 @@ export async function orient(
  * Read recent iteration metrics and identify actionable patterns.
  * Returns a concise summary string, or null if metrics unavailable.
  */
-function computeMetricsSummary(): string | null {
+function computeMetricsSummary(rootDir: string = "."): string | null {
   try {
-    const raw = readFileSync(".autoagent-metrics.json", "utf-8");
+    const raw = readFileSync(`${rootDir}/.autoagent-metrics.json`, "utf-8");
     const all: IterationMetrics[] = JSON.parse(raw);
     if (all.length < 2) return null;
 
@@ -190,7 +191,24 @@ function computeMetricsSummary(): string | null {
     }
 
     const iterRange = `${recent[0].iteration}–${recent[recent.length - 1].iteration}`;
-    return `Last 5 iterations (${iterRange}): avg ${avgTurns.toFixed(0)} turns | LOC stalls: ${stalledCount} | ${insights[0]}`;
+    const baseSummary = `Last 5 iterations (${iterRange}): avg ${avgTurns.toFixed(0)} turns | LOC stalls: ${stalledCount} | ${insights[0]}`;
+
+    // Append calibration hint when predictions are significantly off
+    try {
+      const ratios = readPredictionCalibration(rootDir);
+      const calibration = computeCalibration(ratios);
+      if (calibration > 1.1) {
+        const pct = Math.round((calibration - 1) * 100);
+        return `${baseSummary}\nTurn prediction calibration: ${calibration.toFixed(2)}x (your estimates tend to be ${pct}% low — predict higher)`;
+      } else if (calibration < 0.9) {
+        const pct = Math.round((1 - calibration) * 100);
+        return `${baseSummary}\nTurn prediction calibration: ${calibration.toFixed(2)}x (your estimates tend to be ${pct}% high — predict lower)`;
+      }
+    } catch {
+      // Calibration is optional — don't fail the whole summary
+    }
+
+    return baseSummary;
   } catch {
     return null;
   }

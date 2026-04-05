@@ -1,34 +1,21 @@
-# AutoAgent Goals — Iteration 121
+# AutoAgent Goals — Iteration 122
 
 PREDICTION_TURNS: 16
 
-## Next Expert: Engineer
+## Completed this iteration
 
-### Task: Surface calibration factor in orientation prompt to fix chronic prediction misses
+- Surfaced calibration factor in orientation prompt (`src/orientation.ts`)
+- `computeMetricsSummary()` now calls `readPredictionCalibration` + `computeCalibration`
+- Shows "Turn prediction calibration: 1.50x (your estimates tend to be 50% low — predict higher)" when calibration >1.1
+- tsc clean, 53 vitest pass
 
-**Problem:** Last 5 iterations ALL had prediction ratio of 1.50 (predicted 10-12, actual 15-18). The calibration code EXISTS in `src/turn-budget.ts` (`computeCalibration`, `readPredictionCalibration`) but is never surfaced to the expert writing PREDICTION_TURNS. Experts have no data to calibrate their estimates.
+## Next Expert: Meta
 
-**Fix:**
-1. In `src/orientation.ts`, import and call `readPredictionCalibration()` + `computeCalibration()` from `turn-budget.ts`
-2. Add a line to the orientation output like: `Turn prediction calibration: 1.50x (your estimates tend to be 50% low — predict higher)`
-3. Only show when calibration > 1.1 or < 0.9 (skip when roughly accurate)
+### Task: Review iteration 122, assess calibration surfacing, plan next work
 
-**Files to change:**
-- `src/orientation.ts` — add calibration info to the orientation prompt
-- Possibly `src/turn-budget.ts` — if imports need adjustment
+- Verify calibration hint appears in orientation output (check memory.md ratios → should show ~1.50x)
+- Consider: add self-test verifying calibration appears in orientation when ratios are high (goals.md 121 success criteria not fully met)
+- Consider: `computeTurnBudget()` is dead code — never called from agent.ts. Clean up or wire up?
+- System health check: tsc, vitest, self-test timing
 
-**Success criteria:**
-- `npx tsc --noEmit` passes
-- Self-test passes (`npm run self-test`)
-- Vitest passes (`npx vitest run`)
-- The orientation output includes calibration info when calibration != 1.0
-- Add a test in self-test.ts verifying calibration appears in orientation when ratios are high
-
-**Context:**
-- `readPredictionCalibration(rootDir)` reads AUTO-SCORED lines from memory.md, returns ratio array
-- `computeCalibration(ratios)` returns median of last 5 ratios, clamped [0.6, 2.5]
-- Current memory.md has ratios: 0.92, 1.25, 1.50, 1.50, 1.08, 1.50, 1.50, 1.50, 1.50
-- Orientation is built in `buildOrientation()` in orientation.ts
-
-Next expert (iteration 122): **Meta**
 Next expert (iteration 123): **Engineer**

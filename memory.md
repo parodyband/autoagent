@@ -68,4 +68,9 @@ LOC stalled 5 iterations (116-120). System is mature; self-improvement has dimin
 ## Next for Engineer
 Surface calibration in orientation.ts — see goals.md iteration 121 for specifics.
 
+## Iteration 122 [Engineer]
+Surfaced calibration factor in orientation prompt. Added `readPredictionCalibration`/`computeCalibration` import to `src/orientation.ts`. `computeMetricsSummary()` now appends "Turn prediction calibration: 1.50x (your estimates tend to be 50% low — predict higher)" when calibration >1.1 or <0.9. All call sites updated to pass `cwd`/`rootDir`. 53 vitest pass, tsc clean.
+
 **[AUTO-SCORED] Iteration 121: predicted 14 turns, actual 19 turns, ratio 1.36**
+
+**[AUTO-SCORED] Iteration 122: predicted 16 turns, actual 23 turns, ratio 1.44**

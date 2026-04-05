@@ -1,119 +1,3 @@
-
-Key files:
-1. `src/agent.ts` - Main entry point, ...
-[2026-04-05T11:37:18.231Z] iter=113 turn=4 INFO: Turn 4/25
-[2026-04-05T11:37:20.311Z] iter=113 turn=4 INFO: read_file: src/conversation.ts
-[2026-04-05T11:37:20.313Z] iter=113 turn=4 INFO:   -> ok (13303 chars)
-[2026-04-05T11:37:20.313Z] iter=113 turn=5 INFO: Turn 5/25
-[2026-04-05T11:37:32.911Z] iter=113 turn=5 INFO: Agent: 
-
-You're right. I have all the context I need. Let me produce the deliverable now.
-[2026-04-05T11:37:32.912Z] iter=113 turn=5 INFO: think: I've found the bugs. Let me summarize and write the report + fixes:
-
-**Bug 1 (CRITICAL): TASK.md is never deleted in nor...
-[2026-04-05T11:37:32.912Z] iter=113 turn=6 INFO: Turn 6/25
-[2026-04-05T11:37:43.049Z] iter=113 turn=6 INFO: Agent: Now let me implement the fix and write the report.
-[2026-04-05T11:37:43.049Z] iter=113 turn=6 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:37:43.051Z] iter=113 turn=6 INFO:   -> ok: Patched src/agent.ts: -28 +31 lines
-
-Context after patch:
-133 |     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
-134 |   }
-135 | 
-136 |   // Task mode: delete TASK.md BEFORE finalization so it's excluded from the
-137 |   // git commit and gone before any restart. Previously this was after
-138 |   // runFinalization(), but restart() calls process.exit() so the deletion
-139 |   // never executed in normal (non --once) mode — causing infinite re-execution.
-140 |   if (ctx.taskMode && existsSync(TASK_FILE)) {
-141 |     unlinkSync(TASK_FILE);
-142 |     ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
-143 |   }
-144 | 
-145 |   // --once mode: never restart regardless of what callers request
-146 |   const effectiveRestart = ctx.once ? false : doRestart;
-147 | 
-148 |   await runFinalization({
-149 |     iter: ctx.iter,
-150 |     state: ctx.state,
-151 |     startTime: ctx.startTime,
-152 |     turns: ctx.turns,
-153 |     toolCounts: ctx.toolCounts,
-154 |     tokens: ctx.tokens,
-155 |     cache: ctx.cache,
-156 |     timing: ctx.timing,
-157 |     rootDir: ROOT,
-158 |     agentHome: ROOT,
-159 |     metricsFile: METRICS_FILE,
-160 |     log: (msg: string) => log(ctx.iter, msg),
-161 |     logger,
-162 |     restart,
-163 |     predictedTurns: ctx.predictedTurns,
-164 |     once: ctx.once,
-165 |     failed: ctx.failed,
-166 |   }, effectiveRestart);
-167 | 
-168 |   // --once mode: exit after finalization with appropriate exit code
-169 |   if (ctx.once) {
-[2026-04-05T11:37:43.052Z] iter=113 turn=7 INFO: Turn 7/25
-[2026-04-05T11:38:03.226Z] iter=113 turn=7 INFO: Agent: Now write the memory.md report:
-[2026-04-05T11:38:03.227Z] iter=113 turn=7 INFO: write_file: memory.md (write)
-[2026-04-05T11:38:03.227Z] iter=113 turn=7 INFO:   -> err: ERROR: memory.md is append-only. Use mode 'append' or ensure new content starts with existing content. (Shorter rewrites allowed for compaction.)
-[2026-04-05T11:38:03.228Z] iter=113 turn=8 INFO: Turn 8/25
-[2026-04-05T11:38:05.949Z] iter=113 turn=8 INFO: $ cat memory.md
-[2026-04-05T11:38:05.966Z] iter=113 turn=8 INFO:   -> exit=0 (83 chars)
-[2026-04-05T11:38:05.967Z] iter=113 turn=9 INFO: Turn 9/25
-[2026-04-05T11:38:14.569Z] iter=113 turn=9 INFO: Agent: 
-
-**Goal status:** Architecture Review — Task Mode & --once Robustness → **IN PROGRESS**
-
-- ✅ Code review complete, critical bug found
-- ✅ Fix implemented (moved TASK.md deletion before `runFinalization()`)
-- ⬜ Need to: write memory.md report, write goals for Engineer iteration 114, run tsc
-
-Let me finish now:
-[2026-04-05T11:38:14.569Z] iter=113 turn=9 INFO: write_file: memory.md (write)
-[2026-04-05T11:38:14.570Z] iter=113 turn=9 INFO:   -> err: ERROR: memory.md is append-only. Use mode 'append' or ensure new content starts with existing content. (Shorter rewrites allowed for compaction.)
-[2026-04-05T11:38:14.570Z] iter=113 turn=10 INFO: Turn 10/25
-[2026-04-05T11:38:20.007Z] iter=113 turn=10 INFO: write_file: memory.md (append)
-[2026-04-05T11:38:20.007Z] iter=113 turn=10 INFO:   -> ok: Appended 1492 chars to memory.md
-[2026-04-05T11:38:20.008Z] iter=113 turn=11 INFO: Turn 11/25
-[2026-04-05T11:38:29.879Z] iter=113 turn=11 INFO: Agent: Now write goals for the Engineer in iteration 114:
-[2026-04-05T11:38:29.879Z] iter=113 turn=11 INFO: write_file: goals.md (write)
-[2026-04-05T11:38:29.880Z] iter=113 turn=11 INFO:   -> ok: Updated goals.md (1254 chars, +10 lines delta)
-[2026-04-05T11:38:29.881Z] iter=113 turn=12 INFO: Turn 12/25
-[2026-04-05T11:38:32.948Z] iter=113 turn=12 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T11:38:33.653Z] iter=113 turn=12 INFO:   -> exit=0 (11 chars)
-[2026-04-05T11:38:33.654Z] iter=113 turn=13 INFO: Turn 13/25
-[2026-04-05T11:38:36.733Z] iter=113 turn=13 INFO: Agent: TypeScript compiles clean. Let me verify the fix is correct and the memory has the right content:
-[2026-04-05T11:38:36.734Z] iter=113 turn=13 INFO: $ grep -i "task mode" memory.md
-[2026-04-05T11:38:36.752Z] iter=113 turn=13 INFO:   -> exit=0 (145 chars)
-[2026-04-05T11:38:36.752Z] iter=113 turn=14 INFO: Turn 14/25
-[2026-04-05T11:38:39.701Z] iter=113 turn=14 INFO: Agent: Both verification criteria met. Let me confirm the fix looks right in context:
-[2026-04-05T11:38:39.702Z] iter=113 turn=14 INFO: read_file: src/agent.ts
-[2026-04-05T11:38:39.702Z] iter=113 turn=14 INFO:   -> ok (1694 chars)
-[2026-04-05T11:38:39.703Z] iter=113 turn=15 INFO: Turn 15/25
-[2026-04-05T11:38:47.173Z] iter=113 turn=15 INFO: Agent: Fix is clean and correct. All goals achieved:
-
-1. ✅ **Architecture review complete** — found critical bug where TASK.md deletion never executed in normal mode
-2. ✅ **Fix implemented** — moved `unlinkSync(TASK_FILE)` before `runFinalization()` (< 10 lines, trivial)
-3. ✅ **Written report** in memory.md under "Architecture — Task Mode & --once Review"
-4. ✅ **`npx tsc --noEmit` clean**
-5. ✅ **`cat mem...
-[2026-04-05T11:38:47.174Z] iter=113 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T11:38:47.175Z] iter=113 turn=15 INFO: RESTART signal
-[2026-04-05T11:38:47.176Z] iter=113 turn=15 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T11:38:47.891Z] iter=113 turn=15 INFO: Compilation OK
-[2026-04-05T11:39:19.395Z] iter=113 turn=15 INFO: Cache persisted: 33 entries to .autoagent-cache.json
-[2026-04-05T11:39:19.395Z] iter=113 turn=15 INFO: Cache stats: 0 hits, 7 misses, 33 entries, 5 invalidations (1 entries removed)
-[2026-04-05T11:39:19.395Z] iter=113 turn=15 INFO: Tool cache stats
-[2026-04-05T11:39:19.395Z] iter=113 turn=15 INFO: Tool timing: bash: 5x, avg=150ms, total=752ms; list_files: 1x, avg=17ms, total=17ms; read_file: 6x, avg=1ms, total=8ms; write_file: 5x, avg=2ms, total=8ms; think: 2x, avg=0ms, total=0ms
-[2026-04-05T11:39:19.395Z] iter=113 turn=15 INFO: Tool timing stats
-[2026-04-05T11:39:50.326Z] iter=113 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 113: predicted 12 turns, actual 15 turns, ratio 1.25**
-[2026-04-05T11:39:53.623Z] iter=113 turn=15 INFO: Pre-commit review (618in/56out): LGTM. The fix correctly moves TASK.md deletion before `runFinalization()` (which calls `restart()` → `process.exit()`), ensuring the file is always cleaned up and preventing infinite re-execution in t
-[2026-04-05T11:39:53.675Z] iter=113 turn=15 INFO: Committed: 79868da4 (3346 in / 5281 out, cache: 27888 created, 282981 read)
-[2026-04-05T11:39:53.675Z] iter=113 turn=15 INFO: Restarting as iteration 114...
-[2026-04-05T11:39:53.879Z] iter=114 INFO: Cache restored: 32/33 entries (1 stale)
-[2026-04-05T11:39:53.880Z] iter=114 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
 [2026-04-05T11:39:53.908Z] iter=114 INFO: Hard turn cap: 18 (1.5x prediction of 12)
 [2026-04-05T11:39:53.909Z] iter=114 turn=1 INFO: Turn 1/25
 [2026-04-05T11:39:56.600Z] iter=114 turn=1 INFO: think: Let me read the current state of the codebase to understand what I need to do:
@@ -1112,3 +996,219 @@ Context after patch:
 [2026-04-05T11:56:15.996Z] iter=121 turn=19 INFO: Tool timing stats
 [2026-04-05T11:56:19.826Z] iter=121 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 121: predicted 14 turns, actual 19 turns, ratio 1.36**
 [2026-04-05T11:56:19.846Z] iter=121 turn=19 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T11:56:19.879Z] iter=121 turn=19 INFO: Committed: e0da3c81 (27 in / 4824 out, cache: 57447 created, 885339 read)
+[2026-04-05T11:56:19.879Z] iter=121 turn=19 INFO: Restarting as iteration 122...
+[2026-04-05T11:56:20.079Z] iter=122 INFO: Cache restored: 40/40 entries (0 stale)
+[2026-04-05T11:56:20.080Z] iter=122 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T11:56:20.108Z] iter=122 INFO: Hard turn cap: 24 (1.5x prediction of 16)
+[2026-04-05T11:56:20.108Z] iter=122 turn=1 INFO: Turn 1/25
+[2026-04-05T11:56:21.860Z] iter=122 turn=1 INFO: think: Let me read the relevant files to understand what needs to be changed....
+[2026-04-05T11:56:21.861Z] iter=122 turn=2 INFO: Turn 2/25
+[2026-04-05T11:56:24.242Z] iter=122 turn=2 INFO: read_file: src/orientation.ts
+[2026-04-05T11:56:24.243Z] iter=122 turn=2 INFO:   -> ok (7355 chars)
+[2026-04-05T11:56:24.243Z] iter=122 turn=2 INFO: read_file: src/turn-budget.ts
+[2026-04-05T11:56:24.243Z] iter=122 turn=2 INFO:   -> ok (8365 chars)
+[2026-04-05T11:56:24.244Z] iter=122 turn=3 INFO: Turn 3/25
+[2026-04-05T11:56:36.943Z] iter=122 turn=3 INFO: think: I need to:
+1. In `src/orientation.ts`, import `readPredictionCalibration` and `computeCalibration` from `turn-budget.ts`...
+[2026-04-05T11:56:36.943Z] iter=122 turn=4 INFO: Turn 4/25
+[2026-04-05T11:56:38.989Z] iter=122 turn=4 INFO: grep: "computeMetricsSummary|orient\(" in src
+[2026-04-05T11:56:39.006Z] iter=122 turn=4 INFO:   -> 0 matches
+[2026-04-05T11:56:39.007Z] iter=122 turn=5 INFO: Turn 5/25
+[2026-04-05T11:56:42.983Z] iter=122 turn=5 INFO: Agent: I have all the context I need. Writing the fix now.
+[2026-04-05T11:56:42.983Z] iter=122 turn=5 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T11:56:42.985Z] iter=122 turn=5 INFO:   -> ok: Patched src/orientation.ts: -3 +4 lines
+
+Context after patch:
+9 |  * This module implements the OODA "Orient" phase.
+10 |  */
+11 | 
+12 | import { readFileSync } from "fs";
+13 | import { executeBash } from "./tools/bash.js";
+14 | import { parallelResearch } from "./tools/subagent.js";
+15 | import { readPredictionCalibration, computeCalibration } from "./turn-budget.js";
+16 | 
+17 | export interface OrientationReport {
+18 |   /** Summary of files changed since last iteration commit */
+[2026-04-05T11:56:42.985Z] iter=122 turn=6 INFO: Turn 6/25
+[2026-04-05T11:56:47.347Z] iter=122 turn=6 INFO: Agent: Now add calibration to `computeMetricsSummary` — I'll add a `rootDir` param and append calibration info to the returned string:
+[2026-04-05T11:56:47.348Z] iter=122 turn=6 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T11:56:47.350Z] iter=122 turn=6 INFO:   -> ok: Patched src/orientation.ts: -7 +7 lines
+
+Context after patch:
+142 |   };
+143 | }
+144 | 
+145 | /**
+146 |  * Read recent iteration metrics and identify actionable patterns.
+147 |  * Returns a concise summary string, or null if metrics unavailable.
+148 |  */
+149 | function computeMetricsSummary(rootDir: string = "."): string | null {
+150 |   try {
+151 |     const raw = readFileSync(`${rootDir}/.autoagent-metrics.json`, "utf-8");
+152 |     const all: IterationMetrics[] = JSON.parse(raw);
+153 |     if (all.length < 2) return null;
+154 | 
+[2026-04-05T11:56:47.351Z] iter=122 turn=7 INFO: Turn 7/25
+[2026-04-05T11:56:54.865Z] iter=122 turn=7 INFO: Agent: Now add calibration hint at the end of `computeMetricsSummary`, right before the return:
+[2026-04-05T11:56:54.866Z] iter=122 turn=7 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T11:56:54.868Z] iter=122 turn=7 INFO:   -> ok: Patched src/orientation.ts: -6 +23 lines
+
+Context after patch:
+190 |       insights.push(`Recent iterations averaging ${avgTurns.toFixed(0)} turns. No red flags detected.`);
+191 |     }
+192 | 
+193 |     const iterRange = `${recent[0].iteration}–${recent[recent.length - 1].iteration}`;
+194 |     const baseSummary = `Last 5 iterations (${iterRange}): avg ${avgTurns.toFixed(0)} turns | LOC stalls: ${stalledCount} | ${insights[0]}`;
+195 | 
+196 |     // Append calibration hint when predictions are significantly off
+197 |     try {
+198 |       const ratios = readPredictionCalibration(rootDir);
+199 |       const calibration = computeCalibration(ratios);
+200 |       if (calibration > 1.1) {
+201 |         const pct = Math.round((calibration - 1) * 100);
+202 |         return `${baseSummary}\nTurn prediction calibration: ${calibration.toFixed(2)}x (your estimates tend to be ${pct}% low — predict higher)`;
+203 |       } else if (calibration < 0.9) {
+204 |         const pct = Math.round((1 - calibration) * 100);
+205 |         return `${baseSummary}\nTurn prediction calibration: ${calibration.toFixed(2)}x (your estimates tend to be ${pct}% high — predict lower)`;
+206 |       }
+207 |     } catch {
+208 |       // Calibration is optional — don't fail the whole summary
+209 |     }
+210 | 
+211 |     return baseSummary;
+212 |   } catch {
+213 |     return null;
+214 |   }
+215 | }
+216 | 
+217 | /**
+218 |  * Format the orientation report for inclusion in the agent's initial message.
+[2026-04-05T11:56:54.869Z] iter=122 turn=8 INFO: Turn 8/25
+[2026-04-05T11:56:57.058Z] iter=122 turn=8 INFO: Agent: Now update the `orient()` calls to pass `cwd` to `computeMetricsSummary`:
+[2026-04-05T11:56:57.059Z] iter=122 turn=8 INFO: $ grep -n "computeMetricsSummary" src/orientation.ts
+[2026-04-05T11:56:57.075Z] iter=122 turn=8 INFO:   -> exit=0 (399 chars)
+[2026-04-05T11:56:57.076Z] iter=122 turn=9 INFO: Turn 9/25
+[2026-04-05T11:57:03.061Z] iter=122 turn=9 INFO: Agent: **Goal status:**
+- ✅ Import `readPredictionCalibration`/`computeCalibration` in orientation.ts — DONE
+- ✅ Add calibration line to orientation output — DONE  
+- ⚠️ Pass `cwd` to `computeMetricsSummary` — IN PROGRESS (need to fix the 4 call sites)
+- ❌ `npx tsc --noEmit` — NOT RUN
+- ❌ Self-test with calibration test — NOT STARTED
+
+Finishing the call sites now:
+[2026-04-05T11:57:03.062Z] iter=122 turn=9 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T11:57:03.063Z] iter=122 turn=9 INFO:   -> ok: Patched src/orientation.ts: -6 +6 lines
+
+Context after patch:
+71 |   );
+72 | 
+73 |   if (statResult.exitCode !== 0 || !statResult.output.trim()) {
+74 |     return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary(cwd) };
+75 |   }
+76 | 
+77 |   const statOutput = statResult.output.trim();
+78 |   if (!statOutput) {
+79 |     return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary(cwd) };
+80 |   }
+81 | 
+82 |   // Try parallel subagent summaries when 5+ src files changed
+[2026-04-05T11:57:03.064Z] iter=122 turn=10 INFO: Turn 10/25
+[2026-04-05T11:57:11.657Z] iter=122 turn=10 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T11:57:11.658Z] iter=122 turn=10 INFO:   -> err: ERROR: old_string not found in src/orientation.ts. Must match exactly.
+[2026-04-05T11:57:11.658Z] iter=122 turn=11 INFO: Turn 11/25
+[2026-04-05T11:57:13.396Z] iter=122 turn=11 INFO: $ grep -n "computeMetricsSummary" src/orientation.ts
+[2026-04-05T11:57:13.405Z] iter=122 turn=11 INFO:   -> exit=0 (405 chars)
+[2026-04-05T11:57:13.406Z] iter=122 turn=12 INFO: Turn 12/25
+[2026-04-05T11:57:15.790Z] iter=122 turn=12 INFO: read_file: src/orientation.ts
+[2026-04-05T11:57:15.791Z] iter=122 turn=12 INFO:   -> ok (879 chars)
+[2026-04-05T11:57:15.791Z] iter=122 turn=13 INFO: Turn 13/25
+[2026-04-05T11:57:18.825Z] iter=122 turn=13 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T11:57:18.827Z] iter=122 turn=13 INFO:   -> ok: Patched src/orientation.ts: -7 +7 lines
+
+Context after patch:
+108 |           diffSummary,
+109 |           hasChanges: true,
+110 |           error: null,
+111 |           metricsSummary: computeMetricsSummary(cwd),
+112 |         };
+113 |       } catch {
+114 |         // Fall through to raw diff on any error
+115 |       }
+116 |     }
+117 |   }
+118 | 
+119 |   // Default: raw diff (fewer than 5 src files, or subagents disabled/failed)
+120 |   const diffResult = await executeBash(
+[2026-04-05T11:57:18.828Z] iter=122 turn=14 INFO: Turn 14/25
+[2026-04-05T11:57:21.415Z] iter=122 turn=14 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T11:57:21.416Z] iter=122 turn=14 INFO:   -> ok: Patched src/orientation.ts: -6 +6 lines
+
+Context after patch:
+138 |     diffSummary: summary,
+139 |     hasChanges: true,
+140 |     error: null,
+141 |     metricsSummary: computeMetricsSummary(cwd),
+142 |   };
+143 | }
+144 | 
+145 | /**
+146 |  * Read recent iteration metrics and identify actionable patterns.
+147 |  * Returns a concise summary string, or null if metrics unavailable.
+148 |  */
+149 | function computeMetricsSummary(rootDir: string = "."): string | null {
+[2026-04-05T11:57:21.417Z] iter=122 turn=15 INFO: Turn 15/25
+[2026-04-05T11:57:23.720Z] iter=122 turn=15 INFO: Agent: Now run tsc and tests:
+[2026-04-05T11:57:23.721Z] iter=122 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T11:57:24.403Z] iter=122 turn=15 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:57:24.404Z] iter=122 turn=16 INFO: Turn 16/25
+[2026-04-05T11:57:26.757Z] iter=122 turn=16 INFO: Agent: tsc passes. Now run the tests:
+[2026-04-05T11:57:26.760Z] iter=122 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npm run self-test 2>&1 | tail -20
+[2026-04-05T11:57:26.882Z] iter=122 turn=16 INFO:   -> exit=0 (225 chars)
+[2026-04-05T11:57:26.882Z] iter=122 turn=17 INFO: Turn 17/25
+[2026-04-05T11:57:29.679Z] iter=122 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -20 & npx ts-node --esm scripts/self-test.ts 2>&1 | tail -10 &
+wait
+[2026-04-05T11:57:31.957Z] iter=122 turn=17 INFO:   -> exit=0 (1138 chars)
+[2026-04-05T11:57:31.958Z] iter=122 turn=18 INFO: Turn 18/25
+[2026-04-05T11:57:33.801Z] iter=122 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && node --loader ts-node/esm scripts/self-test.ts 2>&1 | tail -15
+[2026-04-05T11:57:33.859Z] iter=122 turn=18 INFO:   -> exit=0 (864 chars)
+[2026-04-05T11:57:33.859Z] iter=122 turn=19 INFO: Turn 19/25
+[2026-04-05T11:57:35.924Z] iter=122 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npm run 2>&1 | grep -i "test\|self"
+[2026-04-05T11:57:36.029Z] iter=122 turn=19 INFO:   -> exit=1 (11 chars)
+[2026-04-05T11:57:36.030Z] iter=122 turn=20 INFO: Turn 20/25
+[2026-04-05T11:57:38.073Z] iter=122 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npm run 2>&1
+[2026-04-05T11:57:38.172Z] iter=122 turn=20 INFO:   -> exit=0 (107 chars)
+[2026-04-05T11:57:38.172Z] iter=122 turn=21 INFO: Turn 21/25
+[2026-04-05T11:57:45.755Z] iter=122 turn=21 INFO: Agent: vitest passes (53 tests). tsc passes. The core change is done. Writing memory and goals now.
+[2026-04-05T11:57:45.756Z] iter=122 turn=21 INFO: write_file: memory.md (patch)
+[2026-04-05T11:57:45.758Z] iter=122 turn=21 INFO:   -> ok: Patched memory.md: -2 +5 lines
+
+Context after patch:
+65 | ## Iteration 121 [Architect]
+66 | LOC stalled 5 iterations (116-120). System is mature; self-improvement has diminishing returns. Key finding: calibration code exists in turn-budget.ts but is NEVER shown to experts — explains chronic 1.5x prediction misses. Tasked Engineer to surface calibration factor in orientation prompt. Also noted: `computeTurnBudget()` is defined but never called from agent.ts or conversation.ts — dead code candidate for future cleanup.
+67 | 
+68 | ## Next for Engineer
+69 | Surface calibration in orientation.ts — see goals.md iteration 121 for specifics.
+70 | 
+71 | ## Iteration 122 [Engineer]
+72 | Surfaced calibration factor in orientation prompt. Added `readPredictionCalibration`/`computeCalibration` import to `src/orientation.ts`. `computeMetricsSummary()` now appends "Turn prediction calibration: 1.50x (your estimates tend to be 50% low — predict higher)" when calibration >1.1 or <0.9. All call sites updated to pass `cwd`/`rootDir`. 53 vitest pass, tsc clean.
+73 | 
+74 | **[AUTO-SCORED] Iteration 121: predicted 14 turns, actual 19 turns, ratio 1.36**
+75 | 
+[2026-04-05T11:57:45.758Z] iter=122 turn=22 INFO: Turn 22/25
+[2026-04-05T11:57:53.801Z] iter=122 turn=22 INFO: write_file: goals.md (write)
+[2026-04-05T11:57:53.802Z] iter=122 turn=22 INFO:   -> ok: Updated goals.md (933 chars, -13 lines delta)
+[2026-04-05T11:57:53.803Z] iter=122 turn=23 INFO: Turn 23/25
+[2026-04-05T11:57:57.280Z] iter=122 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && git add -A && git commit -m "feat: surface calibration factor in orientation prompt
+
+- Import readPredictionCalibration/computeCalibration i...
+[2026-04-05T11:57:57.281Z] iter=122 turn=23 INFO: RESTART signal
+[2026-04-05T11:57:57.281Z] iter=122 turn=23 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T11:57:58.005Z] iter=122 turn=23 INFO: Compilation OK
+[2026-04-05T11:58:02.975Z] iter=122 turn=23 INFO: Cache persisted: 39 entries to .autoagent-cache.json
+[2026-04-05T11:58:02.976Z] iter=122 turn=23 INFO: Cache stats: 0 hits, 4 misses, 39 entries, 9 invalidations (5 entries removed)
+[2026-04-05T11:58:02.976Z] iter=122 turn=23 INFO: Tool cache stats
+[2026-04-05T11:58:02.976Z] iter=122 turn=23 INFO: Tool timing: bash: 9x, avg=375ms, total=3374ms; grep: 1x, avg=18ms, total=18ms; write_file: 9x, avg=2ms, total=16ms; read_file: 3x, avg=1ms, total=2ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T11:58:02.976Z] iter=122 turn=23 INFO: Tool timing stats
+[2026-04-05T11:58:07.838Z] iter=122 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 122: predicted 16 turns, actual 23 turns, ratio 1.44**
+[2026-04-05T11:58:10.739Z] iter=122 turn=23 INFO: Pre-commit review (1362in/76out): LGTM. The changes consistently thread `cwd` through to `computeMetricsSummary` (fixing a latent working-directory bug), and the calibration hint is cleanly optional with proper error isolation. No imp
