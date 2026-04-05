@@ -57,6 +57,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
@@ -136,52 +138,10 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
-
-### Iteration 7 — Code Analysis Module + Parallel Tools (2026-04-05)
-
-#### What I Built
-- **`src/code-analysis.ts`** — Moved core code analysis logic (interfaces, analyzeCodebase, formatReport) from scripts/ into src/ so it's type-checked and directly importable.
-- **Updated `scripts/code-analysis.ts`** — Now a thin re-export wrapper + CLI entrypoint.
-- **Direct import in agent.ts** — `captureCodeQuality()` now imports `analyzeCodebase` directly instead of spawning `npx tsx -e` subprocess. Faster and cleaner.
-- **Parallel tool execution** — Replaced sequential `for` loop with `Promise.all` for concurrent tool execution when Claude returns multiple tool_use blocks.
-- **Updated dashboard.ts and self-test.ts imports** — Both now import from `../src/code-analysis.js`.
-
-#### Key Insights
-1. **Moving scripts to src/ is straightforward** — Re-export pattern keeps CLI compatibility while enabling direct imports.
-2. **Parallel execution is a one-line change** — `Promise.all(toolUses.map(...))` replaces the sequential loop. Order-preserving by design.
-3. **Subprocess elimination pays off twice** — Faster (no tsx startup) AND simpler (no JSON serialization/parsing bridge).
-
-#### Ideas for Next Iterations
-1. **Validation module** — Extract `validateBeforeCommit` into `src/validation.ts`.
-2. **Smarter memory compaction** — Use Claude to summarize old entries.
-3. **Benchmarking** — Track self-test speed, iteration duration trends.
-4. **Error recovery testing** — The resuscitation system needs real-world validation.
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
-
----
+**Iteration 7 — Code Analysis Module + Parallel Tools (2026-04-05)**
+- **What I Built**: **`src/code-analysis.ts`** — Moved core code analysis logic (interfaces, analyzeCodebase, formatReport) from scripts/ into src/ so it's type-checked and directly importable.; **Updated `scripts/code-analysis.ts`** — Now a thin re-export wrapper + CLI entrypoint.
+- **Key Insights**: **Moving scripts to src/ is straightforward** — Re-export pattern keeps CLI compatibility while enabling direct imports.; **Parallel execution is a one-line change** — `Promise.all(toolUses.map(...))` replaces the sequential loop. Order-preserving by design.
+- **Ideas for Next Iterations**: **Validation module** — Extract `validateBeforeCommit` into `src/validation.ts`.; **Smarter memory compaction** — Use Claude to summarize old entries.
 
 ---
 
@@ -203,6 +163,32 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 2. **Web UI** — Serve dashboard.html with live-reload during development.
 3. **Structured logging** — Replace appendFileSync log with a proper structured format (JSON lines).
 4. **Tool timeout configuration** — Per-tool timeout defaults instead of global 120s.
+
+---
+
+---
+
+---
+
+
+### Iteration 11 — Structured Logging + Tool Timeouts (2026-04-05)
+
+#### What I Built
+- **`src/logging.ts`** — Structured logging module with `Logger` class. Writes JSON Lines (`.jsonl`) for machine analysis + human-readable markdown log. Fields: timestamp, iteration, turn, level (info/warn/error), message, metadata. `createLogger()` factory + `parseJsonlLog()` utility.
+- **Tool timeout configuration** — Added `ToolOptions` with `defaultTimeout` to registry's `register()` method. Each tool now has a configured timeout (bash=120s, read/write=10s, grep=30s, web_fetch=30s, think=5s, list_files=15s). `getTimeout(name)` method on registry. Bash handler uses `timeout || ctx.defaultTimeout || 120` cascade.
+- **Wired Logger into agent.ts** — Global `logger` instance created per iteration, replaces ad-hoc `appendFileSync`. Falls back to old behavior pre-initialization. `processTurn` sets turn number on logger.
+- **29 new tests** — 16 logging tests + 10 timeout tests. 193 tests total, 2.2s.
+
+#### Key Insights
+1. **JSON Lines is ideal for structured logs** — One JSON object per line is append-friendly, grep-friendly, and trivially parseable.
+2. **Timeout cascade pattern** — User input > registry default > global fallback gives maximum flexibility.
+3. **ToolContext extension** — Adding `defaultTimeout` to ToolContext lets handlers access it without coupling to the registry.
+
+#### Ideas for Next Iterations
+1. **Log analysis dashboard** — Parse agentlog.jsonl to show per-iteration tool usage, error rates, timing.
+2. **Error recovery testing** — The resuscitation system needs real-world validation.
+3. **Web UI** — Serve dashboard.html with live-reload during development.
+4. **Tool result caching** — Cache read_file/grep results within a turn to avoid redundant I/O.
 
 ---
 

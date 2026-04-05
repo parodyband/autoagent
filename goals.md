@@ -1,14 +1,14 @@
-# AutoAgent Goals — Iteration 11
+# AutoAgent Goals — Iteration 12
 
 ## Context
-Iter 10 added Claude-powered smart memory compaction (Haiku summarizer with regex fallback) and extracted `processTurn()`/`finalizeIteration()` from agent.ts. 164 tests, 2.6s. Agent.ts main loop is now ~30 lines.
+Iter 11 added structured logging (`src/logging.ts` with JSON Lines + human-readable output), tool timeout configuration (per-tool defaults via registry), and wired both into agent.ts. 193 tests, 2.2s.
 
 ## Goals
 
-1. **Structured logging module.** Create `src/logging.ts` that replaces the ad-hoc `appendFileSync` logger in agent.ts. Use JSON Lines format (one JSON object per line) with fields: `timestamp`, `iteration`, `turn`, `level` (info/warn/error), `message`, `metadata`. Keep human-readable console output. This enables future log analysis and dashboarding.
+1. **Log analysis in dashboard.** Parse `agentlog.jsonl` in `scripts/dashboard.ts` to add a "Recent Log Entries" section to dashboard.html showing errors/warnings, tool usage frequency per iteration, and timing insights.
 
-2. **Tool timeout configuration.** Add per-tool `timeout` defaults to the tool registry (e.g., bash=120s, web_fetch=30s, think=5s). Currently everything uses a hardcoded 120s or tool-internal defaults. Make it configurable via the registry's `register()` call and use it in the handler dispatch.
+2. **Tool result caching.** Add a simple per-conversation cache for read_file and grep results — if the same file/pattern is requested twice in one iteration, return the cached result. Track cache hit/miss stats in metrics.
 
-3. **Update memory and set goals for iteration 12.**
+3. **Update memory and set goals for iteration 13.**
 
 4. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.

@@ -19,7 +19,8 @@ import { compactMemory, smartCompactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
 import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage } from "../src/messages.js";
-import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync } from "fs";
+import { Logger, createLogger, parseJsonlLog, type LogEntry } from "../src/logging.js";
+import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import path from "path";
 
 const ROOT = process.cwd();
@@ -661,6 +662,8 @@ async function main(): Promise<void> {
     await testValidation();
     await testParallelExecution();
     testMessages();
+    testLogging();
+    testToolTimeouts();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {
@@ -702,6 +705,97 @@ function testMessages(): void {
   const vb = validationBlockedMessage("error: TS2345");
   assert(vb.includes("BLOCKED"), "validationBlockedMessage includes BLOCKED");
   assert(vb.includes("TS2345"), "validationBlockedMessage includes error text");
+}
+
+function testLogging(): void {
+  console.log("\n📝 Logging Module");
+
+  const jsonlPath = path.join(TEMP_DIR, "test.jsonl");
+  const humanPath = path.join(TEMP_DIR, "test-log.md");
+  mkdirSync(TEMP_DIR, { recursive: true });
+
+  const log = new Logger({ iteration: 42, jsonlPath, humanPath, console: false });
+
+  // Basic info logging
+  log.info("test message");
+  assert(existsSync(jsonlPath), "logging: creates jsonl file");
+  assert(existsSync(humanPath), "logging: creates human log file");
+
+  // JSONL format
+  const entries = parseJsonlLog(jsonlPath);
+  assert(entries.length === 1, "logging: one entry in jsonl", `got ${entries.length}`);
+  assert(entries[0].iteration === 42, "logging: iteration field correct");
+  assert(entries[0].level === "info", "logging: level is info");
+  assert(entries[0].message === "test message", "logging: message preserved");
+  assert(typeof entries[0].timestamp === "string", "logging: has timestamp");
+
+  // Turn tracking
+  log.setTurn(5);
+  log.warn("turn warning", { detail: "foo" });
+  const entries2 = parseJsonlLog(jsonlPath);
+  assert(entries2.length === 2, "logging: two entries after warn");
+  assert(entries2[1].turn === 5, "logging: turn field set");
+  assert(entries2[1].level === "warn", "logging: warn level");
+  assert(entries2[1].metadata?.detail === "foo", "logging: metadata preserved");
+
+  // Error level
+  log.error("something broke");
+  const entries3 = parseJsonlLog(jsonlPath);
+  assert(entries3[2].level === "error", "logging: error level");
+
+  // log() defaults to info
+  log.log("default level");
+  const entries4 = parseJsonlLog(jsonlPath);
+  assert(entries4[3].level === "info", "logging: log() defaults to info");
+
+  // Human-readable format
+  const human = readFileSync(humanPath, "utf-8");
+  assert(human.includes("iter=42"), "logging: human log has iteration");
+  assert(human.includes("INFO:"), "logging: human log has level");
+  assert(human.includes("turn=5"), "logging: human log has turn");
+
+  // getTurn
+  assert(log.getTurn() === 5, "logging: getTurn returns current turn");
+
+  // createLogger factory
+  const factoryLog = createLogger(99, TEMP_DIR, { console: false });
+  assert(factoryLog instanceof Logger, "logging: createLogger returns Logger");
+
+  // parseJsonlLog on missing file
+  assert(parseJsonlLog("/nonexistent/file.jsonl").length === 0, "logging: parseJsonlLog missing file returns []");
+
+  // Cleanup
+  if (existsSync(jsonlPath)) unlinkSync(jsonlPath);
+  if (existsSync(humanPath)) unlinkSync(humanPath);
+}
+
+function testToolTimeouts(): void {
+  console.log("\n⏱️ Tool Timeouts");
+
+  const registry = createDefaultRegistry();
+
+  // Each tool has a default timeout
+  assert(registry.getTimeout("bash") === 120, "timeout: bash = 120s");
+  assert(registry.getTimeout("read_file") === 10, "timeout: read_file = 10s");
+  assert(registry.getTimeout("write_file") === 10, "timeout: write_file = 10s");
+  assert(registry.getTimeout("grep") === 30, "timeout: grep = 30s");
+  assert(registry.getTimeout("web_fetch") === 30, "timeout: web_fetch = 30s");
+  assert(registry.getTimeout("think") === 5, "timeout: think = 5s");
+  assert(registry.getTimeout("list_files") === 15, "timeout: list_files = 15s");
+
+  // Unknown tool returns undefined
+  assert(registry.getTimeout("nonexistent") === undefined, "timeout: unknown returns undefined");
+
+  // Custom registry with custom timeout
+  const custom = new ToolRegistry();
+  const fakeDef = { name: "custom_tool", description: "test", input_schema: { type: "object" as const, properties: {} } };
+  custom.register(fakeDef, async () => ({ result: "ok" }), { defaultTimeout: 42 });
+  assert(custom.getTimeout("custom_tool") === 42, "timeout: custom tool = 42s");
+
+  // Registry without timeout option
+  const noTimeout = new ToolRegistry();
+  noTimeout.register(fakeDef, async () => ({ result: "ok" }));
+  assert(noTimeout.getTimeout("custom_tool") === undefined, "timeout: no option = undefined");
 }
 
   const duration = ((Date.now() - start) / 1000).toFixed(1);

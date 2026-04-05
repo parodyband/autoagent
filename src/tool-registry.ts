@@ -19,6 +19,8 @@ import { listFilesToolDefinition, executeListFiles } from "./tools/list_files.js
 export interface ToolContext {
   rootDir: string;
   log: (msg: string) => void;
+  /** Default timeout for this tool (from registry), in seconds */
+  defaultTimeout?: number;
 }
 
 export interface ToolResult {
@@ -31,9 +33,15 @@ export type ToolHandler = (
   ctx: ToolContext,
 ) => Promise<ToolResult>;
 
+export interface ToolOptions {
+  /** Default timeout in seconds for this tool (used when caller doesn't specify) */
+  defaultTimeout?: number;
+}
+
 export interface RegisteredTool {
   definition: Anthropic.Tool;
   handler: ToolHandler;
+  defaultTimeout?: number;
 }
 
 // ─── Registry ───────────────────────────────────────────────
@@ -41,12 +49,21 @@ export interface RegisteredTool {
 export class ToolRegistry {
   private tools: Map<string, RegisteredTool> = new Map();
 
-  register(definition: Anthropic.Tool, handler: ToolHandler): void {
-    this.tools.set(definition.name, { definition, handler });
+  register(definition: Anthropic.Tool, handler: ToolHandler, options?: ToolOptions): void {
+    this.tools.set(definition.name, {
+      definition,
+      handler,
+      defaultTimeout: options?.defaultTimeout,
+    });
   }
 
   get(name: string): RegisteredTool | undefined {
     return this.tools.get(name);
+  }
+
+  /** Get the default timeout for a tool, or undefined if not set */
+  getTimeout(name: string): number | undefined {
+    return this.tools.get(name)?.defaultTimeout;
   }
 
   getDefinitions(): Anthropic.Tool[] {
@@ -84,10 +101,11 @@ export function createDefaultRegistry(): ToolRegistry {
       };
     }
 
-    const r = await executeBash(command, timeout || 120, ctx.rootDir);
+    const effectiveTimeout = timeout || ctx.defaultTimeout || 120;
+    const r = await executeBash(command, effectiveTimeout, ctx.rootDir);
     ctx.log(`  -> exit=${r.exitCode} (${r.output.length} chars)`);
     return { result: r.output };
-  });
+  }, { defaultTimeout: 120 });
 
   // ── read_file ─────────────────────────────────────────
   registry.register(readFileToolDefinition, async (input, ctx) => {
@@ -98,7 +116,7 @@ export function createDefaultRegistry(): ToolRegistry {
     const r = executeReadFile(filePath, start_line, end_line, ctx.rootDir);
     ctx.log(`  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
     return { result: r.content };
-  });
+  }, { defaultTimeout: 10 });
 
   // ── write_file ────────────────────────────────────────
   registry.register(writeFileToolDefinition, async (input, ctx) => {
@@ -113,7 +131,7 @@ export function createDefaultRegistry(): ToolRegistry {
     const r = executeWriteFile(filePath, content || "", m, ctx.rootDir, old_string, new_string);
     ctx.log(`  -> ${r.success ? "ok" : "err"}: ${r.message}`);
     return { result: r.message };
-  });
+  }, { defaultTimeout: 10 });
 
   // ── grep ──────────────────────────────────────────────
   registry.register(grepToolDefinition, async (input, ctx) => {
@@ -132,7 +150,7 @@ export function createDefaultRegistry(): ToolRegistry {
     );
     ctx.log(`  -> ${r.matchCount} matches`);
     return { result: r.content };
-  });
+  }, { defaultTimeout: 30 });
 
   // ── web_fetch ─────────────────────────────────────────
   registry.register(webFetchToolDefinition, async (input, ctx) => {
@@ -143,14 +161,14 @@ export function createDefaultRegistry(): ToolRegistry {
     const r = await executeWebFetch(url, extract_text, headers);
     ctx.log(`  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
     return { result: r.content };
-  });
+  }, { defaultTimeout: 30 });
 
   // ── think ─────────────────────────────────────────────
   registry.register(thinkToolDefinition, async (input, ctx) => {
     const { thought } = input as { thought: string };
     ctx.log(`think: ${thought.slice(0, 120)}...`);
     return { result: `Thought recorded (${thought.length} chars). Continue.` };
-  });
+  }, { defaultTimeout: 5 });
 
   // ── list_files ────────────────────────────────────────
   registry.register(listFilesToolDefinition, async (input, ctx) => {
@@ -161,7 +179,7 @@ export function createDefaultRegistry(): ToolRegistry {
     const r = executeListFiles(dirPath, depth, exclude, ctx.rootDir);
     ctx.log(`  -> ${r.success ? "ok" : "err"} (${r.dirCount} dirs, ${r.fileCount} files)`);
     return { result: r.content };
-  });
+  }, { defaultTimeout: 15 });
 
   return registry;
 }

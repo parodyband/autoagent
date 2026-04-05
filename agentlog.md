@@ -1614,3 +1614,201 @@ The current `compactMemory()` function is synchron...
 [2026-04-05T06:29:54.936Z] iter=10 RESTART signal
 [2026-04-05T06:29:54.936Z] iter=10 Validating: npx tsc --noEmit ...
 [2026-04-05T06:29:55.585Z] iter=10 Compilation OK
+[2026-04-05T06:30:02.162Z] iter=10 Committed: 07a8a5fb (862662 in / 12472 out, cache: 0 created, 0 read)
+[2026-04-05T06:30:02.162Z] iter=10 Restarting as iteration 11...
+[2026-04-05T06:30:02.338Z] iter=11 Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T06:30:02.347Z] iter=11 Turn 1/50
+[2026-04-05T06:30:05.613Z] iter=11 Agent: 
+
+I'll start by understanding the current codebase structure, then implement the structured logging module and tool timeout configuration.
+[2026-04-05T06:30:05.613Z] iter=11 list_files: src (depth=2)
+[2026-04-05T06:30:05.627Z] iter=11   -> ok (1 dirs, 14 files)
+[2026-04-05T06:30:05.628Z] iter=11 read_file: goals.md
+[2026-04-05T06:30:05.628Z] iter=11   -> ok (1065 chars)
+[2026-04-05T06:30:05.629Z] iter=11 Turn 2/50
+[2026-04-05T06:30:08.318Z] iter=11 read_file: src/agent.ts
+[2026-04-05T06:30:08.318Z] iter=11   -> ok (14910 chars)
+[2026-04-05T06:30:08.319Z] iter=11 read_file: src/tool-registry.ts
+[2026-04-05T06:30:08.319Z] iter=11   -> ok (6007 chars)
+[2026-04-05T06:30:08.319Z] iter=11 Turn 3/50
+[2026-04-05T06:30:29.550Z] iter=11 think: Let me plan the two changes:
+
+## 1. Structured Logging Module (`src/logging.ts`)
+
+Current state: `log()` function in age...
+[2026-04-05T06:30:29.550Z] iter=11 Turn 4/50
+[2026-04-05T06:30:32.141Z] iter=11 Agent: Now let me look at the existing tests to understand the test patterns:
+[2026-04-05T06:30:32.141Z] iter=11 $ ls tests/
+[2026-04-05T06:30:32.150Z] iter=11   -> exit=1 (38 chars)
+[2026-04-05T06:30:32.151Z] iter=11 Turn 5/50
+[2026-04-05T06:30:35.248Z] iter=11 $ find . -name "*.test.ts" -not -path "*/node_modules/*" | head -20
+[2026-04-05T06:30:35.298Z] iter=11   -> exit=0 (11 chars)
+[2026-04-05T06:30:35.298Z] iter=11 Turn 6/50
+[2026-04-05T06:30:37.505Z] iter=11 $ find . -name "*test*" -not -path "*/node_modules/*" -not -path "*/.git/*" | head -20
+[2026-04-05T06:30:37.542Z] iter=11   -> exit=0 (23 chars)
+[2026-04-05T06:30:37.542Z] iter=11 Turn 7/50
+[2026-04-05T06:30:39.807Z] iter=11 read_file: scripts/self-test.ts
+[2026-04-05T06:30:39.808Z] iter=11   -> ok (3259 chars)
+[2026-04-05T06:30:39.809Z] iter=11 Turn 8/50
+[2026-04-05T06:30:42.004Z] iter=11 $ wc -l scripts/self-test.ts
+[2026-04-05T06:30:42.012Z] iter=11   -> exit=0 (30 chars)
+[2026-04-05T06:30:42.012Z] iter=11 Turn 9/50
+[2026-04-05T06:30:45.697Z] iter=11 Agent: Let me see the end of the test file to understand the test structure and find the registry tests:
+[2026-04-05T06:30:45.698Z] iter=11 grep: "Registry|registry" in scripts/self-test.ts
+[2026-04-05T06:30:45.726Z] iter=11   -> 0 matches
+[2026-04-05T06:30:45.727Z] iter=11 Turn 10/50
+[2026-04-05T06:30:48.765Z] iter=11 grep: "testTool|ToolRegistry|tool.reg" in scripts/self-test.ts
+[2026-04-05T06:30:48.799Z] iter=11   -> 0 matches
+[2026-04-05T06:30:48.799Z] iter=11 Turn 11/50
+[2026-04-05T06:30:53.577Z] iter=11 grep: "createDefaultRegistry|ToolReg" in scripts/self-test.ts
+[2026-04-05T06:30:53.613Z] iter=11   -> 0 matches
+[2026-04-05T06:30:53.614Z] iter=11 Turn 12/50
+[2026-04-05T06:30:56.065Z] iter=11 grep: "tool-registry|ToolRegistry" in scripts/self-test.ts
+[2026-04-05T06:30:56.087Z] iter=11   -> 0 matches
+[2026-04-05T06:30:56.087Z] iter=11 Turn 13/50
+[2026-04-05T06:30:59.208Z] iter=11 Agent: Hmm, the import is there but no tests? Let me check what functions are actually used:
+[2026-04-05T06:30:59.208Z] iter=11 $ grep -n 'createDefaultRegistry\|ToolRegistry' scripts/self-test.ts
+[2026-04-05T06:30:59.218Z] iter=11   -> exit=0 (259 chars)
+[2026-04-05T06:30:59.218Z] iter=11 Turn 14/50
+[2026-04-05T06:31:01.763Z] iter=11 read_file: scripts/self-test.ts
+[2026-04-05T06:31:01.764Z] iter=11   -> ok (3463 chars)
+[2026-04-05T06:31:01.764Z] iter=11 Turn 15/50
+[2026-04-05T06:31:04.840Z] iter=11 Agent: Now let me see the end of the file to understand how tests are invoked:
+[2026-04-05T06:31:04.841Z] iter=11 read_file: scripts/self-test.ts
+[2026-04-05T06:31:04.842Z] iter=11   -> ok (3164 chars)
+[2026-04-05T06:31:04.843Z] iter=11 Turn 16/50
+[2026-04-05T06:31:22.028Z] iter=11 Agent: 
+
+Good, I have a clear picture. Let me implement both changes now.
+
+## Goal 1: Structured Logging Module
+[2026-04-05T06:31:22.029Z] iter=11 write_file: src/logging.ts (write)
+[2026-04-05T06:31:22.030Z] iter=11   -> ok: Created src/logging.ts (4008 chars)
+[2026-04-05T06:31:22.030Z] iter=11 Turn 17/50
+[2026-04-05T06:31:26.274Z] iter=11 think: Wait, I used `require("fs")` in `parseJsonlLog` which won't work in ESM. Let me use `readFileSync` from the already-impo...
+[2026-04-05T06:31:26.274Z] iter=11 Turn 18/50
+[2026-04-05T06:31:29.319Z] iter=11 write_file: src/logging.ts (patch)
+[2026-04-05T06:31:29.320Z] iter=11   -> ok: Patched src/logging.ts: -1 +1 lines
+[2026-04-05T06:31:29.320Z] iter=11 Turn 19/50
+[2026-04-05T06:31:34.229Z] iter=11 write_file: src/logging.ts (patch)
+[2026-04-05T06:31:34.230Z] iter=11   -> ok: Patched src/logging.ts: -16 +15 lines
+[2026-04-05T06:31:34.230Z] iter=11 Turn 20/50
+[2026-04-05T06:31:39.049Z] iter=11 Agent: ## Goal 2: Tool Timeout Configuration
+
+Now let me add timeout support to the tool registry:
+[2026-04-05T06:31:39.049Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:31:39.050Z] iter=11   -> ok: Patched src/tool-registry.ts: -4 +10 lines
+[2026-04-05T06:31:39.050Z] iter=11 Turn 21/50
+[2026-04-05T06:31:43.243Z] iter=11 Agent: Now update `ToolContext` to include the default timeout:
+[2026-04-05T06:31:43.243Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:31:43.244Z] iter=11   -> ok: Patched src/tool-registry.ts: -4 +6 lines
+[2026-04-05T06:31:43.244Z] iter=11 Turn 22/50
+[2026-04-05T06:31:47.930Z] iter=11 Agent: Now update the `register()` method to accept options and `getTimeout()`:
+[2026-04-05T06:31:47.930Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:31:47.931Z] iter=11   -> ok: Patched src/tool-registry.ts: -7 +16 lines
+[2026-04-05T06:31:47.931Z] iter=11 Turn 23/50
+[2026-04-05T06:31:59.356Z] iter=11 Agent: Now add timeout values to each tool registration in `createDefaultRegistry()`:
+[2026-04-05T06:31:59.357Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:31:59.357Z] iter=11   -> ok: Patched src/tool-registry.ts: -17 +18 lines
+[2026-04-05T06:31:59.357Z] iter=11 Turn 24/50
+[2026-04-05T06:32:03.383Z] iter=11 Agent: Now update the remaining tool registrations with timeouts:
+[2026-04-05T06:32:03.384Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:32:03.384Z] iter=11   -> ok: Patched src/tool-registry.ts: -2 +2 lines
+[2026-04-05T06:32:03.384Z] iter=11 Turn 25/50
+[2026-04-05T06:32:06.991Z] iter=11 Agent: Actually, let me not change handler signatures — just add the timeout options to each registration. Let me look at each closing `});` for the registrations:
+[2026-04-05T06:32:06.992Z] iter=11 read_file: src/tool-registry.ts
+[2026-04-05T06:32:06.993Z] iter=11   -> ok (3681 chars)
+[2026-04-05T06:32:06.994Z] iter=11 Turn 26/50
+[2026-04-05T06:32:11.603Z] iter=11 Agent: 
+
+Let me move faster. I'll revert the unnecessary `: Promise<ToolResult>` change, add timeout options to all registrations, then wire the logger into agent.ts.
+[2026-04-05T06:32:11.603Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:32:11.604Z] iter=11   -> ok: Patched src/tool-registry.ts: -1 +1 lines
+[2026-04-05T06:32:11.605Z] iter=11 Turn 27/50
+[2026-04-05T06:32:15.703Z] iter=11 Agent: Now add timeout options to the remaining tool registrations. I need to change the closing `});` of each handler to include the timeout option:
+[2026-04-05T06:32:15.704Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:32:15.705Z] iter=11   -> ok: Patched src/tool-registry.ts: -4 +4 lines
+[2026-04-05T06:32:15.706Z] iter=11 Turn 28/50
+[2026-04-05T06:32:19.270Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:32:19.272Z] iter=11   -> ok: Patched src/tool-registry.ts: -4 +4 lines
+[2026-04-05T06:32:19.272Z] iter=11 Turn 29/50
+[2026-04-05T06:32:22.361Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:32:22.362Z] iter=11   -> ok: Patched src/tool-registry.ts: -4 +4 lines
+[2026-04-05T06:32:22.362Z] iter=11 Turn 30/50
+[2026-04-05T06:32:25.831Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:32:25.832Z] iter=11   -> ok: Patched src/tool-registry.ts: -4 +4 lines
+[2026-04-05T06:32:25.833Z] iter=11 Turn 31/50
+[2026-04-05T06:32:29.010Z] iter=11 Agent: Now for think and list_files, let me read the end of the file:
+[2026-04-05T06:32:29.010Z] iter=11 read_file: src/tool-registry.ts
+[2026-04-05T06:32:29.011Z] iter=11   -> ok (860 chars)
+[2026-04-05T06:32:29.012Z] iter=11 Turn 32/50
+[2026-04-05T06:32:33.227Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:32:33.228Z] iter=11   -> ok: Patched src/tool-registry.ts: -4 +4 lines
+[2026-04-05T06:32:33.228Z] iter=11 Turn 33/50
+[2026-04-05T06:32:36.384Z] iter=11 write_file: src/tool-registry.ts (patch)
+[2026-04-05T06:32:36.385Z] iter=11   -> ok: Patched src/tool-registry.ts: -5 +5 lines
+[2026-04-05T06:32:36.385Z] iter=11 Turn 34/50
+[2026-04-05T06:32:41.069Z] iter=11 Agent: Now wire the Logger into agent.ts. I need to replace the ad-hoc `log()` function and `appendFileSync` calls with the Logger, and pass `defaultTimeout` through ToolContext:
+[2026-04-05T06:32:41.069Z] iter=11 write_file: src/agent.ts (patch)
+[2026-04-05T06:32:41.070Z] iter=11   -> ok: Patched src/agent.ts: -1 +2 lines
+[2026-04-05T06:32:41.070Z] iter=11 Turn 35/50
+[2026-04-05T06:32:47.236Z] iter=11 Agent: Now replace the old `log()` function:
+[2026-04-05T06:32:47.236Z] iter=11 write_file: src/agent.ts (patch)
+[2026-04-05T06:32:47.237Z] iter=11   -> ok: Patched src/agent.ts: -7 +16 lines
+[2026-04-05T06:32:47.238Z] iter=11 Turn 36/50
+[2026-04-05T06:32:52.053Z] iter=11 Agent: 
+
+I need to move fast. Let me wire the logger into the iteration context, pass `defaultTimeout` in handleToolCall, add tests, then verify.
+[2026-04-05T06:32:52.053Z] iter=11 write_file: src/agent.ts (patch)
+[2026-04-05T06:32:52.054Z] iter=11   -> ok: Patched src/agent.ts: -4 +5 lines
+[2026-04-05T06:32:52.056Z] iter=11 Turn 37/50
+[2026-04-05T06:32:58.813Z] iter=11 Agent: Now initialize the logger in `runIteration`:
+[2026-04-05T06:32:58.814Z] iter=11 write_file: src/agent.ts (patch)
+[2026-04-05T06:32:58.815Z] iter=11   -> ok: Patched src/agent.ts: -6 +9 lines
+[2026-04-05T06:32:58.815Z] iter=11 Turn 38/50
+[2026-04-05T06:33:03.008Z] iter=11 Agent: Update `processTurn` to set the turn on the logger:
+[2026-04-05T06:33:03.009Z] iter=11 write_file: src/agent.ts (patch)
+[2026-04-05T06:33:03.009Z] iter=11   -> ok: Patched src/agent.ts: -3 +4 lines
+[2026-04-05T06:33:03.009Z] iter=11 Turn 39/50
+[2026-04-05T06:33:06.862Z] iter=11 Agent: Now let me type-check:
+[2026-04-05T06:33:06.862Z] iter=11 $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T06:33:07.507Z] iter=11   -> exit=0 (11 chars)
+[2026-04-05T06:33:07.507Z] iter=11 Turn 40/50
+[2026-04-05T06:33:10.792Z] iter=11 Agent: Clean compile. Now add tests and run them:
+[2026-04-05T06:33:10.792Z] iter=11 read_file: scripts/self-test.ts
+[2026-04-05T06:33:10.793Z] iter=11   -> ok (1240 chars)
+[2026-04-05T06:33:10.793Z] iter=11 Turn 41/50
+[2026-04-05T06:33:15.710Z] iter=11 Agent: 
+
+Let me add the logging and timeout tests, run them, then wrap up.
+[2026-04-05T06:33:15.711Z] iter=11 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:33:15.712Z] iter=11   -> ok: Patched scripts/self-test.ts: -2 +3 lines
+[2026-04-05T06:33:15.712Z] iter=11 Turn 42/50
+[2026-04-05T06:33:19.010Z] iter=11 Agent: Now add the test functions and wire them into the main runner. Let me find where `testMessages` is defined and add tests after it:
+[2026-04-05T06:33:19.011Z] iter=11 read_file: scripts/self-test.ts
+[2026-04-05T06:33:19.011Z] iter=11   -> ok (368 chars)
+[2026-04-05T06:33:19.012Z] iter=11 Turn 43/50
+[2026-04-05T06:33:25.418Z] iter=11 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:33:25.419Z] iter=11   -> ok: Patched scripts/self-test.ts: -3 +5 lines
+[2026-04-05T06:33:25.419Z] iter=11 Turn 44/50
+[2026-04-05T06:33:29.470Z] iter=11 Agent: Now add the test functions before the closing of `main()`. Let me find the right spot - right after testMessages:
+[2026-04-05T06:33:29.471Z] iter=11 read_file: scripts/self-test.ts
+[2026-04-05T06:33:29.472Z] iter=11   -> ok (359 chars)
+[2026-04-05T06:33:29.472Z] iter=11 Turn 45/50
+[2026-04-05T06:33:49.740Z] iter=11 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:33:49.742Z] iter=11   -> ok: Patched scripts/self-test.ts: -3 +94 lines
+[2026-04-05T06:33:49.742Z] iter=11 Turn 46/50
+[2026-04-05T06:33:52.881Z] iter=11 $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && npx tsx scripts/self-test.ts 2>&1 | tail -30
+[2026-04-05T06:33:56.140Z] iter=11   -> exit=0 (858 chars)
+[2026-04-05T06:33:56.140Z] iter=11 Turn 47/50
+[2026-04-05T06:34:10.742Z] iter=11 Agent: All 193 tests pass (up from 164). Now update memory and goals:
+[2026-04-05T06:34:10.742Z] iter=11 write_file: memory.md (append)
+[2026-04-05T06:34:10.743Z] iter=11   -> ok: Appended 1788 chars to memory.md
+[2026-04-05T06:34:10.743Z] iter=11 Turn 48/50
+[2026-04-05T06:34:18.825Z] iter=11 write_file: goals.md (write)
+[2026-04-05T06:34:18.826Z] iter=11   -> ok: Updated goals.md (849 chars, 0 lines delta)
+[2026-04-05T06:34:18.826Z] iter=11 Turn 49/50
+[2026-04-05T06:34:22.549Z] iter=11 $ cd /Users/austin/Documents/autoagent && git add -A && echo "AUTOAGENT_RESTART"
+[2026-04-05T06:34:22.550Z] iter=11 RESTART signal
+[2026-04-05T06:34:22.551Z] iter=11 Validating: npx tsc --noEmit ...
+[2026-04-05T06:34:23.151Z] iter=11 Compilation OK

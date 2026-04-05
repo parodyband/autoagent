@@ -9,6 +9,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { readFileSync, writeFileSync, existsSync, appendFileSync } from "fs";
+import { Logger, createLogger } from "./logging.js";
 import { spawn as spawnProcess } from "child_process";
 import path from "path";
 import "dotenv/config";
@@ -47,10 +48,19 @@ const MAX_CONSECUTIVE_FAILURES = 3;
 
 // ─── Logging ────────────────────────────────────────────────
 
+// Global logger instance, initialized per iteration in main()
+let logger: Logger;
+
+/** Backward-compatible log function (delegates to structured logger) */
 function log(iter: number, msg: string): void {
-  const line = `[${new Date().toISOString()}] iter=${iter} ${msg}\n`;
-  console.log(`  ${msg}`);
-  try { appendFileSync(AGENT_LOG_FILE, line, "utf-8"); } catch {}
+  if (logger) {
+    logger.info(msg);
+  } else {
+    // Fallback before logger is initialized
+    const line = `[${new Date().toISOString()}] iter=${iter} ${msg}\n`;
+    console.log(`  ${msg}`);
+    try { appendFileSync(AGENT_LOG_FILE, line, "utf-8"); } catch {}
+  }
 }
 
 // ─── Metrics ────────────────────────────────────────────────
@@ -114,6 +124,7 @@ async function handleToolCall(
   const ctx = {
     rootDir: ROOT,
     log: (msg: string) => log(iter, msg),
+    defaultTimeout: tool.defaultTimeout,
   };
 
   try {
@@ -147,6 +158,7 @@ type TurnResult = "continue" | "break" | "restarted";
 async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
   ctx.turns++;
   const turnsLeft = MAX_TURNS - ctx.turns;
+  if (logger) logger.setTurn(ctx.turns);
   log(ctx.iter, `Turn ${ctx.turns}/${MAX_TURNS}`);
 
   const response = await ctx.client.messages.create({
@@ -280,12 +292,15 @@ async function runIteration(state: IterationState): Promise<void> {
     turns: 0,
   };
 
+  // Initialize structured logger for this iteration
+  logger = createLogger(ctx.iter, ROOT);
+
   console.log(`\n${"=".repeat(60)}`);
   console.log(`  AutoAgent — Iteration ${ctx.iter}`);
   console.log(`  Tools: ${toolRegistry.getNames().join(", ")}`);
   console.log(`${"=".repeat(60)}\n`);
 
-  log(ctx.iter, `Starting. Model=${ctx.model} MaxTokens=${ctx.maxTokens}`);
+  logger.info(`Starting. Model=${ctx.model} MaxTokens=${ctx.maxTokens}`);
   await tagPreIteration(ctx.iter);
 
   ctx.messages.push({
