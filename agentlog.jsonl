@@ -1,64 +1,3 @@
-{"timestamp":"2026-04-05T20:52:22.792Z","iteration":376,"level":"info","message":"Agent: The hooks-integration.test.ts is empty (0 bytes) — the patch wiped it. I need to restore + fix it now, then do goals 2b/2c and wrap up.","turn":11}
-{"timestamp":"2026-04-05T20:52:22.794Z","iteration":376,"level":"info","message":"write_file: tests/hooks-integration.test.ts (write)","turn":11}
-{"timestamp":"2026-04-05T20:52:22.796Z","iteration":376,"level":"info","message":"  -> ok: Updated tests/hooks-integration.test.ts (7142 chars, +233 lines delta)","turn":11}
-{"timestamp":"2026-04-05T20:52:22.797Z","iteration":376,"level":"info","message":"Turn 12/25","turn":12}
-{"timestamp":"2026-04-05T20:52:31.561Z","iteration":376,"level":"info","message":"Agent: Now fix orchestrator getSessionStats and TUI /status in parallel:","turn":12}
-{"timestamp":"2026-04-05T20:52:31.562Z","iteration":376,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":12}
-{"timestamp":"2026-04-05T20:52:31.565Z","iteration":376,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -13 +13 lines\n\nContext after patch:\n1083 |     }\n1084 |   }\n1085 | \n1086 |   /** Session statistics for /status display. */\n1087 |   getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: \"↑\" | \"→\" | \"↓\"; sessionCost: number; costSummary: string } {\n1088 |     const durationMs = Date.now() - this.sessionStartTime;\n1089 |     const turnCount = this.turnCosts.length;\n1090 |     const avgCostPerTurn = turnCount > 0 ? this.sessionCost / turnCount : 0;\n1091 |     let costTrend: \"↑\" | \"→\" | \"↓\" = \"→\";\n1092 |     if (turnCount >= 3) {\n1093 |       const recentAvg = this.turnCosts.slice(-3).reduce((a, b) => a + b, 0) / 3;\n1094 |       if (recentAvg > avgCostPerTurn * 1.2) costTrend = \"↑\";\n1095 |       else if (recentAvg < avgCostPerTurn * 0.8) costTrend = \"↓\";\n1096 |     }\n1097 |     return { durationMs, turnCount, avgCostPerTurn, costTrend, sessionCost: this.costTracker.totalCost, costSummary: this.costTracker.sessionSummary };\n1098 |   }\n1099 | \n1100 |   /** Get the current model (override if set, otherwise \"auto\"). */\n1101 |   getModel(): string {","turn":12}
-{"timestamp":"2026-04-05T20:52:31.566Z","iteration":376,"level":"info","message":"Turn 13/25","turn":13}
-{"timestamp":"2026-04-05T20:52:36.912Z","iteration":376,"level":"info","message":"Agent: Now add cost to TUI /status, then wrap up:","turn":13}
-{"timestamp":"2026-04-05T20:52:36.913Z","iteration":376,"level":"info","message":"write_file: src/tui.tsx (patch)","turn":13}
-{"timestamp":"2026-04-05T20:52:36.914Z","iteration":376,"level":"info","message":"  -> ok: Patched src/tui.tsx: -8 +9 lines\n\nContext after patch:\n657 |       const costStr = cost < 0.01 ? `${cost.toFixed(4)}` : `${cost.toFixed(2)}`;\n658 |       const stats = orchestratorRef.current?.getSessionStats();\n659 |       const sessionLines: string[] = [];\n660 |       if (stats) {\n661 |         const totalSec = Math.floor(stats.durationMs / 1000);\n662 |         const m = Math.floor(totalSec / 60);\n663 |         const s = totalSec % 60;\n664 |         sessionLines.push(`  Session:        ${m}m ${s}s`);\n665 |         sessionLines.push(`  Cost:           ${stats.costSummary}`);\n666 |         sessionLines.push(`  Avg cost/turn:  ${stats.avgCostPerTurn.toFixed(4)}`);\n667 |         sessionLines.push(`  Cost trend:     ${stats.costTrend}`);\n668 |       }\n669 |       setMessages(prev => [...prev, {\n670 |         role: \"assistant\",\n671 |         content: [","turn":13}
-{"timestamp":"2026-04-05T20:52:36.915Z","iteration":376,"level":"info","message":"Turn 14/25","turn":14}
-{"timestamp":"2026-04-05T20:52:39.091Z","iteration":376,"level":"info","message":"$ npx tsc --noEmit 2>&1 | head -30","turn":14}
-{"timestamp":"2026-04-05T20:52:39.094Z","iteration":376,"level":"info","message":"$ npx vitest run tests/hooks-integration.test.ts 2>&1 | tail -20","turn":14}
-{"timestamp":"2026-04-05T20:52:40.241Z","iteration":376,"level":"info","message":"  -> exit=0 (282 chars)","turn":14}
-{"timestamp":"2026-04-05T20:52:40.261Z","iteration":376,"level":"info","message":"  -> exit=0 (11 chars)","turn":14}
-{"timestamp":"2026-04-05T20:52:40.262Z","iteration":376,"level":"info","message":"Turn 15/25","turn":15}
-{"timestamp":"2026-04-05T20:52:42.093Z","iteration":376,"level":"info","message":"$ npx vitest run tests/cost-tracker.test.ts 2>&1 | tail -20","turn":15}
-{"timestamp":"2026-04-05T20:52:43.102Z","iteration":376,"level":"info","message":"  -> exit=0 (272 chars)","turn":15}
-{"timestamp":"2026-04-05T20:52:43.103Z","iteration":376,"level":"info","message":"Turn 16/25","turn":16}
-{"timestamp":"2026-04-05T20:52:49.049Z","iteration":376,"level":"info","message":"Agent: All tests pass, TSC is clean. Wrapping up now.","turn":16}
-{"timestamp":"2026-04-05T20:52:49.050Z","iteration":376,"level":"info","message":"save_memory: \"[Engineer iter 376]\"","turn":16}
-{"timestamp":"2026-04-05T20:52:49.052Z","iteration":376,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":16}
-{"timestamp":"2026-04-05T20:52:49.053Z","iteration":376,"level":"info","message":"Turn 17/25","turn":17}
-{"timestamp":"2026-04-05T20:52:59.180Z","iteration":376,"level":"info","message":"write_file: goals.md (write)","turn":17}
-{"timestamp":"2026-04-05T20:52:59.181Z","iteration":376,"level":"info","message":"  -> ok: Updated goals.md (1204 chars, -28 lines delta)","turn":17}
-{"timestamp":"2026-04-05T20:52:59.182Z","iteration":376,"level":"info","message":"Turn 18/25","turn":18}
-{"timestamp":"2026-04-05T20:53:00.562Z","iteration":376,"level":"info","message":"$ npx tsc --noEmit 2>&1; echo \"TSC_EXIT:$?\"","turn":18}
-{"timestamp":"2026-04-05T20:53:01.680Z","iteration":376,"level":"info","message":"  -> exit=0 (11 chars)","turn":18}
-{"timestamp":"2026-04-05T20:53:01.680Z","iteration":376,"level":"info","message":"Turn 19/25","turn":19}
-{"timestamp":"2026-04-05T20:53:03.101Z","iteration":376,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":19}
-{"timestamp":"2026-04-05T20:53:03.101Z","iteration":376,"level":"info","message":"RESTART signal","turn":19}
-{"timestamp":"2026-04-05T20:53:03.102Z","iteration":376,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":19}
-{"timestamp":"2026-04-05T20:53:04.180Z","iteration":376,"level":"info","message":"Compilation OK","turn":19}
-{"timestamp":"2026-04-05T20:53:12.048Z","iteration":376,"level":"info","message":"Cache persisted: 55 entries to .autoagent-cache.json","turn":19}
-{"timestamp":"2026-04-05T20:53:12.048Z","iteration":376,"level":"info","message":"Tool timing: bash: 15x, avg=307ms, total=4599ms; write_file: 6x, avg=3ms, total=15ms; read_scratchpad: 1x, avg=10ms, total=10ms; save_memory: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms","turn":19}
-{"timestamp":"2026-04-05T20:53:12.048Z","iteration":376,"level":"info","message":"Tool timing stats","turn":19,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":10,"minMs":10,"maxMs":10,"avgMs":10},"bash":{"calls":15,"totalMs":4599,"minMs":1,"maxMs":1171,"avgMs":307},"write_file":{"calls":6,"totalMs":15,"minMs":1,"maxMs":4,"avgMs":3},"think":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"save_memory":{"calls":1,"totalMs":3,"minMs":3,"maxMs":3,"avgMs":3}},"totalCalls":25,"totalMs":4629}}}
-{"timestamp":"2026-04-05T20:53:19.201Z","iteration":376,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 376: predicted 15 turns, actual 19 turns, ratio 1.27**","turn":19}
-{"timestamp":"2026-04-05T20:53:21.094Z","iteration":376,"level":"info","message":"Pre-commit review (600in/54out): LGTM. The change cleanly extends the return type with two additional fields (`sessionCost`, `costSummary`) sourced directly from an already-used `costTracker` object, with no logic changes to existing","turn":19}
-{"timestamp":"2026-04-05T20:53:21.150Z","iteration":376,"level":"info","message":"Committed: b83c7761 (33 in / 6896 out, cache: 19402 created, 261866 read)","turn":19}
-{"timestamp":"2026-04-05T20:53:21.150Z","iteration":376,"level":"info","message":"Restarting as iteration 377...","turn":19}
-{"timestamp":"2026-04-05T20:53:21.350Z","iteration":377,"level":"info","message":"Cache restored: 55/55 entries (0 stale)"}
-{"timestamp":"2026-04-05T20:53:21.353Z","iteration":377,"level":"info","message":"Turn budget: 15/25 (calibration=1.27x, predicted=8)"}
-{"timestamp":"2026-04-05T20:53:21.353Z","iteration":377,"level":"info","message":"Starting. Expert=Architect Model=claude-opus-4-6"}
-{"timestamp":"2026-04-05T20:53:21.535Z","iteration":377,"level":"info","message":"Hard turn cap: 12 (1.5x prediction of 8)"}
-{"timestamp":"2026-04-05T20:53:21.536Z","iteration":377,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-05T20:53:25.624Z","iteration":377,"level":"info","message":"Agent: \n\nI'll start by reviewing the current state, then research to identify the highest-leverage next feature, and write goals for the Engineer.","turn":1}
-{"timestamp":"2026-04-05T20:53:25.625Z","iteration":377,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat memory.md","turn":1}
-{"timestamp":"2026-04-05T20:53:25.629Z","iteration":377,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && wc -l src/*.ts src/**/*.ts 2>/dev/null | tail -5","turn":1}
-{"timestamp":"2026-04-05T20:53:25.632Z","iteration":377,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -20","turn":1}
-{"timestamp":"2026-04-05T20:53:25.638Z","iteration":377,"level":"info","message":"  -> exit=0 (4870 chars)","turn":1}
-{"timestamp":"2026-04-05T20:53:25.649Z","iteration":377,"level":"info","message":"  -> exit=0 (141 chars)","turn":1}
-{"timestamp":"2026-04-05T20:53:26.745Z","iteration":377,"level":"info","message":"  -> exit=0 (11 chars)","turn":1}
-{"timestamp":"2026-04-05T20:53:26.745Z","iteration":377,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-05T20:53:40.222Z","iteration":377,"level":"info","message":"Agent: \n\nGood checkpoint. My deliverable is **goals.md** for Engineer iteration 378. Let me do quick research, then write it.","turn":2}
-{"timestamp":"2026-04-05T20:53:40.223Z","iteration":377,"level":"info","message":"think: Let me assess what's the highest-leverage next feature. The roadmap shows:\n\n1. Hook system - COMPLETE\n2. Cost tracking -...","turn":2}
-{"timestamp":"2026-04-05T20:53:40.223Z","iteration":377,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-05T20:53:44.100Z","iteration":377,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && wc -l src/diagnostics.ts src/test-runner.ts && head -40 src/diagnostics.ts","turn":3}
-{"timestamp":"2026-04-05T20:53:44.102Z","iteration":377,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"PostToolUse\\|postToolUse\\|after.*write\\|self.verify\\|auto.*check\" src/orchestrator.ts | head -20","turn":3}
-{"timestamp":"2026-04-05T20:53:44.115Z","iteration":377,"level":"info","message":"  -> exit=0 (1632 chars)","turn":3}
-{"timestamp":"2026-04-05T20:53:44.118Z","iteration":377,"level":"info","message":"  -> exit=0 (259 chars)","turn":3}
 {"timestamp":"2026-04-05T20:53:44.118Z","iteration":377,"level":"info","message":"Turn 4/25","turn":4}
 {"timestamp":"2026-04-05T20:53:55.016Z","iteration":377,"level":"info","message":"Agent: \n\nMy single deliverable is **goals.md**. Status: IN PROGRESS. Let me finish it now.","turn":4}
 {"timestamp":"2026-04-05T20:53:55.016Z","iteration":377,"level":"info","message":"think: I have everything I need. diagnostics.ts already has the infrastructure to detect and run tsc/eslint/etc. The PostToolUs...","turn":4}
@@ -557,3 +496,49 @@
 {"timestamp":"2026-04-05T21:06:11.138Z","iteration":384,"level":"info","message":"Tool timing stats","turn":14,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":6,"minMs":6,"maxMs":6,"avgMs":6},"bash":{"calls":6,"totalMs":4295,"minMs":2,"maxMs":2153,"avgMs":716},"think":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":5,"totalMs":7,"minMs":1,"maxMs":3,"avgMs":1},"save_memory":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":15,"totalMs":4311}}}
 {"timestamp":"2026-04-05T21:06:18.258Z","iteration":384,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 384: predicted 15 turns, actual 14 turns, ratio 0.93**","turn":14}
 {"timestamp":"2026-04-05T21:06:27.801Z","iteration":384,"level":"info","message":"Pre-commit review (1493in/342out): **Issues:**\n\n- **System prompt is shoved into the user message.** The `CONSOLIDATE_PROMPT` is concatenated directly into the `user` content rather than passed as a `system` parameter. This wastes toke","turn":14}
+{"timestamp":"2026-04-05T21:06:27.881Z","iteration":384,"level":"info","message":"Committed: b49b9b2f (24 in / 6777 out, cache: 15851 created, 155199 read)","turn":14}
+{"timestamp":"2026-04-05T21:06:27.881Z","iteration":384,"level":"info","message":"Restarting as iteration 385...","turn":14}
+{"timestamp":"2026-04-05T21:06:28.062Z","iteration":385,"level":"info","message":"Cache restored: 55/55 entries (0 stale)"}
+{"timestamp":"2026-04-05T21:06:28.064Z","iteration":385,"level":"info","message":"Turn budget: 13/25 (calibration=1.13x, predicted=8)"}
+{"timestamp":"2026-04-05T21:06:28.065Z","iteration":385,"level":"info","message":"Starting. Expert=Architect Model=claude-opus-4-6"}
+{"timestamp":"2026-04-05T21:06:28.254Z","iteration":385,"level":"info","message":"Hard turn cap: 12 (1.5x prediction of 8)"}
+{"timestamp":"2026-04-05T21:06:28.255Z","iteration":385,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-05T21:06:32.365Z","iteration":385,"level":"info","message":"Agent: \n\nI'll start by reviewing what the Engineer built, verifying it works, and then planning the next iteration.","turn":1}
+{"timestamp":"2026-04-05T21:06:32.367Z","iteration":385,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20","turn":1}
+{"timestamp":"2026-04-05T21:06:32.376Z","iteration":385,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx vitest run tests/dream.test.ts 2>&1 | tail -20","turn":1}
+{"timestamp":"2026-04-05T21:06:32.388Z","iteration":385,"level":"info","message":"read_file: src/dream.ts","turn":1}
+{"timestamp":"2026-04-05T21:06:32.389Z","iteration":385,"level":"info","message":"  -> ok (3680 chars)","turn":1}
+{"timestamp":"2026-04-05T21:06:33.398Z","iteration":385,"level":"info","message":"  -> exit=0 (267 chars)","turn":1}
+{"timestamp":"2026-04-05T21:06:33.581Z","iteration":385,"level":"info","message":"  -> exit=0 (11 chars)","turn":1}
+{"timestamp":"2026-04-05T21:06:33.581Z","iteration":385,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-05T21:06:43.546Z","iteration":385,"level":"info","message":"Agent: \n\nGood checkpoint. My deliverables are:\n1. Review dream.ts ✅ (done - code looks solid)\n2. Write `goals.md` for Engineer iteration 386\n\nLet me decide the integration path and write goals now.","turn":2}
+{"timestamp":"2026-04-05T21:06:43.547Z","iteration":385,"level":"info","message":"think: Dream integration options:\n- Option A: `/dream` slash command in TUI — user-triggered, low risk, easy to implement\n- Opt...","turn":2}
+{"timestamp":"2026-04-05T21:06:43.547Z","iteration":385,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-05T21:06:46.888Z","iteration":385,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"compact\\|/compact\\|handleSlash\" src/tui.tsx | head -20","turn":3}
+{"timestamp":"2026-04-05T21:06:46.892Z","iteration":385,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"subcommand\\|init.*command\\|case.*init\\|dream\" src/cli.ts | head -20","turn":3}
+{"timestamp":"2026-04-05T21:06:46.906Z","iteration":385,"level":"info","message":"  -> exit=0 (386 chars)","turn":3}
+{"timestamp":"2026-04-05T21:06:46.907Z","iteration":385,"level":"info","message":"  -> exit=0 (184 chars)","turn":3}
+{"timestamp":"2026-04-05T21:06:46.907Z","iteration":385,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-05T21:07:05.883Z","iteration":385,"level":"info","message":"Agent: \n\nGoals status:\n1. Review dream.ts — **DONE** ✅ (solid code, tests pass, TSC clean)\n2. Write goals.md for Engineer 386 — **NOT STARTED**\n\nWriting it now:","turn":4}
+{"timestamp":"2026-04-05T21:07:05.884Z","iteration":385,"level":"info","message":"write_file: goals.md (write)","turn":4}
+{"timestamp":"2026-04-05T21:07:05.884Z","iteration":385,"level":"info","message":"  -> ok: Updated goals.md (2802 chars, +43 lines delta)","turn":4}
+{"timestamp":"2026-04-05T21:07:05.885Z","iteration":385,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-05T21:07:09.946Z","iteration":385,"level":"info","message":"save_memory: \"[Architect 385] Dream integration plan\"","turn":5}
+{"timestamp":"2026-04-05T21:07:09.949Z","iteration":385,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":5}
+{"timestamp":"2026-04-05T21:07:09.950Z","iteration":385,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-05T21:07:13.416Z","iteration":385,"level":"info","message":"Agent: \n\nThis is an Architect iteration — my deliverable is `goals.md` for the Engineer, not src/ changes. That's done. Wrapping up now.","turn":6}
+{"timestamp":"2026-04-05T21:07:13.417Z","iteration":385,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5","turn":6}
+{"timestamp":"2026-04-05T21:07:14.486Z","iteration":385,"level":"info","message":"  -> exit=0 (11 chars)","turn":6}
+{"timestamp":"2026-04-05T21:07:14.486Z","iteration":385,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-05T21:07:17.389Z","iteration":385,"level":"info","message":"Agent: \n\nTSC clean, goals.md written, memory saved. Done.","turn":7}
+{"timestamp":"2026-04-05T21:07:17.390Z","iteration":385,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":7}
+{"timestamp":"2026-04-05T21:07:17.390Z","iteration":385,"level":"info","message":"RESTART signal","turn":7}
+{"timestamp":"2026-04-05T21:07:17.390Z","iteration":385,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":7}
+{"timestamp":"2026-04-05T21:07:18.476Z","iteration":385,"level":"info","message":"Compilation OK","turn":7}
+{"timestamp":"2026-04-05T21:07:26.591Z","iteration":385,"level":"info","message":"Cache persisted: 56 entries to .autoagent-cache.json","turn":7}
+{"timestamp":"2026-04-05T21:07:26.591Z","iteration":385,"level":"info","message":"Cache stats: 0 hits, 1 misses, 56 entries, 1 invalidations (0 entries removed)","turn":7}
+{"timestamp":"2026-04-05T21:07:26.591Z","iteration":385,"level":"info","message":"Tool cache stats","turn":7,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":56,"invalidations":1,"invalidatedEntries":0,"toolStats":{"read_file":{"hits":0,"misses":1}}}}
+{"timestamp":"2026-04-05T21:07:26.591Z","iteration":385,"level":"info","message":"Tool timing: bash: 6x, avg=556ms, total=3338ms; save_memory: 1x, avg=4ms, total=4ms; read_file: 1x, avg=2ms, total=2ms; write_file: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms","turn":7}
+{"timestamp":"2026-04-05T21:07:26.591Z","iteration":385,"level":"info","message":"Tool timing stats","turn":7,"metadata":{"timing":{"tools":{"read_file":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2},"bash":{"calls":6,"totalMs":3338,"minMs":0,"maxMs":1214,"avgMs":556},"think":{"calls":1,"totalMs":0,"minMs":0,"maxMs":0,"avgMs":0},"write_file":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2},"save_memory":{"calls":1,"totalMs":4,"minMs":4,"maxMs":4,"avgMs":4}},"totalCalls":10,"totalMs":3346}}}
+{"timestamp":"2026-04-05T21:07:33.863Z","iteration":385,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 385: predicted 8 turns, actual 7 turns, ratio 0.88**","turn":7}
+{"timestamp":"2026-04-05T21:07:33.888Z","iteration":385,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":7}
