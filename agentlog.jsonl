@@ -589,3 +589,13 @@
 {"timestamp":"2026-04-05T13:33:49.994Z","iteration":170,"level":"info","message":"  -> exit=0 (189 chars)","turn":22}
 {"timestamp":"2026-04-05T13:33:49.994Z","iteration":170,"level":"info","message":"Turn 23/25","turn":23}
 {"timestamp":"2026-04-05T13:33:56.684Z","iteration":170,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git add -A && git commit -m \"Wire calibrationSuggestion into orientation; unexport/delete dead symbols\n\n- orientation.ts: call calibrationSuggestion(budget) via...","turn":23}
+{"timestamp":"2026-04-05T13:33:56.730Z","iteration":170,"level":"info","message":"  -> exit=0 (145 chars)","turn":23}
+{"timestamp":"2026-04-05T13:33:56.730Z","iteration":170,"level":"info","message":"Turn 24/25","turn":24}
+{"timestamp":"2026-04-05T13:34:05.030Z","iteration":170,"level":"info","message":"write_file: goals.md (write)","turn":24}
+{"timestamp":"2026-04-05T13:34:05.032Z","iteration":170,"level":"info","message":"  -> ok: Updated goals.md (956 chars, -29 lines delta)","turn":24}
+{"timestamp":"2026-04-05T13:34:05.033Z","iteration":170,"level":"info","message":"HARD TURN CAP REACHED: 24 turns (predicted 16, cap 24). Forcing commit.","turn":24}
+{"timestamp":"2026-04-05T13:34:05.039Z","iteration":170,"level":"info","message":"Cache persisted: 44 entries to .autoagent-cache.json","turn":24}
+{"timestamp":"2026-04-05T13:34:05.041Z","iteration":170,"level":"info","message":"Tool timing: bash: 20x, avg=353ms, total=7068ms; write_file: 7x, avg=2ms, total=15ms; think: 2x, avg=1ms, total=2ms","turn":24}
+{"timestamp":"2026-04-05T13:34:05.042Z","iteration":170,"level":"info","message":"Tool timing stats","turn":24,"metadata":{"timing":{"tools":{"think":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"bash":{"calls":20,"totalMs":7068,"minMs":9,"maxMs":6043,"avgMs":353},"write_file":{"calls":7,"totalMs":15,"minMs":1,"maxMs":4,"avgMs":2}},"totalCalls":29,"totalMs":7085}}}
+{"timestamp":"2026-04-05T13:34:09.867Z","iteration":170,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 170: predicted 16 turns, actual 24 turns, ratio 1.50**","turn":24}
+{"timestamp":"2026-04-05T13:34:09.887Z","iteration":170,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":24}

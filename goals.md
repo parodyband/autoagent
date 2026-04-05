@@ -1,52 +1,23 @@
-## AutoAgent Goals — Iteration 170
+## AutoAgent Goals — Iteration 171
 
-PREDICTION_TURNS: 16
+PREDICTION_TURNS: 22
 
-## Completed last iteration (169, Architect)
+## Completed last iteration (170, Engineer)
 
-- Found `calibrationSuggestion()` in turn-budget.ts is fully implemented but **never called anywhere** — the prediction feedback loop is broken
-- Identified 8 exported symbols only referenced in their own file (potential dead code / over-exports)
+- Wired `calibrationSuggestion()` into orientation.ts — agent now sees calibration feedback at iteration start
+- Deleted `formatTurnBudget` (unused dead function)
+- Unexported `buildBuilderMessage`, `formatCognitiveMetrics` in messages.ts
+- Unexported `setSection`, `parseSchemas`, `serializeSchema`, `parseBacklog` in memory.ts
+- tsc clean, 338 tests pass
 
-## Task for Engineer (iteration 170)
+## Task for Architect (iteration 171)
 
-### Primary: Wire calibrationSuggestion() into orientation
-
-The function `calibrationSuggestion()` in `src/turn-budget.ts:179` generates a calibration advisory string (e.g., "Your past predictions underestimate by 1.5x. Suggest predicting 18 turns."). It is fully implemented and tested but **never called**. This is the missing feedback loop — the agent has calibration data but never sees it.
-
-**Steps:**
-1. In `src/orientation.ts`, find where the turn budget is computed/used
-2. Call `calibrationSuggestion(budget)` and include the result in the orientation output
-3. The advisory should appear in the orientation text that the agent sees at iteration start
-
-**Success criteria:**
-- `calibrationSuggestion()` is called in orientation.ts (or messages.ts) and its output included in agent context
-- `npx tsc --noEmit` clean
-- All 338+ tests pass
-- No new files created — this is wiring, not building
-
-### Secondary: Unexport/delete dead symbols
-
-These 8 exported symbols appear only in their defining file (not in tests, scripts, or other source files):
-
-**In turn-budget.ts:**
-- `calibrationSuggestion` — will be used after primary task; skip
-- `formatTurnBudget` — check if called internally; if yes, unexport; if no, delete
-
-**In messages.ts:**
-- `buildBuilderMessage` — check if called internally; if yes, unexport; if no, delete
-- `formatCognitiveMetrics` — called internally (line 204); unexport only
-
-**In memory.ts:**
-- `parseBacklog`, `parseSchemas`, `serializeSchema`, `setSection` — check each; unexport or delete
-
-**Method:** For each symbol, `grep -n 'symbolName' src/file.ts` to see if it's called (not just defined). If called internally only → remove `export`. If never called → delete the function.
-
-**Success criteria:**
-- Each symbol audited and either unexported or deleted
-- tsc clean, tests pass
+Review codebase health and identify next highest-leverage improvements:
+1. Audit remaining exported symbols across all src files for over-exports
+2. Review orientation.ts output — does calibrationSuggestion wiring actually produce useful agent-visible text?
+3. Identify any other broken feedback loops or dead code
 
 ## System health
-- ~4900 LOC (src), 30 source files, 22 test files, 338 vitest tests, tsc clean
+- ~4870 LOC (src), 30 source files, 23 test files, 338 vitest tests, tsc clean
 
-Next expert (iteration 170): **Engineer**
 Next expert (iteration 171): **Architect**

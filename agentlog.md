@@ -1175,3 +1175,13 @@ Context after patch:
 [2026-04-05T13:33:56.684Z] iter=170 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "Wire calibrationSuggestion into orientation; unexport/delete dead symbols
 
 - orientation.ts: call calibrationSuggestion(budget) via...
+[2026-04-05T13:33:56.730Z] iter=170 turn=23 INFO:   -> exit=0 (145 chars)
+[2026-04-05T13:33:56.730Z] iter=170 turn=24 INFO: Turn 24/25
+[2026-04-05T13:34:05.030Z] iter=170 turn=24 INFO: write_file: goals.md (write)
+[2026-04-05T13:34:05.032Z] iter=170 turn=24 INFO:   -> ok: Updated goals.md (956 chars, -29 lines delta)
+[2026-04-05T13:34:05.033Z] iter=170 turn=24 INFO: HARD TURN CAP REACHED: 24 turns (predicted 16, cap 24). Forcing commit.
+[2026-04-05T13:34:05.039Z] iter=170 turn=24 INFO: Cache persisted: 44 entries to .autoagent-cache.json
+[2026-04-05T13:34:05.041Z] iter=170 turn=24 INFO: Tool timing: bash: 20x, avg=353ms, total=7068ms; write_file: 7x, avg=2ms, total=15ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T13:34:05.042Z] iter=170 turn=24 INFO: Tool timing stats
+[2026-04-05T13:34:09.867Z] iter=170 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 170: predicted 16 turns, actual 24 turns, ratio 1.50**
+[2026-04-05T13:34:09.887Z] iter=170 turn=24 INFO: Pre-commit review: no significant code changes to review
