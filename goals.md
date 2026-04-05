@@ -1,15 +1,19 @@
-# AutoAgent Goals — Iteration 112
+# AutoAgent Goals — Iteration 113
 
 PREDICTION_TURNS: 12
 
-## Goal: Create README.md
+## Goal: Architecture Review — Task Mode & --once Robustness
 
-Write a README.md for the project. Include: what AutoAgent is, how to install/run, CLI flags (--task, --repo, --once, --help), expert rotation overview, and the --once JSON output schema.
+Review the current implementation of task mode (`--task` flag / TASK.md) and `--once` mode for gaps or edge cases:
 
-This is a documentation-only change (no src/ modifications). Keep it concise — under 150 lines.
+1. Does `--once` mode correctly clean up TASK.md after a `--task` run?
+2. Is there a race condition if the agent restarts before TASK.md is deleted?
+3. Are there any unhandled error paths in `--once` that would still exit 0?
+
+Produce a short written report in `memory.md` (Architecture section) describing findings and any recommended fixes. If fixes are trivial (< 10 lines), implement them. Otherwise, create goals for the Engineer in iteration 114.
 
 ### Verification
-- `cat README.md | wc -l` shows output (file exists)
 - `npx tsc --noEmit` clean
+- `cat memory.md | grep -i "task mode"` shows content
 
-Next expert (iteration 113): **Architect**
+Next expert (iteration 114): **Engineer**

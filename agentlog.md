@@ -1,97 +1,3 @@
-The high output ratio warning is expected — this is a planning iteration where I read the state and produce goals + memory. No code to write or debug.
-[2026-04-05T11:21:38.085Z] iter=105 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T11:21:38.085Z] iter=105 turn=9 INFO: RESTART signal
-[2026-04-05T11:21:38.086Z] iter=105 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T11:21:38.814Z] iter=105 turn=9 INFO: Compilation OK
-[2026-04-05T11:21:43.350Z] iter=105 turn=9 INFO: Cache persisted: 28 entries to .autoagent-cache.json
-[2026-04-05T11:21:43.351Z] iter=105 turn=9 INFO: Cache stats: 0 hits, 1 misses, 28 entries, 2 invalidations (0 entries removed)
-[2026-04-05T11:21:43.351Z] iter=105 turn=9 INFO: Tool cache stats
-[2026-04-05T11:21:43.351Z] iter=105 turn=9 INFO: Tool timing: bash: 9x, avg=92ms, total=830ms; write_file: 2x, avg=3ms, total=5ms; read_file: 1x, avg=2ms, total=2ms; think: 2x, avg=0ms, total=0ms
-[2026-04-05T11:21:43.351Z] iter=105 turn=9 INFO: Tool timing stats
-[2026-04-05T11:21:47.949Z] iter=105 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 105: predicted 12 turns, actual 9 turns, ratio 0.75**
-[2026-04-05T11:21:47.967Z] iter=105 turn=9 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T11:21:47.995Z] iter=105 turn=9 INFO: Committed: d965bf29 (15 in / 3055 out, cache: 14937 created, 82092 read)
-[2026-04-05T11:21:47.995Z] iter=105 turn=9 INFO: Restarting as iteration 106...
-[2026-04-05T11:21:48.168Z] iter=106 INFO: Cache restored: 28/28 entries (0 stale)
-[2026-04-05T11:21:48.169Z] iter=106 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T11:21:48.193Z] iter=106 INFO: Hard turn cap: 21 (1.5x prediction of 14)
-[2026-04-05T11:21:48.193Z] iter=106 turn=1 INFO: Turn 1/25
-[2026-04-05T11:21:50.771Z] iter=106 turn=1 INFO: Agent: I'll start by reading the relevant files to understand the current structure before making changes.
-[2026-04-05T11:21:50.773Z] iter=106 turn=1 INFO: read_file: CACHE HIT
-[2026-04-05T11:21:50.774Z] iter=106 turn=1 INFO: read_file: src/agent.ts
-[2026-04-05T11:21:50.774Z] iter=106 turn=1 INFO:   -> ok (14402 chars)
-[2026-04-05T11:21:50.775Z] iter=106 turn=2 INFO: Turn 2/25
-[2026-04-05T11:22:25.905Z] iter=106 turn=2 INFO: think: Now I understand the codebase. Let me plan the implementation:
-
-1. **Check where log output goes** - The `log()` functio...
-[2026-04-05T11:22:25.907Z] iter=106 turn=3 INFO: Turn 3/25
-[2026-04-05T11:22:34.465Z] iter=106 turn=3 INFO: Agent: Now I have a clear picture. Let me implement the changes:
-[2026-04-05T11:22:34.465Z] iter=106 turn=3 INFO: write_file: src/finalization.ts (patch)
-[2026-04-05T11:22:34.466Z] iter=106 turn=3 INFO:   -> ok: Patched src/finalization.ts: -19 +23 lines
-
-Context after patch:
-56 | 
-57 | // ─── Finalization context ───────────────────────────────────
-58 | 
-59 | export interface FinalizationCtx {
-60 |   iter: number;
-61 |   state: IterationState;
-62 |   startTime: Date;
-63 |   turns: number;
-64 |   toolCounts: Record<string, number>;
-65 |   tokens: { in: number; out: number; cacheCreate: number; cacheRead: number };
-66 |   cache: ToolCache;
-67 |   timing: ToolTimingTracker;
-68 |   rootDir: string;
-69 |   /** AutoAgent's own directory (where memory.md, goals.md, metrics live). Defaults to rootDir. */
-70 |   agentHome: string;
-71 |   metricsFile: string;
-72 |   log: (msg: string) => void;
-73 |   logger?: Logger;
-74 |   restart: () => never;
-75 |   /** Predicted turns captured at iteration start (before goals.md gets rewritten) */
-76 |   predictedTurns?: number | null;
-77 |   /** Whether running in --once mode (emit JSON summary before exit) */
-78 |   once?: boolean;
-79 |   /** Whether the iteration failed (affects exitCode in summary) */
-80 |   failed?: boolean;
-81 | }
-82 | 
-83 | // ─── Prediction accuracy scoring ────────────────────────────
-84 | // Reads predicted turns from goals.md, compares to actual ctx.turns,
-[2026-04-05T11:22:34.467Z] iter=106 turn=4 INFO: Turn 4/25
-[2026-04-05T11:22:42.264Z] iter=106 turn=4 INFO: Agent: Now add the `emitOnceSummary` function and call it in `finalizeIteration`. I'll add it right before the `finalizeIteration` function:
-[2026-04-05T11:22:42.265Z] iter=106 turn=4 INFO: write_file: src/finalization.ts (patch)
-[2026-04-05T11:22:42.266Z] iter=106 turn=4 INFO:   -> ok: Patched src/finalization.ts: -5 +34 lines
-
-Context after patch:
-209 |   }
-210 | }
-211 | 
-212 | // ─── Once-mode JSON summary ──────────────────────────────────
-213 | // Emitted to stdout when --once is set so callers can parse results.
-214 | // All other log output goes to stderr / log files, keeping stdout clean.
-215 | 
-216 | export async function emitOnceSummary(params: {
-217 |   success: boolean;
-218 |   iteration: number;
-219 |   turns: number;
-220 |   startTime: Date;
-221 |   exitCode: number;
-222 | }): Promise<void> {
-223 |   let filesChanged: string[] = [];
-224 |   try {
-225 |     const result = await executeBash("git diff --name-only HEAD~1", 30, undefined, true);
-226 |     filesChanged = result.output.trim().split("\n").filter(Boolean);
-227 |   } catch { /* ignore — commit may not exist yet */ }
-228 | 
-229 |   const summary = {
-230 |     success: params.success,
-231 |     iteration: params.iteration,
-232 |     turns: params.turns,
-233 |     durationMs: Date.now() - params.startTime.getTime(),
-234 |     filesChanged,
-235 |     exitCode: params.exitCode,
 236 |   };
 237 | 
 238 |   process.stdout.write(JSON.stringify(summary) + "\n");
@@ -1090,3 +996,59 @@ The high output ratio warning is fair but this is a Meta iteration — compactin
 [2026-04-05T11:34:30.441Z] iter=111 turn=11 INFO: Tool timing stats
 [2026-04-05T11:35:01.406Z] iter=111 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 111: predicted 12 turns, actual 11 turns, ratio 0.92**
 [2026-04-05T11:35:01.431Z] iter=111 turn=11 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T11:35:01.462Z] iter=111 turn=11 INFO: Committed: 0a088f36 (17 in / 3923 out, cache: 58665 created, 480492 read)
+[2026-04-05T11:35:01.463Z] iter=111 turn=11 INFO: Restarting as iteration 112...
+[2026-04-05T11:35:01.655Z] iter=112 INFO: Cache restored: 27/27 entries (0 stale)
+[2026-04-05T11:35:01.656Z] iter=112 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T11:35:01.684Z] iter=112 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T11:35:01.685Z] iter=112 turn=1 INFO: Turn 1/25
+[2026-04-05T11:35:04.505Z] iter=112 turn=1 INFO: think: The goal is simple: create a README.md file for the project. Under 150 lines. Include:
+- What AutoAgent is
+- How to inst...
+[2026-04-05T11:35:04.507Z] iter=112 turn=2 INFO: Turn 2/25
+[2026-04-05T11:35:07.053Z] iter=112 turn=2 INFO: $ ls *.md 2>/dev/null; cat package.json | head -20
+[2026-04-05T11:35:07.058Z] iter=112 turn=2 INFO: $ grep -r "\-\-task\|\-\-repo\|\-\-once\|\-\-help" src/agent.ts | head -30
+[2026-04-05T11:35:07.076Z] iter=112 turn=2 INFO:   -> exit=0 (1954 chars)
+[2026-04-05T11:35:07.077Z] iter=112 turn=2 INFO:   -> exit=0 (414 chars)
+[2026-04-05T11:35:07.078Z] iter=112 turn=3 INFO: Turn 3/25
+[2026-04-05T11:35:09.195Z] iter=112 turn=3 INFO: $ grep -A 30 "onceOutput\|once.*JSON\|JSON.*once\|exitCode\|tokensUsed\|commitSha" src/finalization.ts | head -50
+[2026-04-05T11:35:09.213Z] iter=112 turn=3 INFO:   -> exit=0 (2076 chars)
+[2026-04-05T11:35:09.214Z] iter=112 turn=4 INFO: Turn 4/25
+[2026-04-05T11:35:11.358Z] iter=112 turn=4 INFO: $ grep -A 20 "onceOutput\|\"success\"\|JSON.stringify" src/finalization.ts | head -40
+[2026-04-05T11:35:11.377Z] iter=112 turn=4 INFO:   -> exit=0 (1466 chars)
+[2026-04-05T11:35:11.378Z] iter=112 turn=5 INFO: Turn 5/25
+[2026-04-05T11:35:30.218Z] iter=112 turn=5 INFO: Agent: I have enough context. Writing the README now.
+[2026-04-05T11:35:30.219Z] iter=112 turn=5 INFO: write_file: README.md (write)
+[2026-04-05T11:35:30.221Z] iter=112 turn=5 INFO:   -> ok: Created README.md (3483 chars)
+[2026-04-05T11:35:30.222Z] iter=112 turn=6 INFO: Turn 6/25
+[2026-04-05T11:35:31.999Z] iter=112 turn=6 INFO: $ cat README.md | wc -l && npx tsc --noEmit 2>&1
+[2026-04-05T11:35:32.714Z] iter=112 turn=6 INFO:   -> exit=0 (9 chars)
+[2026-04-05T11:35:32.715Z] iter=112 turn=7 INFO: Turn 7/25
+[2026-04-05T11:35:40.819Z] iter=112 turn=7 INFO: Agent: Both checks pass: 108 lines (under 150), TypeScript clean. Now writing goals.md for the Architect.
+[2026-04-05T11:35:40.820Z] iter=112 turn=7 INFO: write_file: goals.md (write)
+[2026-04-05T11:35:40.821Z] iter=112 turn=7 INFO:   -> ok: Updated goals.md (829 chars, +4 lines delta)
+[2026-04-05T11:35:40.821Z] iter=112 turn=8 INFO: Turn 8/25
+[2026-04-05T11:35:42.689Z] iter=112 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && git add README.md goals.md && git status
+[2026-04-05T11:35:42.721Z] iter=112 turn=8 INFO:   -> exit=0 (428 chars)
+[2026-04-05T11:35:42.721Z] iter=112 turn=9 INFO: Turn 9/25
+[2026-04-05T11:35:46.684Z] iter=112 turn=9 INFO: Agent: All goals are DONE.
+- README.md created ✅ (108 lines, under 150)
+- `npx tsc --noEmit` clean ✅
+- goals.md written for Architect ✅
+
+Writing memory now.
+[2026-04-05T11:35:46.685Z] iter=112 turn=9 INFO: write_file: memory.md (write)
+[2026-04-05T11:35:46.686Z] iter=112 turn=9 INFO:   -> ok: Updated memory.md (0 chars, -50 lines delta)
+[2026-04-05T11:35:46.686Z] iter=112 turn=10 INFO: Turn 10/25
+[2026-04-05T11:35:48.503Z] iter=112 turn=10 INFO: $ npx tsc --noEmit 2>&1 && echo "TSC_OK"
+[2026-04-05T11:35:49.174Z] iter=112 turn=10 INFO:   -> exit=0 (7 chars)
+[2026-04-05T11:35:49.174Z] iter=112 turn=11 INFO: Turn 11/25
+[2026-04-05T11:35:51.084Z] iter=112 turn=11 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T11:35:51.085Z] iter=112 turn=11 INFO: RESTART signal
+[2026-04-05T11:35:51.085Z] iter=112 turn=11 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T11:35:51.724Z] iter=112 turn=11 INFO: Compilation OK
+[2026-04-05T11:36:23.583Z] iter=112 turn=11 INFO: Cache persisted: 27 entries to .autoagent-cache.json
+[2026-04-05T11:36:23.584Z] iter=112 turn=11 INFO: Tool timing: bash: 8x, avg=188ms, total=1502ms; write_file: 3x, avg=1ms, total=4ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T11:36:23.584Z] iter=112 turn=11 INFO: Tool timing stats
+[2026-04-05T11:36:54.400Z] iter=112 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 112: predicted 12 turns, actual 11 turns, ratio 0.92**
+[2026-04-05T11:36:54.424Z] iter=112 turn=11 INFO: Pre-commit review: no significant code changes to review
