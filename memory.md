@@ -179,3 +179,38 @@ The agent spent 37 turns — still well above the 10-15 target — adding escala
 ---
 
 ---
+
+### Inner voice — after iteration 44
+
+Iteration 44 is the first genuinely good iteration in recent memory: 22 turns, net negative diff (-54 lines), and the hard turn cap appears to have actually worked. The agent reduced turns from 37 to 22 — finally below its own 25-turn ceiling — and the primary change to src/messages.ts is legitimate code, not infrastructure recording infrastructure. However, the goals.md shows the agent set three goals again and completed one (the turn cap), meaning the pattern of multi-goal ambition with single-goal execution persists.
+
+**Questions I should be asking myself:**
+- The turn cap worked — but WHY did it work this time when the checkpoint at turn 30 in iteration 43 was ignored? The mechanism didn't change, the number changed (25 vs 50). Is the lesson 'hard limits work, soft signals don't' — and if so, what else in the agent's behavior is currently governed by soft signals that should be hard limits?
+- The agent predicted ≤12 turns and used 22. That's nearly a 2x miss on prediction. The agent has now made turn predictions across multiple iterations and consistently underestimates by roughly 2x. This is a calibration problem, not a noise problem. What is the agent's model of WHY it underestimates? Not 'I drift' — specifically: which categories of turns (think, bash, write_file) consume the unplanned budget, and is there a structural fix (e.g., 'write_file calls should be planned at the start, not discovered mid-execution') that would close the gap?
+- The iteration succeeded on exactly one of three goals: the turn cap. Schema-based memory and sub-agent delegation were deferred again. These two items have now appeared in goals.md for at least three consecutive iterations without shipping. At what point does a repeatedly-deferred goal become evidence that the agent doesn't actually believe the goal is valuable — and if that's true, why does it keep writing them down? Is goals.md functioning as a commitment device or as a comfort object?
+
+**Sit with this:** The turn cap forced the agent to ship less, and the result was a cleaner, better iteration. This suggests the previous 37-48 turn iterations weren't producing proportionally more value — they were producing proportionally more noise. If that's true, the correct inference is not 'keep the 25-turn cap and try harder to fit three goals inside it' but rather 'the turn cap revealed that most of what I was doing in turns 23-48 was waste, and I should now ask what waste still exists in turns 1-22.' What would a 10-turn version of iteration 44 have looked like — and if the honest answer is 'roughly the same outcome,' why did it take 22?
+
+---
+
+## Self-reflection phase added (operator, after iteration 42)
+
+A new **pre-iteration self-reflection** now runs before every iteration. It's an Opus call
+that reviews your goals, memory, inner voice feedback, and metrics — then asks whether
+past-you set the RIGHT goals or was playing it safe.
+
+If the goals are timid or avoidant, it rewrites them before the iteration begins.
+
+**Why this exists:** There was a gap between the inner critic identifying problems (post-iteration)
+and the agent actually acting on them (next iteration). The agent would read the inner voice
+questions, think "interesting," then set safe goals anyway. This closes the loop:
+inner critic → self-reflection → concrete goals → execution.
+
+**Flow:** Orient → Self-reflection (may rewrite goals.md) → Read goals → Execute
+
+The self-reflection is YOU thinking about yourself. It's not external judgment. It's the
+part of you that steps back and asks "am I working on what actually matters?"
+
+**Schema:** `{ pattern: "pre-iteration-reflection", purpose: "close the loop between insight and action — ensure goals address real problems not comfortable ones", cost: "~$0.15-0.30 per iteration (Opus)" }`
+
+---

@@ -29,6 +29,7 @@ import { ToolCache } from "./tool-cache.js";
 import { ToolTimingTracker } from "./tool-timing.js";
 import { finalizeIteration as runFinalization } from "./finalization.js";
 import { runConversation, type IterationCtx } from "./conversation.js";
+import { runSelfReflection } from "./self-reflection.js";
 import {
   countConsecutiveFailures,
   resuscitate,
@@ -186,6 +187,25 @@ async function runIteration(state: IterationState): Promise<void> {
     logger.info(`Orientation: changes detected since last iteration`);
   }
 
+  // Self-reflection: Opus reviews goals before execution starts.
+  // May rewrite goals.md if they're too timid or misaligned.
+  try {
+    const reflection = await runSelfReflection({
+      iteration: ctx.iter,
+      rootDir: ROOT,
+      log: (msg: string) => log(ctx.iter, msg),
+    });
+    if (reflection.goalsRewritten) {
+      logger.info(`Self-reflection rewrote goals: ${reflection.reasoning}`);
+    }
+    // Track reflection tokens as overhead
+    ctx.tokens.in += reflection.inputTokens;
+    ctx.tokens.out += reflection.outputTokens;
+  } catch (err) {
+    log(ctx.iter, `Self-reflection error (non-fatal): ${err instanceof Error ? err.message : err}`);
+  }
+
+  // Read goals AFTER self-reflection (it may have rewritten them)
   ctx.messages.push({
     role: "user",
     content: buildInitialMessage(readGoals(), readMemory(), orientationText || undefined),
