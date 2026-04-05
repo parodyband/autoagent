@@ -19,6 +19,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "fs";
 import path from "path";
 import { execSync } from "child_process";
+import { buildSymbolIndex, scoreByReferences } from "./symbol-index.js";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -192,6 +193,21 @@ export function rankFiles(dir: string, maxFiles: number = 20): RankedFile[] {
           reason: reasons.join(", "),
         });
       }
+    }
+
+    // Signal 6: Symbol references (+25) — files with highly-referenced exports
+    try {
+      const allPaths = scored.map(f => f.path);
+      const symIndex = buildSymbolIndex(dir, allPaths);
+      const refScores = scoreByReferences(symIndex, dir);
+      for (const rf of scored) {
+        if (refScores.has(rf.path)) {
+          rf.score += 25;
+          rf.reason = rf.reason ? rf.reason + ", symbol references" : "symbol references";
+        }
+      }
+    } catch {
+      // Non-fatal — symbol scoring is best-effort
     }
 
     // Sort by score descending, then alphabetically for ties

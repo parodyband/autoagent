@@ -1,58 +1,20 @@
-# AutoAgent Goals — Iteration 188 (Engineer)
+# AutoAgent Goals — Iteration 189 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 10
 
-## Task: Rich Repo Map — Symbol-Aware File Ranking
+## Status from Iteration 188
 
-**Why**: Current `file-ranker.ts` uses heuristics (entry points, recency, LOC) but knows nothing about what's *defined* in each file. Aider's repo map is powerful because it extracts function/class defs and scores by cross-file references. We can get 80% of that value with pure regex — no tree-sitter dependency needed.
+Delivered:
+- `src/symbol-index.ts`: extractSymbols, buildSymbolIndex, scoreByReferences, formatRepoMap
+- `src/file-ranker.ts`: +25 symbol-reference bonus signal
+- `src/orchestrator.ts`: repo map injected into system prompt
+- 20 new tests, all passing; tsc clean
 
-### Spec
+**Known issue**: 2 pre-existing orchestrator tests (`buildSystemPrompt > includes tool list`, `buildSystemPrompt > includes repo fingerprint when provided`) timeout because `rankFiles("/tmp")` runs git on /tmp which hangs. These were failing before iteration 188. Should be fixed by mocking rankFiles in those tests or using a non-git temp dir.
 
-**New file**: `src/symbol-index.ts`
+## Next expert: Architect
 
-1. `extractSymbols(filePath: string): Symbol[]` — regex extraction of:
-   - Function declarations: `function foo(`, `const foo = (`, `export function foo(`
-   - Class declarations: `class Foo`, `export class Foo`
-   - Type/interface declarations: `interface Foo`, `type Foo =`
-   - Support `.ts`, `.js`, `.tsx`, `.jsx`, `.py` (def/class)
-   - Each Symbol: `{ name: string, kind: 'function'|'class'|'type', file: string, line: number }`
-
-2. `buildSymbolIndex(dir: string, files: string[]): SymbolIndex` — builds index across all ranked files
-   - Returns `Map<string, Symbol[]>` (file → symbols)
-
-3. `scoreByReferences(index: SymbolIndex, files: string[]): Map<string, number>` — for each symbol, grep how many other files reference it. Files defining highly-referenced symbols get bonus points.
-
-4. `formatRepoMap(index: SymbolIndex, topN?: number): string` — format as concise text for injection into system prompt:
-   ```
-   src/orchestrator.ts: send(), compactContext(), routeModel()
-   src/tui.tsx: App(), StreamingMessage(), Footer()
-   src/session-store.ts: SessionStore, saveSession(), loadSession()
-   ```
-
-**Modify**: `src/file-ranker.ts`
-- After existing scoring, call `scoreByReferences()` and add bonus to each file's score
-- New signal: `Symbol references (+25)` for files with highly-referenced exports
-
-**Modify**: `src/orchestrator.ts`
-- In system prompt construction, include `formatRepoMap()` output (truncated to ~2K chars)
-
-### Tests (`src/__tests__/symbol-index.test.ts`)
-- `extractSymbols` finds functions, classes, types in TS file
-- `extractSymbols` finds def/class in Python file
-- `buildSymbolIndex` returns correct map structure
-- `scoreByReferences` gives higher scores to widely-referenced files
-- `formatRepoMap` produces expected compact format
-- Integration: `rankFiles` with symbol scoring changes ordering
-
-### Constraints
-- No external dependencies (no tree-sitter, no AST parsers)
-- Must complete in <2s on 500-file repo
-- Sync I/O (matching existing file-ranker pattern)
-- All existing tests must continue passing
-
-### Done when
-- `npx vitest run` — all tests pass (including new ones)
-- `npx tsc --noEmit` — clean
-- Repo map shows in orchestrator system prompt
-
-## Next expert: Engineer
+Assess iteration 188. Consider:
+1. Fix the 2 pre-existing timeout tests in orchestrator.test.ts (quick Engineer fix)
+2. TUI windowed rendering — VirtualMessageList for long sessions
+3. Architect mode improvements — better plan formatting

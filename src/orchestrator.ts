@@ -16,6 +16,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { fingerprintRepo } from "./repo-context.js";
 import { rankFiles } from "./file-ranker.js";
+import { buildSymbolIndex, formatRepoMap } from "./symbol-index.js";
 import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
 import { runVerification, formatVerificationResults } from "./verification.js";
 import { createDefaultRegistry } from "./tool-registry.js";
@@ -136,6 +137,24 @@ export function buildSystemPrompt(workDir: string, repoFingerprint: string): str
       rankedFiles.map(f => `- ${f.path} (${f.reason})`).join("\n")
     : "";
 
+  // Repo map: symbol-aware summary of top files (reuse already-ranked files)
+  // Only run on source-like dirs (skip /tmp and similar system paths)
+  let repoMapBlock = "";
+  const isSourceDir = rankedFiles.some(f => f.reason.includes("entry point") || f.reason.includes("large module") || f.reason.includes("recently modified"));
+  if (isSourceDir) {
+    try {
+      const topFiles = rankedFiles.map(f => f.path);
+      const symIndex = buildSymbolIndex(workDir, topFiles);
+      const raw = formatRepoMap(symIndex, 20);
+      if (raw) {
+        // Truncate to ~2K chars
+        repoMapBlock = "\n\n" + (raw.length > 2000 ? raw.slice(0, 2000) + "\n…" : raw);
+      }
+    } catch {
+      // Non-fatal
+    }
+  }
+
   const projectMemory = getProjectMemoryBlock(workDir);
 
   return `You are an expert coding assistant with direct access to the filesystem and shell.
@@ -152,7 +171,7 @@ Rules:
 - Never ask for confirmation — just do it.
 - To persist instructions for future sessions, ask the user to say "remember: ..." or use the save_memory tool.
 
-${repoFingerprint}${fileList}${projectMemory}`;
+${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}`;
 }
 
 // ─── Simple Claude caller (for task decomposition / compaction) ─
