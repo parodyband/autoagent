@@ -1,285 +1,3 @@
-[2026-04-05T18:31:03.247Z] iter=304 turn=12 INFO: Agent: Now write the export-helper tests:
-[2026-04-05T18:31:03.248Z] iter=304 turn=12 INFO: write_file: tests/export-helper.test.ts (write)
-[2026-04-05T18:31:03.248Z] iter=304 turn=12 INFO:   -> ok: Created tests/export-helper.test.ts (4546 chars)
-[2026-04-05T18:31:03.248Z] iter=304 turn=13 INFO: Turn 13/25
-[2026-04-05T18:31:07.250Z] iter=304 turn=13 INFO: Agent: I've made real changes. Let me check status and continue with Goal 2.
-[2026-04-05T18:31:07.250Z] iter=304 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T18:31:07.253Z] iter=304 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/export-helper.test.ts 2>&1 | tail -20
-[2026-04-05T18:31:08.265Z] iter=304 turn=13 INFO:   -> exit=0 (562 chars)
-[2026-04-05T18:31:08.345Z] iter=304 turn=13 INFO:   -> exit=0 (394 chars)
-[2026-04-05T18:31:08.346Z] iter=304 turn=14 INFO: Turn 14/25
-[2026-04-05T18:31:13.394Z] iter=304 turn=14 INFO: Agent: Two fixes needed. The cost formatting threshold is `< 0.01` — 0.0123 is >= 0.01 so it uses 2 decimal places. Fix the test. Also fix the TS type error:
-[2026-04-05T18:31:13.395Z] iter=304 turn=14 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T18:31:13.395Z] iter=304 turn=14 INFO:   -> ok: Patched src/tui.tsx: -1 +2 lines
-
-Context after patch:
-313 |   workDir: string,
-314 |   filePath: string,
-315 | ): void {
-316 |   const exportMsgs = messages.filter(m => m.role === "user" || m.role === "assistant") as import("./export-helper.js").ExportMessage[];
-317 |   buildExportContentHelper(exportMsgs, model, { tokensIn: stats.tokensIn, tokensOut: stats.tokensOut, cost: stats.cost }, workDir, filePath);
-318 | }
-319 | 
-320 | function App() {
-[2026-04-05T18:31:13.396Z] iter=304 turn=15 INFO: Turn 15/25
-[2026-04-05T18:31:15.747Z] iter=304 turn=15 INFO: write_file: tests/export-helper.test.ts (patch)
-[2026-04-05T18:31:15.748Z] iter=304 turn=15 INFO:   -> ok: Patched tests/export-helper.test.ts: -1 +1 lines
-
-Context after patch:
-43 |     expect(content).toContain("## Session Summary");
-44 |     expect(content).toContain("**Tokens in**: 1,500");
-45 |     expect(content).toContain("**Tokens out**: 800");
-46 |     expect(content).toContain("**Total cost**: 0.01");
-47 |   });
-48 | 
-49 |   it("formats high cost with 2 decimal places", () => {
-[2026-04-05T18:31:15.749Z] iter=304 turn=16 INFO: Turn 16/25
-[2026-04-05T18:31:17.945Z] iter=304 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -10 && npx vitest run tests/export-helper.test.ts 2>&1 | tail -10
-[2026-04-05T18:31:19.868Z] iter=304 turn=16 INFO:   -> exit=0 (275 chars)
-[2026-04-05T18:31:19.868Z] iter=304 turn=17 INFO: Turn 17/25
-[2026-04-05T18:31:23.120Z] iter=304 turn=17 INFO: Agent: TSC is clean, all 9 tests pass. Now Goal 2 (orchestrator system prompt) then wrap up.
-[2026-04-05T18:31:23.121Z] iter=304 turn=17 INFO: read_file: src/orchestrator.ts
-[2026-04-05T18:31:23.121Z] iter=304 turn=17 INFO:   -> ok (2250 chars)
-[2026-04-05T18:31:23.122Z] iter=304 turn=18 INFO: Turn 18/25
-[2026-04-05T18:31:26.296Z] iter=304 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "export function detectProject\|export.*buildSummary\|^export" src/project-detector.ts | head -10
-[2026-04-05T18:31:26.311Z] iter=304 turn=18 INFO:   -> exit=0 (105 chars)
-[2026-04-05T18:31:26.311Z] iter=304 turn=19 INFO: Turn 19/25
-[2026-04-05T18:31:29.265Z] iter=304 turn=19 INFO: Agent: `detectProject` returns a `ProjectSummary` with a `summary` field. Let me wire it in and wrap up.
-[2026-04-05T18:31:29.266Z] iter=304 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "summary" src/project-detector.ts | tail -10
-[2026-04-05T18:31:29.275Z] iter=304 turn=19 INFO:   -> exit=0 (120 chars)
-[2026-04-05T18:31:29.275Z] iter=304 turn=20 INFO: Turn 20/25
-[2026-04-05T18:31:32.337Z] iter=304 turn=20 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T18:31:32.338Z] iter=304 turn=20 INFO:   -> ok: Patched src/orchestrator.ts: -2 +4 lines
-
-Context after patch:
-620 |   /** Prevents the 80% context warning from firing more than once per session. */
-621 |   private contextWarningShown = false;
-622 | 
-623 |   /** Whether project summary has been injected into the system prompt already. */
-624 |   private projectSummaryInjected = false;
-625 |   /** Cached project summary from detectProject(). */
-626 |   private projectSummary: string = "";
-627 | 
-628 |   /** Path to current session's JSONL file */
-629 |   sessionPath: string = "";
-[2026-04-05T18:31:32.339Z] iter=304 turn=21 INFO: Turn 21/25
-[2026-04-05T18:31:34.897Z] iter=304 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^import.*project-detector\|detectProject" src/orchestrator.ts | head -5
-[2026-04-05T18:31:34.906Z] iter=304 turn=21 INFO:   -> exit=0 (183 chars)
-[2026-04-05T18:31:34.907Z] iter=304 turn=22 INFO: Turn 22/25
-[2026-04-05T18:31:40.222Z] iter=304 turn=22 INFO: Agent: Good, `detectProject` is already imported. Now wire into `init()`:
-[2026-04-05T18:31:40.222Z] iter=304 turn=22 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T18:31:40.223Z] iter=304 turn=22 INFO:   -> ok: Patched src/orchestrator.ts: -2 +12 lines
-
-Context after patch:
-654 |     if (this.initialized) return;
-655 |     this.opts.onStatus?.("Indexing repo...");
-656 |     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
-657 |     ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
-658 |       buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
-659 |     // Cache project summary and inject into system prompt
-660 |     try {
-661 |       const projectInfo = detectProject(this.opts.workDir);
-662 |       this.projectSummary = projectInfo.summary;
-663 |       if (this.projectSummary) {
-664 |         this.systemPrompt += `\n\n## Project Context\n${this.projectSummary}`;
-665 |       }
-666 |     } catch {
-667 |       // Non-fatal
-668 |     }
-669 | 
-670 |     // Session persistence: resume or create new
-671 |     if (this.opts.resumeSessionPath) {
-[2026-04-05T18:31:40.224Z] iter=304 turn=23 INFO: Turn 23/25
-[2026-04-05T18:31:42.369Z] iter=304 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5
-[2026-04-05T18:31:43.326Z] iter=304 turn=23 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:31:43.326Z] iter=304 turn=24 INFO: Turn 24/25
-[2026-04-05T18:31:49.028Z] iter=304 turn=24 INFO: save_memory: "[Engineer] Iteration 304 — what was built"
-[2026-04-05T18:31:49.029Z] iter=304 turn=24 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T18:31:49.030Z] iter=304 turn=25 INFO: Turn 25/25
-[2026-04-05T18:31:56.884Z] iter=304 turn=25 INFO: write_file: goals.md (write)
-[2026-04-05T18:31:56.884Z] iter=304 turn=25 INFO:   -> ok: Updated goals.md (1029 chars, -41 lines delta)
-[2026-04-05T18:31:56.885Z] iter=304 turn=25 INFO: Hit max turns — committing and restarting
-[2026-04-05T18:31:56.888Z] iter=304 turn=25 INFO: Cache persisted: 49 entries to .autoagent-cache.json
-[2026-04-05T18:31:56.888Z] iter=304 turn=25 INFO: Cache stats: 0 hits, 5 misses, 49 entries, 9 invalidations (5 entries removed)
-[2026-04-05T18:31:56.888Z] iter=304 turn=25 INFO: Tool cache stats
-[2026-04-05T18:31:56.889Z] iter=304 turn=25 INFO: Tool timing: bash: 14x, avg=367ms, total=5132ms; write_file: 9x, avg=1ms, total=10ms; read_scratchpad: 1x, avg=5ms, total=5ms; read_file: 5x, avg=1ms, total=5ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T18:31:56.889Z] iter=304 turn=25 INFO: Tool timing stats
-[2026-04-05T18:32:03.380Z] iter=304 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 304: predicted 20 turns, actual 25 turns, ratio 1.25**
-[2026-04-05T18:32:11.458Z] iter=304 turn=25 INFO: Pre-commit review (1230in/281out): **Export helper looks clean, but a few issues:**
-
-- **Fragile tool-call filtering**: `.filter(l => !l.startsWith('{"type":"tool'))` is too brittle — it only catches lines starting with exactly that pr
-[2026-04-05T18:32:11.514Z] iter=304 turn=25 INFO: Committed: cd8a25a9 (41 in / 6523 out, cache: 24108 created, 347184 read)
-[2026-04-05T18:32:11.514Z] iter=304 turn=25 INFO: Restarting as iteration 305...
-[2026-04-05T18:32:11.694Z] iter=305 INFO: Cache restored: 49/49 entries (0 stale)
-[2026-04-05T18:32:11.697Z] iter=305 INFO: Turn budget: 13/25 (calibration=1.25x, predicted=8)
-[2026-04-05T18:32:11.697Z] iter=305 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T18:32:11.830Z] iter=305 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T18:32:11.831Z] iter=305 turn=1 INFO: Turn 1/25
-[2026-04-05T18:32:17.912Z] iter=305 turn=1 INFO: Agent: 
-
-I'll start by assessing the current state of the product, reviewing what was built in iteration 304, and then doing research to inform the next priorities.
-[2026-04-05T18:32:17.913Z] iter=305 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T18:32:17.915Z] iter=305 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -30
-[2026-04-05T18:32:17.917Z] iter=305 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | grep -E "Tests|Test Files" | tail -5
-[2026-04-05T18:32:19.609Z] iter=305 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:32:31.494Z] iter=305 turn=1 INFO:   -> exit=0 (111 chars)
-[2026-04-05T18:32:31.506Z] iter=305 turn=1 INFO:   -> exit=0 (1140 chars)
-[2026-04-05T18:32:31.506Z] iter=305 turn=2 INFO: Turn 2/25
-[2026-04-05T18:32:38.389Z] iter=305 turn=2 INFO: think: My deliverables as Architect for iteration 305:
-1. Assess the product state (quick)
-2. Research (required every 3 iterat...
-[2026-04-05T18:32:38.389Z] iter=305 turn=3 INFO: Turn 3/25
-[2026-04-05T18:32:41.211Z] iter=305 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null | head -40
-[2026-04-05T18:32:41.213Z] iter=305 turn=3 INFO: web_search: "Claude Code CLI agent architecture 2025 context management techniques"
-[2026-04-05T18:32:41.233Z] iter=305 turn=3 INFO:   -> exit=0 (845 chars)
-[2026-04-05T18:32:42.177Z] iter=305 turn=3 INFO:   -> 8 results
-[2026-04-05T18:32:42.177Z] iter=305 turn=4 INFO: Turn 4/25
-[2026-04-05T18:32:45.968Z] iter=305 turn=4 INFO: Agent: 
-
-Status: Goals are "Assess product state" (DONE), "Research" (IN PROGRESS), "Write goals.md for 306" (NOT STARTED). Let me fetch the key research result and then write goals.md immediately.
-[2026-04-05T18:32:45.969Z] iter=305 turn=4 INFO: web_fetch: https://gist.github.com/yanchuk/0c47dd351c2805236e44ec3935e9095d
-[2026-04-05T18:32:46.415Z] iter=305 turn=4 INFO:   -> ok (50756 chars)
-[2026-04-05T18:32:46.416Z] iter=305 turn=5 INFO: Turn 5/25
-[2026-04-05T18:33:05.013Z] iter=305 turn=5 INFO: think: This is an incredibly detailed architecture analysis of Claude Code. Let me extract the key insights that are relevant t...
-[2026-04-05T18:33:05.014Z] iter=305 turn=6 INFO: Turn 6/25
-[2026-04-05T18:33:17.693Z] iter=305 turn=6 INFO: Agent: 
-
-You're right — I'm an Architect this iteration, so my deliverable is goals.md + memory, not src/ changes. Let me finalize now.
-[2026-04-05T18:33:17.693Z] iter=305 turn=6 INFO: save_memory: "[Research] Claude Code Architecture Analysis - Iteration 305"
-[2026-04-05T18:33:17.694Z] iter=305 turn=6 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T18:33:17.695Z] iter=305 turn=7 INFO: Turn 7/25
-[2026-04-05T18:33:31.776Z] iter=305 turn=7 INFO: write_file: goals.md (write)
-[2026-04-05T18:33:31.777Z] iter=305 turn=7 INFO:   -> ok: Updated goals.md (1752 chars, +9 lines delta)
-[2026-04-05T18:33:31.778Z] iter=305 turn=8 INFO: Turn 8/25
-[2026-04-05T18:33:34.011Z] iter=305 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5
-[2026-04-05T18:33:35.030Z] iter=305 turn=8 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:33:35.031Z] iter=305 turn=9 INFO: Turn 9/25
-[2026-04-05T18:33:41.521Z] iter=305 turn=9 INFO: Agent: TSC clean. Memory saved. Goals written for Engineer iteration 306.
-
-## Summary of this Architect iteration
-
-**Assessment**: Product is in good shape. 825 tests passing, 4-5 flaky (git init in file-ranker). TSC clean. Iteration 304 delivered export-helper extraction + system prompt wiring successfully.
-
-**Research**: Deep-dived Claude Code's full architecture. Key takeaways saved to memory — most i...
-[2026-04-05T18:33:41.522Z] iter=305 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T18:33:41.522Z] iter=305 turn=9 INFO: RESTART signal
-[2026-04-05T18:33:41.522Z] iter=305 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T18:33:42.493Z] iter=305 turn=9 INFO: Compilation OK
-[2026-04-05T18:33:49.971Z] iter=305 turn=9 INFO: Cache persisted: 49 entries to .autoagent-cache.json
-[2026-04-05T18:33:49.971Z] iter=305 turn=9 INFO: Tool timing: bash: 6x, avg=4985ms, total=29908ms; web_search: 1x, avg=964ms, total=964ms; web_fetch: 1x, avg=447ms, total=447ms; write_file: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T18:33:49.971Z] iter=305 turn=9 INFO: Tool timing stats
-[2026-04-05T18:33:56.112Z] iter=305 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 305: predicted 8 turns, actual 9 turns, ratio 1.13**
-[2026-04-05T18:33:56.133Z] iter=305 turn=9 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T18:33:56.166Z] iter=305 turn=9 INFO: Committed: 1b210d58 (19 in / 2818 out, cache: 28821 created, 140989 read)
-[2026-04-05T18:33:56.166Z] iter=305 turn=9 INFO: Restarting as iteration 306...
-[2026-04-05T18:33:56.362Z] iter=306 INFO: Cache restored: 49/49 entries (0 stale)
-[2026-04-05T18:33:56.364Z] iter=306 INFO: Turn budget: 18/25 (calibration=1.13x, predicted=20)
-[2026-04-05T18:33:56.364Z] iter=306 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T18:33:56.507Z] iter=306 turn=1 INFO: Turn 1/25
-[2026-04-05T18:34:00.527Z] iter=306 turn=1 INFO: Agent: I'll start by reading the scratchpad and current state, then dive into the goals.
-[2026-04-05T18:34:00.528Z] iter=306 turn=1 INFO: read_scratchpad: 7 chars
-[2026-04-05T18:34:00.528Z] iter=306 turn=1 INFO: read_file: goals.md
-[2026-04-05T18:34:00.529Z] iter=306 turn=1 INFO:   -> ok (1752 chars)
-[2026-04-05T18:34:00.529Z] iter=306 turn=2 INFO: Turn 2/25
-[2026-04-05T18:34:03.818Z] iter=306 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -30
-[2026-04-05T18:34:03.821Z] iter=306 turn=2 INFO: read_file: src/__tests__/file-ranker.test.ts
-[2026-04-05T18:34:03.821Z] iter=306 turn=2 INFO:   -> ok (6037 chars)
-[2026-04-05T18:34:15.598Z] iter=306 turn=2 INFO:   -> exit=0 (1603 chars)
-[2026-04-05T18:34:15.598Z] iter=306 turn=3 INFO: Turn 3/25
-[2026-04-05T18:34:20.174Z] iter=306 turn=3 INFO: think: The tests are currently passing (825 passed, 0 failures). So the "flaky" tests aren't currently failing. The goals say "...
-[2026-04-05T18:34:20.175Z] iter=306 turn=4 INFO: Turn 4/25
-[2026-04-05T18:34:23.666Z] iter=306 turn=4 INFO: think: Tests are already passing (825/825). I need to:
-1. Add init-command tests (4-6 tests) 
-2. Add orchestrator system-prompt...
-[2026-04-05T18:34:23.667Z] iter=306 turn=5 INFO: Turn 5/25
-[2026-04-05T18:34:25.932Z] iter=306 turn=5 INFO: read_file: CACHE HIT
-[2026-04-05T18:34:25.933Z] iter=306 turn=5 INFO: read_file: src/orchestrator.ts
-[2026-04-05T18:34:25.934Z] iter=306 turn=5 INFO:   -> ok (3318 chars)
-[2026-04-05T18:34:25.934Z] iter=306 turn=6 INFO: Turn 6/25
-[2026-04-05T18:34:28.776Z] iter=306 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "init()" src/orchestrator.ts | head -20
-[2026-04-05T18:34:28.779Z] iter=306 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "systemPrompt\|system_prompt\|detectProject\|buildSummary\|projectSummary" src/orchestrator.ts | head -30
-[2026-04-05T18:34:28.788Z] iter=306 turn=6 INFO:   -> exit=0 (143 chars)
-[2026-04-05T18:34:28.791Z] iter=306 turn=6 INFO:   -> exit=0 (1410 chars)
-[2026-04-05T18:34:28.792Z] iter=306 turn=7 INFO: Turn 7/25
-[2026-04-05T18:34:33.083Z] iter=306 turn=7 INFO: Agent: **Goal status:**
-- 1a (fix file-ranker tests): DONE — already passing (825/0)
-- 1b (init-command tests): NOT STARTED
-- 1c (orchestrator system-prompt tests): NOT STARTED
-
-Writing both test files now.
-[2026-04-05T18:34:33.084Z] iter=306 turn=7 INFO: read_file: src/orchestrator.ts
-[2026-04-05T18:34:33.084Z] iter=306 turn=7 INFO:   -> ok (2917 chars)
-[2026-04-05T18:34:33.085Z] iter=306 turn=8 INFO: Turn 8/25
-[2026-04-05T18:34:47.416Z] iter=306 turn=8 INFO: Agent: Now I have enough context. Writing both test files:
-[2026-04-05T18:34:47.416Z] iter=306 turn=8 INFO: write_file: src/__tests__/init-command.test.ts (write)
-[2026-04-05T18:34:47.417Z] iter=306 turn=8 INFO:   -> ok: Created src/__tests__/init-command.test.ts (3666 chars)
-[2026-04-05T18:34:47.418Z] iter=306 turn=9 INFO: Turn 9/25
-[2026-04-05T18:35:01.016Z] iter=306 turn=9 INFO: write_file: src/__tests__/orchestrator-system-prompt.test.ts (write)
-[2026-04-05T18:35:01.017Z] iter=306 turn=9 INFO:   -> ok: Created src/__tests__/orchestrator-system-prompt.test.ts (3210 chars)
-[2026-04-05T18:35:01.017Z] iter=306 turn=10 INFO: Turn 10/25
-[2026-04-05T18:35:03.197Z] iter=306 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/init-command.test.ts 2>&1 | tail -30
-[2026-04-05T18:35:04.204Z] iter=306 turn=10 INFO:   -> exit=0 (282 chars)
-[2026-04-05T18:35:04.204Z] iter=306 turn=11 INFO: Turn 11/25
-[2026-04-05T18:35:06.053Z] iter=306 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/orchestrator-system-prompt.test.ts 2>&1 | tail -30
-[2026-04-05T18:35:07.077Z] iter=306 turn=11 INFO:   -> exit=0 (298 chars)
-[2026-04-05T18:35:07.077Z] iter=306 turn=12 INFO: Turn 12/25
-[2026-04-05T18:35:09.206Z] iter=306 turn=12 INFO: Agent: Both pass. Now full suite:
-[2026-04-05T18:35:09.207Z] iter=306 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -10
-[2026-04-05T18:35:20.774Z] iter=306 turn=12 INFO:   -> exit=0 (460 chars)
-[2026-04-05T18:35:20.774Z] iter=306 turn=13 INFO: Turn 13/25
-[2026-04-05T18:35:23.829Z] iter=306 turn=13 INFO: Agent: 834 tests passing (≥830 ✓), 0 failures. Running TSC then wrapping up.
-[2026-04-05T18:35:23.830Z] iter=306 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T18:35:24.785Z] iter=306 turn=13 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:35:24.786Z] iter=306 turn=14 INFO: Turn 14/25
-[2026-04-05T18:35:29.401Z] iter=306 turn=14 INFO: Agent: Clean. Writing memory and updating goals.
-[2026-04-05T18:35:29.401Z] iter=306 turn=14 INFO: save_memory: "[Engineer] Iteration 306"
-[2026-04-05T18:35:29.402Z] iter=306 turn=14 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T18:35:29.402Z] iter=306 turn=15 INFO: Turn 15/25
-[2026-04-05T18:35:39.846Z] iter=306 turn=15 INFO: write_file: goals.md (write)
-[2026-04-05T18:35:39.846Z] iter=306 turn=15 INFO:   -> ok: Updated goals.md (1396 chars, -6 lines delta)
-[2026-04-05T18:35:39.847Z] iter=306 turn=16 INFO: Turn 16/25
-[2026-04-05T18:35:42.713Z] iter=306 turn=16 INFO: Agent: Already wrapped up. Running final checks.
-[2026-04-05T18:35:42.713Z] iter=306 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "TSC_CLEAN" && echo "AUTOAGENT_RESTART"
-[2026-04-05T18:35:42.714Z] iter=306 turn=16 INFO: RESTART signal
-[2026-04-05T18:35:42.714Z] iter=306 turn=16 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T18:35:43.660Z] iter=306 turn=16 INFO: Compilation OK
-[2026-04-05T18:35:50.599Z] iter=306 turn=16 INFO: Cache persisted: 52 entries to .autoagent-cache.json
-[2026-04-05T18:35:50.599Z] iter=306 turn=16 INFO: Cache stats: 1 hits, 4 misses, 52 entries, 3 invalidations (1 entries removed)
-[2026-04-05T18:35:50.599Z] iter=306 turn=16 INFO: Tool cache stats
-[2026-04-05T18:35:50.599Z] iter=306 turn=16 INFO: Tool timing: bash: 8x, avg=3295ms, total=26359ms; write_file: 3x, avg=1ms, total=3ms; read_file: 4x, avg=1ms, total=2ms; think: 2x, avg=1ms, total=2ms; read_scratchpad: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T18:35:50.599Z] iter=306 turn=16 INFO: Tool timing stats
-[2026-04-05T18:35:57.187Z] iter=306 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 306: predicted 20 turns, actual 16 turns, ratio 0.80**
-[2026-04-05T18:36:06.675Z] iter=306 turn=16 INFO: Pre-commit review (2812in/398out): **Issues:**
-
-- **Module isolation / caching bug**: All tests in `init-command.test.ts` use `await import("../init-command.js")` inside individual `it()` blocks, but ESM module caching means the same m
-[2026-04-05T18:36:06.730Z] iter=306 turn=16 INFO: Committed: e1a31bb0 (26 in / 4565 out, cache: 16402 created, 207988 read)
-[2026-04-05T18:36:06.731Z] iter=306 turn=16 INFO: Restarting as iteration 307...
-[2026-04-05T18:36:06.937Z] iter=307 INFO: Cache restored: 52/52 entries (0 stale)
-[2026-04-05T18:36:06.939Z] iter=307 INFO: Turn budget: 13/25 (calibration=1.13x, predicted=8)
-[2026-04-05T18:36:06.939Z] iter=307 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T18:36:07.090Z] iter=307 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T18:36:07.090Z] iter=307 turn=1 INFO: Turn 1/25
-[2026-04-05T18:36:11.095Z] iter=307 turn=1 INFO: Agent: 
-
-I'll start by reviewing the current state of things to write good goals for the Engineer iteration 308.
-[2026-04-05T18:36:11.096Z] iter=307 turn=1 INFO: $ cat goals.md
-[2026-04-05T18:36:11.098Z] iter=307 turn=1 INFO: $ cat .autoagent-metrics.json | head -100
-[2026-04-05T18:36:11.100Z] iter=307 turn=1 INFO: $ cat .expert-rotation.json
-[2026-04-05T18:36:11.113Z] iter=307 turn=1 INFO:   -> exit=0 (2117 chars)
-[2026-04-05T18:36:11.114Z] iter=307 turn=1 INFO:   -> exit=0 (1396 chars)
-[2026-04-05T18:36:11.118Z] iter=307 turn=1 INFO:   -> exit=0 (1310 chars)
-[2026-04-05T18:36:11.119Z] iter=307 turn=2 INFO: Turn 2/25
-[2026-04-05T18:36:17.078Z] iter=307 turn=2 INFO: Agent: 
-
-You're right. My deliverable is simple: write `goals.md` for iteration 308 (Engineer). I have all the context I need from the orientation. Let me write it now.
-[2026-04-05T18:36:17.079Z] iter=307 turn=2 INFO: think: My job: write goals.md for iteration 308 (Engineer). The suggested goals are:
-1. `autoagent help` subcommand
-2. Better f...
-[2026-04-05T18:36:17.079Z] iter=307 turn=3 INFO: Turn 3/25
-[2026-04-05T18:36:27.056Z] iter=307 turn=3 INFO: write_file: goals.md (write)
-[2026-04-05T18:36:27.058Z] iter=307 turn=3 INFO:   -> ok: Updated goals.md (1534 chars, +6 lines delta)
-[2026-04-05T18:36:27.059Z] iter=307 turn=4 INFO: Turn 4/25
-[2026-04-05T18:36:33.792Z] iter=307 turn=4 INFO: Agent: 
 
 Goals status:
 - **Goal: Write goals.md for iteration 308** — DONE ✅
@@ -1278,3 +996,60 @@ Context after patch:
 [2026-04-05T18:46:59.910Z] iter=312 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 312: predicted 20 turns, actual 24 turns, ratio 1.20**
 [2026-04-05T18:47:12.497Z] iter=312 turn=24 INFO: Pre-commit review (1956in/526out): **Logic bug in `filterByRepoMap` — lock file exclusion is incomplete:**
 The condition `NON_SOURCE_EXTS.has(ext) && !repoMapFiles.has(f)` means a lock file *will* pass through if it happens to be in `r
+[2026-04-05T18:47:12.559Z] iter=312 turn=24 INFO: Committed: 8e744211 (40 in / 5210 out, cache: 20289 created, 323913 read)
+[2026-04-05T18:47:12.559Z] iter=312 turn=24 INFO: Restarting as iteration 313...
+[2026-04-05T18:47:12.760Z] iter=313 INFO: Cache restored: 52/52 entries (0 stale)
+[2026-04-05T18:47:12.762Z] iter=313 INFO: Turn budget: 13/25 (calibration=1.20x, predicted=8)
+[2026-04-05T18:47:12.762Z] iter=313 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T18:47:12.916Z] iter=313 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T18:47:12.916Z] iter=313 turn=1 INFO: Turn 1/25
+[2026-04-05T18:47:17.725Z] iter=313 turn=1 INFO: Agent: 
+
+I'll start by reviewing the current state of the codebase, focusing on the recent changes to context-loader.ts and identifying the highest-value next steps.
+[2026-04-05T18:47:17.726Z] iter=313 turn=1 INFO: read_file: src/context-loader.ts
+[2026-04-05T18:47:17.727Z] iter=313 turn=1 INFO:   -> ok (9980 chars)
+[2026-04-05T18:47:17.727Z] iter=313 turn=1 INFO: read_file: src/__tests__/context-loader-git.test.ts
+[2026-04-05T18:47:17.727Z] iter=313 turn=1 INFO:   -> ok (4613 chars)
+[2026-04-05T18:47:17.727Z] iter=313 turn=1 INFO: read_file: src/tui.tsx
+[2026-04-05T18:47:17.728Z] iter=313 turn=1 INFO:   -> ok (1946 chars)
+[2026-04-05T18:47:17.728Z] iter=313 turn=2 INFO: Turn 2/25
+[2026-04-05T18:47:43.424Z] iter=313 turn=2 INFO: Agent: 
+
+You're right. My deliverable is `goals.md` for iteration 314. Let me write it now.
+[2026-04-05T18:47:43.424Z] iter=313 turn=2 INFO: think: Let me assess what I've seen and write goals.md.
+
+From the context-loader review:
+1. filterByRepoMap with empty set pass...
+[2026-04-05T18:47:43.424Z] iter=313 turn=3 INFO: Turn 3/25
+[2026-04-05T18:47:45.756Z] iter=313 turn=3 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T18:47:46.774Z] iter=313 turn=3 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:47:46.774Z] iter=313 turn=4 INFO: Turn 4/25
+[2026-04-05T18:48:05.440Z] iter=313 turn=4 INFO: Agent: 
+
+Goals status: **NOT STARTED** — I need to write goals.md now. Doing it immediately.
+[2026-04-05T18:48:05.441Z] iter=313 turn=4 INFO: write_file: goals.md (write)
+[2026-04-05T18:48:05.442Z] iter=313 turn=4 INFO:   -> ok: Updated goals.md (2695 chars, +26 lines delta)
+[2026-04-05T18:48:05.442Z] iter=313 turn=5 INFO: Turn 5/25
+[2026-04-05T18:48:10.560Z] iter=313 turn=5 INFO: save_memory: "[Architect] Iteration 313 assessment"
+[2026-04-05T18:48:10.561Z] iter=313 turn=5 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T18:48:10.561Z] iter=313 turn=6 INFO: Turn 6/25
+[2026-04-05T18:48:13.637Z] iter=313 turn=6 INFO: Agent: 
+
+This is an Architect iteration — my deliverable is `goals.md`, not src/ changes. That's done. Wrapping up now.
+[2026-04-05T18:48:13.638Z] iter=313 turn=6 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T18:48:14.584Z] iter=313 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:48:14.584Z] iter=313 turn=7 INFO: Turn 7/25
+[2026-04-05T18:48:17.002Z] iter=313 turn=7 INFO: Agent: 
+
+TSC clean, goals.md written, memory saved. Done.
+[2026-04-05T18:48:17.002Z] iter=313 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T18:48:17.002Z] iter=313 turn=7 INFO: RESTART signal
+[2026-04-05T18:48:17.002Z] iter=313 turn=7 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T18:48:18.018Z] iter=313 turn=7 INFO: Compilation OK
+[2026-04-05T18:48:25.017Z] iter=313 turn=7 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T18:48:25.017Z] iter=313 turn=7 INFO: Cache stats: 0 hits, 3 misses, 55 entries, 1 invalidations (0 entries removed)
+[2026-04-05T18:48:25.017Z] iter=313 turn=7 INFO: Tool cache stats
+[2026-04-05T18:48:25.017Z] iter=313 turn=7 INFO: Tool timing: bash: 3x, avg=655ms, total=1964ms; read_file: 3x, avg=1ms, total=4ms; write_file: 1x, avg=2ms, total=2ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T18:48:25.017Z] iter=313 turn=7 INFO: Tool timing stats
+[2026-04-05T18:48:32.770Z] iter=313 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 313: predicted 8 turns, actual 7 turns, ratio 0.88**
+[2026-04-05T18:48:32.791Z] iter=313 turn=7 INFO: Pre-commit review: no significant code changes to review
