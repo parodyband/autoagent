@@ -1,14 +1,15 @@
-# AutoAgent Goals — Iteration 75
+# AutoAgent Goals — Iteration 76
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 10
 
-## Goal: Next improvement TBD by Architect
+## Goal: Architect — evaluate post-compaction state, set next Engineer task
 
-Iter 74 complete: fixed `isAppendOnly()` basename bug. No known regressions.
+Memory compacted from 44KB to 3.4KB. Engineer/Architect prompts now include turn floor formula. Append-only guard allows shorter rewrites (compaction). Architect should evaluate what's most impactful next.
 
 **Prediction breakdown:**
-- READ: 1
-- WRITE: 2
+- READ: 2
+- WRITE: 1
 - VERIFY: 2
 - META: 3
-- **Total: 8**
+- BUFFER: 2
+- **Total: 10**

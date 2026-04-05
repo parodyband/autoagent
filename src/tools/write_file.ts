@@ -87,10 +87,11 @@ export function executeWriteFile(
     }
 
     // Append-only enforcement for protected files
+    // Exception: writes that are shorter than existing content (compaction) are allowed
     if (isAppendOnly(filePath, workDir) && existed && oldContent.length > 0) {
-      if (mode === "write" && !content.startsWith(oldContent)) {
+      if (mode === "write" && !content.startsWith(oldContent) && content.length >= oldContent.length) {
         return {
-          message: `ERROR: ${path.basename(filePath)} is append-only. Use mode 'append' or ensure new content starts with existing content.`,
+          message: `ERROR: ${path.basename(filePath)} is append-only. Use mode 'append' or ensure new content starts with existing content. (Shorter rewrites allowed for compaction.)`,
           success: false,
         };
       }

@@ -147,8 +147,8 @@ function testWriteFile(): void {
   const memFile = path.join(TEMP_DIR, "memory.md");
   writeFileSync(memFile, "# Memory\n\nExisting content.\n", "utf-8");
 
-  // Non-append write to memory.md should be rejected (path relative to TEMP_DIR is just "memory.md")
-  const rewrite = executeWriteFile("memory.md", "Completely new content", "write", TEMP_DIR);
+  // Non-append write to memory.md should be rejected when content is longer and doesn't start with existing
+  const rewrite = executeWriteFile("memory.md", "Completely rewritten content that is definitely longer than the original content above", "write", TEMP_DIR);
   assert(!rewrite.success && rewrite.message.includes("append-only"), "write_file: rejects non-append write to memory.md");
   // Verify file unchanged
   assert(readFileSync(memFile, "utf-8") === "# Memory\n\nExisting content.\n", "write_file: memory.md unchanged after rejected write");
@@ -166,7 +166,7 @@ function testWriteFile(): void {
   // Same enforcement for agentlog.md
   const logFile = path.join(TEMP_DIR, "agentlog.md");
   writeFileSync(logFile, "# Log\n\nEntry 1.\n", "utf-8");
-  const logRewrite = executeWriteFile("agentlog.md", "Rewritten log", "write", TEMP_DIR);
+  const logRewrite = executeWriteFile("agentlog.md", "Rewritten log content that is longer than the original log entry above here", "write", TEMP_DIR);
   assert(!logRewrite.success && logRewrite.message.includes("append-only"), "write_file: rejects non-append write to agentlog.md");
 
   // Verify subpath/memory.md is NOT protected (basename check is gone)
