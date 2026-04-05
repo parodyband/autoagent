@@ -20,6 +20,7 @@ import { undoLastCommit } from "./auto-commit.js";
 import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
 import { execSync } from "child_process";
 import { runInit } from "./init-command.js";
+import { writeFileSync, mkdirSync } from "fs";
 
 // Parse args
 let workDir = process.cwd();
@@ -30,6 +31,21 @@ if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
 
 // --no-confirm flag: skip write_file diff confirmation
 const noConfirm = process.argv.includes("--no-confirm");
+
+// ─── CLI Subcommand Routing ──────────────────────────────────
+// Must run before TUI render. If first arg is a known subcommand, handle it and exit.
+if (process.argv[2] === "init") {
+  runInit(workDir, (msg) => console.log(msg))
+    .then(({ content, updated }) => {
+      console.log(updated ? "✓ Updated .autoagent.md" : "✓ Created .autoagent.md");
+      console.log("\n" + content);
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.error("Init failed:", err instanceof Error ? err.message : String(err));
+      process.exit(1);
+    });
+}
 
 // --continue / -c flag: auto-resume most recent session
 const continueFlag =
@@ -289,6 +305,56 @@ function Footer({ stats }: { stats: FooterStats }) {
   );
 }
 
+// ─── Export Helper ───────────────────────────────────────────
+function buildExportContent(
+  messages: Message[],
+  model: string,
+  stats: FooterStats,
+  workDir: string,
+  filePath: string,
+): void {
+  const dir = path.dirname(filePath);
+  mkdirSync(dir, { recursive: true });
+  const now = new Date();
+  const projectName = path.basename(workDir);
+  const { tokensIn, tokensOut, cost } = stats;
+  const lines: string[] = [
+    `# AutoAgent Conversation Export`,
+    ``,
+    `**Date**: ${now.toLocaleString()}`,
+    `**Model**: ${model}`,
+    `**Project**: ${projectName}`,
+    ``,
+    `---`,
+    ``,
+  ];
+  for (const msg of messages) {
+    if (msg.role === "user") {
+      lines.push(`## User`, ``, msg.content, ``);
+    } else {
+      const textContent = msg.content
+        .split("\n")
+        .filter(l => !l.startsWith('{"type":"tool'))
+        .join("\n")
+        .trim();
+      if (textContent) {
+        lines.push(`## Assistant`, ``, textContent, ``);
+      }
+    }
+  }
+  lines.push(
+    `---`,
+    ``,
+    `## Session Summary`,
+    ``,
+    `- **Tokens in**: ${tokensIn.toLocaleString()}`,
+    `- **Tokens out**: ${tokensOut.toLocaleString()}`,
+    `- **Total cost**: ${cost < 0.01 ? cost.toFixed(4) : cost.toFixed(2)}`,
+    ``,
+  );
+  writeFileSync(filePath, lines.join("\n"), "utf-8");
+}
+
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -471,6 +537,15 @@ function App() {
       return;
     }
     if (trimmed === "/exit") {
+      if (messages.length > 2) {
+        try {
+          const now = new Date();
+          const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+          const filePath = path.join(workDir, ".autoagent", "exports", `session-${timestamp}.md`);
+          const model = orchestratorRef.current?.getModel() ?? footerStats.model;
+          buildExportContent(messages, model, footerStats, workDir, filePath);
+        } catch { /* never block exit */ }
+      }
       exit();
       return;
     }
@@ -715,46 +790,8 @@ function App() {
       const filename = arg || `session-export-${timestamp}.md`;
       const filePath = path.isAbsolute(filename) ? filename : path.join(workDir, filename);
       try {
-        const projectName = path.basename(workDir);
         const model = orchestratorRef.current?.getModel() ?? footerStats.model;
-        const { tokensIn, tokensOut, cost } = footerStats;
-        const lines: string[] = [
-          `# AutoAgent Conversation Export`,
-          ``,
-          `**Date**: ${now.toLocaleString()}`,
-          `**Model**: ${model}`,
-          `**Project**: ${projectName}`,
-          ``,
-          `---`,
-          ``,
-        ];
-        for (const msg of messages) {
-          if (msg.role === "user") {
-            lines.push(`## User`, ``, msg.content, ``);
-          } else {
-            // Skip tool call content (lines that look like JSON tool invocations)
-            const textContent = msg.content
-              .split("\n")
-              .filter(l => !l.startsWith('{"type":"tool'))
-              .join("\n")
-              .trim();
-            if (textContent) {
-              lines.push(`## Assistant`, ``, textContent, ``);
-            }
-          }
-        }
-        lines.push(
-          `---`,
-          ``,
-          `## Session Summary`,
-          ``,
-          `- **Tokens in**: ${tokensIn.toLocaleString()}`,
-          `- **Tokens out**: ${tokensOut.toLocaleString()}`,
-          `- **Total cost**: ${cost < 0.01 ? cost.toFixed(4) : cost.toFixed(2)}`,
-          ``,
-        );
-        const { writeFileSync } = await import("fs");
-        writeFileSync(filePath, lines.join("\n"), "utf-8");
+        buildExportContent(messages, model, footerStats, workDir, filePath);
         setMessages(prev => [...prev, { role: "assistant", content: `Exported to ${filename}` }]);
       } catch (err) {
         setMessages(prev => [...prev, { role: "assistant", content: `Export failed: ${err instanceof Error ? err.message : err}` }]);

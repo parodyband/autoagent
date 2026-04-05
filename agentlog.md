@@ -1,68 +1,3 @@
-[2026-04-05T18:10:41.110Z] iter=291 turn=8 INFO: Turn 8/25
-[2026-04-05T18:10:54.499Z] iter=291 turn=8 INFO: write_file: goals.md (write)
-[2026-04-05T18:10:54.500Z] iter=291 turn=8 INFO:   -> ok: Updated goals.md (1757 chars, -13 lines delta)
-[2026-04-05T18:10:54.500Z] iter=291 turn=9 INFO: Turn 9/25
-[2026-04-05T18:10:57.161Z] iter=291 turn=9 INFO: $ npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T18:10:58.116Z] iter=291 turn=9 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:10:58.117Z] iter=291 turn=10 INFO: Turn 10/25
-[2026-04-05T18:11:04.925Z] iter=291 turn=10 INFO: Agent: TSC clean. Memory compacted (-122 lines), goals set redirecting toward user-facing features.
-
-```
-echo "AUTOAGENT_RESTART"
-```
-[2026-04-05T18:11:04.926Z] iter=291 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T18:11:04.926Z] iter=291 turn=10 INFO: RESTART signal
-[2026-04-05T18:11:04.926Z] iter=291 turn=10 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T18:11:05.922Z] iter=291 turn=10 INFO: Compilation OK
-[2026-04-05T18:11:12.315Z] iter=291 turn=10 INFO: Cache persisted: 48 entries to .autoagent-cache.json
-[2026-04-05T18:11:12.316Z] iter=291 turn=10 INFO: Cache stats: 0 hits, 1 misses, 48 entries, 2 invalidations (1 entries removed)
-[2026-04-05T18:11:12.316Z] iter=291 turn=10 INFO: Tool cache stats
-[2026-04-05T18:11:12.316Z] iter=291 turn=10 INFO: Tool timing: bash: 7x, avg=155ms, total=1083ms; write_file: 2x, avg=1ms, total=2ms; read_file: 1x, avg=1ms, total=1ms; read_scratchpad: 1x, avg=0ms, total=0ms; think: 2x, avg=0ms, total=0ms
-[2026-04-05T18:11:12.316Z] iter=291 turn=10 INFO: Tool timing stats
-[2026-04-05T18:11:18.100Z] iter=291 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 291: predicted 8 turns, actual 10 turns, ratio 1.25**
-[2026-04-05T18:11:18.119Z] iter=291 turn=10 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T18:11:18.149Z] iter=291 turn=10 INFO: Committed: ad0034a8 (20 in / 3777 out, cache: 15850 created, 96008 read)
-[2026-04-05T18:11:18.149Z] iter=291 turn=10 INFO: Restarting as iteration 292...
-[2026-04-05T18:11:18.327Z] iter=292 INFO: Cache restored: 48/48 entries (0 stale)
-[2026-04-05T18:11:18.329Z] iter=292 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
-[2026-04-05T18:11:18.330Z] iter=292 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T18:11:18.479Z] iter=292 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T18:11:18.479Z] iter=292 turn=1 INFO: Turn 1/25
-[2026-04-05T18:11:21.332Z] iter=292 turn=1 INFO: read_scratchpad: 7 chars
-[2026-04-05T18:11:21.333Z] iter=292 turn=1 INFO: read_file: goals.md
-[2026-04-05T18:11:21.333Z] iter=292 turn=1 INFO:   -> ok (1757 chars)
-[2026-04-05T18:11:21.334Z] iter=292 turn=2 INFO: Turn 2/25
-[2026-04-05T18:11:33.051Z] iter=292 turn=2 INFO: think: The goals.md says the Architect should set goals for iteration 292. But I'm the Engineer and the goals.md still has the ...
-[2026-04-05T18:11:33.051Z] iter=292 turn=3 INFO: Turn 3/25
-[2026-04-05T18:11:40.271Z] iter=292 turn=3 INFO: Agent: I'm building two user-facing features:
-1. **`autoagent init` CLI command** — detect project type, scaffold `.autoagent.md`
-2. **`/export` TUI command** — export conversation to markdown
-
-Starting now.
-[2026-04-05T18:11:40.272Z] iter=292 turn=3 INFO: $ ls src/ | head -30 && cat src/project-detector.ts | head -60
-[2026-04-05T18:11:40.275Z] iter=292 turn=3 INFO: $ cat src/cli.ts 2>/dev/null | head -80 || echo "no cli.ts"
-[2026-04-05T18:11:40.287Z] iter=292 turn=3 INFO:   -> exit=0 (2402 chars)
-[2026-04-05T18:11:40.288Z] iter=292 turn=3 INFO:   -> exit=0 (2749 chars)
-[2026-04-05T18:11:40.289Z] iter=292 turn=4 INFO: Turn 4/25
-[2026-04-05T18:11:45.189Z] iter=292 turn=4 INFO: Agent: Goals status:
-- `autoagent init` command: **NOT STARTED**  
-- `/export` TUI command: **NOT STARTED**
-
-Let me check the main entry point and then build both features:
-[2026-04-05T18:11:45.191Z] iter=292 turn=4 INFO: $ cat src/tui.tsx | grep -n "export\|/clear\|/undo\|handleCommand\|case '" | head -40
-[2026-04-05T18:11:45.198Z] iter=292 turn=4 INFO: $ grep -n "autoagent init\|init\|bin\|main" package.json | head -20 && cat bin/autoagent.js 2>/dev/null | head -30 || ls bin/ 2>/dev/null
-[2026-04-05T18:11:45.224Z] iter=292 turn=4 INFO:   -> exit=0 (579 chars)
-[2026-04-05T18:11:45.235Z] iter=292 turn=4 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:11:45.235Z] iter=292 turn=5 INFO: Turn 5/25
-[2026-04-05T18:11:48.260Z] iter=292 turn=5 INFO: $ grep -n '"bin"\|"main"' package.json && head -20 package.json
-[2026-04-05T18:11:48.262Z] iter=292 turn=5 INFO: $ grep -n "handleCommand\|case '/\|trimmed ==\|trimmed ===" src/tui.tsx | head -30
-[2026-04-05T18:11:48.270Z] iter=292 turn=5 INFO:   -> exit=1 (11 chars)
-[2026-04-05T18:11:48.273Z] iter=292 turn=5 INFO:   -> exit=0 (363 chars)
-[2026-04-05T18:11:48.274Z] iter=292 turn=6 INFO: Turn 6/25
-[2026-04-05T18:11:51.535Z] iter=292 turn=6 INFO: Agent: I have changed nothing. I've been reading instead of writing. Starting immediately.
-[2026-04-05T18:11:51.535Z] iter=292 turn=6 INFO: $ sed -n '430,680p' src/tui.tsx
-[2026-04-05T18:11:51.537Z] iter=292 turn=6 INFO: $ cat src/project-detector.ts | grep -n "buildSummary\|export function\|export async" | head -20
-[2026-04-05T18:11:51.544Z] iter=292 turn=6 INFO:   -> exit=0 (10325 chars)
 [2026-04-05T18:11:51.547Z] iter=292 turn=6 INFO:   -> exit=0 (178 chars)
 [2026-04-05T18:11:51.548Z] iter=292 turn=7 INFO: Turn 7/25
 [2026-04-05T18:11:56.935Z] iter=292 turn=7 INFO: think: I have been reading too much without writing. I now have enough context to write the two features. Let me do it now - wr...
@@ -1061,3 +996,343 @@ Writing goals.md now with the design note, then wrapping up.
 [2026-04-05T18:25:51.979Z] iter=301 turn=9 INFO: Tool timing stats
 [2026-04-05T18:25:58.206Z] iter=301 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 301: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-05T18:25:58.228Z] iter=301 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T18:25:58.262Z] iter=301 turn=9 INFO: Committed: 32de4137 (19 in / 2614 out, cache: 15488 created, 92163 read)
+[2026-04-05T18:25:58.262Z] iter=301 turn=9 INFO: Restarting as iteration 302...
+[2026-04-05T18:25:58.449Z] iter=302 INFO: Cache restored: 48/48 entries (0 stale)
+[2026-04-05T18:25:58.451Z] iter=302 INFO: Turn budget: 16/25 (calibration=1.13x, predicted=20)
+[2026-04-05T18:25:58.451Z] iter=302 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T18:25:58.592Z] iter=302 turn=1 INFO: Turn 1/25
+[2026-04-05T18:26:00.666Z] iter=302 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T18:26:00.667Z] iter=302 turn=1 INFO: read_file: goals.md
+[2026-04-05T18:26:00.667Z] iter=302 turn=1 INFO:   -> ok (3811 chars)
+[2026-04-05T18:26:00.668Z] iter=302 turn=2 INFO: Turn 2/25
+[2026-04-05T18:26:02.982Z] iter=302 turn=2 INFO: read_file: src/tui.tsx
+[2026-04-05T18:26:02.983Z] iter=302 turn=2 INFO:   -> ok (1971 chars)
+[2026-04-05T18:26:02.983Z] iter=302 turn=2 INFO: read_file: src/init-command.ts
+[2026-04-05T18:26:02.983Z] iter=302 turn=2 INFO:   -> ok (6010 chars)
+[2026-04-05T18:26:02.984Z] iter=302 turn=3 INFO: Turn 3/25
+[2026-04-05T18:26:06.422Z] iter=302 turn=3 INFO: read_file: src/tui.tsx
+[2026-04-05T18:26:06.423Z] iter=302 turn=3 INFO:   -> ok (2548 chars)
+[2026-04-05T18:26:06.423Z] iter=302 turn=3 INFO: read_file: src/tui.tsx
+[2026-04-05T18:26:06.423Z] iter=302 turn=3 INFO:   -> ok (2957 chars)
+[2026-04-05T18:26:06.424Z] iter=302 turn=4 INFO: Turn 4/25
+[2026-04-05T18:26:10.680Z] iter=302 turn=4 INFO: think: I have enough context. Let me implement both goals now:
+
+1. Goal 1: CLI subcommand routing in tui.tsx - add `init` subco...
+[2026-04-05T18:26:10.681Z] iter=302 turn=5 INFO: Turn 5/25
+[2026-04-05T18:26:13.255Z] iter=302 turn=5 INFO: Agent: I have enough context. Let me implement both goals now.
+[2026-04-05T18:26:13.256Z] iter=302 turn=5 INFO: read_file: src/tui.tsx
+[2026-04-05T18:26:13.256Z] iter=302 turn=5 INFO:   -> ok (663 chars)
+[2026-04-05T18:26:13.257Z] iter=302 turn=6 INFO: Turn 6/25
+[2026-04-05T18:26:14.997Z] iter=302 turn=6 INFO: $ tail -30 src/tui.tsx
+[2026-04-05T18:26:15.006Z] iter=302 turn=6 INFO:   -> exit=0 (726 chars)
+[2026-04-05T18:26:15.007Z] iter=302 turn=7 INFO: Turn 7/25
+[2026-04-05T18:26:22.164Z] iter=302 turn=7 INFO: Agent: **Goal 1** (CLI subcommand routing): NOT STARTED  
+**Goal 2** (Auto-export on /exit): NOT STARTED
+
+Starting both now in one pass.
+[2026-04-05T18:26:22.165Z] iter=302 turn=7 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:26:22.166Z] iter=302 turn=7 INFO:   -> ok: Patched src/tui.tsx: -2 +18 lines
+
+Context after patch:
+31 | // --no-confirm flag: skip write_file diff confirmation
+32 | const noConfirm = process.argv.includes("--no-confirm");
+33 | 
+34 | // ─── CLI Subcommand Routing ──────────────────────────────────
+35 | // Must run before TUI render. If first arg is a known subcommand, handle it and exit.
+36 | const subcommand = process.argv[2];
+37 | if (subcommand === "init") {
+38 |   runInit(workDir, (msg) => console.log(msg))
+39 |     .then(({ content, updated }) => {
+40 |       console.log(updated ? "✓ Updated .autoagent.md" : "✓ Created .autoagent.md");
+41 |       console.log("\n" + content);
+42 |       process.exit(0);
+43 |     })
+44 |     .catch((err) => {
+45 |       console.error("Init failed:", err instanceof Error ? err.message : String(err));
+46 |       process.exit(1);
+47 |     });
+48 | } else {
+49 | 
+50 | // --continue / -c flag: auto-resume most recent session
+51 | const continueFlag =
+52 |   process.argv.includes("--continue") || process.argv.includes("-c");
+53 | let initialResumeSessionPath: string | undefined;
+54 | if (continueFlag) {
+[2026-04-05T18:26:22.167Z] iter=302 turn=8 INFO: Turn 8/25
+[2026-04-05T18:26:26.774Z] iter=302 turn=8 INFO: Agent: Now close the `else` block at the end of the file:
+[2026-04-05T18:26:26.774Z] iter=302 turn=8 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:26:26.775Z] iter=302 turn=8 INFO:   -> ok: Patched src/tui.tsx: -3 +5 lines
+
+Context after patch:
+923 |   );
+924 | }
+925 | 
+926 | // ─── Entry ──────────────────────────────────────────────────
+927 | 
+928 | render(<App />);
+929 | 
+930 | } // end else (not a subcommand)
+931 | 
+[2026-04-05T18:26:26.775Z] iter=302 turn=9 INFO: Turn 9/25
+[2026-04-05T18:26:29.903Z] iter=302 turn=9 INFO: Agent: Now Goal 2 — extract export helper and wire into `/exit`. First let me see the exact `/exit` handler and `/export` handler:
+[2026-04-05T18:26:29.904Z] iter=302 turn=9 INFO: read_file: src/tui.tsx
+[2026-04-05T18:26:29.904Z] iter=302 turn=9 INFO:   -> ok (2759 chars)
+[2026-04-05T18:26:29.905Z] iter=302 turn=10 INFO: Turn 10/25
+[2026-04-05T18:26:35.280Z] iter=302 turn=10 INFO: think: I need to:
+1. Extract the export logic into a helper function outside the component (so it can be called from both /expo...
+[2026-04-05T18:26:35.281Z] iter=302 turn=11 INFO: Turn 11/25
+[2026-04-05T18:26:37.423Z] iter=302 turn=11 INFO: $ grep -n "^function App\|^export function App\|const App = " src/tui.tsx | head -5
+[2026-04-05T18:26:37.433Z] iter=302 turn=11 INFO:   -> exit=0 (21 chars)
+[2026-04-05T18:26:37.433Z] iter=302 turn=12 INFO: Turn 12/25
+[2026-04-05T18:26:39.164Z] iter=302 turn=12 INFO: read_file: src/tui.tsx
+[2026-04-05T18:26:39.165Z] iter=302 turn=12 INFO:   -> ok (1465 chars)
+[2026-04-05T18:26:39.165Z] iter=302 turn=13 INFO: Turn 13/25
+[2026-04-05T18:26:47.491Z] iter=302 turn=13 INFO: Agent: I've patched Goal 1 (CLI subcommand routing). Now implementing Goal 2 immediately.
+[2026-04-05T18:26:47.491Z] iter=302 turn=13 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:26:47.492Z] iter=302 turn=13 INFO:   -> ok: Patched src/tui.tsx: -53 +15 lines
+
+Context after patch:
+724 |       return;
+725 |     }
+726 | 
+727 |     if (trimmed === "/export" || trimmed.startsWith("/export ")) {
+728 |       const arg = trimmed.slice(7).trim();
+729 |       const now = new Date();
+730 |       const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+731 |       const filename = arg || `session-export-${timestamp}.md`;
+732 |       const filePath = path.isAbsolute(filename) ? filename : path.join(workDir, filename);
+733 |       try {
+734 |         const model = orchestratorRef.current?.getModel() ?? footerStats.model;
+735 |         buildExportContent(messages, model, footerStats, workDir, filePath);
+736 |         setMessages(prev => [...prev, { role: "assistant", content: `Exported to ${filename}` }]);
+737 |       } catch (err) {
+738 |         setMessages(prev => [...prev, { role: "assistant", content: `Export failed: ${err instanceof Error ? err.message : err}` }]);
+739 |       }
+740 |       return;
+741 |     }
+742 | 
+743 |     // Add user message
+744 |     const userMsg: Message = { role: "user", content: trimmed };
+[2026-04-05T18:26:47.493Z] iter=302 turn=14 INFO: Turn 14/25
+[2026-04-05T18:26:52.680Z] iter=302 turn=14 INFO: Agent: Now update `/exit` handler and add the `buildExportContent` helper function, then wrap up.
+[2026-04-05T18:26:52.681Z] iter=302 turn=14 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:26:52.681Z] iter=302 turn=14 INFO:   -> ok: Patched src/tui.tsx: -4 +17 lines
+
+Context after patch:
+486 |       setTimeout(() => setStatus(""), 1000);
+487 |       return;
+488 |     }
+489 |     if (trimmed === "/exit") {
+490 |       if (messages.length > 2) {
+491 |         try {
+492 |           const now = new Date();
+493 |           const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+494 |           const exportsDir = path.join(workDir, ".autoagent", "exports");
+495 |           import("fs").then(({ mkdirSync, existsSync }) => {
+496 |             if (!existsSync(exportsDir)) mkdirSync(exportsDir, { recursive: true });
+497 |           }).catch(() => {});
+498 |           const filePath = path.join(workDir, ".autoagent", "exports", `session-${timestamp}.md`);
+499 |           const model = orchestratorRef.current?.getModel() ?? footerStats.model;
+500 |           buildExportContent(messages, model, footerStats, workDir, filePath);
+501 |         } catch { /* never block exit */ }
+502 |       }
+503 |       exit();
+504 |       return;
+505 |     }
+506 |     if (trimmed === "/init") {
+507 |       setStatus("Analyzing project...");
+508 |       try {
+[2026-04-05T18:26:52.682Z] iter=302 turn=15 INFO: Turn 15/25
+[2026-04-05T18:26:59.030Z] iter=302 turn=15 INFO: Agent: Now add the `buildExportContent` helper before the `App` component:
+[2026-04-05T18:26:59.030Z] iter=302 turn=15 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:26:59.031Z] iter=302 turn=15 INFO:   -> ok: Patched src/tui.tsx: -1 +52 lines
+
+Context after patch:
+305 |   );
+306 | }
+307 | 
+308 | // ─── Export Helper ───────────────────────────────────────────
+309 | function buildExportContent(
+310 |   messages: Message[],
+311 |   model: string,
+312 |   stats: FooterStats,
+313 |   workDir: string,
+314 |   filePath: string,
+315 | ): void {
+316 |   const { writeFileSync, mkdirSync } = require("fs") as typeof import("fs");
+317 |   const dir = path.dirname(filePath);
+318 |   mkdirSync(dir, { recursive: true });
+319 |   const now = new Date();
+320 |   const projectName = path.basename(workDir);
+321 |   const { tokensIn, tokensOut, cost } = stats;
+322 |   const lines: string[] = [
+323 |     `# AutoAgent Conversation Export`,
+324 |     ``,
+325 |     `**Date**: ${now.toLocaleString()}`,
+326 |     `**Model**: ${model}`,
+327 |     `**Project**: ${projectName}`,
+328 |     ``,
+329 |     `---`,
+330 |     ``,
+331 |   ];
+332 |   for (const msg of messages) {
+333 |     if (msg.role === "user") {
+334 |       lines.push(`## User`, ``, msg.content, ``);
+335 |     } else {
+336 |       const textContent = msg.content
+337 |         .split("\n")
+338 |         .filter(l => !l.startsWith('{"type":"tool'))
+339 |         .join("\n")
+340 |         .trim();
+341 |       if (textContent) {
+342 |         lines.push(`## Assistant`, ``, textContent, ``);
+343 |       }
+344 |     }
+345 |   }
+346 |   lines.push(
+347 |     `---`,
+348 |     ``,
+349 |     `## Session Summary`,
+350 |     ``,
+351 |     `- **Tokens in**: ${tokensIn.toLocaleString()}`,
+352 |     `- **Tokens out**: ${tokensOut.toLocaleString()}`,
+353 |     `- **Total cost**: ${cost < 0.01 ? cost.toFixed(4) : cost.toFixed(2)}`,
+354 |     ``,
+355 |   );
+356 |   writeFileSync(filePath, lines.join("\n"), "utf-8");
+357 | }
+358 | 
+359 | function App() {
+360 |   const [messages, setMessages] = useState<Message[]>([]);
+361 |   const [input, setInput] = useState("");
+362 |   const [loading, setLoading] = useState(false);
+[2026-04-05T18:26:59.032Z] iter=302 turn=16 INFO: Turn 16/25
+[2026-04-05T18:27:02.312Z] iter=302 turn=16 INFO: Agent: ESM project — can't use `require`. Fix that, then tsc check.
+[2026-04-05T18:27:02.313Z] iter=302 turn=16 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:27:02.314Z] iter=302 turn=16 INFO:   -> ok: Patched src/tui.tsx: -1 +1 lines
+
+Context after patch:
+313 |   workDir: string,
+314 |   filePath: string,
+315 | ): void {
+316 |   const { writeFileSync, mkdirSync } = await import("fs");
+317 |   const dir = path.dirname(filePath);
+318 |   mkdirSync(dir, { recursive: true });
+319 |   const now = new Date();
+[2026-04-05T18:27:02.315Z] iter=302 turn=17 INFO: Turn 17/25
+[2026-04-05T18:27:06.606Z] iter=302 turn=17 INFO: Agent: `await` can't be used in a non-async function. Fix the signature, then tsc:
+[2026-04-05T18:27:06.607Z] iter=302 turn=17 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:27:06.608Z] iter=302 turn=17 INFO:   -> ok: Patched src/tui.tsx: -8 +9 lines
+
+Context after patch:
+306 | }
+307 | 
+308 | // ─── Export Helper ───────────────────────────────────────────
+309 | import { writeFileSync, mkdirSync } from "fs";
+310 | 
+311 | function buildExportContent(
+312 |   messages: Message[],
+313 |   model: string,
+314 |   stats: FooterStats,
+315 |   workDir: string,
+316 |   filePath: string,
+317 | ): void {
+318 |   const dir = path.dirname(filePath);
+319 |   mkdirSync(dir, { recursive: true });
+320 |   const now = new Date();
+[2026-04-05T18:27:06.608Z] iter=302 turn=18 INFO: Turn 18/25
+[2026-04-05T18:27:09.616Z] iter=302 turn=18 INFO: Agent: `import` must be at the top of the file. Move it there:
+[2026-04-05T18:27:09.616Z] iter=302 turn=18 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:27:09.617Z] iter=302 turn=18 INFO:   -> ok: Patched src/tui.tsx: -4 +2 lines
+
+Context after patch:
+305 |   );
+306 | }
+307 | 
+308 | // ─── Export Helper ───────────────────────────────────────────
+309 | function buildExportContent(
+310 |   messages: Message[],
+311 |   model: string,
+312 |   stats: FooterStats,
+[2026-04-05T18:27:09.618Z] iter=302 turn=19 INFO: Turn 19/25
+[2026-04-05T18:27:12.174Z] iter=302 turn=19 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:27:12.175Z] iter=302 turn=19 INFO:   -> ok: Patched src/tui.tsx: -1 +2 lines
+
+Context after patch:
+19 | import { undoLastCommit } from "./auto-commit.js";
+20 | import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
+21 | import { execSync } from "child_process";
+22 | import { runInit } from "./init-command.js";
+23 | import { writeFileSync, mkdirSync } from "fs";
+24 | 
+25 | // Parse args
+26 | let workDir = process.cwd();
+[2026-04-05T18:27:12.175Z] iter=302 turn=20 INFO: Turn 20/25
+[2026-04-05T18:27:16.430Z] iter=302 turn=20 INFO: Agent: Also remove the unused dynamic import in `/exit` handler:
+[2026-04-05T18:27:16.431Z] iter=302 turn=20 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:27:16.431Z] iter=302 turn=20 INFO:   -> ok: Patched src/tui.tsx: -5 +1 lines
+
+Context after patch:
+542 |         try {
+543 |           const now = new Date();
+544 |           const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+545 |           const filePath = path.join(workDir, ".autoagent", "exports", `session-${timestamp}.md`);
+546 |           const model = orchestratorRef.current?.getModel() ?? footerStats.model;
+547 |           buildExportContent(messages, model, footerStats, workDir, filePath);
+548 |         } catch { /* never block exit */ }
+[2026-04-05T18:27:16.432Z] iter=302 turn=21 INFO: Turn 21/25
+[2026-04-05T18:27:18.487Z] iter=302 turn=21 INFO: $ npx tsc --noEmit 2>&1 | head -40
+[2026-04-05T18:27:19.448Z] iter=302 turn=21 INFO:   -> exit=0 (358 chars)
+[2026-04-05T18:27:19.449Z] iter=302 turn=22 INFO: Turn 22/25
+[2026-04-05T18:27:21.353Z] iter=302 turn=22 INFO: read_file: src/tui.tsx
+[2026-04-05T18:27:21.353Z] iter=302 turn=22 INFO:   -> ok (723 chars)
+[2026-04-05T18:27:21.353Z] iter=302 turn=23 INFO: Turn 23/25
+[2026-04-05T18:27:28.623Z] iter=302 turn=23 INFO: Agent: The `else` block wrapping the whole file is causing TS errors. Let me revert that approach — use an early return pattern instead:
+[2026-04-05T18:27:28.623Z] iter=302 turn=23 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:27:28.624Z] iter=302 turn=23 INFO:   -> ok: Patched src/tui.tsx: -17 +16 lines
+
+Context after patch:
+32 | // --no-confirm flag: skip write_file diff confirmation
+33 | const noConfirm = process.argv.includes("--no-confirm");
+34 | 
+35 | // ─── CLI Subcommand Routing ──────────────────────────────────
+36 | // Must run before TUI render. If first arg is a known subcommand, handle it and exit.
+37 | if (process.argv[2] === "init") {
+38 |   runInit(workDir, (msg) => console.log(msg))
+39 |     .then(({ content, updated }) => {
+40 |       console.log(updated ? "✓ Updated .autoagent.md" : "✓ Created .autoagent.md");
+41 |       console.log("\n" + content);
+42 |       process.exit(0);
+43 |     })
+44 |     .catch((err) => {
+45 |       console.error("Init failed:", err instanceof Error ? err.message : String(err));
+46 |       process.exit(1);
+47 |     });
+48 | }
+49 | 
+50 | // --continue / -c flag: auto-resume most recent session
+51 | const continueFlag =
+52 |   process.argv.includes("--continue") || process.argv.includes("-c");
+53 | let initialResumeSessionPath: string | undefined;
+[2026-04-05T18:27:28.625Z] iter=302 turn=24 INFO: Turn 24/25
+[2026-04-05T18:27:31.593Z] iter=302 turn=24 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:27:31.594Z] iter=302 turn=24 INFO:   -> ok: Patched src/tui.tsx: -3 +1 lines
+
+Context after patch:
+946 | 
+947 | // ─── Entry ──────────────────────────────────────────────────
+948 | 
+949 | render(<App />);
+950 | 
+[2026-04-05T18:27:31.594Z] iter=302 turn=25 INFO: Turn 25/25
+[2026-04-05T18:27:33.345Z] iter=302 turn=25 INFO: $ npx tsc --noEmit 2>&1 | head -20 && echo "TSC_OK"
+[2026-04-05T18:27:34.299Z] iter=302 turn=25 INFO:   -> exit=0 (7 chars)
+[2026-04-05T18:27:34.300Z] iter=302 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T18:27:34.301Z] iter=302 turn=25 INFO: Cache persisted: 50 entries to .autoagent-cache.json
+[2026-04-05T18:27:34.302Z] iter=302 turn=25 INFO: Cache stats: 0 hits, 9 misses, 50 entries, 12 invalidations (7 entries removed)
+[2026-04-05T18:27:34.302Z] iter=302 turn=25 INFO: Tool cache stats
+[2026-04-05T18:27:34.302Z] iter=302 turn=25 INFO: Tool timing: bash: 4x, avg=484ms, total=1936ms; write_file: 12x, avg=1ms, total=15ms; read_file: 9x, avg=1ms, total=7ms; think: 2x, avg=1ms, total=2ms; read_scratchpad: 1x, avg=1ms, total=1ms
+[2026-04-05T18:27:34.302Z] iter=302 turn=25 INFO: Tool timing stats
+[2026-04-05T18:27:41.783Z] iter=302 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 302: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T18:27:41.805Z] iter=302 turn=25 INFO: Pre-commit review: no significant code changes to review
