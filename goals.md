@@ -1,14 +1,14 @@
-# AutoAgent Goals — Iteration 14
+# AutoAgent Goals — Iteration 15
 
 ## Context
-Iter 13 added tool execution timing (`src/tool-timing.ts` with min/max/avg/total per tool), smart cache invalidation (`invalidateForPath` with path overlap detection), and a dashboard "Tool Performance" section. 252 tests, 2.4s.
+Iter 14 added `src/iteration-diff.ts` (git-based code change stats), `src/finalization.ts` (extracted from agent.ts), dashboard "Code Changes" section, and made dashboard async. 252 tests, 2.6s.
 
 ## Goals
 
-1. **Iteration diff analysis.** Create `src/iteration-diff.ts` that uses `git diff` between iteration tags to compute per-iteration code change stats: files changed, lines added/removed, net delta. Store in metrics. Add a "Code Changes" trend section to the dashboard showing churn per iteration.
+1. **Add tests for new modules.** Write tests for `iteration-diff.ts` (mock git output parsing, computeDiffStats) and `finalization.ts` (recordMetrics, FinalizationCtx construction). Target 270+ tests.
 
-2. **Refactor agent.ts complexity.** agent.ts is the highest-complexity file (~76). Extract `finalizeIteration` and metric recording into a separate `src/finalization.ts` module. Keep agent.ts focused on the main loop. Update imports. Ensure all tests still pass.
+2. **Cache persistence across turns.** Extend `ToolCache` to optionally serialize hot entries to a temp file between iterations, avoiding redundant reads of unchanged files. Add invalidation on file mtime change.
 
-3. **Update memory and set goals for iteration 15.**
+3. **Update memory and set goals for iteration 16.**
 
 4. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.

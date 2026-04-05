@@ -15,18 +15,11 @@ import path from "path";
 import "dotenv/config";
 import { executeBash } from "./tools/bash.js";
 import { createDefaultRegistry } from "./tool-registry.js";
-import {
-  validateBeforeCommit,
-  captureCodeQuality,
-  captureBenchmarks,
-  type CodeQualitySnapshot,
-  type BenchmarkSnapshot,
-} from "./validation.js";
+import { validateBeforeCommit } from "./validation.js";
 import {
   loadState,
   saveState,
   tagPreIteration,
-  commitIteration,
   rollbackToPreIteration,
   type IterationState,
 } from "./iteration.js";
@@ -38,7 +31,8 @@ import {
   validationBlockedMessage,
 } from "./messages.js";
 import { ToolCache } from "./tool-cache.js";
-import { ToolTimingTracker, type TimingStats } from "./tool-timing.js";
+import { ToolTimingTracker } from "./tool-timing.js";
+import { finalizeIteration as runFinalization, type IterationMetrics } from "./finalization.js";
 
 const ROOT = process.cwd();
 const GOALS_FILE = path.join(ROOT, "goals.md");
@@ -65,33 +59,7 @@ function log(iter: number, msg: string): void {
   }
 }
 
-// ─── Metrics ────────────────────────────────────────────────
-
-interface IterationMetrics {
-  iteration: number;
-  startTime: string;
-  endTime: string;
-  turns: number;
-  toolCalls: Record<string, number>;
-  success: boolean;
-  durationMs: number;
-  inputTokens: number;
-  outputTokens: number;
-  cacheCreationTokens?: number;
-  cacheReadTokens?: number;
-  codeQuality?: CodeQualitySnapshot;
-  benchmarks?: BenchmarkSnapshot;
-  toolTimings?: TimingStats;
-}
-
-function recordMetrics(m: IterationMetrics): void {
-  let existing: IterationMetrics[] = [];
-  if (existsSync(METRICS_FILE)) {
-    try { existing = JSON.parse(readFileSync(METRICS_FILE, "utf-8")); } catch { existing = []; }
-  }
-  existing.push(m);
-  writeFileSync(METRICS_FILE, JSON.stringify(existing, null, 2));
-}
+// ─── Metrics (see src/finalization.ts) ──────────────────────
 
 // ─── File readers ───────────────────────────────────────────
 
@@ -259,7 +227,7 @@ async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
       return "continue";
     }
 
-    await finalizeIteration(ctx, true);
+    await doFinalize(ctx, true);
     return "restarted";
   }
 
@@ -281,53 +249,23 @@ async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
   return "continue";
 }
 
-/** Finalize: capture metrics, commit, optionally restart. */
-async function finalizeIteration(ctx: IterationCtx, doRestart: boolean): Promise<void> {
-  // Log cache stats
-  const cacheStats = ctx.cache.stats();
-  if (cacheStats.hits > 0 || cacheStats.misses > 0) {
-    log(ctx.iter, `Cache stats: ${cacheStats.hits} hits, ${cacheStats.misses} misses, ${cacheStats.entries} entries, ${cacheStats.invalidations} invalidations (${cacheStats.invalidatedEntries} entries removed)`);
-    if (logger) logger.info("Tool cache stats", { cacheHits: cacheStats.hits, cacheMisses: cacheStats.misses, cacheEntries: cacheStats.entries, invalidations: cacheStats.invalidations, invalidatedEntries: cacheStats.invalidatedEntries, toolStats: cacheStats.toolStats });
-  }
-
-  // Log timing stats
-  const timingStats = ctx.timing.stats();
-  if (timingStats.totalCalls > 0) {
-    const toolSummary = Object.entries(timingStats.tools)
-      .sort((a, b) => b[1].totalMs - a[1].totalMs)
-      .map(([name, t]) => `${name}: ${t.calls}x, avg=${t.avgMs}ms, total=${Math.round(t.totalMs)}ms`)
-      .join("; ");
-    log(ctx.iter, `Tool timing: ${toolSummary}`);
-    if (logger) logger.info("Tool timing stats", { timing: timingStats });
-  }
-
-  const codeQuality = await captureCodeQuality(ROOT);
-  const benchmarks = await captureBenchmarks(ROOT);
-  recordMetrics({
-    iteration: ctx.iter, startTime: ctx.startTime.toISOString(), endTime: new Date().toISOString(),
-    turns: ctx.turns, toolCalls: ctx.toolCounts, success: true,
-    durationMs: Date.now() - ctx.startTime.getTime(),
-    inputTokens: ctx.tokens.in, outputTokens: ctx.tokens.out,
-    cacheCreationTokens: ctx.tokens.cacheCreate || undefined,
-    cacheReadTokens: ctx.tokens.cacheRead || undefined,
-    codeQuality, benchmarks,
-    toolTimings: timingStats.totalCalls > 0 ? timingStats : undefined,
-  });
-
-  const sha = await commitIteration(ctx.iter);
-  const label = doRestart ? "Committed" : "Committed (no restart)";
-  log(ctx.iter, `${label}: ${sha.slice(0, 8)} (${ctx.tokens.in} in / ${ctx.tokens.out} out, cache: ${ctx.tokens.cacheCreate} created, ${ctx.tokens.cacheRead} read)`);
-
-  ctx.state.lastSuccessfulIteration = ctx.iter;
-  ctx.state.lastFailedCommit = null;
-  ctx.state.lastFailureReason = null;
-  ctx.state.iteration++;
-  saveState(ctx.state);
-
-  if (doRestart) {
-    log(ctx.iter, `Restarting as iteration ${ctx.state.iteration}...`);
-    restart();
-  }
+/** Delegate to extracted finalization module. */
+async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> {
+  await runFinalization({
+    iter: ctx.iter,
+    state: ctx.state,
+    startTime: ctx.startTime,
+    turns: ctx.turns,
+    toolCounts: ctx.toolCounts,
+    tokens: ctx.tokens,
+    cache: ctx.cache,
+    timing: ctx.timing,
+    rootDir: ROOT,
+    metricsFile: METRICS_FILE,
+    log: (msg: string) => log(ctx.iter, msg),
+    logger,
+    restart,
+  }, doRestart);
 }
 
 // ─── Main iteration ─────────────────────────────────────────
@@ -371,7 +309,7 @@ async function runIteration(state: IterationState): Promise<void> {
   }
 
   if (ctx.turns >= MAX_TURNS) log(ctx.iter, "Hit max turns — forcing commit");
-  await finalizeIteration(ctx, false);
+  await doFinalize(ctx, false);
 }
 
 // ─── Restart ────────────────────────────────────────────────

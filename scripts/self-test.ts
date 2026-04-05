@@ -453,7 +453,7 @@ function testCodeAnalysis(): void {
 
 // ─── Dashboard Tests ────────────────────────────────────────
 
-function testDashboard(): void {
+async function testDashboard(): Promise<void> {
   console.log("\n📊 Dashboard");
 
   // Generate from sample metrics
@@ -471,7 +471,7 @@ function testDashboard(): void {
     },
   ];
 
-  const html = generateDashboard(sampleMetrics);
+  const html = await generateDashboard(sampleMetrics);
   assert(html.includes("<!DOCTYPE html>"), "dashboard: valid HTML");
   assert(html.includes("AutoAgent Dashboard"), "dashboard: has title");
   assert(html.includes("Iteration"), "dashboard: has iteration column");
@@ -482,7 +482,7 @@ function testDashboard(): void {
   assert(html.includes("Avg"), "dashboard: has average row");
 
   // Empty metrics
-  const emptyHtml = generateDashboard([]);
+  const emptyHtml = await generateDashboard([]);
   assert(emptyHtml.includes("<!DOCTYPE html>"), "dashboard: handles empty metrics");
   assert(emptyHtml.includes("0"), "dashboard: shows zero for empty");
 }
@@ -659,7 +659,7 @@ async function main(): Promise<void> {
     await testWebFetch();
     testCodeAnalysis();
     await testCompactMemory();
-    testDashboard();
+    await testDashboard();
     await testToolRegistry();
     await testValidation();
     await testParallelExecution();
@@ -667,7 +667,7 @@ async function main(): Promise<void> {
     testLogging();
     testToolTimeouts();
     testToolCache();
-    testLogAnalysisDashboard();
+    await testLogAnalysisDashboard();
     testToolTiming();
     testSmartCacheInvalidation();
   } finally {
@@ -867,7 +867,7 @@ function testToolCache(): void {
   assert(CACHEABLE_TOOLS.size >= 2, "cache: CACHEABLE_TOOLS has multiple tools");
 }
 
-function testLogAnalysisDashboard(): void {
+async function testLogAnalysisDashboard(): Promise<void> {
   console.log("\n📋 Log Analysis Dashboard");
   mkdirSync(TEMP_DIR, { recursive: true });
 
@@ -895,7 +895,7 @@ function testLogAnalysisDashboard(): void {
   assert(errors.length === 1, "log-analysis: finds errors");
 
   // Dashboard generation still works (integration test)
-  const html = generateDashboard([{
+  const html = await generateDashboard([{
     iteration: 1, startTime: "2026-01-01T00:00:00Z", endTime: "2026-01-01T00:01:00Z",
     turns: 3, toolCalls: { bash: 1, read_file: 1 }, success: true,
     durationMs: 60000, inputTokens: 50000, outputTokens: 2000,

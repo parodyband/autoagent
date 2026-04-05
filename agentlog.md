@@ -2182,3 +2182,215 @@ Let me find where to insert and add both test functions at once:
 [2026-04-05T06:43:56.855Z] iter=13 turn=48 INFO: Compilation OK
 [2026-04-05T06:44:00.689Z] iter=13 turn=48 INFO: Cache stats: 0 hits, 11 misses, 0 entries
 [2026-04-05T06:44:00.690Z] iter=13 turn=48 INFO: Tool cache stats
+[2026-04-05T06:44:03.550Z] iter=13 turn=48 INFO: Committed: 411796ca (1509353 in / 14215 out, cache: 0 created, 0 read)
+[2026-04-05T06:44:03.550Z] iter=13 turn=48 INFO: Restarting as iteration 14...
+[2026-04-05T06:44:03.762Z] iter=14 INFO: Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T06:44:03.772Z] iter=14 turn=1 INFO: Turn 1/50
+[2026-04-05T06:44:07.326Z] iter=14 turn=1 INFO: Agent: 
+
+I'll start by understanding the current project structure and then execute the goals sequentially.
+[2026-04-05T06:44:07.328Z] iter=14 turn=1 INFO: list_files: src (depth=1)
+[2026-04-05T06:44:07.338Z] iter=14 turn=1 INFO:   -> ok (1 dirs, 10 files)
+[2026-04-05T06:44:07.338Z] iter=14 turn=1 INFO: $ git log --oneline -10
+[2026-04-05T06:44:07.341Z] iter=14 turn=1 INFO: $ git tag -l 'iter-*' | sort -t- -k2 -n
+[2026-04-05T06:44:07.349Z] iter=14 turn=1 INFO:   -> exit=0 (414 chars)
+[2026-04-05T06:44:07.349Z] iter=14 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:44:07.349Z] iter=14 turn=2 INFO: Turn 2/50
+[2026-04-05T06:44:10.435Z] iter=14 turn=2 INFO: think: No iteration tags exist. I'll need to use commit messages to identify iteration boundaries. Let me get all iteration com...
+[2026-04-05T06:44:10.436Z] iter=14 turn=3 INFO: Turn 3/50
+[2026-04-05T06:44:13.694Z] iter=14 turn=3 INFO: $ git log --oneline --all | grep "iteration"
+[2026-04-05T06:44:13.697Z] iter=14 turn=3 INFO: read_file: src/agent.ts
+[2026-04-05T06:44:13.698Z] iter=14 turn=3 INFO:   -> ok (17785 chars)
+[2026-04-05T06:44:13.698Z] iter=14 turn=3 INFO: read_file: src/iteration.ts
+[2026-04-05T06:44:13.698Z] iter=14 turn=3 INFO:   -> ok (2209 chars)
+[2026-04-05T06:44:13.709Z] iter=14 turn=3 INFO:   -> exit=0 (438 chars)
+[2026-04-05T06:44:13.709Z] iter=14 turn=4 INFO: Turn 4/50
+[2026-04-05T06:44:16.910Z] iter=14 turn=4 INFO: read_file: scripts/dashboard.ts
+[2026-04-05T06:44:16.911Z] iter=14 turn=4 INFO:   -> ok (18371 chars)
+[2026-04-05T06:44:16.912Z] iter=14 turn=4 INFO: $ cat .autoagent-metrics.json | head -20
+[2026-04-05T06:44:16.922Z] iter=14 turn=4 INFO:   -> exit=0 (382 chars)
+[2026-04-05T06:44:16.923Z] iter=14 turn=5 INFO: Turn 5/50
+[2026-04-05T06:44:23.465Z] iter=14 turn=5 INFO: think: Now I understand the landscape. Let me plan both goals:
+
+## Goal 1: Iteration diff analysis
+Create `src/iteration-diff.t...
+[2026-04-05T06:44:23.465Z] iter=14 turn=6 INFO: Turn 6/50
+[2026-04-05T06:44:27.008Z] iter=14 turn=6 INFO: Agent: Now let me check the existing test structure:
+[2026-04-05T06:44:27.009Z] iter=14 turn=6 INFO: $ ls tests/
+[2026-04-05T06:44:27.012Z] iter=14 turn=6 INFO: $ git log --oneline --format="%H %s" | grep "iteration"
+[2026-04-05T06:44:27.020Z] iter=14 turn=6 INFO:   -> exit=1 (38 chars)
+[2026-04-05T06:44:27.025Z] iter=14 turn=6 INFO:   -> exit=0 (900 chars)
+[2026-04-05T06:44:27.025Z] iter=14 turn=7 INFO: Turn 7/50
+[2026-04-05T06:44:29.596Z] iter=14 turn=7 INFO: $ ls test/
+[2026-04-05T06:44:29.604Z] iter=14 turn=7 INFO:   -> exit=1 (37 chars)
+[2026-04-05T06:44:29.605Z] iter=14 turn=8 INFO: Turn 8/50
+[2026-04-05T06:44:32.068Z] iter=14 turn=8 INFO: $ find . -name "*.test.ts" -not -path "./node_modules/*" | head -20
+[2026-04-05T06:44:32.094Z] iter=14 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:44:32.095Z] iter=14 turn=9 INFO: Turn 9/50
+[2026-04-05T06:44:34.694Z] iter=14 turn=9 INFO: $ find . -name "*.test.*" -not -path "./node_modules/*" -not -path "./.self-test-tmp/*" | head -20
+[2026-04-05T06:44:34.719Z] iter=14 turn=9 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:44:34.719Z] iter=14 turn=10 INFO: Turn 10/50
+[2026-04-05T06:44:37.091Z] iter=14 turn=10 INFO: $ cat scripts/self-test.ts | head -50
+[2026-04-05T06:44:37.100Z] iter=14 turn=10 INFO:   -> exit=0 (2052 chars)
+[2026-04-05T06:44:37.100Z] iter=14 turn=11 INFO: Turn 11/50
+[2026-04-05T06:44:39.291Z] iter=14 turn=11 INFO: $ wc -l scripts/self-test.ts
+[2026-04-05T06:44:39.299Z] iter=14 turn=11 INFO:   -> exit=0 (30 chars)
+[2026-04-05T06:44:39.299Z] iter=14 turn=12 INFO: Turn 12/50
+[2026-04-05T06:44:42.970Z] iter=14 turn=12 INFO: Agent: Now let me verify what `git diff --numstat` between iteration commits looks like:
+[2026-04-05T06:44:42.971Z] iter=14 turn=12 INFO: $ git diff --numstat c3b5a58 a9beb0d 2>/dev/null | head -20
+[2026-04-05T06:44:42.994Z] iter=14 turn=12 INFO:   -> exit=0 (162 chars)
+[2026-04-05T06:44:42.995Z] iter=14 turn=13 INFO: Turn 13/50
+[2026-04-05T06:44:59.853Z] iter=14 turn=13 INFO: Agent: Good. Now I have the data I need. Let me create the iteration diff module.
+[2026-04-05T06:44:59.855Z] iter=14 turn=13 INFO: write_file: src/iteration-diff.ts (write)
+[2026-04-05T06:44:59.857Z] iter=14 turn=13 INFO:   -> ok: Created src/iteration-diff.ts (3401 chars)
+[2026-04-05T06:44:59.858Z] iter=14 turn=14 INFO: Turn 14/50
+[2026-04-05T06:45:02.479Z] iter=14 turn=14 INFO: Agent: Now let me verify it compiles:
+[2026-04-05T06:45:02.480Z] iter=14 turn=14 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T06:45:03.129Z] iter=14 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:45:03.129Z] iter=14 turn=15 INFO: Turn 15/50
+[2026-04-05T06:45:07.701Z] iter=14 turn=15 INFO: Agent: Let me test it works:
+[2026-04-05T06:45:07.702Z] iter=14 turn=15 INFO: $ npx tsx -e "
+import { getIterationCommits, getAllIterationDiffs } from './src/iteration-diff.js';
+
+async function main() {
+  const commits = await getIterationCommits();
+  console.log('Commits found:'...
+[2026-04-05T06:45:08.076Z] iter=14 turn=15 INFO:   -> exit=1 (5308 chars)
+[2026-04-05T06:45:08.076Z] iter=14 turn=16 INFO: Turn 16/50
+[2026-04-05T06:45:14.370Z] iter=14 turn=16 INFO: $ npx tsx -e "
+import { getIterationCommits, getAllIterationDiffs } from './src/iteration-diff.ts';
+
+async function main() {
+  const commits = await getIterationCommits();
+  console.log('Commits found:'...
+[2026-04-05T06:45:14.837Z] iter=14 turn=16 INFO:   -> exit=0 (499 chars)
+[2026-04-05T06:45:14.837Z] iter=14 turn=17 INFO: Turn 17/50
+[2026-04-05T06:45:38.524Z] iter=14 turn=17 INFO: Agent: The iteration diff module works. Now let me add the dashboard section and write tests. Let me also do Goal 2 (extract finalization) simultaneously.
+[2026-04-05T06:45:38.525Z] iter=14 turn=17 INFO: write_file: src/finalization.ts (write)
+[2026-04-05T06:45:38.525Z] iter=14 turn=17 INFO:   -> ok: Created src/finalization.ts (4549 chars)
+[2026-04-05T06:45:38.525Z] iter=14 turn=18 INFO: Turn 18/50
+[2026-04-05T06:45:48.662Z] iter=14 turn=18 INFO: Agent: Now update agent.ts to use the extracted finalization module:
+[2026-04-05T06:45:48.662Z] iter=14 turn=18 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:45:48.663Z] iter=14 turn=18 INFO:   -> ok: Patched src/agent.ts: -24 +18 lines
+[2026-04-05T06:45:48.664Z] iter=14 turn=19 INFO: Turn 19/50
+[2026-04-05T06:45:54.292Z] iter=14 turn=19 INFO: Agent: Now remove the old `IterationMetrics`, `recordMetrics`, and `finalizeIteration` from agent.ts:
+[2026-04-05T06:45:54.293Z] iter=14 turn=19 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:45:54.293Z] iter=14 turn=19 INFO:   -> ok: Patched src/agent.ts: -27 +1 lines
+[2026-04-05T06:45:54.294Z] iter=14 turn=20 INFO: Turn 20/50
+[2026-04-05T06:45:57.878Z] iter=14 turn=20 INFO: Agent: Now remove the old `finalizeIteration` function and replace references. Let me find it:
+[2026-04-05T06:45:57.880Z] iter=14 turn=20 INFO: grep: "^async function finalizeIteration" in src/agent.ts
+[2026-04-05T06:45:57.895Z] iter=14 turn=20 INFO:   -> 5 matches
+[2026-04-05T06:45:57.896Z] iter=14 turn=21 INFO: Turn 21/50
+[2026-04-05T06:46:00.646Z] iter=14 turn=21 INFO: read_file: src/agent.ts
+[2026-04-05T06:46:00.647Z] iter=14 turn=21 INFO:   -> ok (2797 chars)
+[2026-04-05T06:46:00.647Z] iter=14 turn=22 INFO: Turn 22/50
+[2026-04-05T06:46:11.214Z] iter=14 turn=22 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:46:11.214Z] iter=14 turn=22 INFO:   -> ok: Patched src/agent.ts: -48 +18 lines
+[2026-04-05T06:46:11.214Z] iter=14 turn=23 INFO: Turn 23/50
+[2026-04-05T06:46:14.632Z] iter=14 turn=23 INFO: Agent: Now update the two call sites in agent.ts that called `finalizeIteration` to use `doFinalize`:
+[2026-04-05T06:46:14.633Z] iter=14 turn=23 INFO: grep: "finalizeIteration|doFinalize"" in src/agent.ts
+[2026-04-05T06:46:14.649Z] iter=14 turn=23 INFO:   -> 0 matches
+[2026-04-05T06:46:14.649Z] iter=14 turn=24 INFO: Turn 24/50
+[2026-04-05T06:46:17.385Z] iter=14 turn=24 INFO: grep: "finalizeIteration|doFinalize" in src/agent.ts
+[2026-04-05T06:46:17.400Z] iter=14 turn=24 INFO:   -> 0 matches
+[2026-04-05T06:46:17.400Z] iter=14 turn=25 INFO: Turn 25/50
+[2026-04-05T06:46:20.613Z] iter=14 turn=25 INFO: grep: "finalize" in src/agent.ts
+[2026-04-05T06:46:20.630Z] iter=14 turn=25 INFO:   -> 15 matches
+[2026-04-05T06:46:20.630Z] iter=14 turn=26 INFO: Turn 26/50
+[2026-04-05T06:46:26.769Z] iter=14 turn=26 INFO: think: I see the issue - line 230 and 312 still call `finalizeIteration(ctx, ...)` directly but now `finalizeIteration` from th...
+[2026-04-05T06:46:26.769Z] iter=14 turn=27 INFO: Turn 27/50
+[2026-04-05T06:46:29.826Z] iter=14 turn=27 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:46:29.827Z] iter=14 turn=27 INFO:   -> ok: Patched src/agent.ts: -2 +2 lines
+[2026-04-05T06:46:29.827Z] iter=14 turn=28 INFO: Turn 28/50
+[2026-04-05T06:46:33.182Z] iter=14 turn=28 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:46:33.183Z] iter=14 turn=28 INFO:   -> ok: Patched src/agent.ts: -2 +2 lines
+[2026-04-05T06:46:33.183Z] iter=14 turn=29 INFO: Turn 29/50
+[2026-04-05T06:46:36.602Z] iter=14 turn=29 INFO: Agent: Now rename the import to avoid confusion:
+[2026-04-05T06:46:36.603Z] iter=14 turn=29 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:46:36.604Z] iter=14 turn=29 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
+[2026-04-05T06:46:36.604Z] iter=14 turn=30 INFO: Turn 30/50
+[2026-04-05T06:46:39.758Z] iter=14 turn=30 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T06:46:39.759Z] iter=14 turn=30 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
+[2026-04-05T06:46:39.759Z] iter=14 turn=31 INFO: Turn 31/50
+[2026-04-05T06:46:43.444Z] iter=14 turn=31 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T06:46:44.066Z] iter=14 turn=31 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:46:44.066Z] iter=14 turn=32 INFO: Turn 32/50
+[2026-04-05T06:46:49.319Z] iter=14 turn=32 INFO: Agent: Clean compile. Now add the dashboard "Code Changes" section and tests. Let me add the section to the dashboard:
+[2026-04-05T06:46:49.320Z] iter=14 turn=32 INFO: write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:46:49.322Z] iter=14 turn=32 INFO:   -> ok: Patched scripts/dashboard.ts: -1 +2 lines
+[2026-04-05T06:46:49.323Z] iter=14 turn=33 INFO: Turn 33/50
+[2026-04-05T06:47:01.451Z] iter=14 turn=33 INFO: Agent: Now add the code changes section generator function before the `generateDashboard` function:
+[2026-04-05T06:47:01.452Z] iter=14 turn=33 INFO: write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:47:01.452Z] iter=14 turn=33 INFO:   -> ok: Patched scripts/dashboard.ts: -1 +40 lines
+[2026-04-05T06:47:01.453Z] iter=14 turn=34 INFO: Turn 34/50
+[2026-04-05T06:47:06.222Z] iter=14 turn=34 INFO: Agent: Now make `generateDashboard` async to support the diff analysis, and wire in the section:
+[2026-04-05T06:47:06.223Z] iter=14 turn=34 INFO: write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:47:06.224Z] iter=14 turn=34 INFO:   -> ok: Patched scripts/dashboard.ts: -1 +4 lines
+[2026-04-05T06:47:06.224Z] iter=14 turn=35 INFO: Turn 35/50
+[2026-04-05T06:47:10.492Z] iter=14 turn=35 INFO: Agent: Now find where the code changes section should be inserted in the HTML template:
+[2026-04-05T06:47:10.494Z] iter=14 turn=35 INFO: write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:47:10.495Z] iter=14 turn=35 INFO:   -> ok: Patched scripts/dashboard.ts: -3 +5 lines
+[2026-04-05T06:47:10.495Z] iter=14 turn=36 INFO: Turn 36/50
+[2026-04-05T06:47:15.792Z] iter=14 turn=36 INFO: Agent: 
+
+Now update the CLI entrypoint to handle async:
+[2026-04-05T06:47:15.793Z] iter=14 turn=36 INFO: write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:47:15.794Z] iter=14 turn=36 INFO:   -> ok: Patched scripts/dashboard.ts: -9 +9 lines
+[2026-04-05T06:47:15.794Z] iter=14 turn=37 INFO: Turn 37/50
+[2026-04-05T06:47:18.924Z] iter=14 turn=37 INFO: Agent: Now check if anything else calls `generateDashboard` and needs updating:
+[2026-04-05T06:47:18.925Z] iter=14 turn=37 INFO: grep: "generateDashboard"
+[2026-04-05T06:47:18.944Z] iter=14 turn=37 INFO:   -> 18 matches
+[2026-04-05T06:47:18.945Z] iter=14 turn=38 INFO: Turn 38/50
+[2026-04-05T06:47:22.310Z] iter=14 turn=38 INFO: Agent: The self-tests call `generateDashboard` synchronously. I need to update those calls to `await`:
+[2026-04-05T06:47:22.311Z] iter=14 turn=38 INFO: $ grep -n "generateDashboard" scripts/self-test.ts
+[2026-04-05T06:47:22.326Z] iter=14 turn=38 INFO:   -> exit=0 (195 chars)
+[2026-04-05T06:47:22.326Z] iter=14 turn=39 INFO: Turn 39/50
+[2026-04-05T06:47:25.669Z] iter=14 turn=39 INFO: read_file: scripts/self-test.ts
+[2026-04-05T06:47:25.670Z] iter=14 turn=39 INFO:   -> ok (1749 chars)
+[2026-04-05T06:47:25.670Z] iter=14 turn=40 INFO: Turn 40/50
+[2026-04-05T06:47:29.118Z] iter=14 turn=40 INFO: read_file: scripts/self-test.ts
+[2026-04-05T06:47:29.118Z] iter=14 turn=40 INFO:   -> ok (1659 chars)
+[2026-04-05T06:47:29.119Z] iter=14 turn=41 INFO: Turn 41/50
+[2026-04-05T06:47:37.626Z] iter=14 turn=41 INFO: $ sed -i '' 's/const html = generateDashboard(sampleMetrics);/const html = await generateDashboard(sampleMetrics);/' scripts/self-test.ts
+sed -i '' 's/const emptyHtml = generateDashboard(\[\]);/const em...
+[2026-04-05T06:47:38.278Z] iter=14 turn=41 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:47:38.279Z] iter=14 turn=42 INFO: Turn 42/50
+[2026-04-05T06:47:41.930Z] iter=14 turn=42 INFO: $ cd /Users/austin/Documents/autoagent && timeout 60 npx tsx scripts/self-test.ts 2>&1 | tail -20
+[2026-04-05T06:47:41.938Z] iter=14 turn=42 INFO:   -> exit=0 (33 chars)
+[2026-04-05T06:47:41.939Z] iter=14 turn=43 INFO: Turn 43/50
+[2026-04-05T06:47:45.110Z] iter=14 turn=43 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -15
+[2026-04-05T06:47:45.446Z] iter=14 turn=43 INFO:   -> exit=0 (1005 chars)
+[2026-04-05T06:47:45.446Z] iter=14 turn=44 INFO: Turn 44/50
+[2026-04-05T06:47:49.162Z] iter=14 turn=44 INFO: Agent: The test function containing `await` isn't async. Let me find it:
+[2026-04-05T06:47:49.163Z] iter=14 turn=44 INFO: $ grep -n "function testDashboard" scripts/self-test.ts
+[2026-04-05T06:47:49.180Z] iter=14 turn=44 INFO:   -> exit=0 (37 chars)
+[2026-04-05T06:47:49.180Z] iter=14 turn=45 INFO: Turn 45/50
+[2026-04-05T06:47:52.897Z] iter=14 turn=45 INFO: $ sed -i '' 's/^function testDashboard(): void {/async function testDashboard(): Promise<void> {/' scripts/self-test.ts
+# Also fix the log analysis test at line ~898
+grep -n "function testLogAnalysis" s...
+[2026-04-05T06:47:52.913Z] iter=14 turn=45 INFO:   -> exit=0 (48 chars)
+[2026-04-05T06:47:52.914Z] iter=14 turn=46 INFO: Turn 46/50
+[2026-04-05T06:47:56.600Z] iter=14 turn=46 INFO: $ sed -i '' 's/^function testLogAnalysisDashboard(): void {/async function testLogAnalysisDashboard(): Promise<void> {/' scripts/self-test.ts
+# Check call sites
+grep -n "testDashboard\|testLogAnalysisDa...
+[2026-04-05T06:47:56.618Z] iter=14 turn=46 INFO:   -> exit=0 (61 chars)
+[2026-04-05T06:47:56.618Z] iter=14 turn=47 INFO: Turn 47/50
+[2026-04-05T06:48:00.296Z] iter=14 turn=47 INFO: $ sed -i '' 's/    testDashboard();/    await testDashboard();/' scripts/self-test.ts
+sed -i '' 's/    testLogAnalysisDashboard();/    await testLogAnalysisDashboard();/' scripts/self-test.ts
+npx tsx sc...
+[2026-04-05T06:48:03.258Z] iter=14 turn=47 INFO:   -> exit=0 (309 chars)
+[2026-04-05T06:48:03.259Z] iter=14 turn=48 INFO: Turn 48/50
+[2026-04-05T06:48:19.321Z] iter=14 turn=48 INFO: write_file: memory.md (append)
+[2026-04-05T06:48:19.322Z] iter=14 turn=48 INFO:   -> ok: Appended 1578 chars to memory.md
+[2026-04-05T06:48:19.323Z] iter=14 turn=49 INFO: Turn 49/50
+[2026-04-05T06:48:28.843Z] iter=14 turn=49 INFO: write_file: goals.md (write)
+[2026-04-05T06:48:28.844Z] iter=14 turn=49 INFO:   -> ok: Updated goals.md (813 chars, 0 lines delta)
+[2026-04-05T06:48:28.844Z] iter=14 turn=50 INFO: Turn 50/50
+[2026-04-05T06:48:31.526Z] iter=14 turn=50 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T06:48:31.526Z] iter=14 turn=50 INFO: RESTART signal
+[2026-04-05T06:48:31.527Z] iter=14 turn=50 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T06:48:32.180Z] iter=14 turn=50 INFO: Compilation OK
+[2026-04-05T06:48:36.940Z] iter=14 turn=50 INFO: Cache stats: 0 hits, 12 misses, 3 entries, 16 invalidations (9 entries removed)
+[2026-04-05T06:48:36.940Z] iter=14 turn=50 INFO: Tool cache stats
+[2026-04-05T06:48:36.941Z] iter=14 turn=50 INFO: Tool timing: bash: 25x, avg=252ms, total=6310ms; grep: 5x, avg=17ms, total=83ms; write_file: 16x, avg=1ms, total=20ms; list_files: 1x, avg=14ms, total=14ms; read_file: 6x, avg=2ms, total=10ms; think: 3x, avg=0ms, total=1ms
+[2026-04-05T06:48:36.941Z] iter=14 turn=50 INFO: Tool timing stats

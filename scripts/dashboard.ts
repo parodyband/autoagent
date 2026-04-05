@@ -12,6 +12,7 @@ import path from "path";
 import { analyzeCodebase, type CodebaseAnalysis } from "../src/code-analysis.js";
 import { parseJsonlLog, type LogEntry } from "../src/logging.js";
 import type { TimingStats, ToolTimingEntry } from "../src/tool-timing.js";
+import { getAllIterationDiffs, type IterationDiffStats } from "../src/iteration-diff.js";
 
 const ROOT = process.cwd();
 const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");
@@ -225,6 +226,45 @@ function generateToolPerformanceSection(metrics: IterationMetrics[]): string {
 </table>`;
 }
 
+function generateCodeChangesSection(diffs: IterationDiffStats[]): string {
+  if (diffs.length === 0) return "";
+
+  const maxChurn = Math.max(...diffs.map(d => d.linesAdded + d.linesRemoved));
+
+  const rows = diffs.map(d => {
+    const churn = d.linesAdded + d.linesRemoved;
+    const barWidth = Math.min(100, Math.round(churn / Math.max(1, maxChurn) * 100));
+    const deltaColor = d.netDelta > 0 ? "#3fb950" : d.netDelta < 0 ? "#f85149" : "#8b949e";
+    return `<tr>
+      <td>${d.iteration}</td>
+      <td>${d.filesChanged}</td>
+      <td style="color:#3fb950">+${d.linesAdded}</td>
+      <td style="color:#f85149">-${d.linesRemoved}</td>
+      <td style="color:${deltaColor}">${d.netDelta > 0 ? "+" : ""}${d.netDelta}</td>
+      <td><div style="background:linear-gradient(90deg,#3fb950 ${Math.round(d.linesAdded/Math.max(1,churn)*100)}%,#f85149 ${Math.round(d.linesAdded/Math.max(1,churn)*100)}%);height:12px;width:${barWidth}%;border-radius:3px;"></div></td>
+    </tr>`;
+  }).join("\n");
+
+  const totalAdded = diffs.reduce((s, d) => s + d.linesAdded, 0);
+  const totalRemoved = diffs.reduce((s, d) => s + d.linesRemoved, 0);
+  const totalFiles = diffs.reduce((s, d) => s + d.filesChanged, 0);
+
+  return `
+<h2 style="color: #58a6ff; margin-top: 2rem;">📝 Code Changes</h2>
+<div class="stats" style="margin-top: 1rem;">
+  <div class="stat-card"><div class="stat-value" style="color:#3fb950">+${totalAdded}</div><div class="stat-label">Lines Added</div></div>
+  <div class="stat-card"><div class="stat-value" style="color:#f85149">-${totalRemoved}</div><div class="stat-label">Lines Removed</div></div>
+  <div class="stat-card"><div class="stat-value">${totalAdded - totalRemoved}</div><div class="stat-label">Net Delta</div></div>
+  <div class="stat-card"><div class="stat-value">${totalFiles}</div><div class="stat-label">Files Changed</div></div>
+</div>
+<table style="margin-top: 1rem;">
+<thead><tr><th>Iter</th><th>Files</th><th>Added</th><th>Removed</th><th>Net</th><th>Churn</th></tr></thead>
+<tbody>
+${rows}
+</tbody>
+</table>`;
+}
+
 function generateLogAnalysisSection(jsonlPath: string): string {
   const entries = parseJsonlLog(jsonlPath);
   if (entries.length === 0) return "";
@@ -315,7 +355,10 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-export function generateDashboard(metrics: IterationMetrics[]): string {
+export async function generateDashboard(metrics: IterationMetrics[]): Promise<string> {
+  // Fetch iteration diffs (async - uses git)
+  let iterDiffs: IterationDiffStats[] = [];
+  try { iterDiffs = await getAllIterationDiffs(); } catch {}
   const totalIn = metrics.reduce((s, m) => s + m.inputTokens, 0);
   const totalOut = metrics.reduce((s, m) => s + m.outputTokens, 0);
   const totalDuration = metrics.reduce((s, m) => s + m.durationMs, 0);
@@ -436,6 +479,8 @@ ${generateCodeQualityTrend(metrics)}
 
 ${generateBenchmarkTrend(metrics)}
 
+${generateCodeChangesSection(iterDiffs)}
+
 ${generateToolPerformanceSection(metrics)}
 
 ${generateLogAnalysisSection(path.join(ROOT, "agentlog.jsonl"))}
@@ -454,7 +499,7 @@ if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith
 
   try {
     const metrics: IterationMetrics[] = JSON.parse(readFileSync(METRICS_FILE, "utf-8"));
-    const html = generateDashboard(metrics);
+    const html = await generateDashboard(metrics);
     writeFileSync(OUTPUT_FILE, html, "utf-8");
     console.log(`Dashboard generated: ${OUTPUT_FILE} (${metrics.length} iterations)`);
   } catch (err) {

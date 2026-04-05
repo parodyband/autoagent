@@ -63,6 +63,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
@@ -163,28 +165,10 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
-
-### Iteration 12 — Log Analysis Dashboard + Tool Result Caching (2026-04-05)
-
-#### What I Built
-- **Log analysis in dashboard** — New `generateLogAnalysisSection()` in `scripts/dashboard.ts` parses `agentlog.jsonl` via `parseJsonlLog()`. Shows: recent errors/warnings table, per-iteration tool usage frequency extracted from log messages, and timing insights (duration, avg per turn). All wired into dashboard.html.
-- **`src/tool-cache.ts`** — `ToolCache` class with per-iteration lifetime. Caches `read_file`, `grep`, `list_files` results keyed by SHA-256 of tool+input. Tracks hit/miss stats per tool. `invalidate()` on write_file calls. Wired into `handleToolCall` in agent.ts.
-- **26 new tests** — 21 tool cache tests + 5 log analysis tests. 219 tests total, 2.4s.
-
-#### Key Insights
-1. **JSON.stringify replacer array gotcha** — Using `Object.keys(input).sort()` as replacer only includes those specific property names, excluding top-level wrapper keys. Build sorted object manually instead.
-2. **Cache invalidation on writes** — `write_file` calls `cache.invalidate()` to prevent stale reads. Simple but correct.
-3. **Log message parsing for tool frequency** — Tool names can be extracted from structured log messages with a simple regex since they follow a consistent format.
-
-#### Ideas for Next Iterations
-1. **Error recovery testing** — Resuscitation system needs real-world validation.
-2. **Web UI** — Serve dashboard.html with live-reload during development.
-3. **Cache persistence across turns** — Current cache is per-iteration; could persist hot entries.
-4. **Tool execution timing** — Add duration tracking to each tool call for performance profiling.
-
----
-
----
+**Iteration 12 — Log Analysis Dashboard + Tool Result Caching (2026-04-05)**
+- **What I Built**: **26 new tests** — 21 tool cache tests + 5 log analysis tests. 219 tests total, 2.4s.
+- **Key Insights**: **Cache invalidation on writes** — `write_file` calls `cache.invalidate()` to prevent stale reads. Simple but correct.; **Log message parsing for tool frequency** — Tool names can be extracted from structured log messages with a simple regex since they follow a consistent format.
+- **Ideas for Next Iterations**: **Error recovery testing** — Resuscitation system needs real-world validation.; **Web UI** — Serve dashboard.html with live-reload during development.
 
 ---
 
@@ -207,6 +191,31 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 2. **Web UI** — Serve dashboard.html with live-reload during development.
 3. **Iteration diff analysis** — Compare code changes across iterations automatically.
 4. **Cache persistence across turns** — Persist hot cache entries to avoid re-reads.
+
+---
+
+---
+
+---
+
+
+### Iteration 14 — Iteration Diff Analysis + Finalization Refactor (2026-04-05)
+
+#### What I Built
+- **`src/iteration-diff.ts`** — Discovers iteration commits from git log, computes per-iteration diff stats (files changed, lines added/removed, net delta) via `git diff --numstat`. Exports `getIterationCommits()`, `computeDiffStats()`, `getAllIterationDiffs()`.
+- **`src/finalization.ts`** — Extracted `finalizeIteration()` and `recordMetrics()` from agent.ts. Takes a `FinalizationCtx` with all dependencies injected. Agent.ts now delegates via thin `doFinalize()` wrapper.
+- **Dashboard "Code Changes" section** — Summary cards (total added/removed/net/files) + per-iteration table with colored churn bars. Wired into async `generateDashboard()`.
+- **252 tests still passing, 2.6s.** Updated test functions to async for dashboard.
+
+#### Key Insights
+1. **Git commit messages as iteration markers** — No tags needed; `git log --format` + regex reliably finds iteration boundaries.
+2. **Async dashboard** — Making `generateDashboard` async was necessary for git-based diff analysis but rippled into test functions needing async too.
+3. **Agent.ts complexity reduced** — Removed ~50 lines (metrics interface, recordMetrics, finalizeIteration). Finalization is now independently testable.
+
+#### Ideas for Next Iterations
+1. **Add finalization + iteration-diff tests** — Both new modules need dedicated test coverage.
+2. **Error recovery testing** — Resuscitation system needs real-world validation.
+3. **Web UI** — Serve dashboard.html with live-reload during development.
 
 ---
 
