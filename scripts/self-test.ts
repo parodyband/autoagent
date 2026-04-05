@@ -723,6 +723,7 @@ async function main(): Promise<void> {
     await testResuscitationE2E();
     await testSubagent();
     await testApiRetry();
+    testTaskMdLifecycle();
     // Inline model-selection smoke test (avoids vitest import in tsx context)
     console.log("  model-selection smoke test...");
     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
@@ -2147,6 +2148,58 @@ async function testApiRetry(): Promise<void> {
     }
     assert(threw, "retry: throws immediately on 401");
     assert(callCount === 1, "retry: does NOT retry on 401 (auth error)", `callCount=${callCount}`);
+  }
+}
+
+// ─── TASK.md Lifecycle Tests ────────────────────────────────
+
+function testTaskMdLifecycle(): void {
+  console.log("\n🗂️  TASK.md Lifecycle");
+
+  // Verify that in doFinalize(), TASK.md deletion (unlinkSync) appears BEFORE
+  // runFinalization(). This is a static code analysis test that prevents
+  // regression of the bug where TASK.md was never deleted in normal (non --once)
+  // mode because restart() → process.exit() was called inside runFinalization().
+  const agentSrc = readFileSync(path.join(ROOT, "src/agent.ts"), "utf8");
+  const lines = agentSrc.split("\n");
+
+  // Find doFinalize function boundaries
+  let doFinalizeStart = -1;
+  let doFinalizeEnd = -1;
+  let braceDepth = 0;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes("async function doFinalize(")) {
+      doFinalizeStart = i;
+    }
+    if (doFinalizeStart !== -1) {
+      for (const ch of lines[i]) {
+        if (ch === "{") braceDepth++;
+        if (ch === "}") braceDepth--;
+      }
+      if (braceDepth === 0 && i > doFinalizeStart) {
+        doFinalizeEnd = i;
+        break;
+      }
+    }
+  }
+
+  assert(doFinalizeStart !== -1, "task-md: doFinalize() function found in agent.ts");
+  assert(doFinalizeEnd !== -1, "task-md: doFinalize() function has closing brace");
+
+  const doFinalizeBody = lines.slice(doFinalizeStart, doFinalizeEnd + 1);
+
+  const unlinkLine = doFinalizeBody.findIndex((l) => l.includes("unlinkSync(TASK_FILE)"));
+  const runFinalizationLine = doFinalizeBody.findIndex((l) => l.includes("await runFinalization("));
+
+  assert(unlinkLine !== -1, "task-md: unlinkSync(TASK_FILE) exists in doFinalize()");
+  assert(runFinalizationLine !== -1, "task-md: runFinalization() call exists in doFinalize()");
+
+  if (unlinkLine !== -1 && runFinalizationLine !== -1) {
+    assert(
+      unlinkLine < runFinalizationLine,
+      "task-md: unlinkSync(TASK_FILE) is called BEFORE runFinalization()",
+      `unlinkSync at body line ${unlinkLine}, runFinalization at body line ${runFinalizationLine}`
+    );
   }
 }
 
