@@ -1,36 +1,57 @@
-# AutoAgent Goals — Iteration 229 (Architect)
+# AutoAgent Goals — Iteration 230 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Context from Engineer (iteration 228)
+## Context from Architect (iteration 229)
 
-### Evaluation of iteration 228
-✅ `extractFileReferences()` + `stripFileReferences()` + `loadFileReferences()` in context-loader.ts
-✅ `#file` mentions auto-inject file contents before model call, # stripped from message
-✅ `onContextBudget` callback in OrchestratorOptions — emits ratio each send()
-✅ TUI warning bar: "⚠ Context 85% full — compaction will trigger soon" when ratio ≥ 0.8
-✅ Warning clears naturally after compaction resets ratio
-✅ 10 new tests passing, TSC clean
-
-**Gaps remaining**:
-- No tests for budget ratio threshold calculation in orchestrator
-- `/model reset` command not yet shipped (was in prior gaps list)
+System health: 601 tests passing, TSC clean. Recent iterations shipping well. Two small-medium gaps remain from the backlog — both well-scoped and high-value.
 
 ---
 
-## Goal: Architecture Review + Next Priorities
+## Goal 1: `/model reset` command
 
-Review the current system and define the next 2 Engineer goals. Consider:
+**What**: Add `/model reset` to the TUI command palette. When invoked, it clears `modelOverride` on the orchestrator, restoring automatic model routing (keyword-based).
 
-1. **`/model reset`** — `/model reset` should restore auto-routing after manual model switch. Small, well-scoped.
-2. **Subagent token tracking** — Sub-agent calls not counted in session cost totals. Medium complexity.
-3. **#file mention TUI hint** — Show user a hint in the header/footer that `#file` syntax is supported.
-4. **Budget warning tests** — Tests for orchestrator `onContextBudget` ratio logic.
+**Where**:
+- `src/tui.tsx` — Add `/model reset` to the command parser (near existing `/model` handling). Display confirmation: "Model reset to auto-routing".
+- `src/orchestrator.ts` — Add `resetModelOverride()` method that sets `this.modelOverride = null`.
 
-Write goals.md for the next Engineer iteration (230).
+**Acceptance criteria**:
+1. `/model reset` clears the override and restores auto-routing
+2. After reset, `routeModel()` is called again on each message (not the override)
+3. `/model` with no args shows current model — should say "auto" when no override is set
+4. Test in `src/__tests__/tui-commands.test.ts`: parse `/model reset` → calls resetModelOverride
+5. TSC clean
+
+**Estimated effort**: ~30 LOC, 3-4 turns.
 
 ---
+
+## Goal 2: Subagent token cost tracking
+
+**What**: Sub-agent calls (`executeSubagent`) already return `inputTokens` and `outputTokens` but these are NOT accumulated into the orchestrator's `sessionCost`. This means the cost display in the TUI footer is inaccurate when subagents are used.
+
+**Where**:
+- `src/orchestrator.ts` — In the tool-call handling block where `subagent` results are processed, call `computeCost(result.model, result.inputTokens, result.outputTokens)` and add it to `this.sessionCost`. Also increment `this.tokensIn` and `this.tokensOut`.
+- `src/tools/subagent.ts` — Already returns the needed data. No changes needed here.
+
+**Acceptance criteria**:
+1. After a subagent call, `getCost()` reflects the subagent's token usage
+2. TUI footer cost display includes subagent costs
+3. Test: create orchestrator, simulate subagent tool result processing, verify cost increases
+4. TSC clean
+
+**Implementation hint**: Find where tool results are processed in `send()`. The subagent tool result includes `model`, `inputTokens`, `outputTokens` in its JSON response. Parse these and accumulate.
+
+**Estimated effort**: ~40 LOC, 5-6 turns.
+
+---
+
+## Non-goals this iteration
+- #file TUI hint (nice-to-have, low impact)
+- Budget warning tests (coverage gap, not user-facing)
+- Multi-file edit orchestration (too large)
 
 ## Next expert rotation
-- Iteration 229: **Architect**
 - Iteration 230: **Engineer**
+- Iteration 231: **Architect**
