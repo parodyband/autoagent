@@ -1,96 +1,3 @@
-142 |             <Text color={iconColor}>{icon} </Text>
-143 |             <Text color="cyan">{step.file}</Text>
-144 |             <Text color="gray"> — {step.description}</Text>
-145 |             {step.symbols && step.symbols.length > 0
-146 |               ? <Text color="gray" dimColor> [{step.symbols.join(", ")}]</Text>
-147 |               : null}
-148 |           </Box>
-149 |         );
-150 |       })}
-151 |       {plan.contextFiles && plan.contextFiles.length > 0 && (
-152 |         <Box marginLeft={1}>
-153 |           <Text color="gray" dimColor>Read first: {plan.contextFiles.join(", ")}</Text>
-154 |         </Box>
-155 |       )}
-156 |     </Box>
-157 |   );
-158 | }
-159 | 
-160 | /** Live streaming message — shown while the assistant is generating text. */
-161 | function StreamingMessage({ buffer }: { buffer: string }) {
-162 |   if (!buffer) return null;
-163 |   return (
-164 |     <Box flexDirection="column" marginTop={1}>
-[2026-04-05T15:08:13.328Z] iter=194 turn=22 INFO: Turn 22/25
-[2026-04-05T15:08:19.370Z] iter=194 turn=22 INFO: Agent: Now add plan state + wire `onPlan` to use it, and render `PlanDisplay`:
-[2026-04-05T15:08:19.370Z] iter=194 turn=22 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T15:08:19.372Z] iter=194 turn=22 INFO:   -> ok: Patched src/tui.tsx: -2 +3 lines
-
-Context after patch:
-194 |   const [status, setStatus] = useState("Initializing...");
-195 |   const [currentModel, setCurrentModel] = useState("sonnet");
-196 |   const [streamBuffer, setStreamBuffer] = useState("");
-197 |   const [sessionList, setSessionList] = useState<SessionInfo[]>([]);
-198 |   const [showResume, setShowResume] = useState(false);
-199 |   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
-200 |   const [footerStats, setFooterStats] = useState<FooterStats>({
-201 |     tokensIn: 0,
-202 |     tokensOut: 0,
-[2026-04-05T15:08:19.372Z] iter=194 turn=23 INFO: Turn 23/25
-[2026-04-05T15:08:23.260Z] iter=194 turn=23 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T15:08:23.263Z] iter=194 turn=23 INFO:   -> ok: Patched src/tui.tsx: -10 +3 lines
-
-Context after patch:
-220 |         // Append delta to streaming buffer for real-time display
-221 |         setStreamBuffer(prev => prev + delta);
-222 |       },
-223 |       onPlan: (plan: EditPlan) => {
-224 |         setActivePlan(plan);
-225 |       },
-226 |     });
-227 |     orchestratorRef.current = orch;
-228 |     orch.init().then(() => {
-[2026-04-05T15:08:23.264Z] iter=194 turn=24 INFO: Turn 24/25
-[2026-04-05T15:08:26.677Z] iter=194 turn=24 INFO: $ grep -n "StreamingMessage\|streamBuffer\|activePlan\|PlanDisplay" src/tui.tsx | tail -20
-[2026-04-05T15:08:26.687Z] iter=194 turn=24 INFO:   -> exit=0 (327 chars)
-[2026-04-05T15:08:26.687Z] iter=194 turn=25 INFO: Turn 25/25
-[2026-04-05T15:08:28.789Z] iter=194 turn=25 INFO: $ grep -n "StreamingMessage" src/tui.tsx
-[2026-04-05T15:08:28.797Z] iter=194 turn=25 INFO:   -> exit=0 (135 chars)
-[2026-04-05T15:08:28.798Z] iter=194 turn=25 INFO: Hit max turns — committing and restarting
-[2026-04-05T15:08:28.800Z] iter=194 turn=25 INFO: Cache persisted: 43 entries to .autoagent-cache.json
-[2026-04-05T15:08:28.801Z] iter=194 turn=25 INFO: Cache stats: 0 hits, 9 misses, 43 entries, 9 invalidations (9 entries removed)
-[2026-04-05T15:08:28.801Z] iter=194 turn=25 INFO: Tool cache stats
-[2026-04-05T15:08:28.801Z] iter=194 turn=25 INFO: Tool timing: bash: 11x, avg=14ms, total=151ms; write_file: 9x, avg=2ms, total=20ms; read_file: 9x, avg=2ms, total=17ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T15:08:28.801Z] iter=194 turn=25 INFO: Tool timing stats
-[2026-04-05T15:08:33.905Z] iter=194 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 194: predicted 25 turns, actual 25 turns, ratio 1.00**
-[2026-04-05T15:08:44.252Z] iter=194 turn=25 INFO: Pre-commit review (1802in/456out): A few issues worth flagging:
-
-- **`onPlan` called with potentially undefined plan**: When `architectResult.activated` is true, `architectResult.plan` is passed to `this.opts.onPlan?.(architectResult.p
-[2026-04-05T15:08:44.310Z] iter=194 turn=25 INFO: Committed: 0929f070 (39 in / 6406 out, cache: 29260 created, 512571 read)
-[2026-04-05T15:08:44.310Z] iter=194 turn=25 INFO: Restarting as iteration 195...
-[2026-04-05T15:08:44.503Z] iter=195 INFO: Cache restored: 43/43 entries (0 stale)
-[2026-04-05T15:08:44.505Z] iter=195 INFO: Turn budget: 24/25 (calibration=1.50x, predicted=25)
-[2026-04-05T15:08:44.505Z] iter=195 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T15:08:44.607Z] iter=195 turn=1 INFO: Turn 1/25
-[2026-04-05T15:08:49.692Z] iter=195 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the system — what was actually delivered in iteration 194, and assess the overall health of the self-improvement loop.
-[2026-04-05T15:08:49.693Z] iter=195 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
-[2026-04-05T15:08:49.697Z] iter=195 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -20
-[2026-04-05T15:08:49.700Z] iter=195 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -30
-[2026-04-05T15:08:49.704Z] iter=195 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null
-[2026-04-05T15:08:49.714Z] iter=195 turn=1 INFO:   -> exit=0 (330 chars)
-[2026-04-05T15:08:49.717Z] iter=195 turn=1 INFO:   -> exit=0 (100036 chars)
-[2026-04-05T15:08:50.720Z] iter=195 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-05T15:08:56.508Z] iter=195 turn=1 INFO:   -> exit=0 (1023 chars)
-[2026-04-05T15:08:56.509Z] iter=195 turn=2 INFO: Turn 2/25
-[2026-04-05T15:09:03.928Z] iter=195 turn=2 INFO: think: Let me assess the current state:
-
-1. **tsc passes** ✓
-2. **Tests: 5 failed | 479 passed** — There are 5 failing tests in...
-[2026-04-05T15:09:03.929Z] iter=195 turn=3 INFO: Turn 3/25
-[2026-04-05T15:09:07.195Z] iter=195 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | grep -E "FAIL|fail|error" | head -20
-[2026-04-05T15:09:07.203Z] iter=195 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/orchestrator.test.ts 2>&1
 [2026-04-05T15:09:08.601Z] iter=195 turn=3 INFO:   -> exit=1 (4298 chars)
 [2026-04-05T15:09:14.110Z] iter=195 turn=3 INFO:   -> exit=0 (1564 chars)
 [2026-04-05T15:09:14.110Z] iter=195 turn=4 INFO: Turn 4/25
@@ -1089,3 +996,263 @@ Context after patch:
 [2026-04-05T15:24:50.908Z] iter=203 turn=10 INFO: Tool timing stats
 [2026-04-05T15:24:55.773Z] iter=203 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 203: predicted 8 turns, actual 10 turns, ratio 1.25**
 [2026-04-05T15:24:55.793Z] iter=203 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T15:24:55.824Z] iter=203 turn=10 INFO: Committed: f46bb605 (22 in / 3191 out, cache: 16116 created, 113186 read)
+[2026-04-05T15:24:55.825Z] iter=203 turn=10 INFO: Restarting as iteration 204...
+[2026-04-05T15:24:56.020Z] iter=204 INFO: Cache restored: 45/45 entries (0 stale)
+[2026-04-05T15:24:56.022Z] iter=204 INFO: Turn budget: 18/25 (calibration=1.20x, predicted=15)
+[2026-04-05T15:24:56.022Z] iter=204 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T15:24:56.127Z] iter=204 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-05T15:24:56.127Z] iter=204 turn=1 INFO: Turn 1/25
+[2026-04-05T15:24:58.732Z] iter=204 turn=1 INFO: Agent: I'll start by reading the goals and understanding the codebase structure.
+[2026-04-05T15:24:58.734Z] iter=204 turn=1 INFO: $ cat goals.md
+[2026-04-05T15:24:58.742Z] iter=204 turn=1 INFO: read_file: CACHE HIT
+[2026-04-05T15:24:58.754Z] iter=204 turn=1 INFO:   -> exit=0 (2095 chars)
+[2026-04-05T15:24:58.756Z] iter=204 turn=2 INFO: Turn 2/25
+[2026-04-05T15:25:01.665Z] iter=204 turn=2 INFO: $ grep -n "buildRepoMap\|formatRepoMap\|rankSymbols" src/orchestrator.ts | head -30
+[2026-04-05T15:25:01.670Z] iter=204 turn=2 INFO: $ cat src/__tests__/tree-sitter-map.test.ts | head -80
+[2026-04-05T15:25:01.683Z] iter=204 turn=2 INFO:   -> exit=0 (217 chars)
+[2026-04-05T15:25:01.687Z] iter=204 turn=2 INFO:   -> exit=0 (3335 chars)
+[2026-04-05T15:25:01.688Z] iter=204 turn=3 INFO: Turn 3/25
+[2026-04-05T15:25:04.842Z] iter=204 turn=3 INFO: think: I have enough context. Let me implement both goals:
+1. Add `rankSymbols()` to tree-sitter-map.ts and update `formatRepoM...
+[2026-04-05T15:25:04.843Z] iter=204 turn=4 INFO: Turn 4/25
+[2026-04-05T15:25:19.883Z] iter=204 turn=4 INFO: Agent: Let me implement both goals now. First, I'll add `rankSymbols` and update `formatRepoMap` in tree-sitter-map.ts:
+[2026-04-05T15:25:19.883Z] iter=204 turn=4 INFO: write_file: src/tree-sitter-map.ts (patch)
+[2026-04-05T15:25:19.884Z] iter=204 turn=4 INFO:   -> ok: Patched src/tree-sitter-map.ts: -37 +90 lines
+
+Context after patch:
+349 |   return { files: parsedFiles, builtAt: Date.now() };
+350 | }
+351 | 
+352 | /**
+353 |  * Rank exported symbols by how many files import them (in-degree count).
+354 |  *
+355 |  * @param repoMap - the repo map to analyze
+356 |  * @returns Map<symbolName, score> — only exported symbols, score = number of
+357 |  *          files that import the symbol (0 if never imported)
+358 |  */
+359 | export function rankSymbols(repoMap: RepoMap): Map<string, number> {
+360 |   // Build a map from exported symbol name → count of files importing it
+361 |   const scores = new Map<string, number>();
+362 | 
+363 |   // Initialize all exported symbols with score 0
+364 |   for (const file of repoMap.files) {
+365 |     for (const sym of file.exports) {
+366 |       if (sym.exported && !scores.has(sym.name)) {
+367 |         scores.set(sym.name, 0);
+368 |       }
+369 |     }
+370 |   }
+371 | 
+372 |   // For each file's imports, increment scores for matching exported symbols
+373 |   for (const file of repoMap.files) {
+374 |     for (const imp of file.imports) {
+375 |       for (const name of imp.names) {
+376 |         // Strip "* as X" namespace imports down to the alias, skip counting
+377 |         if (name.startsWith("* as ")) continue;
+378 |         if (scores.has(name)) {
+379 |           scores.set(name, (scores.get(name) ?? 0) + 1);
+380 |         }
+381 |       }
+382 |     }
+383 |   }
+384 | 
+385 |   return scores;
+386 | }
+387 | 
+388 | /**
+389 |  * Format a RepoMap as a compact string suitable for LLM context.
+390 |  *
+391 |  * Output format:
+392 |  *   src/foo.ts
+393 |  *     exports: Foo (class:10), bar (function:25), MyType (type:5)
+394 |  *     imports: react, ./utils
+395 |  */
+396 | export function formatRepoMap(
+397 |   repoMap: RepoMap,
+398 |   opts?: { onlyExported?: boolean; maxFiles?: number; ranked?: Map<string, number> }
+399 | ): string {
+400 |   const onlyExported = opts?.onlyExported ?? true;
+401 |   const maxFiles = opts?.maxFiles ?? 200;
+402 |   const ranked = opts?.ranked;
+403 | 
+404 |   const lines: string[] = ["# Repo Map"];
+405 | 
+406 |   const files = repoMap.files.slice(0, maxFiles);
+407 |   for (const file of files) {
+408 |     let relevantExports = onlyExported ? file.exports.filter((s) => s.exported) : file.exports;
+409 |     // Skip files with no exports and no imports (probably empty or non-source)
+410 |     if (relevantExports.length === 0 && file.imports.length === 0) continue;
+411 | 
+412 |     lines.push(file.path);
+413 | 
+414 |     if (relevantExports.length > 0) {
+415 |       // Sort by rank (highest first) if ranked map provided
+416 |       if (ranked) {
+417 |         relevantExports = [...relevantExports].sort((a, b) => {
+418 |           const sa = ranked.get(a.name) ?? 0;
+419 |           const sb = ranked.get(b.name) ?? 0;
+420 |           return sb - sa;
+421 |         });
+422 |       }
+423 | 
+424 |       const symStr = relevantExports
+425 |         .map((s) => {
+426 |           const score = ranked?.get(s.name) ?? 0;
+427 |           const suffix = ranked && score >= 2 ? ` (×${score})` : "";
+428 |           return `${s.name}${suffix} (${s.kind}:${s.line})`;
+429 |         })
+430 |         .join(", ");
+431 |       lines.push(`  exports: ${symStr}`);
+432 |     }
+433 | 
+434 |     if (file.imports.length > 0) {
+435 |       const fromList = [...new Set(file.imports.map((i) => i.from))].join(", ");
+436 |       lines.push(`  imports: ${fromList}`);
+437 |     }
+438 |   }
+439 | 
+440 |   return lines.join("\n");
+441 | }
+442 | 
+[2026-04-05T15:25:19.885Z] iter=204 turn=5 INFO: Turn 5/25
+[2026-04-05T15:25:22.989Z] iter=204 turn=5 INFO: Agent: Now update orchestrator.ts to use `rankSymbols`:
+[2026-04-05T15:25:22.989Z] iter=204 turn=5 INFO: $ grep -n "buildRepoMap\|formatRepoMap\|rankSymbols\|tree-sitter-map" src/orchestrator.ts | head -20
+[2026-04-05T15:25:23.006Z] iter=204 turn=5 INFO:   -> exit=0 (217 chars)
+[2026-04-05T15:25:23.007Z] iter=204 turn=6 INFO: Turn 6/25
+[2026-04-05T15:25:26.755Z] iter=204 turn=6 INFO: Agent: **Goal 1 (rankSymbols + formatRepoMap):** IN PROGRESS — tree-sitter-map.ts patched, need orchestrator.ts update  
+**Goal 2 (/help command):** NOT STARTED
+[2026-04-05T15:25:26.756Z] iter=204 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:25:26.758Z] iter=204 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+17 | import { compressToolOutput } from "./tool-output-compressor.js";
+18 | import { fingerprintRepo } from "./repo-context.js";
+19 | import { rankFiles } from "./file-ranker.js";
+20 | import { buildRepoMap, formatRepoMap, rankSymbols } from "./tree-sitter-map.js";
+21 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
+22 | import { runVerification, formatVerificationResults } from "./verification.js";
+23 | import { createDefaultRegistry } from "./tool-registry.js";
+[2026-04-05T15:25:26.759Z] iter=204 turn=7 INFO: Turn 7/25
+[2026-04-05T15:25:29.826Z] iter=204 turn=7 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:25:29.827Z] iter=204 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
+
+Context after patch:
+151 |   if (isSourceDir) {
+152 |     try {
+153 |       const rankedPaths = rankedFiles.map(f => f.path);
+154 |       const repoMap = buildRepoMap(workDir, rankedPaths);
+155 |       const ranked = rankSymbols(repoMap);
+156 |       const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 20, ranked });
+157 |       if (raw.length > 50) {
+158 |         repoMapBlock = "\n\n" + (raw.length > 3000 ? raw.slice(0, 3000) + "\n…" : raw);
+159 |       }
+[2026-04-05T15:25:29.827Z] iter=204 turn=8 INFO: Turn 8/25
+[2026-04-05T15:25:32.791Z] iter=204 turn=8 INFO: Agent: Now add `/help` to tui.tsx:
+[2026-04-05T15:25:32.792Z] iter=204 turn=8 INFO: $ grep -n "/clear\|/reindex\|/exit\|/resume\|handleCommand\|cmd ==\|cmd ===" src/tui.tsx | head -30
+[2026-04-05T15:25:32.803Z] iter=204 turn=8 INFO:   -> exit=0 (360 chars)
+[2026-04-05T15:25:32.803Z] iter=204 turn=9 INFO: Turn 9/25
+[2026-04-05T15:25:34.945Z] iter=204 turn=9 INFO: read_file: src/tui.tsx
+[2026-04-05T15:25:34.945Z] iter=204 turn=9 INFO:   -> ok (1896 chars)
+[2026-04-05T15:25:34.946Z] iter=204 turn=10 INFO: Turn 10/25
+[2026-04-05T15:25:39.646Z] iter=204 turn=10 INFO: Agent: I've changed src/tree-sitter-map.ts and src/orchestrator.ts. Still need to add `/help` to tui.tsx and write tests. Doing it now.
+[2026-04-05T15:25:39.647Z] iter=204 turn=10 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:25:39.649Z] iter=204 turn=10 INFO:   -> ok: Patched src/tui.tsx: -4 +18 lines
+
+Context after patch:
+269 |       setTimeout(() => setStatus(""), 1000);
+270 |       return;
+271 |     }
+272 |     if (trimmed === "/exit") {
+273 |       exit();
+274 |       return;
+275 |     }
+276 |     if (trimmed === "/help") {
+277 |       setMessages(prev => [...prev, {
+278 |         role: "assistant",
+279 |         content: [
+280 |           "Available commands:",
+281 |           "  /help     — Show this help message",
+282 |           "  /clear    — Clear the conversation history",
+283 |           "  /reindex  — Re-index the repository files",
+284 |           "  /resume   — List and restore a previous session",
+285 |           "  /exit     — Quit AutoAgent",
+286 |         ].join("\n"),
+287 |       }]);
+288 |       return;
+289 |     }
+290 |     if (trimmed === "/resume") {
+291 |       const sessions = listSessions(workDir);
+292 |       if (sessions.length === 0) {
+[2026-04-05T15:25:39.650Z] iter=204 turn=11 INFO: Turn 11/25
+[2026-04-05T15:25:42.510Z] iter=204 turn=11 INFO: Agent: Also update the footer hint to show `/help`:
+[2026-04-05T15:25:42.510Z] iter=204 turn=11 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:25:42.511Z] iter=204 turn=11 INFO:   -> ok: Patched src/tui.tsx: -1 +1 lines
+
+Context after patch:
+68 |         {workDir}
+69 |       </Text>
+70 |       <Text color="gray" dimColor>
+71 |         Commands: /help  /clear  /reindex  /exit  Esc
+72 |       </Text>
+73 |     </Box>
+74 |   );
+[2026-04-05T15:25:42.511Z] iter=204 turn=12 INFO: Turn 12/25
+[2026-04-05T15:25:45.170Z] iter=204 turn=12 INFO: Agent: Now add tests:
+[2026-04-05T15:25:45.171Z] iter=204 turn=12 INFO: $ tail -50 src/__tests__/tree-sitter-map.test.ts
+[2026-04-05T15:25:45.179Z] iter=204 turn=12 INFO:   -> exit=0 (1766 chars)
+[2026-04-05T15:25:45.179Z] iter=204 turn=13 INFO: Turn 13/25
+[2026-04-05T15:25:58.288Z] iter=204 turn=13 INFO: Agent: Adding tests, then wrapping up:
+[2026-04-05T15:25:58.288Z] iter=204 turn=13 INFO: $ cat >> src/__tests__/tree-sitter-map.test.ts << 'EOF'
+
+// ─── rankSymbols ──────────────────────────────────────────────
+
+describe("rankSymbols", () => {
+  it("returns correct in-degree counts for cro...
+[2026-04-05T15:25:58.297Z] iter=204 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:25:58.298Z] iter=204 turn=14 INFO: Turn 14/25
+[2026-04-05T15:26:00.218Z] iter=204 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T15:26:01.073Z] iter=204 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:26:01.073Z] iter=204 turn=15 INFO: Turn 15/25
+[2026-04-05T15:26:03.153Z] iter=204 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tree-sitter-map.test.ts 2>&1 | tail -30
+[2026-04-05T15:26:04.188Z] iter=204 turn=15 INFO:   -> exit=0 (1075 chars)
+[2026-04-05T15:26:04.188Z] iter=204 turn=16 INFO: Turn 16/25
+[2026-04-05T15:26:07.845Z] iter=204 turn=16 INFO: Agent: Need to fix the import in the test file:
+[2026-04-05T15:26:07.846Z] iter=204 turn=16 INFO: write_file: src/__tests__/tree-sitter-map.test.ts (patch)
+[2026-04-05T15:26:07.848Z] iter=204 turn=16 INFO:   -> ok: Patched src/__tests__/tree-sitter-map.test.ts: -1 +1 lines
+
+Context after patch:
+1 | import { describe, it, expect } from "vitest";
+2 | import path from "path";
+3 | import { parseFile, buildRepoMap, formatRepoMap, rankSymbols } from "../tree-sitter-map.js";
+4 | import type { ParsedFile, RepoMap } from "../tree-sitter-map.js";
+5 | 
+6 | const FIXTURES_DIR = path.join(path.dirname(new URL(import.meta.url).pathname), "fixtures");
+[2026-04-05T15:26:07.849Z] iter=204 turn=17 INFO: Turn 17/25
+[2026-04-05T15:26:09.944Z] iter=204 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tree-sitter-map.test.ts 2>&1 | tail -15
+[2026-04-05T15:26:10.990Z] iter=204 turn=17 INFO:   -> exit=0 (288 chars)
+[2026-04-05T15:26:10.990Z] iter=204 turn=18 INFO: Turn 18/25
+[2026-04-05T15:26:13.477Z] iter=204 turn=18 INFO: Agent: All 26 tests pass. Now run full test suite and tsc:
+[2026-04-05T15:26:13.478Z] iter=204 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && npx vitest run 2>&1 | tail -15
+[2026-04-05T15:26:21.274Z] iter=204 turn=18 INFO:   -> exit=0 (737 chars)
+[2026-04-05T15:26:21.275Z] iter=204 turn=19 INFO: Turn 19/25
+[2026-04-05T15:26:27.251Z] iter=204 turn=19 INFO: Agent: All 524 tests pass, tsc clean. Writing memory and goals now.
+[2026-04-05T15:26:27.252Z] iter=204 turn=19 INFO: save_memory: "[Engineer] Iteration 204"
+[2026-04-05T15:26:27.253Z] iter=204 turn=19 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T15:26:27.254Z] iter=204 turn=20 INFO: Turn 20/25
+[2026-04-05T15:26:34.979Z] iter=204 turn=20 INFO: write_file: goals.md (write)
+[2026-04-05T15:26:34.980Z] iter=204 turn=20 INFO:   -> ok: Updated goals.md (934 chars, -28 lines delta)
+[2026-04-05T15:26:34.981Z] iter=204 turn=21 INFO: Turn 21/25
+[2026-04-05T15:26:37.384Z] iter=204 turn=21 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T15:26:37.384Z] iter=204 turn=21 INFO: RESTART signal
+[2026-04-05T15:26:37.384Z] iter=204 turn=21 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T15:26:38.301Z] iter=204 turn=21 INFO: Compilation OK
+[2026-04-05T15:26:43.919Z] iter=204 turn=21 INFO: Cache persisted: 44 entries to .autoagent-cache.json
+[2026-04-05T15:26:43.920Z] iter=204 turn=21 INFO: Cache stats: 1 hits, 1 misses, 44 entries, 7 invalidations (2 entries removed)
+[2026-04-05T15:26:43.920Z] iter=204 turn=21 INFO: Tool cache stats
+[2026-04-05T15:26:43.920Z] iter=204 turn=21 INFO: Tool timing: bash: 12x, avg=903ms, total=10837ms; write_file: 7x, avg=2ms, total=13ms; save_memory: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-05T15:26:43.920Z] iter=204 turn=21 INFO: Tool timing stats
+[2026-04-05T15:26:48.923Z] iter=204 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 204: predicted 15 turns, actual 21 turns, ratio 1.40**
+[2026-04-05T15:26:58.276Z] iter=204 turn=21 INFO: Pre-commit review (2994in/393out): **Potential symbol name collision across files**
+
+`rankSymbols` uses a flat `Map<string, number>` keyed only by symbol name. If two different files export a symbol with the same name (e.g., both `src/

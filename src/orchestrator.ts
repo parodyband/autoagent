@@ -17,7 +17,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { compressToolOutput } from "./tool-output-compressor.js";
 import { fingerprintRepo } from "./repo-context.js";
 import { rankFiles } from "./file-ranker.js";
-import { buildRepoMap, formatRepoMap } from "./tree-sitter-map.js";
+import { buildRepoMap, formatRepoMap, rankSymbols } from "./tree-sitter-map.js";
 import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
 import { runVerification, formatVerificationResults } from "./verification.js";
 import { createDefaultRegistry } from "./tool-registry.js";
@@ -152,7 +152,8 @@ export function buildSystemPrompt(
     try {
       const rankedPaths = rankedFiles.map(f => f.path);
       const repoMap = buildRepoMap(workDir, rankedPaths);
-      const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 20 });
+      const ranked = rankSymbols(repoMap);
+      const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 20, ranked });
       if (raw.length > 50) {
         repoMapBlock = "\n\n" + (raw.length > 3000 ? raw.slice(0, 3000) + "\n…" : raw);
       }

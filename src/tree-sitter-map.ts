@@ -350,6 +350,42 @@ export function buildRepoMap(workDir: string, files: string[]): RepoMap {
 }
 
 /**
+ * Rank exported symbols by how many files import them (in-degree count).
+ *
+ * @param repoMap - the repo map to analyze
+ * @returns Map<symbolName, score> — only exported symbols, score = number of
+ *          files that import the symbol (0 if never imported)
+ */
+export function rankSymbols(repoMap: RepoMap): Map<string, number> {
+  // Build a map from exported symbol name → count of files importing it
+  const scores = new Map<string, number>();
+
+  // Initialize all exported symbols with score 0
+  for (const file of repoMap.files) {
+    for (const sym of file.exports) {
+      if (sym.exported && !scores.has(sym.name)) {
+        scores.set(sym.name, 0);
+      }
+    }
+  }
+
+  // For each file's imports, increment scores for matching exported symbols
+  for (const file of repoMap.files) {
+    for (const imp of file.imports) {
+      for (const name of imp.names) {
+        // Strip "* as X" namespace imports down to the alias, skip counting
+        if (name.startsWith("* as ")) continue;
+        if (scores.has(name)) {
+          scores.set(name, (scores.get(name) ?? 0) + 1);
+        }
+      }
+    }
+  }
+
+  return scores;
+}
+
+/**
  * Format a RepoMap as a compact string suitable for LLM context.
  *
  * Output format:
@@ -357,23 +393,40 @@ export function buildRepoMap(workDir: string, files: string[]): RepoMap {
  *     exports: Foo (class:10), bar (function:25), MyType (type:5)
  *     imports: react, ./utils
  */
-export function formatRepoMap(repoMap: RepoMap, opts?: { onlyExported?: boolean; maxFiles?: number }): string {
+export function formatRepoMap(
+  repoMap: RepoMap,
+  opts?: { onlyExported?: boolean; maxFiles?: number; ranked?: Map<string, number> }
+): string {
   const onlyExported = opts?.onlyExported ?? true;
   const maxFiles = opts?.maxFiles ?? 200;
+  const ranked = opts?.ranked;
 
   const lines: string[] = ["# Repo Map"];
 
   const files = repoMap.files.slice(0, maxFiles);
   for (const file of files) {
-    const relevantExports = onlyExported ? file.exports.filter((s) => s.exported) : file.exports;
+    let relevantExports = onlyExported ? file.exports.filter((s) => s.exported) : file.exports;
     // Skip files with no exports and no imports (probably empty or non-source)
     if (relevantExports.length === 0 && file.imports.length === 0) continue;
 
     lines.push(file.path);
 
     if (relevantExports.length > 0) {
+      // Sort by rank (highest first) if ranked map provided
+      if (ranked) {
+        relevantExports = [...relevantExports].sort((a, b) => {
+          const sa = ranked.get(a.name) ?? 0;
+          const sb = ranked.get(b.name) ?? 0;
+          return sb - sa;
+        });
+      }
+
       const symStr = relevantExports
-        .map((s) => `${s.name} (${s.kind}:${s.line})`)
+        .map((s) => {
+          const score = ranked?.get(s.name) ?? 0;
+          const suffix = ranked && score >= 2 ? ` (×${score})` : "";
+          return `${s.name}${suffix} (${s.kind}:${s.line})`;
+        })
         .join(", ");
       lines.push(`  exports: ${symStr}`);
     }

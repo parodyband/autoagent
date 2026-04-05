@@ -68,7 +68,7 @@ function Header({ model }: { model: string }) {
         {workDir}
       </Text>
       <Text color="gray" dimColor>
-        Commands: /clear  /reindex  /exit  Esc
+        Commands: /help  /clear  /reindex  /exit  Esc
       </Text>
     </Box>
   );
@@ -271,6 +271,20 @@ function App() {
     }
     if (trimmed === "/exit") {
       exit();
+      return;
+    }
+    if (trimmed === "/help") {
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: [
+          "Available commands:",
+          "  /help     — Show this help message",
+          "  /clear    — Clear the conversation history",
+          "  /reindex  — Re-index the repository files",
+          "  /resume   — List and restore a previous session",
+          "  /exit     — Quit AutoAgent",
+        ].join("\n"),
+      }]);
       return;
     }
     if (trimmed === "/resume") {

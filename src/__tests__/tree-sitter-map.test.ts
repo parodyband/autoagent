@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import path from "path";
-import { parseFile, buildRepoMap, formatRepoMap } from "../tree-sitter-map.js";
+import { parseFile, buildRepoMap, formatRepoMap, rankSymbols } from "../tree-sitter-map.js";
 import type { ParsedFile, RepoMap } from "../tree-sitter-map.js";
 
 const FIXTURES_DIR = path.join(path.dirname(new URL(import.meta.url).pathname), "fixtures");
@@ -208,5 +208,133 @@ describe("formatRepoMap", () => {
     const output = formatRepoMap(repoMap);
     expect(output).toContain("symbol-index.ts");
     expect(output.length).toBeGreaterThan(20);
+  });
+});
+
+// ─── rankSymbols ──────────────────────────────────────────────
+
+describe("rankSymbols", () => {
+  it("returns correct in-degree counts for cross-file imports", () => {
+    const repoMap: RepoMap = {
+      files: [
+        {
+          path: "src/a.ts",
+          exports: [{ name: "foo", kind: "function", line: 1, exported: true }],
+          imports: [],
+        },
+        {
+          path: "src/b.ts",
+          exports: [{ name: "bar", kind: "function", line: 1, exported: true }],
+          imports: [{ names: ["foo"], from: "./a.js" }],
+        },
+        {
+          path: "src/c.ts",
+          exports: [],
+          imports: [{ names: ["foo"], from: "./a.js" }],
+        },
+      ],
+      builtAt: Date.now(),
+    };
+    const scores = rankSymbols(repoMap);
+    expect(scores.get("foo")).toBe(2);
+    expect(scores.get("bar")).toBe(0);
+  });
+
+  it("returns score 0 for symbols imported by no files", () => {
+    const repoMap: RepoMap = {
+      files: [
+        {
+          path: "src/a.ts",
+          exports: [{ name: "unused", kind: "const", line: 1, exported: true }],
+          imports: [],
+        },
+      ],
+      builtAt: Date.now(),
+    };
+    const scores = rankSymbols(repoMap);
+    expect(scores.get("unused")).toBe(0);
+  });
+
+  it("only tracks exported symbols", () => {
+    const repoMap: RepoMap = {
+      files: [
+        {
+          path: "src/a.ts",
+          exports: [
+            { name: "pub", kind: "function", line: 1, exported: true },
+            { name: "priv", kind: "function", line: 2, exported: false },
+          ],
+          imports: [],
+        },
+        {
+          path: "src/b.ts",
+          exports: [],
+          imports: [{ names: ["pub", "priv"], from: "./a.js" }],
+        },
+      ],
+      builtAt: Date.now(),
+    };
+    const scores = rankSymbols(repoMap);
+    expect(scores.has("pub")).toBe(true);
+    expect(scores.has("priv")).toBe(false);
+  });
+});
+
+describe("formatRepoMap with ranked", () => {
+  it("sorts symbols by rank (highest first)", () => {
+    const repoMap: RepoMap = {
+      files: [
+        {
+          path: "src/a.ts",
+          exports: [
+            { name: "low", kind: "function", line: 1, exported: true },
+            { name: "high", kind: "function", line: 2, exported: true },
+          ],
+          imports: [],
+        },
+      ],
+      builtAt: Date.now(),
+    };
+    const ranked = new Map([["low", 0], ["high", 5]]);
+    const output = formatRepoMap(repoMap, { ranked });
+    const lowIdx = output.indexOf("low");
+    const highIdx = output.indexOf("high");
+    expect(highIdx).toBeLessThan(lowIdx);
+  });
+
+  it("appends (×N) for symbols with score >= 2", () => {
+    const repoMap: RepoMap = {
+      files: [
+        {
+          path: "src/a.ts",
+          exports: [
+            { name: "popular", kind: "function", line: 1, exported: true },
+            { name: "rare", kind: "function", line: 2, exported: true },
+          ],
+          imports: [],
+        },
+      ],
+      builtAt: Date.now(),
+    };
+    const ranked = new Map([["popular", 3], ["rare", 1]]);
+    const output = formatRepoMap(repoMap, { ranked });
+    expect(output).toContain("popular (×3)");
+    expect(output).not.toContain("rare (×");
+  });
+
+  it("without ranked map preserves existing behavior", () => {
+    const repoMap: RepoMap = {
+      files: [
+        {
+          path: "src/a.ts",
+          exports: [{ name: "fn", kind: "function", line: 1, exported: true }],
+          imports: [],
+        },
+      ],
+      builtAt: Date.now(),
+    };
+    const output = formatRepoMap(repoMap);
+    expect(output).toContain("fn (function:1)");
+    expect(output).not.toContain("×");
   });
 });
