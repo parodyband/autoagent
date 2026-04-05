@@ -1,31 +1,40 @@
-# AutoAgent Goals — Iteration 177 (NEW MISSION)
+# AutoAgent Goals — Iteration 179 (Engineer)
 
-PREDICTION_TURNS: 18
+PREDICTION_TURNS: 16
 
-## Mission change
+## Mission
+Build the best possible AI coding agent tool. The TUI + orchestrator is the product.
 
-The agent's mission has changed. You are no longer self-improving for its own sake.
-Your mission is: **build the best possible AI coding agent tool.**
+## What was built (iteration 178)
+- `src/orchestrator.ts` — model routing, context injection, task decomposition, verification
+- `src/tui.tsx` — uses Orchestrator, shows model used, `/reindex` command
+- 10 new tests, tsc clean
 
-The TUI (src/tui.tsx) is the user interface. The orchestration underneath is the product.
-The self-improvement loop exists to make the product better.
+## Next task: `--target <dir>` CLI support + session persistence
 
-## First task for Architect
+### 1. `--target <dir>` flag for agent.ts
+The foundation already exists (`rootDir` vs `agentHome` in agent.ts, conditional `fingerprintRepo`).
+Just needs a `--target` CLI flag wired through.
 
-This is an Architect iteration. Your job:
+- Add `--target <dir>` to CLI arg parsing in the entry point (check `src/cli.ts` or `src/index.ts`)
+- Wire it so `rootDir` is set to the target dir
+- Confirm `fingerprintRepo()` is called for external dirs
 
-1. **Research** — Use web_search to study 2-3 coding agent architectures (Aider, SWE-Agent,
-   OpenHands, or others). What do they do that we don't? What's their core loop?
-   Focus on: how they manage context, how they decompose tasks, how they verify work.
+### 2. Session persistence for TUI
+The TUI loses conversation history on restart. Add simple JSON session save/load:
+- On exit, save `apiMessages` to `~/.autoagent/sessions/<hash-of-workdir>.json`
+- On start, offer to resume if a recent session exists (< 24h old)
+- `/sessions` command to list and load saved sessions
 
-2. **Assess our current product** — Read src/tui.tsx. It's a bare REPL right now.
-   What's missing to make it a useful coding tool? Prioritize ruthlessly.
+### 3. Token cost display
+Show running token cost in the TUI footer (use Haiku vs Sonnet pricing).
+- Haiku: $0.25/$1.25 per MTok in/out
+- Sonnet: $3/$15 per MTok in/out
+- Display as: `~$0.023 this session`
 
-3. **Design the orchestrator** — The TUI should talk to an orchestrator, not directly
-   to Claude. The orchestrator decomposes tasks, manages context, routes to models,
-   verifies results. Sketch this architecture.
+## Success criteria
+- `npx tsc --noEmit` clean
+- New tests for session persistence (pure unit tests, no API calls)
+- TUI shows cost in footer
 
-4. **Leave specific instructions for the Engineer** — What should iteration 178 build first?
-   Be concrete: files to create, interfaces to define, success criteria.
-
-## Next expert: Architect
+## Next expert: Engineer

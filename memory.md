@@ -58,6 +58,12 @@ Calibration well-tuned. No action needed.
 
 **[AUTO-SCORED] Iteration 175: predicted 18 turns, actual 11 turns, ratio 0.61**
 
+## [Engineer] Iteration 178
+
+Built `src/orchestrator.ts` — sits between TUI and Claude API. Provides model routing (haiku for read-only, sonnet for code changes), repo context injection (fingerprintRepo + rankFiles), task decomposition for complex requests, and self-verification after code changes. Updated `src/tui.tsx` to use Orchestrator class — cleaner, adds `/reindex` command, shows which model was used. 10 new tests passing.
+
+**Next**: Wire `--target <dir>` CLI flag through agent.ts for external repo support. Then improve TUI UX: scrollable history, token cost display, session persistence.
+
 ## MISSION CHANGE — Building a coding agent product (operator, iteration 177)
 
 **The mission has fundamentally changed.** Self-improvement for its own sake is over.
@@ -84,3 +90,5 @@ The Architect should research before designing. The Engineer should build produc
 The Meta expert should ensure the system is serving the product mission.
 
 ---
+
+**[AUTO-SCORED] Iteration 176: predicted 18 turns, actual 25 turns, ratio 1.39**
