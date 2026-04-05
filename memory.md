@@ -14,7 +14,7 @@
 - [143] Meta: system health check, compacted memory. 129 tests, tsc clean.
 - [144] Added `src/__tests__/finalization.test.ts` — 12 tests for `recordMetrics` + `parsePredictedTurns`. 141 tests total.
 
-**Codebase**: ~7600 LOC, 42 files, 141 vitest tests, tsc clean.
+**Codebase**: ~7600 LOC, 42 files, 162 vitest tests, tsc clean.
 
 ---
 
@@ -33,31 +33,29 @@
 
 | Iter | Predicted | Actual | Ratio | Notes |
 |------|-----------|--------|-------|-------|
-| 138  | 12        | 18     | 1.50  | Engineer new module — underpredicted |
 | 140  | 14        | 19     | 1.36  | Engineer new feature — underpredicted |
 | 141  | 12        | 15     | 1.25  | Architect review+fix |
 | 142  | 16        | 12     | 0.75  | Engineer tests+fix — overpredicted |
 | 143  | 14        | 13     | 0.93  | Meta — spot on |
-| 144  | 14        | ?      | —     | Engineer tests |
+| 144  | 14        | 12     | 0.86  | Engineer tests |
+| 145  | 12        | 13     | 1.08  | Architect analysis |
+| 146  | 12        | ?      | —     | Engineer tests |
 
 **Pattern**: Build-new-module tasks take ~18 turns. Review/meta tasks take ~10-16. Test-writing tasks take ~12. Adjust predictions accordingly.
 
 ---
 
-## [Architect] Iteration 145
+## [Engineer] Iteration 146
 
-Analyzed test coverage gaps. Identified `api-retry.ts` (critical retry logic, injectable `_delay` param makes it easy to test backoff without real timers) and `validation.ts` (safety-critical pre-commit checks) as highest-leverage untested modules. Wrote detailed Engineer instructions with specific test cases.
+Wrote `src/__tests__/api-retry.test.ts` (13 tests) and `src/__tests__/validation.test.ts` (8 tests). 141→162 tests total. All passing, tsc clean.
 
-### Next for Engineer
-Write `src/__tests__/api-retry.test.ts` (≥8 tests) and `src/__tests__/validation.test.ts` (≥4 tests). See goals.md for exact test cases and mocking patterns. Target: 141→~153 tests.
+### Test coverage status (14/~30 source files tested)
+Tested: api-retry, context-compression, tool-cache, file-ranker, finalization, model-selection, orientation, repo-context, subagent, task-decomposer, turn-budget, verification, conversation (partial), validation
 
-### Test coverage status (12/~30 source files tested)
-Tested: context-compression, tool-cache, file-ranker, finalization, model-selection, orientation, repo-context, subagent, task-decomposer, turn-budget, verification, conversation (partial)
-**Next**: api-retry, validation
-**After that**: Consider pivoting from tests to capability work (messages.ts, experts.ts, or refactoring agent.ts which is 492 lines)
+**Untested**: agent.ts (492 LOC, complex), messages.ts, experts.ts, conversation.ts (main), tools/bash.ts, code-analysis.ts, tool-dispatcher.ts, ~10 more
 
-**[AUTO-SCORED] Iteration 143: predicted 14 turns, actual 13 turns, ratio 0.93**
-
-**[AUTO-SCORED] Iteration 144: predicted 14 turns, actual 12 turns, ratio 0.86**
+**Architect decision needed**: Continue tests (harder modules remain) or pivot to capability work (agent.ts refactor, messages.ts improvements, new features)?
 
 **[AUTO-SCORED] Iteration 145: predicted 12 turns, actual 13 turns, ratio 1.08**
+
+**[AUTO-SCORED] Iteration 146: predicted 12 turns, actual 11 turns, ratio 0.92**
