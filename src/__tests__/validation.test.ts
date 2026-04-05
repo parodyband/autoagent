@@ -5,10 +5,6 @@ vi.mock("../tools/bash.js", () => ({
   executeBash: vi.fn(),
 }));
 
-vi.mock("../code-analysis.js", () => ({
-  analyzeCodebase: vi.fn(),
-}));
-
 // Also mock fs.existsSync so we control whether the pre-commit script "exists"
 vi.mock("fs", async (importOriginal) => {
   const actual = await importOriginal<typeof import("fs")>();
@@ -16,11 +12,10 @@ vi.mock("fs", async (importOriginal) => {
 });
 
 import { executeBash } from "../tools/bash.js";
-import { analyzeCodebase } from "../code-analysis.js";
 import { validateBeforeCommit, captureCodeQuality, captureBenchmarks } from "../validation.js";
+import type { CodebaseAnalysis } from "../validation.js";
 
 const mockExecuteBash = executeBash as ReturnType<typeof vi.fn>;
-const mockAnalyzeCodebase = analyzeCodebase as ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -79,19 +74,23 @@ describe("validateBeforeCommit", () => {
 
 describe("captureCodeQuality", () => {
   it("returns a snapshot from analyzeCodebase", async () => {
-    mockAnalyzeCodebase.mockReturnValueOnce({
+    const fakeAnalysis: CodebaseAnalysis = {
+      files: [],
       totals: {
         totalLines: 8000,
         codeLines: 6000,
         fileCount: 45,
         functionCount: 200,
         complexity: 3.5,
+        blankLines: 0,
+        commentLines: 0,
       },
-    });
+      averageComplexityPerFunction: 0,
+    };
     // grep call for test count
     mockExecuteBash.mockResolvedValueOnce({ exitCode: 0, output: "42\n" });
 
-    const snapshot = await captureCodeQuality("/fake/root");
+    const snapshot = await captureCodeQuality("/fake/root", () => fakeAnalysis);
 
     expect(snapshot).toBeDefined();
     expect(snapshot!.totalLOC).toBe(8000);
@@ -103,11 +102,9 @@ describe("captureCodeQuality", () => {
   });
 
   it("returns undefined if analyzeCodebase throws", async () => {
-    mockAnalyzeCodebase.mockImplementationOnce(() => {
+    const snapshot = await captureCodeQuality("/fake/root", () => {
       throw new Error("analysis failed");
     });
-
-    const snapshot = await captureCodeQuality("/fake/root");
 
     expect(snapshot).toBeUndefined();
   });

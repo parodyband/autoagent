@@ -1,139 +1,3 @@
-[2026-04-05T13:01:31.931Z] iter=154 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && git add tests/integration-repo-pipeline.test.ts && git commit -m "Add integration test for external-repo pipeline (14 tests)
-
-Tests fingerprintRepo() → extractC...
-[2026-04-05T13:01:31.973Z] iter=154 turn=10 INFO:   -> exit=0 (171 chars)
-[2026-04-05T13:01:31.973Z] iter=154 turn=11 INFO: Turn 11/25
-[2026-04-05T13:01:43.228Z] iter=154 turn=11 INFO: write_file: goals.md (write)
-[2026-04-05T13:01:43.230Z] iter=154 turn=11 INFO:   -> ok: Updated goals.md (1581 chars, -20 lines delta)
-[2026-04-05T13:01:43.230Z] iter=154 turn=12 INFO: Turn 12/25
-[2026-04-05T13:01:47.566Z] iter=154 turn=12 INFO: write_file: memory.md (patch)
-[2026-04-05T13:01:47.567Z] iter=154 turn=12 INFO:   -> ok: Patched memory.md: -1 +5 lines
-
-Context after patch:
-45 | 
-46 | **[AUTO-SCORED] Iteration 152: predicted 15 turns, actual 17 turns, ratio 1.13**
-47 | 
-48 | ## [Engineer] Iteration 154
-49 | 
-50 | Built `tests/integration-repo-pipeline.test.ts` (14 tests). Tests the full pipeline: `fingerprintRepo()` → `extractCommands()` cross-module data flow, `rankFiles()` on real temp dir (entry points > test files, large modules score correctly), `shouldDecompose()` on realistic tasks. Creates a real temp Node.js/TS git repo in `beforeAll`. 245 total tests passing, tsc clean. Commit: 069ff28.
-51 | 
-52 | ## [Architect] Iteration 153
-53 | 
-54 | Evaluated capability module integration. All 4 modules (repo-context, file-ranker, task-decomposer, verification) are correctly wired into agent.ts, but ONLY for --repo mode. Zero integration testing exists — each module has unit tests but their composition at integration boundaries has never been validated. This is the critical gap after 40+ iterations of infrastructure building.
-55 | 
-[2026-04-05T13:01:47.567Z] iter=154 turn=13 INFO: Turn 13/25
-[2026-04-05T13:01:49.641Z] iter=154 turn=13 INFO: Agent: Already done — just need to restart.
-[2026-04-05T13:01:49.641Z] iter=154 turn=13 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T13:01:49.642Z] iter=154 turn=13 INFO: RESTART signal
-[2026-04-05T13:01:49.642Z] iter=154 turn=13 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T13:01:50.371Z] iter=154 turn=13 INFO: Compilation OK
-[2026-04-05T13:01:55.313Z] iter=154 turn=13 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-05T13:01:55.313Z] iter=154 turn=13 INFO: Cache stats: 0 hits, 1 misses, 56 entries, 3 invalidations (0 entries removed)
-[2026-04-05T13:01:55.313Z] iter=154 turn=13 INFO: Tool cache stats
-[2026-04-05T13:01:55.314Z] iter=154 turn=13 INFO: Tool timing: bash: 9x, avg=473ms, total=4259ms; write_file: 3x, avg=2ms, total=6ms; read_file: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T13:01:55.314Z] iter=154 turn=13 INFO: Tool timing stats
-[2026-04-05T13:01:59.903Z] iter=154 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 154: predicted 15 turns, actual 13 turns, ratio 0.87**
-[2026-04-05T13:01:59.922Z] iter=154 turn=13 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T13:01:59.955Z] iter=154 turn=13 INFO: Committed: c29d6687 (21 in / 4033 out, cache: 13163 created, 133320 read)
-[2026-04-05T13:01:59.956Z] iter=154 turn=13 INFO: Restarting as iteration 155...
-[2026-04-05T13:02:00.156Z] iter=155 INFO: Cache restored: 56/56 entries (0 stale)
-[2026-04-05T13:02:00.158Z] iter=155 INFO: Turn budget: 15/25 (calibration=0.91x, predicted=11)
-[2026-04-05T13:02:00.158Z] iter=155 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T13:02:00.207Z] iter=155 INFO: Hard turn cap: 17 (1.5x prediction of 11)
-[2026-04-05T13:02:00.208Z] iter=155 turn=1 INFO: Turn 1/25
-[2026-04-05T13:02:03.437Z] iter=155 turn=1 INFO: Agent: 
-
-I'll start by assessing the current state of the system — is it producing genuine improvement or just cycling?
-[2026-04-05T13:02:03.438Z] iter=155 turn=1 INFO: $ cat .autoagent-metrics.json
-[2026-04-05T13:02:03.440Z] iter=155 turn=1 INFO: $ cat .expert-rotation.json
-[2026-04-05T13:02:03.443Z] iter=155 turn=1 INFO: $ cat goals.md
-[2026-04-05T13:02:03.448Z] iter=155 turn=1 INFO:   -> exit=0 (100036 chars)
-[2026-04-05T13:02:03.451Z] iter=155 turn=1 INFO:   -> exit=0 (1310 chars)
-[2026-04-05T13:02:03.453Z] iter=155 turn=1 INFO:   -> exit=0 (1581 chars)
-[2026-04-05T13:02:03.453Z] iter=155 turn=2 INFO: Turn 2/25
-[2026-04-05T13:02:42.088Z] iter=155 turn=2 INFO: think: Let me analyze the state of the system:
-
-1. **Rotation pattern**: E-A-E-M repeating perfectly. Every 4 iterations we cyc...
-[2026-04-05T13:02:42.089Z] iter=155 turn=3 INFO: Turn 3/25
-[2026-04-05T13:02:46.067Z] iter=155 turn=3 INFO: read_file: memory.md
-[2026-04-05T13:02:46.068Z] iter=155 turn=3 INFO:   -> ok (3838 chars)
-[2026-04-05T13:02:46.069Z] iter=155 turn=3 INFO: $ cat src/experts.ts | head -100
-[2026-04-05T13:02:46.073Z] iter=155 turn=3 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -30
-[2026-04-05T13:02:46.087Z] iter=155 turn=3 INFO:   -> exit=0 (4333 chars)
-[2026-04-05T13:02:48.198Z] iter=155 turn=3 INFO:   -> exit=0 (2882 chars)
-[2026-04-05T13:02:48.199Z] iter=155 turn=4 INFO: Turn 4/25
-[2026-04-05T13:02:51.458Z] iter=155 turn=4 INFO: $ cat src/experts.ts | wc -l
-[2026-04-05T13:02:51.462Z] iter=155 turn=4 INFO: $ wc -l memory.md
-[2026-04-05T13:02:51.465Z] iter=155 turn=4 INFO: $ cat .autoagent-state.json
-[2026-04-05T13:02:51.474Z] iter=155 turn=4 INFO:   -> exit=0 (19 chars)
-[2026-04-05T13:02:51.475Z] iter=155 turn=4 INFO:   -> exit=0 (9 chars)
-[2026-04-05T13:02:51.478Z] iter=155 turn=4 INFO:   -> exit=0 (113 chars)
-[2026-04-05T13:02:51.478Z] iter=155 turn=5 INFO: Turn 5/25
-[2026-04-05T13:03:02.839Z] iter=155 turn=5 INFO: Agent: 
-
-You're right. My deliverables are:
-
-1. **Compact memory.md** — remove stale entries, keep it useful
-2. **Write goals.md** for Engineer iteration 156
-3. **Assess system health** — is the rotation producing value or cycling?
-
-Let me execute now.
-[2026-04-05T13:03:02.840Z] iter=155 turn=5 INFO: think: Key assessment:
-
-The system IS producing genuine improvement but velocity is declining. The 4-cycle E-A-E-M rotation mea...
-[2026-04-05T13:03:02.841Z] iter=155 turn=6 INFO: Turn 6/25
-[2026-04-05T13:03:17.085Z] iter=155 turn=6 INFO: write_file: memory.md (write)
-[2026-04-05T13:03:17.087Z] iter=155 turn=6 INFO:   -> ok: Updated memory.md (2429 chars, -16 lines delta)
-[2026-04-05T13:03:17.088Z] iter=155 turn=7 INFO: Turn 7/25
-[2026-04-05T13:03:34.910Z] iter=155 turn=7 INFO: write_file: goals.md (write)
-[2026-04-05T13:03:34.910Z] iter=155 turn=7 INFO:   -> ok: Updated goals.md (2460 chars, +25 lines delta)
-[2026-04-05T13:03:34.911Z] iter=155 turn=8 INFO: Turn 8/25
-[2026-04-05T13:03:37.445Z] iter=155 turn=8 INFO: Agent: Now verify the build is clean and restart:
-[2026-04-05T13:03:37.446Z] iter=155 turn=8 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T13:03:38.115Z] iter=155 turn=8 INFO:   -> exit=0 (11 chars)
-[2026-04-05T13:03:38.115Z] iter=155 turn=9 INFO: Turn 9/25
-[2026-04-05T13:03:45.259Z] iter=155 turn=9 INFO: Agent: 
-
-Goals status:
-- **Compact memory.md**: ✅ DONE
-- **Write goals.md for Engineer iter 156**: ✅ DONE  
-- **Assess system health**: ✅ DONE (in think block + memory entry)
-
-All goals complete. The low read ratio is fine — this was a Meta iteration focused on writing goals/memory, not code. I read the key files (memory.md, experts.ts, goals.md, metrics, rotation) in the first batch of calls.
-[2026-04-05T13:03:45.260Z] iter=155 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T13:03:45.261Z] iter=155 turn=9 INFO: RESTART signal
-[2026-04-05T13:03:45.262Z] iter=155 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T13:03:45.987Z] iter=155 turn=9 INFO: Compilation OK
-[2026-04-05T13:03:51.258Z] iter=155 turn=9 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-05T13:03:51.258Z] iter=155 turn=9 INFO: Cache stats: 0 hits, 1 misses, 56 entries, 2 invalidations (1 entries removed)
-[2026-04-05T13:03:51.258Z] iter=155 turn=9 INFO: Tool cache stats
-[2026-04-05T13:03:51.258Z] iter=155 turn=9 INFO: Tool timing: bash: 10x, avg=289ms, total=2890ms; read_file: 1x, avg=11ms, total=11ms; write_file: 2x, avg=2ms, total=4ms; think: 2x, avg=2ms, total=3ms
-[2026-04-05T13:03:51.258Z] iter=155 turn=9 INFO: Tool timing stats
-[2026-04-05T13:03:57.180Z] iter=155 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 155: predicted 11 turns, actual 9 turns, ratio 0.82**
-[2026-04-05T13:03:57.200Z] iter=155 turn=9 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T13:03:57.233Z] iter=155 turn=9 INFO: Committed: af5cd839 (15 in / 4329 out, cache: 53857 created, 359195 read)
-[2026-04-05T13:03:57.234Z] iter=155 turn=9 INFO: Restarting as iteration 156...
-[2026-04-05T13:03:57.412Z] iter=156 INFO: Cache restored: 56/56 entries (0 stale)
-[2026-04-05T13:03:57.413Z] iter=156 INFO: Turn budget: 14/25 (calibration=1.00x, predicted=15)
-[2026-04-05T13:03:57.413Z] iter=156 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T13:03:57.458Z] iter=156 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-05T13:03:57.458Z] iter=156 turn=1 INFO: Turn 1/25
-[2026-04-05T13:04:00.720Z] iter=156 turn=1 INFO: think: I need to build `src/context-window.ts` with two functions:
-1. `summarizeOldTurns(messages: Message[], keepRecent: numbe...
-[2026-04-05T13:04:00.721Z] iter=156 turn=2 INFO: Turn 2/25
-[2026-04-05T13:04:03.993Z] iter=156 turn=2 INFO: $ find /Users/austin/Documents/autoagent/src -name "*.ts" | head -30 && echo "---" && cat /Users/austin/Documents/autoagent/src/conversation.ts | head -50
-[2026-04-05T13:04:03.997Z] iter=156 turn=2 INFO: $ grep -r "Message" /Users/austin/Documents/autoagent/src --include="*.ts" -l | head -10
-[2026-04-05T13:04:04.011Z] iter=156 turn=2 INFO:   -> exit=0 (3544 chars)
-[2026-04-05T13:04:04.014Z] iter=156 turn=2 INFO:   -> exit=0 (480 chars)
-[2026-04-05T13:04:04.014Z] iter=156 turn=3 INFO: Turn 3/25
-[2026-04-05T13:04:06.657Z] iter=156 turn=3 INFO: $ cat /Users/austin/Documents/autoagent/src/context-compression.ts
-[2026-04-05T13:04:06.662Z] iter=156 turn=3 INFO: $ grep -n "MessageParam\|type Message\|interface Message" /Users/austin/Documents/autoagent/src/messages.ts | head -20
-[2026-04-05T13:04:06.675Z] iter=156 turn=3 INFO:   -> exit=0 (9631 chars)
-[2026-04-05T13:04:06.680Z] iter=156 turn=3 INFO:   -> exit=0 (11 chars)
-[2026-04-05T13:04:06.680Z] iter=156 turn=4 INFO: Turn 4/25
-[2026-04-05T13:04:09.218Z] iter=156 turn=4 INFO: $ cat /Users/austin/Documents/autoagent/src/tools/subagent.ts
-[2026-04-05T13:04:09.226Z] iter=156 turn=4 INFO: $ cat /Users/austin/Documents/autoagent/src/__tests__/context-compression.test.ts | head -60
-[2026-04-05T13:04:09.243Z] iter=156 turn=4 INFO:   -> exit=0 (3729 chars)
 [2026-04-05T13:04:09.247Z] iter=156 turn=4 INFO:   -> exit=0 (1810 chars)
 [2026-04-05T13:04:09.247Z] iter=156 turn=5 INFO: Turn 5/25
 [2026-04-05T13:04:19.830Z] iter=156 turn=5 INFO: Agent: I have enough context. Let me build the files now.
@@ -1132,3 +996,74 @@ Context after patch:
 [2026-04-05T13:22:31.801Z] iter=165 turn=15 INFO: Tool timing stats
 [2026-04-05T13:22:36.104Z] iter=165 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 165: predicted 10 turns, actual 15 turns, ratio 1.50**
 [2026-04-05T13:22:38.032Z] iter=165 turn=15 INFO: Pre-commit review (664in/44out): LGTM. The diff cleanly removes the `formatReport` import and its associated tests, which is consistent — no dangling references remain and the remaining smoke test logic is unaffected.
+[2026-04-05T13:22:38.107Z] iter=165 turn=15 INFO: Committed: 88b973bb (27 in / 4415 out, cache: 126827 created, 711329 read)
+[2026-04-05T13:22:38.107Z] iter=165 turn=15 INFO: Restarting as iteration 166...
+[2026-04-05T13:22:38.283Z] iter=166 INFO: Cache restored: 53/53 entries (0 stale)
+[2026-04-05T13:22:38.285Z] iter=166 INFO: Turn budget: 16/25 (calibration=1.50x, predicted=12)
+[2026-04-05T13:22:38.285Z] iter=166 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T13:22:38.331Z] iter=166 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T13:22:38.331Z] iter=166 turn=1 INFO: Turn 1/25
+[2026-04-05T13:22:40.801Z] iter=166 turn=1 INFO: Agent: I'll start by reading the relevant files to understand what needs to be consolidated.
+[2026-04-05T13:22:40.802Z] iter=166 turn=1 INFO: $ cat src/code-analysis.ts
+[2026-04-05T13:22:40.804Z] iter=166 turn=1 INFO: $ grep -r 'code-analysis' src/ --include="*.ts" -l
+[2026-04-05T13:22:40.811Z] iter=166 turn=1 INFO:   -> exit=0 (4623 chars)
+[2026-04-05T13:22:40.821Z] iter=166 turn=1 INFO:   -> exit=0 (51 chars)
+[2026-04-05T13:22:40.822Z] iter=166 turn=2 INFO: Turn 2/25
+[2026-04-05T13:22:44.182Z] iter=166 turn=2 INFO: $ grep -n 'code-analysis' src/validation.ts src/__tests__/validation.test.ts
+[2026-04-05T13:22:44.184Z] iter=166 turn=2 INFO: $ ls src/__tests__/code-analysis* 2>/dev/null || echo "no code-analysis test file"
+[2026-04-05T13:22:44.192Z] iter=166 turn=2 INFO:   -> exit=0 (241 chars)
+[2026-04-05T13:22:44.194Z] iter=166 turn=2 INFO:   -> exit=0 (27 chars)
+[2026-04-05T13:22:44.194Z] iter=166 turn=3 INFO: Turn 3/25
+[2026-04-05T13:22:46.839Z] iter=166 turn=3 INFO: read_file: src/validation.ts
+[2026-04-05T13:22:46.840Z] iter=166 turn=3 INFO:   -> ok (3720 chars)
+[2026-04-05T13:22:46.841Z] iter=166 turn=3 INFO: read_file: src/__tests__/validation.test.ts
+[2026-04-05T13:22:46.842Z] iter=166 turn=3 INFO:   -> ok (1417 chars)
+[2026-04-05T13:22:46.842Z] iter=166 turn=4 INFO: Turn 4/25
+[2026-04-05T13:22:54.948Z] iter=166 turn=4 INFO: think: I need to:
+1. Move `analyzeCodebase()`, `findTsFiles()`, `analyzeFile()`, and interfaces (`FileAnalysis`, `CodebaseAnaly...
+[2026-04-05T13:22:54.949Z] iter=166 turn=5 INFO: Turn 5/25
+[2026-04-05T13:22:57.077Z] iter=166 turn=5 INFO: read_file: src/__tests__/validation.test.ts
+[2026-04-05T13:22:57.078Z] iter=166 turn=5 INFO:   -> ok (2639 chars)
+[2026-04-05T13:22:57.078Z] iter=166 turn=6 INFO: Turn 6/25
+[2026-04-05T13:23:29.029Z] iter=166 turn=6 INFO: Agent: Now I have enough context. The test mocks `analyzeCodebase` from `../code-analysis.js`. After consolidation, I need to restructure so the mock works. The cleanest approach: keep `analyzeCodebase` importable from `validation.js` directly, and update the mock path.
+[2026-04-05T13:23:29.030Z] iter=166 turn=6 INFO: write_file: src/validation.ts (write)
+[2026-04-05T13:23:29.033Z] iter=166 turn=6 INFO:   -> ok: Updated src/validation.ts (8236 chars, +145 lines delta)
+[2026-04-05T13:23:29.035Z] iter=166 turn=7 INFO: Turn 7/25
+[2026-04-05T13:23:32.716Z] iter=166 turn=7 INFO: Agent: Now update the test to mock `../validation.js` instead of `../code-analysis.js`:
+[2026-04-05T13:23:32.717Z] iter=166 turn=7 INFO: read_file: src/__tests__/validation.test.ts
+[2026-04-05T13:23:32.718Z] iter=166 turn=7 INFO:   -> ok (4493 chars)
+[2026-04-05T13:23:32.719Z] iter=166 turn=8 INFO: Turn 8/25
+[2026-04-05T13:23:49.029Z] iter=166 turn=8 INFO: think: The test currently mocks `../code-analysis.js` and imports `analyzeCodebase` from there. After consolidation, `analyzeCo...
+[2026-04-05T13:23:49.030Z] iter=166 turn=9 INFO: Turn 9/25
+[2026-04-05T13:23:56.065Z] iter=166 turn=9 INFO: Agent: **Goal status:**
+- Consolidate code-analysis.ts into validation.ts: IN PROGRESS (validation.ts updated, need to fix test)
+- Delete code-analysis.ts: NOT STARTED
+- Tests pass: NOT STARTED
+
+The key issue: `captureCodeQuality` now calls `analyzeCodebase` internally, so the test can't mock it via `vi.mock('../code-analysis.js')` anymore. I'll use dependency injection to fix this cleanly.
+[2026-04-05T13:23:56.066Z] iter=166 turn=9 INFO: write_file: src/validation.ts (write)
+[2026-04-05T13:23:56.066Z] iter=166 turn=9 INFO:   -> ok: Updated src/validation.ts (0 chars, -280 lines delta)
+[2026-04-05T13:23:56.067Z] iter=166 turn=10 INFO: Turn 10/25
+[2026-04-05T13:23:58.316Z] iter=166 turn=10 INFO: $ cat src/validation.ts | grep -n "analyzeFn\|analyzeCodebase\|captureCodeQuality" | head -20
+[2026-04-05T13:23:58.337Z] iter=166 turn=10 INFO:   -> exit=0 (11 chars)
+[2026-04-05T13:23:58.338Z] iter=166 turn=11 INFO: Turn 11/25
+[2026-04-05T13:24:00.668Z] iter=166 turn=11 INFO: $ wc -l src/validation.ts && grep -n "captureCodeQuality\|analyzeFn\|analyzeCodebase" src/validation.ts
+[2026-04-05T13:24:00.682Z] iter=166 turn=11 INFO:   -> exit=1 (27 chars)
+[2026-04-05T13:24:00.682Z] iter=166 turn=12 INFO: Turn 12/25
+[2026-04-05T13:24:32.618Z] iter=166 turn=12 INFO: Agent: The file got wiped. Let me rewrite it completely:
+[2026-04-05T13:24:32.618Z] iter=166 turn=12 INFO: write_file: src/validation.ts (write)
+[2026-04-05T13:24:32.619Z] iter=166 turn=12 INFO:   -> ok: Updated src/validation.ts (8233 chars, +282 lines delta)
+[2026-04-05T13:24:32.619Z] iter=166 turn=13 INFO: Turn 13/25
+[2026-04-05T13:24:50.290Z] iter=166 turn=13 INFO: Agent: Now update the test to use DI instead of mocking `code-analysis.js`:
+[2026-04-05T13:24:50.290Z] iter=166 turn=13 INFO: write_file: src/__tests__/validation.test.ts (write)
+[2026-04-05T13:24:50.291Z] iter=166 turn=13 INFO:   -> ok: Updated src/__tests__/validation.test.ts (4422 chars, -3 lines delta)
+[2026-04-05T13:24:50.291Z] iter=166 turn=14 INFO: Turn 14/25
+[2026-04-05T13:24:53.508Z] iter=166 turn=14 INFO: Agent: Now delete code-analysis.ts and verify everything:
+[2026-04-05T13:24:53.510Z] iter=166 turn=14 INFO: $ rm src/code-analysis.ts && npx tsc --noEmit 2>&1
+[2026-04-05T13:24:54.240Z] iter=166 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T13:24:54.241Z] iter=166 turn=15 INFO: Turn 15/25
+[2026-04-05T13:24:57.195Z] iter=166 turn=15 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -20
+[2026-04-05T13:25:03.245Z] iter=166 turn=15 INFO:   -> exit=0 (1648 chars)
+[2026-04-05T13:25:03.245Z] iter=166 turn=16 INFO: Turn 16/25
+[2026-04-05T13:25:06.832Z] iter=166 turn=16 INFO: Agent: All tests pass (338/338), tsc clean, code-analysis.ts deleted. Commit and wrap up:
+[2026-04-05T13:25:06.833Z] iter=166 turn=16 INFO: $ git add -A && git commit -m "Consolidate code-analysis.ts into validation.ts (-1 file, cleaner deps)"
