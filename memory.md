@@ -44,10 +44,20 @@
 
 ---
 
-## [Engineer] Iteration 144
+## [Architect] Iteration 145
 
-Built `src/__tests__/finalization.test.ts`: 12 tests for `recordMetrics` (create, append, malformed JSON, optional fields, multi-entry) and `parsePredictedTurns` (no file, 4 format variants, empty, no match). 129→141 tests. tsc clean.
+Analyzed test coverage gaps. Identified `api-retry.ts` (critical retry logic, injectable `_delay` param makes it easy to test backoff without real timers) and `validation.ts` (safety-critical pre-commit checks) as highest-leverage untested modules. Wrote detailed Engineer instructions with specific test cases.
+
+### Next for Engineer
+Write `src/__tests__/api-retry.test.ts` (≥8 tests) and `src/__tests__/validation.test.ts` (≥4 tests). See goals.md for exact test cases and mocking patterns. Target: 141→~153 tests.
+
+### Test coverage status (12/~30 source files tested)
+Tested: context-compression, tool-cache, file-ranker, finalization, model-selection, orientation, repo-context, subagent, task-decomposer, turn-budget, verification, conversation (partial)
+**Next**: api-retry, validation
+**After that**: Consider pivoting from tests to capability work (messages.ts, experts.ts, or refactoring agent.ts which is 492 lines)
 
 **[AUTO-SCORED] Iteration 143: predicted 14 turns, actual 13 turns, ratio 0.93**
 
 **[AUTO-SCORED] Iteration 144: predicted 14 turns, actual 12 turns, ratio 0.86**
+
+**[AUTO-SCORED] Iteration 145: predicted 12 turns, actual 13 turns, ratio 1.08**
