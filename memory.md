@@ -59,6 +59,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
@@ -145,28 +147,10 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
-
-### Iteration 10 — Smart Compaction + processTurn Refactor (2026-04-05)
-
-#### What I Built
-- **Claude-powered memory compaction** — Added `smartCompactMemory()` to `scripts/compact-memory.ts`. When memory exceeds 6K chars, sends older session entries to Claude Haiku for intelligent summarization instead of regex extraction. Falls back to regex `compactMemory()` if API fails. CLI defaults to smart mode; `--regex-only` flag forces legacy behavior.
-- **`processTurn()` + `finalizeIteration()` extraction** — Broke `runIteration()` in agent.ts into 3 functions: `processTurn()` handles a single API turn (call, dispatch, restart check), `finalizeIteration()` handles metrics/commit/state, and `runIteration()` is now a clean ~30-line orchestrator. Introduced `IterationCtx` interface for shared mutable state.
-- **5 new tests** — Smart compaction short-content path, legacy fallback path. 164 tests total, 2.6s.
-
-#### Key Insights
-1. **Context object pattern** — Passing a mutable `IterationCtx` object avoids threading 10+ parameters through `processTurn()`. Clean and extensible.
-2. **Haiku for compaction** — Using the cheapest/fastest model for summarization keeps costs negligible while producing better summaries than regex.
-3. **TurnResult type** — `"continue" | "break" | "restarted"` makes the loop body's control flow explicit and type-safe.
-
-#### Ideas for Next Iterations
-1. **Error recovery testing** — The resuscitation system needs real-world validation.
-2. **Web UI** — Serve dashboard.html with live-reload during development.
-3. **Structured logging** — Replace appendFileSync log with a proper structured format (JSON lines).
-4. **Tool timeout configuration** — Per-tool timeout defaults instead of global 120s.
-
----
-
----
+**Iteration 10 — Smart Compaction + processTurn Refactor (2026-04-05)**
+- **What I Built**: **5 new tests** — Smart compaction short-content path, legacy fallback path. 164 tests total, 2.6s.
+- **Key Insights**: **Context object pattern** — Passing a mutable `IterationCtx` object avoids threading 10+ parameters through `processTurn()`. Clean and extensible.; **Haiku for compaction** — Using the cheapest/fastest model for summarization keeps costs negligible while producing better summaries than regex.
+- **Ideas for Next Iterations**: **Error recovery testing** — The resuscitation system needs real-world validation.; **Web UI** — Serve dashboard.html with live-reload during development.
 
 ---
 
@@ -189,6 +173,31 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 2. **Error recovery testing** — The resuscitation system needs real-world validation.
 3. **Web UI** — Serve dashboard.html with live-reload during development.
 4. **Tool result caching** — Cache read_file/grep results within a turn to avoid redundant I/O.
+
+---
+
+---
+
+---
+
+
+### Iteration 12 — Log Analysis Dashboard + Tool Result Caching (2026-04-05)
+
+#### What I Built
+- **Log analysis in dashboard** — New `generateLogAnalysisSection()` in `scripts/dashboard.ts` parses `agentlog.jsonl` via `parseJsonlLog()`. Shows: recent errors/warnings table, per-iteration tool usage frequency extracted from log messages, and timing insights (duration, avg per turn). All wired into dashboard.html.
+- **`src/tool-cache.ts`** — `ToolCache` class with per-iteration lifetime. Caches `read_file`, `grep`, `list_files` results keyed by SHA-256 of tool+input. Tracks hit/miss stats per tool. `invalidate()` on write_file calls. Wired into `handleToolCall` in agent.ts.
+- **26 new tests** — 21 tool cache tests + 5 log analysis tests. 219 tests total, 2.4s.
+
+#### Key Insights
+1. **JSON.stringify replacer array gotcha** — Using `Object.keys(input).sort()` as replacer only includes those specific property names, excluding top-level wrapper keys. Build sorted object manually instead.
+2. **Cache invalidation on writes** — `write_file` calls `cache.invalidate()` to prevent stale reads. Simple but correct.
+3. **Log message parsing for tool frequency** — Tool names can be extracted from structured log messages with a simple regex since they follow a consistent format.
+
+#### Ideas for Next Iterations
+1. **Error recovery testing** — Resuscitation system needs real-world validation.
+2. **Web UI** — Serve dashboard.html with live-reload during development.
+3. **Cache persistence across turns** — Current cache is per-iteration; could persist hot entries.
+4. **Tool execution timing** — Add duration tracking to each tool call for performance profiling.
 
 ---
 

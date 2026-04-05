@@ -37,6 +37,7 @@ import {
   turnLimitNudge,
   validationBlockedMessage,
 } from "./messages.js";
+import { ToolCache } from "./tool-cache.js";
 
 const ROOT = process.cwd();
 const GOALS_FILE = path.join(ROOT, "goals.md");
@@ -112,13 +113,23 @@ const toolRegistry = createDefaultRegistry();
 async function handleToolCall(
   iter: number,
   toolUse: { type: "tool_use"; id: string; name: string; input: Record<string, unknown> },
-  counts: Record<string, number>
+  counts: Record<string, number>,
+  cache?: ToolCache,
 ): Promise<{ result: string; isRestart: boolean }> {
   counts[toolUse.name] = (counts[toolUse.name] || 0) + 1;
 
   const tool = toolRegistry.get(toolUse.name);
   if (!tool) {
     return { result: `Unknown tool: ${toolUse.name}`, isRestart: false };
+  }
+
+  // Check cache for idempotent tools
+  if (cache) {
+    const cached = cache.get(toolUse.name, toolUse.input);
+    if (cached !== undefined) {
+      log(iter, `${toolUse.name}: CACHE HIT`);
+      return { result: cached, isRestart: false };
+    }
   }
 
   const ctx = {
@@ -129,6 +140,14 @@ async function handleToolCall(
 
   try {
     const { result, isRestart } = await tool.handler(toolUse.input, ctx);
+    // Cache the result for idempotent tools
+    if (cache) {
+      cache.set(toolUse.name, toolUse.input, result);
+    }
+    // Invalidate cache on writes (file content may have changed)
+    if (cache && toolUse.name === "write_file") {
+      cache.invalidate();
+    }
     return { result, isRestart: isRestart || false };
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err);
@@ -150,6 +169,7 @@ interface IterationCtx {
   tokens: { in: number; out: number; cacheCreate: number; cacheRead: number };
   startTime: Date;
   turns: number;
+  cache: ToolCache;
 }
 
 type TurnResult = "continue" | "break" | "restarted";
@@ -203,7 +223,7 @@ async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
   // Execute independent tools concurrently
   const toolResults = await Promise.all(
     toolUses.map(async (tu) => {
-      const { result, isRestart } = await handleToolCall(ctx.iter, tu, ctx.toolCounts);
+      const { result, isRestart } = await handleToolCall(ctx.iter, tu, ctx.toolCounts, ctx.cache);
       return { id: tu.id, result, isRestart };
     })
   );
@@ -248,6 +268,13 @@ async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
 
 /** Finalize: capture metrics, commit, optionally restart. */
 async function finalizeIteration(ctx: IterationCtx, doRestart: boolean): Promise<void> {
+  // Log cache stats
+  const cacheStats = ctx.cache.stats();
+  if (cacheStats.hits > 0 || cacheStats.misses > 0) {
+    log(ctx.iter, `Cache stats: ${cacheStats.hits} hits, ${cacheStats.misses} misses, ${cacheStats.entries} entries`);
+    if (logger) logger.info("Tool cache stats", { cacheHits: cacheStats.hits, cacheMisses: cacheStats.misses, cacheEntries: cacheStats.entries, toolStats: cacheStats.toolStats });
+  }
+
   const codeQuality = await captureCodeQuality(ROOT);
   const benchmarks = await captureBenchmarks(ROOT);
   recordMetrics({
@@ -290,6 +317,7 @@ async function runIteration(state: IterationState): Promise<void> {
     tokens: { in: 0, out: 0, cacheCreate: 0, cacheRead: 0 },
     messages: [],
     turns: 0,
+    cache: new ToolCache(),
   };
 
   // Initialize structured logger for this iteration

@@ -20,6 +20,7 @@ import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
 import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage } from "../src/messages.js";
 import { Logger, createLogger, parseJsonlLog, type LogEntry } from "../src/logging.js";
+import { ToolCache, CACHEABLE_TOOLS } from "../src/tool-cache.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import path from "path";
 
@@ -664,6 +665,8 @@ async function main(): Promise<void> {
     testMessages();
     testLogging();
     testToolTimeouts();
+    testToolCache();
+    testLogAnalysisDashboard();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {
@@ -796,6 +799,109 @@ function testToolTimeouts(): void {
   const noTimeout = new ToolRegistry();
   noTimeout.register(fakeDef, async () => ({ result: "ok" }));
   assert(noTimeout.getTimeout("custom_tool") === undefined, "timeout: no option = undefined");
+}
+
+function testToolCache(): void {
+  console.log("\n🗄️ Tool Cache");
+
+  const cache = new ToolCache();
+
+  // Cacheable tools
+  assert(cache.isCacheable("read_file"), "cache: read_file is cacheable");
+  assert(cache.isCacheable("grep"), "cache: grep is cacheable");
+  assert(cache.isCacheable("list_files"), "cache: list_files is cacheable");
+  assert(!cache.isCacheable("bash"), "cache: bash is not cacheable");
+  assert(!cache.isCacheable("write_file"), "cache: write_file is not cacheable");
+  assert(!cache.isCacheable("think"), "cache: think is not cacheable");
+
+  // Cache miss then hit
+  const input1 = { path: "src/agent.ts" };
+  const miss = cache.get("read_file", input1);
+  assert(miss === undefined, "cache: first get is a miss");
+
+  cache.set("read_file", input1, "file contents here");
+  const hit = cache.get("read_file", input1);
+  assert(hit === "file contents here", "cache: second get is a hit");
+
+  // Different input = different key
+  const input2 = { path: "src/logging.ts" };
+  const miss2 = cache.get("read_file", input2);
+  assert(miss2 === undefined, "cache: different input is a miss");
+
+  // Non-cacheable tools are never stored
+  cache.set("bash", { command: "echo hi" }, "hi");
+  const nope = cache.get("bash", { command: "echo hi" });
+  assert(nope === undefined, "cache: non-cacheable tool not stored");
+
+  // Stats tracking
+  const stats = cache.stats();
+  assert(stats.hits === 1, "cache: stats tracks hits", `got ${stats.hits}`);
+  assert(stats.misses === 2, "cache: stats tracks misses", `got ${stats.misses}`);
+  assert(stats.entries === 1, "cache: stats tracks entries", `got ${stats.entries}`);
+  assert(stats.toolStats.read_file.hits === 1, "cache: per-tool hit stats");
+  assert(stats.toolStats.read_file.misses === 2, "cache: per-tool miss stats");
+
+  // Invalidate clears all
+  cache.invalidate();
+  const afterInvalidate = cache.get("read_file", input1);
+  assert(afterInvalidate === undefined, "cache: invalidate clears entries");
+
+  // Clear resets stats too
+  cache.set("grep", { pattern: "foo" }, "results");
+  cache.get("grep", { pattern: "foo" });
+  cache.clear();
+  const statsAfterClear = cache.stats();
+  assert(statsAfterClear.hits === 0, "cache: clear resets hits");
+  assert(statsAfterClear.entries === 0, "cache: clear resets entries");
+
+  // makeKey is deterministic
+  const key1 = ToolCache.makeKey("read_file", { path: "a.ts", start_line: 1 });
+  const key2 = ToolCache.makeKey("read_file", { path: "a.ts", start_line: 1 });
+  assert(key1 === key2, "cache: makeKey is deterministic");
+
+  // CACHEABLE_TOOLS constant
+  assert(CACHEABLE_TOOLS.has("read_file"), "cache: CACHEABLE_TOOLS has read_file");
+  assert(CACHEABLE_TOOLS.size >= 2, "cache: CACHEABLE_TOOLS has multiple tools");
+}
+
+function testLogAnalysisDashboard(): void {
+  console.log("\n📋 Log Analysis Dashboard");
+  mkdirSync(TEMP_DIR, { recursive: true });
+
+  // Create a test JSONL log
+  const jsonlPath = path.join(TEMP_DIR, "test-analysis.jsonl");
+  const entries: LogEntry[] = [
+    { timestamp: "2026-01-01T00:00:01Z", iteration: 1, level: "info", message: "read_file: src/agent.ts", turn: 1 },
+    { timestamp: "2026-01-01T00:00:02Z", iteration: 1, level: "info", message: "grep: \"pattern\"", turn: 1 },
+    { timestamp: "2026-01-01T00:00:03Z", iteration: 1, level: "warn", message: "Something suspicious", turn: 2 },
+    { timestamp: "2026-01-01T00:00:10Z", iteration: 1, level: "error", message: "TOOL ERROR (bash): timeout", turn: 3 },
+    { timestamp: "2026-01-01T00:01:00Z", iteration: 2, level: "info", message: "Turn 1/50", turn: 1 },
+    { timestamp: "2026-01-01T00:01:05Z", iteration: 2, level: "info", message: "$ echo hello", turn: 1 },
+  ];
+  writeFileSync(jsonlPath, entries.map(e => JSON.stringify(e)).join("\n") + "\n");
+
+  // Generate dashboard with log analysis (it reads from ROOT/agentlog.jsonl)
+  // We test the parse function directly since dashboard reads from fixed path
+  const parsed = parseJsonlLog(jsonlPath);
+  assert(parsed.length === 6, "log-analysis: parses all entries", `got ${parsed.length}`);
+
+  const warnings = parsed.filter(e => e.level === "warn");
+  assert(warnings.length === 1, "log-analysis: finds warnings");
+
+  const errors = parsed.filter(e => e.level === "error");
+  assert(errors.length === 1, "log-analysis: finds errors");
+
+  // Dashboard generation still works (integration test)
+  const html = generateDashboard([{
+    iteration: 1, startTime: "2026-01-01T00:00:00Z", endTime: "2026-01-01T00:01:00Z",
+    turns: 3, toolCalls: { bash: 1, read_file: 1 }, success: true,
+    durationMs: 60000, inputTokens: 50000, outputTokens: 2000,
+  }]);
+  assert(html.includes("Log Analysis"), "log-analysis: dashboard has log section");
+  assert(html.includes("Errors"), "log-analysis: dashboard has errors section");
+
+  // Cleanup
+  if (existsSync(jsonlPath)) unlinkSync(jsonlPath);
 }
 
   const duration = ((Date.now() - start) / 1000).toFixed(1);

@@ -10,6 +10,7 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 import { analyzeCodebase, type CodebaseAnalysis } from "../src/code-analysis.js";
+import { parseJsonlLog, type LogEntry } from "../src/logging.js";
 
 const ROOT = process.cwd();
 const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");
@@ -165,6 +166,96 @@ ${rows}
 </table>`;
 }
 
+function generateLogAnalysisSection(jsonlPath: string): string {
+  const entries = parseJsonlLog(jsonlPath);
+  if (entries.length === 0) return "";
+
+  // ── Errors & Warnings ──
+  const issues = entries.filter(e => e.level === "error" || e.level === "warn");
+  const recentIssues = issues.slice(-20); // last 20
+
+  let issueRows = "";
+  if (recentIssues.length > 0) {
+    issueRows = recentIssues.map(e => {
+      const color = e.level === "error" ? "#f85149" : "#d29922";
+      const icon = e.level === "error" ? "❌" : "⚠️";
+      const time = new Date(e.timestamp).toLocaleTimeString();
+      return `<tr><td>${icon} <span style="color:${color}">${e.level.toUpperCase()}</span></td><td>${e.iteration}</td><td>${e.turn || "—"}</td><td>${time}</td><td>${escapeHtml(e.message.slice(0, 120))}</td></tr>`;
+    }).join("\n");
+  } else {
+    issueRows = '<tr><td colspan="5" style="color: #3fb950; text-align: center;">✅ No errors or warnings</td></tr>';
+  }
+
+  // ── Per-iteration tool frequency from log messages ──
+  const iterToolMap = new Map<number, Record<string, number>>();
+  const toolNamePattern = /^(read_file|write_file|grep|list_files|web_fetch|think|bash|\$)/;
+  for (const e of entries) {
+    const match = e.message.match(toolNamePattern);
+    if (!match) continue;
+    const toolName = match[1] === "$" ? "bash" : match[1];
+    if (!iterToolMap.has(e.iteration)) iterToolMap.set(e.iteration, {});
+    const tools = iterToolMap.get(e.iteration)!;
+    tools[toolName] = (tools[toolName] || 0) + 1;
+  }
+
+  let toolFreqRows = "";
+  const sortedIters = [...iterToolMap.keys()].sort((a, b) => a - b).slice(-10); // last 10 iterations
+  for (const iter of sortedIters) {
+    const tools = iterToolMap.get(iter)!;
+    const sorted = Object.entries(tools).sort((a, b) => b[1] - a[1]);
+    const total = sorted.reduce((s, [, c]) => s + c, 0);
+    const breakdown = sorted.map(([t, c]) => `${t}(${c})`).join(", ");
+    toolFreqRows += `<tr><td>${iter}</td><td>${total}</td><td>${breakdown}</td></tr>\n`;
+  }
+
+  // ── Timing insights ──
+  const iterTimestamps = new Map<number, { first: number; last: number; turns: number }>();
+  for (const e of entries) {
+    const ts = new Date(e.timestamp).getTime();
+    if (!iterTimestamps.has(e.iteration)) {
+      iterTimestamps.set(e.iteration, { first: ts, last: ts, turns: 0 });
+    }
+    const t = iterTimestamps.get(e.iteration)!;
+    if (ts < t.first) t.first = ts;
+    if (ts > t.last) t.last = ts;
+    if (e.message.startsWith("Turn ")) t.turns++;
+  }
+
+  let timingRows = "";
+  const recentIters = [...iterTimestamps.keys()].sort((a, b) => a - b).slice(-10);
+  for (const iter of recentIters) {
+    const t = iterTimestamps.get(iter)!;
+    const durationMs = t.last - t.first;
+    const durationStr = durationMs > 60000 ? `${(durationMs / 60000).toFixed(1)}m` : `${(durationMs / 1000).toFixed(0)}s`;
+    const avgPerTurn = t.turns > 0 ? `${(durationMs / t.turns / 1000).toFixed(1)}s` : "—";
+    timingRows += `<tr><td>${iter}</td><td>${t.turns}</td><td>${durationStr}</td><td>${avgPerTurn}</td></tr>\n`;
+  }
+
+  return `
+<h2 style="color: #58a6ff; margin-top: 2rem;">📋 Log Analysis</h2>
+<h3 style="color: #c9d1d9; margin-top: 1rem; font-size: 1rem;">Recent Errors &amp; Warnings</h3>
+<table style="margin-top: 0.5rem;">
+<thead><tr><th>Level</th><th>Iter</th><th>Turn</th><th>Time</th><th>Message</th></tr></thead>
+<tbody>${issueRows}</tbody>
+</table>
+
+<h3 style="color: #c9d1d9; margin-top: 1.5rem; font-size: 1rem;">Tool Usage by Iteration (from logs)</h3>
+<table style="margin-top: 0.5rem;">
+<thead><tr><th>Iter</th><th>Total</th><th>Breakdown</th></tr></thead>
+<tbody>${toolFreqRows}</tbody>
+</table>
+
+<h3 style="color: #c9d1d9; margin-top: 1.5rem; font-size: 1rem;">Timing Insights</h3>
+<table style="margin-top: 0.5rem;">
+<thead><tr><th>Iter</th><th>Turns</th><th>Duration</th><th>Avg/Turn</th></tr></thead>
+<tbody>${timingRows}</tbody>
+</table>`;
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 export function generateDashboard(metrics: IterationMetrics[]): string {
   const totalIn = metrics.reduce((s, m) => s + m.inputTokens, 0);
   const totalOut = metrics.reduce((s, m) => s + m.outputTokens, 0);
@@ -285,6 +376,8 @@ ${generateCodeQualitySection()}
 ${generateCodeQualityTrend(metrics)}
 
 ${generateBenchmarkTrend(metrics)}
+
+${generateLogAnalysisSection(path.join(ROOT, "agentlog.jsonl"))}
 
 <footer>AutoAgent — Self-improving autonomous agent</footer>
 </body>
