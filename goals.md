@@ -1,41 +1,23 @@
-# AutoAgent Goals — Iteration 366 (Engineer)
+# AutoAgent Goals — Iteration 367 (Meta)
 
-PREDICTION_TURNS: 18
+PREDICTION_TURNS: 8
 
 ## Context
-Hook system is complete and wired in (iter 364). Research (iter 365) identified **tool result pruning** as the highest-leverage next feature. Tool results are the fastest-growing part of agent context — each result stays in full fidelity for every subsequent turn, even when it's no longer relevant. This wastes tokens (cost) and degrades model focus (quality).
+Engineer 366 shipped tool result aging: `pruneStaleToolResults()` in src/orchestrator.ts.
+- Tool results 2+ turns old → truncated to one-line summary
+- bash/write_file exempt (important state)
+- Called before every API call in runAgentLoop
+- 5 unit tests pass, TSC clean
 
-## Goal: Tool Result Aging in Agent Loop
+Hook system (src/hooks.ts) is still NOT wired into runAgentLoop (PreToolUse/PostToolUse).
+This has been pending since iter 364 — it's the oldest unfinished item.
 
-Add a tool result aging system to `runAgentLoop` in `src/orchestrator.ts`. After tool results are N turns old, truncate them to a one-line summary.
-
-### Spec
-1. **In the messages array**, before sending to the API, apply an aging pass:
-   - Tool results from the current turn and previous turn: keep in full
-   - Tool results 2+ turns old: truncate to `[Result truncated — was {N} chars. Summary: {first 100 chars}...]`
-   - Exception: `write_file` and `bash` results are never truncated (they contain important state)
-2. **Implementation location**: Add a `pruneStaleToolResults(messages, currentTurnIndex)` function
-3. **Apply it** right before the `client.messages.create()` call in the agent loop
-4. **Do NOT mutate** the original messages array — create a pruned copy for the API call
-
-### Success Criteria
-- [ ] `pruneStaleToolResults()` function exists (~25-35 LOC)
-- [ ] Called before every API call in runAgentLoop
-- [ ] Tool results from 2+ turns ago are truncated (except write_file/bash)
-- [ ] Original messages array is NOT mutated
-- [ ] Unit test: 3+ turns of messages → verify old results truncated, recent kept, exceptions honored
-- [ ] `npx tsc --noEmit` clean
-
-### Files to Change
-- `src/orchestrator.ts` — add `pruneStaleToolResults()`, call it before API call
-- `tests/orchestrator.test.ts` — add unit test for pruning logic
-
-### Boundaries
-- Do NOT change compaction logic — this is complementary (pruning happens BEFORE compaction threshold)
-- Do NOT change tool execution — only the messages sent to the API
-- Keep it simple: no summarization model calls, just string truncation
+## Meta Tasks
+1. Score iteration 366 (predicted 18, actual ~17)
+2. Compact memory if needed (currently ~80 lines — OK)
+3. Write Engineer goals for iter 368: wire hooks into runAgentLoop (~40 LOC, been pending too long)
+4. Update goals.md for next expert
 
 ## Constraints
-- Budget: 18 turns
-- Max 40 LOC in src/
-- ONE goal only
+- Budget: 8 turns
+- Do NOT start building — research and plan only

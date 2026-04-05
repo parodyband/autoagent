@@ -458,6 +458,75 @@ async function executeToolsParallel(
   return results;
 }
 
+/**
+ * Prune stale tool results before sending messages to the API.
+ * - Tool results from the current turn and previous turn: kept in full.
+ * - Tool results 2+ turns old: truncated to a one-line summary.
+ * - Exception: bash and write_file results are never truncated (important state).
+ * Does NOT mutate the original messages array.
+ */
+export function pruneStaleToolResults(messages: Anthropic.MessageParam[]): Anthropic.MessageParam[] {
+  // Build map: tool_use_id → tool name by scanning assistant messages
+  const toolUseIdToName = new Map<string, string>();
+  for (const msg of messages) {
+    if (msg.role === "assistant" && Array.isArray(msg.content)) {
+      for (const block of msg.content) {
+        if (typeof block === "object" && "type" in block && block.type === "tool_use") {
+          const tu = block as Anthropic.ToolUseBlock;
+          toolUseIdToName.set(tu.id, tu.name);
+        }
+      }
+    }
+  }
+
+  // Count assistant messages to determine turn index for each user message
+  const NEVER_PRUNE = new Set(["bash", "write_file"]);
+  let assistantTurnsSeen = 0;
+
+  // Build a list of (message_index, assistantTurnsSeen_at_that_point) for user messages
+  // We track how many assistant turns have been seen BEFORE each user message
+  const userMsgTurnIndex: number[] = [];
+  for (const msg of messages) {
+    if (msg.role === "user") {
+      userMsgTurnIndex.push(assistantTurnsSeen);
+    } else if (msg.role === "assistant") {
+      assistantTurnsSeen++;
+    }
+  }
+  const totalTurns = assistantTurnsSeen;
+
+  let userMsgCount = 0;
+  return messages.map((msg) => {
+    if (msg.role !== "user" || !Array.isArray(msg.content)) {
+      if (msg.role === "assistant") return msg;
+      return msg;
+    }
+    const turnIndex = userMsgTurnIndex[userMsgCount++];
+    const turnsAgo = totalTurns - turnIndex;
+    if (turnsAgo < 2) return msg; // current or previous turn — keep full
+
+    // Check if this user message contains tool_result blocks to prune
+    const newContent = msg.content.map((block) => {
+      if (typeof block !== "object" || !("type" in block) || block.type !== "tool_result") return block;
+      const tr = block as Anthropic.ToolResultBlockParam;
+      const toolName = toolUseIdToName.get(tr.tool_use_id as string) ?? "unknown";
+      if (NEVER_PRUNE.has(toolName)) return block;
+
+      // Truncate: extract text from content
+      const text = typeof tr.content === "string"
+        ? tr.content
+        : Array.isArray(tr.content)
+          ? (tr.content as Array<{ type: string; text?: string }>).filter(b => b.type === "text").map(b => b.text ?? "").join("")
+          : "";
+      if (text.length <= 120) return block; // already short — no need to truncate
+      const summary = text.slice(0, 100);
+      return { ...tr, content: `[Result truncated — was ${text.length} chars. Summary: ${summary}...]` };
+    });
+
+    return { ...msg, content: newContent };
+  });
+}
+
 async function runAgentLoop(
   client: Anthropic,
   model: string,
@@ -496,7 +565,9 @@ async function runAgentLoop(
 
     // Inject prompt cache breakpoints for cost reduction (90% cheaper cache hits)
     const cachedSystem = buildCachedSystem(systemPrompt);
-    const cachedMessages = injectMessageCacheBreakpoints(apiMessages);
+    // Prune stale tool results before sending (keeps recent 2 turns full, truncates older)
+    const prunedMessages = pruneStaleToolResults(apiMessages);
+    const cachedMessages = injectMessageCacheBreakpoints(prunedMessages);
 
     // Use streaming API with prompt-cache breakpoints (system as content blocks)
     // Extended thinking enabled: lets Claude reason before responding (better tool decisions, code, debugging)

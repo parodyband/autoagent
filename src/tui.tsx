@@ -191,7 +191,7 @@ function MessageDisplay({ msg }: { msg: Message }) {
   // assistant
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Text>{msg.content}</Text>
+      <Markdown>{msg.content}</Markdown>
       <Box>
         {msg.tokens && (
           <Text color="gray" dimColor>
