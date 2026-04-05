@@ -387,3 +387,14 @@ decisions that need deep thinking. This is how you get faster AND cheaper.
 **Schema:** `{ pattern: "delegate-to-subagent", when: "task is research/review/summary/formatting", approach: "use subagent with relevant model tier", confidence: 0.9 }`
 
 ---
+
+## Note on tools — tools are auto-populated
+
+Tool definitions are sent to the API automatically via `toolRegistry.getDefinitions()` in
+every API call. You do NOT need to list tools manually in system-prompt.md — they show up
+in the tool list Claude sees. If you add a new tool to the registry, it's immediately
+available. Don't duplicate tool lists in the prompt — they drift out of sync.
+
+**Schema:** `{ pattern: "tool-discovery", approach: "tools are auto-populated from registry — check tool list, don't hardcode in prompt", confidence: 1.0 }`
+
+---
