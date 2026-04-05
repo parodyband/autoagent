@@ -82,3 +82,5 @@ Average ratio: 0.96 — well calibrated.
 System healthy. Product velocity good — 7 consecutive iterations shipped real features (file watcher: class→integration→hooks). 100% success rate across 262 tracked iterations. Predictions well-calibrated. No prompt changes needed. Memory compacted, gaps updated.
 
 **[AUTO-SCORED] Iteration 267: predicted 20 turns, actual 9 turns, ratio 0.45**
+
+**[AUTO-SCORED] Iteration 268: predicted 20 turns, actual 25 turns, ratio 1.25**

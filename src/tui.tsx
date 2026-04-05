@@ -301,6 +301,7 @@ function App() {
   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
   const [contextBudgetRatio, setContextBudgetRatio] = useState(0);
   const [contextWarning, setContextWarning] = useState(false);
+  const [externalChanges, setExternalChanges] = useState<string[]>([]);
   const [fileSuggestions, setFileSuggestions] = useState<string[]>([]);
   const [fileSuggestionIdx, setFileSuggestionIdx] = useState(0);
   const repoMapRef = useRef<import("./tree-sitter-map.js").RepoMap | null>(null);
@@ -342,6 +343,10 @@ function App() {
       },
       onContextWarning: () => {
         setContextWarning(true);
+      },
+      onExternalFileChange: (_count) => {
+        // Collect changed file paths from orchestrator externallyChangedFiles
+        // We only get the count here; use a ref to track paths via onFileWatch
       },
     });
     orchestratorRef.current = orch;
