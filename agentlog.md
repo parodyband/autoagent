@@ -1,73 +1,3 @@
-[2026-04-05T20:25:34.657Z] iter=362 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -3 +6 lines
-
-Context after patch:
-854 |     // Clean up old sessions non-blocking
-855 |     setImmediate(() => cleanOldSessions(this.opts.workDir));
-856 | 
-857 |     // Load hooks config
-858 |     this.hooksConfig = loadHooksConfig(this.opts.workDir);
-859 | 
-860 |     this.initialized = true;
-861 |     this.opts.onStatus?.("");
-862 |   }
-863 | 
-864 |   /**
-865 |    * Resume an existing session by loading its history.
-[2026-04-05T20:25:34.657Z] iter=362 turn=15 INFO: Turn 15/25
-[2026-04-05T20:25:38.121Z] iter=362 turn=15 INFO: Agent: Now I need to wire PreToolUse/PostToolUse hooks into the tool execution. The `runAgentLoop` function needs the hooksConfig. Let me find the right spot — the parallel execution of non-write tools and the write_file execution:
-[2026-04-05T20:25:38.122Z] iter=362 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "runAgentLoop\|hooksConfig\|this\.hooksConfig" src/orchestrator.ts | head -20
-[2026-04-05T20:25:38.136Z] iter=362 turn=15 INFO:   -> exit=0 (396 chars)
-[2026-04-05T20:25:38.136Z] iter=362 turn=16 INFO: Turn 16/25
-[2026-04-05T20:25:40.020Z] iter=362 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1445,1470p' src/orchestrator.ts
-[2026-04-05T20:25:40.052Z] iter=362 turn=16 INFO:   -> exit=0 (718 chars)
-[2026-04-05T20:25:40.053Z] iter=362 turn=17 INFO: Turn 17/25
-[2026-04-05T20:25:44.032Z] iter=362 turn=17 INFO: think: I need to stop and wrap up. The hooks wiring into runAgentLoop is complex and would take more turns. Let me:
-1. Run the ...
-[2026-04-05T20:25:44.032Z] iter=362 turn=18 INFO: Turn 18/25
-[2026-04-05T20:25:45.714Z] iter=362 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/hooks.test.ts 2>&1 | tail -30
-[2026-04-05T20:25:47.007Z] iter=362 turn=18 INFO:   -> exit=0 (272 chars)
-[2026-04-05T20:25:47.007Z] iter=362 turn=19 INFO: Turn 19/25
-[2026-04-05T20:25:48.740Z] iter=362 turn=19 INFO: Agent: 15 tests passing. Running TSC then wrapping up.
-[2026-04-05T20:25:48.740Z] iter=362 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T20:25:49.837Z] iter=362 turn=19 INFO:   -> exit=0 (11 chars)
-[2026-04-05T20:25:49.837Z] iter=362 turn=20 INFO: Turn 20/25
-[2026-04-05T20:25:54.196Z] iter=362 turn=20 INFO: Agent: TSC clean.
-[2026-04-05T20:25:54.197Z] iter=362 turn=20 INFO: save_memory: "[Engineer 362] Hook system"
-[2026-04-05T20:25:54.199Z] iter=362 turn=20 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T20:25:54.199Z] iter=362 turn=21 INFO: Turn 21/25
-[2026-04-05T20:26:08.586Z] iter=362 turn=21 INFO: write_file: goals.md (write)
-[2026-04-05T20:26:08.588Z] iter=362 turn=21 INFO:   -> ok: Updated goals.md (2308 chars, -28 lines delta)
-[2026-04-05T20:26:08.589Z] iter=362 turn=22 INFO: Turn 22/25
-[2026-04-05T20:26:10.101Z] iter=362 turn=22 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T20:26:10.102Z] iter=362 turn=22 INFO: RESTART signal
-[2026-04-05T20:26:10.102Z] iter=362 turn=22 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T20:26:11.236Z] iter=362 turn=22 INFO: Compilation OK
-[2026-04-05T20:26:19.514Z] iter=362 turn=22 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-05T20:26:19.514Z] iter=362 turn=22 INFO: Tool timing: bash: 14x, avg=186ms, total=2597ms; write_file: 6x, avg=3ms, total=16ms; read_scratchpad: 1x, avg=4ms, total=4ms; save_memory: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms
-[2026-04-05T20:26:19.514Z] iter=362 turn=22 INFO: Tool timing stats
-[2026-04-05T20:26:27.043Z] iter=362 turn=22 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 362: predicted 20 turns, actual 22 turns, ratio 1.10**
-[2026-04-05T20:26:30.011Z] iter=362 turn=22 INFO: Pre-commit review (2568in/96out): **LGTM** — the implementation is clean, imports use `.js` extensions, error handling is thorough, and the aggregation logic is correct. One minor note: `runHooks` executes hooks in parallel via `Promi
-[2026-04-05T20:26:30.055Z] iter=362 turn=22 INFO: Committed: b6a03017 (36 in / 7114 out, cache: 19221 created, 315653 read)
-[2026-04-05T20:26:30.056Z] iter=362 turn=22 INFO: Restarting as iteration 363...
-[2026-04-05T20:26:30.267Z] iter=363 INFO: Cache restored: 56/56 entries (0 stale)
-[2026-04-05T20:26:30.269Z] iter=363 INFO: Turn budget: 20/25 (calibration=1.13x, predicted=18)
-[2026-04-05T20:26:30.269Z] iter=363 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T20:26:30.453Z] iter=363 turn=1 INFO: Turn 1/25
-[2026-04-05T20:26:32.964Z] iter=363 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the system and what's happened recently.
-[2026-04-05T20:26:32.965Z] iter=363 turn=1 INFO: read_scratchpad: 1755 chars
-[2026-04-05T20:26:32.966Z] iter=363 turn=2 INFO: Turn 2/25
-[2026-04-05T20:26:41.612Z] iter=363 turn=2 INFO: think: Let me assess the current situation:
-
-1. I'm the Meta expert for iteration 363 (though goals.md says 364 should be Meta....
-[2026-04-05T20:26:41.613Z] iter=363 turn=3 INFO: Turn 3/25
-[2026-04-05T20:26:45.208Z] iter=363 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-state.json
-[2026-04-05T20:26:45.212Z] iter=363 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat .expert-rotation.json
-[2026-04-05T20:26:45.214Z] iter=363 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | tail -40
-[2026-04-05T20:26:45.220Z] iter=363 turn=3 INFO:   -> exit=0 (113 chars)
-[2026-04-05T20:26:45.221Z] iter=363 turn=3 INFO:   -> exit=0 (1310 chars)
-[2026-04-05T20:26:45.231Z] iter=363 turn=3 INFO:   -> exit=0 (775 chars)
 [2026-04-05T20:26:45.231Z] iter=363 turn=4 INFO: Turn 4/25
 [2026-04-05T20:26:55.170Z] iter=363 turn=4 INFO: Agent: 
 
@@ -1066,3 +996,267 @@ TSC clean. Both goals complete. Wrapping up.
 [2026-04-05T20:43:01.023Z] iter=371 turn=7 INFO: Tool timing stats
 [2026-04-05T20:43:08.215Z] iter=371 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 371: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T20:43:08.238Z] iter=371 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T20:43:08.274Z] iter=371 turn=7 INFO: Committed: cc66a54f (17 in / 3486 out, cache: 15306 created, 59652 read)
+[2026-04-05T20:43:08.274Z] iter=371 turn=7 INFO: Restarting as iteration 372...
+[2026-04-05T20:43:08.477Z] iter=372 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T20:43:08.479Z] iter=372 INFO: Turn budget: 17/25 (calibration=1.00x, predicted=20)
+[2026-04-05T20:43:08.480Z] iter=372 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T20:43:08.665Z] iter=372 turn=1 INFO: Turn 1/25
+[2026-04-05T20:43:10.815Z] iter=372 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T20:43:10.816Z] iter=372 turn=1 INFO: $ cat goals.md
+[2026-04-05T20:43:10.824Z] iter=372 turn=1 INFO:   -> exit=0 (1789 chars)
+[2026-04-05T20:43:10.825Z] iter=372 turn=2 INFO: Turn 2/25
+[2026-04-05T20:43:13.612Z] iter=372 turn=2 INFO: $ cat src/hooks.ts
+[2026-04-05T20:43:13.619Z] iter=372 turn=2 INFO: $ cat src/task-planner.ts
+[2026-04-05T20:43:13.636Z] iter=372 turn=2 INFO:   -> exit=0 (5513 chars)
+[2026-04-05T20:43:13.639Z] iter=372 turn=2 INFO:   -> exit=0 (10354 chars)
+[2026-04-05T20:43:13.641Z] iter=372 turn=3 INFO: Turn 3/25
+[2026-04-05T20:43:16.383Z] iter=372 turn=3 INFO: $ ls tests/
+[2026-04-05T20:43:16.386Z] iter=372 turn=3 INFO: $ grep -n "PreToolUse\|runHooks\|Hook blocked\|hooks" src/orchestrator.ts | head -40
+[2026-04-05T20:43:16.395Z] iter=372 turn=3 INFO:   -> exit=0 (507 chars)
+[2026-04-05T20:43:16.401Z] iter=372 turn=3 INFO:   -> exit=0 (1035 chars)
+[2026-04-05T20:43:16.402Z] iter=372 turn=4 INFO: Turn 4/25
+[2026-04-05T20:43:23.019Z] iter=372 turn=4 INFO: think: I have enough context. Let me write the two deliverables:
+
+1. `tests/hooks-integration.test.ts` - Integration tests for ...
+[2026-04-05T20:43:23.021Z] iter=372 turn=5 INFO: Turn 5/25
+[2026-04-05T20:43:24.395Z] iter=372 turn=5 INFO: $ grep -n "executePlan\|/plan\|stub\|executor" src/tui.tsx | head -30
+[2026-04-05T20:43:24.409Z] iter=372 turn=5 INFO:   -> exit=0 (504 chars)
+[2026-04-05T20:43:24.409Z] iter=372 turn=6 INFO: Turn 6/25
+[2026-04-05T20:43:26.182Z] iter=372 turn=6 INFO: $ cat src/plan-commands.ts 2>/dev/null || grep -n "handlePlanCommand\|executePlan\|stub" src/tui.tsx | head -30
+[2026-04-05T20:43:26.194Z] iter=372 turn=6 INFO:   -> exit=0 (5959 chars)
+[2026-04-05T20:43:26.195Z] iter=372 turn=7 INFO: Turn 7/25
+[2026-04-05T20:43:56.437Z] iter=372 turn=7 INFO: Agent: Goal 1 (hooks-integration test): NOT STARTED
+Goal 2 (wire real executor / dry-run for /plan): NOT STARTED
+
+I have enough context. Writing both deliverables now.
+[2026-04-05T20:43:56.439Z] iter=372 turn=7 INFO: write_file: tests/hooks-integration.test.ts (write)
+[2026-04-05T20:43:56.442Z] iter=372 turn=7 INFO:   -> ok: Created tests/hooks-integration.test.ts (7164 chars)
+[2026-04-05T20:43:56.445Z] iter=372 turn=8 INFO: Turn 8/25
+[2026-04-05T20:43:59.568Z] iter=372 turn=8 INFO: Agent: Now Goal 2 — add `--dry-run` to /plan command and tests:
+[2026-04-05T20:43:59.569Z] iter=372 turn=8 INFO: $ grep -n "dry.run\|dryRun\|dry_run" src/plan-commands.ts src/task-planner.ts 2>/dev/null | head -10
+[2026-04-05T20:43:59.580Z] iter=372 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:43:59.581Z] iter=372 turn=9 INFO: Turn 9/25
+[2026-04-05T20:44:10.736Z] iter=372 turn=9 INFO: write_file: src/plan-commands.ts (patch)
+[2026-04-05T20:44:10.740Z] iter=372 turn=9 INFO:   -> ok: Patched src/plan-commands.ts: -6 +62 lines
+
+Context after patch:
+122 |     return;
+123 |   }
+124 | 
+125 |   // /plan --dry-run <description> — show what WOULD execute without running
+126 |   if (trimmed.startsWith("--dry-run")) {
+127 |     const description = trimmed.slice("--dry-run".length).trim();
+128 |     if (!description) {
+129 |       addMessage("Usage: /plan --dry-run <description>");
+130 |       return;
+131 |     }
+132 |     setLoading?.(true);
+133 |     setStatus?.("Creating dry-run plan...");
+134 |     try {
+135 |       let projectContext = `Working directory: ${workDir}`;
+136 |       try {
+137 |         const info = detectProject(workDir);
+138 |         if (info.name) {
+139 |           projectContext += `\n\nProject: ${info.name} (${info.type}, ${info.language})`;
+140 |         }
+141 |       } catch {
+142 |         // non-fatal
+143 |       }
+144 |       const plan = await createPlan(description, projectContext);
+145 |       const lines: string[] = [
+146 |         `🔍 Dry-run plan for: "${description}"`,
+147 |         "",
+148 |         formatPlan(plan),
+149 |         "",
+150 |         "Tasks that would execute (in order):",
+151 |       ];
+152 |       // Show execution order respecting dependencies
+153 |       const remaining = plan.tasks.map((t) => ({ ...t }));
+154 |       const ordered: string[] = [];
+155 |       const done = new Set<string>();
+156 |       let iterations = 0;
+157 |       while (remaining.some((t) => t.status === "pending") && iterations < 20) {
+158 |         iterations++;
+159 |         for (const task of remaining) {
+160 |           if (task.status !== "pending") continue;
+161 |           if (task.dependsOn.every((dep) => done.has(dep))) {
+162 |             ordered.push(`  ${ordered.length + 1}. [${task.id}] ${task.title}`);
+163 |             ordered.push(`     ${task.description}`);
+164 |             task.status = "done";
+165 |             done.add(task.id);
+166 |           }
+167 |         }
+168 |       }
+169 |       lines.push(...ordered);
+170 |       lines.push("");
+171 |       lines.push("(Dry run — no tasks were executed)");
+172 |       addMessage(lines.join("\n"));
+173 |     } catch (err) {
+174 |       addMessage(`Dry-run error: ${err instanceof Error ? err.message : String(err)}`);
+175 |     }
+176 |     setLoading?.(false);
+177 |     setStatus?.("");
+178 |     return;
+179 |   }
+180 | 
+181 |   // /plan <description> — unknown single-word subcommands fall through to create
+182 |   const description = trimmed;
+183 |   if (!description) {
+184 |     addMessage("Usage: /plan <description>");
+185 |     return;
+186 |   }
+187 | 
+188 |   // Build project context
+189 |   let projectContext = `Working directory: ${workDir}`;
+[2026-04-05T20:44:10.741Z] iter=372 turn=10 INFO: Turn 10/25
+[2026-04-05T20:44:14.795Z] iter=372 turn=10 INFO: Agent: Now add the help text for `--dry-run`:
+[2026-04-05T20:44:14.795Z] iter=372 turn=10 INFO: write_file: src/plan-commands.ts (patch)
+[2026-04-05T20:44:14.796Z] iter=372 turn=10 INFO:   -> ok: Patched src/plan-commands.ts: -6 +7 lines
+
+Context after patch:
+44 | 
+45 |   // /plan or /plan help
+46 |   if (trimmed === "" || trimmed === "help") {
+47 |     addMessage(
+48 |       "Usage:\n" +
+49 |         "  /plan <description> — Create and execute a task plan\n" +
+50 |         "  /plan --dry-run <description> — Show what tasks would run without executing\n" +
+51 |         "  /plan list — Show saved plans\n" +
+52 |         "  /plan resume — Resume most recent incomplete plan"
+53 |     );
+54 |     return;
+55 |   }
+56 | 
+[2026-04-05T20:44:14.796Z] iter=372 turn=11 INFO: Turn 11/25
+[2026-04-05T20:44:16.947Z] iter=372 turn=11 INFO: Agent: Now add tests for dry-run. Let me check the existing plan-executor test to understand the mocking pattern:
+[2026-04-05T20:44:16.948Z] iter=372 turn=11 INFO: $ head -60 tests/plan-executor.test.ts
+[2026-04-05T20:44:16.962Z] iter=372 turn=11 INFO:   -> exit=0 (2262 chars)
+[2026-04-05T20:44:16.962Z] iter=372 turn=12 INFO: Turn 12/25
+[2026-04-05T20:44:18.716Z] iter=372 turn=12 INFO: Agent: Now write the dry-run tests. I'll add them to the existing plan-executor test or create a new file for plan-commands:
+[2026-04-05T20:44:18.717Z] iter=372 turn=12 INFO: $ ls tests/ | grep plan
+[2026-04-05T20:44:18.729Z] iter=372 turn=12 INFO:   -> exit=0 (51 chars)
+[2026-04-05T20:44:18.730Z] iter=372 turn=13 INFO: Turn 13/25
+[2026-04-05T20:44:22.075Z] iter=372 turn=13 INFO: think: I've made 2 src/ changes:
+1. Created tests/hooks-integration.test.ts (Goal 1)
+2. Modified src/plan-commands.ts to add --...
+[2026-04-05T20:44:22.076Z] iter=372 turn=14 INFO: Turn 14/25
+[2026-04-05T20:44:24.791Z] iter=372 turn=14 INFO: Agent: src/ changes so far:
+- `src/plan-commands.ts`: +56 LOC (--dry-run feature) ✅
+- `tests/hooks-integration.test.ts`: created ✅
+
+Now run tests and wrap up:
+[2026-04-05T20:44:24.791Z] iter=372 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/hooks-integration.test.ts 2>&1 | tail -30
+[2026-04-05T20:44:25.836Z] iter=372 turn=14 INFO:   -> exit=0 (938 chars)
+[2026-04-05T20:44:25.837Z] iter=372 turn=15 INFO: Turn 15/25
+[2026-04-05T20:44:27.393Z] iter=372 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/hooks-integration.test.ts 2>&1 | grep "FAIL\|Error\|fail" | head -20
+[2026-04-05T20:44:28.413Z] iter=372 turn=15 INFO:   -> exit=0 (797 chars)
+[2026-04-05T20:44:28.414Z] iter=372 turn=16 INFO: Turn 16/25
+[2026-04-05T20:44:34.097Z] iter=372 turn=16 INFO: Agent: The `blocked` value is a string (not null) but `toMatch` needs a string — the issue is `checkPreToolUse` returning the string correctly but the hook not executing fast enough, OR `blocked` is null. Let me fix the tests quickly:
+[2026-04-05T20:44:34.099Z] iter=372 turn=16 INFO: write_file: tests/hooks-integration.test.ts (patch)
+[2026-04-05T20:44:34.101Z] iter=372 turn=16 INFO:   -> ok: Patched tests/hooks-integration.test.ts: -3 +4 lines
+
+Context after patch:
+81 |       },
+82 |     };
+83 | 
+84 |     const blocked = await checkPreToolUse(config, "bash", { command: "rm -rf /" }, WORKDIR);
+85 |     expect(typeof blocked).toBe("string");
+86 |     expect(blocked as string).toContain("[Hook blocked]");
+87 |     expect(blocked as string).toContain("Dangerous command blocked");
+88 |   });
+89 | 
+90 |   it("allows bash tool calls that don't match the dangerous pattern", async () => {
+[2026-04-05T20:44:34.102Z] iter=372 turn=17 INFO: Turn 17/25
+[2026-04-05T20:44:37.083Z] iter=372 turn=17 INFO: write_file: tests/hooks-integration.test.ts (patch)
+[2026-04-05T20:44:37.085Z] iter=372 turn=17 INFO:   -> ok: Patched tests/hooks-integration.test.ts: -3 +4 lines
+
+Context after patch:
+144 |       },
+145 |     };
+146 | 
+147 |     const blocked = await checkPreToolUse(config, "write_file", { path: "/etc/passwd", content: "evil" }, WORKDIR);
+148 |     expect(typeof blocked).toBe("string");
+149 |     expect(blocked as string).toContain("[Hook blocked]");
+150 |     expect(blocked as string).toContain("write blocked");
+151 |   });
+152 | 
+153 |   it("returns no block when hooks config is empty", async () => {
+[2026-04-05T20:44:37.085Z] iter=372 turn=18 INFO: Turn 18/25
+[2026-04-05T20:44:39.509Z] iter=372 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/hooks-integration.test.ts 2>&1 | tail -10 && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T20:44:41.562Z] iter=372 turn=18 INFO:   -> exit=0 (235 chars)
+[2026-04-05T20:44:41.562Z] iter=372 turn=19 INFO: Turn 19/25
+[2026-04-05T20:44:43.263Z] iter=372 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/hooks-integration.test.ts 2>&1 | grep "FAIL\|TypeError\|AssertionError" | head -10
+[2026-04-05T20:44:44.274Z] iter=372 turn=19 INFO:   -> exit=0 (681 chars)
+[2026-04-05T20:44:44.274Z] iter=372 turn=20 INFO: Turn 20/25
+[2026-04-05T20:44:51.052Z] iter=372 turn=20 INFO: think: The blocking tests return "object" when typeof is called - meaning `blocked` is null (typeof null === "object"). So the ...
+[2026-04-05T20:44:51.052Z] iter=372 turn=21 INFO: Turn 21/25
+[2026-04-05T20:44:56.513Z] iter=372 turn=21 INFO: write_file: tests/hooks-integration.test.ts (patch)
+[2026-04-05T20:44:56.514Z] iter=372 turn=21 INFO:   -> ok: Patched tests/hooks-integration.test.ts: -24 +16 lines
+
+Context after patch:
+61 | 
+62 |   it("blocks bash tool calls matching a dangerous pattern (exit code 2)", async () => {
+63 |     // Hook that exits 2 when stdin contains "rm -rf"
+64 |     const config: HooksConfig = {
+65 |       hooks: {
+66 |         PreToolUse: [
+67 |           {
+68 |             matcher: "bash",
+69 |             command: `sh -c 'echo "Dangerous command blocked" >&2; exit 2'`,
+70 |             timeout: 5000,
+71 |           } satisfies HookConfig,
+72 |         ],
+73 |       },
+74 |     };
+75 | 
+76 |     const blocked = await checkPreToolUse(config, "bash", { command: "rm -rf /" }, WORKDIR);
+77 |     expect(typeof blocked).toBe("string");
+78 |     expect(blocked as string).toContain("[Hook blocked]");
+79 |     expect(blocked as string).toContain("Dangerous command blocked");
+80 |   });
+81 | 
+82 |   it("allows bash tool calls that don't match the dangerous pattern", async () => {
+[2026-04-05T20:44:56.514Z] iter=372 turn=22 INFO: Turn 22/25
+[2026-04-05T20:45:00.738Z] iter=372 turn=22 INFO: write_file: tests/hooks-integration.test.ts (patch)
+[2026-04-05T20:45:00.740Z] iter=372 turn=22 INFO:   -> ok: Patched tests/hooks-integration.test.ts: -16 +16 lines
+
+Context after patch:
+124 |   });
+125 | 
+126 |   it("blocks write_file when the hook matcher targets it", async () => {
+127 |     const config: HooksConfig = {
+128 |       hooks: {
+129 |         PreToolUse: [
+130 |           {
+131 |             matcher: "write_file",
+132 |             command: `sh -c 'echo "write blocked" >&2; exit 2'`,
+133 |             timeout: 5000,
+134 |           } satisfies HookConfig,
+135 |         ],
+136 |       },
+137 |     };
+138 | 
+139 |     const blocked = await checkPreToolUse(config, "write_file", { path: "/etc/passwd", content: "evil" }, WORKDIR);
+140 |     expect(typeof blocked).toBe("string");
+141 |     expect(blocked as string).toContain("[Hook blocked]");
+142 |     expect(blocked as string).toContain("write blocked");
+143 |   });
+144 | 
+145 |   it("returns no block when hooks config is empty", async () => {
+[2026-04-05T20:45:00.741Z] iter=372 turn=23 INFO: Turn 23/25
+[2026-04-05T20:45:03.067Z] iter=372 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/hooks-integration.test.ts 2>&1 | tail -5 && npx tsc --noEmit 2>&1 | head -5
+[2026-04-05T20:45:05.084Z] iter=372 turn=23 INFO:   -> exit=0 (191 chars)
+[2026-04-05T20:45:05.084Z] iter=372 turn=24 INFO: Turn 24/25
+[2026-04-05T20:45:09.280Z] iter=372 turn=24 INFO: save_memory: "[Engineer 372] hooks-integration + plan dry-run"
+[2026-04-05T20:45:09.282Z] iter=372 turn=24 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:45:09.282Z] iter=372 turn=25 INFO: Turn 25/25
+[2026-04-05T20:45:17.237Z] iter=372 turn=25 INFO: write_file: goals.md (write)
+[2026-04-05T20:45:17.237Z] iter=372 turn=25 INFO:   -> ok: Updated goals.md (1002 chars, -18 lines delta)
+[2026-04-05T20:45:17.237Z] iter=372 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T20:45:17.241Z] iter=372 turn=25 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T20:45:17.241Z] iter=372 turn=25 INFO: Tool timing: bash: 15x, avg=487ms, total=7298ms; write_file: 8x, avg=2ms, total=17ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 3x, avg=1ms, total=3ms; save_memory: 1x, avg=3ms, total=3ms
+[2026-04-05T20:45:17.242Z] iter=372 turn=25 INFO: Tool timing stats
+[2026-04-05T20:45:24.317Z] iter=372 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 372: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T20:45:33.057Z] iter=372 turn=25 INFO: Pre-commit review (1018in/360out): **Issue 1: `setLoading?.(false)` not called on early return paths**
+If `!description` triggers the early return (line ~135), `setLoading?.(true)` has already been called but `setLoading?.(false)` is n

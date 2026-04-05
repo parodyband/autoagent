@@ -73,3 +73,5 @@ Recent avg (363–370): 1.00x — well calibrated.
 363=0.67, 364=1.17, 365=0.88, 366=1.11, 367=1.13, 368=1.00, 369=1.38, 370=0.60
 
 **[AUTO-SCORED] Iteration 371: predicted 8 turns, actual 7 turns, ratio 0.88**
+
+**[AUTO-SCORED] Iteration 372: predicted 20 turns, actual 25 turns, ratio 1.25**

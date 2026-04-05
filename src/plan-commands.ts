@@ -47,6 +47,7 @@ export async function handlePlanCommand(
     addMessage(
       "Usage:\n" +
         "  /plan <description> — Create and execute a task plan\n" +
+        "  /plan --dry-run <description> — Show what tasks would run without executing\n" +
         "  /plan list — Show saved plans\n" +
         "  /plan resume — Resume most recent incomplete plan"
     );
@@ -116,6 +117,62 @@ export async function handlePlanCommand(
       addMessage(
         `Plan execution error: ${err instanceof Error ? err.message : String(err)}`
       );
+    }
+    setLoading?.(false);
+    setStatus?.("");
+    return;
+  }
+
+  // /plan --dry-run <description> — show what WOULD execute without running
+  if (trimmed.startsWith("--dry-run")) {
+    const description = trimmed.slice("--dry-run".length).trim();
+    if (!description) {
+      addMessage("Usage: /plan --dry-run <description>");
+      return;
+    }
+    setLoading?.(true);
+    setStatus?.("Creating dry-run plan...");
+    try {
+      let projectContext = `Working directory: ${workDir}`;
+      try {
+        const info = detectProject(workDir);
+        if (info.name) {
+          projectContext += `\n\nProject: ${info.name} (${info.type}, ${info.language})`;
+        }
+      } catch {
+        // non-fatal
+      }
+      const plan = await createPlan(description, projectContext);
+      const lines: string[] = [
+        `🔍 Dry-run plan for: "${description}"`,
+        "",
+        formatPlan(plan),
+        "",
+        "Tasks that would execute (in order):",
+      ];
+      // Show execution order respecting dependencies
+      const remaining = plan.tasks.map((t) => ({ ...t }));
+      const ordered: string[] = [];
+      const done = new Set<string>();
+      let iterations = 0;
+      while (remaining.some((t) => t.status === "pending") && iterations < 20) {
+        iterations++;
+        for (const task of remaining) {
+          if (task.status !== "pending") continue;
+          if (task.dependsOn.every((dep) => done.has(dep))) {
+            ordered.push(`  ${ordered.length + 1}. [${task.id}] ${task.title}`);
+            ordered.push(`     ${task.description}`);
+            task.status = "done";
+            done.add(task.id);
+          }
+        }
+      }
+      lines.push(...ordered);
+      lines.push("");
+      lines.push("(Dry run — no tasks were executed)");
+      addMessage(lines.join("\n"));
+    } catch (err) {
+      addMessage(`Dry-run error: ${err instanceof Error ? err.message : String(err)}`);
     }
     setLoading?.(false);
     setStatus?.("");
