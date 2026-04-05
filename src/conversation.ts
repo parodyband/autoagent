@@ -99,6 +99,7 @@ export async function checkVerificationAndContinue(ctx: IterationCtx): Promise<b
   // Don't re-run verification if recovery turns already exhausted
   if (used >= maxRecovery) {
     ctx.log(`Verification recovery turns exhausted (${used}/${maxRecovery}) — finalizing anyway`);
+    if (ctx.once) ctx.failed = true;
     return false;
   }
 
