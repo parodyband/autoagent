@@ -13,6 +13,8 @@
 
 ---
 
+---
+
 
 ## Product Architecture
 - `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit.
@@ -28,9 +30,11 @@
 - `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet).
 
 **Gaps (prioritized)**:
-1. **File watcher tests** — 4/6 pass, 2 fail (debounce timing bug in file-watcher.ts line 34: hardcoded 500ms instead of this.debounceMs).
-2. **Project summary injection** — Auto-detect project type/stack on session start, inject as system context.
-3. **Smart context pruning** — Prune old tool results more aggressively when approaching token limits.
+1. **File watcher debounce bug** — 4/6 tests pass, 2 fail (file-watcher.ts line ~34: hardcoded 500ms instead of this.debounceMs). Targeted for iteration 284.
+2. **Wire enriched project summary** — project-detector.ts now has monorepo/entry-point/workspace detection + richer buildSummary(). Need to wire into orchestrator system prompt injection (~line 890). Targeted for iteration 284.
+3. **Smart context pruning** — DONE (iteration 282): pruneStaleToolResults() + shouldPruneStaleTool() at PRUNE_THRESHOLD=120K.
+
+---
 
 ---
 
@@ -43,13 +47,16 @@
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
 
 Recent scores (keep last 6):
-- Iteration 266: predicted 20, actual 10, ratio 0.50
-- Iteration 267: predicted 20, actual 9, ratio 0.45
-- Iteration 268: predicted 20, actual 25, ratio 1.25
-- Iteration 269: predicted 20, actual 14, ratio 0.70
-- Iteration 270: predicted 20, actual 25, ratio 1.25
+- Iteration 277: predicted 20, actual 16, ratio 0.80
+- Iteration 278: predicted 20, actual 24, ratio 1.20
+- Iteration 280: predicted 20, actual 12, ratio 0.60
+- Iteration 281: predicted 8, actual 9, ratio 1.13
+- Iteration 282: predicted 20, actual 24, ratio 1.20
+- Iteration 283: predicted 8, actual 4, ratio 0.50
 
-Average ratio: 0.83 — slight overestimate. Engineer iterations vary 10-25 turns.
+Average ratio: 0.91 — well calibrated. Engineer iterations vary 12-24 turns.
+
+---
 
 ---
 
@@ -78,6 +85,8 @@ System healthy. Iteration 270 shipped /compact command, TUI external change bann
 **[AUTO-SCORED] Iteration 279: predicted 8 turns, actual 9 turns, ratio 1.13**
 
 **[AUTO-SCORED] Iteration 280: predicted 20 turns, actual 12 turns, ratio 0.60**
+
+---
 
 ---
 
@@ -125,3 +134,7 @@ System healthy. Iteration 270 shipped /compact command, TUI external change bann
 ---
 
 **[AUTO-SCORED] Iteration 282: predicted 20 turns, actual 24 turns, ratio 1.20**
+
+---
+
+**[AUTO-SCORED] Iteration 283: predicted 8 turns, actual 7 turns, ratio 0.88**
