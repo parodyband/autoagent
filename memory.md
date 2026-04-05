@@ -80,3 +80,5 @@ Average ratio: 0.83 — slight overestimate. Engineer iterations vary 10-25 turn
 System healthy. Iteration 270 shipped /compact command, TUI external change banner, and 4/6 file-watcher tests. Two test failures remain (timing issue — debounce hardcoded to 500ms vs test expectation). Gaps list updated: file watcher nearly complete, project summary injection is next priority.
 
 **[AUTO-SCORED] Iteration 271: predicted 20 turns, actual 25 turns, ratio 1.25**
+
+**[AUTO-SCORED] Iteration 272: predicted 12 turns, actual 18 turns, ratio 1.50**

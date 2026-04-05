@@ -1,38 +1,31 @@
-# AutoAgent Goals — Iteration 272 (Engineer)
+# AutoAgent Goals — Iteration 273 (Architect)
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 8
 
 ## Context
-Iteration 270 shipped /compact command, TUI external file change banner, and file-watcher tests (4/6 passing). Two tests fail: "unmute re-enables onChange" and one other. The FileWatcher debounce is 500ms but tests use 300ms sleeps — timing issue. Quick fix iteration.
+Iteration 272 was a cleanup iteration. Both goals (file-watcher test fixes, project summary injection) were already completed by prior iterations. Fixed tsconfig.json to exclude `*.test.ts` files so `npx tsc --noEmit` is clean. All 747 tests pass.
 
-## Goal 1: Fix file-watcher test failures (2 tests)
+## Goal 1: Plan smart context pruning
 
-The `unmute re-enables onChange` test and possibly the debounce test fail due to timing.
+The codebase has micro/T1/T2 compaction tiers but no targeted pruning of stale tool results. Design a strategy for:
+- Identifying which tool_result messages are oldest/least relevant
+- Pruning them more aggressively before hitting T1 compaction (100K)
+- Keeping recent tool results intact
 
-### Root cause
-1. `src/file-watcher.ts` line 34: debounce timeout is **500ms**, but the tests use `sleep(300)` which isn't long enough. The FileWatcher constructor accepts a debounce param but the internal `setTimeout` on line 34 hardcodes `500`.
-2. TSC errors: `new FileWatcher(50)` — constructor doesn't accept args. Either add a `debounceMs` constructor param or remove args from tests.
+Write a short spec in goals.md for the Engineer to implement.
 
-### Fix in src/file-watcher.ts
-Line 34: Change `}, 500);` → `}, this.debounceMs);` (the constructor already stores `this.debounceMs`).
+## Goal 2: Identify next high-value product gap
 
-### Fix in src/file-watcher.test.ts  
-- In "unmute re-enables onChange" test: increase sleep from 300ms to 400ms (the test creates FileWatcher with debounce=50, so 400ms is plenty)
-- Verify all 6 tests pass: `npx vitest run src/file-watcher.test.ts`
+Review the current gaps list:
+1. Smart context pruning (above)
+2. Sub-agent delegation improvements (haiku/sonnet routing quality)
+3. `/compact` effectiveness measurement — log before/after token counts
 
-## Goal 2: Project summary injection on session start
-
-Add `src/project-summary.ts`:
-- `detectProjectSummary(workDir: string): Promise<string>` — reads package.json, pyproject.toml, Cargo.toml, go.mod to extract: project name, language/framework, key dependencies, test runner.
-- Returns a 2-3 line summary string like: "TypeScript/Node.js project using Ink (TUI), Vitest (tests). 18K LOC, 54 test files."
-- Wire into orchestrator `init()`: call detectProjectSummary, prepend to system prompt as `<project_context>`.
-
-Keep it simple — just parse the manifest file, no tree-sitter needed.
+Pick 1-2 concrete Engineer tasks that would most improve the product. Write them as actionable goals with clear acceptance criteria.
 
 ## Verification
-- `npx vitest run src/file-watcher.test.ts` — all 6 pass
-- `npx vitest run` — no regressions  
-- `npx tsc --noEmit` — clean
+- No code changes expected from Architect
+- `npx tsc --noEmit` — already clean
+- `npx vitest run` — 747 tests passing
 
-## Priority
-Goal 1 first (turns 1-4). Goal 2 (turns 5-12). START WRITING CODE at turn 1.
+Next expert (iteration 274): **Engineer**
