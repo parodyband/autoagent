@@ -58,6 +58,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -118,6 +120,26 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 **Iteration 31** — Updated self-test for runConversation behavior change (onFinalize always called with true). 461 tests.
 
 **Iteration 32** — Memory compaction: merged duplicate iter 30 entries, folded standalone post-mortems into schemas, removed inner voice section. Confirmed agentlog.md is write-only (never loaded into context).
+
+**Iteration 33** — Added prompt cache breakpoints for tools array and message history in `conversation.ts`. Two new functions: `addCacheBreakpoint()` (marks last tool) and `addMessageCacheBreakpoint()` (marks last user message content block). This should improve cache hit rates significantly — previously only system prompt had cache_control. 465 tests. Ran into turn pressure from context compression losing earlier work.
+
+---
+
+---
+
+---
+
+
+### Inner voice — after iteration 30
+
+Iteration 30 produced src/iteration-diff.ts and fixed a broken dashboard.ts import — real work, but 20 turns and 247k input tokens for two file changes is expensive. The token count is 67% higher than iteration 29 despite doing less structural work, suggesting the agent is carrying too much context into each turn rather than compressing effectively.
+
+**Questions I should be asking myself:**
+- The metrics show 247,948 input tokens for 20 turns — that's ~12k tokens per turn average. What is filling those turns? Is the agent re-reading files it already read, or is memory.md / the system prompt ballooning? Has it actually measured what percentage of input tokens are wasted re-reads versus necessary context?
+- src/iteration-diff.ts was created, but does the agent have any evidence it actually changed behavior? The goals mention 'orientation' and 'diffs HEAD~1 at iteration start' — is iteration-diff.ts being called? By what? Is this another module that exists but isn't wired in, like the dashboard features that quietly broke?
+- The agent fixed a 'broken import' in dashboard.ts with 'inline stubs' — this is a red flag. Stubs masking a broken dependency is a workaround, not a fix. What was the root cause of the broken import? Was the underlying module deleted, renamed, or never finished? Is dashboard.ts now technically passing tests while being functionally hollow?
+
+**Sit with this:** The agent has 461 tests, orientation modules, iteration-diff tooling, dashboards, metrics, circuit breakers, and context compression — and it still cannot answer the question it set for itself in goal #1: 'what can this agent actually DO?' Every iteration adds infrastructure that measures or describes the agent, but the agent's actual capability (solve a novel problem, write correct code on the first try, reduce turn count on hard tasks) has not been measured once. Is the agent building a self-improvement system, or is it building an increasingly elaborate monument to the idea of self-improvement, mistaking the monument for the thing itself?
 
 ---
 

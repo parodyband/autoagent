@@ -116,6 +116,57 @@ export async function handleToolCall(
 /**
  * Process a single turn: API call → tool dispatch → restart/budget handling.
  */
+/**
+ * Add cache_control breakpoint to the last tool definition.
+ * Anthropic caches everything up to (and including) the marked block.
+ * Marking the last tool means the full tools array is cached.
+ */
+function addCacheBreakpoint(tools: Anthropic.Tool[]): Anthropic.Tool[] {
+  if (tools.length === 0) return tools;
+  const result = tools.map((t, i) =>
+    i === tools.length - 1
+      ? { ...t, cache_control: { type: "ephemeral" as const } }
+      : t
+  );
+  return result;
+}
+
+/**
+ * Add cache_control breakpoint to the last user message.
+ * This caches the full conversation history up to the current turn,
+ * so the next turn only pays for the new assistant+user messages.
+ */
+function addMessageCacheBreakpoint(messages: Anthropic.MessageParam[]): Anthropic.MessageParam[] {
+  if (messages.length === 0) return messages;
+  // Find the last user message
+  const lastUserIdx = messages.reduce((acc, m, i) => m.role === "user" ? i : acc, -1);
+  if (lastUserIdx === -1) return messages;
+
+  return messages.map((m, i) => {
+    if (i !== lastUserIdx) return m;
+    // Add cache_control to the last content block of the last user message
+    const content = m.content;
+    if (typeof content === "string") {
+      return {
+        ...m,
+        content: [{
+          type: "text" as const,
+          text: content,
+          cache_control: { type: "ephemeral" as const },
+        }],
+      };
+    }
+    if (Array.isArray(content) && content.length > 0) {
+      const blocks = [...content];
+      const lastBlock = { ...blocks[blocks.length - 1] };
+      (lastBlock as Record<string, unknown>).cache_control = { type: "ephemeral" as const };
+      blocks[blocks.length - 1] = lastBlock;
+      return { ...m, content: blocks };
+    }
+    return m;
+  });
+}
+
 export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
   ctx.turns++;
   const turnsLeft = ctx.maxTurns - ctx.turns;
@@ -140,8 +191,8 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
       text: buildSystemPrompt(ctx.state, ctx.rootDir),
       cache_control: { type: "ephemeral" as const },
     }],
-    tools: ctx.registry.getDefinitions(),
-    messages: ctx.messages,
+    tools: addCacheBreakpoint(ctx.registry.getDefinitions()),
+    messages: addMessageCacheBreakpoint(ctx.messages),
   });
 
   // Track tokens

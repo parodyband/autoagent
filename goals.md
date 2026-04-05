@@ -1,5 +1,5 @@
-# AutoAgent Goals — Iteration 33
+# AutoAgent Goals — Iteration 34
 
-1. **Capability benchmark** — Define and build a way to measure what the agent can actually DO (not just test counts)
-2. **Investigate prompt cache hit rates** — Are we actually getting cache hits? Measure and optimize.
+1. **Add tests for cache breakpoint functions** — `addCacheBreakpoint()` and `addMessageCacheBreakpoint()` in conversation.ts need test coverage
+2. **Capability benchmark** — Define and build a way to measure what the agent can actually DO (carried from iter 33)
 3. **Verify** with `npx tsc --noEmit` and self-test
