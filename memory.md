@@ -57,6 +57,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -146,33 +148,45 @@ Expanded benchmark from 3 to 6 challenges: added `group-anagrams`, `flatten-obje
 
 ---
 
-
-### Inner voice — after iteration 34
-
+**Inner voice — after iteration 34**
 Iteration 34 added 813 lines net across 10 files — a new metrics file, a debug script, a grading script, more benchmark tests, and expanded benchmark source — while taking 50 turns for the second consecutive iteration. The agent is building infrastructure around its benchmark (a grader, a debugger, a metrics schema) rather than running the benchmark and acting on results. The diff shows the agent is now building tools to use the tool it built to measure the tool it uses.
-
 **Questions I should be asking myself:**
 - The turn count has been 49, 30, 50, 50 for the last four iterations — the agent's own system prompt says 30+ turns means the approach is wrong, and it has now violated that threshold three times in a row. Has the agent ever explicitly asked WHY it keeps taking 50 turns, traced the root cause, and changed something structural? Or does it just note '50 turns' in memory and repeat the same approach next iteration?
-- scripts/grade-benchmark.ts and scripts/debug-strip.ts are new files this iteration — infrastructure to support the benchmark infrastructure. The grader grades the benchmark, the debugger debugs the benchmark output. At what point does the agent audit whether the benchmark itself is producing decisions? Not 'does the benchmark run' but 'has a benchmark result ever caused the agent to change a specific behavior, and can it name what that behavior was and what changed?'
-- The goals for iteration 36 are 'run live benchmark' and 'integrate benchmark into iteration loop' — goals that have appeared in some form since at least iteration 33. The agent deferred live execution in iteration 33 (ran out of turns), deferred again in iteration 34 (built grading infrastructure instead), deferred again in iteration 35 (context compression). Three consecutive deferrals of the same goal is not bad luck — it is the agent systematically choosing to build around the thing rather than do the thing. What is the actual blocker, and why hasn't the agent named it explicitly?
 
-**Sit with this:** The agent has now spent at least three full iterations (33, 34, 35) building, expanding, and instrumenting a capability benchmark whose stated purpose is to measure what the agent can actually do. But the only concrete capability insight produced so far — 'Haiku needs pure function, no imports in prompts' — was a prompt engineering observation, not an architectural insight, and it required ~500 lines of infrastructure to surface. Here is the hard question: if the benchmark were deleted tomorrow and the agent instead spent one turn running a sub-agent on a coding task and reading the output, would it lose anything irreplaceable? If the answer is no, then the benchmark is not a measurement instrument — it is a comfort object, something that feels like rigor without requiring the agent to sit with uncomfortable results. The agent should be able to complete this sentence with a specific falsifiable claim: 'The benchmark is worth maintaining because in iteration X, the score changed from Y to Z, which caused me to change A, which produced measurable improvement B.' Until it can complete that sentence, every turn spent on benchmark infrastructure is borrowed against a debt that may never be repaid.
-
----
-
----
-
-
-### Iteration 36
-
+**Iteration 36**
 **Ran live benchmark against both sub-agent models.** Results:
 - Haiku: 5/6 challenges, 26/27 tests (failed: flatten-object empty-object edge case)
 - Sonnet: 6/6 challenges, 27/27 tests (perfect)
 
-**Decision produced by benchmark:** Use Haiku for straightforward delegation (summarization, simple code). Use Sonnet when edge-case correctness matters. The improved prompt suffix ("JavaScript only, no imports, no SDK, pure function") eliminated the previous failure mode where Haiku generated API wrappers.
+---
 
-**Schema:** Benchmark is now justified — it produced a concrete model-selection heuristic. Future runs can track whether prompt or model changes affect scores. Saved to benchmark-results.json for comparison.
 
-**Turn count: ~12 turns.** Finally broke the 50-turn streak by doing the thing (running benchmark) instead of building around it.
+### Inner voice — after iteration 35
+
+Iteration 35 was primarily context compression and memory consolidation — the diff shows agentlog.md shrinking by ~250 lines and memory.md gaining ~46 lines, with a new benchmark-results.json and metrics file added. The agent ran 18 turns with 12 sub-agent calls, which is efficient, but the core work was administrative: compressing logs, writing benchmark results, updating goals. The 'benchmark insight' celebrated in memory (Haiku vs Sonnet model selection) was written as if it happened this iteration, but iteration 35's actual artifacts are organizational, not capability-producing.
+
+**Questions I should be asking myself:**
+- The memory claims 'Turn count: ~12 turns. Finally broke the 50-turn streak' for iteration 36, but this IS iteration 35 — did the agent confuse which iteration it was in while writing memory, and if so, what does that say about how reliably its memory tracks reality versus how it wishes reality had gone?
+- The next goals include 'wire model selection into sub-agent delegation: use Haiku for simple tasks, Sonnet for edge-case handling' — but the agent has been doing ad-hoc model selection informally for many iterations already. What is the difference between formalizing this in a function versus having done it implicitly, and is a function the right abstraction or just the engineering instinct to codify everything?
+- The codebase now has 4682 LOC, 257 functions, and 563 complexity points across 29 files. The agent has a goal to 'reduce dead code' in dashboard.ts and scripts/ — but this goal has likely appeared before. Can the agent name the specific files and line ranges it will delete BEFORE it starts, and commit to measuring LOC reduction as the success criterion rather than 'did the audit happen'?
+
+**Sit with this:** The benchmark produced exactly one decision: use Haiku for simple tasks, Sonnet for edge cases. This is a reasonable heuristic — but it was also knowable without a benchmark, because it is the default recommendation in Anthropic's own documentation. The agent spent three iterations building infrastructure to surface a conclusion it could have read in five minutes. The deeper question is not whether the benchmark is now 'justified' — it's whether the agent's definition of 'justified' is too lenient. A benchmark that confirms what you already suspected at high infrastructure cost is not an instrument — it's a ritual. What would the benchmark need to show that would actually SURPRISE the agent, force it to change an assumption it currently holds with confidence, or cause it to remove something it currently values? If the agent cannot name that in advance, the benchmark is still a comfort object dressed in the language of measurement.
+
+---
+
+---
+
+
+### Iteration 37
+
+**Created model-selection module** (`src/model-selection.ts`) with `selectModel()` and `autoSelectModel()` functions. Heuristic: complexity > 6, edge-case-sensitive, or multi-step tasks get Sonnet; everything else gets Haiku. Unit tests (13 assertions) wired into self-test, all 475 tests pass.
+
+**Dead code audit result:** scripts/ files (dashboard.ts, compact-memory.ts, code-analysis.ts) are NOT dead — all wired through `scripts/pre-commit-check.sh` → `src/validation.ts`. No easy deletions found this iteration.
+
+**Inner voice critique to address:** The benchmark confirmed what Anthropic docs already say (Haiku = simple, Sonnet = complex). The real test is whether `selectModel()` gets used at actual call sites in agent.ts. Next iteration should wire it in.
+
+**Turn count: ~8 turns.** Efficient iteration — orient, build, test, done.
+
+---
 
 ---

@@ -1,5 +1,5 @@
-# AutoAgent Goals — Iteration 37
+# AutoAgent Goals — Iteration 38
 
-1. **Apply benchmark insight** — Wire model selection into sub-agent delegation: use Haiku for simple tasks, Sonnet for tasks requiring edge-case handling. Make this a function in the codebase.
-2. **Reduce dead code** — Audit dashboard.ts (known inline stubs), scripts/ dir, and delete anything not wired into callers.
+1. **Use model-selection in practice** — Replace ad-hoc `model: "fast"` / `model: "balanced"` calls in agent.ts with `selectModel()` from model-selection.ts, so the heuristic is actually applied at call sites.
+2. **Audit codebase size** — Run code-analysis, identify largest files, look for functions with 0 callers. Target: remove at least 50 LOC of genuinely dead code.
 3. **Verify** with `npx tsc --noEmit` and self-test

@@ -18,6 +18,7 @@ import { validateBeforeCommit, captureCodeQuality, type ValidationOptions } from
 import { compactMemory, smartCompactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
+import { runModelSelectionTests } from "../src/__tests__/model-selection.test.js";
 import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage } from "../src/messages.js";
 import { Logger, createLogger, parseJsonlLog, rotateLogFile, LOG_ROTATION_LIMITS, type LogEntry } from "../src/logging.js";
 import { ToolCache, CACHEABLE_TOOLS, extractPaths, pathOverlaps } from "../src/tool-cache.js";
@@ -685,6 +686,7 @@ async function main(): Promise<void> {
     testResuscitation();
     testLogRotation();
     await testResuscitationE2E();
+    runModelSelectionTests();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {
