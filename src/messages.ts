@@ -191,40 +191,66 @@ function formatCognitiveMetrics(m: CognitiveMetrics): string {
 // ─── Progress checkpoint ────────────────────────────────────
 
 /**
- * Inject escalating progress checkpoints at turns 8, 15, and 20.
- * This combats turn bloat by creating multiple "wrap up" decision points
- * with increasing urgency. The #1 pattern of wasted iterations is
- * continuing past turn 20 without a concrete reason.
+ * Inject escalating progress checkpoints proportional to the predicted budget.
+ *
+ * When `predictedBudget` is provided, checkpoints fire at ~15%, ~32%, ~60%,
+ * and ~80% of that budget — so a 14-turn budget gets warnings at turns 2, 4,
+ * 8, and 11, while a 22-turn budget gets them at 3, 7, 13, and 18.
+ *
+ * Falls back to hardcoded turns 4/8/15/20 when no budget is provided (backward
+ * compat). `maxTurns` is used for display only ("Turn X/maxTurns").
  *
  * When cognitive metrics are provided, the checkpoint includes quantitative
  * feedback about the agent's reading-vs-generating behavior — a concrete
  * signal that helps prevent drift into pure output mode.
  */
-export function progressCheckpoint(turn: number, metrics?: CognitiveMetrics): string | null {
+export function progressCheckpoint(
+  turn: number,
+  predictedBudget?: number | null,
+  maxTurns?: number,
+  metrics?: CognitiveMetrics
+): string | null {
   const metricsBlock = metrics ? `\n\nCognitive metrics this iteration:\n${formatCognitiveMetrics(metrics)}` : "";
+  const cap = maxTurns ?? 25;
 
-  if (turn === 4) {
+  // Compute checkpoint turns proportionally when a budget is available.
+  // Clamp each value so it's at least 1 and fits within the budget.
+  let t1: number, t2: number, t3: number, t4: number;
+  if (predictedBudget && predictedBudget > 0) {
+    t1 = Math.max(1, Math.round(predictedBudget * 0.15));
+    t2 = Math.max(t1 + 1, Math.round(predictedBudget * 0.32));
+    t3 = Math.max(t2 + 1, Math.round(predictedBudget * 0.60));
+    t4 = Math.max(t3 + 1, Math.round(predictedBudget * 0.80));
+  } else {
+    // Hardcoded fallback schedule (backward compat)
+    t1 = 4;
+    t2 = 8;
+    t3 = 15;
+    t4 = 20;
+  }
+
+  if (turn === t1) {
     return (
-      "SYSTEM: Early checkpoint — Turn 4/25. " +
-      "You've used 4 turns. Have you started producing a deliverable yet (writing/patching a file that's in your goals)? " +
+      `SYSTEM: Early checkpoint — Turn ${turn}/${cap}. ` +
+      `You've used ${turn} turn${turn === 1 ? "" : "s"}. Have you started producing a deliverable yet (writing/patching a file that's in your goals)? ` +
       "If you've only been reading, exploring, or thinking — STOP exploring and start writing. " +
       "The #1 source of waste is unfocused upfront exploration: reading files you won't use, " +
       "running probes that fail, gathering context beyond what your deliverables require. " +
       "State your deliverables and start producing them NOW."
     );
   }
-  if (turn === 8) {
+  if (turn === t2) {
     return (
-      "SYSTEM: Progress checkpoint — Turn 8/25. " +
+      `SYSTEM: Progress checkpoint — Turn ${turn}/${cap}. ` +
       "Review your goals.md. State status of each goal: DONE, IN PROGRESS, or NOT STARTED. " +
       "If all goals are DONE, write memory, update goals, run `npx tsc --noEmit`, and `echo \"AUTOAGENT_RESTART\"`. " +
-      "If goals remain, briefly state what's left and continue — but plan to finish by turn 15." +
+      `If goals remain, briefly state what's left and continue — but plan to finish by turn ${t3}.` +
       metricsBlock
     );
   }
-  if (turn === 15) {
+  if (turn === t3) {
     return (
-      "SYSTEM: Progress checkpoint — Turn 15/25. Past halfway. " +
+      `SYSTEM: Progress checkpoint — Turn ${turn}/${cap}. Past halfway. ` +
       "STOP. What have you actually changed in src/ this iteration? " +
       "If the answer is 'nothing' or 'only bookkeeping', you are in a drift loop. " +
       "Begin wrapping up NOW: write memory, update goals, commit. " +
@@ -232,11 +258,11 @@ export function progressCheckpoint(turn: number, metrics?: CognitiveMetrics): st
       metricsBlock
     );
   }
-  if (turn === 20) {
+  if (turn === t4) {
     return (
-      "SYSTEM: FINAL WARNING — Turn 20/25. Hard stop in 5 turns. " +
+      `SYSTEM: FINAL WARNING — Turn ${turn}/${cap}. Hard stop in ${cap - turn} turns. ` +
       "STOP ALL WORK. Write memory. Update goals. Run `npx tsc --noEmit`. `echo \"AUTOAGENT_RESTART\"`. " +
-      "Every turn past 20 is wasted money. You will be cut off at 25." +
+      `Every turn past ${turn} is wasted money. You will be cut off at ${cap}.` +
       metricsBlock
     );
   }

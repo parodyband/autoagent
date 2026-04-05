@@ -167,39 +167,40 @@ describe("budgetWarning", () => {
 // ─── progressCheckpoint ──────────────────────────────────────
 
 describe("progressCheckpoint", () => {
-  it("returns null for non-checkpoint turns", () => {
+  // ── Fallback (no budget) ──────────────────────────────────
+  it("returns null for non-checkpoint turns (no budget)", () => {
     expect(progressCheckpoint(1)).toBeNull();
     expect(progressCheckpoint(5)).toBeNull();
     expect(progressCheckpoint(10)).toBeNull();
     expect(progressCheckpoint(12)).toBeNull();
   });
 
-  it("returns early checkpoint at turn 4", () => {
+  it("returns early checkpoint at turn 4 (no budget)", () => {
     const result = progressCheckpoint(4);
     expect(result).not.toBeNull();
     expect(result).toContain("4");
   });
 
-  it("returns checkpoint at turn 8", () => {
+  it("returns checkpoint at turn 8 (no budget)", () => {
     const result = progressCheckpoint(8);
     expect(result).not.toBeNull();
     expect(result).toContain("8");
   });
 
-  it("returns checkpoint at turn 15", () => {
+  it("returns checkpoint at turn 15 (no budget)", () => {
     const result = progressCheckpoint(15);
     expect(result).not.toBeNull();
     expect(result).toContain("15");
   });
 
-  it("returns FINAL WARNING at turn 20", () => {
+  it("returns FINAL WARNING at turn 20 (no budget)", () => {
     const result = progressCheckpoint(20);
     expect(result).not.toBeNull();
     expect(result).toContain("20");
     expect(result).toContain("FINAL");
   });
 
-  it("includes cognitive metrics block when provided", () => {
+  it("includes cognitive metrics block when provided (no budget)", () => {
     const metrics = {
       inputTokens: 8000,
       outputTokens: 4000,
@@ -208,13 +209,103 @@ describe("progressCheckpoint", () => {
       totalCalls: 7,
       turns: 8,
     };
-    const result = progressCheckpoint(8, metrics);
+    const result = progressCheckpoint(8, null, undefined, metrics);
     expect(result).toContain("Cognitive metrics");
   });
 
-  it("omits metrics block when not provided", () => {
+  it("omits metrics block when not provided (no budget)", () => {
     const result = progressCheckpoint(8);
     expect(result).not.toContain("Cognitive metrics");
+  });
+
+  // ── Budget 14 ─────────────────────────────────────────────
+  // t1=round(14*0.15)=2, t2=max(3,round(14*0.32))=max(3,4)=4
+  // t3=max(5,round(14*0.60))=max(5,8)=8, t4=max(9,round(14*0.80))=max(9,11)=11
+  it("budget 14: early checkpoint at turn 2", () => {
+    const result = progressCheckpoint(2, 14, 25);
+    expect(result).not.toBeNull();
+    expect(result).toContain("Early checkpoint");
+    expect(result).toContain("Turn 2/25");
+  });
+
+  it("budget 14: progress checkpoint at turn 4", () => {
+    const result = progressCheckpoint(4, 14, 25);
+    expect(result).not.toBeNull();
+    expect(result).toContain("Progress checkpoint");
+    expect(result).toContain("Turn 4/25");
+  });
+
+  it("budget 14: past halfway at turn 8", () => {
+    const result = progressCheckpoint(8, 14, 25);
+    expect(result).not.toBeNull();
+    expect(result).toContain("Past halfway");
+    expect(result).toContain("Turn 8/25");
+  });
+
+  it("budget 14: final warning at turn 11", () => {
+    const result = progressCheckpoint(11, 14, 25);
+    expect(result).not.toBeNull();
+    expect(result).toContain("FINAL WARNING");
+    expect(result).toContain("Turn 11/25");
+  });
+
+  it("budget 14: returns null at turns that are not checkpoints", () => {
+    expect(progressCheckpoint(1, 14, 25)).toBeNull();
+    expect(progressCheckpoint(3, 14, 25)).toBeNull();
+    expect(progressCheckpoint(5, 14, 25)).toBeNull();
+    expect(progressCheckpoint(9, 14, 25)).toBeNull();
+  });
+
+  // ── Budget 22 ─────────────────────────────────────────────
+  // t1=round(22*0.15)=3, t2=max(4,round(22*0.32))=max(4,7)=7
+  // t3=max(8,round(22*0.60))=max(8,13)=13, t4=max(14,round(22*0.80))=max(14,18)=18
+  it("budget 22: early checkpoint at turn 3", () => {
+    const result = progressCheckpoint(3, 22, 25);
+    expect(result).not.toBeNull();
+    expect(result).toContain("Early checkpoint");
+    expect(result).toContain("Turn 3/25");
+  });
+
+  it("budget 22: progress checkpoint at turn 7", () => {
+    const result = progressCheckpoint(7, 22, 25);
+    expect(result).not.toBeNull();
+    expect(result).toContain("Progress checkpoint");
+    expect(result).toContain("Turn 7/25");
+  });
+
+  it("budget 22: past halfway at turn 13", () => {
+    const result = progressCheckpoint(13, 22, 25);
+    expect(result).not.toBeNull();
+    expect(result).toContain("Past halfway");
+    expect(result).toContain("Turn 13/25");
+  });
+
+  it("budget 22: final warning at turn 18", () => {
+    const result = progressCheckpoint(18, 22, 25);
+    expect(result).not.toBeNull();
+    expect(result).toContain("FINAL WARNING");
+    expect(result).toContain("Turn 18/25");
+  });
+
+  it("budget 22: returns null at turns that are not checkpoints", () => {
+    expect(progressCheckpoint(4, 22, 25)).toBeNull();
+    expect(progressCheckpoint(8, 22, 25)).toBeNull();
+    expect(progressCheckpoint(15, 22, 25)).toBeNull();
+    expect(progressCheckpoint(20, 22, 25)).toBeNull();
+  });
+
+  // ── Metrics with budget ───────────────────────────────────
+  it("includes cognitive metrics block when budget provided", () => {
+    const metrics = {
+      inputTokens: 8000,
+      outputTokens: 4000,
+      readCalls: 5,
+      writeCalls: 2,
+      totalCalls: 7,
+      turns: 7,
+    };
+    const result = progressCheckpoint(7, 22, 25, metrics);
+    expect(result).toContain("Cognitive metrics");
   });
 });
 

@@ -375,7 +375,7 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
     totalCalls,
     turns: ctx.turns,
   };
-  const checkpoint = progressCheckpoint(ctx.turns, cogMetrics);
+  const checkpoint = progressCheckpoint(ctx.turns, ctx.predictedTurns, ctx.maxTurns, cogMetrics);
   if (checkpoint) ctx.messages.push({ role: "user", content: checkpoint });
 
   const nudge = turnLimitNudge(turnsLeft);
