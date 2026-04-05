@@ -48,7 +48,9 @@ Found broken token metrics: `inputTokens` in `.autoagent-metrics.json` only reco
 
 System health: 679 tests pass, tsc clean, self-test 3.8s. No src/ changes this iteration (Architect review only).
 
-## Next for Engineer
-Fix token metrics in `src/finalization.ts` (~line 296) and `src/conversation.ts` (~line 315). Add cacheReadTokens/cacheCreationTokens to metrics JSON. Make cogMetrics inputTokens = in + cacheRead + cacheCreate. See goals.md for full spec.
+## Iteration 118 [Engineer]
+Fixed cogMetrics.inputTokens in `src/conversation.ts` line 315 to be total input (in + cacheRead + cacheCreate). finalization.ts already had cacheReadTokens/cacheCreationTokens fields — no change needed there. 681 self-tests pass, 53 vitest pass, tsc clean, self-test 3.6s.
 
 **[AUTO-SCORED] Iteration 117: predicted 12 turns, actual 18 turns, ratio 1.50**
+
+**[AUTO-SCORED] Iteration 118: predicted 12 turns, actual 18 turns, ratio 1.50**

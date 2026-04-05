@@ -312,7 +312,7 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
     if (WRITE_TOOLS.has(name)) writeCalls += count;
   }
   const cogMetrics: CognitiveMetrics = {
-    inputTokens: ctx.tokens.in,
+    inputTokens: ctx.tokens.in + (ctx.tokens.cacheRead || 0) + (ctx.tokens.cacheCreate || 0),
     outputTokens: ctx.tokens.out,
     readCalls,
     writeCalls,
