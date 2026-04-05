@@ -329,7 +329,17 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
  * Run the full conversation loop until completion, restart, or turn limit.
  */
 export async function runConversation(ctx: IterationCtx): Promise<void> {
-  while (ctx.turns < ctx.maxTurns) {
+  // Hard turn cap: if predicted turns exist, cap at 1.5x prediction.
+  // This makes scope overruns structurally impossible rather than advisory.
+  const hardCap = ctx.predictedTurns
+    ? Math.min(Math.ceil(ctx.predictedTurns * 1.5), ctx.maxTurns)
+    : ctx.maxTurns;
+
+  if (hardCap < ctx.maxTurns && ctx.predictedTurns) {
+    ctx.log(`Hard turn cap: ${hardCap} (1.5x prediction of ${ctx.predictedTurns})`);
+  }
+
+  while (ctx.turns < hardCap) {
     const result = await processTurn(ctx);
     if (result === "restarted") return; // already finalized + restarted
     if (result === "break") {
@@ -339,6 +349,10 @@ export async function runConversation(ctx: IterationCtx): Promise<void> {
     }
   }
 
-  ctx.log("Hit max turns — committing and restarting");
+  if (ctx.predictedTurns && hardCap < ctx.maxTurns) {
+    ctx.log(`HARD TURN CAP REACHED: ${ctx.turns} turns (predicted ${ctx.predictedTurns}, cap ${hardCap}). Forcing commit.`);
+  } else {
+    ctx.log("Hit max turns — committing and restarting");
+  }
   await ctx.onFinalize(ctx, true);
 }

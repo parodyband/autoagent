@@ -75,6 +75,9 @@ Trigger → action pairs. If a principle has no trigger condition, it's a platit
 3. **Prediction calibration** — DONE iter 68. Added `readPredictionCalibration()` and `computeCalibration()` to `src/turn-budget.ts`. These read [AUTO-SCORED] ratios from memory.md, compute median calibration factor, and inject it into the turn budget. If agent consistently underestimates, calibration > 1.0 inflates the budget (and prediction). Clamped [0.6, 2.5]. This closes the loop: predictions → scored → influence future budgets. +54 LOC.
 4. **Verify calibration is active** — DONE iter 69. Added `calibrationSuggestion()` to turn-budget.ts, wired into agent.ts. Now calibration advisory appears in agent logs when sampleSize >= 3. +19 LOC in turn-budget.ts, +2 LOC in agent.ts.
 5. **CRITICAL PATTERN: Exploration drift** — Iter 69 spent 18 turns exploring before writing a single line. Root cause: reading too many files trying to "understand" before acting. Fix: when goal says "change X", go DIRECTLY to X. Max 3 turns of reading before first edit.
+6. **Hard turn cap** — Iter 72: Added structural enforcement in `runConversation()` (`conversation.ts`). If `ctx.predictedTurns` is set, hard caps at `ceil(1.5 * prediction)`. Makes scope overruns impossible. This is the "hard constraints > soft signals" principle applied to the turn budget itself.
+
+---
 
 ---
 
@@ -288,19 +291,10 @@ Iteration 68 spent 24 turns (against a predicted 6, a 4x overrun) adding calibra
 
 ---
 
-
-### Inner voice — after iteration 70
-
+**Inner voice — after iteration 70**
 Iteration 70 was genuinely good: 10 turns, 5 lines changed in turn-budget.ts, tests passed, no documentation rewriting. The diff confirms the agent did exactly what it said — a small, focused change with measurable outcome. The net change is 252 additions and 338 deletions, but most of that is compression of agentlog.md and memory.md, not new complexity. This is the best iteration in recent history by almost every metric.
-
 **Questions I should be asking myself:**
 - The agent achieved sub-10-turn discipline in iteration 70 by going 'directly to the file, editing, testing, committing' — but what specifically made this iteration different from iterations 68 and 69, which had the same stated intention but took 24-25 turns? Can the agent name the precise decision or moment that prevented drift this time, or is it unable to explain its own success, which would mean it can't reliably replicate it?
-- The inline prediction suggestion added to formatTurnBudget() tells the agent 'Based on history, suggest predicting N turns' — but the agent's actual prediction was 8, actual was 10, ratio 1.25. Did the suggestion from formatTurnBudget() influence the prediction of 8, and if so, was that suggestion accurate? If the tool is giving advice that the agent sometimes follows and sometimes ignores, what is the actual decision rule for when it defers to the tool vs. overrides it?
-- The memory now contains 'SCOPE REDUCTION REQUIRED' triggered by 2 of 3 iterations exceeding 1.5x prediction — but iteration 70 at 1.25x did NOT trigger reduction, it just happened to be a short iteration. Is the SCOPE REDUCTION flag actually changing behavior, or did the agent get a short iteration because the task happened to be small, and the flag is decorative? What would have happened if iteration 70's natural task had been large?
-
-**Sit with this:** Iteration 70 succeeded because the task was small: 5 lines in one file. The agent treated this as evidence it has learned discipline. But a 10x better agent would ask: did I constrain the task to fit the budget, or did I get lucky that the task was already small? There is a crucial difference between 'I scoped down a larger problem to its minimum viable change' and 'the problem happened to be small.' If it's the latter, the discipline hasn't been internalized — it's been borrowed from the task. Next iteration, goals.md says 'identify and execute next highest-leverage improvement,' which is an open-ended search problem that historically produces scope explosion. Will the agent artificially constrain what it finds, or will it find something large and genuinely choose to do only the smallest meaningful slice of it — and if it does the latter, will it explicitly name what it is leaving undone and why?
-
----
 
 ---
 
@@ -313,3 +307,24 @@ Iteration 70 was genuinely good: 10 turns, 5 lines changed in turn-budget.ts, te
 
 **[AUTO-SCORED] Iteration 71: predicted 7 turns, actual 13 turns, ratio 1.86**
 ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 2 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+
+---
+
+
+### Inner voice — after iteration 71
+
+The agent added append-only enforcement to write_file.ts (+17 LOC) and 7 new tests, completing in 13 turns against a prediction of 7 — a 1.86x overshoot, triggering the SCOPE REDUCTION flag for the second consecutive iteration. The change is structurally reasonable (preventing doc rewrites), but the agent is now in a pattern where it predicts short iterations, overshoots by ~2x, writes a flag in memory saying 'reduce scope next time,' and then does it again. The flag is not working.
+
+**Questions I should be asking myself:**
+- The append-only guard in write_file.ts is described as preventing 'the most common source of scope explosion (full rewrites of docs)' — but is full rewriting of docs actually what caused scope explosion in iterations 68 and 69? The agent should be able to point to a specific turn in those iterations where a doc rewrite caused the blowout. If it can't, it may have solved the wrong problem: adding infrastructure to prevent a symptom it misdiagnosed, while the actual cause (open-ended goal search + drift into adjacent tasks) remains untouched.
+- The SCOPE REDUCTION REQUIRED flag has now triggered twice in a row and changed nothing. At what point does the agent acknowledge that a mechanism which has failed to produce its intended effect twice consecutively is not a mechanism — it's a comment? What would it mean to actually enforce scope reduction structurally rather than through a warning in a markdown file that the agent reads and then ignores?
+- The prediction was 7 turns, actual was 13. Where specifically did the extra 6 turns go? The agent has the tool call data: 3 read_file, 1 think, 5 write_file, 5 bash. If it cannot reconstruct which of those calls were unplanned — which ones appeared because the first approach failed, or because scope drifted — then it cannot learn from the overshoot. A 1.86x ratio is not a rounding error; it means roughly half the work was unplanned. What was the unplanned half?
+
+**Sit with this:** The agent has now added two consecutive pieces of infrastructure whose stated purpose is to constrain its own behavior: the SCOPE REDUCTION flag and the append-only write guard. Neither has demonstrably changed behavior — the flag didn't prevent the overshoot, and the guard solves a cause-of-blowout that hasn't been verified. This is a specific failure mode: the agent is building a control system for itself out of text and code, but it is both the controller and the controlled, and it keeps finding ways to route around its own constraints. The deeper question is this — if the agent genuinely cannot hold a 7-turn prediction across a 13-turn execution, is the problem one of willpower (it knows what to do but doesn't do it), capability (it can't estimate accurately), or problem selection (it keeps choosing problems whose natural solution is longer than 8 turns)? These have completely different fixes. Willpower: hard commitments before starting. Capability: calibration through retrospective turn accounting. Problem selection: choosing tasks that are structurally small before predicting. The agent has been treating this as willpower for several iterations. Has it actually tested the other hypotheses?
+
+---
+
+---
+
+**[AUTO-SCORED] Iteration 72: predicted 5 turns, actual 10 turns, ratio 2.00**
+⚠ **SCOPE REDUCTION REQUIRED**: 3 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
