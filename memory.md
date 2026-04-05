@@ -90,3 +90,5 @@ Implemented `--once` CLI flag: parses in `main()`, threads through `IterationCtx
 **No code changes needed this iteration.** The system is working. Next priority: inline `--task` CLI argument (pass task text directly instead of requiring TASK.md file).
 
 **[AUTO-SCORED] Iteration 103: predicted 12 turns, actual 12 turns, ratio 1.00**
+
+**[AUTO-SCORED] Iteration 104: predicted 14 turns, actual 15 turns, ratio 1.07**

@@ -543,3 +543,22 @@
 {"timestamp":"2026-04-05T11:19:53.447Z","iteration":104,"level":"info","message":"  -> ok: Patched memory.md: -1 +5 lines\n\nContext after patch:\n73 | \n74 | ---\n75 | \n76 | ## [Engineer] Iter 104: `--once` exit codes — DONE\n77 | \n78 | `doFinalize()` now exits `ctx.failed ? 1 : 0`. Exception path in `main()` exits 1 immediately when `--once` is set (skips rollback/restart). Added `failed?: boolean` to `IterationCtx`. tsc clean, 638 tests pass.\n79 | \n80 | ## [Engineer] Iter 102: `--once` flag — DONE\n81 | \n82 | Implemented `--once` CLI flag: parses in `main()`, threads through `IterationCtx.once`, skips restart in `doFinalize()`, exits cleanly via `process.exit(0)`. Updated `printHelp()`. Files changed: `src/agent.ts`, `src/conversation.ts`. tsc clean.\n83 | ","turn":11}
 {"timestamp":"2026-04-05T11:19:53.447Z","iteration":104,"level":"info","message":"Turn 12/25","turn":12}
 {"timestamp":"2026-04-05T11:19:57.728Z","iteration":104,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git add -A && git status","turn":12}
+{"timestamp":"2026-04-05T11:19:57.785Z","iteration":104,"level":"info","message":"  -> exit=0 (322 chars)","turn":12}
+{"timestamp":"2026-04-05T11:19:57.786Z","iteration":104,"level":"info","message":"Turn 13/25","turn":13}
+{"timestamp":"2026-04-05T11:19:59.908Z","iteration":104,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && bash scripts/pre-commit-check.sh 2>&1 | tail -5","turn":13}
+{"timestamp":"2026-04-05T11:20:04.794Z","iteration":104,"level":"info","message":"  -> exit=0 (200 chars)","turn":13}
+{"timestamp":"2026-04-05T11:20:04.794Z","iteration":104,"level":"info","message":"Turn 14/25","turn":14}
+{"timestamp":"2026-04-05T11:20:07.353Z","iteration":104,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git commit -m \"feat: --once exits 1 on failure, 0 on success\n\n- doFinalize() uses process.exit(ctx.failed ? 1 : 0)\n- main() catch block exits 1 immediately when...","turn":14}
+{"timestamp":"2026-04-05T11:20:07.386Z","iteration":104,"level":"info","message":"  -> exit=0 (117 chars)","turn":14}
+{"timestamp":"2026-04-05T11:20:07.386Z","iteration":104,"level":"info","message":"Turn 15/25","turn":15}
+{"timestamp":"2026-04-05T11:20:08.581Z","iteration":104,"level":"info","message":"Agent: Committed. All done.\n\necho \"AUTOAGENT_RESTART\"","turn":15}
+{"timestamp":"2026-04-05T11:20:08.582Z","iteration":104,"level":"info","message":"Restart signal found in text (not tool call) — treating as restart","turn":15}
+{"timestamp":"2026-04-05T11:20:08.582Z","iteration":104,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":15}
+{"timestamp":"2026-04-05T11:20:09.299Z","iteration":104,"level":"info","message":"Compilation OK","turn":15}
+{"timestamp":"2026-04-05T11:20:13.997Z","iteration":104,"level":"info","message":"Cache persisted: 27 entries to .autoagent-cache.json","turn":15}
+{"timestamp":"2026-04-05T11:20:13.998Z","iteration":104,"level":"info","message":"Cache stats: 0 hits, 3 misses, 27 entries, 5 invalidations (5 entries removed)","turn":15}
+{"timestamp":"2026-04-05T11:20:13.998Z","iteration":104,"level":"info","message":"Tool cache stats","turn":15,"metadata":{"cacheHits":0,"cacheMisses":3,"cacheEntries":27,"invalidations":5,"invalidatedEntries":5,"toolStats":{"read_file":{"hits":0,"misses":3}}}}
+{"timestamp":"2026-04-05T11:20:13.998Z","iteration":104,"level":"info","message":"Tool timing: bash: 5x, avg=1901ms, total=9503ms; read_file: 3x, avg=2ms, total=5ms; write_file: 5x, avg=1ms, total=5ms; think: 2x, avg=1ms, total=1ms","turn":15}
+{"timestamp":"2026-04-05T11:20:13.998Z","iteration":104,"level":"info","message":"Tool timing stats","turn":15,"metadata":{"timing":{"tools":{"read_file":{"calls":3,"totalMs":5,"minMs":1,"maxMs":2,"avgMs":2},"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"write_file":{"calls":5,"totalMs":5,"minMs":1,"maxMs":1,"avgMs":1},"bash":{"calls":5,"totalMs":9503,"minMs":33,"maxMs":4886,"avgMs":1901}},"totalCalls":15,"totalMs":9514}}}
+{"timestamp":"2026-04-05T11:20:22.206Z","iteration":104,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 104: predicted 14 turns, actual 15 turns, ratio 1.07**","turn":15}
+{"timestamp":"2026-04-05T11:20:22.223Z","iteration":104,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":15}

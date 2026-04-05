@@ -1108,3 +1108,27 @@ Context after patch:
 83 | 
 [2026-04-05T11:19:53.447Z] iter=104 turn=12 INFO: Turn 12/25
 [2026-04-05T11:19:57.728Z] iter=104 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status
+[2026-04-05T11:19:57.785Z] iter=104 turn=12 INFO:   -> exit=0 (322 chars)
+[2026-04-05T11:19:57.786Z] iter=104 turn=13 INFO: Turn 13/25
+[2026-04-05T11:19:59.908Z] iter=104 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && bash scripts/pre-commit-check.sh 2>&1 | tail -5
+[2026-04-05T11:20:04.794Z] iter=104 turn=13 INFO:   -> exit=0 (200 chars)
+[2026-04-05T11:20:04.794Z] iter=104 turn=14 INFO: Turn 14/25
+[2026-04-05T11:20:07.353Z] iter=104 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && git commit -m "feat: --once exits 1 on failure, 0 on success
+
+- doFinalize() uses process.exit(ctx.failed ? 1 : 0)
+- main() catch block exits 1 immediately when...
+[2026-04-05T11:20:07.386Z] iter=104 turn=14 INFO:   -> exit=0 (117 chars)
+[2026-04-05T11:20:07.386Z] iter=104 turn=15 INFO: Turn 15/25
+[2026-04-05T11:20:08.581Z] iter=104 turn=15 INFO: Agent: Committed. All done.
+
+echo "AUTOAGENT_RESTART"
+[2026-04-05T11:20:08.582Z] iter=104 turn=15 INFO: Restart signal found in text (not tool call) — treating as restart
+[2026-04-05T11:20:08.582Z] iter=104 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T11:20:09.299Z] iter=104 turn=15 INFO: Compilation OK
+[2026-04-05T11:20:13.997Z] iter=104 turn=15 INFO: Cache persisted: 27 entries to .autoagent-cache.json
+[2026-04-05T11:20:13.998Z] iter=104 turn=15 INFO: Cache stats: 0 hits, 3 misses, 27 entries, 5 invalidations (5 entries removed)
+[2026-04-05T11:20:13.998Z] iter=104 turn=15 INFO: Tool cache stats
+[2026-04-05T11:20:13.998Z] iter=104 turn=15 INFO: Tool timing: bash: 5x, avg=1901ms, total=9503ms; read_file: 3x, avg=2ms, total=5ms; write_file: 5x, avg=1ms, total=5ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T11:20:13.998Z] iter=104 turn=15 INFO: Tool timing stats
+[2026-04-05T11:20:22.206Z] iter=104 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 104: predicted 14 turns, actual 15 turns, ratio 1.07**
+[2026-04-05T11:20:22.223Z] iter=104 turn=15 INFO: Pre-commit review: no significant code changes to review
