@@ -156,13 +156,38 @@ export function compressMessages(
     return { messages, compressed: false, removedCount: 0 };
   }
 
-  // Keep first message (initial prompt) and last `keepRecent` messages
+  // Keep first message (initial prompt) and last `keepRecent` messages.
+  // CRITICAL: We must not split a tool_use/tool_result pair across the boundary.
+  // A user message containing tool_result blocks MUST be preceded by an assistant
+  // message containing the corresponding tool_use blocks.
   const initial = messages[0]; // user: goals + memory
-  const toCompress = messages.slice(1, messages.length - config.keepRecent);
-  const recent = messages.slice(messages.length - config.keepRecent);
+
+  // Find a safe split point: walk backward from the desired split to find a
+  // position where the message AFTER the split is NOT a user message with tool_results.
+  let splitIdx = messages.length - config.keepRecent;
+  // Ensure splitIdx >= 2 (keep at least initial + 1 message to compress)
+  if (splitIdx < 2) splitIdx = 2;
+
+  // Walk the split forward if it lands just before a tool_result user message,
+  // because that message's tool_use is in the assistant message before it (which
+  // would be compressed away). We need to include the assistant+user pair together.
+  while (splitIdx < messages.length - 2) {
+    const msgAfterSplit = messages[splitIdx];
+    if (msgAfterSplit.role === "user" && hasToolResults(msgAfterSplit)) {
+      // This user message has tool_results — its matching tool_use is at splitIdx-1.
+      // Move split back by 1 to include the assistant message too, OR
+      // move split forward by 1 to compress this user message as well.
+      // Moving forward is safer (compress more, keep less).
+      splitIdx++;
+    } else {
+      break;
+    }
+  }
+
+  const toCompress = messages.slice(1, splitIdx);
+  const recent = messages.slice(splitIdx);
 
   if (toCompress.length < 2) {
-    // Not enough to compress
     return { messages, compressed: false, removedCount: 0 };
   }
 
@@ -226,6 +251,16 @@ export function compressMessages(
     compressed: true,
     removedCount: toCompress.length,
   };
+}
+
+/** Check if a message contains tool_result blocks */
+function hasToolResults(msg: Anthropic.MessageParam): boolean {
+  if (typeof msg.content === "string") return false;
+  if (!Array.isArray(msg.content)) return false;
+  return msg.content.some((b) => {
+    const block = b as unknown as Record<string, unknown>;
+    return block.type === "tool_result";
+  });
 }
 
 function truncate(s: string, max: number): string {

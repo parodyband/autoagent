@@ -361,3 +361,10 @@ This is the first change since iteration 10 that directly improves the agent's c
 Read agentlog.md to understand what went wrong. Set conservative goals.
 
 ---
+
+## Iteration 26 — FAILED (2026-04-05T07:47:43.926Z)
+
+- **Error**: 400 {"type":"error","error":{"type":"invalid_request_error","message":"messages.2.content.0: unexpected `tool_use_id` found in `tool_result` blocks: toolu_01Rr4dDtRcJHxUzeLwdXdhNy. Each `tool_result` block must have a corresponding `tool_use` block in the previous message."},"request_id":"req_011CZkFkvhrkN44otxf92aYx"}
+- **Rolled back**
+
+---

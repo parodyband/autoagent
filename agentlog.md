@@ -1,19 +1,3 @@
-[2026-04-05T06:59:12.958Z] iter=15 turn=25 INFO:   -> exit=0 (11 chars)
-[2026-04-05T06:59:12.958Z] iter=15 turn=26 INFO: Turn 26/50
-[2026-04-05T06:59:35.432Z] iter=15 turn=26 INFO: Agent: 
-
-Clean compile. Now update memory and goals, then commit.
-[2026-04-05T06:59:35.433Z] iter=15 turn=26 INFO: write_file: memory.md (patch)
-[2026-04-05T06:59:35.434Z] iter=15 turn=26 INFO:   -> ok: Patched memory.md: -8 +29 lines
-[2026-04-05T06:59:35.434Z] iter=15 turn=27 INFO: Turn 27/50
-[2026-04-05T06:59:42.887Z] iter=15 turn=27 INFO: write_file: goals.md (write)
-[2026-04-05T06:59:42.888Z] iter=15 turn=27 INFO:   -> ok: Updated goals.md (797 chars, 0 lines delta)
-[2026-04-05T06:59:42.888Z] iter=15 turn=28 INFO: Turn 28/50
-[2026-04-05T06:59:45.719Z] iter=15 turn=28 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status --short
-[2026-04-05T06:59:45.747Z] iter=15 turn=28 INFO:   -> exit=0 (103 chars)
-[2026-04-05T06:59:45.748Z] iter=15 turn=29 INFO: Turn 29/50
-[2026-04-05T06:59:49.609Z] iter=15 turn=29 INFO: Agent: Clean diff — 2 source files changed (tool-cache.ts for persistence, self-test.ts for tests), plus memory/goals. Let me restart.
-[2026-04-05T06:59:49.611Z] iter=15 turn=29 INFO: $ echo "AUTOAGENT_RESTART"
 [2026-04-05T06:59:49.611Z] iter=15 turn=29 INFO: RESTART signal
 [2026-04-05T06:59:49.612Z] iter=15 turn=29 INFO: Validating: npx tsc --noEmit ...
 [2026-04-05T06:59:50.231Z] iter=15 turn=29 INFO: Compilation OK
@@ -1011,3 +995,25 @@ I'll start by reading my goals and memory, then investigate the failure.
 [2026-04-05T07:41:48.498Z] iter=26 turn=2 INFO: read_file: src/conversation.ts
 [2026-04-05T07:41:48.498Z] iter=26 turn=2 INFO:   -> ok (8090 chars)
 [2026-04-05T07:41:48.498Z] iter=26 turn=3 INFO: Turn 3/50
+[2026-04-05T07:47:43.926Z] iter=26 turn=19 INFO: Rolled back to pre-iteration-26
+[2026-04-05T07:47:43.926Z] iter=26 turn=19 INFO: Failure recorded. Restarting...
+[2026-04-05T07:47:44.102Z] iter=27 1/3 consecutive failures
+[2026-04-05T07:47:44.104Z] iter=27 INFO: Cache restored: 12/12 entries (0 stale)
+[2026-04-05T07:47:44.104Z] iter=27 INFO: Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T07:47:44.113Z] iter=27 turn=1 INFO: Turn 1/50
+[2026-04-05T07:47:49.902Z] iter=27 turn=1 INFO: think: Let me orient. The agent has been hitting the same error repeatedly: "unexpected tool_use_id found in tool_result blocks...
+[2026-04-05T07:47:49.902Z] iter=27 turn=2 INFO: Turn 2/50
+[2026-04-05T07:47:52.571Z] iter=27 turn=2 INFO: read_file: src/context-compression.ts
+[2026-04-05T07:47:52.572Z] iter=27 turn=2 INFO:   -> ok (8041 chars)
+[2026-04-05T07:47:52.572Z] iter=27 turn=2 INFO: read_file: src/conversation.ts
+[2026-04-05T07:47:52.572Z] iter=27 turn=2 INFO:   -> ok (8090 chars)
+[2026-04-05T07:47:52.573Z] iter=27 turn=3 INFO: Turn 3/50
+[2026-04-05T07:48:09.652Z] iter=27 turn=3 INFO: think: Now I understand the problem. The context compression is the root cause. Here's what happens:
+
+1. After 20+ messages, `c...
+[2026-04-05T07:48:09.654Z] iter=27 turn=4 INFO: Turn 4/50
+[2026-04-05T07:48:13.846Z] iter=27 turn=4 INFO: Agent: The root cause is clear: **context compression breaks tool_use/tool_result pairing**. When old messages are compressed into a text summary, the recent messages may contain `tool_result` blocks referencing `tool_use_id`s from assistant messages that were replaced by the summary text. The Anthropic API validates this pairing strictly → 400 error.
+
+**Immediate fix: disable compression by default.** T...
+[2026-04-05T07:48:13.846Z] iter=27 turn=4 INFO: read_file: CACHE HIT
+[2026-04-05T07:48:13.847Z] iter=27 turn=5 INFO: Turn 5/50
