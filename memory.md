@@ -341,3 +341,5 @@ Recent scores (iters 294–302, avg ratio 1.15):
 ---
 
 **[AUTO-SCORED] Iteration 325: predicted 20 turns, actual 17 turns, ratio 0.85**
+
+**[AUTO-SCORED] Iteration 326: predicted 20 turns, actual 25 turns, ratio 1.25**

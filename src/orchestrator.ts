@@ -284,6 +284,65 @@ ${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}`;
   return { systemPrompt, repoMapBlock, rawRepoMap };
 }
 
+// ─── Prompt cache control helpers ────────────────────────────────────────────
+
+/**
+ * Build a system param array with cache_control on the last block.
+ * Anthropic's prompt caching requires content-block arrays (not plain strings).
+ */
+export function buildCachedSystem(
+  systemPrompt: string,
+): Array<{ type: "text"; text: string; cache_control: { type: "ephemeral" } }> {
+  return [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }];
+}
+
+/**
+ * Inject cache_control breakpoints into the last 2 user message content
+ * boundaries so Anthropic can cache the conversation prefix.
+ * Returns a new messages array — does not mutate the input.
+ */
+export function injectMessageCacheBreakpoints(
+  messages: Anthropic.MessageParam[],
+): Anthropic.MessageParam[] {
+  // Find the indices of the last 2 user messages
+  const userIndices: number[] = [];
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i].role === "user") {
+      userIndices.push(i);
+      if (userIndices.length === 2) break;
+    }
+  }
+
+  if (userIndices.length === 0) return messages;
+
+  // Clone array and patch targeted messages
+  const result = [...messages];
+  for (const idx of userIndices) {
+    const msg = result[idx];
+    const content = msg.content;
+    if (typeof content === "string") {
+      // Convert to block array so we can attach cache_control
+      result[idx] = {
+        ...msg,
+        content: [
+          {
+            type: "text" as const,
+            text: content,
+            cache_control: { type: "ephemeral" as const },
+          },
+        ],
+      };
+    } else if (Array.isArray(content) && content.length > 0) {
+      // Attach cache_control to the last content block in this message
+      const blocks = [...content];
+      const last = blocks[blocks.length - 1];
+      blocks[blocks.length - 1] = { ...last, cache_control: { type: "ephemeral" } } as typeof last;
+      result[idx] = { ...msg, content: blocks };
+    }
+  }
+  return result;
+}
+
 // ─── Simple Claude caller (for task decomposition / compaction) ─
 
 function makeSimpleCaller(client: Anthropic): (prompt: string) => Promise<string> {
@@ -419,14 +478,19 @@ async function runAgentLoop(
   let fullText = "";
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
-    // Use streaming API
-    const stream = client.messages.stream({
+    // Inject prompt cache breakpoints for cost reduction (90% cheaper cache hits)
+    const cachedSystem = buildCachedSystem(systemPrompt);
+    const cachedMessages = injectMessageCacheBreakpoints(apiMessages);
+
+    // Use streaming API with prompt-cache breakpoints (system as content blocks)
+    const streamParams = {
       model,
       max_tokens: MAX_TOKENS,
-      system: systemPrompt,
+      system: cachedSystem as unknown as string,
       tools,
-      messages: apiMessages,
-    });
+      messages: cachedMessages,
+    };
+    const stream = client.messages.stream(streamParams);
 
     // Accumulate tool_use inputs (arrive as JSON deltas)
     const toolInputBuffers: Record<string, string> = {};
