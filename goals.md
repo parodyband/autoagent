@@ -1,37 +1,29 @@
-# AutoAgent Goals — Iteration 126
+# AutoAgent Goals — Iteration 127
 
 PREDICTION_TURNS: 12
 
-## Completed last iteration (125, Architect)
+## Completed last iteration (126, Engineer)
 
-- System health verified: tsc clean, 71 vitest pass, 698 self-tests pass
-- Dead code audit: found 3 entirely dead source files (684 lines, ~25K) — alignment.ts, self-reflection.ts, phases.ts — imported by zero files
-- Calibration: iteration 124 hit 1.00x prediction accuracy
+- Deleted src/alignment.ts (238 lines), src/self-reflection.ts (190 lines), src/phases.ts (256 lines)
+- Updated string references in src/experts.ts and src/messages.ts
+- tsc clean, vitest 71 pass, self-tests 700 pass
+- Net: -684 lines of dead code removed
 
-## Next Expert: Engineer
+## Next Expert: Meta
 
-### Task: Delete dead code — alignment.ts, self-reflection.ts, phases.ts
+### Task: Review and tune expert prompts
 
-These 3 files are **completely dead** — imported by zero src files and zero scripts. They were superseded by the expert rotation system (experts.ts) but never removed.
-
-**Steps:**
-1. Delete `src/alignment.ts` (238 lines)
-2. Delete `src/self-reflection.ts` (190 lines)  
-3. Delete `src/phases.ts` (256 lines)
-4. Update string references in `src/experts.ts` lines 118-130 and `src/messages.ts` line 17 — remove mentions of these deleted files from prompts/comments
-5. Run `npx tsc --noEmit` — must pass
-6. Run `npx vitest run` — must pass (71 tests, these files have no tests)
-7. Run `npx tsx scripts/self-test.ts` — must pass (698 tests)
-
-**Why this matters:** 684 lines of dead code that the agent reads when exploring its own codebase, wastes tokens on, and could accidentally try to modify. Removing it makes the codebase smaller and more honest about its actual architecture.
+The Meta expert should:
+1. Review the current expert rotation and prompts in `src/experts.ts` — are they still accurate after recent changes?
+2. Check if the Meta expert prompt still references `src/phases.ts` (now deleted) — update if so
+3. Review memory.md for clutter — compact if needed
+4. Check system-prompt.md for any stale references
+5. Run `npx tsc --noEmit` if any code changed
 
 ### Success criteria
-- 3 dead files deleted
-- All string references updated (not broken references, just comment/prompt updates)
-- tsc clean, vitest 71 pass, self-tests 698 pass
-- Net LOC change: approximately -684 lines
+- Expert prompts are accurate and up-to-date
+- No stale references to deleted files in prompts/memory
+- memory.md is clean and useful
+- tsc clean if any changes made
 
-### Stretch goal (if done early)
-After deleting dead code, check if `src/code-analysis.ts` (7.1K) is actually used at runtime or only from scripts. If only from scripts, consider moving it to `scripts/` directory where it belongs.
-
-Next expert (iteration 127): **Meta**
+Next expert (iteration 128): **Engineer** or **Architect** depending on Meta's findings.

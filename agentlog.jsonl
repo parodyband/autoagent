@@ -541,3 +541,22 @@
 {"timestamp":"2026-04-05T12:05:56.645Z","iteration":126,"level":"info","message":"Turn 10/25","turn":10}
 {"timestamp":"2026-04-05T12:06:00.889Z","iteration":126,"level":"info","message":"Agent: All goals DONE (700 self-tests, up from 698 — no failures). Now committing and writing goals.","turn":10}
 {"timestamp":"2026-04-05T12:06:00.890Z","iteration":126,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git add -A && git commit -m \"Delete dead code: alignment.ts, self-reflection.ts, phases.ts (-684 lines)\n\n- Remove 3 completely unused source files superseded by...","turn":10}
+{"timestamp":"2026-04-05T12:06:00.938Z","iteration":126,"level":"info","message":"  -> exit=0 (260 chars)","turn":10}
+{"timestamp":"2026-04-05T12:06:00.938Z","iteration":126,"level":"info","message":"Turn 11/25","turn":11}
+{"timestamp":"2026-04-05T12:06:08.792Z","iteration":126,"level":"info","message":"write_file: goals.md (write)","turn":11}
+{"timestamp":"2026-04-05T12:06:08.793Z","iteration":126,"level":"info","message":"  -> ok: Updated goals.md (1089 chars, -8 lines delta)","turn":11}
+{"timestamp":"2026-04-05T12:06:08.794Z","iteration":126,"level":"info","message":"Turn 12/25","turn":12}
+{"timestamp":"2026-04-05T12:06:13.073Z","iteration":126,"level":"info","message":"write_file: memory.md (patch)","turn":12}
+{"timestamp":"2026-04-05T12:06:13.074Z","iteration":126,"level":"info","message":"  -> ok: Patched memory.md: -2 +2 lines\n\nContext after patch:\n87 | \n88 | **Key insight:** Last 5+ iterations were infrastructure-about-infrastructure (turn budget, calibration, tests for calibration). This cleanup reverses the complexity trend — making the codebase smaller, not bigger.\n89 | \n90 | ## Iteration 126 [Engineer]\n91 | Deleted src/alignment.ts (238L), src/self-reflection.ts (190L), src/phases.ts (256L) — 684 lines of dead code removed. Updated string references in experts.ts and messages.ts. code-analysis.ts stays in src/ (imported by src/validation.ts). tsc clean, vitest 71, self-tests 700.\n92 | \n93 | **[AUTO-SCORED] Iteration 125: predicted 20 turns, actual 19 turns, ratio 0.95**\n94 | ","turn":12}
+{"timestamp":"2026-04-05T12:06:13.075Z","iteration":126,"level":"info","message":"Turn 13/25","turn":13}
+{"timestamp":"2026-04-05T12:06:14.709Z","iteration":126,"level":"info","message":"$ npx tsc --noEmit && echo \"AUTOAGENT_RESTART\"","turn":13}
+{"timestamp":"2026-04-05T12:06:14.709Z","iteration":126,"level":"info","message":"RESTART signal","turn":13}
+{"timestamp":"2026-04-05T12:06:14.710Z","iteration":126,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":13}
+{"timestamp":"2026-04-05T12:06:15.425Z","iteration":126,"level":"info","message":"Compilation OK","turn":13}
+{"timestamp":"2026-04-05T12:06:20.438Z","iteration":126,"level":"info","message":"Cache persisted: 35 entries to .autoagent-cache.json","turn":13}
+{"timestamp":"2026-04-05T12:06:20.439Z","iteration":126,"level":"info","message":"Cache stats: 0 hits, 2 misses, 35 entries, 5 invalidations (5 entries removed)","turn":13}
+{"timestamp":"2026-04-05T12:06:20.439Z","iteration":126,"level":"info","message":"Tool cache stats","turn":13,"metadata":{"cacheHits":0,"cacheMisses":2,"cacheEntries":35,"invalidations":5,"invalidatedEntries":5,"toolStats":{"read_file":{"hits":0,"misses":2}}}}
+{"timestamp":"2026-04-05T12:06:20.439Z","iteration":126,"level":"info","message":"Tool timing: bash: 9x, avg=717ms, total=6454ms; write_file: 5x, avg=2ms, total=8ms; think: 1x, avg=1ms, total=1ms; read_file: 2x, avg=1ms, total=1ms","turn":13}
+{"timestamp":"2026-04-05T12:06:20.439Z","iteration":126,"level":"info","message":"Tool timing stats","turn":13,"metadata":{"timing":{"tools":{"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"read_file":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"bash":{"calls":9,"totalMs":6454,"minMs":1,"maxMs":4567,"avgMs":717},"write_file":{"calls":5,"totalMs":8,"minMs":0,"maxMs":3,"avgMs":2}},"totalCalls":17,"totalMs":6464}}}
+{"timestamp":"2026-04-05T12:06:24.235Z","iteration":126,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 126: predicted 12 turns, actual 13 turns, ratio 1.08**","turn":13}
+{"timestamp":"2026-04-05T12:06:24.252Z","iteration":126,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":13}

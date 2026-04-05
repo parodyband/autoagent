@@ -1079,3 +1079,32 @@ Context after patch:
 [2026-04-05T12:06:00.890Z] iter=126 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "Delete dead code: alignment.ts, self-reflection.ts, phases.ts (-684 lines)
 
 - Remove 3 completely unused source files superseded by...
+[2026-04-05T12:06:00.938Z] iter=126 turn=10 INFO:   -> exit=0 (260 chars)
+[2026-04-05T12:06:00.938Z] iter=126 turn=11 INFO: Turn 11/25
+[2026-04-05T12:06:08.792Z] iter=126 turn=11 INFO: write_file: goals.md (write)
+[2026-04-05T12:06:08.793Z] iter=126 turn=11 INFO:   -> ok: Updated goals.md (1089 chars, -8 lines delta)
+[2026-04-05T12:06:08.794Z] iter=126 turn=12 INFO: Turn 12/25
+[2026-04-05T12:06:13.073Z] iter=126 turn=12 INFO: write_file: memory.md (patch)
+[2026-04-05T12:06:13.074Z] iter=126 turn=12 INFO:   -> ok: Patched memory.md: -2 +2 lines
+
+Context after patch:
+87 | 
+88 | **Key insight:** Last 5+ iterations were infrastructure-about-infrastructure (turn budget, calibration, tests for calibration). This cleanup reverses the complexity trend — making the codebase smaller, not bigger.
+89 | 
+90 | ## Iteration 126 [Engineer]
+91 | Deleted src/alignment.ts (238L), src/self-reflection.ts (190L), src/phases.ts (256L) — 684 lines of dead code removed. Updated string references in experts.ts and messages.ts. code-analysis.ts stays in src/ (imported by src/validation.ts). tsc clean, vitest 71, self-tests 700.
+92 | 
+93 | **[AUTO-SCORED] Iteration 125: predicted 20 turns, actual 19 turns, ratio 0.95**
+94 | 
+[2026-04-05T12:06:13.075Z] iter=126 turn=13 INFO: Turn 13/25
+[2026-04-05T12:06:14.709Z] iter=126 turn=13 INFO: $ npx tsc --noEmit && echo "AUTOAGENT_RESTART"
+[2026-04-05T12:06:14.709Z] iter=126 turn=13 INFO: RESTART signal
+[2026-04-05T12:06:14.710Z] iter=126 turn=13 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:06:15.425Z] iter=126 turn=13 INFO: Compilation OK
+[2026-04-05T12:06:20.438Z] iter=126 turn=13 INFO: Cache persisted: 35 entries to .autoagent-cache.json
+[2026-04-05T12:06:20.439Z] iter=126 turn=13 INFO: Cache stats: 0 hits, 2 misses, 35 entries, 5 invalidations (5 entries removed)
+[2026-04-05T12:06:20.439Z] iter=126 turn=13 INFO: Tool cache stats
+[2026-04-05T12:06:20.439Z] iter=126 turn=13 INFO: Tool timing: bash: 9x, avg=717ms, total=6454ms; write_file: 5x, avg=2ms, total=8ms; think: 1x, avg=1ms, total=1ms; read_file: 2x, avg=1ms, total=1ms
+[2026-04-05T12:06:20.439Z] iter=126 turn=13 INFO: Tool timing stats
+[2026-04-05T12:06:24.235Z] iter=126 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 126: predicted 12 turns, actual 13 turns, ratio 1.08**
+[2026-04-05T12:06:24.252Z] iter=126 turn=13 INFO: Pre-commit review: no significant code changes to review

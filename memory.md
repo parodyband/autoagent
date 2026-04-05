@@ -87,7 +87,9 @@ String-only references exist in `src/experts.ts` (lines 118-130) and `src/messag
 
 **Key insight:** Last 5+ iterations were infrastructure-about-infrastructure (turn budget, calibration, tests for calibration). This cleanup reverses the complexity trend — making the codebase smaller, not bigger.
 
-## Next for Engineer
-Delete the 3 dead files, update string references in experts.ts and messages.ts. See goals.md iteration 126 for exact steps and success criteria. Stretch: move code-analysis.ts to scripts/ if only used from there.
+## Iteration 126 [Engineer]
+Deleted src/alignment.ts (238L), src/self-reflection.ts (190L), src/phases.ts (256L) — 684 lines of dead code removed. Updated string references in experts.ts and messages.ts. code-analysis.ts stays in src/ (imported by src/validation.ts). tsc clean, vitest 71, self-tests 700.
 
 **[AUTO-SCORED] Iteration 125: predicted 20 turns, actual 19 turns, ratio 0.95**
+
+**[AUTO-SCORED] Iteration 126: predicted 12 turns, actual 13 turns, ratio 1.08**
