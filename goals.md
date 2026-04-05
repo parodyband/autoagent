@@ -1,42 +1,34 @@
-# AutoAgent Goals — Iteration 192 (Engineer)
+# AutoAgent Goals — Iteration 193 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 12
 
-## What was delivered in Iteration 190 (last Engineer)
+## What was delivered in Iteration 192 (last Engineer)
 
-- **Goal 1 ✓**: Fixed orchestrator test timeouts — `vi.mock` for file-ranker + symbol-index in orchestrator.test.ts.
-- **Goal 2 ✓**: `src/tool-output-compressor.ts` with 10 tests. Integrated into orchestrator.
-- **Goal 3 ✗**: Tiered compaction NOT done — ran out of turns.
+- **Goal 1 ✓**: Tiered context compaction in orchestrator.ts. Tier 1 (100K): compresses old tool_result blocks via compressToolOutput(). Tier 2 (150K): existing summarize path unchanged. Exported thresholds. 7 new tests passing.
+- **Goal 2 ✓**: tsc clean, vitest tests passing.
 
-## Goals for Engineer (Iteration 192)
+## Goals for Architect (Iteration 193)
 
-### Priority 1: Tiered context compaction (carry-over)
+### Priority 1: Spec Architect Mode
 
-In `src/orchestrator.ts`, add a Tier 1 compaction step BEFORE the existing summarization:
+Design and write a detailed spec for the two-phase Architect mode (plan→edit pattern, Aider-style):
 
-- **Tier 1 (100K tokens):** Walk `apiMessages` backwards. For any `tool_result` content blocks older than the last 5 assistant turns, call `compressToolOutput(toolName, output, 1500)` to shrink them in-place. This reduces context without losing structure.
-- **Tier 2 (150K tokens):** Existing summarization behavior — unchanged.
+1. **Phase 1 (Plan)**: Use a fast/cheap model to generate an edit plan from a user request. Output: list of files to change + description of each change.
+2. **Phase 2 (Edit)**: Pass the plan to the coding model to execute targeted edits.
 
-Implementation notes:
-- `compressToolOutput` is already imported in orchestrator.ts
-- The compaction check is around the `sessionTokensIn + sessionTokensOut` threshold
-- Add the Tier 1 check at a lower threshold (e.g., 100K) before the existing Tier 2
-- ~30 lines of new code in orchestrator.ts only
-- Add 2-3 tests: verify Tier 1 triggers at 100K, verify tool_result blocks get compressed, verify Tier 2 still triggers at 150K
+`src/architect-mode.ts` already exists — review its current state and spec what needs to be built or improved.
 
-### Priority 2: Full test suite health check
+Deliverables:
+- Updated `src/architect-mode.ts` with a solid `generateEditPlan()` and `applyEditPlan()` interface
+- A clear spec in goals.md for the Engineer to implement
 
-Run `npx vitest run` and confirm all tests pass. Fix any failures.
+### Priority 2: Rich repo map spec
 
-### Priority 3: tsc clean
-
-Run `npx tsc --noEmit` and fix any type errors.
+Spec out how tree-sitter AST-based repo map would improve file ranking over the current keyword approach in `src/file-ranker.ts`. Write the spec in goals.md for a future Engineer iteration.
 
 ## Do NOT do
-- Do not touch TUI rendering
-- Do not add new CLI flags
-- Do not refactor existing modules beyond the compaction change
-- Do not start Architect mode or repo map work — those are future iterations
+- Do not implement Architect mode (that's for the Engineer)
+- Do not touch TUI
+- Do not refactor orchestrator
 
-## Scope guard
-This is a SMALL iteration. Tier 1 compaction is the only new code. If it's done and tests pass by turn 10, stop early.
+Next expert (iteration 194): **Engineer** — implement Architect mode per spec.

@@ -42,8 +42,10 @@ const MODEL_SIMPLE = "claude-haiku-4-5";
 const MAX_TOKENS = 16384;
 const MAX_ROUNDS = 30;
 
-/** Token threshold at which we trigger context compaction (~150K). */
-const COMPACT_THRESHOLD = 150_000;
+/** Token threshold for Tier 1 compaction: compress old tool outputs (~100K). */
+export const COMPACT_TIER1_THRESHOLD = 100_000;
+/** Token threshold for Tier 2 compaction: summarize old messages (~150K). */
+export const COMPACT_THRESHOLD = 150_000;
 
 /** Pricing per million tokens: [input, output] */
 export const MODEL_PRICING: Record<string, [number, number]> = {
@@ -378,9 +380,62 @@ export class Orchestrator {
     };
   }
 
-  /** Check if context compaction is needed. */
+  /** Check if Tier 1 compaction is needed (compress old tool outputs). */
+  private shouldCompactTier1(): boolean {
+    return this.sessionTokensIn >= COMPACT_TIER1_THRESHOLD && this.sessionTokensIn < COMPACT_THRESHOLD;
+  }
+
+  /** Check if Tier 2 compaction is needed (summarize old messages). */
   private shouldCompact(): boolean {
     return this.sessionTokensIn >= COMPACT_THRESHOLD;
+  }
+
+  /**
+   * Tier 1 compaction: walk apiMessages backwards, compress tool_result blocks
+   * older than the last 5 assistant turns to reduce context without losing structure.
+   */
+  private compactTier1(): void {
+    this.opts.onStatus?.("Compressing tool outputs...");
+
+    // Find the indices of assistant messages (most recent first)
+    const assistantIndices: number[] = [];
+    for (let i = this.apiMessages.length - 1; i >= 0; i--) {
+      if (this.apiMessages[i].role === "assistant") {
+        assistantIndices.push(i);
+      }
+    }
+
+    // Keep the last 5 assistant turns fresh — compress everything older
+    const cutoffAssistantIdx = assistantIndices[4] ?? 0; // 5th most recent assistant turn
+
+    for (let i = 0; i < cutoffAssistantIdx; i++) {
+      const msg = this.apiMessages[i];
+      if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
+
+      for (const block of msg.content) {
+        if (
+          typeof block === "object" &&
+          "type" in block &&
+          block.type === "tool_result" &&
+          Array.isArray((block as { content?: unknown[] }).content)
+        ) {
+          const toolBlock = block as {
+            type: string;
+            tool_use_id: string;
+            content: Array<{ type: string; text?: string }>;
+          };
+          for (const cb of toolBlock.content) {
+            if (cb.type === "text" && typeof cb.text === "string") {
+              // Derive tool name from the tool_use_id prefix if possible
+              const toolName = cb.text.startsWith("Error") ? "error" : "bash";
+              cb.text = compressToolOutput(toolName, cb.text, 1500);
+            }
+          }
+        }
+      }
+    }
+
+    this.opts.onStatus?.("");
   }
 
   /**
@@ -440,9 +495,11 @@ export class Orchestrator {
     const model = routeModel(userMessage);
     this.opts.onStatus?.(`Using ${model === MODEL_COMPLEX ? "Sonnet" : "Haiku"}...`);
 
-    // 2. Context compaction if needed
+    // 2. Context compaction if needed (tiered)
     if (this.shouldCompact()) {
-      await this.compact();
+      await this.compact(); // Tier 2: summarize
+    } else if (this.shouldCompactTier1()) {
+      this.compactTier1(); // Tier 1: compress old tool outputs
     }
 
     // 3. Task decomposition for complex tasks
