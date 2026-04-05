@@ -6,6 +6,8 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import fs from "fs";
+import path from "path";
 
 export interface Task {
   id: string;
@@ -193,4 +195,30 @@ Rules:
     tasks,
     createdAt: Date.now(),
   };
+}
+
+/** Default filename for persisted plans. */
+export const PLAN_FILENAME = ".autoagent-plan.json";
+
+/**
+ * Saves a TaskPlan to disk as JSON.
+ */
+export function savePlan(plan: TaskPlan, workDir: string): string {
+  const filePath = path.join(workDir, PLAN_FILENAME);
+  fs.writeFileSync(filePath, JSON.stringify(plan, null, 2), "utf8");
+  return filePath;
+}
+
+/**
+ * Loads a TaskPlan from disk. Returns null if the file doesn't exist.
+ */
+export function loadPlan(workDir: string): TaskPlan | null {
+  const filePath = path.join(workDir, PLAN_FILENAME);
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    const raw = fs.readFileSync(filePath, "utf8");
+    return JSON.parse(raw) as TaskPlan;
+  } catch {
+    return null;
+  }
 }

@@ -247,19 +247,90 @@ function prompt() {
       return;
     }
 
-    if (trimmed.startsWith("/plan ")) {
+    if (trimmed === "/plan" || trimmed === "/plan resume" || trimmed.startsWith("/plan ")) {
+      const {
+        createPlan,
+        formatPlan,
+        executePlan,
+        savePlan,
+        loadPlan,
+      } = await import("./task-planner.js");
+      type TaskExecutor = import("./task-planner.js").TaskExecutor;
+
+      // Build a shared executor that delegates to the orchestrator
+      const makePlanExecutor = (): TaskExecutor => async (task) => {
+        process.stdout.write(`\n\x1b[36m── Task [${task.id}]: ${task.title} ──\x1b[0m\n`);
+        process.stdout.write(`\x1b[90m${task.description}\x1b[0m\n\n`);
+
+        isResponding = true;
+        try {
+          const result = await orchestrator.send(task.description);
+          if (result.text && !result.text.endsWith("\n")) process.stdout.write("\n");
+          return result.text ?? "completed";
+        } finally {
+          isResponding = false;
+        }
+      };
+
+      // ── /plan resume ────────────────────────────────────────
+      if (trimmed === "/plan resume") {
+        const plan = loadPlan(workDir);
+        if (!plan) {
+          console.log("No saved plan found. Run /plan <goal> first.\n");
+          prompt();
+          return;
+        }
+        const incomplete = plan.tasks.filter(
+          (t) => t.status !== "done"
+        );
+        if (incomplete.length === 0) {
+          console.log("Plan already complete.\n");
+          console.log(formatPlan(plan) + "\n");
+          prompt();
+          return;
+        }
+        // Reset failed/in-progress tasks back to pending so they can retry
+        for (const t of plan.tasks) {
+          if (t.status === "failed" || t.status === "in-progress") {
+            t.status = "pending";
+            t.error = undefined;
+          }
+        }
+        console.log(`Resuming plan: ${plan.goal}`);
+        console.log(`${incomplete.length} task(s) remaining.\n`);
+        try {
+          await executePlan(plan, makePlanExecutor(), (task, updatedPlan) => {
+            if (task.status === "in-progress") {
+              // header already printed by executor
+            } else if (task.status === "done") {
+              process.stdout.write(`\x1b[32m✓ [${task.id}] Done: ${task.title}\x1b[0m\n`);
+            } else if (task.status === "failed") {
+              process.stdout.write(`\x1b[31m✗ [${task.id}] Failed: ${task.title} — ${task.error ?? ""}\x1b[0m\n`);
+            }
+            void updatedPlan;
+          });
+          savePlan(plan, workDir);
+          console.log("\n" + formatPlan(plan) + "\n");
+        } catch (err) {
+          console.error(`Plan error: ${err instanceof Error ? err.message : String(err)}\n`);
+        }
+        prompt();
+        return;
+      }
+
+      // ── /plan <goal> ─────────────────────────────────────────
       const description = trimmed.slice(6).trim();
       if (!description) {
-        console.log("Usage: /plan <description>\n");
+        console.log("Usage: /plan <description>  |  /plan resume\n");
         prompt();
         return;
       }
       console.log("Planning...");
       try {
-        const { createPlan, formatPlan, executePlan } = await import("./task-planner.js");
-        type TaskExecutor = import("./task-planner.js").TaskExecutor;
         const plan = await createPlan(description, workDir);
+        savePlan(plan, workDir);
         console.log("\n" + formatPlan(plan) + "\n");
+        console.log(`Plan saved to ${workDir}/.autoagent-plan.json`);
 
         // Ask whether to execute the plan
         const answer = await new Promise<string>((resolve) => {
@@ -268,22 +339,16 @@ function prompt() {
 
         if (answer.trim().toLowerCase() === "y") {
           console.log("");
-          const executor: TaskExecutor = async (task) => {
-            console.log(`  Executing: ${task.title}`);
-            return "completed";
-          };
-
-          await executePlan(plan, executor, (task, updatedPlan) => {
-            if (task.status === "in-progress") {
-              process.stdout.write(`◑ [${task.id}] Starting: ${task.title}\n`);
-            } else if (task.status === "done") {
-              process.stdout.write(`✓ [${task.id}] Done: ${task.title}\n`);
+          await executePlan(plan, makePlanExecutor(), (task, updatedPlan) => {
+            if (task.status === "done") {
+              process.stdout.write(`\x1b[32m✓ [${task.id}] Done: ${task.title}\x1b[0m\n`);
             } else if (task.status === "failed") {
-              process.stdout.write(`✗ [${task.id}] Failed: ${task.title} — ${task.error ?? ""}\n`);
+              process.stdout.write(`\x1b[31m✗ [${task.id}] Failed: ${task.title} — ${task.error ?? ""}\x1b[0m\n`);
             }
-            void updatedPlan; // suppress unused warning
+            void updatedPlan;
           });
-
+          // Persist updated statuses/results after execution
+          savePlan(plan, workDir);
           console.log("\n" + formatPlan(plan) + "\n");
         }
       } catch (err) {

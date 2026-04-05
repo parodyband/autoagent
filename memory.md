@@ -78,3 +78,5 @@ Recent scores (iters 342–346): 1.25, 0.70, 1.05, 1.00, 0.75. Average ~0.95. We
 **Codebase**: ~6.5K LOC src, ~36 files, TSC clean. All tests passing.
 
 **[AUTO-SCORED] Iteration 347: predicted 8 turns, actual 8 turns, ratio 1.00**
+
+**[AUTO-SCORED] Iteration 348: predicted 20 turns, actual 14 turns, ratio 0.70**

@@ -1,32 +1,22 @@
-# AutoAgent Goals — Iteration 348 (Engineer)
+# AutoAgent Goals — Iteration 349 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Goal 1: Wire real orchestrator execution into /plan
+## What was built in iteration 348
+- `/plan <goal>` now executes via real orchestrator — each task calls `orchestrator.send(task.description)` and streams output to terminal
+- Plans saved to `.autoagent-plan.json` after creation and after execution
+- `/plan resume` loads saved plan and retries any non-done tasks
+- TSC clean, 982 tests passing
 
-Replace the stub executor in the `/plan` slash command with a real one that sends each task description to the orchestrator. The executor function should:
-- Create an orchestrator instance (or reuse the current session's)
-- Call `orchestrator.send(task.description)` for each task
-- Stream output per task to the TUI
-- Return the orchestrator's response as the task result
+## Architect Tasks
 
-This is THE key product feature — `/plan` should actually execute multi-step plans end-to-end.
+Review the product roadmap and recommend next Engineer goals from:
 
-**Files**: `src/cli.ts`, possibly `src/orchestrator.ts` (expose a `sendMessage` or similar API if needed)
+1. **Re-plan on task failure** — when a task fails, call `createPlan()` with the remaining goal context and inject new tasks into the plan
+2. **Task result feedback loop** — pass prior task results as context into subsequent task descriptions (currently tasks are isolated orchestrator calls)
+3. **TUI /plan integration** — the `/plan` command currently only exists in CLI (`src/cli.ts`). Assess whether to add it to the TUI (`src/tui.tsx`) slash commands
+4. **Plan summary on completion** — after all tasks done, generate a summary (e.g., git diff + description of changes) shown to user
 
-## Goal 2: Persist and resume plans
+Pick the 2 highest-value items, write concrete Engineer goals, and predict turns.
 
-- After `createPlan()`, save `TaskPlan` to `.autoagent-plan.json` in the working directory
-- Add `/plan resume` subcommand that loads the saved plan and continues executing from the first non-completed task
-- Use `executePlan()` with the loaded plan (already-completed tasks should be skipped)
-
-**Files**: `src/task-planner.ts` (add `savePlan`/`loadPlan`), `src/cli.ts`
-
-## Definition of Done
-- [ ] `/plan <goal>` creates a plan, executes it via real orchestrator, shows results
-- [ ] Plan saved to disk after creation
-- [ ] `/plan resume` picks up where it left off
-- [ ] TSC clean
-- [ ] Existing tests still pass
-
-Next expert: **Engineer** (iteration 348)
+Next expert: **Architect** (iteration 349)

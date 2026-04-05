@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775418719465,
+  "generatedAt": 1775419073235,
   "files": [
     {
       "path": "src/context-loader.ts",
@@ -968,52 +968,6 @@
       "lastModified": 1775412317356.8694
     },
     {
-      "path": "src/cli.ts",
-      "exports": [
-        {
-          "name": "printHelp",
-          "kind": "function",
-          "line": 31,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "readline"
-        },
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "url"
-        },
-        {
-          "names": [],
-          "from": "child_process"
-        },
-        {
-          "names": [],
-          "from": "dotenv/config"
-        },
-        {
-          "names": [],
-          "from": "./orchestrator.js"
-        },
-        {
-          "names": [],
-          "from": "./init-command.js"
-        }
-      ],
-      "lastModified": 1775418407871.365
-    },
-    {
       "path": "src/loop-detector.ts",
       "exports": [
         {
@@ -1303,48 +1257,6 @@
       "lastModified": 1775418402074.0774
     },
     {
-      "path": "src/task-planner.ts",
-      "exports": [
-        {
-          "name": "Task",
-          "kind": "interface",
-          "line": 10,
-          "exported": true
-        },
-        {
-          "name": "TaskPlan",
-          "kind": "interface",
-          "line": 18,
-          "exported": true
-        },
-        {
-          "name": "getNextTasks",
-          "kind": "function",
-          "line": 35,
-          "exported": true
-        },
-        {
-          "name": "formatPlan",
-          "kind": "function",
-          "line": 48,
-          "exported": true
-        },
-        {
-          "name": "createPlan",
-          "kind": "function",
-          "line": 75,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        }
-      ],
-      "lastModified": 1775418420421.8577
-    },
-    {
       "path": "src/__tests__/loop-detector.test.ts",
       "exports": [],
       "imports": [
@@ -1362,6 +1274,132 @@
         }
       ],
       "lastModified": 1775418341410.3752
+    },
+    {
+      "path": "src/cli.ts",
+      "exports": [
+        {
+          "name": "printHelp",
+          "kind": "function",
+          "line": 31,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "readline"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "url"
+        },
+        {
+          "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
+          "from": "dotenv/config"
+        },
+        {
+          "names": [],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [],
+          "from": "./init-command.js"
+        }
+      ],
+      "lastModified": 1775419062882.0312
+    },
+    {
+      "path": "src/task-planner.ts",
+      "exports": [
+        {
+          "name": "Task",
+          "kind": "interface",
+          "line": 12,
+          "exported": true
+        },
+        {
+          "name": "TaskPlan",
+          "kind": "interface",
+          "line": 22,
+          "exported": true
+        },
+        {
+          "name": "TaskExecutor",
+          "kind": "type",
+          "line": 29,
+          "exported": true
+        },
+        {
+          "name": "getNextTasks",
+          "kind": "function",
+          "line": 42,
+          "exported": true
+        },
+        {
+          "name": "formatPlan",
+          "kind": "function",
+          "line": 55,
+          "exported": true
+        },
+        {
+          "name": "executePlan",
+          "kind": "function",
+          "line": 84,
+          "exported": true
+        },
+        {
+          "name": "createPlan",
+          "kind": "function",
+          "line": 131,
+          "exported": true
+        },
+        {
+          "name": "PLAN_FILENAME",
+          "kind": "const",
+          "line": 201,
+          "exported": true
+        },
+        {
+          "name": "savePlan",
+          "kind": "function",
+          "line": 206,
+          "exported": true
+        },
+        {
+          "name": "loadPlan",
+          "kind": "function",
+          "line": 215,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        }
+      ],
+      "lastModified": 1775419041729.5645
     }
   ]
 }
