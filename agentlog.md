@@ -1,97 +1,3 @@
-[2026-04-05T16:03:23.664Z] iter=225 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T16:03:23.769Z] iter=225 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T16:03:23.769Z] iter=225 turn=1 INFO: Turn 1/25
-[2026-04-05T16:03:28.434Z] iter=225 turn=1 INFO: Agent: 
-
-I'll start by evaluating what the Engineer shipped in iteration 224, then research multi-file edit patterns in other coding agents, and produce a concrete design spec.
-[2026-04-05T16:03:28.435Z] iter=225 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T16:03:28.437Z] iter=225 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -20
-[2026-04-05T16:03:28.440Z] iter=225 turn=1 INFO: read_file: src/orchestrator.ts
-[2026-04-05T16:03:28.440Z] iter=225 turn=1 INFO:   -> ok (2035 chars)
-[2026-04-05T16:03:28.441Z] iter=225 turn=1 INFO: read_file: src/tool-registry.ts
-[2026-04-05T16:03:28.441Z] iter=225 turn=1 INFO:   -> ok (9764 chars)
-[2026-04-05T16:03:29.503Z] iter=225 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:03:36.361Z] iter=225 turn=1 INFO:   -> exit=0 (1598 chars)
-[2026-04-05T16:03:36.361Z] iter=225 turn=2 INFO: Turn 2/25
-[2026-04-05T16:03:41.443Z] iter=225 turn=2 INFO: Agent: 
-
-You're right. My deliverable is a concrete multi-file edit design spec in goals.md. Let me research quickly then write it.
-[2026-04-05T16:03:41.444Z] iter=225 turn=2 INFO: web_search: "coding agent multi-file edit orchestration atomic batch edits Aider Cursor Claude Code"
-[2026-04-05T16:03:41.474Z] iter=225 turn=2 INFO: read_file: src/tools/write_file.ts
-[2026-04-05T16:03:41.475Z] iter=225 turn=2 INFO:   -> ok (1357 chars)
-[2026-04-05T16:03:42.750Z] iter=225 turn=2 INFO:   -> 8 results
-[2026-04-05T16:03:42.751Z] iter=225 turn=3 INFO: Turn 3/25
-[2026-04-05T16:03:46.428Z] iter=225 turn=3 INFO: web_fetch: https://www.morphllm.com/ai-agent-orchestration
-[2026-04-05T16:03:46.430Z] iter=225 turn=3 INFO: read_file: src/tools/write_file.ts
-[2026-04-05T16:03:46.431Z] iter=225 turn=3 INFO:   -> ok (2921 chars)
-[2026-04-05T16:03:46.660Z] iter=225 turn=3 INFO:   -> ok (21901 chars)
-[2026-04-05T16:03:46.661Z] iter=225 turn=4 INFO: Turn 4/25
-[2026-04-05T16:04:00.489Z] iter=225 turn=4 INFO: Agent: 
-
-Status: **IN PROGRESS** — Goal is "Evaluate multi-file edit orchestration design and produce concrete spec in goals.md". Research done, now writing the deliverable.
-[2026-04-05T16:04:00.491Z] iter=225 turn=4 INFO: think: Based on my research and understanding of the codebase, here's my design for multi-file edit orchestration:
-
-Key insight...
-[2026-04-05T16:04:00.491Z] iter=225 turn=5 INFO: Turn 5/25
-[2026-04-05T16:04:03.411Z] iter=225 turn=5 INFO: read_file: src/orchestrator.ts
-[2026-04-05T16:04:03.412Z] iter=225 turn=5 INFO:   -> ok (3347 chars)
-[2026-04-05T16:04:03.413Z] iter=225 turn=6 INFO: Turn 6/25
-[2026-04-05T16:04:35.890Z] iter=225 turn=6 INFO: Agent: 
-
-You're right — my deliverable is goals.md with a design spec, not src/ changes. This is an Architect iteration. Let me write it now.
-[2026-04-05T16:04:35.891Z] iter=225 turn=6 INFO: write_file: goals.md (write)
-[2026-04-05T16:04:35.893Z] iter=225 turn=6 INFO:   -> ok: Updated goals.md (4603 chars, +49 lines delta)
-[2026-04-05T16:04:35.896Z] iter=225 turn=7 INFO: Turn 7/25
-[2026-04-05T16:04:44.188Z] iter=225 turn=7 INFO: Agent: 
-
-Wrapping up now.
-[2026-04-05T16:04:44.189Z] iter=225 turn=7 INFO: save_memory: "[Architect] Multi-file edit design spec"
-[2026-04-05T16:04:44.191Z] iter=225 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T16:04:44.192Z] iter=225 turn=7 INFO: save_memory: "[Research] Multi-agent orchestration patterns (Feb 2026)"
-[2026-04-05T16:04:44.193Z] iter=225 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T16:04:44.193Z] iter=225 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
-[2026-04-05T16:04:45.134Z] iter=225 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:04:45.135Z] iter=225 turn=8 INFO: Turn 8/25
-[2026-04-05T16:04:50.138Z] iter=225 turn=8 INFO: Agent: TSC clean. Done.
-
-**Summary of this iteration:**
-- ✅ Evaluated Engineer's iteration 224 (sub-agent token tracking, /model reset) — both clean
-- ✅ Researched multi-agent orchestration across 6+ tools (Claude Code Agent Teams, Cursor, Codex, Windsurf, Grok Build, Aider)
-- ✅ Designed multi-file edit batching spec: unified diff preview, atomic apply/reject, rollback on failure
-- ✅ Wrote concrete goals...
-[2026-04-05T16:04:50.139Z] iter=225 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T16:04:50.140Z] iter=225 turn=8 INFO: RESTART signal
-[2026-04-05T16:04:50.140Z] iter=225 turn=8 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T16:04:51.038Z] iter=225 turn=8 INFO: Compilation OK
-[2026-04-05T16:04:56.733Z] iter=225 turn=8 INFO: Cache persisted: 49 entries to .autoagent-cache.json
-[2026-04-05T16:04:56.733Z] iter=225 turn=8 INFO: Cache stats: 0 hits, 5 misses, 49 entries, 1 invalidations (0 entries removed)
-[2026-04-05T16:04:56.733Z] iter=225 turn=8 INFO: Tool cache stats
-[2026-04-05T16:04:56.734Z] iter=225 turn=8 INFO: Tool timing: bash: 4x, avg=2484ms, total=9934ms; web_search: 1x, avg=1307ms, total=1307ms; web_fetch: 1x, avg=233ms, total=233ms; save_memory: 2x, avg=9ms, total=17ms; read_file: 5x, avg=1ms, total=6ms; write_file: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T16:04:56.734Z] iter=225 turn=8 INFO: Tool timing stats
-[2026-04-05T16:05:03.016Z] iter=225 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 225: predicted 8 turns, actual 8 turns, ratio 1.00**
-[2026-04-05T16:05:03.037Z] iter=225 turn=8 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T16:05:03.070Z] iter=225 turn=8 INFO: Committed: f7848453 (18 in / 3199 out, cache: 22140 created, 104003 read)
-[2026-04-05T16:05:03.071Z] iter=225 turn=8 INFO: Restarting as iteration 226...
-[2026-04-05T16:05:03.262Z] iter=226 INFO: Cache restored: 49/49 entries (0 stale)
-[2026-04-05T16:05:03.264Z] iter=226 INFO: Turn budget: 20/25 (calibration=1.00x, predicted=20)
-[2026-04-05T16:05:03.265Z] iter=226 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T16:05:03.369Z] iter=226 turn=1 INFO: Turn 1/25
-[2026-04-05T16:05:06.744Z] iter=226 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand the existing implementation before building the multi-file edit batching feature.
-[2026-04-05T16:05:06.745Z] iter=226 turn=1 INFO: $ cat goals.md
-[2026-04-05T16:05:06.747Z] iter=226 turn=1 INFO: $ grep -n "toolUses\|write_file\|onDiffPreview\|computeUnifiedDiff\|DiffPreview" src/orchestrator.ts | head -60
-[2026-04-05T16:05:06.753Z] iter=226 turn=1 INFO:   -> exit=0 (4603 chars)
-[2026-04-05T16:05:06.757Z] iter=226 turn=1 INFO:   -> exit=0 (945 chars)
-[2026-04-05T16:05:06.758Z] iter=226 turn=2 INFO: Turn 2/25
-[2026-04-05T16:05:09.514Z] iter=226 turn=2 INFO: read_file: src/orchestrator.ts
-[2026-04-05T16:05:09.515Z] iter=226 turn=2 INFO:   -> ok (5355 chars)
-[2026-04-05T16:05:09.515Z] iter=226 turn=2 INFO: read_file: src/tui.tsx
-[2026-04-05T16:05:09.515Z] iter=226 turn=2 INFO:   -> ok (1752 chars)
-[2026-04-05T16:05:09.516Z] iter=226 turn=3 INFO: Turn 3/25
-[2026-04-05T16:05:12.788Z] iter=226 turn=3 INFO: grep: "DiffPreviewDisplay" in src/tui.tsx
-[2026-04-05T16:05:12.807Z] iter=226 turn=3 INFO:   -> 2 matches
-[2026-04-05T16:05:12.808Z] iter=226 turn=3 INFO: $ grep -n "DiffPreview\|onDiffPreview\|diff.*preview\|preview.*diff" src/tui.tsx | head -40
-[2026-04-05T16:05:12.816Z] iter=226 turn=3 INFO:   -> exit=0 (252 chars)
-[2026-04-05T16:05:12.816Z] iter=226 turn=4 INFO: Turn 4/25
 [2026-04-05T16:05:18.442Z] iter=226 turn=4 INFO: think: I have enough context. Let me start building immediately.
 
 Key facts from my exploration:
@@ -1090,3 +996,321 @@ Memory and goals are already written. Finishing up.
 [2026-04-05T16:15:34.791Z] iter=231 turn=8 INFO: Tool timing stats
 [2026-04-05T16:15:40.008Z] iter=231 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 231: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-05T16:15:40.028Z] iter=231 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T16:15:40.060Z] iter=231 turn=8 INFO: Committed: ae44c09d (18 in / 3987 out, cache: 13670 created, 72390 read)
+[2026-04-05T16:15:40.060Z] iter=231 turn=8 INFO: Restarting as iteration 232...
+[2026-04-05T16:15:40.259Z] iter=232 INFO: Cache restored: 47/47 entries (0 stale)
+[2026-04-05T16:15:40.261Z] iter=232 INFO: Turn budget: 18/25 (calibration=1.00x, predicted=20)
+[2026-04-05T16:15:40.261Z] iter=232 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T16:15:40.379Z] iter=232 turn=1 INFO: Turn 1/25
+[2026-04-05T16:15:43.645Z] iter=232 turn=1 INFO: Agent: I'll start by reading the current state of relevant files to understand what needs to be built.
+[2026-04-05T16:15:43.646Z] iter=232 turn=1 INFO: $ cat src/tui.tsx | head -100
+[2026-04-05T16:15:43.648Z] iter=232 turn=1 INFO: $ grep -n "fuzzySearch\|#file\|autocomplete\|suggestion" src/tui.tsx | head -30
+[2026-04-05T16:15:43.656Z] iter=232 turn=1 INFO:   -> exit=0 (2928 chars)
+[2026-04-05T16:15:43.659Z] iter=232 turn=1 INFO:   -> exit=0 (130 chars)
+[2026-04-05T16:15:43.660Z] iter=232 turn=2 INFO: Turn 2/25
+[2026-04-05T16:15:46.508Z] iter=232 turn=2 INFO: $ grep -n "dynamicBudgetWarning\|computeTurnBudget\|computeCalibration" src/*.ts src/*.tsx | head -30
+[2026-04-05T16:15:46.513Z] iter=232 turn=2 INFO: $ cat src/__tests__/tui-commands.test.ts
+[2026-04-05T16:15:46.528Z] iter=232 turn=2 INFO:   -> exit=0 (5141 chars)
+[2026-04-05T16:15:46.540Z] iter=232 turn=2 INFO:   -> exit=0 (1120 chars)
+[2026-04-05T16:15:46.540Z] iter=232 turn=3 INFO: Turn 3/25
+[2026-04-05T16:15:49.481Z] iter=232 turn=3 INFO: $ cat src/turn-budget.ts | grep -n "dynamicBudgetWarning" -A 40
+[2026-04-05T16:15:49.486Z] iter=232 turn=3 INFO: $ grep -n "useInput\|TextInput\|input\|handleInput\|handleSubmit\|/model\|/find" src/tui.tsx | head -60
+[2026-04-05T16:15:49.501Z] iter=232 turn=3 INFO:   -> exit=0 (1026 chars)
+[2026-04-05T16:15:49.507Z] iter=232 turn=3 INFO:   -> exit=0 (887 chars)
+[2026-04-05T16:15:49.507Z] iter=232 turn=4 INFO: Turn 4/25
+[2026-04-05T16:15:57.051Z] iter=232 turn=4 INFO: think: I have enough context. Let me build both deliverables now:
+
+1. **`#file` hint logic** - pure functions for extracting th...
+[2026-04-05T16:15:57.052Z] iter=232 turn=5 INFO: Turn 5/25
+[2026-04-05T16:15:59.746Z] iter=232 turn=5 INFO: $ grep -n "repoMap\|setInput\|onSubmit\|TextInput\|footer\|FooterStats\|suggestion\|overlay" src/tui.tsx | head -50
+[2026-04-05T16:15:59.750Z] iter=232 turn=5 INFO: $ sed -n '225,320p' src/tui.tsx
+[2026-04-05T16:15:59.764Z] iter=232 turn=5 INFO:   -> exit=0 (3077 chars)
+[2026-04-05T16:15:59.766Z] iter=232 turn=5 INFO:   -> exit=0 (694 chars)
+[2026-04-05T16:15:59.766Z] iter=232 turn=6 INFO: Turn 6/25
+[2026-04-05T16:16:01.252Z] iter=232 turn=6 INFO: $ sed -n '570,620p' src/tui.tsx
+[2026-04-05T16:16:01.274Z] iter=232 turn=6 INFO:   -> exit=0 (916 chars)
+[2026-04-05T16:16:01.275Z] iter=232 turn=7 INFO: Turn 7/25
+[2026-04-05T16:16:04.423Z] iter=232 turn=7 INFO: Agent: **Goal 1: `#file` TUI hint** — NOT STARTED  
+**Goal 2: Budget warning tests** — NOT STARTED
+
+Building both now.
+[2026-04-05T16:16:04.424Z] iter=232 turn=7 INFO: $ sed -n '540,560p' src/tui.tsx
+[2026-04-05T16:16:04.432Z] iter=232 turn=7 INFO:   -> exit=0 (611 chars)
+[2026-04-05T16:16:04.433Z] iter=232 turn=8 INFO: Turn 8/25
+[2026-04-05T16:16:15.136Z] iter=232 turn=8 INFO: Agent: Now I have enough context. Let me write both deliverables:
+[2026-04-05T16:16:15.137Z] iter=232 turn=8 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:16:15.139Z] iter=232 turn=8 INFO:   -> ok: Patched src/tui.tsx: -1 +42 lines
+
+Context after patch:
+67 |   model: string;
+68 | }
+69 | 
+70 | // ─── #file hint pure helpers ────────────────────────────────
+71 | 
+72 | /**
+73 |  * If the input contains `#` followed by partial text, return that partial.
+74 |  * Returns null if no `#` trigger is present.
+75 |  * E.g. "look at #src/orch" → "src/orch"
+76 |  *      "hello world"       → null
+77 |  */
+78 | export function extractFileQuery(input: string): string | null {
+79 |   const idx = input.lastIndexOf("#");
+80 |   if (idx === -1) return null;
+81 |   // Only trigger when # is not followed by a space (or is at end)
+82 |   const after = input.slice(idx + 1);
+83 |   if (after.includes(" ")) return null; // completed word — no longer partial
+84 |   return after; // may be empty string (just typed #)
+85 | }
+86 | 
+87 | /**
+88 |  * Given a partial file query string and a RepoMap, return up to `limit`
+89 |  * matching file paths.
+90 |  */
+91 | export function getFileSuggestions(
+92 |   repoMap: import("./tree-sitter-map.js").RepoMap,
+93 |   partial: string,
+94 |   limit = 5
+95 | ): string[] {
+96 |   if (!repoMap || repoMap.files.length === 0) return [];
+97 |   const results = fuzzySearch(repoMap, partial || "", limit);
+98 |   // deduplicate by file path and return just the paths
+99 |   const seen = new Set<string>();
+100 |   const paths: string[] = [];
+101 |   for (const r of results) {
+102 |     if (!seen.has(r.file)) {
+103 |       seen.add(r.file);
+104 |       paths.push(r.file);
+105 |     }
+106 |     if (paths.length >= limit) break;
+107 |   }
+108 |   return paths;
+109 | }
+110 | 
+111 | // ─── Components ─────────────────────────────────────────────
+112 | 
+113 | function Header({ model }: { model: string }) {
+114 |   return (
+[2026-04-05T16:16:15.141Z] iter=232 turn=9 INFO: Turn 9/25
+[2026-04-05T16:16:19.480Z] iter=232 turn=9 INFO: Agent: Now add the suggestion overlay state and display in the App component:
+[2026-04-05T16:16:19.480Z] iter=232 turn=9 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:16:19.481Z] iter=232 turn=9 INFO:   -> ok: Patched src/tui.tsx: -1 +4 lines
+
+Context after patch:
+280 |   const [showResume, setShowResume] = useState(false);
+281 |   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
+282 |   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
+283 |   const [contextBudgetRatio, setContextBudgetRatio] = useState(0);
+284 |   const [fileSuggestions, setFileSuggestions] = useState<string[]>([]);
+285 |   const [fileSuggestionIdx, setFileSuggestionIdx] = useState(0);
+286 |   const repoMapRef = useRef<import("./tree-sitter-map.js").RepoMap | null>(null);
+287 |   const [footerStats, setFooterStats] = useState<FooterStats>({
+288 |     tokensIn: 0,
+289 |     tokensOut: 0,
+[2026-04-05T16:16:19.481Z] iter=232 turn=10 INFO: Turn 10/25
+[2026-04-05T16:16:21.933Z] iter=232 turn=10 INFO: Agent: Now update the onChange handler to compute file suggestions live, and handle Tab key for selection:
+[2026-04-05T16:16:21.933Z] iter=232 turn=10 INFO: $ sed -n '295,360p' src/tui.tsx
+[2026-04-05T16:16:21.942Z] iter=232 turn=10 INFO:   -> exit=0 (1911 chars)
+[2026-04-05T16:16:21.942Z] iter=232 turn=11 INFO: Turn 11/25
+[2026-04-05T16:16:30.331Z] iter=232 turn=11 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:16:30.332Z] iter=232 turn=11 INFO:   -> ok: Patched src/tui.tsx: -13 +55 lines
+
+Context after patch:
+338 |     }).catch(() => setStatus("Init failed"));
+339 |   }, []);
+340 | 
+341 |   // Update file suggestions whenever input changes
+342 |   const handleInputChange = useCallback((val: string) => {
+343 |     setInput(val);
+344 |     const partial = extractFileQuery(val);
+345 |     if (partial !== null && repoMapRef.current) {
+346 |       const suggs = getFileSuggestions(repoMapRef.current, partial, 5);
+347 |       setFileSuggestions(suggs);
+348 |       setFileSuggestionIdx(0);
+349 |     } else {
+350 |       setFileSuggestions([]);
+351 |       setFileSuggestionIdx(0);
+352 |     }
+353 |   }, []);
+354 | 
+355 |   // Accept suggestion: replace #partial with the selected file path
+356 |   const acceptFileSuggestion = useCallback((path: string) => {
+357 |     setInput(prev => {
+358 |       const idx = prev.lastIndexOf("#");
+359 |       if (idx === -1) return prev;
+360 |       return prev.slice(0, idx) + "#" + path + " ";
+361 |     });
+362 |     setFileSuggestions([]);
+363 |     setFileSuggestionIdx(0);
+364 |   }, []);
+365 | 
+366 |   useInput((ch, key) => {
+367 |     if (pendingDiff) {
+368 |       if (ch === "y" || ch === "Y" || key.return) {
+369 |         pendingDiff.resolve(true);
+370 |         setPendingDiff(null);
+371 |       } else if (ch === "n" || ch === "N" || key.escape) {
+372 |         pendingDiff.resolve(false);
+373 |         setPendingDiff(null);
+374 |       }
+375 |       return;
+376 |     }
+377 |     // Tab: cycle through / accept file suggestions
+378 |     if (key.tab && fileSuggestions.length > 0) {
+379 |       const nextIdx = (fileSuggestionIdx + 1) % fileSuggestions.length;
+380 |       setFileSuggestionIdx(nextIdx);
+381 |       return;
+382 |     }
+383 |     // Enter when suggestions open: accept highlighted suggestion
+384 |     if (key.return && fileSuggestions.length > 0) {
+385 |       acceptFileSuggestion(fileSuggestions[fileSuggestionIdx]);
+386 |       return;
+387 |     }
+388 |     if (key.escape) {
+389 |       if (fileSuggestions.length > 0) {
+390 |         setFileSuggestions([]);
+391 |         return;
+392 |       }
+393 |       exit();
+394 |     }
+395 |   });
+396 | 
+397 |   const handleSubmit = useCallback(async (value: string) => {
+398 |     const trimmed = value.trim();
+[2026-04-05T16:16:30.332Z] iter=232 turn=12 INFO: Turn 12/25
+[2026-04-05T16:16:33.301Z] iter=232 turn=12 INFO: Agent: Now I need to: 1) wire the repoMap into `repoMapRef` during /reindex, 2) update the TextInput to use `handleInputChange`, and 3) add the suggestion overlay in the render. Let me find /reindex:
+[2026-04-05T16:16:33.301Z] iter=232 turn=12 INFO: $ grep -n "reindex\|buildRepoMap\|repoMap" src/tui.tsx | head -20
+[2026-04-05T16:16:33.312Z] iter=232 turn=12 INFO:   -> exit=0 (803 chars)
+[2026-04-05T16:16:33.312Z] iter=232 turn=13 INFO: Turn 13/25
+[2026-04-05T16:16:35.964Z] iter=232 turn=13 INFO: Agent: I've patched tui.tsx with `extractFileQuery`, `getFileSuggestions`, state for suggestions, and input handler. Let me finish wiring the repoMap and overlay, then write tests.
+[2026-04-05T16:16:35.966Z] iter=232 turn=13 INFO: $ sed -n '408,420p' src/tui.tsx
+[2026-04-05T16:16:35.987Z] iter=232 turn=13 INFO:   -> exit=0 (336 chars)
+[2026-04-05T16:16:35.988Z] iter=232 turn=14 INFO: Turn 14/25
+[2026-04-05T16:16:40.287Z] iter=232 turn=14 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:16:40.289Z] iter=232 turn=14 INFO:   -> ok: Patched src/tui.tsx: -7 +14 lines
+
+Context after patch:
+408 |       setTimeout(() => setStatus(""), 1000);
+409 |       return;
+410 |     }
+411 |     if (trimmed === "/reindex") {
+412 |       setStatus("Re-indexing repo...");
+413 |       orchestratorRef.current?.reindex();
+414 |       // Rebuild repoMap for #file suggestions
+415 |       try {
+416 |         const { execSync } = await import("child_process");
+417 |         const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf8" });
+418 |         const allFiles = out.split("\n").filter(Boolean);
+419 |         repoMapRef.current = buildRepoMap(workDir, allFiles);
+420 |       } catch { /* ignore */ }
+421 |       setStatus("Re-indexed");
+422 |       setTimeout(() => setStatus(""), 1000);
+423 |       return;
+424 |     }
+425 |     if (trimmed === "/exit") {
+426 |       exit();
+427 |       return;
+[2026-04-05T16:16:40.290Z] iter=232 turn=15 INFO: Turn 15/25
+[2026-04-05T16:16:44.347Z] iter=232 turn=15 INFO: Agent: Now also initialize repoMapRef during orch.init():
+[2026-04-05T16:16:44.348Z] iter=232 turn=15 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:16:44.349Z] iter=232 turn=15 INFO:   -> ok: Patched src/tui.tsx: -3 +9 lines
+
+Context after patch:
+334 |           }]);
+335 |         }
+336 |       }
+337 |       setStatus("");
+338 |       // Build initial repoMap for #file suggestions
+339 |       try {
+340 |         const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf8" });
+341 |         const allFiles = out.split("\n").filter(Boolean);
+342 |         repoMapRef.current = buildRepoMap(workDir, allFiles);
+343 |       } catch { /* non-git repo — suggestions unavailable */ }
+344 |     }).catch(() => setStatus("Init failed"));
+345 |   }, []);
+346 | 
+347 |   // Update file suggestions whenever input changes
+348 |   const handleInputChange = useCallback((val: string) => {
+[2026-04-05T16:16:44.350Z] iter=232 turn=16 INFO: Turn 16/25
+[2026-04-05T16:16:46.685Z] iter=232 turn=16 INFO: Agent: Let me finish the TextInput wire-up, suggestion overlay, and tests all at once.
+[2026-04-05T16:16:46.685Z] iter=232 turn=16 INFO: $ grep -n "TextInput\|onChange\|onSubmit\|handleSubmit" src/tui.tsx | tail -10
+[2026-04-05T16:16:46.696Z] iter=232 turn=16 INFO:   -> exit=0 (210 chars)
+[2026-04-05T16:16:46.696Z] iter=232 turn=17 INFO: Turn 17/25
+[2026-04-05T16:16:49.584Z] iter=232 turn=17 INFO: think: I need to finish fast. Let me do the remaining patches and tests in parallel, then tsc, then wrap up....
+[2026-04-05T16:16:49.585Z] iter=232 turn=18 INFO: Turn 18/25
+[2026-04-05T16:16:52.756Z] iter=232 turn=18 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:16:52.758Z] iter=232 turn=18 INFO:   -> ok: Patched src/tui.tsx: -4 +4 lines
+
+Context after patch:
+688 |       {!loading && (
+689 |         <Box marginTop={1}>
+690 |           <Text color="cyan" bold>❯ </Text>
+691 |           <TextInput
+692 |             value={input}
+693 |             onChange={handleInputChange}
+694 |             onSubmit={handleSubmit}
+695 |             placeholder="Ask anything..."
+696 |           />
+697 |         </Box>
+[2026-04-05T16:16:52.759Z] iter=232 turn=19 INFO: Turn 19/25
+[2026-04-05T16:16:57.980Z] iter=232 turn=19 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:16:57.983Z] iter=232 turn=19 INFO:   -> ok: Patched src/tui.tsx: -1 +13 lines
+
+Context after patch:
+681 |         </Box>
+682 |       )}
+683 | 
+684 |       {/* #file suggestion overlay */}
+685 |       {fileSuggestions.length > 0 && (
+686 |         <Box flexDirection="column" marginTop={1} borderStyle="single" borderColor="cyan">
+687 |           <Text color="cyan" bold> File suggestions (Tab=cycle, Enter=accept, Esc=dismiss):</Text>
+688 |           {fileSuggestions.map((f, i) => (
+689 |             <Text key={f} color={i === fileSuggestionIdx ? "green" : "gray"}>
+690 |               {i === fileSuggestionIdx ? "▸ " : "  "}{f}
+691 |             </Text>
+692 |           ))}
+693 |         </Box>
+694 |       )}
+695 | 
+696 |       {/* Footer: token + cost stats */}
+697 |       <Footer stats={footerStats} />
+698 | 
+699 |       {/* Input */}
+[2026-04-05T16:16:57.984Z] iter=232 turn=20 INFO: Turn 20/25
+[2026-04-05T16:17:12.769Z] iter=232 turn=20 INFO: Agent: Now write both test suites:
+[2026-04-05T16:17:12.770Z] iter=232 turn=20 INFO: write_file: src/__tests__/tui-file-hint.test.ts (write)
+[2026-04-05T16:17:12.771Z] iter=232 turn=20 INFO:   -> ok: Created src/__tests__/tui-file-hint.test.ts (2816 chars)
+[2026-04-05T16:17:12.771Z] iter=232 turn=21 INFO: Turn 21/25
+[2026-04-05T16:17:27.156Z] iter=232 turn=21 INFO: write_file: src/__tests__/budget-warning.test.ts (write)
+[2026-04-05T16:17:27.156Z] iter=232 turn=21 INFO:   -> ok: Created src/__tests__/budget-warning.test.ts (2924 chars)
+[2026-04-05T16:17:27.157Z] iter=232 turn=22 INFO: Turn 22/25
+[2026-04-05T16:17:28.903Z] iter=232 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -40
+[2026-04-05T16:17:29.833Z] iter=232 turn=22 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:17:29.833Z] iter=232 turn=23 INFO: Turn 23/25
+[2026-04-05T16:17:31.999Z] iter=232 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/budget-warning.test.ts src/__tests__/tui-file-hint.test.ts 2>&1 | tail -20
+[2026-04-05T16:17:33.798Z] iter=232 turn=23 INFO:   -> exit=0 (547 chars)
+[2026-04-05T16:17:33.798Z] iter=232 turn=24 INFO: Turn 24/25
+[2026-04-05T16:17:37.401Z] iter=232 turn=24 INFO: write_file: src/__tests__/tui-file-hint.test.ts (patch)
+[2026-04-05T16:17:37.401Z] iter=232 turn=24 INFO:   -> ok: Patched src/__tests__/tui-file-hint.test.ts: -3 +4 lines
+
+Context after patch:
+22 |     expect(extractFileQuery("#src/foo.ts done")).toBeNull();
+23 |   });
+24 | 
+25 |   it("uses lastIndexOf — picks the last # in input (no space after last #)", () => {
+26 |     // "a #foo b #bar" — last # is #bar, no space after → returns "bar"
+27 |     expect(extractFileQuery("a #foo b #bar")).toBe("bar");
+28 |   });
+29 | 
+30 |   it("returns partial for last # at end with no space", () => {
+31 |     expect(extractFileQuery("compare #old and #new")).toBe("new");
+[2026-04-05T16:17:37.402Z] iter=232 turn=25 INFO: Turn 25/25
+[2026-04-05T16:17:38.837Z] iter=232 turn=25 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/budget-warning.test.ts src/__tests__/tui-file-hint.test.ts 2>&1 | tail -8
+[2026-04-05T16:17:40.599Z] iter=232 turn=25 INFO:   -> exit=0 (238 chars)
+[2026-04-05T16:17:40.599Z] iter=232 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T16:17:40.601Z] iter=232 turn=25 INFO: Cache persisted: 47 entries to .autoagent-cache.json
+[2026-04-05T16:17:40.601Z] iter=232 turn=25 INFO: Tool timing: bash: 17x, avg=278ms, total=4719ms; write_file: 10x, avg=2ms, total=20ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T16:17:40.601Z] iter=232 turn=25 INFO: Tool timing stats
+[2026-04-05T16:17:46.086Z] iter=232 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 232: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T16:17:56.228Z] iter=232 turn=25 INFO: Pre-commit review (2435in/379out): **Issues:**
+
+- **Fragile `makeBudget` edge cases with `Math.round`**: `makeBudget(20)` computes `warnAt = Math.round(20 * 0.75) = 15`, which the tests hardcode. This is fine now, but if `dynamicBudget

@@ -67,6 +67,47 @@ interface FooterStats {
   model: string;
 }
 
+// ─── #file hint pure helpers ────────────────────────────────
+
+/**
+ * If the input contains `#` followed by partial text, return that partial.
+ * Returns null if no `#` trigger is present.
+ * E.g. "look at #src/orch" → "src/orch"
+ *      "hello world"       → null
+ */
+export function extractFileQuery(input: string): string | null {
+  const idx = input.lastIndexOf("#");
+  if (idx === -1) return null;
+  // Only trigger when # is not followed by a space (or is at end)
+  const after = input.slice(idx + 1);
+  if (after.includes(" ")) return null; // completed word — no longer partial
+  return after; // may be empty string (just typed #)
+}
+
+/**
+ * Given a partial file query string and a RepoMap, return up to `limit`
+ * matching file paths.
+ */
+export function getFileSuggestions(
+  repoMap: import("./tree-sitter-map.js").RepoMap,
+  partial: string,
+  limit = 5
+): string[] {
+  if (!repoMap || repoMap.files.length === 0) return [];
+  const results = fuzzySearch(repoMap, partial || "", limit);
+  // deduplicate by file path and return just the paths
+  const seen = new Set<string>();
+  const paths: string[] = [];
+  for (const r of results) {
+    if (!seen.has(r.file)) {
+      seen.add(r.file);
+      paths.push(r.file);
+    }
+    if (paths.length >= limit) break;
+  }
+  return paths;
+}
+
 // ─── Components ─────────────────────────────────────────────
 
 function Header({ model }: { model: string }) {
@@ -240,6 +281,9 @@ function App() {
   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
   const [contextBudgetRatio, setContextBudgetRatio] = useState(0);
+  const [fileSuggestions, setFileSuggestions] = useState<string[]>([]);
+  const [fileSuggestionIdx, setFileSuggestionIdx] = useState(0);
+  const repoMapRef = useRef<import("./tree-sitter-map.js").RepoMap | null>(null);
   const [footerStats, setFooterStats] = useState<FooterStats>({
     tokensIn: 0,
     tokensOut: 0,
@@ -291,7 +335,38 @@ function App() {
         }
       }
       setStatus("");
+      // Build initial repoMap for #file suggestions
+      try {
+        const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf8" });
+        const allFiles = out.split("\n").filter(Boolean);
+        repoMapRef.current = buildRepoMap(workDir, allFiles);
+      } catch { /* non-git repo — suggestions unavailable */ }
     }).catch(() => setStatus("Init failed"));
+  }, []);
+
+  // Update file suggestions whenever input changes
+  const handleInputChange = useCallback((val: string) => {
+    setInput(val);
+    const partial = extractFileQuery(val);
+    if (partial !== null && repoMapRef.current) {
+      const suggs = getFileSuggestions(repoMapRef.current, partial, 5);
+      setFileSuggestions(suggs);
+      setFileSuggestionIdx(0);
+    } else {
+      setFileSuggestions([]);
+      setFileSuggestionIdx(0);
+    }
+  }, []);
+
+  // Accept suggestion: replace #partial with the selected file path
+  const acceptFileSuggestion = useCallback((path: string) => {
+    setInput(prev => {
+      const idx = prev.lastIndexOf("#");
+      if (idx === -1) return prev;
+      return prev.slice(0, idx) + "#" + path + " ";
+    });
+    setFileSuggestions([]);
+    setFileSuggestionIdx(0);
   }, []);
 
   useInput((ch, key) => {
@@ -305,7 +380,24 @@ function App() {
       }
       return;
     }
-    if (key.escape) exit();
+    // Tab: cycle through / accept file suggestions
+    if (key.tab && fileSuggestions.length > 0) {
+      const nextIdx = (fileSuggestionIdx + 1) % fileSuggestions.length;
+      setFileSuggestionIdx(nextIdx);
+      return;
+    }
+    // Enter when suggestions open: accept highlighted suggestion
+    if (key.return && fileSuggestions.length > 0) {
+      acceptFileSuggestion(fileSuggestions[fileSuggestionIdx]);
+      return;
+    }
+    if (key.escape) {
+      if (fileSuggestions.length > 0) {
+        setFileSuggestions([]);
+        return;
+      }
+      exit();
+    }
   });
 
   const handleSubmit = useCallback(async (value: string) => {
@@ -325,6 +417,13 @@ function App() {
     if (trimmed === "/reindex") {
       setStatus("Re-indexing repo...");
       orchestratorRef.current?.reindex();
+      // Rebuild repoMap for #file suggestions
+      try {
+        const { execSync } = await import("child_process");
+        const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf8" });
+        const allFiles = out.split("\n").filter(Boolean);
+        repoMapRef.current = buildRepoMap(workDir, allFiles);
+      } catch { /* ignore */ }
       setStatus("Re-indexed");
       setTimeout(() => setStatus(""), 1000);
       return;
@@ -582,6 +681,18 @@ function App() {
         </Box>
       )}
 
+      {/* #file suggestion overlay */}
+      {fileSuggestions.length > 0 && (
+        <Box flexDirection="column" marginTop={1} borderStyle="single" borderColor="cyan">
+          <Text color="cyan" bold> File suggestions (Tab=cycle, Enter=accept, Esc=dismiss):</Text>
+          {fileSuggestions.map((f, i) => (
+            <Text key={f} color={i === fileSuggestionIdx ? "green" : "gray"}>
+              {i === fileSuggestionIdx ? "▸ " : "  "}{f}
+            </Text>
+          ))}
+        </Box>
+      )}
+
       {/* Footer: token + cost stats */}
       <Footer stats={footerStats} />
 
@@ -591,7 +702,7 @@ function App() {
           <Text color="cyan" bold>❯ </Text>
           <TextInput
             value={input}
-            onChange={setInput}
+            onChange={handleInputChange}
             onSubmit={handleSubmit}
             placeholder="Ask anything..."
           />
