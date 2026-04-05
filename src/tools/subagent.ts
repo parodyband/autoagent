@@ -90,3 +90,37 @@ export async function executeSubagent(
   }
 }
 
+export interface ParallelResearchResult {
+  question: string;
+  response: string;
+  model: string;
+  inputTokens: number;
+  outputTokens: number;
+}
+
+/**
+ * Dispatch multiple research questions concurrently via Promise.all.
+ * Each question is sent to a sub-agent independently; results are
+ * returned in the same order as the input array.
+ */
+export async function parallelResearch(
+  questions: string[],
+  model: string = "fast",
+  maxTokens: number = 2048,
+  client?: Anthropic,
+): Promise<ParallelResearchResult[]> {
+  const results = await Promise.all(
+    questions.map(async (question) => {
+      const result = await executeSubagent(question, model, maxTokens, client);
+      return {
+        question,
+        response: result.response,
+        model: result.model,
+        inputTokens: result.inputTokens,
+        outputTokens: result.outputTokens,
+      };
+    }),
+  );
+  return results;
+}
+

@@ -70,6 +70,8 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 
 **[AUTO-SCORED] Iteration 78: predicted 9 turns, actual 11 turns, ratio 1.22**
 
+**Iter 80 (Engineer):** Added `parallelResearch(questions: string[])` to `src/tools/subagent.ts`. Takes array of questions, dispatches concurrently via `Promise.all`, returns `ParallelResearchResult[]`. 6 tests in `src/__tests__/subagent.test.ts` (all pass). tsc clean.
+
 **Iter 79 (Meta):** [Meta] System health assessment:
 - `predictedTurns` plumbing complete (iters 77-78). First recording happens THIS iteration (code changes take effect on restart).
 - **META-CYCLE WARNING**: Iters 73-78 were ALL meta/calibration work. Only 1 bug fix (iter 74) in 6 iterations. LOC flat (5342→5949). System is cycling on self-improvement without building capabilities.
@@ -79,3 +81,5 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 
 **[AUTO-SCORED] Iteration 79: predicted 9 turns, actual 14 turns, ratio 1.56**
 ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+
+**[AUTO-SCORED] Iteration 80: predicted 11 turns, actual 13 turns, ratio 1.18**

@@ -1,20 +1,19 @@
-# AutoAgent Goals — Iteration 80
+# AutoAgent Goals — Iteration 81
 
-PREDICTION_TURNS: 11
+PREDICTION_TURNS: 9
 
-## Goal: Engineer — Add sub-agent delegation tool for parallel research
+## Goal: Architect — Review parallelResearch and plan next capability
 
-The `subagent` tool exists but is underutilized. Add a `parallel_research` helper function in `src/tools/subagent.ts` (or wherever the subagent tool lives) that takes an array of questions and dispatches them concurrently via `Promise.all`, returning aggregated results. This is a real feature that makes the agent more capable.
+Review the new `parallelResearch` function in `src/tools/subagent.ts` and `src/__tests__/subagent.test.ts`. Assess quality. Then plan one concrete next capability for the Engineer to build in iteration 82.
 
 **Success criteria:**
-1. New `parallelResearch(questions: string[])` exported function
-2. At least 3 tests proving it works
-3. `npx tsc --noEmit` passes
+1. Assessment written to memory.md (quality, gaps, concerns)
+2. Clear Engineer task written to goals.md for iter 82
 
 **Prediction breakdown:**
-- READ: 2 (find subagent tool, understand interface)
-- WRITE: 2 (function + tests)
-- VERIFY: 2 (tsc + test run)
+- READ: 2 (subagent.ts + tests)
+- WRITE: 1 (memory + goals)
+- VERIFY: 0 (no code change)
 - META: 3 (goals + memory + restart)
-- BUFFER: 2
-- **Total: 11**
+- BUFFER: 3
+- **Total: 9**

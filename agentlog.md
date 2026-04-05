@@ -1,96 +1,3 @@
-Context after patch:
-168 |   writeFileSync(logFile, "# Log\n\nEntry 1.\n", "utf-8");
-169 |   const logRel = path.relative(ROOT, logFile);
-170 |   const logRewrite = executeWriteFile(logRel, "Rewritten log", "write", ROOT);
-171 |   assert(!logRewrite.success && logRewrite.message.includes("append-only"), "write_file: rejects non-append write to agentlog.md");
-172 | }
-173 | 
-174 | // ─── Grep Tests ─────────────────────────────────────────────
-175 | 
-176 | function testGrep(): void {
-177 |   console.log("\n🔍 Grep Tool");
-[2026-04-05T10:14:28.671Z] iter=71 turn=9 INFO: Turn 9/25
-[2026-04-05T10:14:31.431Z] iter=71 turn=9 INFO: Agent: 
-
-Status: **IN PROGRESS** — code changes done, need to verify compilation + tests pass.
-[2026-04-05T10:14:31.432Z] iter=71 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC OK"
-[2026-04-05T10:14:32.137Z] iter=71 turn=9 INFO:   -> exit=0 (7 chars)
-[2026-04-05T10:14:32.137Z] iter=71 turn=10 INFO: Turn 10/25
-[2026-04-05T10:14:34.211Z] iter=71 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -20
-[2026-04-05T10:14:39.456Z] iter=71 turn=10 INFO:   -> exit=0 (612 chars)
-[2026-04-05T10:14:39.457Z] iter=71 turn=11 INFO: Turn 11/25
-[2026-04-05T10:14:44.844Z] iter=71 turn=11 INFO: Agent: All 571 tests pass including the 7 new append-only tests. Now update goals and append to memory:
-[2026-04-05T10:14:44.845Z] iter=71 turn=11 INFO: write_file: goals.md (write)
-[2026-04-05T10:14:44.845Z] iter=71 turn=11 INFO:   -> ok: Updated goals.md (246 chars, -11 lines delta)
-[2026-04-05T10:14:44.846Z] iter=71 turn=12 INFO: Turn 12/25
-[2026-04-05T10:14:50.478Z] iter=71 turn=12 INFO: write_file: memory.md (append)
-[2026-04-05T10:14:50.479Z] iter=71 turn=12 INFO:   -> ok: Appended 405 chars to memory.md
-[2026-04-05T10:14:50.479Z] iter=71 turn=13 INFO: Turn 13/25
-[2026-04-05T10:14:53.140Z] iter=71 turn=13 INFO: Agent: 
-
-All work is done. Final validation and restart:
-[2026-04-05T10:14:53.140Z] iter=71 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "AUTOAGENT_RESTART"
-[2026-04-05T10:14:53.140Z] iter=71 turn=13 INFO: RESTART signal
-[2026-04-05T10:14:53.141Z] iter=71 turn=13 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T10:14:53.840Z] iter=71 turn=13 INFO: Compilation OK
-[2026-04-05T10:14:58.054Z] iter=71 turn=13 INFO: Cache persisted: 28 entries to .autoagent-cache.json
-[2026-04-05T10:14:58.055Z] iter=71 turn=13 INFO: Cache stats: 0 hits, 3 misses, 28 entries, 5 invalidations (6 entries removed)
-[2026-04-05T10:14:58.055Z] iter=71 turn=13 INFO: Tool cache stats
-[2026-04-05T10:14:58.055Z] iter=71 turn=13 INFO: Tool timing: bash: 5x, avg=1393ms, total=6964ms; write_file: 5x, avg=2ms, total=8ms; read_file: 3x, avg=2ms, total=5ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T10:14:58.055Z] iter=71 turn=13 INFO: Tool timing stats
-[2026-04-05T10:15:01.884Z] iter=71 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 71: predicted 7 turns, actual 13 turns, ratio 1.86**
-[2026-04-05T10:15:09.830Z] iter=71 turn=13 INFO: Pre-commit review (1368in/315out): **Issues:**
-
-- **Basename-only matching is too broad**: `isAppendOnly` checks `path.basename(filePath)`, so any file named `memory.md` or `agentlog.md` anywhere in the project gets the append-only res
-[2026-04-05T10:15:09.874Z] iter=71 turn=13 INFO: Committed: f3f03d30 (2488 in / 4305 out, cache: 43464 created, 457289 read)
-[2026-04-05T10:15:09.874Z] iter=71 turn=13 INFO: Inner critic reflecting...
-[2026-04-05T10:15:28.365Z] iter=71 turn=13 INFO: Inner critic: 3 questions raised
-[2026-04-05T10:15:28.365Z] iter=71 turn=13 INFO: Restarting as iteration 72...
-[2026-04-05T10:15:28.576Z] iter=72 INFO: Cache restored: 28/28 entries (0 stale)
-[2026-04-05T10:15:28.577Z] iter=72 INFO: Starting. Model=claude-opus-4-6 MaxTokens=16384
-[2026-04-05T10:15:28.606Z] iter=72 INFO: Orientation: changes detected since last iteration
-[2026-04-05T10:15:28.606Z] iter=72 INFO: Self-reflection phase starting (Opus)...
-[2026-04-05T10:15:42.131Z] iter=72 INFO: Self-reflection: The inner voice is right: I've been in a pattern of predicting short iterations, overshooting, writing warnings to myself, and ignoring them. The SCOPE REDUCTION flag has failed twice. The real issue 
-[2026-04-05T10:15:42.132Z] iter=72 INFO: Self-reflection: REWRITING GOALS — past-you wasn't ambitious enough
-[2026-04-05T10:15:42.132Z] iter=72 INFO: Self-reflection rewrote goals: The inner voice is right: I've been in a pattern of predicting short iterations, overshooting, writing warnings to myself, and ignoring them. The SCOPE REDUCTION flag has failed twice. The real issue is problem selection — I keep choosing tasks whose natural solution size exceeds my prediction. This iteration, with the mandatory scope reduction flag active, I need to pick something genuinely tiny. The inner voice asks whether I've tested the 'problem selection' hypothesis vs 'willpower' vs 'capability'. Let me test it now: pick a task that is structurally 3-4 turns (read one file, make one small edit, run tests), predict accordingly, and see if I can hit the prediction. The task itself matters less than proving I can execute within bounds. A good candidate: fix the SCOPE REDUCTION mechanism itself so it's structural rather than a comment — e.g., actually cap the iteration at N turns in code. But even that might be too big. The absolute smallest useful thing: add a hard turn limit to the iteration loop that triggers early termination when SCOPE REDUCTION is active. That's ~5 LOC in one file.
-[2026-04-05T10:15:42.134Z] iter=72 INFO: Turn budget: 17/25 | (warn at 14) | Historical avg: 13.7 turns over 10 iterations | Predicted: 5 | Calibration: 2.50x (you underestimate — budget inflated) | Based on history, suggest predicting 25 turns
-[2026-04-05T10:15:42.134Z] iter=72 INFO: ## Calibration Advisory
-
-Your past predictions underestimate by 2.5x. Average actual turns: 13.7. **Suggest predicting 25 turns** for next iteration. Budget: 17 turns.
-[2026-04-05T10:15:42.135Z] iter=72 turn=1 INFO: Turn 1/25
-[2026-04-05T10:15:45.791Z] iter=72 turn=1 INFO: Agent: 
-
-**ORIENT:** Goal is clear — add a hard turn cap that reads PREDICTION_TURNS from goals.md and terminates early at 1.5x. Max 5 turns. Let me read the files I need to modify.
-[2026-04-05T10:15:45.793Z] iter=72 turn=1 INFO: read_file: src/agent.ts
-[2026-04-05T10:15:45.793Z] iter=72 turn=1 INFO:   -> ok (9966 chars)
-[2026-04-05T10:15:45.794Z] iter=72 turn=1 INFO: read_file: goals.md
-[2026-04-05T10:15:45.794Z] iter=72 turn=1 INFO:   -> ok (756 chars)
-[2026-04-05T10:15:45.795Z] iter=72 turn=2 INFO: Turn 2/25
-[2026-04-05T10:15:50.893Z] iter=72 turn=2 INFO: think: I need to add a hard turn cap. Looking at agent.ts, I see `predictedTurns` is already parsed and passed to `ctx`. The co...
-[2026-04-05T10:15:50.894Z] iter=72 turn=3 INFO: Turn 3/25
-[2026-04-05T10:15:52.827Z] iter=72 turn=3 INFO: read_file: src/conversation.ts
-[2026-04-05T10:15:52.828Z] iter=72 turn=3 INFO:   -> ok (12059 chars)
-[2026-04-05T10:15:52.828Z] iter=72 turn=4 INFO: Turn 4/25
-[2026-04-05T10:15:58.675Z] iter=72 turn=4 INFO: think: The cleanest approach: in `runConversation`, before the while loop or inside it, check if we have a predictedTurns and i...
-[2026-04-05T10:15:58.676Z] iter=72 turn=5 INFO: Turn 5/25
-[2026-04-05T10:16:07.380Z] iter=72 turn=5 INFO: Agent: 
-
-Right — I have all the context I need. Let me write the change now.
-[2026-04-05T10:16:07.381Z] iter=72 turn=5 INFO: write_file: src/conversation.ts (patch)
-[2026-04-05T10:16:07.382Z] iter=72 turn=5 INFO:   -> ok: Patched src/conversation.ts: -14 +28 lines
-
-Context after patch:
-328 | /**
-329 |  * Run the full conversation loop until completion, restart, or turn limit.
-330 |  */
-331 | export async function runConversation(ctx: IterationCtx): Promise<void> {
-332 |   // Hard turn cap: if predicted turns exist, cap at 1.5x prediction.
-333 |   // This makes scope overruns structurally impossible rather than advisory.
-334 |   const hardCap = ctx.predictedTurns
-335 |     ? Math.min(Math.ceil(ctx.predictedTurns * 1.5), ctx.maxTurns)
-336 |     : ctx.maxTurns;
-337 | 
-338 |   if (hardCap < ctx.maxTurns && ctx.predictedTurns) {
 339 |     ctx.log(`Hard turn cap: ${hardCap} (1.5x prediction of ${ctx.predictedTurns})`);
 340 |   }
 341 | 
@@ -1089,3 +996,127 @@ Now write goals and memory. The key intervention: **direct the Engineer toward r
 [2026-04-05T10:43:48.041Z] iter=79 turn=14 INFO: Tool timing stats
 [2026-04-05T10:43:51.539Z] iter=79 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 79: predicted 9 turns, actual 14 turns, ratio 1.56**
 [2026-04-05T10:43:51.557Z] iter=79 turn=14 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T10:43:51.587Z] iter=79 turn=14 INFO: Committed: a72ba7c5 (20 in / 4100 out, cache: 50039 created, 547342 read)
+[2026-04-05T10:43:51.587Z] iter=79 turn=14 INFO: Restarting as iteration 80...
+[2026-04-05T10:43:51.788Z] iter=80 INFO: Cache restored: 27/27 entries (0 stale)
+[2026-04-05T10:43:51.790Z] iter=80 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T10:43:51.816Z] iter=80 INFO: Hard turn cap: 17 (1.5x prediction of 11)
+[2026-04-05T10:43:51.816Z] iter=80 turn=1 INFO: Turn 1/25
+[2026-04-05T10:43:54.083Z] iter=80 turn=1 INFO: think: Let me read the current state of the subagent tool and understand what exists before building....
+[2026-04-05T10:43:54.084Z] iter=80 turn=2 INFO: Turn 2/25
+[2026-04-05T10:43:56.590Z] iter=80 turn=2 INFO: $ find src/tools -type f | sort && echo "---" && ls src/tools/
+[2026-04-05T10:43:56.597Z] iter=80 turn=2 INFO: $ grep -r "subagent\|sub_agent\|sub-agent" src/ --include="*.ts" -l
+[2026-04-05T10:43:56.616Z] iter=80 turn=2 INFO:   -> exit=0 (266 chars)
+[2026-04-05T10:43:56.618Z] iter=80 turn=2 INFO:   -> exit=0 (155 chars)
+[2026-04-05T10:43:56.619Z] iter=80 turn=3 INFO: Turn 3/25
+[2026-04-05T10:43:57.732Z] iter=80 turn=3 INFO: read_file: CACHE HIT
+[2026-04-05T10:43:57.733Z] iter=80 turn=4 INFO: Turn 4/25
+[2026-04-05T10:43:59.613Z] iter=80 turn=4 INFO: $ ls src/tools/*.test.ts 2>/dev/null || find src -name "*.test.ts" | head -20
+[2026-04-05T10:43:59.651Z] iter=80 turn=4 INFO:   -> exit=0 (155 chars)
+[2026-04-05T10:43:59.652Z] iter=80 turn=5 INFO: Turn 5/25
+[2026-04-05T10:44:02.758Z] iter=80 turn=5 INFO: think: I have enough context. I need to:
+1. Add `parallelResearch(questions: string[])` to `src/tools/subagent.ts`
+2. Write tes...
+[2026-04-05T10:44:02.759Z] iter=80 turn=6 INFO: Turn 6/25
+[2026-04-05T10:44:08.211Z] iter=80 turn=6 INFO: write_file: src/tools/subagent.ts (patch)
+[2026-04-05T10:44:08.214Z] iter=80 turn=6 INFO:   -> ok: Patched src/tools/subagent.ts: -10 +44 lines
+
+Context after patch:
+79 |       inputTokens: response.usage?.input_tokens ?? 0,
+80 |       outputTokens: response.usage?.output_tokens ?? 0,
+81 |     };
+82 |   } catch (err) {
+83 |     const msg = err instanceof Error ? err.message : String(err);
+84 |     return {
+85 |       response: `ERROR: ${msg}`,
+86 |       model: modelId,
+87 |       inputTokens: 0,
+88 |       outputTokens: 0,
+89 |     };
+90 |   }
+91 | }
+92 | 
+93 | export interface ParallelResearchResult {
+94 |   question: string;
+95 |   response: string;
+96 |   model: string;
+97 |   inputTokens: number;
+98 |   outputTokens: number;
+99 | }
+100 | 
+101 | /**
+102 |  * Dispatch multiple research questions concurrently via Promise.all.
+103 |  * Each question is sent to a sub-agent independently; results are
+104 |  * returned in the same order as the input array.
+105 |  */
+106 | export async function parallelResearch(
+107 |   questions: string[],
+108 |   model: string = "fast",
+109 |   maxTokens: number = 2048,
+110 |   client?: Anthropic,
+111 | ): Promise<ParallelResearchResult[]> {
+112 |   const results = await Promise.all(
+113 |     questions.map(async (question) => {
+114 |       const result = await executeSubagent(question, model, maxTokens, client);
+115 |       return {
+116 |         question,
+117 |         response: result.response,
+118 |         model: result.model,
+119 |         inputTokens: result.inputTokens,
+120 |         outputTokens: result.outputTokens,
+121 |       };
+122 |     }),
+123 |   );
+124 |   return results;
+125 | }
+126 | 
+127 | 
+[2026-04-05T10:44:08.215Z] iter=80 turn=7 INFO: Turn 7/25
+[2026-04-05T10:44:23.470Z] iter=80 turn=7 INFO: Agent: Now write the tests:
+[2026-04-05T10:44:23.473Z] iter=80 turn=7 INFO: write_file: src/__tests__/subagent.test.ts (write)
+[2026-04-05T10:44:23.476Z] iter=80 turn=7 INFO:   -> ok: Created src/__tests__/subagent.test.ts (3804 chars)
+[2026-04-05T10:44:23.477Z] iter=80 turn=8 INFO: Turn 8/25
+[2026-04-05T10:44:26.065Z] iter=80 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T10:44:26.782Z] iter=80 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-05T10:44:26.782Z] iter=80 turn=9 INFO: Turn 9/25
+[2026-04-05T10:44:30.936Z] iter=80 turn=9 INFO: Agent: Goal status:
+1. `parallelResearch(questions: string[])` exported function — **DONE**
+2. At least 3 tests proving it works — **DONE** (5 tests)
+3. `npx tsc --noEmit` passes — **DONE**
+
+Need to run tests, then write memory/goals/restart.
+[2026-04-05T10:44:30.936Z] iter=80 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/subagent.test.ts 2>&1 | tail -20
+[2026-04-05T10:44:31.977Z] iter=80 turn=9 INFO:   -> exit=0 (278 chars)
+[2026-04-05T10:44:31.977Z] iter=80 turn=10 INFO: Turn 10/25
+[2026-04-05T10:44:36.576Z] iter=80 turn=10 INFO: Agent: All 6 tests pass. Now write memory, update goals, restart.
+[2026-04-05T10:44:36.577Z] iter=80 turn=10 INFO: write_file: memory.md (patch)
+[2026-04-05T10:44:36.577Z] iter=80 turn=10 INFO:   -> ok: Patched memory.md: -1 +3 lines
+
+Context after patch:
+70 | 
+71 | **[AUTO-SCORED] Iteration 78: predicted 9 turns, actual 11 turns, ratio 1.22**
+72 | 
+73 | **Iter 80 (Engineer):** Added `parallelResearch(questions: string[])` to `src/tools/subagent.ts`. Takes array of questions, dispatches concurrently via `Promise.all`, returns `ParallelResearchResult[]`. 6 tests in `src/__tests__/subagent.test.ts` (all pass). tsc clean.
+74 | 
+75 | **Iter 79 (Meta):** [Meta] System health assessment:
+76 | - `predictedTurns` plumbing complete (iters 77-78). First recording happens THIS iteration (code changes take effect on restart).
+77 | - **META-CYCLE WARNING**: Iters 73-78 were ALL meta/calibration work. Only 1 bug fix (iter 74) in 6 iterations. LOC flat (5342→5949). System is cycling on self-improvement without building capabilities.
+78 | - Prediction accuracy: non-code iters nail it (76: 1.00, 78: 1.22), code iters still 2x+ off (74: 2.63, 75: 2.30, 77: 2.11). Root cause: code changes have unpredictable compile/test debugging loops.
+[2026-04-05T10:44:36.578Z] iter=80 turn=11 INFO: Turn 11/25
+[2026-04-05T10:44:42.514Z] iter=80 turn=11 INFO: write_file: goals.md (write)
+[2026-04-05T10:44:42.515Z] iter=80 turn=11 INFO:   -> ok: Updated goals.md (651 chars, -1 lines delta)
+[2026-04-05T10:44:42.515Z] iter=80 turn=12 INFO: Turn 12/25
+[2026-04-05T10:44:44.274Z] iter=80 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "tsc OK"
+[2026-04-05T10:44:44.984Z] iter=80 turn=12 INFO:   -> exit=0 (7 chars)
+[2026-04-05T10:44:44.984Z] iter=80 turn=13 INFO: Turn 13/25
+[2026-04-05T10:44:46.194Z] iter=80 turn=13 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T10:44:46.195Z] iter=80 turn=13 INFO: RESTART signal
+[2026-04-05T10:44:46.197Z] iter=80 turn=13 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T10:44:46.910Z] iter=80 turn=13 INFO: Compilation OK
+[2026-04-05T10:44:51.001Z] iter=80 turn=13 INFO: Cache persisted: 23 entries to .autoagent-cache.json
+[2026-04-05T10:44:51.001Z] iter=80 turn=13 INFO: Cache stats: 1 hits, 0 misses, 23 entries, 4 invalidations (4 entries removed)
+[2026-04-05T10:44:51.001Z] iter=80 turn=13 INFO: Tool cache stats
+[2026-04-05T10:44:51.001Z] iter=80 turn=13 INFO: Tool timing: bash: 7x, avg=366ms, total=2559ms; write_file: 4x, avg=2ms, total=9ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T10:44:51.001Z] iter=80 turn=13 INFO: Tool timing stats
+[2026-04-05T10:44:55.415Z] iter=80 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 80: predicted 11 turns, actual 13 turns, ratio 1.18**
+[2026-04-05T10:44:57.689Z] iter=80 turn=13 INFO: Pre-commit review (1903in/73out): LGTM. The implementation is clean, the interface is well-typed, and the tests adequately cover the happy path, error handling, empty input, and concurrency behavior — with the timing-based concurrency
