@@ -582,3 +582,16 @@
 {"timestamp":"2026-04-05T18:18:56.511Z","iteration":296,"level":"info","message":"  -> ok: Updated goals.md (1034 chars, -5 lines delta)","turn":20}
 {"timestamp":"2026-04-05T18:18:56.512Z","iteration":296,"level":"info","message":"Turn 21/25","turn":21}
 {"timestamp":"2026-04-05T18:18:58.556Z","iteration":296,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git add -A && git commit -m \"iter 296: add file-watcher + init-command tests, CLI init subcommand, fix ESM require\"","turn":21}
+{"timestamp":"2026-04-05T18:18:58.609Z","iteration":296,"level":"info","message":"  -> exit=0 (252 chars)","turn":21}
+{"timestamp":"2026-04-05T18:18:58.610Z","iteration":296,"level":"info","message":"Turn 22/25","turn":22}
+{"timestamp":"2026-04-05T18:19:00.705Z","iteration":296,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":22}
+{"timestamp":"2026-04-05T18:19:00.706Z","iteration":296,"level":"info","message":"RESTART signal","turn":22}
+{"timestamp":"2026-04-05T18:19:00.706Z","iteration":296,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":22}
+{"timestamp":"2026-04-05T18:19:01.714Z","iteration":296,"level":"info","message":"Compilation OK","turn":22}
+{"timestamp":"2026-04-05T18:19:08.493Z","iteration":296,"level":"info","message":"Cache persisted: 48 entries to .autoagent-cache.json","turn":22}
+{"timestamp":"2026-04-05T18:19:08.493Z","iteration":296,"level":"info","message":"Cache stats: 0 hits, 1 misses, 48 entries, 7 invalidations (1 entries removed)","turn":22}
+{"timestamp":"2026-04-05T18:19:08.493Z","iteration":296,"level":"info","message":"Tool cache stats","turn":22,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":48,"invalidations":7,"invalidatedEntries":1,"toolStats":{"grep":{"hits":0,"misses":1}}}}
+{"timestamp":"2026-04-05T18:19:08.493Z","iteration":296,"level":"info","message":"Tool timing: bash: 17x, avg=386ms, total=6567ms; grep: 1x, avg=17ms, total=17ms; write_file: 7x, avg=2ms, total=12ms; read_scratchpad: 1x, avg=3ms, total=3ms; save_memory: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms","turn":22}
+{"timestamp":"2026-04-05T18:19:08.493Z","iteration":296,"level":"info","message":"Tool timing stats","turn":22,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":3,"minMs":3,"maxMs":3,"avgMs":3},"bash":{"calls":17,"totalMs":6567,"minMs":1,"maxMs":3059,"avgMs":386},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":7,"totalMs":12,"minMs":1,"maxMs":2,"avgMs":2},"grep":{"calls":1,"totalMs":17,"minMs":17,"maxMs":17,"avgMs":17},"save_memory":{"calls":1,"totalMs":3,"minMs":3,"maxMs":3,"avgMs":3}},"totalCalls":28,"totalMs":6603}}}
+{"timestamp":"2026-04-05T18:19:14.526Z","iteration":296,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 296: predicted 20 turns, actual 22 turns, ratio 1.10**","turn":22}
+{"timestamp":"2026-04-05T18:19:14.547Z","iteration":296,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":22}

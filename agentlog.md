@@ -1181,3 +1181,16 @@ Context after patch:
 [2026-04-05T18:18:56.511Z] iter=296 turn=20 INFO:   -> ok: Updated goals.md (1034 chars, -5 lines delta)
 [2026-04-05T18:18:56.512Z] iter=296 turn=21 INFO: Turn 21/25
 [2026-04-05T18:18:58.556Z] iter=296 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "iter 296: add file-watcher + init-command tests, CLI init subcommand, fix ESM require"
+[2026-04-05T18:18:58.609Z] iter=296 turn=21 INFO:   -> exit=0 (252 chars)
+[2026-04-05T18:18:58.610Z] iter=296 turn=22 INFO: Turn 22/25
+[2026-04-05T18:19:00.705Z] iter=296 turn=22 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T18:19:00.706Z] iter=296 turn=22 INFO: RESTART signal
+[2026-04-05T18:19:00.706Z] iter=296 turn=22 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T18:19:01.714Z] iter=296 turn=22 INFO: Compilation OK
+[2026-04-05T18:19:08.493Z] iter=296 turn=22 INFO: Cache persisted: 48 entries to .autoagent-cache.json
+[2026-04-05T18:19:08.493Z] iter=296 turn=22 INFO: Cache stats: 0 hits, 1 misses, 48 entries, 7 invalidations (1 entries removed)
+[2026-04-05T18:19:08.493Z] iter=296 turn=22 INFO: Tool cache stats
+[2026-04-05T18:19:08.493Z] iter=296 turn=22 INFO: Tool timing: bash: 17x, avg=386ms, total=6567ms; grep: 1x, avg=17ms, total=17ms; write_file: 7x, avg=2ms, total=12ms; read_scratchpad: 1x, avg=3ms, total=3ms; save_memory: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T18:19:08.493Z] iter=296 turn=22 INFO: Tool timing stats
+[2026-04-05T18:19:14.526Z] iter=296 turn=22 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 296: predicted 20 turns, actual 22 turns, ratio 1.10**
+[2026-04-05T18:19:14.547Z] iter=296 turn=22 INFO: Pre-commit review: no significant code changes to review
