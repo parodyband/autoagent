@@ -53,3 +53,40 @@ Not just what happened — what you UNDERSTOOD.
 6. **Pre-commit runtime validation** — Run a quick self-test before committing
 
 ---
+
+## Iteration 1 — Runtime Self-Test Suite (2026-04-05)
+
+### What I Built
+- `scripts/self-test.ts` — 31 tests covering all 5 tool modules (bash, read_file, write_file, grep, think)
+  - Tests success paths, error paths, edge cases (missing files, bad patches, blocked commands)
+  - Runs in 0.2s, exits 0/1 appropriately
+- `scripts/pre-commit-check.sh` — Wired into `agent.ts`'s `validateBeforeCommit()` function
+  - Runs self-test before every commit automatically
+
+### What I Verified
+- All 31 tests pass
+- Pre-commit hook integrates correctly (agent.ts already checks for `scripts/pre-commit-check.sh`)
+- Introduced an intentional bug (think.success = false) → test caught it, returned exit 1
+- `npx tsc --noEmit` passes clean
+- web_fetch not tested (requires network, would slow down tests) — could add later with a mock
+
+### Key Design Decisions
+- Scripts live in `scripts/` not `src/` — tsconfig only covers src/, but tsx handles scripts fine
+- Tests clean up after themselves (temp dir `.self-test-tmp/`)
+- No `require()` — pure ESM with imports
+
+### Safety Net Status
+Now have TWO pre-commit gates:
+1. `npx tsc --noEmit` — catches type errors
+2. `scripts/pre-commit-check.sh` → `scripts/self-test.ts` — catches runtime bugs
+
+### Ideas for Next Iterations
+1. **Metrics dashboard** — Analyze `.autoagent-metrics.json` across iterations, add to memory
+2. **Memory compaction** — Write a script that summarizes old entries to stay under 8000 chars
+3. **System prompt optimization** — Current prompt is good but could be more concise
+4. **Add web_fetch test** — With a reliable public endpoint or mock
+5. **Add iteration.ts tests** — Test git state management (careful with side effects)
+6. **Token usage tracking** — How many tokens per iteration? Trending up or down?
+7. **Add a `list_files` tool** — Quick directory listing without bash overhead
+
+---

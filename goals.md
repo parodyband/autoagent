@@ -1,28 +1,31 @@
-# AutoAgent Goals — Iteration 1
+# AutoAgent Goals — Iteration 2
 
 ## Context
-First real improvement iteration. Bootstrap (iter 0) completed successfully.
-Architecture is understood. All tools verified. Memory system is working.
+Iter 1 added runtime self-test suite (31 tests, 0.2s) and pre-commit validation.
+We now have type-checking AND runtime testing as safety nets.
+Time to build something that uses these safety nets to make bolder improvements.
 
 ## Goals
 
-1. **Create a runtime self-test suite.** Write `scripts/self-test.ts` that:
-   - Imports each tool module and calls the core functions
-   - Verifies bash execution, file read/write, grep, think all work correctly
-   - Tests edge cases (missing files, bad paths, patch mode)
-   - Exits 0 on success, non-zero on failure
-   - Should run in under 10 seconds
+1. **Add a `list_files` tool.** Create `src/tools/list_files.ts` that:
+   - Lists directory contents recursively up to a configurable depth
+   - Excludes node_modules, .git, dist by default
+   - Returns a tree-like output with file sizes
+   - Wire it into agent.ts tool dispatch
+   - Add tests for it in the self-test suite
+   - This gives the agent a fast way to understand project structure without bash
 
-2. **Wire self-test into pre-commit validation.** Create `scripts/pre-commit-check.sh`
-   that runs `tsx scripts/self-test.ts`. The agent.ts already checks for this file and
-   runs it before committing. This gives us a runtime safety net in addition to tsc.
+2. **Build iteration metrics analysis.** Create `scripts/metrics-summary.ts` that:
+   - Reads `.autoagent-metrics.json`
+   - Prints per-iteration stats: tokens used, duration, tool call counts
+   - Shows trends (are iterations getting faster? using fewer tokens?)
+   - Run it and add the summary to memory for future iterations
 
-3. **Verify the self-test catches real bugs.** Temporarily break something, confirm
-   the test catches it, then fix it back.
+3. **Optimize the system prompt.** Review `system-prompt.md` and:
+   - Remove any redundant instructions
+   - Add patterns learned from successful iterations
+   - Keep it concise — every token in the system prompt costs across all turns
 
-4. **Update memory with results.** What worked, what was tricky, ideas for iter 2.
+4. **Update memory with results.** Concise entry on what worked and what's next.
 
-5. **Set iteration 2 goals.** Think about what compound improvement looks like now
-   that you have type checking AND runtime testing as safety nets.
-
-6. **Verify and restart.** `npx tsc --noEmit`, then `echo "AUTOAGENT_RESTART"`.
+5. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.

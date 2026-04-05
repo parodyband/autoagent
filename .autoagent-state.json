@@ -1,6 +1,6 @@
 {
-  "iteration": 0,
-  "lastSuccessfulIteration": -1,
+  "iteration": 1,
+  "lastSuccessfulIteration": 0,
   "lastFailedCommit": null,
   "lastFailureReason": null
 }
