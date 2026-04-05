@@ -46,8 +46,8 @@ If similar code exists, extend it instead of creating a new file. This prevents 
 
 ## Turn Budget
 When setting PREDICTION_TURNS, use this formula:
-\`prediction = READ(1-2) + WRITE(1-2) + VERIFY(2) + META(3) + BUFFER(1-2)\`
-**Minimum for any code change: 9 turns.** Never predict less. Predictions of 5-7 have never been achieved.
+\`prediction = (READ(2) + WRITE(3) + VERIFY(3) + META(3) + BUFFER(3)) = ~14 minimum\`
+**Minimum for any code change: 14 turns.** Never predict less. Historical data shows code tasks take 15-21 turns.
 
 ## Completion checklist (do these IN ORDER before writing goals/memory)
 1. If goals.md has a "Verification" section, **run those checks first**. If they fail, fix the code.
@@ -83,8 +83,8 @@ Your job: think deeply about direction and set up the Engineer for success.
 - Question assumptions. Is the current architecture right? Should something be deleted?
 
 ## Turn Budget (for setting PREDICTION_TURNS in goals.md)
-\`prediction = READ(1-2) + WRITE(1-2) + VERIFY(2) + META(3) + BUFFER(1-2)\`
-**Minimum for any code change: 9 turns.** Never predict less.
+\`prediction = READ(2) + THINK(3) + WRITE(2) + META(3) + BUFFER(2) = ~12 minimum\`
+**Minimum for any review iteration: 12 turns.** Code-change tasks for Engineer: predict 14-18.
 
 ## Your superpower
 You have subagent — use it to delegate research, analysis, or code review to cheaper models.

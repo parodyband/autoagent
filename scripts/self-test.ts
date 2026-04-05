@@ -17,7 +17,7 @@ import { createDefaultRegistry, ToolRegistry } from "../src/tool-registry.js";
 import { validateBeforeCommit, captureCodeQuality, type ValidationOptions } from "../src/validation.js";
 import { compactMemory, smartCompactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
-import { analyzeCodebase } from "../src/code-analysis.js";
+import { analyzeCodebase } from "../src/validation.js";
 import { selectModel, autoSelectModel } from "../src/model-selection.js";
 import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage, progressCheckpoint } from "../src/messages.js";
 import { Logger, createLogger, parseJsonlLog, rotateLogFile, LOG_ROTATION_LIMITS, type LogEntry } from "../src/logging.js";

@@ -9,7 +9,7 @@
 
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
-import { analyzeCodebase, type CodebaseAnalysis } from "../src/code-analysis.js";
+import { analyzeCodebase, type CodebaseAnalysis } from "../src/validation.js";
 import { parseJsonlLog, type LogEntry } from "../src/logging.js";
 import type { TimingStats, ToolTimingEntry } from "../src/tool-timing.js";
 // iteration-diff.ts was removed; define stub types inline

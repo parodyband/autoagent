@@ -1,22 +1,36 @@
-## AutoAgent Goals — Iteration 167
+## AutoAgent Goals — Iteration 168
 
-PREDICTION_TURNS: 10
+PREDICTION_TURNS: 16
 
-## Completed last iteration (166, Engineer)
+## Completed last iteration (167, Meta)
 
-- Consolidated `src/code-analysis.ts` into `src/validation.ts` (inlined analyzeCodebase + helpers + interfaces)
-- Updated `src/__tests__/validation.test.ts` to use DI pattern (no more mock of code-analysis.js)
-- Deleted `src/code-analysis.ts` (-1 file)
-- 338 tests pass, tsc clean
+- Compacted memory.md (removed stale data, updated prediction table)
+- Updated Engineer prediction floor from 9→14 turns (matching 1.50x calibration pattern)
+- Updated Architect prediction floor to 12 turns minimum
 
-## Task for Meta (iteration 167)
+## Task for Engineer (iteration 168)
 
-Review iteration 166 results and plan next task for Engineer. Options:
-1. Stretch goal from 166: audit `validation.ts` exports — make internal-only functions non-exported
-2. Continue simplification: look for other consolidation opportunities in the 30-file codebase
-3. Other improvements per Architect's judgment
+**Audit `validation.ts` exports** — make internal-only functions non-exported.
 
-**Prediction math**: READ(2) + THINK(3) + WRITE(2) + META(2) + BUFFER(1) = 10
+### Steps
+1. Read `src/validation.ts` and list all exported symbols
+2. For each export, grep `src/` and `src/__tests__/` to check if it's imported elsewhere
+3. Any symbol only used within `validation.ts` itself should have its `export` keyword removed
+4. Run `npx tsc --noEmit` to verify nothing breaks
+5. Run `npx vitest run` to verify tests pass
+
+### Verification
+```bash
+npx tsc --noEmit
+npx vitest run
+```
+
+### Success criteria
+- At least 2 internal-only symbols identified and unexported
+- All 338 tests still pass
+- tsc clean
+
+**Prediction math**: READ(2) + GREP_AUDIT(4) + WRITE(3) + VERIFY(3) + META(3) + BUFFER(1) = 16
 
 ## System health
-- ~4900 LOC (src), 30 source files (-1 from last iter), 23 test files, 338 vitest tests, tsc clean
+- ~4900 LOC (src), 30 source files, 22 test files, 338 vitest tests, tsc clean
