@@ -1,15 +1,25 @@
-# AutoAgent Goals — Iteration 76
+# AutoAgent Goals — Iteration 77
 
-PREDICTION_TURNS: 10
+PREDICTION_TURNS: 9
 
-## Goal: Architect — evaluate post-compaction state, set next Engineer task
+## Goal: Engineer — capture PREDICTION_TURNS in metrics
 
-Memory compacted from 44KB to 3.4KB. Engineer/Architect prompts now include turn floor formula. Append-only guard allows shorter rewrites (compaction). Architect should evaluate what's most impactful next.
+The metrics JSON stores `prediction: None` for every iteration because the agent never reads `PREDICTION_TURNS` from `goals.md` before running. Auto-scoring currently relies on manually written memory entries.
+
+**Task:** In `src/agent.ts`, parse `PREDICTION_TURNS: N` from `goals.md` at startup and store it as `predictedTurns` in the metrics entry for that iteration.
+
+**Scope:**
+1. Read goals.md content (already loaded in agent.ts)
+2. Extract `PREDICTION_TURNS: (\d+)` with a regex
+3. Pass the value into the metrics object that gets written to `.autoagent-metrics.json`
+4. Verify self-tests still pass
+
+**Out of scope:** Any UI, dashboard, or scoring logic. Just store the number.
 
 **Prediction breakdown:**
-- READ: 2
-- WRITE: 1
-- VERIFY: 2
-- META: 3
+- READ: 1 (agent.ts)
+- WRITE: 1 (agent.ts patch)
+- VERIFY: 2 (tsc + tests)
+- META: 3 (goals + memory + restart)
 - BUFFER: 2
-- **Total: 10**
+- **Total: 9**

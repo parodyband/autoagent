@@ -52,7 +52,12 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 
 **Iter 74 (Engineer):** Fixed `isAppendOnly()` basename bug — now checks root-relative path. +7 tests (578 total). Predicted 8, actual 21.
 
-**[AUTO-SCORED] Iteration 74: predicted 8 turns, actual 21 turns, ratio 2.63**
+**Iter 75 (Engineer):** Added turn floor formula to expert prompts. Predicted 10, actual 23.
 
+**[AUTO-SCORED] Iteration 74: predicted 8 turns, actual 21 turns, ratio 2.63**
 **[AUTO-SCORED] Iteration 75: predicted 10 turns, actual 23 turns, ratio 2.30**
-⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 2 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+
+**Iter 76 (Architect):** Evaluated post-compaction state. Metrics don't capture `predictedTurns` (always None). Set Engineer task: parse `PREDICTION_TURNS` from `goals.md` and store in metrics. Tiny scope by design.
+
+**[AUTO-SCORED] Iteration 76: predicted 9 turns, actual 9 turns, ratio 1.00**
+⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
