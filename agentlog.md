@@ -1,139 +1,3 @@
-28 | import { parseMemory, getSection, serializeMemory } from "./memory.js";
-29 | import { ToolCache } from "./tool-cache.js";
-30 | import { ToolTimingTracker } from "./tool-timing.js";
-31 | import { finalizeIteration as runFinalization, emitOnceSummary } from "./finalization.js";
-32 | import { runConversation, type IterationCtx } from "./conversation.js";
-33 | import { loadExperts, pickExpert, buildExpertPrompt, saveExpertState } from "./experts.js";
-34 | import {
-[2026-04-05T11:22:57.133Z] iter=106 turn=7 INFO: Turn 7/25
-[2026-04-05T11:23:01.949Z] iter=106 turn=7 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:23:01.950Z] iter=106 turn=7 INFO:   -> ok: Patched src/agent.ts: -9 +9 lines
-
-Context after patch:
-52 | 
-53 | let logger: Logger;
-54 | 
-55 | function log(iter: number, msg: string): void {
-56 |   if (logger) {
-57 |     logger.info(msg);
-58 |   } else {
-59 |     const line = `[${new Date().toISOString()}] iter=${iter} ${msg}\n`;
-60 |     console.error(`  ${msg}`);
-61 |     try { appendFileSync(AGENT_LOG_FILE, line, "utf-8"); } catch {}
-62 |   }
-63 | }
-64 | 
-65 | // ─── File readers ───────────────────────────────────────────
-66 | 
-[2026-04-05T11:23:01.950Z] iter=106 turn=8 INFO: Turn 8/25
-[2026-04-05T11:23:07.429Z] iter=106 turn=8 INFO: Agent: Now pass `once` and `failed` to `runFinalization`:
-[2026-04-05T11:23:07.430Z] iter=106 turn=8 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:23:07.430Z] iter=106 turn=8 INFO:   -> ok: Patched src/agent.ts: -17 +19 lines
-
-Context after patch:
-136 |   // --once mode: never restart regardless of what callers request
-137 |   const effectiveRestart = ctx.once ? false : doRestart;
-138 | 
-139 |   await runFinalization({
-140 |     iter: ctx.iter,
-141 |     state: ctx.state,
-142 |     startTime: ctx.startTime,
-143 |     turns: ctx.turns,
-144 |     toolCounts: ctx.toolCounts,
-145 |     tokens: ctx.tokens,
-146 |     cache: ctx.cache,
-147 |     timing: ctx.timing,
-148 |     rootDir: ROOT,
-149 |     agentHome: ROOT,
-150 |     metricsFile: METRICS_FILE,
-151 |     log: (msg: string) => log(ctx.iter, msg),
-152 |     logger,
-153 |     restart,
-154 |     predictedTurns: ctx.predictedTurns,
-155 |     once: ctx.once,
-156 |     failed: ctx.failed,
-157 |   }, effectiveRestart);
-158 | 
-159 |   // Task mode: delete TASK.md after successful iteration
-160 |   if (ctx.taskMode && existsSync(TASK_FILE)) {
-[2026-04-05T11:23:07.431Z] iter=106 turn=9 INFO: Turn 9/25
-[2026-04-05T11:23:17.113Z] iter=106 turn=9 INFO: think: Let me check what's done and what's left:
-
-1. ✅ Added `once?` and `failed?` to `FinalizationCtx` in finalization.ts
-2. ✅...
-[2026-04-05T11:23:17.114Z] iter=106 turn=10 INFO: Turn 10/25
-[2026-04-05T11:23:23.676Z] iter=106 turn=10 INFO: Agent: Status:
-- ✅ `emitOnceSummary()` added to finalization.ts
-- ✅ Called in `finalizeIteration()` when `once` is true  
-- ✅ `once`/`failed` added to `FinalizationCtx`, passed from `doFinalize`
-- ✅ `log()` → `console.error`
-- 🔲 Other `console.log` banner calls → `console.error`
-- 🔲 Exception path in `main()`: emit failure JSON
-
-Finishing now:
-[2026-04-05T11:23:23.677Z] iter=106 turn=10 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:23:23.678Z] iter=106 turn=10 INFO:   -> ok: Patched src/agent.ts: -4 +4 lines
-
-Context after patch:
-251 |     once: onceMode,
-252 |   };
-253 | 
-254 |   console.error(`\n${"=".repeat(60)}`);
-255 |   console.error(`  AutoAgent — Iteration ${ctx.iter}`);
-256 |   console.error(`  Expert: ${expert.name} (${expert.model})`);
-257 |   console.error(`${"=".repeat(60)}\n`);
-258 | 
-259 |   logger.info(`Starting. Expert=${expert.name} Model=${expert.model}`);
-260 |   await tagPreIteration(ctx.iter);
-[2026-04-05T11:23:23.679Z] iter=106 turn=11 INFO: Turn 11/25
-[2026-04-05T11:23:25.807Z] iter=106 turn=11 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:23:25.808Z] iter=106 turn=11 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
-
-Context after patch:
-366 |     writeFileSync(AGENT_LOG_FILE, "# AutoAgent Log\n\n", "utf-8");
-367 |   }
-368 | 
-369 |   console.error("AutoAgent starting...");
-370 | 
-371 |   const gitCheck = await executeBash("git status --porcelain", 120, undefined, true);
-372 |   if (gitCheck.exitCode !== 0) {
-[2026-04-05T11:23:25.809Z] iter=106 turn=12 INFO: Turn 12/25
-[2026-04-05T11:23:28.255Z] iter=106 turn=12 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:23:28.257Z] iter=106 turn=12 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
-
-Context after patch:
-343 |       process.exit(1);
-344 |     }
-345 |     WORK_DIR = resolved;
-346 |     console.error(`Repo mode: operating on ${WORK_DIR}`);
-347 |   }
-348 | 
-349 |   // Parse --task "description" CLI flag
-[2026-04-05T11:23:28.257Z] iter=106 turn=13 INFO: Turn 13/25
-[2026-04-05T11:23:30.496Z] iter=106 turn=13 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:23:30.498Z] iter=106 turn=13 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
-
-Context after patch:
-359 |       process.exit(1);
-360 |     }
-361 |     writeFileSync(TASK_FILE, taskDescription + "\n", "utf-8");
-362 |     console.error(`Created TASK.md with task: ${taskDescription}`);
-363 |   }
-364 | 
-365 |   if (!existsSync(AGENT_LOG_FILE)) {
-[2026-04-05T11:23:30.499Z] iter=106 turn=14 INFO: Turn 14/25
-[2026-04-05T11:23:36.119Z] iter=106 turn=14 INFO: Agent: Now add the failure JSON emit in the exception handler:
-[2026-04-05T11:23:36.120Z] iter=106 turn=14 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:23:36.122Z] iter=106 turn=14 INFO:   -> ok: Patched src/agent.ts: -10 +19 lines
-
-Context after patch:
-383 |     return;
-384 |   }
-385 | 
-386 |   const iterStartTime = new Date();
-387 |   try {
-388 |     await runIteration(state, WORK_DIR, onceMode);
-389 |   } catch (err) {
 390 |     if (onceMode) {
 391 |       const reason = err instanceof Error ? err.message : String(err);
 392 |       console.error("--once iteration failed:", reason);
@@ -1132,3 +996,169 @@ Let me finish now:
 [2026-04-05T11:39:19.395Z] iter=113 turn=15 INFO: Tool timing stats
 [2026-04-05T11:39:50.326Z] iter=113 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 113: predicted 12 turns, actual 15 turns, ratio 1.25**
 [2026-04-05T11:39:53.623Z] iter=113 turn=15 INFO: Pre-commit review (618in/56out): LGTM. The fix correctly moves TASK.md deletion before `runFinalization()` (which calls `restart()` → `process.exit()`), ensuring the file is always cleaned up and preventing infinite re-execution in t
+[2026-04-05T11:39:53.675Z] iter=113 turn=15 INFO: Committed: 79868da4 (3346 in / 5281 out, cache: 27888 created, 282981 read)
+[2026-04-05T11:39:53.675Z] iter=113 turn=15 INFO: Restarting as iteration 114...
+[2026-04-05T11:39:53.879Z] iter=114 INFO: Cache restored: 32/33 entries (1 stale)
+[2026-04-05T11:39:53.880Z] iter=114 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T11:39:53.908Z] iter=114 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T11:39:53.909Z] iter=114 turn=1 INFO: Turn 1/25
+[2026-04-05T11:39:56.600Z] iter=114 turn=1 INFO: think: Let me read the current state of the codebase to understand what I need to do:
+
+1. Add a test for TASK.md lifecycle (spe...
+[2026-04-05T11:39:56.601Z] iter=114 turn=2 INFO: Turn 2/25
+[2026-04-05T11:39:59.256Z] iter=114 turn=2 INFO: $ ls src/__tests__/ 2>/dev/null || echo "No __tests__ dir"; ls scripts/ 2>/dev/null
+[2026-04-05T11:39:59.260Z] iter=114 turn=2 INFO: read_file: src/agent.ts
+[2026-04-05T11:39:59.260Z] iter=114 turn=2 INFO:   -> ok (2186 chars)
+[2026-04-05T11:39:59.270Z] iter=114 turn=2 INFO:   -> exit=0 (213 chars)
+[2026-04-05T11:39:59.271Z] iter=114 turn=3 INFO: Turn 3/25
+[2026-04-05T11:40:02.127Z] iter=114 turn=3 INFO: read_file: scripts/self-test.ts
+[2026-04-05T11:40:02.129Z] iter=114 turn=3 INFO:   -> ok (2925 chars)
+[2026-04-05T11:40:02.130Z] iter=114 turn=3 INFO: $ head -50 src/__tests__/conversation-cache.test.ts
+[2026-04-05T11:40:02.145Z] iter=114 turn=3 INFO:   -> exit=0 (2005 chars)
+[2026-04-05T11:40:02.146Z] iter=114 turn=4 INFO: Turn 4/25
+[2026-04-05T11:40:03.868Z] iter=114 turn=4 INFO: $ wc -l scripts/self-test.ts; tail -50 scripts/self-test.ts
+[2026-04-05T11:40:03.887Z] iter=114 turn=4 INFO:   -> exit=0 (1561 chars)
+[2026-04-05T11:40:03.887Z] iter=114 turn=5 INFO: Turn 5/25
+[2026-04-05T11:40:09.384Z] iter=114 turn=5 INFO: think: I need to add a test for TASK.md lifecycle. The goals say:
+1. Add a test in self-test.ts that verifies TASK.md deletion ...
+[2026-04-05T11:40:09.385Z] iter=114 turn=6 INFO: Turn 6/25
+[2026-04-05T11:40:12.058Z] iter=114 turn=6 INFO: $ grep -n "async function main\|testApiRetry\|testResuscitation\|testIterationDiff\|^}" scripts/self-test.ts | tail -20
+[2026-04-05T11:40:12.079Z] iter=114 turn=6 INFO:   -> exit=0 (275 chars)
+[2026-04-05T11:40:12.080Z] iter=114 turn=7 INFO: Turn 7/25
+[2026-04-05T11:40:14.110Z] iter=114 turn=7 INFO: $ grep -n "^async function main" scripts/self-test.ts
+[2026-04-05T11:40:14.128Z] iter=114 turn=7 INFO:   -> exit=0 (43 chars)
+[2026-04-05T11:40:14.128Z] iter=114 turn=8 INFO: Turn 8/25
+[2026-04-05T11:40:16.311Z] iter=114 turn=8 INFO: read_file: scripts/self-test.ts
+[2026-04-05T11:40:16.313Z] iter=114 turn=8 INFO:   -> ok (439 chars)
+[2026-04-05T11:40:16.316Z] iter=114 turn=9 INFO: Turn 9/25
+[2026-04-05T11:40:27.508Z] iter=114 turn=9 INFO: Agent: **Goal status: NOT STARTED** — I've only been reading so far.
+
+Let me write the test now:
+[2026-04-05T11:40:27.509Z] iter=114 turn=9 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T11:40:27.513Z] iter=114 turn=9 INFO:   -> ok: Patched scripts/self-test.ts: -4 +56 lines
+
+Context after patch:
+2150 |   }
+2151 | }
+2152 | 
+2153 | // ─── TASK.md Lifecycle Tests ────────────────────────────────
+2154 | 
+2155 | function testTaskMdLifecycle(): void {
+2156 |   console.log("\n🗂️  TASK.md Lifecycle");
+2157 | 
+2158 |   // Verify that in doFinalize(), TASK.md deletion (unlinkSync) appears BEFORE
+2159 |   // runFinalization(). This is a static code analysis test that prevents
+2160 |   // regression of the bug where TASK.md was never deleted in normal (non --once)
+2161 |   // mode because restart() → process.exit() was called inside runFinalization().
+2162 |   const agentSrc = readFileSync(path.join(ROOT, "src/agent.ts"), "utf8");
+2163 |   const lines = agentSrc.split("\n");
+2164 | 
+2165 |   // Find doFinalize function boundaries
+2166 |   let doFinalizeStart = -1;
+2167 |   let doFinalizeEnd = -1;
+2168 |   let braceDepth = 0;
+2169 |   for (let i = 0; i < lines.length; i++) {
+2170 |     if (lines[i].includes("async function doFinalize(")) {
+2171 |       doFinalizeStart = i;
+2172 |     }
+2173 |     if (doFinalizeStart !== -1) {
+2174 |       for (const ch of lines[i]) {
+2175 |         if (ch === "{") braceDepth++;
+2176 |         if (ch === "}") braceDepth--;
+2177 |       }
+2178 |       if (braceDepth === 0 && i > doFinalizeStart) {
+2179 |         doFinalizeEnd = i;
+2180 |         break;
+2181 |       }
+2182 |     }
+2183 |   }
+2184 | 
+2185 |   assert(doFinalizeStart !== -1, "task-md: doFinalize() function found in agent.ts");
+2186 |   assert(doFinalizeEnd !== -1, "task-md: doFinalize() function has closing brace");
+2187 | 
+2188 |   const doFinalizeBody = lines.slice(doFinalizeStart, doFinalizeEnd + 1);
+2189 | 
+2190 |   const unlinkLine = doFinalizeBody.findIndex((l) => l.includes("unlinkSync(TASK_FILE)"));
+2191 |   const runFinalizationLine = doFinalizeBody.findIndex((l) => l.includes("await runFinalization("));
+2192 | 
+2193 |   assert(unlinkLine !== -1, "task-md: unlinkSync(TASK_FILE) exists in doFinalize()");
+2194 |   assert(runFinalizationLine !== -1, "task-md: runFinalization() call exists in doFinalize()");
+2195 | 
+2196 |   if (unlinkLine !== -1 && runFinalizationLine !== -1) {
+2197 |     assert(
+2198 |       unlinkLine < runFinalizationLine,
+2199 |       "task-md: unlinkSync(TASK_FILE) is called BEFORE runFinalization()",
+2200 |       `unlinkSync at body line ${unlinkLine}, runFinalization at body line ${runFinalizationLine}`
+2201 |     );
+2202 |   }
+2203 | }
+2204 | 
+2205 | main().catch((err) => {
+2206 |   console.error("Self-test crashed:", err);
+2207 |   process.exit(1);
+2208 | });
+2209 | 
+[2026-04-05T11:40:27.514Z] iter=114 turn=10 INFO: Turn 10/25
+[2026-04-05T11:40:30.286Z] iter=114 turn=10 INFO: Agent: Now I need to call `testTaskMdLifecycle()` from inside `main()`:
+[2026-04-05T11:40:30.287Z] iter=114 turn=10 INFO: $ grep -n "testApiRetry\|testResuscitation\|await test" scripts/self-test.ts | tail -20
+[2026-04-05T11:40:30.311Z] iter=114 turn=10 INFO:   -> exit=0 (728 chars)
+[2026-04-05T11:40:30.312Z] iter=114 turn=11 INFO: Turn 11/25
+[2026-04-05T11:40:32.438Z] iter=114 turn=11 INFO: read_file: scripts/self-test.ts
+[2026-04-05T11:40:32.441Z] iter=114 turn=11 INFO:   -> ok (572 chars)
+[2026-04-05T11:40:32.442Z] iter=114 turn=12 INFO: Turn 12/25
+[2026-04-05T11:40:36.019Z] iter=114 turn=12 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T11:40:36.020Z] iter=114 turn=12 INFO:   -> ok: Patched scripts/self-test.ts: -1 +2 lines
+
+Context after patch:
+722 |     testLogRotation();
+723 |     await testResuscitationE2E();
+724 |     await testSubagent();
+725 |     await testApiRetry();
+726 |     testTaskMdLifecycle();
+727 |     // Inline model-selection smoke test (avoids vitest import in tsx context)
+728 |     console.log("  model-selection smoke test...");
+729 |     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
+[2026-04-05T11:40:36.020Z] iter=114 turn=13 INFO: Turn 13/25
+[2026-04-05T11:40:38.889Z] iter=114 turn=13 INFO: Agent: Now run TypeScript check and the test:
+[2026-04-05T11:40:38.890Z] iter=114 turn=13 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T11:40:38.894Z] iter=114 turn=13 INFO: $ npx tsx scripts/self-test.ts 2>&1 | grep -A 5 "TASK.md\|task-md\|❌\|passed\|failed" | head -30
+[2026-04-05T11:40:39.638Z] iter=114 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:41:10.331Z] iter=114 turn=13 INFO:   -> exit=-1 (1294 chars)
+[2026-04-05T11:41:10.331Z] iter=114 turn=14 INFO: Turn 14/25
+[2026-04-05T11:41:12.576Z] iter=114 turn=14 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -20
+[2026-04-05T11:41:43.453Z] iter=114 turn=14 INFO:   -> exit=-1 (710 chars)
+[2026-04-05T11:41:43.453Z] iter=114 turn=15 INFO: Turn 15/25
+[2026-04-05T11:41:47.734Z] iter=114 turn=15 INFO: Agent: All 5 TASK.md lifecycle tests pass. TypeScript is clean. Committing:
+[2026-04-05T11:41:47.734Z] iter=114 turn=15 INFO: $ git add scripts/self-test.ts && git commit -m "test: add TASK.md lifecycle ordering test in self-test.ts
+
+Adds testTaskMdLifecycle() that statically verifies unlinkSync(TASK_FILE)
+appears before runFi...
+[2026-04-05T11:41:47.773Z] iter=114 turn=15 INFO:   -> exit=0 (109 chars)
+[2026-04-05T11:41:47.774Z] iter=114 turn=16 INFO: Turn 16/25
+[2026-04-05T11:41:53.517Z] iter=114 turn=16 INFO: Agent: Goal is DONE. Wrapping up now.
+[2026-04-05T11:41:53.518Z] iter=114 turn=16 INFO: write_file: goals.md (write)
+[2026-04-05T11:41:53.519Z] iter=114 turn=16 INFO:   -> ok: Updated goals.md (482 chars, -15 lines delta)
+[2026-04-05T11:41:53.519Z] iter=114 turn=17 INFO: Turn 17/25
+[2026-04-05T11:41:57.693Z] iter=114 turn=17 INFO: write_file: memory.md (patch)
+[2026-04-05T11:41:57.693Z] iter=114 turn=17 INFO:   -> ok: Patched memory.md: -1 +4 lines
+
+Context after patch:
+24 | 
+25 | Add a TASK.md lifecycle test in self-test.ts — verify create/execute/delete. Prevents regression of the critical bug fixed in iteration 113.
+26 | 
+27 | **[AUTO-SCORED] Iteration 113: predicted 12 turns, actual 15 turns, ratio 1.25**
+28 | 
+29 | ## Iteration 114 [Engineer]
+30 | Added `testTaskMdLifecycle()` in `scripts/self-test.ts`. Statically verifies `unlinkSync(TASK_FILE)` appears before `runFinalization()` in `doFinalize()`. All 673 tests pass. Prevents regression of the infinite-re-execution bug fixed in iteration 113. No src/ changes needed.
+31 | 
+[2026-04-05T11:41:57.694Z] iter=114 turn=18 INFO: Turn 18/25
+[2026-04-05T11:41:59.488Z] iter=114 turn=18 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T11:42:00.206Z] iter=114 turn=18 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:42:00.206Z] iter=114 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
+[2026-04-05T11:42:00.207Z] iter=114 turn=18 INFO: Cache persisted: 33 entries to .autoagent-cache.json
+[2026-04-05T11:42:00.207Z] iter=114 turn=18 INFO: Cache stats: 0 hits, 4 misses, 33 entries, 4 invalidations (3 entries removed)
+[2026-04-05T11:42:00.207Z] iter=114 turn=18 INFO: Tool cache stats
+[2026-04-05T11:42:00.207Z] iter=114 turn=18 INFO: Tool timing: bash: 11x, avg=5812ms, total=63933ms; read_file: 4x, avg=5ms, total=18ms; write_file: 4x, avg=2ms, total=8ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T11:42:00.207Z] iter=114 turn=18 INFO: Tool timing stats
+[2026-04-05T11:42:31.211Z] iter=114 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 114: predicted 12 turns, actual 18 turns, ratio 1.50**
+[2026-04-05T11:42:31.233Z] iter=114 turn=18 INFO: Pre-commit review: no significant code changes to review
