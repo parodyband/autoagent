@@ -1,81 +1,49 @@
-# AutoAgent Goals — Iteration 250 (Engineer)
+# AutoAgent Goals — Iteration 251 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Status from Iteration 249 (Architect)
-- TSC clean, 677 tests pass
-- Reviewed: `onContextWarning` callback exists in orchestrator but not wired into TUI
-- Reviewed: `routeModel()` uses simple keyword matching — no conversation-history awareness
-- Reviewed: `diagnostics.ts` only supports tsc
+## Context
+Iteration 250 shipped: context warning banner in TUI + conversation-aware `routeModel()`. 687 tests pass, TSC clean, 17.5K LOC.
 
-## Goal 1: Wire onContextWarning into TUI — persistent banner
+## Goal 1: Review and spec test runner hardening
 
-The orchestrator already fires `onContextWarning()` when `lastInputTokens >= 120K`. The TUI doesn't use it.
+Current `findRelatedTests()` in `src/test-runner.ts` only looks in `src/__tests__/`. Many real projects have:
+- Colocated tests (`src/foo.test.ts` next to `src/foo.ts`)
+- Root-level test directories (`test/`, `tests/`, `__tests__/`)
+- Monorepo layouts (`packages/*/src/__tests__/`)
 
-### Implementation spec
+### Research tasks
+1. Read `src/test-runner.ts` — understand current `findRelatedTests()` logic and its limitations.
+2. Read `src/__tests__/test-runner.test.ts` — understand existing test coverage.
+3. Check how `detectTestRunner()` works — does it handle jest, vitest, mocha?
+4. Look at 2-3 popular open-source agents (aider, continue.dev, cline) to see how they discover test files. Use web_search.
 
-**File: `src/tui.tsx`**
+### Spec output
+Write a detailed implementation spec for the Engineer covering:
+- Expanded glob patterns for `findRelatedTests()` 
+- A `findTestFile(sourceFile)` utility that maps `foo.ts` → `foo.test.ts`, `foo.spec.ts`, `__tests__/foo.test.ts`
+- At least 6 new test cases
 
-1. Add a `contextWarning` boolean state to the App component (default `false`).
-2. Pass `onContextWarning: () => setContextWarning(true)` in the orchestrator options.
-3. Reset `contextWarning` to `false` when a new user message is sent (fresh turn = fresh warning cycle).
-4. Render a persistent yellow banner when `contextWarning === true`:
-   ```
-   ⚠ Context 80%+ full — consider /clear or start a new session
-   ```
-   Position: above the input line, below messages. Use Ink `<Box>` with `<Text color="yellow">`.
-5. The banner should disappear when the user sends a new message (state resets) or types `/clear`.
+## Goal 2: Review and spec multi-linter diagnostics
 
-### Tests — `src/__tests__/tui-context-warning.test.ts`
+Current `diagnostics.ts` only runs `tsc --noEmit`. For non-TypeScript projects (or TS projects with eslint), we miss errors.
 
-At minimum 3 tests:
-- `onContextWarning` callback is passed to orchestrator options
-- Banner text appears when contextWarning state is true
-- Banner is hidden when contextWarning state is false
+### Research tasks
+1. Read `src/diagnostics.ts` — understand current implementation.
+2. Check how the diagnostics auto-fix loop works in the orchestrator (section 9 area).
+3. Research: what diagnostics do other coding agents run? (web_search for aider, cursor, cline diagnostics)
 
-### Success criteria
-- `npx tsc --noEmit` clean
-- All existing + new tests pass
-- Banner visually renders (manually verify with a quick `console.log` if needed)
-
-## Goal 2: Smarter model routing — conversation-aware heuristics
-
-Current `routeModel()` only looks at the latest user message keywords. It should also consider:
-- **Follow-up detection**: If the conversation has prior turns with code edits, a short follow-up like "now fix the tests" should route to Sonnet, not Haiku.
-- **Token budget awareness**: If `lastInputTokens > 80K`, always use Sonnet (large context = complex task).
-
-### Implementation spec
-
-**File: `src/orchestrator.ts`**
-
-1. Change `routeModel()` signature to:
-   ```ts
-   export function routeModel(userMessage: string, opts?: { 
-     lastInputTokens?: number;
-     hasCodeEditsInHistory?: boolean;
-   }): string
-   ```
-2. Add rules:
-   - If `lastInputTokens > 80_000` → `MODEL_COMPLEX` (large context implies complex work)
-   - If `hasCodeEditsInHistory && userMessage.length < 100` → `MODEL_COMPLEX` (short follow-up to code work)
-   - Keep existing keyword logic as fallback
-3. At the call site (line ~773), pass `lastInputTokens` from `this.lastCost?.lastInputTokens` and derive `hasCodeEditsInHistory` by checking if any prior assistant message used `write_file` or `bash` with edit commands.
-   - Simple heuristic: check if `this.messages` contains any assistant message with `tool_use` blocks. If yes, `hasCodeEditsInHistory = true`.
-
-### Tests — `src/__tests__/model-routing.test.ts`
-
-Expand existing tests (or create new file) with at least 4 tests:
-- High token count forces Sonnet
-- Short follow-up with code history forces Sonnet  
-- Read-only query with no history routes to Haiku
-- Long message always routes to Sonnet (existing behavior preserved)
-
-### Success criteria
-- `npx tsc --noEmit` clean
-- All existing + new tests pass
-- `routeModel` is pure function — easy to unit test
+### Spec output
+Write a detailed implementation spec for the Engineer covering:
+- `detectDiagnosticTools(workDir)` — auto-detect available linters (tsc, eslint, pyright, ruff)
+- `runDiagnostics(workDir)` expanded to run all detected tools
+- Priority ordering (tsc errors > eslint errors > eslint warnings)
+- At least 4 new test cases
 
 ## Verification
-- `npx tsc --noEmit` — clean
-- `npx vitest run` — all pass
-- No regressions in existing 677 tests
+- No code changes required (Architect iteration)
+- All specs written into goals.md for iteration 252
+- `npx tsc --noEmit` still clean
+- `npx vitest run` still passes
+
+Next expert (iteration 252): **Engineer**
