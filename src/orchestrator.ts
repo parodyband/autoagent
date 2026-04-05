@@ -33,6 +33,7 @@ import {
   type EditPlan,
 } from "./architect-mode.js";
 import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
+import { runDiagnostics } from "./diagnostics.js";
 
 // ─── Constants ────────────────────────────────────────────────
 
@@ -614,6 +615,44 @@ export class Orchestrator {
       commitResult = await autoCommit(this.opts.workDir, userMessage);
       if (commitResult.committed) {
         this.opts.onStatus?.(`✓ Committed ${commitResult.hash}: ${commitResult.message}`);
+      }
+
+      // 8. Post-edit diagnostics: run tsc after commit, auto-fix if errors
+      const MAX_DIAG_RETRIES = 3;
+      for (let diagRetry = 0; diagRetry < MAX_DIAG_RETRIES; diagRetry++) {
+        const diagErrors = await runDiagnostics(this.opts.workDir);
+        if (!diagErrors) break; // Clean — no errors
+
+        const errorCount = (diagErrors.match(/error TS/g) ?? []).length || 1;
+        this.opts.onStatus?.(`⚠ ${errorCount} TS error${errorCount > 1 ? "s" : ""} — auto-fixing (${diagRetry + 1}/${MAX_DIAG_RETRIES})…`);
+
+        this.apiMessages.push({
+          role: "user",
+          content: `TypeScript errors after edit:\n\`\`\`\n${diagErrors}\n\`\`\`\nPlease fix these errors.`,
+        });
+
+        const fixResult = await runAgentLoop(
+          this.client,
+          model,
+          this.systemPrompt,
+          this.apiMessages,
+          this.registry,
+          this.opts.workDir,
+          this.opts.onToolCall,
+          this.opts.onStatus,
+          this.opts.onText,
+        );
+
+        this.sessionTokensIn += fixResult.tokensIn;
+        this.sessionTokensOut += fixResult.tokensOut;
+        this.sessionCost += computeCost(model, fixResult.tokensIn, fixResult.tokensOut);
+
+        // Re-commit the fix
+        const fixCommit = await autoCommit(this.opts.workDir, "fix TypeScript errors");
+        if (fixCommit.committed) {
+          commitResult = fixCommit;
+          this.opts.onStatus?.(`✓ Fix committed ${fixCommit.hash}: ${fixCommit.message}`);
+        }
       }
     }
 

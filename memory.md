@@ -13,6 +13,7 @@
 - [200] Auto-commit — `src/auto-commit.ts`, aider-style git integration after edits.
 - [204] `/help` command in TUI listing available commands.
 - [206] `/diff` and `/undo` TUI commands. `undoLastCommit()` in auto-commit.ts.
+- [211] `src/diagnostics.ts` — Post-edit diagnostics. Runs `tsc --noEmit` after auto-commit, injects errors back for auto-fix (up to 3 retries).
 
 **Earlier foundation** (pre-product): Turn-budget pipeline, repo-context, file-ranker, task-decomposer, verification+recovery.
 
@@ -36,13 +37,14 @@
 - `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → agent loop (streaming) → verify. Cost tracking. Tiered context compaction. Session persistence.
 - `src/architect-mode.ts` — `runArchitectMode(msg, repoMap, caller)` → `ArchitectResult { activated, plan, prefill }`.
 - `src/auto-commit.ts` — `autoCommit()` + `undoLastCommit()`. Git integration after edits.
+- `src/diagnostics.ts` — `runDiagnostics(workDir)` + `detectDiagnosticCommand(workDir)`. Post-edit tsc check with auto-fix loop.
 - `src/tree-sitter-map.ts` — Tree-sitter based repo map with symbol extraction.
 - `src/tool-output-compressor.ts` — `compressToolOutput(toolName, output, maxChars?)`.
 - `src/session-store.ts` — JSONL under `~/.autoagent/sessions/{project-hash}/`. Auto-clean 30 days.
 - `src/project-memory.ts` — Discovers+injects CLAUDE.md hierarchy. Write-back via `saveToProjectMemory`.
 - Model routing: keyword-based (CODE_CHANGE → sonnet, READ_ONLY → haiku).
 
-**Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓ | VirtualMessageList ✓ | Auto-commit ✓ | /diff /undo /help ✓
+**Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓ | VirtualMessageList ✓ | Auto-commit ✓ | /diff /undo /help ✓ | Post-edit diagnostics ✓
 
 **Gaps (prioritized)**:
 1. **Fuzzy file/symbol search** — `/find <query>` command in TUI
@@ -70,3 +72,5 @@ System is productive — 6 consecutive iterations shipped real features (200-206
 **[AUTO-SCORED] Iteration 209: predicted 20 turns, actual 21 turns, ratio 1.05**
 
 **[AUTO-SCORED] Iteration 210: predicted 8 turns, actual 10 turns, ratio 1.25**
+
+**[AUTO-SCORED] Iteration 211: predicted 20 turns, actual 19 turns, ratio 0.95**
