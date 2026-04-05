@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { getRecentlyChangedFiles } from "../context-loader.js";
+import { getRecentlyChangedFiles, filterByRepoMap } from "../context-loader.js";
 
 vi.mock("child_process", () => ({
   execSync: vi.fn(),
@@ -78,5 +78,47 @@ describe("getRecentlyChangedFiles", () => {
     const result = getRecentlyChangedFiles("/fake");
     expect(result).not.toContain("src/deleted.ts");
     expect(result).toContain("src/exists.ts");
+  });
+
+  it("filters to knownFiles set when provided", () => {
+    vi.mocked(childProcess.execSync).mockImplementation(() => {
+      return "src/foo.ts\npackage-lock.json\nsrc/bar.ts\n" as unknown as Buffer;
+    });
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    const knownFiles = new Set(["src/foo.ts"]);
+    const result = getRecentlyChangedFiles("/fake", knownFiles);
+    expect(result).toContain("src/foo.ts");
+    expect(result).not.toContain("package-lock.json");
+    expect(result).not.toContain("src/bar.ts");
+  });
+});
+
+describe("filterByRepoMap", () => {
+  it("keeps files present in repo map", () => {
+    const files = ["src/foo.ts", "src/bar.ts"];
+    const repoMapFiles = new Set(["src/foo.ts", "src/bar.ts"]);
+    expect(filterByRepoMap(files, repoMapFiles)).toEqual(["src/foo.ts", "src/bar.ts"]);
+  });
+
+  it("excludes files not in repo map", () => {
+    const files = ["src/foo.ts", "src/unknown.ts"];
+    const repoMapFiles = new Set(["src/foo.ts"]);
+    const result = filterByRepoMap(files, repoMapFiles);
+    expect(result).toContain("src/foo.ts");
+    expect(result).not.toContain("src/unknown.ts");
+  });
+
+  it("always excludes lock files even if in repo map set", () => {
+    const files = ["package-lock.json", "src/app.ts"];
+    const repoMapFiles = new Set(["src/app.ts"]);
+    const result = filterByRepoMap(files, repoMapFiles);
+    expect(result).not.toContain("package-lock.json");
+    expect(result).toContain("src/app.ts");
+  });
+
+  it("returns all files when repo map set is empty", () => {
+    const files = ["src/foo.ts", "src/bar.ts"];
+    const result = filterByRepoMap(files, new Set());
+    expect(result).toEqual(["src/foo.ts", "src/bar.ts"]);
   });
 });

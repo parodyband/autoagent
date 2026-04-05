@@ -136,14 +136,39 @@ export function extractKeywords(message: string): string[] {
 /** Maximum number of git-changed files to prioritize in context. */
 const MAX_GIT_FILES = 3;
 
+/** Extensions that are never useful for AI context. */
+const NON_SOURCE_EXTS = new Set([
+  "lock", "json", "md", "yaml", "yml", "toml", "ini", "cfg", "conf",
+  "txt", "log", "csv", "env", "gitignore", "dockerignore",
+]);
+
+/**
+ * Filter a list of git-changed file paths to only those present in the repo
+ * map, removing lock files, JSON configs, markdown, and other non-source files.
+ *
+ * @param files - raw list of relative file paths from git
+ * @param repoMapFiles - set of relative paths indexed in the repo map
+ */
+export function filterByRepoMap(files: string[], repoMapFiles: Set<string>): string[] {
+  return files.filter(f => {
+    // Always exclude by extension unless it's in the repo map
+    const ext = f.split(".").pop()?.toLowerCase() ?? "";
+    if (NON_SOURCE_EXTS.has(ext) && !repoMapFiles.has(f)) return false;
+    // If repo map is non-empty, require file to be indexed
+    if (repoMapFiles.size > 0 && !repoMapFiles.has(f)) return false;
+    return true;
+  });
+}
+
 /**
  * Return recently-changed file paths from `git diff` (unstaged + staged).
  * Returns an empty array if not in a git repo or no changes are found.
  * Binary files and missing files are silently filtered out.
  *
  * @param workDir - the working directory to run git in
+ * @param knownFiles - optional set of repo-map-indexed paths to filter against
  */
-export function getRecentlyChangedFiles(workDir: string): string[] {
+export function getRecentlyChangedFiles(workDir: string, knownFiles?: Set<string>): string[] {
   try {
     const run = (args: string) =>
       execSync(`git -C ${JSON.stringify(workDir)} ${args}`, {
@@ -174,6 +199,11 @@ export function getRecentlyChangedFiles(workDir: string): string[] {
       }
     }
 
+    // Apply repo-map filter if provided
+    if (knownFiles && knownFiles.size > 0) {
+      return filterByRepoMap(result, knownFiles);
+    }
+
     return result;
   } catch {
     // Not a git repo, or git not available
@@ -202,7 +232,8 @@ export function autoLoadContext(
   if (keywords.length === 0) return "";
 
   // --- Git-changed files get highest priority ---
-  const gitChanged = getRecentlyChangedFiles(workDir)
+  const repoMapFileSet = new Set(repoMap.files.map(f => f.path));
+  const gitChanged = getRecentlyChangedFiles(workDir, repoMapFileSet)
     .filter(p => !alreadyMentioned.has(p))
     .slice(0, MAX_GIT_FILES);
 

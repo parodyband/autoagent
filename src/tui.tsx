@@ -543,6 +543,8 @@ function App() {
       setMessages(prev => [...prev, {
         role: "assistant",
         content: [
+          `Current model: ${currentModel}`,
+          "",
           "Available commands:",
           "  /help     — Show this help message",
           "  /init     — Analyze repo and generate/update .autoagent.md",
