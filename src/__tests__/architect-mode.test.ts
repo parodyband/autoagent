@@ -10,21 +10,26 @@ import {
 // ─── needsArchitectMode ───────────────────────────────────────
 
 describe("needsArchitectMode", () => {
-  it("returns true for refactor requests", () => {
-    expect(needsArchitectMode("Refactor the auth module to use JWT")).toBe(true);
+  it("returns true for multi-keyword requests", () => {
+    expect(needsArchitectMode("Refactor the auth module and implement JWT")).toBe(true);
   });
 
-  it("returns true for implement requests", () => {
-    expect(needsArchitectMode("Implement a new caching layer for the API")).toBe(true);
+  it("returns true for multi-keyword build+create requests", () => {
+    expect(needsArchitectMode("Build a CLI tool and create a parser module")).toBe(true);
   });
 
-  it("returns true for build requests", () => {
-    expect(needsArchitectMode("Build a CLI tool that parses CSV files")).toBe(true);
-  });
-
-  it("returns true for long messages (>200 chars)", () => {
-    const longMsg = "a".repeat(201);
+  it("returns true for long messages with keyword (>300 chars)", () => {
+    const longMsg = "Refactor " + "a".repeat(300);
     expect(needsArchitectMode(longMsg)).toBe(true);
+  });
+
+  it("returns false for single keyword in short message", () => {
+    expect(needsArchitectMode("Refactor the auth module")).toBe(false);
+  });
+
+  it("returns false for long message without keywords", () => {
+    const longMsg = "a".repeat(400);
+    expect(needsArchitectMode(longMsg)).toBe(false);
   });
 
   it("returns false for simple read-only questions", () => {
@@ -145,7 +150,7 @@ describe("formatPlanForEditor", () => {
     expect(formatted).toContain("✚"); // create icon
     expect(formatted).toContain("✎"); // modify icon
     expect(formatted).toContain("✖"); // delete icon
-    expect(formatted).toContain("Now executing...");
+    expect(formatted).toContain("execute this plan step by step");
   });
 
   it("returns empty string for empty plan", () => {
