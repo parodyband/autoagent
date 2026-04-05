@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775416272356,
+  "generatedAt": 1775416551878,
   "files": [
     {
       "path": "src/cli.ts",
@@ -529,6 +529,74 @@
       "lastModified": 1775414977083.2922
     },
     {
+      "path": "tests/prune-backref-boost.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "../src/orchestrator.js"
+        }
+      ],
+      "lastModified": 1775415752278.593
+    },
+    {
+      "path": "scripts/analyze-repo.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        }
+      ],
+      "lastModified": 1775381098459.9417
+    },
+    {
+      "path": "scripts/dashboard.ts",
+      "exports": [
+        {
+          "name": "generateDashboard",
+          "kind": "function",
+          "line": 534,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "../src/validation.js"
+        },
+        {
+          "names": [],
+          "from": "../src/logging.js"
+        },
+        {
+          "names": [],
+          "from": "../src/tool-timing.js"
+        }
+      ],
+      "lastModified": 1775395619870.8926
+    },
+    {
       "path": "src/orchestrator.ts",
       "exports": [
         {
@@ -628,15 +696,27 @@
           "exported": true
         },
         {
+          "name": "buildCachedSystem",
+          "kind": "function",
+          "line": 293,
+          "exported": true
+        },
+        {
+          "name": "injectMessageCacheBreakpoints",
+          "kind": "function",
+          "line": 304,
+          "exported": true
+        },
+        {
           "name": "isToolError",
           "kind": "function",
-          "line": 341,
+          "line": 400,
           "exported": true
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 647,
+          "line": 711,
           "exported": true
         }
       ],
@@ -773,75 +853,208 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775416230314.867
+      "lastModified": 1775416492049.9343
     },
     {
-      "path": "tests/prune-backref-boost.test.ts",
+      "path": "scripts/self-test.ts",
       "exports": [],
       "imports": [
         {
-          "names": [],
-          "from": "vitest"
+          "names": [
+            "executeBash"
+          ],
+          "from": "../src/tools/bash.js"
         },
         {
-          "names": [],
-          "from": "../src/orchestrator.js"
-        }
-      ],
-      "lastModified": 1775415752278.593
-    },
-    {
-      "path": "scripts/analyze-repo.ts",
-      "exports": [],
-      "imports": [
-        {
-          "names": [],
-          "from": "fs"
+          "names": [
+            "executeReadFile"
+          ],
+          "from": "../src/tools/read_file.js"
         },
         {
-          "names": [],
-          "from": "path"
+          "names": [
+            "executeWriteFile"
+          ],
+          "from": "../src/tools/write_file.js"
         },
         {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        }
-      ],
-      "lastModified": 1775381098459.9417
-    },
-    {
-      "path": "scripts/dashboard.ts",
-      "exports": [
-        {
-          "name": "generateDashboard",
-          "kind": "function",
-          "line": 534,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "fs"
+          "names": [
+            "executeGrep"
+          ],
+          "from": "../src/tools/grep.js"
         },
         {
-          "names": [],
-          "from": "path"
+          "names": [
+            "executeThink"
+          ],
+          "from": "../src/tools/think.js"
         },
         {
-          "names": [],
+          "names": [
+            "executeListFiles"
+          ],
+          "from": "../src/tools/list_files.js"
+        },
+        {
+          "names": [
+            "executeWebFetch"
+          ],
+          "from": "../src/tools/web_fetch.js"
+        },
+        {
+          "names": [
+            "createDefaultRegistry",
+            "ToolRegistry"
+          ],
+          "from": "../src/tool-registry.js"
+        },
+        {
+          "names": [
+            "validateBeforeCommit",
+            "captureCodeQuality",
+            "type ValidationOptions"
+          ],
           "from": "../src/validation.js"
         },
         {
-          "names": [],
+          "names": [
+            "compactMemory",
+            "smartCompactMemory"
+          ],
+          "from": "./compact-memory.js"
+        },
+        {
+          "names": [
+            "generateDashboard"
+          ],
+          "from": "./dashboard.js"
+        },
+        {
+          "names": [
+            "analyzeCodebase"
+          ],
+          "from": "../src/validation.js"
+        },
+        {
+          "names": [
+            "selectModel",
+            "autoSelectModel"
+          ],
+          "from": "../src/model-selection.js"
+        },
+        {
+          "names": [
+            "buildSystemPrompt",
+            "buildInitialMessage",
+            "budgetWarning",
+            "turnLimitNudge",
+            "validationBlockedMessage",
+            "progressCheckpoint"
+          ],
+          "from": "../src/messages.js"
+        },
+        {
+          "names": [
+            "Logger",
+            "createLogger",
+            "parseJsonlLog",
+            "rotateLogFile",
+            "LOG_ROTATION_LIMITS",
+            "type LogEntry"
+          ],
           "from": "../src/logging.js"
         },
         {
-          "names": [],
+          "names": [
+            "ToolCache",
+            "CACHEABLE_TOOLS",
+            "extractPaths",
+            "pathOverlaps"
+          ],
+          "from": "../src/tool-cache.js"
+        },
+        {
+          "names": [
+            "ToolTimingTracker"
+          ],
           "from": "../src/tool-timing.js"
+        },
+        {
+          "names": [
+            "recordMetrics",
+            "type IterationMetrics"
+          ],
+          "from": "../src/finalization.js"
+        },
+        {
+          "names": [
+            "handleToolCall",
+            "processTurn",
+            "runConversation",
+            "type IterationCtx",
+            "type TurnResult"
+          ],
+          "from": "../src/conversation.js"
+        },
+        {
+          "names": [
+            "countConsecutiveFailures",
+            "buildRecoveryNote",
+            "buildRecoveryGoals",
+            "resuscitate",
+            "handleIterationFailure",
+            "type ResuscitationConfig"
+          ],
+          "from": "../src/resuscitation.js"
+        },
+        {
+          "names": [
+            "executeSubagent"
+          ],
+          "from": "../src/tools/subagent.js"
+        },
+        {
+          "names": [
+            "callWithRetry"
+          ],
+          "from": "../src/api-retry.js"
+        },
+        {
+          "names": [
+            "getIterationCommits",
+            "computeDiffStats",
+            "getAllIterationDiffs"
+          ],
+          "from": "../src/iteration-diff.js"
+        },
+        {
+          "names": [
+            "IterationState"
+          ],
+          "from": "../src/iteration.js"
+        },
+        {
+          "names": [
+            "existsSync",
+            "unlinkSync",
+            "rmSync",
+            "mkdirSync",
+            "writeFileSync",
+            "readFileSync",
+            "statSync",
+            "mkdtempSync"
+          ],
+          "from": "fs"
+        },
+        {
+          "names": [
+            "path"
+          ],
+          "from": "path"
         }
       ],
-      "lastModified": 1775395619870.8926
+      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
+      "lastModified": 1775401928442.4028
     }
   ]
 }

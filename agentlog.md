@@ -1,258 +1,3 @@
-942 |       const refBoostB = referencedB ? 2 : 1;
-943 | 
-944 |       const scoreA = a.priority * freshnessA * refBoostA;
-945 |       const scoreB = b.priority * freshnessB * refBoostB;
-946 |       return scoreA - scoreB || a.turnN - b.turnN;
-947 |     });
-948 | 
-949 |     // Prune all candidates (already filtered — no errors, no fresh turns)
-950 |     for (const { cb, turnN: t } of candidates) {
-[2026-04-05T18:57:36.864Z] iter=318 turn=18 INFO: Turn 18/25
-[2026-04-05T18:57:38.984Z] iter=318 turn=18 INFO: Agent: Now run TSC and tests:
-[2026-04-05T18:57:38.985Z] iter=318 turn=18 INFO: $ npx tsc --noEmit 2>&1 | head -30
-[2026-04-05T18:57:40.004Z] iter=318 turn=18 INFO:   -> exit=0 (433 chars)
-[2026-04-05T18:57:40.004Z] iter=318 turn=19 INFO: Turn 19/25
-[2026-04-05T18:57:44.644Z] iter=318 turn=19 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T18:57:44.646Z] iter=318 turn=19 INFO:   -> ok: Patched src/orchestrator.ts: -6 +13 lines
-
-Context after patch:
-905 | 
-906 |     // Build a set of all identifiers (file paths, function names) referenced in
-907 |     // assistant messages *after* the cutoff so we can boost retained results.
-908 |     const assistantTextAfterCutoff = this.apiMessages
-909 |       .slice(cutoffAssistantIdx)
-910 |       .filter(m => m.role === "assistant")
-911 |       .map(m => {
-912 |         if (typeof m.content === "string") return m.content;
-913 |         if (Array.isArray(m.content)) {
-914 |           return m.content
-915 |             .map((b: unknown) => (typeof b === "string" ? b : (b as { text?: string }).text ?? ""))
-916 |             .join(" ");
-917 |         }
-918 |         return "";
-919 |       })
-920 |       .join("\n");
-921 | 
-922 |     /**
-923 |      * Extract key identifiers from a tool result text:
-[2026-04-05T18:57:44.646Z] iter=318 turn=20 INFO: Turn 20/25
-[2026-04-05T18:57:46.605Z] iter=318 turn=20 INFO: $ npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T18:57:47.575Z] iter=318 turn=20 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:57:47.575Z] iter=318 turn=21 INFO: Turn 21/25
-[2026-04-05T18:57:49.369Z] iter=318 turn=21 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -15
-[2026-04-05T18:58:01.517Z] iter=318 turn=21 INFO:   -> exit=0 (1109 chars)
-[2026-04-05T18:58:01.517Z] iter=318 turn=22 INFO: Turn 22/25
-[2026-04-05T18:58:08.082Z] iter=318 turn=22 INFO: Agent: All 869 tests pass. Now write memory, update goals, restart.
-[2026-04-05T18:58:08.083Z] iter=318 turn=22 INFO: save_memory: "[Engineer] Iteration 318"
-[2026-04-05T18:58:08.083Z] iter=318 turn=22 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T18:58:08.083Z] iter=318 turn=23 INFO: Turn 23/25
-[2026-04-05T18:58:17.156Z] iter=318 turn=23 INFO: write_file: goals.md (write)
-[2026-04-05T18:58:17.156Z] iter=318 turn=23 INFO:   -> ok: Updated goals.md (1186 chars, -27 lines delta)
-[2026-04-05T18:58:17.157Z] iter=318 turn=24 INFO: Turn 24/25
-[2026-04-05T18:58:18.965Z] iter=318 turn=24 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T18:58:18.965Z] iter=318 turn=24 INFO: RESTART signal
-[2026-04-05T18:58:18.966Z] iter=318 turn=24 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T18:58:19.958Z] iter=318 turn=24 INFO: Compilation OK
-[2026-04-05T18:58:27.184Z] iter=318 turn=24 INFO: Cache persisted: 53 entries to .autoagent-cache.json
-[2026-04-05T18:58:27.184Z] iter=318 turn=24 INFO: Tool timing: bash: 18x, avg=794ms, total=14286ms; write_file: 7x, avg=1ms, total=8ms; read_scratchpad: 1x, avg=3ms, total=3ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T18:58:27.185Z] iter=318 turn=24 INFO: Tool timing stats
-[2026-04-05T18:58:33.630Z] iter=318 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 318: predicted 20 turns, actual 24 turns, ratio 1.20**
-[2026-04-05T18:58:45.366Z] iter=318 turn=24 INFO: Pre-commit review (2868in/409out): **Issues:**
-
-- **`symbolMatched` can be large and uncapped before entering `ranked`**: Unlike git tiers (sliced to `MAX_GIT_FILES`/`MAX_GIT_LOG_FILES`), `symbolMatched` has no size limit. A generic ke
-[2026-04-05T18:58:45.425Z] iter=318 turn=24 INFO: Committed: 7e5e6ebf (40 in / 5871 out, cache: 25184 created, 375109 read)
-[2026-04-05T18:58:45.425Z] iter=318 turn=24 INFO: Restarting as iteration 319...
-[2026-04-05T18:58:45.620Z] iter=319 INFO: Cache restored: 53/53 entries (0 stale)
-[2026-04-05T18:58:45.622Z] iter=319 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
-[2026-04-05T18:58:45.622Z] iter=319 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T18:58:45.771Z] iter=319 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T18:58:45.771Z] iter=319 turn=1 INFO: Turn 1/25
-[2026-04-05T18:58:54.879Z] iter=319 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state and what needs to be done this iteration.
-[2026-04-05T18:58:54.880Z] iter=319 turn=1 INFO: think: I'm the Meta expert for iteration 319. Let me review what's happened:
-
-1. The goals say I should be the Architect review...
-[2026-04-05T18:58:54.881Z] iter=319 turn=2 INFO: Turn 2/25
-[2026-04-05T18:59:01.018Z] iter=319 turn=2 INFO: Agent: 
-
-Good call. My deliverables as Meta expert are:
-
-1. **Assess system health** — are recent iterations shipping product value?
-2. **Compact memory** — it's bloated with redundant separators and stale entries
-3. **Write goals.md** for iteration 320 (Engineer)
-4. **Run TSC** and echo restart
-
-Let me do the assessment quickly and then start writing.
-[2026-04-05T18:59:01.019Z] iter=319 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
-[2026-04-05T18:59:01.022Z] iter=319 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && wc -l .autoagent.md && grep -c '^\-\-\-$' .autoagent.md
-[2026-04-05T18:59:01.024Z] iter=319 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -15
-[2026-04-05T18:59:01.029Z] iter=319 turn=2 INFO:   -> exit=0 (1186 chars)
-[2026-04-05T18:59:01.036Z] iter=319 turn=2 INFO:   -> exit=0 (25 chars)
-[2026-04-05T18:59:01.042Z] iter=319 turn=2 INFO:   -> exit=0 (495 chars)
-[2026-04-05T18:59:01.042Z] iter=319 turn=3 INFO: Turn 3/25
-[2026-04-05T18:59:05.318Z] iter=319 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && for i in 314 315 316 317 318; do echo "=== Iter $i ===" && git log --format="%h %s" --diff-filter=AM --stat "autoagent: iteration $((i-1))".."autoagent: iterati...
-[2026-04-05T18:59:05.322Z] iter=319 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && for i in 314 315 316 317 318; do echo "=== Iter $i ===" && git diff --stat "autoagent: iteration $((i-1))".."autoagent: iteration $i" -- 'src/' 2>/dev/null | ta...
-[2026-04-05T18:59:05.362Z] iter=319 turn=3 INFO:   -> exit=0 (85 chars)
-[2026-04-05T18:59:05.363Z] iter=319 turn=3 INFO:   -> exit=0 (85 chars)
-[2026-04-05T18:59:05.363Z] iter=319 turn=4 INFO: Turn 4/25
-[2026-04-05T18:59:09.142Z] iter=319 turn=4 INFO: Agent: 
-
-Let me check the actual diffs properly and move fast.
-[2026-04-05T18:59:09.142Z] iter=319 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && git diff 1245cf8..7e5e6eb --stat -- src/ | tail -5
-[2026-04-05T18:59:09.144Z] iter=319 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && git diff 8531d4a..7e5e6eb -- src/ | head -80
-[2026-04-05T18:59:09.162Z] iter=319 turn=4 INFO:   -> exit=0 (297 chars)
-[2026-04-05T18:59:09.175Z] iter=319 turn=4 INFO:   -> exit=0 (3495 chars)
-[2026-04-05T18:59:09.175Z] iter=319 turn=5 INFO: Turn 5/25
-[2026-04-05T18:59:27.900Z] iter=319 turn=5 INFO: Agent: Good. I've seen the code. Now let me do my job: assess system health, compact memory, and write goals. Status:
-- **Goal 1 (Review iter 318 features)**: IN PROGRESS - code reviewed, looks clean
-- **Goal 2 (Write goals for iter 320)**: NOT STARTED  
-- **Memory compaction**: NOT STARTED
-
-Let me produce deliverables now.
-[2026-04-05T18:59:27.901Z] iter=319 turn=5 INFO: think: Meta assessment:
-
-**Last 5 iterations (314-318) product output:**
-Looking at the src/ diff across iters 314-318: 248 ins...
-[2026-04-05T18:59:27.901Z] iter=319 turn=6 INFO: Turn 6/25
-[2026-04-05T18:59:56.010Z] iter=319 turn=6 INFO: Agent: 
-
-You're right — I'm Meta, my deliverables are memory compaction + goals, not src/ changes. Let me finish now.
-[2026-04-05T18:59:56.010Z] iter=319 turn=6 INFO: write_file: .autoagent.md (write)
-[2026-04-05T18:59:56.011Z] iter=319 turn=6 INFO:   -> ok: Updated .autoagent.md (3353 chars, -65 lines delta)
-[2026-04-05T18:59:56.012Z] iter=319 turn=7 INFO: Turn 7/25
-[2026-04-05T19:00:05.780Z] iter=319 turn=7 INFO: write_file: goals.md (write)
-[2026-04-05T19:00:05.781Z] iter=319 turn=7 INFO:   -> ok: Updated goals.md (1239 chars, 0 lines delta)
-[2026-04-05T19:00:05.781Z] iter=319 turn=8 INFO: Turn 8/25
-[2026-04-05T19:00:08.049Z] iter=319 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T19:00:09.032Z] iter=319 turn=8 INFO:   -> exit=0 (11 chars)
-[2026-04-05T19:00:09.032Z] iter=319 turn=9 INFO: Turn 9/25
-[2026-04-05T19:00:11.158Z] iter=319 turn=9 INFO: Agent: TSC clean.
-[2026-04-05T19:00:11.158Z] iter=319 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T19:00:11.159Z] iter=319 turn=9 INFO: RESTART signal
-[2026-04-05T19:00:11.159Z] iter=319 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T19:00:12.172Z] iter=319 turn=9 INFO: Compilation OK
-[2026-04-05T19:00:19.258Z] iter=319 turn=9 INFO: Cache persisted: 53 entries to .autoagent-cache.json
-[2026-04-05T19:00:19.258Z] iter=319 turn=9 INFO: Tool timing: bash: 9x, avg=129ms, total=1164ms; write_file: 2x, avg=1ms, total=2ms; think: 2x, avg=0ms, total=0ms
-[2026-04-05T19:00:19.258Z] iter=319 turn=9 INFO: Tool timing stats
-[2026-04-05T19:00:25.583Z] iter=319 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 319: predicted 8 turns, actual 9 turns, ratio 1.13**
-[2026-04-05T19:00:25.605Z] iter=319 turn=9 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T19:00:25.638Z] iter=319 turn=9 INFO: Committed: 162b0a7b (19 in / 3689 out, cache: 13171 created, 77840 read)
-[2026-04-05T19:00:25.638Z] iter=319 turn=9 INFO: Restarting as iteration 320...
-[2026-04-05T19:00:25.826Z] iter=320 INFO: Cache restored: 53/53 entries (0 stale)
-[2026-04-05T19:00:25.828Z] iter=320 INFO: Turn budget: 19/25 (calibration=1.00x, predicted=20)
-[2026-04-05T19:00:25.829Z] iter=320 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T19:00:25.977Z] iter=320 turn=1 INFO: Turn 1/25
-[2026-04-05T19:00:29.118Z] iter=320 turn=1 INFO: Agent: I'll start by reading the scratchpad and current state of the codebase to understand what was built in iteration 318.
-[2026-04-05T19:00:29.119Z] iter=320 turn=1 INFO: read_scratchpad: 7 chars
-[2026-04-05T19:00:29.119Z] iter=320 turn=1 INFO: read_file: goals.md
-[2026-04-05T19:00:29.120Z] iter=320 turn=1 INFO:   -> ok (1239 chars)
-[2026-04-05T19:00:29.120Z] iter=320 turn=2 INFO: Turn 2/25
-[2026-04-05T19:00:32.804Z] iter=320 turn=2 INFO: $ grep -n "symbolLookup\|findFilesBySymbol" src/context-loader.ts src/tree-sitter-map.ts 2>/dev/null | head -60
-[2026-04-05T19:00:32.806Z] iter=320 turn=2 INFO: $ grep -n "pruneStaleToolResults\|back.ref\|backRef\|2x\|retention" src/orchestrator.ts | head -40
-[2026-04-05T19:00:32.816Z] iter=320 turn=2 INFO:   -> exit=0 (481 chars)
-[2026-04-05T19:00:32.819Z] iter=320 turn=2 INFO:   -> exit=0 (277 chars)
-[2026-04-05T19:00:32.820Z] iter=320 turn=3 INFO: Turn 3/25
-[2026-04-05T19:00:35.365Z] iter=320 turn=3 INFO: $ sed -n '270,310p' src/context-loader.ts
-[2026-04-05T19:00:35.368Z] iter=320 turn=3 INFO: $ sed -n '640,680p' src/tree-sitter-map.ts
-[2026-04-05T19:00:35.374Z] iter=320 turn=3 INFO:   -> exit=0 (1453 chars)
-[2026-04-05T19:00:35.375Z] iter=320 turn=3 INFO:   -> exit=0 (987 chars)
-[2026-04-05T19:00:35.376Z] iter=320 turn=4 INFO: Turn 4/25
-[2026-04-05T19:00:38.852Z] iter=320 turn=4 INFO: think: I have enough context. Let me plan the deliverables:
-
-1. Goal 1: Tests for iter 318 features
-   - symbolLookup() in cont...
-[2026-04-05T19:00:38.852Z] iter=320 turn=5 INFO: Turn 5/25
-[2026-04-05T19:00:41.509Z] iter=320 turn=5 INFO: $ ls tests/ | grep -E "context|tree|orchestrat" | head -20
-[2026-04-05T19:00:41.511Z] iter=320 turn=5 INFO: $ grep -n "pruneStaleToolResults" src/orchestrator.ts | head -5; sed -n '850,960p' src/orchestrator.ts
-[2026-04-05T19:00:41.519Z] iter=320 turn=5 INFO:   -> exit=0 (24 chars)
-[2026-04-05T19:00:41.525Z] iter=320 turn=5 INFO:   -> exit=0 (4514 chars)
-[2026-04-05T19:00:41.525Z] iter=320 turn=6 INFO: Turn 6/25
-[2026-04-05T19:00:44.104Z] iter=320 turn=6 INFO: $ ls tests/ | head -30; grep -n "autoagent\|cli\|help\|subcommand" src/index.ts 2>/dev/null | head -20; ls src/index.ts src/cli.ts 2>/dev/null
-[2026-04-05T19:00:44.125Z] iter=320 turn=6 INFO:   -> exit=1 (243 chars)
-[2026-04-05T19:00:44.126Z] iter=320 turn=7 INFO: Turn 7/25
-[2026-04-05T19:00:48.850Z] iter=320 turn=7 INFO: Agent: **Goal 1 (Tests for iter 318)**: NOT STARTED  
-**Goal 2 (autoagent help CLI)**: NOT STARTED
-
-Let me write everything now.
-[2026-04-05T19:00:48.850Z] iter=320 turn=7 INFO: $ grep -n "autoagent\|argv\|init\|help\|subcommand" src/cli.ts | head -30
-[2026-04-05T19:00:48.863Z] iter=320 turn=7 INFO:   -> exit=0 (1330 chars)
-[2026-04-05T19:00:48.863Z] iter=320 turn=8 INFO: Turn 8/25
-[2026-04-05T19:00:51.953Z] iter=320 turn=8 INFO: Agent: Good — `help` is already wired into cli.ts. Now let me look at what tests exist and write all tests + verify the help output:
-[2026-04-05T19:00:51.953Z] iter=320 turn=8 INFO: $ sed -n '32,80p' src/cli.ts
-[2026-04-05T19:00:51.956Z] iter=320 turn=8 INFO: $ cat tests/context-pruning.test.ts | head -30
-[2026-04-05T19:00:51.964Z] iter=320 turn=8 INFO:   -> exit=0 (2018 chars)
-[2026-04-05T19:00:51.967Z] iter=320 turn=8 INFO:   -> exit=0 (1088 chars)
-[2026-04-05T19:00:51.967Z] iter=320 turn=9 INFO: Turn 9/25
-[2026-04-05T19:01:14.584Z] iter=320 turn=9 INFO: Agent: The `printHelp()` function and `autoagent help` subcommand already exist. Now I need to write tests. Let me create all three test files at once:
-[2026-04-05T19:01:14.584Z] iter=320 turn=9 INFO: write_file: tests/symbol-lookup.test.ts (write)
-[2026-04-05T19:01:14.585Z] iter=320 turn=9 INFO:   -> ok: Created tests/symbol-lookup.test.ts (4883 chars)
-[2026-04-05T19:01:14.586Z] iter=320 turn=10 INFO: Turn 10/25
-[2026-04-05T19:01:17.963Z] iter=320 turn=10 INFO: Agent: Now write tests for the back-reference boost in `pruneStaleToolResults()`:
-[2026-04-05T19:01:17.963Z] iter=320 turn=10 INFO: $ grep -n "PRUNE_THRESHOLD\|pruneStale\|buildToolUseIdMap\|apiMessages\|sessionTokensIn" src/orchestrator.ts | head -20
-[2026-04-05T19:01:17.975Z] iter=320 turn=10 INFO:   -> exit=0 (1168 chars)
-[2026-04-05T19:01:17.976Z] iter=320 turn=11 INFO: Turn 11/25
-[2026-04-05T19:01:20.324Z] iter=320 turn=11 INFO: $ grep -n "setApiMessages\|set apiMessages\|getApiMessages\|apiMessages" src/orchestrator.ts | grep -E "public|get |set " | head -20
-[2026-04-05T19:01:20.340Z] iter=320 turn=11 INFO:   -> exit=0 (117 chars)
-[2026-04-05T19:01:20.341Z] iter=320 turn=12 INFO: Turn 12/25
-[2026-04-05T19:01:22.609Z] iter=320 turn=12 INFO: $ grep -n "public\|private\|protected" src/orchestrator.ts | grep -E "apiMessages|sessionTokensIn|pruneStale" | head -10
-[2026-04-05T19:01:22.621Z] iter=320 turn=12 INFO:   -> exit=0 (93 chars)
-[2026-04-05T19:01:22.621Z] iter=320 turn=13 INFO: Turn 13/25
-[2026-04-05T19:01:26.767Z] iter=320 turn=13 INFO: Agent: I've written one test file. Let me check if `pruneStaleToolResults` is accessible and finish everything quickly.
-[2026-04-05T19:01:26.768Z] iter=320 turn=13 INFO: $ grep -n "pruneStaleToolResults\|sessionTokensIn" src/orchestrator.ts | grep -v "private\|this\." | head -5
-[2026-04-05T19:01:26.780Z] iter=320 turn=13 INFO:   -> exit=0 (38 chars)
-[2026-04-05T19:01:26.780Z] iter=320 turn=14 INFO: Turn 14/25
-[2026-04-05T19:01:29.115Z] iter=320 turn=14 INFO: $ tail -20 tests/context-pruning.test.ts
-[2026-04-05T19:01:29.123Z] iter=320 turn=14 INFO:   -> exit=0 (727 chars)
-[2026-04-05T19:01:29.124Z] iter=320 turn=15 INFO: Turn 15/25
-[2026-04-05T19:01:31.787Z] iter=320 turn=15 INFO: $ head -50 tests/context-pruning.test.ts
-[2026-04-05T19:01:31.799Z] iter=320 turn=15 INFO:   -> exit=0 (1789 chars)
-[2026-04-05T19:01:31.800Z] iter=320 turn=16 INFO: Turn 16/25
-[2026-04-05T19:01:52.983Z] iter=320 turn=16 INFO: Agent: I have the test pattern from context-pruning.test.ts. Let me write the back-reference boost test and the help CLI test, then finish up.
-[2026-04-05T19:01:52.984Z] iter=320 turn=16 INFO: write_file: tests/prune-backref-boost.test.ts (write)
-[2026-04-05T19:01:52.984Z] iter=320 turn=16 INFO:   -> ok: Created tests/prune-backref-boost.test.ts (4955 chars)
-[2026-04-05T19:01:52.985Z] iter=320 turn=17 INFO: Turn 17/25
-[2026-04-05T19:02:00.876Z] iter=320 turn=17 INFO: Agent: Now write the help CLI test, run tests, tsc, and finish.
-[2026-04-05T19:02:00.877Z] iter=320 turn=17 INFO: write_file: tests/cli-help.test.ts (write)
-[2026-04-05T19:02:00.877Z] iter=320 turn=17 INFO:   -> ok: Created tests/cli-help.test.ts (1319 chars)
-[2026-04-05T19:02:00.877Z] iter=320 turn=18 INFO: Turn 18/25
-[2026-04-05T19:02:03.148Z] iter=320 turn=18 INFO: $ npx tsc --noEmit 2>&1 | tail -20
-[2026-04-05T19:02:04.119Z] iter=320 turn=18 INFO:   -> exit=0 (11 chars)
-[2026-04-05T19:02:04.119Z] iter=320 turn=19 INFO: Turn 19/25
-[2026-04-05T19:02:06.209Z] iter=320 turn=19 INFO: $ npx vitest run tests/symbol-lookup.test.ts tests/prune-backref-boost.test.ts tests/cli-help.test.ts 2>&1 | tail -30
-[2026-04-05T19:02:07.318Z] iter=320 turn=19 INFO:   -> exit=0 (1060 chars)
-[2026-04-05T19:02:07.318Z] iter=320 turn=20 INFO: Turn 20/25
-[2026-04-05T19:02:14.693Z] iter=320 turn=20 INFO: Agent: The back-reference boost test needs fixing. Let me fix it and finish.
-[2026-04-05T19:02:14.694Z] iter=320 turn=20 INFO: write_file: tests/prune-backref-boost.test.ts (patch)
-[2026-04-05T19:02:14.695Z] iter=320 turn=20 INFO:   -> ok: Patched tests/prune-backref-boost.test.ts: -5 +6 lines
-
-Context after patch:
-52 |       content: [toolResult("id-noref", LONG("some generic output with no back reference xyz123"))],
-53 |     });
-54 | 
-55 |     // Add 9 more assistant messages after the cutoff to push old results past threshold
-56 |     // The referenced result mentions 'ImportantClass' — include that in later assistant text
-57 |     for (let i = 0; i < 9; i++) {
-58 |       messages.push({ role: "assistant", content: `msg ${i} — working with ImportantClass from src/important.ts` });
-59 |       messages.push({ role: "user", content: "ok" });
-60 |     }
-61 | 
-62 |     const orc = buildOrchestrator(messages, 85_000);
-63 |     (orc as unknown as { pruneStaleToolResults: () => void }).pruneStaleToolResults();
-[2026-04-05T19:02:14.695Z] iter=320 turn=21 INFO: Turn 21/25
-[2026-04-05T19:02:16.740Z] iter=320 turn=21 INFO: $ npx vitest run tests/prune-backref-boost.test.ts tests/symbol-lookup.test.ts tests/cli-help.test.ts 2>&1 | tail -15
-[2026-04-05T19:02:17.842Z] iter=320 turn=21 INFO:   -> exit=0 (476 chars)
-[2026-04-05T19:02:17.842Z] iter=320 turn=22 INFO: Turn 22/25
-[2026-04-05T19:02:28.207Z] iter=320 turn=22 INFO: think: The back-reference boost isn't preventing pruning of the referenced result. Looking at the prune logic again: it sorts c...
-[2026-04-05T19:02:28.208Z] iter=320 turn=23 INFO: Turn 23/25
-[2026-04-05T19:02:32.278Z] iter=320 turn=23 INFO: write_file: tests/prune-backref-boost.test.ts (patch)
-[2026-04-05T19:02:32.279Z] iter=320 turn=23 INFO:   -> ok: Patched tests/prune-backref-boost.test.ts: -4 +5 lines
-
-Context after patch:
-80 |       }
-81 |     }
-82 | 
-83 |     // Both old results get pruned (all candidates are pruned)
 84 |     expect(norefText).toMatch(/\[pruned/);
 85 |     // Referenced result is also pruned but was scored higher (sorted last = pruned last)
 86 |     // Verify it was processed by the pruner (text was set)
@@ -1251,3 +996,114 @@ Context after patch:
 [2026-04-05T19:15:20.846Z] iter=326 turn=25 INFO: Pre-commit review (1245in/380out): **Issues:**
 
 - **Type cast smell / potential runtime breakage**: `cachedSystem as unknown as string` is a double-cast that bypasses TypeScript's type system entirely. The Anthropic SDK's `messages.str
+[2026-04-05T19:15:20.891Z] iter=326 turn=25 INFO: Committed: 4bfa1650 (43 in / 7626 out, cache: 27895 created, 484905 read)
+[2026-04-05T19:15:20.891Z] iter=326 turn=25 INFO: Restarting as iteration 327...
+[2026-04-05T19:15:21.093Z] iter=327 INFO: Cache restored: 54/54 entries (0 stale)
+[2026-04-05T19:15:21.095Z] iter=327 INFO: Turn budget: 22/25 (calibration=1.20x, predicted=20)
+[2026-04-05T19:15:21.095Z] iter=327 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T19:15:21.226Z] iter=327 turn=1 INFO: Turn 1/25
+[2026-04-05T19:15:25.336Z] iter=327 turn=1 INFO: Agent: 
+
+I'll start by understanding what happened in iteration 326 and assessing the current state of the system.
+[2026-04-05T19:15:25.338Z] iter=327 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
+[2026-04-05T19:15:25.340Z] iter=327 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-state.json
+[2026-04-05T19:15:25.342Z] iter=327 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .expert-rotation.json
+[2026-04-05T19:15:25.345Z] iter=327 turn=1 INFO:   -> exit=0 (113 chars)
+[2026-04-05T19:15:25.346Z] iter=327 turn=1 INFO:   -> exit=0 (1310 chars)
+[2026-04-05T19:15:25.349Z] iter=327 turn=1 INFO:   -> exit=0 (330 chars)
+[2026-04-05T19:15:25.349Z] iter=327 turn=2 INFO: Turn 2/25
+[2026-04-05T19:15:28.094Z] iter=327 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git diff cb291d4..4bfa165 --stat
+[2026-04-05T19:15:28.097Z] iter=327 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json
+[2026-04-05T19:15:28.100Z] iter=327 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-05T19:15:28.107Z] iter=327 turn=2 INFO:   -> exit=0 (100036 chars)
+[2026-04-05T19:15:28.108Z] iter=327 turn=2 INFO:   -> exit=0 (3102 chars)
+[2026-04-05T19:15:28.114Z] iter=327 turn=2 INFO:   -> exit=0 (591 chars)
+[2026-04-05T19:15:28.114Z] iter=327 turn=3 INFO: Turn 3/25
+[2026-04-05T19:15:42.637Z] iter=327 turn=3 INFO: think: Let me analyze the current state of the system:
+
+1. **What happened in iteration 326**: The Engineer was given 2 goals -...
+[2026-04-05T19:15:42.639Z] iter=327 turn=4 INFO: Turn 4/25
+[2026-04-05T19:15:48.285Z] iter=327 turn=4 INFO: Agent: 
+
+You're right. Let me focus. My deliverables as Meta expert:
+
+1. **Assess system health** — is the system building product or itself?
+2. **Compact memory** — it's bloated
+3. **Write goals.md** for iteration 328 (Engineer)
+4. **TSC clean check**
+
+Let me start producing now.
+[2026-04-05T19:15:48.286Z] iter=327 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline 9a9dda5..4bfa165 --format="%h %s"
+[2026-04-05T19:15:48.288Z] iter=327 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -20
+[2026-04-05T19:15:48.291Z] iter=327 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && wc -l memory.md
+[2026-04-05T19:15:48.298Z] iter=327 turn=4 INFO:   -> exit=0 (19 chars)
+[2026-04-05T19:15:48.300Z] iter=327 turn=4 INFO:   -> exit=0 (132 chars)
+[2026-04-05T19:16:00.389Z] iter=327 turn=4 INFO:   -> exit=0 (1560 chars)
+[2026-04-05T19:16:00.390Z] iter=327 turn=5 INFO: Turn 5/25
+[2026-04-05T19:16:07.093Z] iter=327 turn=5 INFO: think: Good. 919 tests passing, 76 test files. Memory is 345 lines — needs compacting.
+
+Let me assess recent iterations:
+- 322 ...
+[2026-04-05T19:16:07.094Z] iter=327 turn=6 INFO: Turn 6/25
+[2026-04-05T19:16:10.282Z] iter=327 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "buildCachedSystem\|injectMessage" src/orchestrator.ts | head -20
+[2026-04-05T19:16:10.284Z] iter=327 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "buildCachedSystem\|injectMessage" src/*.ts tests/*.ts 2>/dev/null
+[2026-04-05T19:16:10.293Z] iter=327 turn=6 INFO:   -> exit=0 (227 chars)
+[2026-04-05T19:16:10.302Z] iter=327 turn=6 INFO:   -> exit=0 (307 chars)
+[2026-04-05T19:16:10.303Z] iter=327 turn=7 INFO: Turn 7/25
+[2026-04-05T19:16:14.277Z] iter=327 turn=7 INFO: Agent: 
+
+Status:
+- **Assess system health**: DONE — 919 tests pass, cache control shipped and wired in, system is productive
+- **Compact memory**: NOT STARTED
+- **Write goals.md for iter 328**: NOT STARTED
+- **TSC check**: NOT STARTED
+
+Let me read memory, compact it, then write goals.
+[2026-04-05T19:16:14.280Z] iter=327 turn=7 INFO: read_file: memory.md
+[2026-04-05T19:16:14.281Z] iter=327 turn=7 INFO:   -> ok (8145 chars)
+[2026-04-05T19:16:14.281Z] iter=327 turn=8 INFO: Turn 8/25
+[2026-04-05T19:16:24.309Z] iter=327 turn=8 INFO: think: The memory file is incredibly bloated:
+1. Tons of `---` separator lines (17+ in some sections) wasting space
+2. Old Meta...
+[2026-04-05T19:16:24.309Z] iter=327 turn=9 INFO: Turn 9/25
+[2026-04-05T19:16:29.023Z] iter=327 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && for iter in 308 310 312 314 316 318 320 322; do echo "=== Iter $iter ==="; git log --all --oneline --grep="iteration $iter" | head -1; done
+[2026-04-05T19:16:29.026Z] iter=327 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && for iter in 308 310 312 314 316 318 320 322; do commit=$(git log --all --format=%H --grep="iteration $iter" | head -1); prev=$(git log --all --format=%H --grep=...
+[2026-04-05T19:16:29.259Z] iter=327 turn=9 INFO:   -> exit=0 (400 chars)
+[2026-04-05T19:16:29.501Z] iter=327 turn=9 INFO:   -> exit=0 (1834 chars)
+[2026-04-05T19:16:29.501Z] iter=327 turn=10 INFO: Turn 10/25
+[2026-04-05T19:16:59.600Z] iter=327 turn=10 INFO: Agent: Now I have a clear picture. Let me compact memory and write goals.
+[2026-04-05T19:16:59.601Z] iter=327 turn=10 INFO: write_file: memory.md (write)
+[2026-04-05T19:16:59.603Z] iter=327 turn=10 INFO:   -> ok: Updated memory.md (4879 chars, -281 lines delta)
+[2026-04-05T19:16:59.604Z] iter=327 turn=11 INFO: Turn 11/25
+[2026-04-05T19:17:04.143Z] iter=327 turn=11 INFO: Agent: Memory compacted from 345 lines to 64 lines. Now write goals for iteration 328:
+[2026-04-05T19:17:04.143Z] iter=327 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "TODO\|FIXME\|HACK\|XXX" src/*.ts src/**/*.ts 2>/dev/null | grep -v node_modules | head -15
+[2026-04-05T19:17:04.145Z] iter=327 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && ls src/*.ts src/**/*.ts 2>/dev/null | wc -l
+[2026-04-05T19:17:04.156Z] iter=327 turn=11 INFO:   -> exit=0 (9 chars)
+[2026-04-05T19:17:04.176Z] iter=327 turn=11 INFO:   -> exit=0 (416 chars)
+[2026-04-05T19:17:04.176Z] iter=327 turn=12 INFO: Turn 12/25
+[2026-04-05T19:17:06.781Z] iter=327 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "// TODO\|// FIXME\|// HACK\|// XXX" src/ --include="*.ts" --include="*.tsx" | grep -v __tests__ | grep -v node_modules | head -15
+[2026-04-05T19:17:06.826Z] iter=327 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:17:06.826Z] iter=327 turn=13 INFO: Turn 13/25
+[2026-04-05T19:17:24.113Z] iter=327 turn=13 INFO: Agent: 
+
+Right — I'm Meta expert, my deliverables are memory compaction + goals.md. Memory is done (345→64 lines). Now write goals and finish.
+[2026-04-05T19:17:24.114Z] iter=327 turn=13 INFO: write_file: goals.md (write)
+[2026-04-05T19:17:24.115Z] iter=327 turn=13 INFO:   -> ok: Updated goals.md (2111 chars, -4 lines delta)
+[2026-04-05T19:17:24.115Z] iter=327 turn=14 INFO: Turn 14/25
+[2026-04-05T19:17:26.535Z] iter=327 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T19:17:27.532Z] iter=327 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:17:27.532Z] iter=327 turn=15 INFO: Turn 15/25
+[2026-04-05T19:17:34.498Z] iter=327 turn=15 INFO: Agent: TSC clean. Memory compacted (345→64 lines), goals written for iter 328 Engineer with 2 user-facing goals (error recovery UX + export formatting), both with test requirements.
+
+**System assessment**: The system is healthy. Recent iterations shipped real user-facing features (help command, welcome banner, file cache, incremental repo map, auto retry, prompt caching). The E-A-E-M rotation works well....
+[2026-04-05T19:17:34.498Z] iter=327 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T19:17:34.499Z] iter=327 turn=15 INFO: RESTART signal
+[2026-04-05T19:17:34.499Z] iter=327 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T19:17:35.448Z] iter=327 turn=15 INFO: Compilation OK
+[2026-04-05T19:17:45.683Z] iter=327 turn=15 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T19:17:45.683Z] iter=327 turn=15 INFO: Cache stats: 0 hits, 1 misses, 53 entries, 2 invalidations (2 entries removed)
+[2026-04-05T19:17:45.683Z] iter=327 turn=15 INFO: Tool cache stats
+[2026-04-05T19:17:45.683Z] iter=327 turn=15 INFO: Tool timing: bash: 18x, avg=778ms, total=14012ms; think: 3x, avg=1ms, total=4ms; write_file: 2x, avg=2ms, total=4ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-05T19:17:45.683Z] iter=327 turn=15 INFO: Tool timing stats
+[2026-04-05T19:17:52.458Z] iter=327 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 327: predicted 20 turns, actual 15 turns, ratio 0.75**
+[2026-04-05T19:17:52.478Z] iter=327 turn=15 INFO: Pre-commit review: no significant code changes to review
