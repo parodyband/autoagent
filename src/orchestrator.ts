@@ -1024,7 +1024,12 @@ export class Orchestrator {
       try {
         const projectInfo = detectProject(this.opts.workDir);
         if (projectInfo.type !== "unknown") {
-          this.systemPrompt += `\n\n## Project Context\n${projectInfo.summary}`;
+          const contextLines: string[] = [projectInfo.summary];
+          if (projectInfo.testRunner) contextLines.push(`Test runner: ${projectInfo.testRunner}.`);
+          if (projectInfo.packageManager) contextLines.push(`Package manager: ${projectInfo.packageManager}.`);
+          if (projectInfo.entryPoints?.length) contextLines.push(`Entry points: ${projectInfo.entryPoints.join(", ")}.`);
+          if (projectInfo.framework) contextLines.push(`Framework: ${projectInfo.framework}.`);
+          this.systemPrompt += `\n\n## Project Context\n${contextLines.join(" ")}`;
         }
       } catch { /* non-fatal — skip if detection fails */ }
       this.projectSummaryInjected = true;

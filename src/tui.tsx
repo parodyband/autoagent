@@ -19,6 +19,7 @@ import { VirtualMessageList } from "./virtual-message-list.js";
 import { undoLastCommit } from "./auto-commit.js";
 import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
 import { execSync } from "child_process";
+import { runInit } from "./init-command.js";
 
 // Parse args
 let workDir = process.cwd();
@@ -473,12 +474,33 @@ function App() {
       exit();
       return;
     }
+    if (trimmed === "/init") {
+      setStatus("Analyzing project...");
+      try {
+        const { content, updated } = await runInit(workDir, (msg) => setStatus(msg));
+        setStatus("");
+        const preview = content.split("\n").slice(0, 20).join("\n");
+        const truncated = content.split("\n").length > 20 ? "\n...(truncated)" : "";
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          content: `${updated ? "Updated" : "Created"} .autoagent.md:\n\n\`\`\`markdown\n${preview}${truncated}\n\`\`\``,
+        }]);
+      } catch (err) {
+        setStatus("");
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          content: `Failed to initialize: ${err instanceof Error ? err.message : String(err)}`,
+        }]);
+      }
+      return;
+    }
     if (trimmed === "/help") {
       setMessages(prev => [...prev, {
         role: "assistant",
         content: [
           "Available commands:",
           "  /help     — Show this help message",
+          "  /init     — Analyze repo and generate/update .autoagent.md",
           "  /status   — Show session stats (turns, tokens, cost, model)",
           "  /find Q   — Fuzzy search files & symbols in the repo",
           "  /model    — Show current model (or /model haiku|sonnet to switch)",

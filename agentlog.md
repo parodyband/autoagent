@@ -1,77 +1,3 @@
-797 |   }
-798 | 
-799 |   /**
-800 |    * Build a map from tool_use_id → tool name by scanning all assistant messages.
-801 |    */
-802 |   private buildToolUseIdMap(): Map<string, string> {
-803 |     const map = new Map<string, string>();
-804 |     for (const msg of this.apiMessages) {
-805 |       if (msg.role !== "assistant" || !Array.isArray(msg.content)) continue;
-806 |       for (const block of msg.content) {
-807 |         if (
-808 |           typeof block === "object" &&
-809 |           "type" in block &&
-810 |           block.type === "tool_use" &&
-811 |           "id" in block &&
-812 |           "name" in block
-813 |         ) {
-814 |           map.set(
-815 |             (block as { id: string; name: string }).id,
-816 |             (block as { id: string; name: string }).name,
-817 |           );
-818 |         }
-819 |       }
-820 |     }
-821 |     return map;
-822 |   }
-823 | 
-824 |   /** Return true if the text contains error indicators we must preserve. */
-825 |   private hasErrorIndicator(text: string): boolean {
-826 |     return /Error|FAIL|error:|ERR!/i.test(text) && /Error|FAIL|error:|ERR!/.test(text);
-827 |   }
-828 | 
-829 |   /**
-830 |    * Prune stale tool results with priority-based ordering.
-831 |    *
-832 |    * Fires at MICRO_COMPACT_THRESHOLD (80K) and above.
-833 |    * - Never prunes results that contain error indicators.
-834 |    * - Prunes low-value tools first (read_file, grep, list_files).
-835 |    * - Prunes high-value tools last (bash, write_file).
-836 |    * - Keeps the last 8 assistant turns untouched.
-837 |    */
-838 |   pruneStaleToolResults(): void {
-839 |     const toolUseIdMap = this.buildToolUseIdMap();
-840 | 
-841 |     // Find the index of the 8th most recent assistant message
-842 |     const assistantIndices: number[] = [];
-843 |     for (let i = this.apiMessages.length - 1; i >= 0; i--) {
-844 |       if (this.apiMessages[i].role === "assistant") {
-845 |         assistantIndices.push(i);
-846 |       }
-847 |     }
-848 | 
-849 |     // Keep last 8 assistant turns fresh — prune everything older
-850 |     const cutoffAssistantIdx = assistantIndices[7] ?? 0; // 8th most recent assistant turn
-851 | 
-852 |     // Collect all candidate tool_result blocks with their priority
-853 |     type Candidate = {
-854 |       cb: { type: string; text?: string };
-855 |       turnN: number;
-856 |       priority: number;
-857 |     };
-858 |     const candidates: Candidate[] = [];
-859 | 
-860 |     let turnN = 0;
-861 |     for (let i = 0; i < cutoffAssistantIdx; i++) {
-862 |       const msg = this.apiMessages[i];
-863 |       if (msg.role === "assistant") turnN++;
-864 |       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
-865 | 
-866 |       for (const block of msg.content) {
-867 |         if (
-868 |           typeof block === "object" &&
-869 |           "type" in block &&
-870 |           block.type === "tool_result" &&
 871 |           Array.isArray((block as { content?: unknown[] }).content)
 872 |         ) {
 873 |           const toolBlock = block as {
@@ -1070,3 +996,205 @@ Goals.md is written. Wrapping up now.
 [2026-04-05T18:13:34.675Z] iter=293 turn=8 INFO: Tool timing stats
 [2026-04-05T18:13:40.818Z] iter=293 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 293: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-05T18:13:40.839Z] iter=293 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T18:13:40.871Z] iter=293 turn=8 INFO: Committed: 02de2fd8 (18 in / 2509 out, cache: 13921 created, 71954 read)
+[2026-04-05T18:13:40.871Z] iter=293 turn=8 INFO: Restarting as iteration 294...
+[2026-04-05T18:13:41.070Z] iter=294 INFO: Cache restored: 48/48 entries (0 stale)
+[2026-04-05T18:13:41.072Z] iter=294 INFO: Turn budget: 16/25 (calibration=1.25x, predicted=20)
+[2026-04-05T18:13:41.073Z] iter=294 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T18:13:41.218Z] iter=294 turn=1 INFO: Turn 1/25
+[2026-04-05T18:13:43.883Z] iter=294 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T18:13:43.885Z] iter=294 turn=1 INFO: read_file: goals.md
+[2026-04-05T18:13:43.886Z] iter=294 turn=1 INFO:   -> ok (3474 chars)
+[2026-04-05T18:13:43.887Z] iter=294 turn=2 INFO: Turn 2/25
+[2026-04-05T18:13:46.538Z] iter=294 turn=2 INFO: $ cat src/project-detector.ts
+[2026-04-05T18:13:46.541Z] iter=294 turn=2 INFO: $ grep -n "projectSummary\|buildSummary\|detectProject" src/orchestrator.ts | head -40
+[2026-04-05T18:13:46.547Z] iter=294 turn=2 INFO:   -> exit=0 (10373 chars)
+[2026-04-05T18:13:46.552Z] iter=294 turn=2 INFO:   -> exit=0 (263 chars)
+[2026-04-05T18:13:46.553Z] iter=294 turn=3 INFO: Turn 3/25
+[2026-04-05T18:13:49.506Z] iter=294 turn=3 INFO: $ sed -n '1018,1055p' src/orchestrator.ts
+[2026-04-05T18:13:49.510Z] iter=294 turn=3 INFO: $ grep -n "slash\|command\|/help\|/clear\|/reindex\|onInput\|handleCommand" src/tui.tsx | head -40
+[2026-04-05T18:13:49.521Z] iter=294 turn=3 INFO:   -> exit=0 (1568 chars)
+[2026-04-05T18:13:49.527Z] iter=294 turn=3 INFO:   -> exit=0 (536 chars)
+[2026-04-05T18:13:49.527Z] iter=294 turn=4 INFO: Turn 4/25
+[2026-04-05T18:13:54.943Z] iter=294 turn=4 INFO: think: I have enough context. Let me start writing immediately.
+
+Deliverables:
+1. `src/init-command.ts` - new file with runInit...
+[2026-04-05T18:13:54.943Z] iter=294 turn=5 INFO: Turn 5/25
+[2026-04-05T18:13:58.569Z] iter=294 turn=5 INFO: $ grep -n "generateRepoMap\|RepoMap" src/tree-sitter-map.ts | head -10
+[2026-04-05T18:13:58.572Z] iter=294 turn=5 INFO: $ grep -n "^export\|argv\|process.argv\|autoagent init" src/index.ts | head -20
+[2026-04-05T18:13:58.580Z] iter=294 turn=5 INFO:   -> exit=0 (646 chars)
+[2026-04-05T18:13:58.584Z] iter=294 turn=5 INFO:   -> exit=0 (46 chars)
+[2026-04-05T18:13:58.584Z] iter=294 turn=6 INFO: Turn 6/25
+[2026-04-05T18:14:01.488Z] iter=294 turn=6 INFO: $ ls src/*.ts src/*.tsx | grep -v test | head -20 && cat package.json | grep -A5 '"bin"\|"main"\|"scripts"'
+[2026-04-05T18:14:01.522Z] iter=294 turn=6 INFO:   -> exit=0 (518 chars)
+[2026-04-05T18:14:01.523Z] iter=294 turn=7 INFO: Turn 7/25
+[2026-04-05T18:14:05.173Z] iter=294 turn=7 INFO: Agent: Goal 1 (init-command): NOT STARTED. Goal 2 (enriched project summary): NOT STARTED.
+
+Starting both now.
+[2026-04-05T18:14:05.173Z] iter=294 turn=7 INFO: $ sed -n '440,530p' src/tui.tsx
+[2026-04-05T18:14:05.175Z] iter=294 turn=7 INFO: $ head -10 src/cli.ts && grep -n "argv\|process.argv\|main\|export" src/cli.ts | head -20
+[2026-04-05T18:14:05.182Z] iter=294 turn=7 INFO:   -> exit=0 (3806 chars)
+[2026-04-05T18:14:05.189Z] iter=294 turn=7 INFO:   -> exit=0 (527 chars)
+[2026-04-05T18:14:05.190Z] iter=294 turn=8 INFO: Turn 8/25
+[2026-04-05T18:14:30.077Z] iter=294 turn=8 INFO: Agent: Now I'll write all the files at once:
+[2026-04-05T18:14:30.078Z] iter=294 turn=8 INFO: write_file: src/init-command.ts (write)
+[2026-04-05T18:14:30.080Z] iter=294 turn=8 INFO:   -> ok: Created src/init-command.ts (6067 chars)
+[2026-04-05T18:14:30.081Z] iter=294 turn=9 INFO: Turn 9/25
+[2026-04-05T18:14:34.576Z] iter=294 turn=9 INFO: Agent: Now wire into TUI and fix the orchestrator enriched summary in parallel:
+[2026-04-05T18:14:34.578Z] iter=294 turn=9 INFO: $ grep -n "\/help\|\/find\|\/model\|\/status\|\/export\|Available commands" src/tui.tsx | head -20
+[2026-04-05T18:14:34.588Z] iter=294 turn=9 INFO: $ sed -n '1023,1035p' src/orchestrator.ts
+[2026-04-05T18:14:34.606Z] iter=294 turn=9 INFO:   -> exit=0 (825 chars)
+[2026-04-05T18:14:34.608Z] iter=294 turn=9 INFO:   -> exit=0 (547 chars)
+[2026-04-05T18:14:34.608Z] iter=294 turn=10 INFO: Turn 10/25
+[2026-04-05T18:14:41.489Z] iter=294 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T18:14:41.490Z] iter=294 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -9 +14 lines
+
+Context after patch:
+1020 |     if (!this.initialized) await this.init();
+1021 | 
+1022 |     // 0. Project summary injection (once per session)
+1023 |     if (!this.projectSummaryInjected) {
+1024 |       try {
+1025 |         const projectInfo = detectProject(this.opts.workDir);
+1026 |         if (projectInfo.type !== "unknown") {
+1027 |           const contextLines: string[] = [projectInfo.summary];
+1028 |           if (projectInfo.testRunner) contextLines.push(`Test runner: ${projectInfo.testRunner}.`);
+1029 |           if (projectInfo.packageManager) contextLines.push(`Package manager: ${projectInfo.packageManager}.`);
+1030 |           if (projectInfo.entryPoints?.length) contextLines.push(`Entry points: ${projectInfo.entryPoints.join(", ")}.`);
+1031 |           if (projectInfo.framework) contextLines.push(`Framework: ${projectInfo.framework}.`);
+1032 |           this.systemPrompt += `\n\n## Project Context\n${contextLines.join(" ")}`;
+1033 |         }
+1034 |       } catch { /* non-fatal — skip if detection fails */ }
+1035 |       this.projectSummaryInjected = true;
+1036 |     }
+1037 | 
+1038 |     // 0b. Prepend external file change warning if any files changed since last send
+1039 |     if (this.externallyChangedFiles.size > 0) {
+[2026-04-05T18:14:41.491Z] iter=294 turn=11 INFO: Turn 11/25
+[2026-04-05T18:14:43.651Z] iter=294 turn=11 INFO: Agent: Goal 2 done. Now wire `/init` into TUI:
+[2026-04-05T18:14:43.651Z] iter=294 turn=11 INFO: $ grep -n "^import" src/tui.tsx | tail -20
+[2026-04-05T18:14:43.661Z] iter=294 turn=11 INFO:   -> exit=0 (689 chars)
+[2026-04-05T18:14:43.661Z] iter=294 turn=12 INFO: Turn 12/25
+[2026-04-05T18:14:47.260Z] iter=294 turn=12 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:14:47.261Z] iter=294 turn=12 INFO:   -> ok: Patched src/tui.tsx: -1 +2 lines
+
+Context after patch:
+18 | import { VirtualMessageList } from "./virtual-message-list.js";
+19 | import { undoLastCommit } from "./auto-commit.js";
+20 | import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
+21 | import { execSync } from "child_process";
+22 | import { runInit } from "./init-command.js";
+23 | 
+24 | // Parse args
+25 | let workDir = process.cwd();
+[2026-04-05T18:14:47.261Z] iter=294 turn=13 INFO: Turn 13/25
+[2026-04-05T18:14:50.935Z] iter=294 turn=13 INFO: think: I've made real changes:
+1. Created src/init-command.ts (new file)
+2. Patched src/orchestrator.ts (Goal 2 done)
+3. Added ...
+[2026-04-05T18:14:50.937Z] iter=294 turn=14 INFO: Turn 14/25
+[2026-04-05T18:15:05.114Z] iter=294 turn=14 INFO: Agent: I've changed: `src/init-command.ts` (new), `src/orchestrator.ts` (Goal 2 patched), `src/tui.tsx` (import added). Need to finish wiring /init in TUI, then wrap up.
+[2026-04-05T18:15:05.115Z] iter=294 turn=14 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:15:05.117Z] iter=294 turn=14 INFO:   -> ok: Patched src/tui.tsx: -22 +43 lines
+
+Context after patch:
+474 |       exit();
+475 |       return;
+476 |     }
+477 |     if (trimmed === "/init") {
+478 |       setStatus("Analyzing project...");
+479 |       try {
+480 |         const { content, updated } = await runInit(workDir, (msg) => setStatus(msg));
+481 |         setStatus("");
+482 |         const preview = content.split("\n").slice(0, 20).join("\n");
+483 |         const truncated = content.split("\n").length > 20 ? "\n...(truncated)" : "";
+484 |         setMessages(prev => [...prev, {
+485 |           role: "assistant",
+486 |           content: `${updated ? "Updated" : "Created"} .autoagent.md:\n\n\`\`\`markdown\n${preview}${truncated}\n\`\`\``,
+487 |         }]);
+488 |       } catch (err) {
+489 |         setStatus("");
+490 |         setMessages(prev => [...prev, {
+491 |           role: "assistant",
+492 |           content: `Failed to initialize: ${err instanceof Error ? err.message : String(err)}`,
+493 |         }]);
+494 |       }
+495 |       return;
+496 |     }
+497 |     if (trimmed === "/help") {
+498 |       setMessages(prev => [...prev, {
+499 |         role: "assistant",
+500 |         content: [
+501 |           "Available commands:",
+502 |           "  /help     — Show this help message",
+503 |           "  /init     — Analyze repo and generate/update .autoagent.md",
+504 |           "  /status   — Show session stats (turns, tokens, cost, model)",
+505 |           "  /find Q   — Fuzzy search files & symbols in the repo",
+506 |           "  /model    — Show current model (or /model haiku|sonnet to switch)",
+507 |           "  /clear    — Clear the conversation history",
+508 |           "  /reindex  — Re-index the repository files",
+509 |           "  /resume   — List and restore a previous session",
+510 |           "  /rewind   — Restore conversation to a prior checkpoint",
+511 |           "  /compact  — Manually compact conversation context",
+512 |           "  /diff     — Show uncommitted git changes",
+513 |           "  /undo     — Revert the last autoagent commit",
+514 |           "  /export   — Export conversation to markdown (optional filename arg)",
+515 |           "  /exit     — Quit AutoAgent",
+516 |         ].join("\n"),
+517 |       }]);
+518 |       return;
+519 |     }
+520 |     if (trimmed === "/rewind") {
+521 |       const checkpoints = orchestratorRef.current?.getCheckpoints() ?? [];
+522 |       if (checkpoints.length === 0) {
+[2026-04-05T18:15:05.118Z] iter=294 turn=15 INFO: Turn 15/25
+[2026-04-05T18:15:07.926Z] iter=294 turn=15 INFO: Agent: Now add CLI entry point and write tests:
+[2026-04-05T18:15:07.927Z] iter=294 turn=15 INFO: $ grep -n "argv\|process.argv\|--dir\|workDir" src/cli.ts | head -15
+[2026-04-05T18:15:07.936Z] iter=294 turn=15 INFO:   -> exit=0 (369 chars)
+[2026-04-05T18:15:07.937Z] iter=294 turn=16 INFO: Turn 16/25
+[2026-04-05T18:15:12.262Z] iter=294 turn=16 INFO: $ head -30 src/cli.ts
+[2026-04-05T18:15:12.275Z] iter=294 turn=16 INFO:   -> exit=0 (940 chars)
+[2026-04-05T18:15:12.276Z] iter=294 turn=17 INFO: Turn 17/25
+[2026-04-05T18:15:15.216Z] iter=294 turn=17 INFO: Agent: Wrapping up now. Running tsc first.
+[2026-04-05T18:15:15.217Z] iter=294 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T18:15:16.192Z] iter=294 turn=17 INFO:   -> exit=0 (246 chars)
+[2026-04-05T18:15:16.192Z] iter=294 turn=18 INFO: Turn 18/25
+[2026-04-05T18:15:19.109Z] iter=294 turn=18 INFO: $ grep -n "formatRepoMap\|maxLines\|maxTokens" src/tree-sitter-map.ts | head -10
+[2026-04-05T18:15:19.124Z] iter=294 turn=18 INFO:   -> exit=0 (487 chars)
+[2026-04-05T18:15:19.125Z] iter=294 turn=19 INFO: Turn 19/25
+[2026-04-05T18:15:24.021Z] iter=294 turn=19 INFO: write_file: src/init-command.ts (patch)
+[2026-04-05T18:15:24.022Z] iter=294 turn=19 INFO:   -> ok: Patched src/init-command.ts: -3 +3 lines
+
+Context after patch:
+50 |     const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf-8" }) as string;
+51 |     const files = out.split("\n").filter((f: string) => f.endsWith(".ts") || f.endsWith(".tsx") || f.endsWith(".js") || f.endsWith(".py") || f.endsWith(".rs") || f.endsWith(".go"));
+52 |     if (files.length === 0) return "";
+53 |     const repoMap = buildRepoMap(workDir, files.slice(0, 80));
+54 |     const ranked = rankSymbols(repoMap);
+55 |     return formatRepoMap(repoMap, { ranked });
+56 |   } catch {
+57 |     return "";
+58 |   }
+[2026-04-05T18:15:24.022Z] iter=294 turn=20 INFO: Turn 20/25
+[2026-04-05T18:15:26.069Z] iter=294 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T18:15:27.057Z] iter=294 turn=20 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:15:27.057Z] iter=294 turn=21 INFO: Turn 21/25
+[2026-04-05T18:15:32.993Z] iter=294 turn=21 INFO: Agent: TSC clean. Now write memory and update goals:
+[2026-04-05T18:15:32.993Z] iter=294 turn=21 INFO: save_memory: "[Engineer] Iteration 294"
+[2026-04-05T18:15:32.994Z] iter=294 turn=21 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T18:15:32.994Z] iter=294 turn=22 INFO: Turn 22/25
+[2026-04-05T18:15:46.348Z] iter=294 turn=22 INFO: write_file: goals.md (write)
+[2026-04-05T18:15:46.349Z] iter=294 turn=22 INFO:   -> ok: Updated goals.md (1843 chars, -20 lines delta)
+[2026-04-05T18:15:46.349Z] iter=294 turn=23 INFO: Turn 23/25
+[2026-04-05T18:15:48.290Z] iter=294 turn=23 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T18:15:48.291Z] iter=294 turn=23 INFO: RESTART signal
+[2026-04-05T18:15:48.291Z] iter=294 turn=23 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T18:15:49.294Z] iter=294 turn=23 INFO: Compilation OK
+[2026-04-05T18:15:55.859Z] iter=294 turn=23 INFO: Cache persisted: 48 entries to .autoagent-cache.json
+[2026-04-05T18:15:55.859Z] iter=294 turn=23 INFO: Cache stats: 0 hits, 1 misses, 48 entries, 6 invalidations (1 entries removed)
+[2026-04-05T18:15:55.859Z] iter=294 turn=23 INFO: Tool cache stats
+[2026-04-05T18:15:55.860Z] iter=294 turn=23 INFO: Tool timing: bash: 18x, avg=122ms, total=2200ms; write_file: 6x, avg=2ms, total=10ms; read_scratchpad: 1x, avg=4ms, total=4ms; read_file: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=2ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T18:15:55.860Z] iter=294 turn=23 INFO: Tool timing stats
+[2026-04-05T18:16:01.751Z] iter=294 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 294: predicted 20 turns, actual 23 turns, ratio 1.15**
+[2026-04-05T18:16:12.254Z] iter=294 turn=23 INFO: Pre-commit review (2639in/409out): - **`require()` in ESM module**: `buildRepoMapContext` uses `require("child_process")` (line ~52), which will throw at runtime in an ESM project. Should be `import { execSync } from "child_process";` 
