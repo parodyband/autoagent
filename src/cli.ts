@@ -11,7 +11,9 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { createInterface } from "readline";
+import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import "dotenv/config";
 import { createDefaultRegistry } from "./tool-registry.js";
 import { runInit } from "./init-command.js";
@@ -25,6 +27,57 @@ let workDir = process.cwd();
 const dirIdx = process.argv.indexOf("--dir");
 if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
   workDir = path.resolve(process.argv[dirIdx + 1]);
+}
+
+// ─── /help subcommand ────────────────────────────────────────
+export function printHelp(): void {
+  // Read version from package.json if available
+  let version = "unknown";
+  try {
+    const pkgPath = fileURLToPath(new URL("../package.json", import.meta.url));
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8")) as { version?: string };
+    if (pkg.version) version = pkg.version;
+  } catch { /* ignore */ }
+
+  console.log(`
+\x1b[1mAutoAgent\x1b[0m v${version}
+An AI coding agent that's better than talking to Claude directly.
+
+\x1b[1mUSAGE\x1b[0m
+  autoagent              Start the interactive TUI
+  autoagent init         Scaffold .autoagent.md project config
+  autoagent help         Show this help message
+
+\x1b[1mCLI SUBCOMMANDS\x1b[0m
+  init                   Analyze repo and generate/update .autoagent.md
+  help                   Print this help and exit
+
+\x1b[1mTUI SLASH COMMANDS\x1b[0m
+  /help                  Show available commands
+  /clear                 Clear conversation history
+  /init                  Scaffold .autoagent.md for current project
+  /diff                  Show git diff of recent changes
+  /undo                  Undo the last auto-commit
+  /find <query>          Search the codebase for files/symbols
+  /model [name]          Show or switch the active model
+  /status                Show project status (git, diagnostics)
+  /rewind [n]            Rewind conversation to a previous checkpoint
+  /exit                  Exit and auto-export session log
+  /export [file]         Export session to a markdown file
+  /resume                Resume a previous session
+  /reindex               Rebuild the repo symbol index
+  /compact               Compact conversation history to save tokens
+
+\x1b[1mEXAMPLES\x1b[0m
+  autoagent              # Start chatting with the agent
+  autoagent init         # Set up .autoagent.md for your project
+  autoagent --dir ./app  # Work in a specific directory
+`.trim());
+}
+
+if (process.argv[2] === "help") {
+  printHelp();
+  process.exit(0);
 }
 
 // ─── /init subcommand ────────────────────────────────────────

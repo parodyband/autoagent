@@ -11,6 +11,7 @@ import { render, Box, Text, useInput, useApp } from "ink";
 import Spinner from "ink-spinner";
 import TextInput from "ink-text-input";
 import path from "path";
+import fs from "fs";
 import "dotenv/config";
 import { Orchestrator } from "./orchestrator.js";
 import { listSessions, type SessionInfo } from "./session-store.js";
@@ -389,6 +390,15 @@ function App() {
           setMessages([{
             role: "assistant",
             content: "⚠ No saved sessions found — starting fresh.",
+          }]);
+        }
+      } else {
+        // First-run welcome: show onboarding banner if .autoagent.md doesn't exist
+        const memoryPath = path.join(workDir, ".autoagent.md");
+        if (!fs.existsSync(memoryPath)) {
+          setMessages(prev => [...prev, {
+            role: "assistant",
+            content: "👋 Welcome to AutoAgent! No `.autoagent.md` found in this project.\nRun `/init` to scaffold project config and give the agent context about your codebase.",
           }]);
         }
       }

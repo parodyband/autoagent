@@ -1,100 +1,3 @@
-29 | }
-30 | 
-31 | // --no-confirm flag: skip write_file diff confirmation
-32 | const noConfirm = process.argv.includes("--no-confirm");
-33 | 
-34 | // --continue / -c flag: auto-resume most recent session
-35 | const continueFlag =
-36 |   process.argv.includes("--continue") || process.argv.includes("-c");
-37 | let initialResumeSessionPath: string | undefined;
-38 | if (continueFlag) {
-39 |   const recentSessions = listSessions(workDir);
-40 |   if (recentSessions.length > 0) {
-41 |     initialResumeSessionPath = recentSessions[0].path;
-42 |   } else {
-43 |     // Will show warning in TUI after mount
-44 |   }
-45 | }
-46 | 
-47 | // ─── Types ──────────────────────────────────────────────────
-48 | 
-49 | export interface Message {
-50 |   role: "user" | "assistant" | "tool";
-51 |   content: string;
-52 |   toolName?: string;
-53 |   tokens?: { in: number; out: number };
-54 |   model?: string;
-55 |   verificationPassed?: boolean;
-56 | }
-[2026-04-05T18:21:04.413Z] iter=298 turn=12 INFO: Turn 12/25
-[2026-04-05T18:21:26.535Z] iter=298 turn=12 INFO: Agent: Now let me write the export command tests:
-[2026-04-05T18:21:26.535Z] iter=298 turn=12 INFO: write_file: tests/export-command.test.ts (write)
-[2026-04-05T18:21:26.536Z] iter=298 turn=12 INFO:   -> ok: Created tests/export-command.test.ts (6525 chars)
-[2026-04-05T18:21:26.536Z] iter=298 turn=13 INFO: Turn 13/25
-[2026-04-05T18:21:29.324Z] iter=298 turn=13 INFO: Agent: Let me run the tests and TypeScript check now, then wrap up.
-[2026-04-05T18:21:29.325Z] iter=298 turn=13 INFO: $ npx vitest run tests/export-command.test.ts 2>&1 | tail -25 && npx vitest run tests/file-watcher.test.ts 2>&1 | tail -10
-[2026-04-05T18:21:32.323Z] iter=298 turn=13 INFO:   -> exit=0 (673 chars)
-[2026-04-05T18:21:32.324Z] iter=298 turn=14 INFO: Turn 14/25
-[2026-04-05T18:21:34.707Z] iter=298 turn=14 INFO: $ npx tsc --noEmit 2>&1 | head -30
-[2026-04-05T18:21:35.675Z] iter=298 turn=14 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:21:35.675Z] iter=298 turn=15 INFO: Turn 15/25
-[2026-04-05T18:21:40.556Z] iter=298 turn=15 INFO: Agent: TSC clean. All tests pass. Now write memory and update goals.
-[2026-04-05T18:21:40.557Z] iter=298 turn=15 INFO: save_memory: "[Engineer] Iteration 298"
-[2026-04-05T18:21:40.558Z] iter=298 turn=15 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T18:21:40.558Z] iter=298 turn=16 INFO: Turn 16/25
-[2026-04-05T18:21:48.749Z] iter=298 turn=16 INFO: write_file: goals.md (write)
-[2026-04-05T18:21:48.750Z] iter=298 turn=16 INFO:   -> ok: Updated goals.md (1108 chars, -7 lines delta)
-[2026-04-05T18:21:48.750Z] iter=298 turn=17 INFO: Turn 17/25
-[2026-04-05T18:21:50.921Z] iter=298 turn=17 INFO: Agent: Already done. Running final checks:
-[2026-04-05T18:21:50.921Z] iter=298 turn=17 INFO: $ npx tsc --noEmit && echo "TSC_OK"
-[2026-04-05T18:21:51.872Z] iter=298 turn=17 INFO:   -> exit=0 (7 chars)
-[2026-04-05T18:21:51.872Z] iter=298 turn=18 INFO: Turn 18/25
-[2026-04-05T18:21:53.442Z] iter=298 turn=18 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T18:21:53.443Z] iter=298 turn=18 INFO: RESTART signal
-[2026-04-05T18:21:53.443Z] iter=298 turn=18 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T18:21:54.419Z] iter=298 turn=18 INFO: Compilation OK
-[2026-04-05T18:22:01.208Z] iter=298 turn=18 INFO: Cache persisted: 48 entries to .autoagent-cache.json
-[2026-04-05T18:22:01.209Z] iter=298 turn=18 INFO: Tool timing: bash: 13x, avg=544ms, total=7077ms; write_file: 3x, avg=1ms, total=4ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 3x, avg=1ms, total=2ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T18:22:01.209Z] iter=298 turn=18 INFO: Tool timing stats
-[2026-04-05T18:22:07.390Z] iter=298 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 298: predicted 20 turns, actual 18 turns, ratio 0.90**
-[2026-04-05T18:22:07.416Z] iter=298 turn=18 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T18:22:07.452Z] iter=298 turn=18 INFO: Committed: ffb4862c (30 in / 5524 out, cache: 19415 created, 243681 read)
-[2026-04-05T18:22:07.452Z] iter=298 turn=18 INFO: Restarting as iteration 299...
-[2026-04-05T18:22:07.632Z] iter=299 INFO: Cache restored: 48/48 entries (0 stale)
-[2026-04-05T18:22:07.634Z] iter=299 INFO: Turn budget: 13/25 (calibration=1.13x, predicted=8)
-[2026-04-05T18:22:07.634Z] iter=299 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T18:22:07.769Z] iter=299 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T18:22:07.769Z] iter=299 turn=1 INFO: Turn 1/25
-[2026-04-05T18:22:10.464Z] iter=299 turn=1 INFO: Agent: 
-
-I'll start by assessing the current state of the system and determining what needs attention.
-[2026-04-05T18:22:10.465Z] iter=299 turn=1 INFO: read_scratchpad: 7 chars
-[2026-04-05T18:22:10.466Z] iter=299 turn=2 INFO: Turn 2/25
-[2026-04-05T18:22:25.002Z] iter=299 turn=2 INFO: think: Let me assess what's happening and what I need to do as Meta expert:
-
-1. The goals say iteration 299 is Architect, itera...
-[2026-04-05T18:22:25.002Z] iter=299 turn=3 INFO: Turn 3/25
-[2026-04-05T18:22:28.175Z] iter=299 turn=3 INFO: read_file: memory.md
-[2026-04-05T18:22:28.176Z] iter=299 turn=3 INFO:   -> ok (5846 chars)
-[2026-04-05T18:22:28.176Z] iter=299 turn=3 INFO: read_file: goals.md
-[2026-04-05T18:22:28.176Z] iter=299 turn=3 INFO:   -> ok (1108 chars)
-[2026-04-05T18:22:28.176Z] iter=299 turn=3 INFO: read_file: .autoagent-metrics.json
-[2026-04-05T18:22:28.177Z] iter=299 turn=3 INFO:   -> ok (404393 chars)
-[2026-04-05T18:22:28.178Z] iter=299 turn=4 INFO: Turn 4/25
-[2026-04-05T18:22:39.031Z] iter=299 turn=4 INFO: think: Let me assess quickly and deliver. My goals as Meta expert:
-
-1. Assess system health - product vs self-building balance
-...
-[2026-04-05T18:22:39.032Z] iter=299 turn=5 INFO: Turn 5/25
-[2026-04-05T18:23:21.118Z] iter=299 turn=5 INFO: Agent: Goals status: My deliverables are (1) compact memory, (2) update goals.md, (3) TSC check. All NOT STARTED. Delivering now.
-[2026-04-05T18:23:21.118Z] iter=299 turn=5 INFO: write_file: memory.md (write)
-[2026-04-05T18:23:21.119Z] iter=299 turn=5 INFO:   -> ok: Updated memory.md (4976 chars, -21 lines delta)
-[2026-04-05T18:23:21.120Z] iter=299 turn=6 INFO: Turn 6/25
-[2026-04-05T18:23:34.748Z] iter=299 turn=6 INFO: Agent: 
-
-Meta expert doesn't change src/ — my job is memory compaction and goal-setting. Memory is DONE. Now finishing goals.md and TSC check.
-[2026-04-05T18:23:34.748Z] iter=299 turn=6 INFO: write_file: goals.md (write)
-[2026-04-05T18:23:34.749Z] iter=299 turn=6 INFO:   -> ok: Updated goals.md (1431 chars, +6 lines delta)
 [2026-04-05T18:23:34.750Z] iter=299 turn=7 INFO: Turn 7/25
 [2026-04-05T18:23:38.936Z] iter=299 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
 [2026-04-05T18:23:39.884Z] iter=299 turn=7 INFO:   -> exit=0 (11 chars)
@@ -1093,3 +996,265 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T18:36:58.385Z] iter=307 turn=7 INFO: Tool timing stats
 [2026-04-05T18:37:04.895Z] iter=307 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 307: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T18:37:04.918Z] iter=307 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T18:37:04.953Z] iter=307 turn=7 INFO: Committed: 9816905a (17 in / 1811 out, cache: 11154 created, 53305 read)
+[2026-04-05T18:37:04.954Z] iter=307 turn=7 INFO: Restarting as iteration 308...
+[2026-04-05T18:37:05.147Z] iter=308 INFO: Cache restored: 52/52 entries (0 stale)
+[2026-04-05T18:37:05.149Z] iter=308 INFO: Turn budget: 17/25 (calibration=0.88x, predicted=20)
+[2026-04-05T18:37:05.150Z] iter=308 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T18:37:05.281Z] iter=308 turn=1 INFO: Turn 1/25
+[2026-04-05T18:37:07.986Z] iter=308 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T18:37:07.987Z] iter=308 turn=1 INFO: $ cat goals.md
+[2026-04-05T18:37:07.995Z] iter=308 turn=1 INFO:   -> exit=0 (1534 chars)
+[2026-04-05T18:37:07.995Z] iter=308 turn=2 INFO: Turn 2/25
+[2026-04-05T18:37:09.961Z] iter=308 turn=2 INFO: $ cat src/cli.ts
+[2026-04-05T18:37:09.964Z] iter=308 turn=2 INFO: $ ls src/__tests__/ | head -20
+[2026-04-05T18:37:09.970Z] iter=308 turn=2 INFO:   -> exit=0 (5620 chars)
+[2026-04-05T18:37:09.972Z] iter=308 turn=2 INFO:   -> exit=0 (436 chars)
+[2026-04-05T18:37:09.973Z] iter=308 turn=3 INFO: Turn 3/25
+[2026-04-05T18:37:12.862Z] iter=308 turn=3 INFO: $ ls src/__tests__/ | tail -30
+[2026-04-05T18:37:12.864Z] iter=308 turn=3 INFO: $ grep -n "\.autoagent\.md\|welcome\|onboarding\|firstRun\|first_run" src/tui.tsx | head -20
+[2026-04-05T18:37:12.872Z] iter=308 turn=3 INFO:   -> exit=0 (706 chars)
+[2026-04-05T18:37:12.876Z] iter=308 turn=3 INFO:   -> exit=0 (291 chars)
+[2026-04-05T18:37:12.876Z] iter=308 turn=4 INFO: Turn 4/25
+[2026-04-05T18:37:16.052Z] iter=308 turn=4 INFO: think: I have enough context. Let me build both deliverables now:
+
+1. `autoagent help` CLI subcommand - wire into src/cli.ts, a...
+[2026-04-05T18:37:16.052Z] iter=308 turn=5 INFO: Turn 5/25
+[2026-04-05T18:37:28.652Z] iter=308 turn=5 INFO: write_file: src/cli.ts (patch)
+[2026-04-05T18:37:28.654Z] iter=308 turn=5 INFO:   -> ok: Patched src/cli.ts: -2 +56 lines
+
+Context after patch:
+27 |   workDir = path.resolve(process.argv[dirIdx + 1]);
+28 | }
+29 | 
+30 | // ─── /help subcommand ────────────────────────────────────────
+31 | export function printHelp(): void {
+32 |   // Read version from package.json if available
+33 |   let version = "unknown";
+34 |   try {
+35 |     const { createRequire } = await import("module").then(() => { throw new Error("use sync"); }).catch(() => ({ createRequire: null }));
+36 |     // eslint-disable-next-line @typescript-eslint/no-require-imports
+37 |     const pkg = JSON.parse(
+38 |       (await import("fs")).readFileSync(new URL("../package.json", import.meta.url), "utf8")
+39 |     ) as { version?: string };
+40 |     if (pkg.version) version = pkg.version;
+41 |   } catch { /* ignore */ }
+42 | 
+43 |   console.log(`
+44 | \x1b[1mAutoAgent\x1b[0m v${version}
+45 | An AI coding agent that's better than talking to Claude directly.
+46 | 
+47 | \x1b[1mUSAGE\x1b[0m
+48 |   autoagent              Start the interactive TUI
+49 |   autoagent init         Scaffold .autoagent.md project config
+50 |   autoagent help         Show this help message
+51 | 
+52 | \x1b[1mCLI SUBCOMMANDS\x1b[0m
+53 |   init                   Analyze repo and generate/update .autoagent.md
+54 |   help                   Print this help and exit
+55 | 
+56 | \x1b[1mTUI SLASH COMMANDS\x1b[0m
+57 |   /help                  Show available commands
+58 |   /clear                 Clear conversation history
+59 |   /init                  Scaffold .autoagent.md for current project
+60 |   /diff                  Show git diff of recent changes
+61 |   /undo                  Undo the last auto-commit
+62 |   /find <query>          Search the codebase for files/symbols
+63 |   /model [name]          Show or switch the active model
+64 |   /status                Show project status (git, diagnostics)
+65 |   /rewind [n]            Rewind conversation to a previous checkpoint
+66 |   /exit                  Exit and auto-export session log
+67 |   /export [file]         Export session to a markdown file
+68 |   /resume                Resume a previous session
+69 |   /reindex               Rebuild the repo symbol index
+70 |   /compact               Compact conversation history to save tokens
+71 | 
+72 | \x1b[1mEXAMPLES\x1b[0m
+73 |   autoagent              # Start chatting with the agent
+74 |   autoagent init         # Set up .autoagent.md for your project
+75 |   autoagent --dir ./app  # Work in a specific directory
+76 | `.trim());
+77 | }
+78 | 
+79 | if (process.argv[2] === "help") {
+80 |   printHelp();
+81 |   process.exit(0);
+82 | }
+83 | 
+84 | // ─── /init subcommand ────────────────────────────────────────
+85 | if (process.argv[2] === "init") {
+86 |   try {
+87 |     const result = await runInit(workDir, (msg) => console.log(`  ${msg}`));
+88 |     if (result.updated) {
+[2026-04-05T18:37:28.655Z] iter=308 turn=6 INFO: Turn 6/25
+[2026-04-05T18:37:32.079Z] iter=308 turn=6 INFO: think: The `printHelp` function has an issue - it uses `await` inside a sync function. Let me simplify the version reading to b...
+[2026-04-05T18:37:32.080Z] iter=308 turn=7 INFO: Turn 7/25
+[2026-04-05T18:37:37.950Z] iter=308 turn=7 INFO: Agent: **Goal 1 (help subcommand):** IN PROGRESS - wrote the handler but has a bug (async in sync fn). Need to fix.
+**Goal 2 (first-run welcome):** NOT STARTED
+
+Let me fix the help function and add the TUI welcome banner:
+[2026-04-05T18:37:37.951Z] iter=308 turn=7 INFO: write_file: src/cli.ts (patch)
+[2026-04-05T18:37:37.951Z] iter=308 turn=7 INFO:   -> ok: Patched src/cli.ts: -11 +10 lines
+
+Context after patch:
+28 | }
+29 | 
+30 | // ─── /help subcommand ────────────────────────────────────────
+31 | export function printHelp(): void {
+32 |   // Read version from package.json if available
+33 |   let version = "unknown";
+34 |   try {
+35 |     const pkgPath = new URL("../package.json", import.meta.url);
+36 |     const pkg = JSON.parse(
+37 |       (await import("fs")).default.readFileSync(pkgPath, "utf8")
+38 |     ) as { version?: string };
+39 |     if (pkg.version) version = pkg.version;
+40 |   } catch { /* ignore */ }
+41 | 
+42 |   console.log(`
+43 | \x1b[1mAutoAgent\x1b[0m v${version}
+[2026-04-05T18:37:37.952Z] iter=308 turn=8 INFO: Turn 8/25
+[2026-04-05T18:37:39.657Z] iter=308 turn=8 INFO: $ head -5 src/cli.ts
+[2026-04-05T18:37:39.665Z] iter=308 turn=8 INFO:   -> exit=0 (155 chars)
+[2026-04-05T18:37:39.666Z] iter=308 turn=9 INFO: Turn 9/25
+[2026-04-05T18:37:44.160Z] iter=308 turn=9 INFO: Agent: The function still has `await` inside a sync `void` function. Let me fix it properly with synchronous `fs`:
+[2026-04-05T18:37:44.161Z] iter=308 turn=9 INFO: write_file: src/cli.ts (patch)
+[2026-04-05T18:37:44.161Z] iter=308 turn=9 INFO:   -> ok: Patched src/cli.ts: -6 +8 lines
+
+Context after patch:
+9 |  * tool registry but doesn't touch memory, goals, metrics, or state.
+10 |  */
+11 | 
+12 | import Anthropic from "@anthropic-ai/sdk";
+13 | import { createInterface } from "readline";
+14 | import fs from "fs";
+15 | import path from "path";
+16 | import { fileURLToPath } from "url";
+17 | import "dotenv/config";
+18 | import { createDefaultRegistry } from "./tool-registry.js";
+19 | import { runInit } from "./init-command.js";
+20 | 
+21 | const MODEL = "claude-sonnet-4-6";
+22 | const MAX_TOKENS = 16384;
+[2026-04-05T18:37:44.162Z] iter=308 turn=10 INFO: Turn 10/25
+[2026-04-05T18:37:48.259Z] iter=308 turn=10 INFO: write_file: src/cli.ts (patch)
+[2026-04-05T18:37:48.260Z] iter=308 turn=10 INFO:   -> ok: Patched src/cli.ts: -10 +8 lines
+
+Context after patch:
+30 | }
+31 | 
+32 | // ─── /help subcommand ────────────────────────────────────────
+33 | export function printHelp(): void {
+34 |   // Read version from package.json if available
+35 |   let version = "unknown";
+36 |   try {
+37 |     const pkgPath = fileURLToPath(new URL("../package.json", import.meta.url));
+38 |     const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8")) as { version?: string };
+39 |     if (pkg.version) version = pkg.version;
+40 |   } catch { /* ignore */ }
+41 | 
+42 |   console.log(`
+43 | \x1b[1mAutoAgent\x1b[0m v${version}
+[2026-04-05T18:37:48.260Z] iter=308 turn=11 INFO: Turn 11/25
+[2026-04-05T18:37:50.998Z] iter=308 turn=11 INFO: Agent: Good. Now let me add the first-run welcome banner to the TUI:
+[2026-04-05T18:37:50.998Z] iter=308 turn=11 INFO: $ grep -n "useEffect\|useState\|messages\|initialMessages\|autoagent\.md\|workDir" src/tui.tsx | head -40
+[2026-04-05T18:37:51.009Z] iter=308 turn=11 INFO:   -> exit=0 (2740 chars)
+[2026-04-05T18:37:51.009Z] iter=308 turn=12 INFO: Turn 12/25
+[2026-04-05T18:37:54.352Z] iter=308 turn=12 INFO: $ grep -n "useEffect\|setMessages\|Initializing" src/tui.tsx | head -20
+[2026-04-05T18:37:54.363Z] iter=308 turn=12 INFO:   -> exit=0 (1310 chars)
+[2026-04-05T18:37:54.363Z] iter=308 turn=13 INFO: Turn 13/25
+[2026-04-05T18:37:57.191Z] iter=308 turn=13 INFO: think: I've changed src/cli.ts to add the printHelp function and the help subcommand. Now I need to:
+1. Add the first-run welco...
+[2026-04-05T18:37:57.192Z] iter=308 turn=14 INFO: Turn 14/25
+[2026-04-05T18:38:00.035Z] iter=308 turn=14 INFO: Agent: Let me check what I actually need to see in tui.tsx's init effect and then write everything:
+[2026-04-05T18:38:00.036Z] iter=308 turn=14 INFO: read_file: src/tui.tsx
+[2026-04-05T18:38:00.036Z] iter=308 turn=14 INFO:   -> ok (2160 chars)
+[2026-04-05T18:38:00.036Z] iter=308 turn=15 INFO: Turn 15/25
+[2026-04-05T18:38:10.990Z] iter=308 turn=15 INFO: Agent: I need to ship now. Let me add the TUI welcome banner and tests simultaneously:
+[2026-04-05T18:38:10.991Z] iter=308 turn=15 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:38:10.992Z] iter=308 turn=15 INFO:   -> ok: Patched src/tui.tsx: -15 +24 lines
+
+Context after patch:
+378 |       },
+379 |     });
+380 |     orchestratorRef.current = orch;
+381 |     orch.init().then(() => {
+382 |       if (continueFlag) {
+383 |         if (initialResumeSessionPath) {
+384 |           setMessages([{
+385 |             role: "assistant",
+386 |             content: "✓ Resumed most recent session.",
+387 |           }]);
+388 |         } else {
+389 |           setMessages([{
+390 |             role: "assistant",
+391 |             content: "⚠ No saved sessions found — starting fresh.",
+392 |           }]);
+393 |         }
+394 |       } else {
+395 |         // First-run welcome: show onboarding banner if .autoagent.md doesn't exist
+396 |         const memoryPath = path.join(workDir, ".autoagent.md");
+397 |         if (!fs.existsSync(memoryPath)) {
+398 |           setMessages(prev => [...prev, {
+399 |             role: "assistant",
+400 |             content: "👋 Welcome to AutoAgent! No `.autoagent.md` found in this project.\nRun `/init` to scaffold project config and give the agent context about your codebase.",
+401 |           }]);
+402 |         }
+403 |       }
+404 |       setStatus("");
+405 |       // Build initial repoMap for #file suggestions
+406 |       try {
+407 |         const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf8" });
+[2026-04-05T18:38:10.992Z] iter=308 turn=16 INFO: Turn 16/25
+[2026-04-05T18:38:14.370Z] iter=308 turn=16 INFO: Agent: Now check if `fs` is already imported in tui.tsx, write tests, run tsc:
+[2026-04-05T18:38:14.370Z] iter=308 turn=16 INFO: $ head -25 src/tui.tsx | grep "import fs\|from \"fs\"\|from 'fs'"
+[2026-04-05T18:38:14.383Z] iter=308 turn=16 INFO:   -> exit=1 (11 chars)
+[2026-04-05T18:38:14.383Z] iter=308 turn=17 INFO: Turn 17/25
+[2026-04-05T18:38:16.482Z] iter=308 turn=17 INFO: $ grep -n "^import" src/tui.tsx | head -20
+[2026-04-05T18:38:16.498Z] iter=308 turn=17 INFO:   -> exit=0 (825 chars)
+[2026-04-05T18:38:16.498Z] iter=308 turn=18 INFO: Turn 18/25
+[2026-04-05T18:38:19.554Z] iter=308 turn=18 INFO: Agent: I need to add the `fs` import to tui.tsx, then run tsc, write memory, update goals, and restart.
+[2026-04-05T18:38:19.554Z] iter=308 turn=18 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:38:19.555Z] iter=308 turn=18 INFO:   -> ok: Patched src/tui.tsx: -2 +3 lines
+
+Context after patch:
+10 | import { render, Box, Text, useInput, useApp } from "ink";
+11 | import Spinner from "ink-spinner";
+12 | import TextInput from "ink-text-input";
+13 | import path from "path";
+14 | import fs from "fs";
+15 | import "dotenv/config";
+16 | import { Orchestrator } from "./orchestrator.js";
+17 | import { listSessions, type SessionInfo } from "./session-store.js";
+18 | import type { EditPlan } from "./architect-mode.js";
+[2026-04-05T18:38:19.556Z] iter=308 turn=19 INFO: Turn 19/25
+[2026-04-05T18:38:21.538Z] iter=308 turn=19 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T18:38:22.547Z] iter=308 turn=19 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:38:22.547Z] iter=308 turn=20 INFO: Turn 20/25
+[2026-04-05T18:38:27.886Z] iter=308 turn=20 INFO: Agent: TSC clean. Now write tests, memory, goals, restart:
+[2026-04-05T18:38:27.887Z] iter=308 turn=20 INFO: write_file: src/__tests__/help-command.test.ts (write)
+[2026-04-05T18:38:27.887Z] iter=308 turn=20 INFO:   -> ok: Created src/__tests__/help-command.test.ts (983 chars)
+[2026-04-05T18:38:27.888Z] iter=308 turn=21 INFO: Turn 21/25
+[2026-04-05T18:38:29.730Z] iter=308 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/help-command.test.ts 2>&1 | tail -20
+[2026-04-05T18:38:30.800Z] iter=308 turn=21 INFO:   -> exit=0 (608 chars)
+[2026-04-05T18:38:30.800Z] iter=308 turn=22 INFO: Turn 22/25
+[2026-04-05T18:38:35.772Z] iter=308 turn=22 INFO: Agent: Tests pass. Now write memory and update goals:
+[2026-04-05T18:38:35.772Z] iter=308 turn=22 INFO: save_memory: "[Engineer] Iteration 308"
+[2026-04-05T18:38:35.773Z] iter=308 turn=22 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T18:38:35.773Z] iter=308 turn=23 INFO: Turn 23/25
+[2026-04-05T18:38:42.326Z] iter=308 turn=23 INFO: write_file: goals.md (write)
+[2026-04-05T18:38:42.327Z] iter=308 turn=23 INFO:   -> ok: Updated goals.md (839 chars, -11 lines delta)
+[2026-04-05T18:38:42.327Z] iter=308 turn=24 INFO: Turn 24/25
+[2026-04-05T18:38:44.169Z] iter=308 turn=24 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T18:38:44.169Z] iter=308 turn=24 INFO: RESTART signal
+[2026-04-05T18:38:44.169Z] iter=308 turn=24 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T18:38:45.179Z] iter=308 turn=24 INFO: Compilation OK
+[2026-04-05T18:38:52.345Z] iter=308 turn=24 INFO: Cache persisted: 52 entries to .autoagent-cache.json
+[2026-04-05T18:38:52.345Z] iter=308 turn=24 INFO: Cache stats: 0 hits, 1 misses, 52 entries, 8 invalidations (1 entries removed)
+[2026-04-05T18:38:52.345Z] iter=308 turn=24 INFO: Tool cache stats
+[2026-04-05T18:38:52.345Z] iter=308 turn=24 INFO: Tool timing: bash: 13x, avg=168ms, total=2189ms; write_file: 8x, avg=1ms, total=8ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 3x, avg=0ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms; read_file: 1x, avg=0ms, total=0ms
+[2026-04-05T18:38:52.345Z] iter=308 turn=24 INFO: Tool timing stats
+[2026-04-05T18:38:58.540Z] iter=308 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 308: predicted 20 turns, actual 24 turns, ratio 1.20**
+[2026-04-05T18:39:09.347Z] iter=308 turn=24 INFO: Pre-commit review (1525in/465out): **Issues found:**
+
+- **Top-level side-effect on import**: The `if (process.argv[2] === "help") { printHelp(); process.exit(0); }` block executes at module load time. Since the test imports `printHelp`
