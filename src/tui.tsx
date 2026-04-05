@@ -128,6 +128,35 @@ function MessageDisplay({ msg }: { msg: Message }) {
   );
 }
 
+/** Architect plan display — shown before execution begins. */
+function PlanDisplay({ plan }: { plan: EditPlan }) {
+  return (
+    <Box flexDirection="column" marginTop={1} borderStyle="round" borderColor="magenta" paddingX={1}>
+      <Text bold color="magenta">📋 Architect Plan</Text>
+      {plan.summary ? <Text color="white">{plan.summary}</Text> : null}
+      {plan.steps.map((step, i) => {
+        const icon = step.action === "create" ? "✚" : step.action === "delete" ? "✖" : "✎";
+        const iconColor = step.action === "create" ? "green" : step.action === "delete" ? "red" : "yellow";
+        return (
+          <Box key={i} marginLeft={1}>
+            <Text color={iconColor}>{icon} </Text>
+            <Text color="cyan">{step.file}</Text>
+            <Text color="gray"> — {step.description}</Text>
+            {step.symbols && step.symbols.length > 0
+              ? <Text color="gray" dimColor> [{step.symbols.join(", ")}]</Text>
+              : null}
+          </Box>
+        );
+      })}
+      {plan.contextFiles && plan.contextFiles.length > 0 && (
+        <Box marginLeft={1}>
+          <Text color="gray" dimColor>Read first: {plan.contextFiles.join(", ")}</Text>
+        </Box>
+      )}
+    </Box>
+  );
+}
+
 /** Live streaming message — shown while the assistant is generating text. */
 function StreamingMessage({ buffer }: { buffer: string }) {
   if (!buffer) return null;
@@ -167,6 +196,7 @@ function App() {
   const [streamBuffer, setStreamBuffer] = useState("");
   const [sessionList, setSessionList] = useState<SessionInfo[]>([]);
   const [showResume, setShowResume] = useState(false);
+  const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
   const [footerStats, setFooterStats] = useState<FooterStats>({
     tokensIn: 0,
     tokensOut: 0,
@@ -191,14 +221,7 @@ function App() {
         setStreamBuffer(prev => prev + delta);
       },
       onPlan: (plan: EditPlan) => {
-        const steps = plan.steps
-          .map((s, i) => {
-            const icon = s.action === "create" ? "✚" : s.action === "delete" ? "✖" : "✎";
-            return `  ${i + 1}. ${icon} ${s.file}: ${s.description}`;
-          })
-          .join("\n");
-        const content = `📋 Plan: ${plan.summary}\n${steps}`;
-        setMessages(prev => [...prev, { role: "assistant", content, model: "haiku" }]);
+        setActivePlan(plan);
       },
     });
     orchestratorRef.current = orch;

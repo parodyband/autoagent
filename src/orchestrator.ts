@@ -29,9 +29,7 @@ import {
   cleanOldSessions,
 } from "./session-store.js";
 import {
-  needsArchitectMode,
-  generateEditPlan,
-  formatPlanForEditor,
+  runArchitectMode,
   type EditPlan,
 } from "./architect-mode.js";
 
@@ -132,8 +130,12 @@ export function computeCost(model: string, tokensIn: number, tokensOut: number):
 /**
  * Build an enriched system prompt for the given workDir.
  * Includes repo fingerprint and top-ranked files.
+ * Returns both the system prompt string and the raw repoMapBlock (for architect mode).
  */
-export function buildSystemPrompt(workDir: string, repoFingerprint: string): string {
+export function buildSystemPrompt(
+  workDir: string,
+  repoFingerprint: string,
+): { systemPrompt: string; repoMapBlock: string } {
   const rankedFiles = rankFiles(workDir, 8);
   const fileList = rankedFiles.length > 0
     ? "\n\n## Key Files (ranked by importance)\n" +
@@ -160,7 +162,7 @@ export function buildSystemPrompt(workDir: string, repoFingerprint: string): str
 
   const projectMemory = getProjectMemoryBlock(workDir);
 
-  return `You are an expert coding assistant with direct access to the filesystem and shell.
+  const systemPrompt = `You are an expert coding assistant with direct access to the filesystem and shell.
 
 Working directory: ${workDir}
 
@@ -175,6 +177,8 @@ Rules:
 - To persist instructions for future sessions, ask the user to say "remember: ..." or use the save_memory tool.
 
 ${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}`;
+
+  return { systemPrompt, repoMapBlock };
 }
 
 // ─── Simple Claude caller (for task decomposition / compaction) ─
@@ -304,6 +308,7 @@ export class Orchestrator {
   private registry: ReturnType<typeof createDefaultRegistry>;
   private repoFingerprint: string = "";
   private systemPrompt: string = "";
+  private repoMapBlock: string = "";
   private apiMessages: Anthropic.MessageParam[] = [];
   private opts: OrchestratorOptions;
   private initialized = false;
@@ -327,7 +332,8 @@ export class Orchestrator {
     if (this.initialized) return;
     this.opts.onStatus?.("Indexing repo...");
     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
-    this.systemPrompt = buildSystemPrompt(this.opts.workDir, this.repoFingerprint);
+    ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
+      buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
 
     // Session persistence: resume or create new
     if (this.opts.resumeSessionPath) {
@@ -368,7 +374,8 @@ export class Orchestrator {
   /** Re-index the repo (after significant changes). */
   reindex(): void {
     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
-    this.systemPrompt = buildSystemPrompt(this.opts.workDir, this.repoFingerprint);
+    ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
+      buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
   }
 
   /** Get current session cost info. */
@@ -514,20 +521,15 @@ export class Orchestrator {
       }
     }
 
-    // 3b. Architect mode: generate plan for complex tasks
-    let planInjection: Anthropic.MessageParam | undefined;
-    if (needsArchitectMode(userMessage)) {
-      this.opts.onStatus?.("Planning...");
-      const caller = makeSimpleCaller(this.client);
-      const plan = await generateEditPlan(userMessage, this.repoFingerprint, caller);
-      if (plan.steps.length > 0) {
-        this.opts.onPlan?.(plan);
-        const planText = formatPlanForEditor(plan);
-        if (planText) {
-          // Inject as prefilled assistant message so the agent sees its own plan
-          planInjection = { role: "assistant", content: planText };
-        }
-      }
+    // 3b. Architect mode: two-phase plan→edit for complex tasks
+    const architectResult = await runArchitectMode(
+      userMessage,
+      this.repoMapBlock,
+      makeSimpleCaller(this.client),
+    );
+    if (architectResult.activated) {
+      this.opts.onStatus?.("Architect mode: plan generated");
+      this.opts.onPlan?.(architectResult.plan);
     }
 
     // 4. Add user message to history and persist
@@ -535,9 +537,14 @@ export class Orchestrator {
     this.apiMessages.push(userMsg);
     if (this.sessionPath) saveMessage(this.sessionPath, userMsg);
 
-    // 4b. Inject plan as prefilled assistant message if architect mode generated one
-    if (planInjection) {
-      this.apiMessages.push(planInjection);
+    // 4b. Inject architect plan as prefilled assistant message
+    if (architectResult.activated && architectResult.prefill) {
+      this.apiMessages.push({ role: "assistant", content: architectResult.prefill });
+      // Inject context file guidance so the executor reads them first
+      if (architectResult.plan.contextFiles?.length) {
+        const ctxNote = `Before editing, read these context files: ${architectResult.plan.contextFiles.join(", ")}`;
+        this.apiMessages.push({ role: "user", content: ctxNote });
+      }
     }
 
     this.opts.onStatus?.("Thinking...");
