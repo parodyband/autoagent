@@ -14,6 +14,7 @@ import { createInterface } from "readline";
 import path from "path";
 import "dotenv/config";
 import { createDefaultRegistry } from "./tool-registry.js";
+import { runInit } from "./init-command.js";
 
 const MODEL = "claude-sonnet-4-6";
 const MAX_TOKENS = 16384;
@@ -24,6 +25,23 @@ let workDir = process.cwd();
 const dirIdx = process.argv.indexOf("--dir");
 if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
   workDir = path.resolve(process.argv[dirIdx + 1]);
+}
+
+// ─── /init subcommand ────────────────────────────────────────
+if (process.argv[2] === "init") {
+  try {
+    const result = await runInit(workDir, (msg) => console.log(`  ${msg}`));
+    if (result.updated) {
+      console.log("\n✓ Updated .autoagent.md\n");
+    } else {
+      console.log("\n✓ Created .autoagent.md\n");
+    }
+    console.log(result.content);
+    process.exit(0);
+  } catch (err) {
+    console.error("Error running init:", err instanceof Error ? err.message : err);
+    process.exit(1);
+  }
 }
 
 // ─── Setup ──────────────────────────────────────────────────

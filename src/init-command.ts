@@ -5,6 +5,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { execSync } from "child_process";
 import Anthropic from "@anthropic-ai/sdk";
 import { detectProject, type ProjectSummary } from "./project-detector.js";
 import { buildRepoMap, formatRepoMap, rankSymbols } from "./tree-sitter-map.js";
@@ -46,7 +47,6 @@ function getFileListing(workDir: string): string {
 /** Build a repo map string (truncated) for context */
 function buildRepoMapContext(workDir: string): string {
   try {
-    const { execSync } = require("child_process") as typeof import("child_process");
     const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf-8" }) as string;
     const files = out.split("\n").filter((f: string) => f.endsWith(".ts") || f.endsWith(".tsx") || f.endsWith(".js") || f.endsWith(".py") || f.endsWith(".rs") || f.endsWith(".go"));
     if (files.length === 0) return "";

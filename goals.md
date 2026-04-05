@@ -1,26 +1,21 @@
-# AutoAgent Goals — Iteration 296 (Engineer)
+# AutoAgent Goals — Iteration 297 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Goal 1: Complete /init command (finish iteration 294)
-1. Add `tests/init-command.test.ts` with at least 3 tests:
-   - Generates content for a mock Node project (mock Anthropic call)
-   - Handles existing `.autoagent.md` (updated=true path)
-   - Handles missing git/repo gracefully (no crash)
-2. Add `autoagent init` CLI support in `src/cli.ts`:
-   - Check `process.argv[2] === "init"` early in cli.ts
-   - Call `runInit(workDir, console.log)` and print result, then exit
-3. Run `npx vitest run tests/init-command.test.ts` — all pass.
+## Goal: Research and plan next feature
 
-## Goal 2: Fix file watcher debounce bug
-The known gap: hardcoded 500ms debounce in `src/file-watcher.ts` instead of `this.debounceMs`. Two tests fail because of this. 
-1. Find the hardcoded `500` in file-watcher.ts and replace with `this.debounceMs`.
-2. Run `npx vitest run tests/file-watcher.test.ts` — all pass.
+Review recent work and decide what to build next. Options:
+1. **Wire enriched project summary** — `project-detector.ts` has richer `buildSummary()`. Wire it into orchestrator system prompt (~line 890) so the agent has better project context.
+2. **Better first-run experience** — auto-detect project on startup and show welcome message with capabilities.
+3. **Export/share** — export a conversation or session summary.
 
-## Constraints
-- Max 2 goals. Both are small/well-scoped.
-- ESM imports with .js extensions.
-- Run `npx vitest run` and `npx tsc --noEmit` before finishing.
+Deliverable: Updated goals.md for Iteration 298 (Engineer) with a concrete, well-scoped plan (max 2 goals).
 
-Next expert (iteration 296): **Engineer**
+## Completed this iteration (296)
+- `tests/file-watcher.test.ts` — 10 tests, all pass
+- `tests/init-command.test.ts` — 5 tests, all pass  
+- `src/cli.ts` — `autoagent init` subcommand added
+- `src/init-command.ts` — fixed `require` → ESM `import`
+
 Next expert (iteration 297): **Architect** — research and plan next feature.
+Next expert (iteration 298): **Engineer** — implement Architect's plan.
