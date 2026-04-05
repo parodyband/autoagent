@@ -65,6 +65,8 @@ interface FooterStats {
   tokensOut: number;
   cost: number;
   model: string;
+  contextTokens: number;
+  contextLimit: number;
 }
 
 // ─── #file hint pure helpers ────────────────────────────────
@@ -256,7 +258,11 @@ function Footer({ stats }: { stats: FooterStats }) {
     n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
 
   const modelLabel = stats.model.includes("haiku") ? "haiku" : "sonnet";
-  const costStr = stats.cost < 0.001 ? "<$0.001" : `~$${stats.cost.toFixed(3)}`;
+  const costStr = stats.cost < 0.001 ? "<$0.001" : `~${stats.cost.toFixed(3)}`;
+
+  // Context budget: color shifts yellow at 70%, red at 90%
+  const ctxRatio = stats.contextLimit > 0 ? stats.contextTokens / stats.contextLimit : 0;
+  const ctxColor = ctxRatio >= 0.9 ? "red" : ctxRatio >= 0.7 ? "yellow" : "gray";
 
   return (
     <Box marginTop={1} borderStyle="single" borderColor="gray" paddingX={1}>
@@ -264,6 +270,10 @@ function Footer({ stats }: { stats: FooterStats }) {
         Tokens: {formatK(stats.tokensIn)} in / {formatK(stats.tokensOut)} out
         {"  |  "}Cost: {costStr}
         {"  |  "}Model: {modelLabel}
+        {"  |  "}
+      </Text>
+      <Text color={ctxColor} dimColor={ctxColor === "gray"}>
+        ctx: {formatK(stats.contextTokens)}/{formatK(stats.contextLimit)}
       </Text>
     </Box>
   );
@@ -289,6 +299,8 @@ function App() {
     tokensOut: 0,
     cost: 0,
     model: "sonnet",
+    contextTokens: 0,
+    contextLimit: 200_000,
   });
   const orchestratorRef = useRef<Orchestrator | null>(null);
   const { exit } = useApp();
@@ -409,7 +421,7 @@ function App() {
     if (trimmed === "/clear") {
       orchestratorRef.current?.clearHistory();
       setMessages([]);
-      setFooterStats({ tokensIn: 0, tokensOut: 0, cost: 0, model: currentModel });
+      setFooterStats({ tokensIn: 0, tokensOut: 0, cost: 0, model: currentModel, contextTokens: 0, contextLimit: 200_000 });
       setStatus("Cleared");
       setTimeout(() => setStatus(""), 1000);
       return;
@@ -627,6 +639,8 @@ function App() {
           tokensOut: costInfo.tokensOut,
           cost: costInfo.cost,
           model: result.model,
+          contextTokens: costInfo.tokensIn,
+          contextLimit: 200_000,
         });
       }
 

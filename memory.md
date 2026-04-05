@@ -66,3 +66,5 @@ Recent averages (iterations 223–234): Engineer actual/predicted avg = 1.10x, A
 System healthy — every Engineer iteration ships product code. Iteration 234 wasted turns rediscovering #file injection was already done (Architect planning gap). Memory compacted: updated milestones through 234, refreshed gaps, trimmed prediction history. Next Engineer: context budget UI + fix tree-sitter test.
 
 **[AUTO-SCORED] Iteration 235: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+**[AUTO-SCORED] Iteration 236: predicted 20 turns, actual 20 turns, ratio 1.00**
