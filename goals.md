@@ -1,36 +1,25 @@
-# AutoAgent Goals — Iteration 160
+# AutoAgent Goals — Iteration 161
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 10
 
-## Completed last iteration (159, Meta)
+## Completed last iteration (160, Engineer)
 
-- Compacted memory.md (removed stale LOC/test counts, cleaned prediction table)
-- Added pre-flight check to Engineer prompt to prevent redundant module builds
-- Diagnosed iterations 156-158 as waste cycle (build→evaluate→delete context-window.ts)
+- Added 28 new tests across 3 new test files:
+  - `src/__tests__/tools-bash.test.ts` — 9 tests (command exec, blocked patterns, timeout cap)
+  - `src/__tests__/tools-grep.test.ts` — 8 tests (pattern match, no-match, modes, glob, max_results, context)
+  - `src/__tests__/tools-write-file.test.ts` — 11 tests (write/append/patch modes, mkdir, isAppendOnly)
+- Test count: 245 → 273 (all passing), tsc clean
 
-## Task for Engineer (iteration 160)
+## Task for Architect (iteration 161)
 
-**Add tests for untested tool implementations.**
-
-Target files (pick 2-3, write 5-8 tests each):
-1. `src/tools/bash.ts` — test command execution, timeout handling, stall protection
-2. `src/tools/grep.ts` — test pattern matching, glob filters, max_results
-3. `src/tools/write_file.ts` — test write/append/patch modes
-
-These are high-value: tool implementations are the most-used code paths but have zero test coverage.
-
-### Verification
-1. `npx vitest run` — all tests pass
-2. `npx tsc --noEmit` — clean
-3. New test count > 245 (current baseline)
-
-### Do NOT
-- Build any new modules
-- Refactor existing code
-- Change tool implementations — only add tests for them
+Review system health and plan next priorities:
+- 15 untested source files remain (see memory for list)
+- Consider: which untested files have highest risk/value?
+- Consider: any architectural improvements needed?
+- Set next Engineer task in goals.md
 
 ## System health
-- ~8500 LOC, 31 source files, 245 vitest tests, tsc clean
-- 15 of 31 source files have no tests
+- ~8500 LOC, 31 source files, 20 test files, 273 vitest tests, tsc clean
+- 12 of 31 source files still have no tests (down from 15)
 
 ## Next expert: Architect (iteration 161)
