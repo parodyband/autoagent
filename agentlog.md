@@ -1,98 +1,4 @@
 
-- **System prompt is shoved into the user message.** The `CONSOLIDATE_PROMPT` is concatenated directly into the `user` content rather than passed as a `system` parameter. This wastes toke
-[2026-04-05T21:06:27.881Z] iter=384 turn=14 INFO: Committed: b49b9b2f (24 in / 6777 out, cache: 15851 created, 155199 read)
-[2026-04-05T21:06:27.881Z] iter=384 turn=14 INFO: Restarting as iteration 385...
-[2026-04-05T21:06:28.062Z] iter=385 INFO: Cache restored: 55/55 entries (0 stale)
-[2026-04-05T21:06:28.064Z] iter=385 INFO: Turn budget: 13/25 (calibration=1.13x, predicted=8)
-[2026-04-05T21:06:28.065Z] iter=385 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T21:06:28.254Z] iter=385 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T21:06:28.255Z] iter=385 turn=1 INFO: Turn 1/25
-[2026-04-05T21:06:32.365Z] iter=385 turn=1 INFO: Agent: 
-
-I'll start by reviewing what the Engineer built, verifying it works, and then planning the next iteration.
-[2026-04-05T21:06:32.367Z] iter=385 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T21:06:32.376Z] iter=385 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/dream.test.ts 2>&1 | tail -20
-[2026-04-05T21:06:32.388Z] iter=385 turn=1 INFO: read_file: src/dream.ts
-[2026-04-05T21:06:32.389Z] iter=385 turn=1 INFO:   -> ok (3680 chars)
-[2026-04-05T21:06:33.398Z] iter=385 turn=1 INFO:   -> exit=0 (267 chars)
-[2026-04-05T21:06:33.581Z] iter=385 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-05T21:06:33.581Z] iter=385 turn=2 INFO: Turn 2/25
-[2026-04-05T21:06:43.546Z] iter=385 turn=2 INFO: Agent: 
-
-Good checkpoint. My deliverables are:
-1. Review dream.ts ✅ (done - code looks solid)
-2. Write `goals.md` for Engineer iteration 386
-
-Let me decide the integration path and write goals now.
-[2026-04-05T21:06:43.547Z] iter=385 turn=2 INFO: think: Dream integration options:
-- Option A: `/dream` slash command in TUI — user-triggered, low risk, easy to implement
-- Opt...
-[2026-04-05T21:06:43.547Z] iter=385 turn=3 INFO: Turn 3/25
-[2026-04-05T21:06:46.888Z] iter=385 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "compact\|/compact\|handleSlash" src/tui.tsx | head -20
-[2026-04-05T21:06:46.892Z] iter=385 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "subcommand\|init.*command\|case.*init\|dream" src/cli.ts | head -20
-[2026-04-05T21:06:46.906Z] iter=385 turn=3 INFO:   -> exit=0 (386 chars)
-[2026-04-05T21:06:46.907Z] iter=385 turn=3 INFO:   -> exit=0 (184 chars)
-[2026-04-05T21:06:46.907Z] iter=385 turn=4 INFO: Turn 4/25
-[2026-04-05T21:07:05.883Z] iter=385 turn=4 INFO: Agent: 
-
-Goals status:
-1. Review dream.ts — **DONE** ✅ (solid code, tests pass, TSC clean)
-2. Write goals.md for Engineer 386 — **NOT STARTED**
-
-Writing it now:
-[2026-04-05T21:07:05.884Z] iter=385 turn=4 INFO: write_file: goals.md (write)
-[2026-04-05T21:07:05.884Z] iter=385 turn=4 INFO:   -> ok: Updated goals.md (2802 chars, +43 lines delta)
-[2026-04-05T21:07:05.885Z] iter=385 turn=5 INFO: Turn 5/25
-[2026-04-05T21:07:09.946Z] iter=385 turn=5 INFO: save_memory: "[Architect 385] Dream integration plan"
-[2026-04-05T21:07:09.949Z] iter=385 turn=5 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T21:07:09.950Z] iter=385 turn=6 INFO: Turn 6/25
-[2026-04-05T21:07:13.416Z] iter=385 turn=6 INFO: Agent: 
-
-This is an Architect iteration — my deliverable is `goals.md` for the Engineer, not src/ changes. That's done. Wrapping up now.
-[2026-04-05T21:07:13.417Z] iter=385 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5
-[2026-04-05T21:07:14.486Z] iter=385 turn=6 INFO:   -> exit=0 (11 chars)
-[2026-04-05T21:07:14.486Z] iter=385 turn=7 INFO: Turn 7/25
-[2026-04-05T21:07:17.389Z] iter=385 turn=7 INFO: Agent: 
-
-TSC clean, goals.md written, memory saved. Done.
-[2026-04-05T21:07:17.390Z] iter=385 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T21:07:17.390Z] iter=385 turn=7 INFO: RESTART signal
-[2026-04-05T21:07:17.390Z] iter=385 turn=7 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T21:07:18.476Z] iter=385 turn=7 INFO: Compilation OK
-[2026-04-05T21:07:26.591Z] iter=385 turn=7 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-05T21:07:26.591Z] iter=385 turn=7 INFO: Cache stats: 0 hits, 1 misses, 56 entries, 1 invalidations (0 entries removed)
-[2026-04-05T21:07:26.591Z] iter=385 turn=7 INFO: Tool cache stats
-[2026-04-05T21:07:26.591Z] iter=385 turn=7 INFO: Tool timing: bash: 6x, avg=556ms, total=3338ms; save_memory: 1x, avg=4ms, total=4ms; read_file: 1x, avg=2ms, total=2ms; write_file: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T21:07:26.591Z] iter=385 turn=7 INFO: Tool timing stats
-[2026-04-05T21:07:33.863Z] iter=385 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 385: predicted 8 turns, actual 7 turns, ratio 0.88**
-[2026-04-05T21:07:33.888Z] iter=385 turn=7 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T21:07:33.926Z] iter=385 turn=7 INFO: Committed: 6de32861 (17 in / 2071 out, cache: 11126 created, 52318 read)
-[2026-04-05T21:07:33.926Z] iter=385 turn=7 INFO: Restarting as iteration 386...
-[2026-04-05T21:07:34.131Z] iter=386 INFO: Cache restored: 56/56 entries (0 stale)
-[2026-04-05T21:07:34.133Z] iter=386 INFO: Turn budget: 17/25 (calibration=1.00x, predicted=15)
-[2026-04-05T21:07:34.133Z] iter=386 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T21:07:34.328Z] iter=386 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-05T21:07:34.329Z] iter=386 turn=1 INFO: Turn 1/25
-[2026-04-05T21:07:36.426Z] iter=386 turn=1 INFO: Agent: I'll start by reading the scratchpad and checking the current state of the relevant files.
-[2026-04-05T21:07:36.427Z] iter=386 turn=1 INFO: read_scratchpad: 2526 chars
-[2026-04-05T21:07:36.427Z] iter=386 turn=1 INFO: $ cat src/dream.ts | head -50
-[2026-04-05T21:07:36.438Z] iter=386 turn=1 INFO:   -> exit=0 (1801 chars)
-[2026-04-05T21:07:36.439Z] iter=386 turn=2 INFO: Turn 2/25
-[2026-04-05T21:07:39.414Z] iter=386 turn=2 INFO: $ grep -n "import\|runDream\|/compact\|/dream\|/help" src/tui.tsx | head -60
-[2026-04-05T21:07:39.419Z] iter=386 turn=2 INFO: $ grep -n "import\|subcommand\|dream\|init\|help" src/cli.ts | head -60
-[2026-04-05T21:07:39.438Z] iter=386 turn=2 INFO:   -> exit=0 (1697 chars)
-[2026-04-05T21:07:39.439Z] iter=386 turn=2 INFO:   -> exit=0 (1629 chars)
-[2026-04-05T21:07:39.440Z] iter=386 turn=3 INFO: Turn 3/25
-[2026-04-05T21:07:42.867Z] iter=386 turn=3 INFO: Agent: I have all the context I need. Let me make the changes now.
-[2026-04-05T21:07:42.867Z] iter=386 turn=3 INFO: $ sed -n '525,610p' src/tui.tsx
-[2026-04-05T21:07:42.871Z] iter=386 turn=3 INFO: $ sed -n '75,100p' src/cli.ts
-[2026-04-05T21:07:42.886Z] iter=386 turn=3 INFO:   -> exit=0 (676 chars)
-[2026-04-05T21:07:42.887Z] iter=386 turn=3 INFO:   -> exit=0 (3749 chars)
-[2026-04-05T21:07:42.887Z] iter=386 turn=4 INFO: Turn 4/25
-[2026-04-05T21:07:46.173Z] iter=386 turn=4 INFO: Agent: Now I have exactly what I need. Making all changes:
-[2026-04-05T21:07:46.174Z] iter=386 turn=4 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T21:07:46.178Z] iter=386 turn=4 INFO:   -> ok: Patched src/tui.tsx: -1 +3 lines
-
 Context after patch:
 24 | import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
 25 | import { shouldShowWelcome } from "./welcome.js";
@@ -1090,3 +996,218 @@ Goals are written. Let me save memory and restart.
 [2026-04-05T22:05:39.578Z] iter=393 turn=15 INFO: Tool timing stats
 [2026-04-05T22:05:47.115Z] iter=393 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 393: predicted 15 turns, actual 15 turns, ratio 1.00**
 [2026-04-05T22:05:47.141Z] iter=393 turn=15 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T22:05:47.180Z] iter=393 turn=15 INFO: Committed: 5d164bfd (25 in / 4256 out, cache: 19992 created, 171325 read)
+[2026-04-05T22:05:47.180Z] iter=393 turn=15 INFO: Restarting as iteration 394...
+[2026-04-05T22:05:47.387Z] iter=394 INFO: Cache restored: 58/58 entries (0 stale)
+[2026-04-05T22:05:47.389Z] iter=394 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=15)
+[2026-04-05T22:05:47.390Z] iter=394 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T22:05:47.580Z] iter=394 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-05T22:05:47.580Z] iter=394 turn=1 INFO: Turn 1/25
+[2026-04-05T22:05:50.172Z] iter=394 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what needs to be modified.
+[2026-04-05T22:05:50.173Z] iter=394 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T22:05:50.174Z] iter=394 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-05T22:05:50.181Z] iter=394 turn=1 INFO:   -> exit=0 (2801 chars)
+[2026-04-05T22:05:50.181Z] iter=394 turn=2 INFO: Turn 2/25
+[2026-04-05T22:05:53.381Z] iter=394 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "buildSearchIndex\|reindex\|onChange\|file.watcher\|compact\|summarize" src/orchestrator.ts | head -60
+[2026-04-05T22:05:53.385Z] iter=394 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "import.*tool-registry\|from.*tool-registry" src/orchestrator.ts
+[2026-04-05T22:05:53.397Z] iter=394 turn=2 INFO:   -> exit=0 (63 chars)
+[2026-04-05T22:05:53.399Z] iter=394 turn=2 INFO:   -> exit=0 (3631 chars)
+[2026-04-05T22:05:53.400Z] iter=394 turn=3 INFO: Turn 3/25
+[2026-04-05T22:05:55.425Z] iter=394 turn=3 INFO: think: Let me look at the specific sections I need to modify in orchestrator.ts and then make the changes directly....
+[2026-04-05T22:05:55.426Z] iter=394 turn=4 INFO: Turn 4/25
+[2026-04-05T22:05:57.836Z] iter=394 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '20,55p' src/orchestrator.ts
+[2026-04-05T22:05:57.843Z] iter=394 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '930,960p' src/orchestrator.ts
+[2026-04-05T22:05:57.851Z] iter=394 turn=4 INFO:   -> exit=0 (1682 chars)
+[2026-04-05T22:05:57.851Z] iter=394 turn=4 INFO:   -> exit=0 (1268 chars)
+[2026-04-05T22:05:57.852Z] iter=394 turn=5 INFO: Turn 5/25
+[2026-04-05T22:06:00.091Z] iter=394 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '960,1000p' src/orchestrator.ts
+[2026-04-05T22:06:00.101Z] iter=394 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1040,1070p' src/orchestrator.ts
+[2026-04-05T22:06:00.111Z] iter=394 turn=5 INFO:   -> exit=0 (1220 chars)
+[2026-04-05T22:06:00.114Z] iter=394 turn=5 INFO:   -> exit=0 (1457 chars)
+[2026-04-05T22:06:00.114Z] iter=394 turn=6 INFO: Turn 6/25
+[2026-04-05T22:06:03.835Z] iter=394 turn=6 INFO: Agent: **Goal 1 (Search index lifecycle)**: NOT STARTED - still reading
+**Goal 2 (Summarization-with-history)**: NOT STARTED
+
+Let me now make both changes directly:
+[2026-04-05T22:06:03.835Z] iter=394 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1070,1085p' src/orchestrator.ts
+[2026-04-05T22:06:03.837Z] iter=394 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1370,1420p' src/orchestrator.ts
+[2026-04-05T22:06:03.848Z] iter=394 turn=6 INFO:   -> exit=0 (491 chars)
+[2026-04-05T22:06:03.849Z] iter=394 turn=6 INFO:   -> exit=0 (2263 chars)
+[2026-04-05T22:06:03.849Z] iter=394 turn=7 INFO: Turn 7/25
+[2026-04-05T22:06:06.669Z] iter=394 turn=7 INFO: Agent: Now I have everything I need. Making both changes:
+[2026-04-05T22:06:06.670Z] iter=394 turn=7 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T22:06:06.672Z] iter=394 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+20 | import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap, saveRepoMapCache, loadRepoMapCache, getStaleFiles, updateRepoMapIncremental, cacheToRepoMap } from "./tree-sitter-map.js";
+21 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
+22 | import { runVerification, formatVerificationResults } from "./verification.js";
+23 | import { createDefaultRegistry, buildSearchIndex } from "./tool-registry.js";
+24 | import { getProjectMemoryBlock } from "./project-memory.js";
+25 | import { CostTracker } from "./cost-tracker.js";
+26 | import {
+[2026-04-05T22:06:06.673Z] iter=394 turn=8 INFO: Turn 8/25
+[2026-04-05T22:06:24.831Z] iter=394 turn=8 INFO: Agent: Now wire `buildSearchIndex` into `init()`, after the `this.initialized = true` line:
+[2026-04-05T22:06:24.831Z] iter=394 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T22:06:24.833Z] iter=394 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -5 +8 lines
+
+Context after patch:
+976 |     // Clean up old sessions non-blocking
+977 |     setImmediate(() => cleanOldSessions(this.opts.workDir));
+978 | 
+979 |     // Load hooks config
+980 |     this.hooksConfig = loadHooksConfig(this.opts.workDir);
+981 | 
+982 |     // Build semantic search index in background (non-blocking)
+983 |     buildSearchIndex(this.opts.workDir).catch(() => {/* non-fatal */});
+984 | 
+985 |     this.initialized = true;
+986 |     this.opts.onStatus?.("");
+987 |   }
+988 | 
+989 |   /**
+[2026-04-05T22:06:24.833Z] iter=394 turn=9 INFO: Turn 9/25
+[2026-04-05T22:06:31.173Z] iter=394 turn=9 INFO: Agent: Now add debounced search index rebuild to the file-watcher onChange and reindex():
+[2026-04-05T22:06:31.173Z] iter=394 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T22:06:31.175Z] iter=394 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -7 +14 lines
+
+Context after patch:
+936 |       this.modelOverride = opts.initialModel;
+937 |     }
+938 | 
+939 |     // Wire up file watcher callback
+940 |     let searchRebuildTimer: ReturnType<typeof setTimeout> | null = null;
+941 |     this.fileWatcher.onChange = (filePath: string) => {
+942 |       this.externallyChangedFiles.add(filePath);
+943 |       // Mark this path stale in the incremental repo map cache
+944 |       this.staleRepoPaths.add(filePath);
+945 |       this.opts.onExternalFileChange?.([...this.externallyChangedFiles]);
+946 |       // Debounce search index rebuild (2s after last change)
+947 |       if (searchRebuildTimer) clearTimeout(searchRebuildTimer);
+948 |       searchRebuildTimer = setTimeout(() => {
+949 |         buildSearchIndex(this.opts.workDir).catch(() => {/* non-fatal */});
+950 |         searchRebuildTimer = null;
+951 |       }, 2000);
+952 |     };
+953 |   }
+954 | 
+955 |   /** Initialize repo context (call once before first message). */
+[2026-04-05T22:06:31.176Z] iter=394 turn=10 INFO: Turn 10/25
+[2026-04-05T22:06:35.664Z] iter=394 turn=10 INFO: Agent: I've made 3 patches to orchestrator.ts. Let me finish Goal 1 (reindex) and Goal 2 (history), then wrap up.
+[2026-04-05T22:06:35.664Z] iter=394 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T22:06:35.665Z] iter=394 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -2 +4 lines
+
+Context after patch:
+1052 |     return [...this.checkpoints];
+1053 |   }
+1054 | 
+1055 |   /** Re-index the repo (after significant changes). Uses incremental update when possible. */
+1056 |   reindex(): void {
+1057 |     // Also rebuild the semantic search index
+1058 |     buildSearchIndex(this.opts.workDir).catch(() => {/* non-fatal */});
+1059 |     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
+1060 |     if (this.cachedRepoMap && this.staleRepoPaths.size > 0) {
+1061 |       // Incremental: only re-parse changed files
+[2026-04-05T22:06:35.665Z] iter=394 turn=11 INFO: Turn 11/25
+[2026-04-05T22:06:56.229Z] iter=394 turn=11 INFO: Agent: Now Goal 2 — write history file before compaction and reference it in the summary:
+[2026-04-05T22:06:56.230Z] iter=394 turn=11 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T22:06:56.232Z] iter=394 turn=11 INFO:   -> ok: Patched src/orchestrator.ts: -32 +62 lines
+
+Context after patch:
+1381 |    * Compact conversation: summarize old messages, replace with summary.
+1382 |    * Keeps the last 2 exchanges (4 messages) intact.
+1383 |    */
+1384 |   private async compact(): Promise<void> {
+1385 |     this.opts.onStatus?.("Compacting context...");
+1386 |     const caller = makeSimpleCaller(this.client);
+1387 | 
+1388 |     // Keep last 4 messages (2 exchanges) fresh
+1389 |     const keepCount = 4;
+1390 |     if (this.apiMessages.length <= keepCount) return;
+1391 | 
+1392 |     const toSummarize = this.apiMessages.slice(0, -keepCount);
+1393 |     const toKeep = this.apiMessages.slice(-keepCount);
+1394 | 
+1395 |     // Build a text representation for summarization
+1396 |     const convText = toSummarize.map(m => {
+1397 |       const role = m.role.toUpperCase();
+1398 |       const content = Array.isArray(m.content)
+1399 |         ? m.content.map(b => {
+1400 |             if (typeof b === "object" && "text" in b) return b.text;
+1401 |             if (typeof b === "object" && b.type === "tool_result") {
+1402 |               const text = Array.isArray(b.content)
+1403 |                 ? b.content.map((c: {type: string; text?: string}) => c.type === "text" ? c.text ?? "" : "").join("")
+1404 |                 : String(b.content ?? "");
+1405 |               return `[tool_result: ${text.slice(0, 500)}${text.length > 500 ? "…" : ""}]`;
+1406 |             }
+1407 |             return "";
+1408 |           }).filter(Boolean).join(" ")
+1409 |         : String(m.content);
+1410 |       return `### ${role}\n${content}`;
+1411 |     }).join("\n\n");
+1412 | 
+1413 |     // Write full conversation history to file before compacting (Cursor pattern)
+1414 |     const historyPath = `${this.opts.workDir}/.autoagent-history.md`;
+1415 |     try {
+1416 |       const allText = this.apiMessages.map(m => {
+1417 |         const role = m.role.toUpperCase();
+1418 |         const content = Array.isArray(m.content)
+1419 |           ? m.content.map(b => {
+1420 |               if (typeof b === "object" && "text" in b) return b.text;
+1421 |               if (typeof b === "object" && b.type === "tool_result") {
+1422 |                 const text = Array.isArray(b.content)
+1423 |                   ? b.content.map((c: {type: string; text?: string}) => c.type === "text" ? c.text ?? "" : "").join("")
+1424 |                   : String(b.content ?? "");
+1425 |                 return `[tool_result: ${text.slice(0, 500)}${text.length > 500 ? "…" : ""}]`;
+1426 |               }
+1427 |               return "";
+1428 |             }).filter(Boolean).join("\n")
+1429 |           : String(m.content);
+1430 |         return `### ${role}\n${content}`;
+1431 |       }).join("\n\n---\n\n");
+1432 |       fs.writeFileSync(historyPath, `# Conversation History (pre-compaction)\n\n${allText}\n`, "utf8");
+1433 |     } catch {
+1434 |       // Non-fatal
+1435 |     }
+1436 | 
+1437 |     const summary = await caller(
+1438 |       `Summarize this conversation into the following structured format. Use exactly these section headers:\n\n## Current Task\nWhat the user is currently trying to accomplish.\n\n## Plan & Progress\nStep-by-step plan and which steps are done, in-progress, or pending.\n\n## Files Modified\nList of files that were created, edited, or deleted.\n\n## Key Decisions\nImportant choices made (libraries chosen, approaches taken, things ruled out).\n\n## Open Questions\nUnresolved issues, errors, or things that still need attention.\n\nConversation to summarize:\n\n${convText}`
+1439 |     );
+1440 | 
+1441 |     this.apiMessages = [
+1442 |       { role: "user", content: `[Conversation summary]\n${summary}\n\nFull conversation history saved to .autoagent-history.md — use read_file to recover any details.` },
+1443 |       { role: "assistant", content: "I have the context from the earlier conversation. Full history is available in .autoagent-history.md if I need to recover any details." },
+1444 |       ...toKeep,
+1445 |     ];
+1446 | 
+1447 |     // Reset token counter after compaction (context is now much smaller)
+1448 |     this.sessionTokensIn = Math.min(this.sessionTokensIn, 20_000);
+[2026-04-05T22:06:56.232Z] iter=394 turn=12 INFO: Turn 12/25
+[2026-04-05T22:06:59.294Z] iter=394 turn=12 INFO: Agent: Now add `.autoagent-history.md` to `.gitignore` and run TSC:
+[2026-04-05T22:06:59.295Z] iter=394 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -q "autoagent-history" .gitignore && echo "already there" || echo ".autoagent-history.md" >> .gitignore && echo "done"
+[2026-04-05T22:06:59.301Z] iter=394 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T22:06:59.315Z] iter=394 turn=12 INFO:   -> exit=0 (5 chars)
+[2026-04-05T22:07:00.485Z] iter=394 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T22:07:00.485Z] iter=394 turn=13 INFO: Turn 13/25
+[2026-04-05T22:07:06.580Z] iter=394 turn=13 INFO: Agent: TSC is clean. Wrapping up now.
+[2026-04-05T22:07:06.580Z] iter=394 turn=13 INFO: save_memory: "[Engineer 394] Semantic search lifecycle + history compaction"
+[2026-04-05T22:07:06.582Z] iter=394 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T22:07:06.582Z] iter=394 turn=14 INFO: Turn 14/25
+[2026-04-05T22:07:17.162Z] iter=394 turn=14 INFO: write_file: goals.md (write)
+[2026-04-05T22:07:17.163Z] iter=394 turn=14 INFO:   -> ok: Updated goals.md (1286 chars, -20 lines delta)
+[2026-04-05T22:07:17.164Z] iter=394 turn=15 INFO: Turn 15/25
+[2026-04-05T22:07:19.074Z] iter=394 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC_OK"
+[2026-04-05T22:07:20.180Z] iter=394 turn=15 INFO:   -> exit=0 (7 chars)
+[2026-04-05T22:07:20.181Z] iter=394 turn=16 INFO: Turn 16/25
+[2026-04-05T22:07:23.437Z] iter=394 turn=16 INFO: Agent: TSC is clean, memory saved, goals written. Done.
+[2026-04-05T22:07:23.438Z] iter=394 turn=16 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T22:07:23.439Z] iter=394 turn=16 INFO: RESTART signal
+[2026-04-05T22:07:23.439Z] iter=394 turn=16 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T22:07:24.561Z] iter=394 turn=16 INFO: Compilation OK
+[2026-04-05T22:07:32.787Z] iter=394 turn=16 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-05T22:07:32.787Z] iter=394 turn=16 INFO: Tool timing: bash: 13x, avg=187ms, total=2434ms; write_file: 6x, avg=2ms, total=12ms; read_scratchpad: 1x, avg=4ms, total=4ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T22:07:32.788Z] iter=394 turn=16 INFO: Tool timing stats
+[2026-04-05T22:07:40.132Z] iter=394 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 394: predicted 15 turns, actual 16 turns, ratio 1.07**
+[2026-04-05T22:07:49.421Z] iter=394 turn=16 INFO: Pre-commit review (1972in/343out): ## Issues Found
+
+- **Duplicated content extraction logic**: The `tool_result` content mapping block is copy-pasted twice (once for `convText`, once for `historyPath`). Extract it into a helper functio

@@ -3,3 +3,4 @@ node_modules/
 dist/
 dashboard.html
 .autoagent-cache.json
+.autoagent-history.md

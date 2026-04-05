@@ -20,7 +20,7 @@ import { rankFiles } from "./file-ranker.js";
 import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap, saveRepoMapCache, loadRepoMapCache, getStaleFiles, updateRepoMapIncremental, cacheToRepoMap } from "./tree-sitter-map.js";
 import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
 import { runVerification, formatVerificationResults } from "./verification.js";
-import { createDefaultRegistry } from "./tool-registry.js";
+import { createDefaultRegistry, buildSearchIndex } from "./tool-registry.js";
 import { getProjectMemoryBlock } from "./project-memory.js";
 import { CostTracker } from "./cost-tracker.js";
 import {
@@ -937,11 +937,18 @@ export class Orchestrator {
     }
 
     // Wire up file watcher callback
+    let searchRebuildTimer: ReturnType<typeof setTimeout> | null = null;
     this.fileWatcher.onChange = (filePath: string) => {
       this.externallyChangedFiles.add(filePath);
       // Mark this path stale in the incremental repo map cache
       this.staleRepoPaths.add(filePath);
       this.opts.onExternalFileChange?.([...this.externallyChangedFiles]);
+      // Debounce search index rebuild (2s after last change)
+      if (searchRebuildTimer) clearTimeout(searchRebuildTimer);
+      searchRebuildTimer = setTimeout(() => {
+        buildSearchIndex(this.opts.workDir).catch(() => {/* non-fatal */});
+        searchRebuildTimer = null;
+      }, 2000);
     };
   }
 
@@ -978,6 +985,9 @@ export class Orchestrator {
 
     // Load hooks config
     this.hooksConfig = loadHooksConfig(this.opts.workDir);
+
+    // Build semantic search index in background (non-blocking)
+    buildSearchIndex(this.opts.workDir).catch(() => {/* non-fatal */});
 
     this.initialized = true;
     this.opts.onStatus?.("");
@@ -1044,6 +1054,8 @@ export class Orchestrator {
 
   /** Re-index the repo (after significant changes). Uses incremental update when possible. */
   reindex(): void {
+    // Also rebuild the semantic search index
+    buildSearchIndex(this.opts.workDir).catch(() => {/* non-fatal */});
     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
     if (this.cachedRepoMap && this.staleRepoPaths.size > 0) {
       // Incremental: only re-parse changed files
@@ -1384,21 +1396,51 @@ export class Orchestrator {
     const convText = toSummarize.map(m => {
       const role = m.role.toUpperCase();
       const content = Array.isArray(m.content)
-        ? m.content
-            .map(b => (typeof b === "object" && "text" in b ? b.text : ""))
-            .filter(Boolean)
-            .join(" ")
+        ? m.content.map(b => {
+            if (typeof b === "object" && "text" in b) return b.text;
+            if (typeof b === "object" && b.type === "tool_result") {
+              const text = Array.isArray(b.content)
+                ? b.content.map((c: {type: string; text?: string}) => c.type === "text" ? c.text ?? "" : "").join("")
+                : String(b.content ?? "");
+              return `[tool_result: ${text.slice(0, 500)}${text.length > 500 ? "…" : ""}]`;
+            }
+            return "";
+          }).filter(Boolean).join(" ")
         : String(m.content);
-      return `${role}: ${content}`;
+      return `### ${role}\n${content}`;
     }).join("\n\n");
+
+    // Write full conversation history to file before compacting (Cursor pattern)
+    const historyPath = `${this.opts.workDir}/.autoagent-history.md`;
+    try {
+      const allText = this.apiMessages.map(m => {
+        const role = m.role.toUpperCase();
+        const content = Array.isArray(m.content)
+          ? m.content.map(b => {
+              if (typeof b === "object" && "text" in b) return b.text;
+              if (typeof b === "object" && b.type === "tool_result") {
+                const text = Array.isArray(b.content)
+                  ? b.content.map((c: {type: string; text?: string}) => c.type === "text" ? c.text ?? "" : "").join("")
+                  : String(b.content ?? "");
+                return `[tool_result: ${text.slice(0, 500)}${text.length > 500 ? "…" : ""}]`;
+              }
+              return "";
+            }).filter(Boolean).join("\n")
+          : String(m.content);
+        return `### ${role}\n${content}`;
+      }).join("\n\n---\n\n");
+      fs.writeFileSync(historyPath, `# Conversation History (pre-compaction)\n\n${allText}\n`, "utf8");
+    } catch {
+      // Non-fatal
+    }
 
     const summary = await caller(
       `Summarize this conversation into the following structured format. Use exactly these section headers:\n\n## Current Task\nWhat the user is currently trying to accomplish.\n\n## Plan & Progress\nStep-by-step plan and which steps are done, in-progress, or pending.\n\n## Files Modified\nList of files that were created, edited, or deleted.\n\n## Key Decisions\nImportant choices made (libraries chosen, approaches taken, things ruled out).\n\n## Open Questions\nUnresolved issues, errors, or things that still need attention.\n\nConversation to summarize:\n\n${convText}`
     );
 
     this.apiMessages = [
-      { role: "user", content: `[Conversation summary]\n${summary}` },
-      { role: "assistant", content: "I have the context from the earlier conversation." },
+      { role: "user", content: `[Conversation summary]\n${summary}\n\nFull conversation history saved to .autoagent-history.md — use read_file to recover any details.` },
+      { role: "assistant", content: "I have the context from the earlier conversation. Full history is available in .autoagent-history.md if I need to recover any details." },
       ...toKeep,
     ];
 

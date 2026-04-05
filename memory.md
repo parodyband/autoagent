@@ -78,3 +78,5 @@ during the iteration (glob types were cached?) but the next process crashed on s
 ---
 
 **[AUTO-SCORED] Iteration 393: predicted 15 turns, actual 15 turns, ratio 1.00**
+
+**[AUTO-SCORED] Iteration 394: predicted 15 turns, actual 16 turns, ratio 1.07**
