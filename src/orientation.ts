@@ -27,7 +27,7 @@ export interface OrientationReport {
  * Returns a concise report suitable for including in the agent's
  * initial context without bloating the token budget.
  */
-export async function orient(maxDiffChars: number = 2000): Promise<OrientationReport> {
+export async function orient(maxDiffChars: number = 1000): Promise<OrientationReport> {
   // Get the stat summary (which files changed)
   const statResult = await executeBash(
     "git diff HEAD~1 --stat 2>/dev/null",
@@ -37,7 +37,6 @@ export async function orient(maxDiffChars: number = 2000): Promise<OrientationRe
   );
 
   if (statResult.exitCode !== 0 || !statResult.output.trim()) {
-    // No previous commit or git error — not fatal
     return { diffSummary: null, hasChanges: false, error: null };
   }
 
@@ -46,9 +45,9 @@ export async function orient(maxDiffChars: number = 2000): Promise<OrientationRe
     return { diffSummary: null, hasChanges: false, error: null };
   }
 
-  // Get the actual diff, limited to source files (skip logs and generated files)
+  // Only diff src/ files — .md and .json are the agent's own output and already known
   const diffResult = await executeBash(
-    "git diff HEAD~1 -- 'src/**' '*.md' '*.json' ':!agentlog.*' ':!.autoagent-*' ':!package-lock.json' 2>/dev/null",
+    "git diff HEAD~1 -- 'src/**' ':!agentlog.*' 2>/dev/null",
     10,
     undefined,
     true
@@ -56,13 +55,12 @@ export async function orient(maxDiffChars: number = 2000): Promise<OrientationRe
 
   let diffContent = diffResult.output.trim();
   
-  // Truncate if too long — we want orientation, not a full code review
   if (diffContent.length > maxDiffChars) {
     diffContent = diffContent.slice(0, maxDiffChars) + "\n... (truncated)";
   }
 
   const summary = diffContent
-    ? `Files changed:\n${statOutput}\n\nDiff (src + config):\n${diffContent}`
+    ? `Files changed:\n${statOutput}\n\nDiff (src only):\n${diffContent}`
     : `Files changed:\n${statOutput}`;
 
   return {
@@ -83,7 +81,6 @@ export function formatOrientation(report: OrientationReport): string {
 
   return (
     `## Orientation — Changes since last iteration\n\n` +
-    `${report.diffSummary}\n\n` +
-    `Review the above diff before starting work. If you didn't make these changes, the operator did — update your mental model accordingly.\n`
+    `${report.diffSummary}\n`
   );
 }

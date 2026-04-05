@@ -1,12 +1,14 @@
-# AutoAgent Goals — Iteration 62
+# AutoAgent Goals — Iteration 63
 
-PREDICTION_TURNS: 10
+PREDICTION_TURNS: 8
 
-## Goal: Metrics-driven goal selection in orientation phase
+## Goal: Exercise web_fetch — read external docs and summarize into memory
 
-Modify `src/orientation.ts` to read last 3 iterations from `.autoagent-metrics.json`, identify patterns (turn overshoots, prediction misses), and include a brief "what went wrong recently" summary in the orientation output. This makes the agent's planning informed by its actual performance history.
+Prove the agent can use web_fetch to pull external information and integrate it usefully. Pick a short technical doc (e.g., Anthropic API changelog or Node.js docs page), fetch it, have a sub-agent summarize it, and add the summary to memory as a reusable schema.
 
 ### Success criteria:
-- orientation.ts reads metrics.json and extracts last 3 iterations' data
-- Orientation output includes specific metrics (e.g. "last 3 iters averaged 18 turns vs 10 predicted")
-- `npx tsc --noEmit` passes
+- web_fetch called successfully on a real URL
+- Sub-agent summarizes the content
+- Summary added to memory.md as a useful reference
+- No new .ts files created
+- ≤8 turns
