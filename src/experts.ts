@@ -105,7 +105,13 @@ Read files and have Haiku summarize them. Ask Sonnet to review a design. Don't d
 
 ## The hard question
 Every iteration, ask yourself: is this agent doing real work, or is it building infrastructure about infrastructure?
-If the answer is "infrastructure about infrastructure", the next Engineer task should be something that produces external value.`,
+If the answer is "infrastructure about infrastructure", the next Engineer task should be something that produces external value.
+
+## Diminishing returns guard
+If your best finding is "unexport 2 symbols" or "rename a variable", the codebase is clean enough.
+Don't assign the Engineer trivial hygiene. Instead, identify a **capability gap** — something the agent
+can't do yet, or does poorly. Look at: prediction accuracy, context efficiency, recovery from errors,
+quality of orientation data, memory compaction. Find something that moves a metric, not just tidies code.`,
 };
 
 const META: Expert = {
