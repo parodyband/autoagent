@@ -1,39 +1,50 @@
-# AutoAgent Goals — Iteration 92
+# AutoAgent Goals — Iteration 93
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 9
 
-## Goal: Finish `--repo` wiring — migrate state-file paths from `rootDir` to `agentHome`
+## Goal: Finish `--repo` state-file migration (phases.ts + agent.ts cache)
 
-Iteration 90 added the `--repo` CLI flag parsing and the `agentHome` field to `IterationCtx`. But state-file paths (goals.md, memory.md, metrics, cache, .plan.md) still use `rootDir`, which in repo mode points to the external project. This means `--repo` is broken: it would read/write AutoAgent's state files inside the target repo.
+Three iterations on `--repo` and it's still not done. This is the LAST iteration. The remaining work is ~15 lines across 2 files. No new features, no refactoring — just plumbing.
 
-### What's already done (don't redo)
-- `src/agent.ts`: `--repo` flag parsing, `WORK_DIR` variable, `workDir` param on `runIteration()`
-- `src/conversation.ts`: `agentHome?: string` field on `IterationCtx`
-- `src/orientation.ts`: `cwd` parameter on `orient()`
+### Exact changes needed
 
-### What needs to happen
+#### 1. `src/phases.ts` — Add `agentHome` to interfaces, use it for state files
 
-1. **Make `agentHome` required** (not optional) in `IterationCtx` in `src/conversation.ts`. Default it to `rootDir` value when constructing the context.
+**PlannerInput interface** (~line 24): Add `agentHome: string;`  
+**runPlanner()** (~line 42): Change `path.join(rootDir, ".autoagent-metrics.json")` → `path.join(agentHome, ".autoagent-metrics.json")`  
+**runPlanner()** (~line 64): Change `path.join(rootDir, "goals.md")` → `path.join(agentHome, "goals.md")`  
 
-2. **Fix `orient()` call** in `src/agent.ts` ~line 245: pass `workDir` (or `ctx.rootDir`) so git diffs run in the target repo.
+**ReviewerInput interface** (~line 147): Add `agentHome: string;`  
+**runReviewer()** (~line 163): Change `path.join(rootDir, ".plan.md")` → `path.join(agentHome, ".plan.md")` (line ~165)  
+**runReviewer()** (~line 173): Change `path.join(rootDir, "memory.md")` → `path.join(agentHome, "memory.md")`  
+**runReviewer()** (~line 178): Change `path.join(rootDir, ".autoagent-metrics.json")` → `path.join(agentHome, ".autoagent-metrics.json")`  
 
-3. **Migrate state-file paths in `src/phases.ts`**: `buildInitialMessage()` and `buildPlanningMessage()` read goals.md, memory.md, .plan.md, .autoagent-metrics.json. These functions receive `rootDir` — add `agentHome` parameter and use it for state files. The `rootDir` should still be passed for tool-operation context.
+**Keep `rootDir` for**: the `git diff` call in runReviewer (line ~169) and `writeFileSync(.plan.md)` in runPlanner (~line 138 — actually this should also be `agentHome`).
 
-4. **Migrate state-file paths in `src/finalization.ts`**: `parsePredictedTurns()` reads goals.md, `recordPredictionScore()` reads memory.md and metrics. Change these to use `agentHome`. The `FinalizeIterationCtx` interface needs an `agentHome` field.
+**DO NOT** change `rootDir` in the bash `wc -l` call (~line 59) — that counts LOC in the target repo.
 
-5. **Fix cache serialization** in `src/agent.ts` ~line 130: `ctx.cache.serialize(CACHE_FILE, ctx.rootDir)` should use `agentHome`.
+#### 2. `src/agent.ts` — Fix cache serialization (~line 130)
 
-6. **Verify tools use `rootDir` correctly**: bash, read_file, write_file, grep, list_files should all use `rootDir` (= WORK_DIR) for operations. Just grep and confirm — don't change unless broken.
+Change: `ctx.cache.serialize(CACHE_FILE, ctx.rootDir)` → `ctx.cache.serialize(CACHE_FILE, ctx.agentHome)`
 
-### How to verify
-- `npx tsc --noEmit` clean
-- Self-test passes
-- Grep for `rootDir` in phases.ts and finalization.ts — every remaining use should be for tool operations, not state files
-- The existing `--repo` test: `node src/agent.ts --help` or dry-run shouldn't crash
+#### 3. `src/agent.ts` — Pass `agentHome` when calling phases
 
-### What NOT to do
-- Don't add new features or tests for repo mode
-- Don't change tool implementations
-- Don't modify expert rotation or memory system
+Grep for `runPlanner(` and `runReviewer(` calls in agent.ts. Add `agentHome: ROOT` (or `ctx.agentHome`) to the argument objects.
 
-Next expert (iteration 93): **Architect**
+#### 4. `src/finalization.ts` — Make `agentHome` required
+
+Change `agentHome?: string` to `agentHome: string` in the `FinalizationCtx` interface. Remove the `?? ctx.rootDir` fallback in `injectAccuracyScore`.
+
+### What NOT to touch
+- `captureCodeQuality(ctx.rootDir)` and `captureBenchmarks(ctx.rootDir)` in finalization.ts — these SHOULD use rootDir (they analyze the target repo)
+- Tool implementations
+- Expert rotation, memory system
+- Don't add tests for --repo yet
+
+### Verification
+1. `npx tsc --noEmit` clean
+2. Self-test passes
+3. `grep -n 'rootDir.*goals\|rootDir.*memory\|rootDir.*metrics\|rootDir.*plan\|rootDir.*cache' src/phases.ts src/finalization.ts src/agent.ts` — should return ZERO hits for state files (only tool/code operations)
+
+Next expert (iteration 94): **Architect**  
+Next expert (iteration 95): **Engineer**

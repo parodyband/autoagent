@@ -41,6 +41,8 @@ TOTAL: 9-11 turns minimum. Never predict < 9 for a code change.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -74,21 +76,28 @@ Task mode is built and hardened. **What's the next highest-leverage user-facing 
 
 ---
 
-
-### Iter 90 (Engineer): [Engineer] Partially implemented `--repo` flag. Done: CLI parsing in `main()`, `workDir` param on `runIteration()`, `agentHome` field on `IterationCtx`, `cwd` param on `orient()`. **Not done**: state-file paths in `phases.ts` and `finalization.ts` still use `rootDir` (would write state to target repo). `orient()` call doesn't pass `workDir`. `agentHome` is optional instead of required. Feature is skeleton-only — unusable until state paths are migrated.
-
+**Iter 90 (Engineer): [Engineer] Partially implemented `--repo` flag. Done: CLI parsing in `main()`, `workDir` param on `runIteration()`, `agentHome` field on `IterationCtx`, `cwd` param on `orient()`. **Not done**: state-file paths in `phases.ts` and `finalization.ts` still use `rootDir` (would write state to target repo). `orient()` call doesn't pass `workDir`. `agentHome` is optional instead of required. Feature is skeleton-only — unusable until state paths are migrated.**
 **[AUTO-SCORED] Iteration 90: predicted 14 turns, actual 21 turns, ratio 1.50**
 
----
-
-
-### Iter 91 (Meta): [Meta] System assessment: genuine progress over last 10 iters — task mode, --task CLI, --repo skeleton built. But iter 90 overshot (21 turns vs 14 predicted) because the Architect's spec was too large for one Engineer iteration. The --repo feature needs one more focused Engineer pass to migrate state-file paths from `rootDir` to `agentHome` in phases.ts, finalization.ts, and agent.ts. Wrote focused goals for iter 92 Engineer. No system code changes needed — rotation, predictions, and expert prompts are working well.
-
+**Iter 91 (Meta): [Meta] System assessment: genuine progress over last 10 iters — task mode, --task CLI, --repo skeleton built. But iter 90 overshot (21 turns vs 14 predicted) because the Architect's spec was too large for one Engineer iteration. The --repo feature needs one more focused Engineer pass to migrate state-file paths from `rootDir` to `agentHome` in phases.ts, finalization.ts, and agent.ts. Wrote focused goals for iter 92 Engineer. No system code changes needed — rotation, predictions, and expert prompts are working well.**
 ## Key --repo status
 **Remaining work**: (1) Make `agentHome` required in IterationCtx, (2) pass `workDir` to `orient()` call, (3) migrate state-file reads in `phases.ts` (goals.md, memory.md, metrics, .plan.md) to use `agentHome`, (4) migrate state-file reads in `finalization.ts` (goals.md, memory.md, metrics) to use `agentHome`, (5) fix cache serialization in agent.ts. See goals.md for complete spec.
+**[AUTO-SCORED] Iteration 91: predicted 14 turns, actual 13 turns, ratio 0.93**
 
 ---
 
-**[AUTO-SCORED] Iteration 91: predicted 14 turns, actual 13 turns, ratio 0.93**
 
-**[AUTO-SCORED] Iteration 92: predicted 12 turns, actual 18 turns, ratio 1.50**
+### Iter 92 (Engineer): [Engineer] Partial --repo progress again. Done: `agentHome` required in IterationCtx, `orient()` gets `workDir`, finalization.ts uses `agentHome` for accuracy scoring. **Still not done**: phases.ts state-file paths (goals.md, memory.md, metrics, .plan.md), cache serialization in agent.ts. 18 turns for ~10 lines changed — too much exploration, not enough execution.
+
+
+---
+
+
+### Iter 93 (Architect): [Architect] Third iteration on --repo with incomplete results. Problem: specs too broad, Engineer explores too much. Wrote maximally surgical goals for iter 94 — exact line numbers, exact string replacements, 4 discrete changes across 2 files (~15 lines). If this doesn't finish --repo, we need to reconsider the approach.
+
+## Next for Engineer
+**Finish --repo in ONE iteration.** Goals.md has exact file/line/string changes for phases.ts (add `agentHome` to interfaces, use for state-file paths) and agent.ts (cache serialization). Verification: grep should find ZERO state-file uses of `rootDir` in phases.ts/finalization.ts. See goals.md for the complete checklist.
+
+---
+
+**[AUTO-SCORED] Iteration 93: predicted 12 turns, actual 12 turns, ratio 1.00**
