@@ -16,6 +16,8 @@ import { Orchestrator } from "./orchestrator.js";
 import { listSessions, type SessionInfo } from "./session-store.js";
 import type { EditPlan } from "./architect-mode.js";
 import { VirtualMessageList } from "./virtual-message-list.js";
+import { undoLastCommit } from "./auto-commit.js";
+import { execSync } from "child_process";
 
 // Parse args
 let workDir = process.cwd();
@@ -68,7 +70,7 @@ function Header({ model }: { model: string }) {
         {workDir}
       </Text>
       <Text color="gray" dimColor>
-        Commands: /help  /clear  /reindex  /exit  Esc
+        Commands: /help  /clear  /reindex  /diff  /undo  /exit  Esc
       </Text>
     </Box>
   );
@@ -282,9 +284,47 @@ function App() {
           "  /clear    — Clear the conversation history",
           "  /reindex  — Re-index the repository files",
           "  /resume   — List and restore a previous session",
+          "  /diff     — Show uncommitted git changes",
+          "  /undo     — Revert the last autoagent commit",
           "  /exit     — Quit AutoAgent",
         ].join("\n"),
       }]);
+      return;
+    }
+    if (trimmed === "/diff") {
+      try {
+        const isRepo = execSync("git rev-parse --is-inside-work-tree", {
+          cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"],
+        }).trim();
+        if (isRepo !== "true") throw new Error("not a repo");
+        const stat = execSync("git diff --stat", { cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+        const diff = execSync("git diff", { cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+        const combined = [stat, diff].filter(Boolean).join("\n\n");
+        if (!combined) {
+          setMessages(prev => [...prev, { role: "assistant", content: "No uncommitted changes." }]);
+        } else {
+          const lines = combined.split("\n");
+          const truncated = lines.length > 200 ? lines.slice(0, 200).join("\n") + "\n(truncated)" : combined;
+          setMessages(prev => [...prev, { role: "assistant", content: truncated }]);
+        }
+      } catch {
+        setMessages(prev => [...prev, { role: "assistant", content: "No uncommitted changes." }]);
+      }
+      return;
+    }
+    if (trimmed === "/undo") {
+      const result = await undoLastCommit(workDir);
+      if (result.undone) {
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          content: `✓ Undid commit ${result.hash}: ${result.message}`,
+        }]);
+      } else {
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          content: `Cannot undo: ${result.error}`,
+        }]);
+      }
       return;
     }
     if (trimmed === "/resume") {

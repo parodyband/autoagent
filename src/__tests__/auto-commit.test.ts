@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { autoCommit } from "../auto-commit.js";
+import { autoCommit, undoLastCommit } from "../auto-commit.js";
 
 // ─── Helpers ───────────────────────────────────────────────────
 
@@ -23,7 +23,7 @@ function cleanup(dir: string): void {
   fs.rmSync(dir, { recursive: true, force: true });
 }
 
-// ─── Tests ─────────────────────────────────────────────────────
+// ─── autoCommit tests ──────────────────────────────────────────
 
 describe("autoCommit", () => {
   let tmpDir: string;
@@ -110,5 +110,98 @@ describe("autoCommit", () => {
 
     expect(result.committed).toBe(true);
     expect(result.message).toBe("autoagent: first line");
+  });
+});
+
+// ─── undoLastCommit tests ──────────────────────────────────────
+
+describe("undoLastCommit", () => {
+  let tmpDir: string;
+
+  beforeEach(() => {
+    delete process.env.AUTOAGENT_NO_AUTOCOMMIT;
+  });
+
+  afterEach(() => {
+    if (tmpDir) cleanup(tmpDir);
+    delete process.env.AUTOAGENT_NO_AUTOCOMMIT;
+  });
+
+  it("undoes an autoagent commit", async () => {
+    tmpDir = mkTmpRepo();
+    // Make initial commit so HEAD~1 exists
+    addFile(tmpDir, "init.txt", "init");
+    execSync("git add -A && git commit -m 'initial'", { cwd: tmpDir, stdio: "ignore" });
+
+    // Make autoagent commit
+    addFile(tmpDir, "file.txt", "changed");
+    execSync("git add -A && git commit -m 'autoagent: fix bug'", { cwd: tmpDir, stdio: "ignore" });
+    const headBefore = execSync("git rev-parse HEAD", { cwd: tmpDir, encoding: "utf-8" }).trim();
+
+    const result = await undoLastCommit(tmpDir);
+
+    expect(result.undone).toBe(true);
+    expect(result.message).toBe("autoagent: fix bug");
+    expect(result.hash).toBeTruthy();
+
+    // HEAD should have changed
+    const headAfter = execSync("git rev-parse HEAD", { cwd: tmpDir, encoding: "utf-8" }).trim();
+    expect(headAfter).not.toBe(headBefore);
+
+    // Changes should be staged (soft reset)
+    const staged = execSync("git diff --cached --name-only", { cwd: tmpDir, encoding: "utf-8" }).trim();
+    expect(staged).toContain("file.txt");
+  });
+
+  it("refuses to undo a non-autoagent commit", async () => {
+    tmpDir = mkTmpRepo();
+    addFile(tmpDir, "init.txt", "init");
+    execSync("git add -A && git commit -m 'initial'", { cwd: tmpDir, stdio: "ignore" });
+    addFile(tmpDir, "file.txt", "changed");
+    execSync("git add -A && git commit -m 'manual commit'", { cwd: tmpDir, stdio: "ignore" });
+
+    const result = await undoLastCommit(tmpDir);
+
+    expect(result.undone).toBe(false);
+    expect(result.error).toMatch(/not an autoagent commit/i);
+  });
+
+  it("refuses when working tree has uncommitted changes", async () => {
+    tmpDir = mkTmpRepo();
+    addFile(tmpDir, "init.txt", "init");
+    execSync("git add -A && git commit -m 'autoagent: something'", { cwd: tmpDir, stdio: "ignore" });
+
+    // Add an uncommitted change
+    addFile(tmpDir, "dirty.txt", "dirty");
+
+    const result = await undoLastCommit(tmpDir);
+
+    expect(result.undone).toBe(false);
+    expect(result.error).toMatch(/uncommitted changes/i);
+  });
+
+  it("returns undone:false outside a git repo", async () => {
+    const nonRepo = fs.mkdtempSync(path.join(os.tmpdir(), "autoagent-nonrepo-"));
+    try {
+      const result = await undoLastCommit(nonRepo);
+      expect(result.undone).toBe(false);
+      expect(result.error).toMatch(/git repository/i);
+    } finally {
+      cleanup(nonRepo);
+    }
+  });
+
+  it("returns undone:false when AUTOAGENT_NO_AUTOCOMMIT=1", async () => {
+    tmpDir = mkTmpRepo();
+    addFile(tmpDir, "init.txt", "init");
+    execSync("git add -A && git commit -m 'initial'", { cwd: tmpDir, stdio: "ignore" });
+    addFile(tmpDir, "file.txt", "changed");
+    execSync("git add -A && git commit -m 'autoagent: fix'", { cwd: tmpDir, stdio: "ignore" });
+    process.env.AUTOAGENT_NO_AUTOCOMMIT = "1";
+
+    const result = await undoLastCommit(tmpDir);
+
+    expect(result.undone).toBe(false);
+    expect(result.error).toMatch(/disabled/i);
   });
 });
