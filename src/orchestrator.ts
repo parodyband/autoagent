@@ -551,6 +551,7 @@ async function runAgentLoop(
   signal?: AbortSignal,
   maxConsecutiveLoops = 2,
   hooksConfig: HooksConfig = {},
+  sessionFilesModified: Set<string> = new Set(),
 ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number; aborted?: boolean }> {
   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
     totalIn += tIn;
@@ -740,7 +741,7 @@ async function runAgentLoop(
         if (onFileWatch) {
           onFileWatch("write", writtenPath);
         }
-        this.sessionFilesModified.add(writtenPath);
+        sessionFilesModified.add(writtenPath);
         const result = compressToolOutput(tu.name, rawResult);
         results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
       }
@@ -1119,7 +1120,7 @@ export class Orchestrator {
   }
 
   /** Session statistics for /status display. */
-  getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: "↑" | "→" | "↓"; sessionCost: number; costSummary: string } {
+  getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: "↑" | "→" | "↓"; sessionCost: number; costSummary: string; filesModified: string[] } {
     const durationMs = Date.now() - this.sessionStartTime;
     const turnCount = this.turnCosts.length;
     const avgCostPerTurn = turnCount > 0 ? this.sessionCost / turnCount : 0;
