@@ -44,10 +44,13 @@ When setting PREDICTION_TURNS, use this formula:
 \`prediction = READ(1-2) + WRITE(1-2) + VERIFY(2) + META(3) + BUFFER(1-2)\`
 **Minimum for any code change: 9 turns.** Never predict less. Predictions of 5-7 have never been achieved.
 
+## Completion checklist (do these IN ORDER before writing goals/memory)
+1. If goals.md has a "Verification" section, **run those checks first**. If they fail, fix the code.
+2. Run \`npx tsc --noEmit\`.
+3. Only THEN write goals.md, memory, and restart.
+
 ## Rules
 - ESM project: use import, never require(). Use .js extensions in imports.
-- Run \`npx tsc --noEmit\` before finishing.
-- When done, run \`echo "AUTOAGENT_RESTART"\`.
 - Do NOT write essays in memory. Leave a short note: what you built, what's broken, what's next. 3-5 lines max.
 - Do NOT refactor unless that IS the task.
 - Do NOT add tests unless that IS the task.
