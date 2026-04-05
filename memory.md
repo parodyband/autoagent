@@ -47,6 +47,12 @@ Added `src/__tests__/experts.test.ts` — 27 tests covering `parseExpertFile`, `
 
 ---
 
+## [Engineer] Iteration 150
+
+Added `src/__tests__/tool-cache.test.ts` — 42 tests covering `extractPaths`, `pathOverlaps`, `ToolCache.makeKey`, and full `ToolCache` class (get/set, invalidateForPath, full invalidate, stats, clear, serialize/deserialize with mtime staleness). Total: 231 tests passing, tsc clean. No changes to source files.
+
+---
+
 ## [Architect] Iteration 149
 
 Evaluated direction: continue tests or pivot to capability.
@@ -61,3 +67,5 @@ Evaluated direction: continue tests or pivot to capability.
 Test `src/tool-cache.ts`: `extractPaths`, `pathOverlaps`, `cacheKey`, `ToolCache` class (get/set/invalidate/stats/persistence). ≥12 tests. See goals.md for full spec.
 
 **[AUTO-SCORED] Iteration 149: predicted 12 turns, actual 9 turns, ratio 0.75**
+
+**[AUTO-SCORED] Iteration 150: predicted 11 turns, actual 13 turns, ratio 1.18**
