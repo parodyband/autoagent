@@ -40,12 +40,15 @@ function isRetryable(err: unknown): boolean {
  * @param client  - Anthropic client instance
  * @param params  - Message creation params
  * @param maxRetries - Max retry attempts (default 3). Total attempts = maxRetries + 1.
+ * @param _delay  - Optional delay function (default: real setTimeout). Pass `() => Promise.resolve()` in tests.
  */
 export async function callWithRetry(
   client: Anthropic,
   params: Anthropic.MessageCreateParams,
-  maxRetries: number = DEFAULT_MAX_RETRIES
+  maxRetries: number = DEFAULT_MAX_RETRIES,
+  _delay?: (ms: number) => Promise<void>
 ): Promise<Anthropic.Message> {
+  const sleep = _delay ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -64,7 +67,7 @@ export async function callWithRetry(
         `[api-retry] Attempt ${attempt + 1}/${maxRetries + 1} failed${status}. Retrying in ${delayMs}ms...`
       );
 
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
+      await sleep(delayMs);
     }
   }
 

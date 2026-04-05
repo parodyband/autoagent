@@ -1619,11 +1619,12 @@ async function testRunConversation(): Promise<void> {
 async function testProcessTurnErrors(): Promise<void> {
   console.log("\n⚠️ processTurn Error Handling Tests");
 
-  // 1. API call throws network error → propagates (processTurn doesn't catch API errors)
+  // 1. API call throws error → propagates (processTurn doesn't catch API errors)
+  // Use a non-retryable message so callWithRetry doesn't add retry delays
   {
     const client = {
       messages: {
-        create: async () => { throw new Error("network timeout"); },
+        create: async () => { throw new Error("mock API failure"); },
       },
     };
     const ctx = makeMockCtx({ client: client as any });
@@ -1632,7 +1633,7 @@ async function testProcessTurnErrors(): Promise<void> {
       await processTurn(ctx);
     } catch (e: any) {
       threw = true;
-      assert(e.message === "network timeout", "error: API error message preserved");
+      assert(e.message === "mock API failure", "error: API error message preserved");
     }
     assert(threw, "error: API network error propagates from processTurn");
     assert(ctx.turns === 1, "error: turns still incremented before API call");
@@ -2025,6 +2026,9 @@ async function testSubagent(): Promise<void> {
 async function testApiRetry(): Promise<void> {
   console.log("\n🔄 callWithRetry Tests");
 
+  // Use zero-delay for all retry tests to avoid real sleep delays
+  const noDelay = () => Promise.resolve();
+
   // Test 1: Succeeds on first try — no retry needed
   {
     let callCount = 0;
@@ -2044,7 +2048,7 @@ async function testApiRetry(): Promise<void> {
         },
       },
     } as any;
-    const result = await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] });
+    const result = await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3, noDelay);
     assert(callCount === 1, "retry: succeeds on first try with no retries");
     assert(result.content[0].type === "text", "retry: returns valid response");
   }
@@ -2073,10 +2077,7 @@ async function testApiRetry(): Promise<void> {
         },
       },
     } as any;
-    // Use maxRetries=1 to keep test fast (no real delay needed — we mock setTimeout)
-    // We need to speed up backoff for tests: override with maxRetries=1, delay is 1s
-    // Instead, just verify the behavior with a small retry count by catching timing
-    const result = await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 1);
+    const result = await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 1, noDelay);
     assert(callCount === 2, "retry: retries once on 429 then succeeds", `callCount=${callCount}`);
     assert((result.content[0] as any).text === "ok after retry", "retry: returns response from second attempt");
   }
@@ -2096,7 +2097,7 @@ async function testApiRetry(): Promise<void> {
     } as any;
     let threw = false;
     try {
-      await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 2);
+      await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 2, noDelay);
     } catch {
       threw = true;
     }
@@ -2119,7 +2120,7 @@ async function testApiRetry(): Promise<void> {
     } as any;
     let threw = false;
     try {
-      await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3);
+      await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3, noDelay);
     } catch {
       threw = true;
     }
@@ -2142,7 +2143,7 @@ async function testApiRetry(): Promise<void> {
     } as any;
     let threw = false;
     try {
-      await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3);
+      await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3, noDelay);
     } catch {
       threw = true;
     }
