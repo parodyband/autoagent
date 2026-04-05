@@ -1,111 +1,3 @@
-136 |     log(`Planner error: ${msg}`);
-137 |     // Write a fallback plan
-138 |     const fallback = `# Plan — Iteration ${iteration}\n\n## Objective\nFix whatever broke last iteration.\n\n## Steps\n1. Read memory.md for context\n2. Check if tsc compiles\n3. Fix any issues\n4. Restart\n\n## Success criteria\n- tsc --noEmit passes\n- No regressions\n`;
-139 |     writeFileSync(path.join(agentHome, ".plan.md"), fallback, "utf-8");
-140 |     return { plan: fallback, inputTokens: 0, outputTokens: 0 };
-141 |   }
-142 | }
-[2026-04-05T11:05:49.045Z] iter=94 turn=10 INFO: Turn 10/25
-[2026-04-05T11:05:52.611Z] iter=94 turn=10 INFO: write_file: src/phases.ts (patch)
-[2026-04-05T11:05:52.612Z] iter=94 turn=10 INFO:   -> ok: Patched src/phases.ts: -5 +6 lines
-
-Context after patch:
-143 | 
-144 | // ─── Reviewer ───────────────────────────────────────────────
-145 | 
-146 | interface ReviewerInput {
-147 |   iteration: number;
-148 |   rootDir: string;
-149 |   agentHome: string;
-150 |   log: (msg: string) => void;
-151 | }
-152 | 
-153 | interface ReviewerResult {
-154 |   review: string;
-[2026-04-05T11:05:52.613Z] iter=94 turn=11 INFO: Turn 11/25
-[2026-04-05T11:05:55.947Z] iter=94 turn=11 INFO: write_file: src/phases.ts (patch)
-[2026-04-05T11:05:55.948Z] iter=94 turn=11 INFO:   -> ok: Patched src/phases.ts: -7 +7 lines
-
-Context after patch:
-156 |   outputTokens: number;
-157 | }
-158 | 
-159 | export async function runReviewer(input: ReviewerInput): Promise<ReviewerResult> {
-160 |   const { iteration, rootDir, agentHome, log } = input;
-161 | 
-162 |   log("Reviewer (Opus) starting...");
-163 | 
-164 |   // Read the plan
-165 |   const planPath = path.join(agentHome, ".plan.md");
-166 |   const plan = existsSync(planPath) ? readFileSync(planPath, "utf-8") : "(no plan found)";
-167 | 
-168 |   // Get the diff
-[2026-04-05T11:05:55.948Z] iter=94 turn=12 INFO: Turn 12/25
-[2026-04-05T11:05:58.186Z] iter=94 turn=12 INFO: write_file: src/phases.ts (patch)
-[2026-04-05T11:05:58.187Z] iter=94 turn=12 INFO:   -> ok: Patched src/phases.ts: -2 +2 lines
-
-Context after patch:
-171 |     30, rootDir, true
-172 |   );
-173 | 
-174 |   // Read current memory
-175 |   const memoryPath = path.join(agentHome, "memory.md");
-176 |   const memory = existsSync(memoryPath) ? readFileSync(memoryPath, "utf-8") : "";
-177 |   const recentMemory = memory.length > 3000 ? memory.slice(-3000) : memory;
-178 | 
-[2026-04-05T11:05:58.187Z] iter=94 turn=13 INFO: Turn 13/25
-[2026-04-05T11:06:00.604Z] iter=94 turn=13 INFO: write_file: src/phases.ts (patch)
-[2026-04-05T11:06:00.605Z] iter=94 turn=13 INFO:   -> ok: Patched src/phases.ts: -2 +2 lines
-
-Context after patch:
-176 |   const memory = existsSync(memoryPath) ? readFileSync(memoryPath, "utf-8") : "";
-177 |   const recentMemory = memory.length > 3000 ? memory.slice(-3000) : memory;
-178 | 
-179 |   // Metrics for this iteration
-180 |   const metricsPath = path.join(agentHome, ".autoagent-metrics.json");
-181 |   let thisIterMetrics = "";
-182 |   if (existsSync(metricsPath)) {
-183 |     try {
-[2026-04-05T11:06:00.605Z] iter=94 turn=14 INFO: Turn 14/25
-[2026-04-05T11:06:03.848Z] iter=94 turn=14 INFO: Agent: Now fix agent.ts cache serialization and the appendFileSync for memory in reviewer:
-[2026-04-05T11:06:03.849Z] iter=94 turn=14 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:06:03.849Z] iter=94 turn=14 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
-
-Context after patch:
-127 | 
-128 | async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> {
-129 |   try {
-130 |     const count = ctx.cache.serialize(CACHE_FILE, ctx.agentHome);
-131 |     ctx.log(`Cache persisted: ${count} entries to ${path.basename(CACHE_FILE)}`);
-132 |   } catch (err) {
-133 |     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
-[2026-04-05T11:06:03.850Z] iter=94 turn=14 INFO: HARD TURN CAP REACHED: 14 turns (predicted 9, cap 14). Forcing commit.
-[2026-04-05T11:06:03.853Z] iter=94 turn=14 INFO: Cache persisted: 27 entries to .autoagent-cache.json
-[2026-04-05T11:06:03.854Z] iter=94 turn=14 INFO: Cache stats: 1 hits, 2 misses, 27 entries, 10 invalidations (6 entries removed)
-[2026-04-05T11:06:03.854Z] iter=94 turn=14 INFO: Tool cache stats
-[2026-04-05T11:06:03.854Z] iter=94 turn=14 INFO: Tool timing: bash: 1x, avg=13ms, total=13ms; write_file: 10x, avg=1ms, total=13ms; think: 2x, avg=2ms, total=4ms; read_file: 2x, avg=2ms, total=4ms
-[2026-04-05T11:06:03.855Z] iter=94 turn=14 INFO: Tool timing stats
-[2026-04-05T11:06:07.931Z] iter=94 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 94: predicted 9 turns, actual 14 turns, ratio 1.56**
-[2026-04-05T11:06:10.542Z] iter=94 turn=14 INFO: Pre-commit review (1714in/78out): LGTM. This diff consistently migrates agent-internal files (`.plan.md`, `memory.md`, `.autoagent-metrics.json`, cache) from `rootDir` (the project being modified) to `agentHome` (the agent's own direc
-[2026-04-05T11:06:10.611Z] iter=94 turn=14 INFO: Committed: 66883a36 (20 in / 3223 out, cache: 16769 created, 190099 read)
-[2026-04-05T11:06:10.611Z] iter=94 turn=14 INFO: Restarting as iteration 95...
-[2026-04-05T11:06:10.800Z] iter=95 INFO: Cache restored: 27/27 entries (0 stale)
-[2026-04-05T11:06:10.801Z] iter=95 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T11:06:10.825Z] iter=95 INFO: Hard turn cap: 14 (1.5x prediction of 9)
-[2026-04-05T11:06:10.826Z] iter=95 turn=1 INFO: Turn 1/25
-[2026-04-05T11:06:15.231Z] iter=95 turn=1 INFO: Agent: 
-
-I need to assess the current state of the system. Let me start by understanding what happened in the last few iterations and whether the system is producing genuine improvement.
-[2026-04-05T11:06:15.233Z] iter=95 turn=1 INFO: $ cat /Users/austin/Documents/autoagent/.autoagent-metrics.json
-[2026-04-05T11:06:15.238Z] iter=95 turn=1 INFO: $ cat /Users/austin/Documents/autoagent/.expert-rotation.json
-[2026-04-05T11:06:15.244Z] iter=95 turn=1 INFO: $ cat /Users/austin/Documents/autoagent/goals.md
-[2026-04-05T11:06:15.256Z] iter=95 turn=1 INFO:   -> exit=0 (100036 chars)
-[2026-04-05T11:06:15.257Z] iter=95 turn=1 INFO:   -> exit=0 (1290 chars)
-[2026-04-05T11:06:15.262Z] iter=95 turn=1 INFO:   -> exit=0 (2647 chars)
-[2026-04-05T11:06:15.262Z] iter=95 turn=2 INFO: Turn 2/25
-[2026-04-05T11:06:21.604Z] iter=95 turn=2 INFO: think: Let me analyze the situation:
-
-1. I'm iteration 95, the Meta expert. 
 2. The goals.md was written for iteration 93 (Arch...
 [2026-04-05T11:06:21.605Z] iter=95 turn=3 INFO: Turn 3/25
 [2026-04-05T11:06:25.816Z] iter=95 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'rootDir.*goals\|rootDir.*memory\|rootDir.*metrics\|rootDir.*plan\|rootDir.*cache' src/phases.ts src/finalization.ts src/agent.ts 2>/dev/null || echo "N...
@@ -1104,3 +996,115 @@ The high output ratio warning is misleading here — as Meta, my job is assessme
 [2026-04-05T11:18:17.264Z] iter=103 turn=12 INFO: Tool timing stats
 [2026-04-05T11:18:21.117Z] iter=103 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 103: predicted 12 turns, actual 12 turns, ratio 1.00**
 [2026-04-05T11:18:21.135Z] iter=103 turn=12 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T11:18:21.163Z] iter=103 turn=12 INFO: Committed: 9c44fafa (18 in / 4724 out, cache: 56193 created, 511209 read)
+[2026-04-05T11:18:21.163Z] iter=103 turn=12 INFO: Restarting as iteration 104...
+[2026-04-05T11:18:21.335Z] iter=104 INFO: Cache restored: 29/29 entries (0 stale)
+[2026-04-05T11:18:21.336Z] iter=104 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T11:18:21.365Z] iter=104 INFO: Hard turn cap: 21 (1.5x prediction of 14)
+[2026-04-05T11:18:21.365Z] iter=104 turn=1 INFO: Turn 1/25
+[2026-04-05T11:18:23.745Z] iter=104 turn=1 INFO: Agent: I'll start by reading the relevant files to understand the current implementation before making changes.
+[2026-04-05T11:18:23.747Z] iter=104 turn=1 INFO: read_file: src/agent.ts
+[2026-04-05T11:18:23.748Z] iter=104 turn=1 INFO:   -> ok (14152 chars)
+[2026-04-05T11:18:23.748Z] iter=104 turn=1 INFO: read_file: src/conversation.ts
+[2026-04-05T11:18:23.748Z] iter=104 turn=1 INFO:   -> ok (13158 chars)
+[2026-04-05T11:18:23.749Z] iter=104 turn=2 INFO: Turn 2/25
+[2026-04-05T11:18:59.165Z] iter=104 turn=2 INFO: think: Now I understand the current structure. Let me analyze what needs to change:
+
+1. `doFinalize()` currently always calls `...
+[2026-04-05T11:18:59.165Z] iter=104 turn=3 INFO: Turn 3/25
+[2026-04-05T11:19:00.930Z] iter=104 turn=3 INFO: read_file: src/resuscitation.ts
+[2026-04-05T11:19:00.931Z] iter=104 turn=3 INFO:   -> ok (5450 chars)
+[2026-04-05T11:19:00.932Z] iter=104 turn=4 INFO: Turn 4/25
+[2026-04-05T11:19:16.057Z] iter=104 turn=4 INFO: think: Now I see the full picture. `handleIterationFailure()` always calls `config.restart()` at the end, which calls `process....
+[2026-04-05T11:19:16.057Z] iter=104 turn=5 INFO: Turn 5/25
+[2026-04-05T11:19:20.548Z] iter=104 turn=5 INFO: Agent: I have all the context I need. Making the changes now.
+[2026-04-05T11:19:20.548Z] iter=104 turn=5 INFO: write_file: src/conversation.ts (patch)
+[2026-04-05T11:19:20.549Z] iter=104 turn=5 INFO:   -> ok: Patched src/conversation.ts: -3 +5 lines
+
+Context after patch:
+61 |   systemPromptBuilder?: (state: IterationState, rootDir: string) => string;
+62 |   /** True when running a user task from TASK.md */
+63 |   taskMode?: boolean;
+64 |   /** When true, run exactly one iteration and exit cleanly (no restart) */
+65 |   once?: boolean;
+66 |   /** Set to true when the iteration has failed (used by --once exit code) */
+67 |   failed?: boolean;
+68 | }
+69 | 
+70 | export type TurnResult = "continue" | "break" | "restarted";
+71 | 
+[2026-04-05T11:19:20.550Z] iter=104 turn=6 INFO: Turn 6/25
+[2026-04-05T11:19:25.699Z] iter=104 turn=6 INFO: Agent: Now patch `doFinalize()` in `agent.ts` to use exit code based on `ctx.failed`, and handle the error path in `main()`:
+[2026-04-05T11:19:25.700Z] iter=104 turn=6 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:19:25.701Z] iter=104 turn=6 INFO:   -> ok: Patched src/agent.ts: -5 +6 lines
+
+Context after patch:
+160 |     ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
+161 |   }
+162 | 
+163 |   // --once mode: exit after finalization with appropriate exit code
+164 |   if (ctx.once) {
+165 |     const exitCode = ctx.failed ? 1 : 0;
+166 |     ctx.log(`--once mode: exiting after single iteration (exit ${exitCode})`);
+167 |     process.exit(exitCode);
+168 |   }
+169 | }
+170 | 
+171 | // ─── Restart ────────────────────────────────────────────────
+[2026-04-05T11:19:25.702Z] iter=104 turn=7 INFO: Turn 7/25
+[2026-04-05T11:19:30.633Z] iter=104 turn=7 INFO: Agent: Now handle the error path in `main()` — if `--once` is set and an exception is thrown, exit 1 immediately:
+[2026-04-05T11:19:30.634Z] iter=104 turn=7 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:19:30.635Z] iter=104 turn=7 INFO:   -> ok: Patched src/agent.ts: -5 +10 lines
+
+Context after patch:
+381 |     return;
+382 |   }
+383 | 
+384 |   try {
+385 |     await runIteration(state, WORK_DIR, onceMode);
+386 |   } catch (err) {
+387 |     if (onceMode) {
+388 |       const reason = err instanceof Error ? err.message : String(err);
+389 |       console.error("--once iteration failed:", reason);
+390 |       process.exit(1);
+391 |     }
+392 |     await handleIterationFailure(state, err, resusConfig);
+393 |   }
+394 | }
+395 | 
+396 | main().catch(async (err) => {
+[2026-04-05T11:19:30.636Z] iter=104 turn=8 INFO: Turn 8/25
+[2026-04-05T11:19:33.100Z] iter=104 turn=8 INFO: Agent: Now verify TypeScript compiles clean and run self-tests:
+[2026-04-05T11:19:33.101Z] iter=104 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T11:19:33.816Z] iter=104 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:19:33.816Z] iter=104 turn=9 INFO: Turn 9/25
+[2026-04-05T11:19:37.504Z] iter=104 turn=9 INFO: Agent: **Goal status:**
+- `process.exit(ctx.failed ? 1 : 0)` in `doFinalize()` — **DONE**
+- `process.exit(1)` on exception in `--once` mode — **DONE**
+- `failed?: boolean` on `IterationCtx` — **DONE**
+- `npx tsc --noEmit` passes — **DONE**
+- Self-tests — **NOT STARTED**
+[2026-04-05T11:19:37.505Z] iter=104 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -20
+[2026-04-05T11:19:41.314Z] iter=104 turn=9 INFO:   -> exit=0 (612 chars)
+[2026-04-05T11:19:41.315Z] iter=104 turn=10 INFO: Turn 10/25
+[2026-04-05T11:19:49.436Z] iter=104 turn=10 INFO: Agent: All passing. Write goals/memory and restart.
+[2026-04-05T11:19:49.437Z] iter=104 turn=10 INFO: write_file: goals.md (write)
+[2026-04-05T11:19:49.438Z] iter=104 turn=10 INFO:   -> ok: Updated goals.md (963 chars, -10 lines delta)
+[2026-04-05T11:19:49.439Z] iter=104 turn=11 INFO: Turn 11/25
+[2026-04-05T11:19:53.446Z] iter=104 turn=11 INFO: write_file: memory.md (patch)
+[2026-04-05T11:19:53.447Z] iter=104 turn=11 INFO:   -> ok: Patched memory.md: -1 +5 lines
+
+Context after patch:
+73 | 
+74 | ---
+75 | 
+76 | ## [Engineer] Iter 104: `--once` exit codes — DONE
+77 | 
+78 | `doFinalize()` now exits `ctx.failed ? 1 : 0`. Exception path in `main()` exits 1 immediately when `--once` is set (skips rollback/restart). Added `failed?: boolean` to `IterationCtx`. tsc clean, 638 tests pass.
+79 | 
+80 | ## [Engineer] Iter 102: `--once` flag — DONE
+81 | 
+82 | Implemented `--once` CLI flag: parses in `main()`, threads through `IterationCtx.once`, skips restart in `doFinalize()`, exits cleanly via `process.exit(0)`. Updated `printHelp()`. Files changed: `src/agent.ts`, `src/conversation.ts`. tsc clean.
+83 | 
+[2026-04-05T11:19:53.447Z] iter=104 turn=12 INFO: Turn 12/25
+[2026-04-05T11:19:57.728Z] iter=104 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status

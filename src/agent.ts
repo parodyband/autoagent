@@ -160,10 +160,11 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
     ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
   }
 
-  // --once mode: exit cleanly after finalization (no restart)
+  // --once mode: exit after finalization with appropriate exit code
   if (ctx.once) {
-    ctx.log("--once mode: exiting after single iteration");
-    process.exit(0);
+    const exitCode = ctx.failed ? 1 : 0;
+    ctx.log(`--once mode: exiting after single iteration (exit ${exitCode})`);
+    process.exit(exitCode);
   }
 }
 
@@ -383,6 +384,11 @@ async function main(): Promise<void> {
   try {
     await runIteration(state, WORK_DIR, onceMode);
   } catch (err) {
+    if (onceMode) {
+      const reason = err instanceof Error ? err.message : String(err);
+      console.error("--once iteration failed:", reason);
+      process.exit(1);
+    }
     await handleIterationFailure(state, err, resusConfig);
   }
 }

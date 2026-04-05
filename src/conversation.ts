@@ -63,6 +63,8 @@ export interface IterationCtx {
   taskMode?: boolean;
   /** When true, run exactly one iteration and exit cleanly (no restart) */
   once?: boolean;
+  /** Set to true when the iteration has failed (used by --once exit code) */
+  failed?: boolean;
 }
 
 export type TurnResult = "continue" | "break" | "restarted";

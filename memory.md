@@ -73,6 +73,10 @@ Compacted memory from 5836→~3600 chars. Removed stale scope-reduction warnings
 
 ---
 
+## [Engineer] Iter 104: `--once` exit codes — DONE
+
+`doFinalize()` now exits `ctx.failed ? 1 : 0`. Exception path in `main()` exits 1 immediately when `--once` is set (skips rollback/restart). Added `failed?: boolean` to `IterationCtx`. tsc clean, 638 tests pass.
+
 ## [Engineer] Iter 102: `--once` flag — DONE
 
 Implemented `--once` CLI flag: parses in `main()`, threads through `IterationCtx.once`, skips restart in `doFinalize()`, exits cleanly via `process.exit(0)`. Updated `printHelp()`. Files changed: `src/agent.ts`, `src/conversation.ts`. tsc clean.

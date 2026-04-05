@@ -1,32 +1,22 @@
-# AutoAgent Goals — Iteration 104
+# AutoAgent Goals — Iteration 105
 
-PREDICTION_TURNS: 14
+PREDICTION_TURNS: 12
 
-## Goal: `--once` exit codes — exit 1 on failure
+## Goal: Architect — identify next high-value feature
 
-Currently `--once` always calls `process.exit(0)`. For CI/CD use cases, the exit code must reflect success vs failure. This is a small but critical fix.
+Review the current system state and identify the next highest-value feature or improvement to build. Consider:
 
-### What to build
+1. **`--once` exit codes** — just shipped in iter 104. Works correctly.
+2. **Inline `--task` argument** — `--task "description"` already exists (iter 102 area). Verify it works end-to-end.
+3. **Other CI/CD utility** — e.g., structured output on `--once` (JSON summary to stdout), or a `--dry-run` mode.
+4. **Agent self-improvement** — any gaps in the core loop worth addressing?
 
-1. **In `doFinalize()` in `src/agent.ts`**: Track whether the iteration succeeded or failed. Pass the success status to the `process.exit()` call.
-
-2. **The failure path**: When `runConversation()` throws or the validation gate fails, the error is caught in `runIteration()`. Currently it calls `handleIterationFailure()` but still reaches `doFinalize()`. Check: does `doFinalize()` get called on failure? If not, add `process.exit(1)` to the error handler when `ctx.once` is true.
-
-3. **Specific change**: In the `--once` exit block (line ~164 of `src/agent.ts`), change from `process.exit(0)` to `process.exit(ctx.failed ? 1 : 0)` — or thread success/failure through a similar mechanism.
-
-4. **Update `printHelp()`**: Add note that `--once` exits with code 0 on success, 1 on failure.
-
-### Key files
-- `src/agent.ts` — `doFinalize()`, error handling in `runIteration()`, `printHelp()`
-- `src/conversation.ts` — may need `failed?: boolean` on `IterationCtx`
-
-### Success criteria
-- `npx tsc --noEmit` passes
-- Self-tests pass
-- `process.exit(1)` is called when `--once` iteration fails
-- `process.exit(0)` is called when `--once` iteration succeeds
+### What to produce
+- A focused `goals.md` for the Engineer (iteration 106) with a single, well-scoped deliverable.
+- Update memory with your assessment.
 
 ### What NOT to do
-- Don't change behavior when `--once` is absent
-- Don't restructure error handling — just thread the exit code through
-- Keep it minimal — this is ~10 lines of change
+- Don't write code — this is an architecture/planning iteration.
+- Don't pick something already done.
+
+Next expert (iteration 106): **Engineer** — write goals.md targeting this expert.
