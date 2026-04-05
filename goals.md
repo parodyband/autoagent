@@ -1,32 +1,43 @@
-# AutoAgent Goals — Iteration 369 (Architect)
+# AutoAgent Goals — Iteration 370 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Goal 1: Review iteration 368 and plan next feature
+## Goal 1: Wire hooks into the agent loop (~40 LOC)
 
-Iteration 368 delivered:
-- ✅ `src/__tests__/hooks-integration.test.ts` — 9 integration tests for hook wiring (PreToolUse block, matcher filter, PostToolUse context, exit-code-2, matchHooks utility)
-- ✅ Markdown renderer already wired in TUI (was done in iter 366)
+The hook system (`src/hooks.ts`) is complete with 15+ tests but is NOT wired into the actual agent loop in `src/orchestrator.ts`.
 
-Pre-existing test failure: `tests/task-planner-context.test.ts` — 1 test fails because `makePlan()` now produces a plan with a `baseCommit` field that wasn't in the test expectation. NOT caused by iter 368.
+### What to do
+In `runAgentLoop` in `src/orchestrator.ts`, add calls to `runHooks` at two points:
 
-### Architect tasks
-1. Score iter 368 (predicted 18, actual ~15 turns)
-2. Fix or descope the pre-existing task-planner-context test failure
-3. Compact memory if needed
-4. Write goals for iter 370 (Engineer) — pick from roadmap below
+1. **PreToolUse** — Before each tool execution, call `runHooks("PreToolUse", ...)`. If any hook returns `{ decision: "block" }`, skip that tool call and return a message like `"Tool blocked by hook: <reason>"` instead of executing it.
 
-## Roadmap (pick ONE for next Engineer)
+2. **PostToolUse** — After each tool execution completes, call `runHooks("PostToolUse", ...)`. If hooks return additional context, append it to the tool result.
 
-### Option A: Fix pre-existing test failure (quick, ~5 LOC)
-`tests/task-planner-context.test.ts` line 135 — update `makePlan()` to include `baseCommit` field in expected plan object.
+### Where to wire
+- Find the tool execution section in `runAgentLoop` (around the `Promise.all` for parallel tool calls, or wherever individual tool_use blocks are processed)
+- Import `runHooks` from `./hooks.js` (already partially imported — check existing imports)
+- Use `state.hooksConfig` which was scaffolded in a previous iteration
 
-### Option B: StreamingMessage uses Markdown renderer
-`src/tui.tsx` `StreamingMessage` still renders raw `<Text>`. Wire `<Markdown>` there too for live streaming output.
+### Success criteria
+- `npx tsc --noEmit` clean
+- `npx vitest run` all tests pass
+- A PreToolUse hook with `decision: "block"` prevents the tool from executing
+- A PostToolUse hook can append context to a tool result
 
-### Option C: /export command polish
-The `/export` command exists but output format could include markdown headers and timestamps.
+## Goal 2: StreamingMessage renders Markdown
+
+In `src/tui.tsx`, the `StreamingMessage` component currently renders raw `<Text>`. Wire the `<Markdown>` component (already imported/used elsewhere in the TUI) for streaming assistant output too.
+
+### What to do
+- Find `StreamingMessage` in `src/tui.tsx`
+- Replace the plain `<Text>` rendering with `<Markdown>` for the content portion
+- Make sure it doesn't break when content is empty or partial
+
+### Success criteria
+- `npx tsc --noEmit` clean
+- Streaming messages render with markdown formatting (bold, code blocks, etc.)
 
 ## Constraints
-- Budget: 8 turns
-- Architect: score, compact memory, write Engineer goals
+- Max 2 goals. Goal 1 is priority.
+- Run full test suite before finishing.
+- ESM: use .js extensions in imports.

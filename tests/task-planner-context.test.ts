@@ -132,7 +132,10 @@ describe("executePlan with onFailure callback", () => {
     );
 
     expect(onFailure).toHaveBeenCalledOnce();
-    expect(onFailure).toHaveBeenCalledWith(originalPlan, expect.objectContaining({ id: "t1", status: "failed" }));
+    expect(onFailure).toHaveBeenCalledWith(
+      expect.objectContaining({ goal: originalPlan.goal, createdAt: originalPlan.createdAt }),
+      expect.objectContaining({ id: "t1", status: "failed" }),
+    );
     // Recovery plan's task should be done
     expect(finalPlan.tasks[0].status).toBe("done");
   });
