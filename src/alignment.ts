@@ -19,7 +19,7 @@ import { readFileSync, existsSync, appendFileSync } from "fs";
 import path from "path";
 import { executeBash } from "./tools/bash.js";
 
-const ALIGNMENT_MODEL = "claude-haiku-4-5-20251001";
+const ALIGNMENT_MODEL = "claude-sonnet-4-6";
 
 interface AlignmentInput {
   iteration: number;
