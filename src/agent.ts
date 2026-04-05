@@ -223,11 +223,18 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
   // Parse predicted turns from goals before they get rewritten
   const goalsContent = readGoals(state.iteration);
   const predMatch = goalsContent.match(/PREDICTION_TURNS:\s*(\d+)/);
-  const predictedTurns = predMatch ? parseInt(predMatch[1], 10) : null;
+  const rawPrediction = predMatch ? parseInt(predMatch[1], 10) : null;
 
   // Compute adaptive turn budget from historical metrics + calibration
-  const turnBudget = computeTurnBudget(METRICS_FILE, predictedTurns, MAX_TURNS, 10, workDir);
-  log(state.iteration, `Turn budget: ${turnBudget.recommended}/${turnBudget.hardMax} (calibration=${turnBudget.calibration.toFixed(2)}x, predicted=${predictedTurns})`);
+  const turnBudget = computeTurnBudget(METRICS_FILE, rawPrediction, MAX_TURNS, 10, workDir);
+
+  // Auto-correct under-predictions: if calibration says we underestimate by >20%,
+  // use the calibrated prediction instead of the raw one. This closes the loop —
+  // without this, the agent sees "predict higher" but ctx.predictedTurns stays low.
+  const predictedTurns = (rawPrediction && turnBudget.calibration > 1.2)
+    ? Math.ceil(rawPrediction * turnBudget.calibration)
+    : rawPrediction;
+  log(state.iteration, `Turn budget: ${turnBudget.recommended}/${turnBudget.hardMax} (calibration=${turnBudget.calibration.toFixed(2)}x, raw=${rawPrediction}, effective=${predictedTurns})`);
 
   // Compute next expert so current expert can write properly-targeted goals
   const nextExpert = pickExpert(state.iteration + 1, experts);
