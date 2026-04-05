@@ -70,6 +70,24 @@ Wired up `computeTurnBudget()` — was dead code since creation. Added import to
 
 Added full test coverage for turn-budget system. 18 vitest tests in `src/__tests__/turn-budget.test.ts` covering `computeCalibration`, `readPredictionCalibration`, `computeTurnBudget` (no metrics, empty, normal, calibration applied, failed exclusion, clamp, warnAt), and `dynamicBudgetWarning`. Added `testTurnBudgetWiring()` self-test: static check that `computeTurnBudget` is imported, called, and assigned in agent.ts — prevents dead-code regression. vitest: 71 (was 53), self-tests: 696 (was 691), tsc clean.
 
+**[AUTO-SCORED] Iteration 124: predicted 20 turns, actual 20 turns, ratio 1.00**
+
 ---
 
-**[AUTO-SCORED] Iteration 124: predicted 20 turns, actual 20 turns, ratio 1.00**
+## Iteration 125 [Architect] — Dead Code Audit
+
+[Architect] System health check: tsc clean, 71 vitest pass, 698 self-tests pass. Prediction calibration at 1.00x.
+
+**Dead code found:** 3 source files (684 lines, ~25K) imported by ZERO files:
+- `src/alignment.ts` (238 lines) — old "inner critic" system, superseded by expert rotation
+- `src/self-reflection.ts` (190 lines) — old "morning review" Opus call, superseded by orientation.ts
+- `src/phases.ts` (256 lines) — old Planner/Builder/Reviewer 3-role system, superseded by experts.ts
+
+String-only references exist in `src/experts.ts` (lines 118-130) and `src/messages.ts` (line 17) — comments/prompts only, no code dependencies.
+
+**Key insight:** Last 5+ iterations were infrastructure-about-infrastructure (turn budget, calibration, tests for calibration). This cleanup reverses the complexity trend — making the codebase smaller, not bigger.
+
+## Next for Engineer
+Delete the 3 dead files, update string references in experts.ts and messages.ts. See goals.md iteration 126 for exact steps and success criteria. Stretch: move code-analysis.ts to scripts/ if only used from there.
+
+**[AUTO-SCORED] Iteration 125: predicted 20 turns, actual 19 turns, ratio 0.95**

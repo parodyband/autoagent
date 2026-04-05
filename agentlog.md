@@ -1,160 +1,3 @@
-2083 |   }
-2084 | 
-2085 |   // Test 3: Gives up after maxRetries and throws
-2086 |   {
-2087 |     let callCount = 0;
-2088 |     const mockClient = {
-2089 |       messages: {
-2090 |         create: async (_params: unknown) => {
-2091 |           callCount++;
-2092 |           const err = Object.assign(new Error("Overloaded"), { status: 529 });
-2093 |           Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
-2094 |           throw err;
-2095 |         },
-2096 |       },
-2097 |     } as any;
-2098 |     let threw = false;
-2099 |     try {
-2100 |       await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 2, noDelay);
-2101 |     } catch {
-2102 |       threw = true;
-2103 |     }
-2104 |     assert(threw, "retry: throws after maxRetries exhausted");
-2105 |     assert(callCount === 3, "retry: made exactly maxRetries+1 attempts", `callCount=${callCount}`);
-2106 |   }
-2107 | 
-2108 |   // Test 4: Does NOT retry on 400
-2109 |   {
-2110 |     let callCount = 0;
-2111 |     const mockClient = {
-2112 |       messages: {
-2113 |         create: async (_params: unknown) => {
-2114 |           callCount++;
-2115 |           const err = Object.assign(new Error("Bad request"), { status: 400 });
-2116 |           Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
-2117 |           throw err;
-2118 |         },
-2119 |       },
-2120 |     } as any;
-2121 |     let threw = false;
-2122 |     try {
-2123 |       await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3, noDelay);
-2124 |     } catch {
-2125 |       threw = true;
-2126 |     }
-2127 |     assert(threw, "retry: throws immediately on 400");
-2128 |     assert(callCount === 1, "retry: does NOT retry on 400 (client error)", `callCount=${callCount}`);
-2129 |   }
-2130 | 
-2131 |   // Test 5: Does NOT retry on 401
-2132 |   {
-2133 |     let callCount = 0;
-2134 |     const mockClient = {
-2135 |       messages: {
-2136 |         create: async (_params: unknown) => {
-2137 |           callCount++;
-2138 |           const err = Object.assign(new Error("Unauthorized"), { status: 401 });
-2139 |           Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
-2140 |           throw err;
-2141 |         },
-2142 |       },
-2143 |     } as any;
-2144 |     let threw = false;
-2145 |     try {
-2146 |       await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3, noDelay);
-2147 |     } catch {
-2148 |       threw = true;
-2149 |     }
-2150 |     assert(threw, "retry: throws immediately on 401");
-2151 |     assert(callCount === 1, "retry: does NOT retry on 401 (auth error)", `callCount=${callCount}`);
-2152 |   }
-2153 | }
-2154 | 
-2155 | // ─── TASK.md Lifecycle Tests ────────────────────────────────
-2156 | 
-[2026-04-05T11:46:46.548Z] iter=116 turn=8 INFO: Turn 8/25
-[2026-04-05T11:46:49.671Z] iter=116 turn=8 INFO: Agent: Now verify with TypeScript and run the self-test:
-[2026-04-05T11:46:49.672Z] iter=116 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T11:46:50.407Z] iter=116 turn=8 INFO:   -> exit=0 (11 chars)
-[2026-04-05T11:46:50.407Z] iter=116 turn=9 INFO: Turn 9/25
-[2026-04-05T11:46:54.948Z] iter=116 turn=9 INFO: Agent: **Goal status: DONE** — TypeScript passes, fixes are in place. Running the self-test to verify:
-[2026-04-05T11:46:54.949Z] iter=116 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && time npx tsx scripts/self-test.ts 2>&1 | tail -5
-[2026-04-05T11:46:59.751Z] iter=116 turn=9 INFO:   -> exit=0 (158 chars)
-[2026-04-05T11:46:59.751Z] iter=116 turn=10 INFO: Turn 10/25
-[2026-04-05T11:47:03.607Z] iter=116 turn=10 INFO: Agent: 4.4s — under the 5s target. Committing and restarting.
-[2026-04-05T11:47:03.608Z] iter=116 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && git add src/api-retry.ts scripts/self-test.ts && git commit -m "fix: self-test perf regression — inject zero-delay in retry tests (31s→4s)"
-[2026-04-05T11:47:03.649Z] iter=116 turn=10 INFO:   -> exit=0 (144 chars)
-[2026-04-05T11:47:03.649Z] iter=116 turn=11 INFO: Turn 11/25
-[2026-04-05T11:47:08.922Z] iter=116 turn=11 INFO: write_file: goals.md (write)
-[2026-04-05T11:47:08.924Z] iter=116 turn=11 INFO:   -> ok: Updated goals.md (512 chars, -12 lines delta)
-[2026-04-05T11:47:08.924Z] iter=116 turn=12 INFO: Turn 12/25
-[2026-04-05T11:47:14.930Z] iter=116 turn=12 INFO: write_file: memory.md (append)
-[2026-04-05T11:47:14.930Z] iter=116 turn=12 INFO:   -> ok: Appended 446 chars to memory.md
-[2026-04-05T11:47:14.931Z] iter=116 turn=13 INFO: Turn 13/25
-[2026-04-05T11:47:16.606Z] iter=116 turn=13 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T11:47:16.606Z] iter=116 turn=13 INFO: RESTART signal
-[2026-04-05T11:47:16.607Z] iter=116 turn=13 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T11:47:17.343Z] iter=116 turn=13 INFO: Compilation OK
-[2026-04-05T11:47:22.240Z] iter=116 turn=13 INFO: Cache persisted: 35 entries to .autoagent-cache.json
-[2026-04-05T11:47:22.241Z] iter=116 turn=13 INFO: Cache stats: 0 hits, 1 misses, 35 entries, 5 invalidations (1 entries removed)
-[2026-04-05T11:47:22.241Z] iter=116 turn=13 INFO: Tool cache stats
-[2026-04-05T11:47:22.241Z] iter=116 turn=13 INFO: Tool timing: bash: 7x, avg=5294ms, total=37061ms; write_file: 5x, avg=2ms, total=9ms; read_file: 1x, avg=1ms, total=1ms; think: 2x, avg=1ms, total=1ms
-[2026-04-05T11:47:22.241Z] iter=116 turn=13 INFO: Tool timing stats
-[2026-04-05T11:47:26.492Z] iter=116 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 116: predicted 12 turns, actual 13 turns, ratio 1.08**
-[2026-04-05T11:47:26.510Z] iter=116 turn=13 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T11:47:26.538Z] iter=116 turn=13 INFO: Committed: d16cce9c (19 in / 8212 out, cache: 57096 created, 580938 read)
-[2026-04-05T11:47:26.538Z] iter=116 turn=13 INFO: Restarting as iteration 117...
-[2026-04-05T11:47:26.712Z] iter=117 INFO: Cache restored: 35/35 entries (0 stale)
-[2026-04-05T11:47:26.713Z] iter=117 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T11:47:26.740Z] iter=117 INFO: Hard turn cap: 18 (1.5x prediction of 12)
-[2026-04-05T11:47:26.740Z] iter=117 turn=1 INFO: Turn 1/25
-[2026-04-05T11:47:30.643Z] iter=117 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the system, then decide what's highest-leverage next.
-[2026-04-05T11:47:30.644Z] iter=117 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -80
-[2026-04-05T11:47:30.646Z] iter=117 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -20
-[2026-04-05T11:47:30.649Z] iter=117 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/*.ts src/**/*.ts 2>/dev/null
-[2026-04-05T11:47:30.655Z] iter=117 turn=1 INFO:   -> exit=0 (1679 chars)
-[2026-04-05T11:47:30.661Z] iter=117 turn=1 INFO:   -> exit=0 (1125 chars)
-[2026-04-05T11:47:30.666Z] iter=117 turn=1 INFO:   -> exit=0 (851 chars)
-[2026-04-05T11:47:30.666Z] iter=117 turn=2 INFO: Turn 2/25
-[2026-04-05T11:47:35.445Z] iter=117 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | python3 -c "
-import json, sys
-data = json.load(sys.stdin)
-# Last 10 iterations
-recent = data[-10:]
-for m in recent:
-    i = m['ite...
-[2026-04-05T11:47:35.448Z] iter=117 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T11:47:35.451Z] iter=117 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npm test 2>&1 | tail -10
-[2026-04-05T11:47:35.562Z] iter=117 turn=2 INFO:   -> exit=0 (220 chars)
-[2026-04-05T11:47:35.580Z] iter=117 turn=2 INFO:   -> exit=0 (520 chars)
-[2026-04-05T11:47:36.102Z] iter=117 turn=2 INFO:   -> exit=0 (11 chars)
-[2026-04-05T11:47:36.102Z] iter=117 turn=3 INFO: Turn 3/25
-[2026-04-05T11:47:38.866Z] iter=117 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -20
-[2026-04-05T11:47:38.868Z] iter=117 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && node scripts/self-test.js 2>&1 | tail -20
-[2026-04-05T11:47:38.909Z] iter=117 turn=3 INFO:   -> exit=0 (759 chars)
-[2026-04-05T11:47:39.940Z] iter=117 turn=3 INFO:   -> exit=0 (509 chars)
-[2026-04-05T11:47:39.941Z] iter=117 turn=4 INFO: Turn 4/25
-[2026-04-05T11:47:43.335Z] iter=117 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && ls scripts/ && head -5 package.json
-[2026-04-05T11:47:43.337Z] iter=117 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -20
-[2026-04-05T11:47:43.349Z] iter=117 turn=4 INFO:   -> exit=0 (183 chars)
-[2026-04-05T11:47:47.536Z] iter=117 turn=4 INFO:   -> exit=0 (639 chars)
-[2026-04-05T11:47:47.536Z] iter=117 turn=5 INFO: Turn 5/25
-[2026-04-05T11:48:05.354Z] iter=117 turn=5 INFO: think: Let me assess the situation clearly:
-
-The system is healthy: 679 tests pass, tsc clean, self-test at 3.8s. Recent iterat...
-[2026-04-05T11:48:05.355Z] iter=117 turn=6 INFO: Turn 6/25
-[2026-04-05T11:48:10.064Z] iter=117 turn=6 INFO: Agent: Good point. My deliverables are: (1) goals.md for Engineer iteration 118, (2) memory.md entry. Let me do a quick targeted scan then write both.
-[2026-04-05T11:48:10.065Z] iter=117 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn 'TODO\|FIXME\|HACK\|XXX\|WORKAROUND' src/ --include='*.ts' 2>/dev/null | head -20
-[2026-04-05T11:48:10.068Z] iter=117 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
-[2026-04-05T11:48:10.081Z] iter=117 turn=6 INFO:   -> exit=0 (512 chars)
-[2026-04-05T11:48:10.094Z] iter=117 turn=6 INFO:   -> exit=0 (416 chars)
-[2026-04-05T11:48:10.094Z] iter=117 turn=7 INFO: Turn 7/25
-[2026-04-05T11:48:17.263Z] iter=117 turn=7 INFO: subagent [fast]: I have a codebase for an AI coding agent called AutoAgent. It's 6537 lines of TypeScript across thes...
-[2026-04-05T11:48:30.701Z] iter=117 turn=7 INFO:   -> claude-haiku-4-5-20251001 (335in/1072out)
-[2026-04-05T11:48:30.703Z] iter=117 turn=8 INFO: Turn 8/25
-[2026-04-05T11:48:48.157Z] iter=117 turn=8 INFO: think: The subagent's suggestions are reasonable but somewhat generic. Let me think about what's actually most impactful for TH...
 [2026-04-05T11:48:48.158Z] iter=117 turn=9 INFO: Turn 9/25
 [2026-04-05T11:48:56.665Z] iter=117 turn=9 INFO: think: My goals for iteration 117 (Architect):
 1. Review iteration 116 outcome ✅ DONE - confirmed self-test perf fix works (3.8...
@@ -1153,3 +996,142 @@ Context after patch:
 [2026-04-05T12:02:23.560Z] iter=124 turn=20 INFO: Tool timing stats
 [2026-04-05T12:02:28.310Z] iter=124 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 124: predicted 20 turns, actual 20 turns, ratio 1.00**
 [2026-04-05T12:02:28.329Z] iter=124 turn=20 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T12:02:28.357Z] iter=124 turn=20 INFO: Committed: 1361e2b0 (30 in / 6263 out, cache: 17544 created, 252659 read)
+[2026-04-05T12:02:28.357Z] iter=124 turn=20 INFO: Restarting as iteration 125...
+[2026-04-05T12:02:28.541Z] iter=125 INFO: Cache restored: 37/37 entries (0 stale)
+[2026-04-05T12:02:28.543Z] iter=125 INFO: Turn budget: 21/25 (calibration=1.25x, predicted=20)
+[2026-04-05T12:02:28.544Z] iter=125 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T12:02:28.575Z] iter=125 turn=1 INFO: Turn 1/25
+[2026-04-05T12:02:32.754Z] iter=125 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state of the system, then identify the highest-leverage next task.
+[2026-04-05T12:02:32.756Z] iter=125 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T12:02:32.763Z] iter=125 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -15
+[2026-04-05T12:02:32.771Z] iter=125 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && node scripts/self-test.ts 2>&1 | tail -5
+[2026-04-05T12:02:32.774Z] iter=125 turn=1 INFO: list_files: src (depth=3)
+[2026-04-05T12:02:32.789Z] iter=125 turn=1 INFO:   -> ok (2 dirs, 38 files)
+[2026-04-05T12:02:32.866Z] iter=125 turn=1 INFO:   -> exit=0 (120 chars)
+[2026-04-05T12:02:33.463Z] iter=125 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:02:33.859Z] iter=125 turn=1 INFO:   -> exit=0 (562 chars)
+[2026-04-05T12:02:33.860Z] iter=125 turn=2 INFO: Turn 2/25
+[2026-04-05T12:02:38.251Z] iter=125 turn=2 INFO: Agent: Self-tests are failing. Let me check that first.
+[2026-04-05T12:02:38.252Z] iter=125 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && node scripts/self-test.ts 2>&1 | head -30
+[2026-04-05T12:02:38.254Z] iter=125 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null | head -60
+[2026-04-05T12:02:38.262Z] iter=125 turn=2 INFO:   -> exit=0 (1267 chars)
+[2026-04-05T12:02:38.350Z] iter=125 turn=2 INFO:   -> exit=0 (950 chars)
+[2026-04-05T12:02:38.350Z] iter=125 turn=3 INFO: Turn 3/25
+[2026-04-05T12:02:41.713Z] iter=125 turn=3 INFO: think: Self-tests are failing with ERR_MODULE_NOT_FOUND for src/tools/bash.js. This is a ts-node/ESM issue where imports with ....
+[2026-04-05T12:02:41.714Z] iter=125 turn=4 INFO: Turn 4/25
+[2026-04-05T12:02:44.889Z] iter=125 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && head -30 scripts/self-test.ts
+[2026-04-05T12:02:44.892Z] iter=125 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && cat tsconfig.json
+[2026-04-05T12:02:44.894Z] iter=125 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && cat package.json | head -20
+[2026-04-05T12:02:44.901Z] iter=125 turn=4 INFO:   -> exit=0 (1965 chars)
+[2026-04-05T12:02:44.905Z] iter=125 turn=4 INFO:   -> exit=0 (317 chars)
+[2026-04-05T12:02:44.911Z] iter=125 turn=4 INFO:   -> exit=0 (366 chars)
+[2026-04-05T12:02:44.911Z] iter=125 turn=5 INFO: Turn 5/25
+[2026-04-05T12:03:00.501Z] iter=125 turn=5 INFO: think: My deliverables are:
+1. Assess system health (tsc clean ✓, vitest 71 pass ✓, self-tests FAILING ✗)
+2. Identify the highe...
+[2026-04-05T12:03:00.501Z] iter=125 turn=6 INFO: Turn 6/25
+[2026-04-05T12:03:11.576Z] iter=125 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -5
+[2026-04-05T12:03:11.578Z] iter=125 turn=6 INFO: subagent [balanced]: Analyze these AutoAgent source files and identify dead code, unused exports, or unnecessary complexi...
+[2026-04-05T12:03:15.995Z] iter=125 turn=6 INFO:   -> exit=0 (100 chars)
+[2026-04-05T12:03:42.109Z] iter=125 turn=6 INFO:   -> claude-sonnet-4-6 (577in/1500out)
+[2026-04-05T12:03:42.110Z] iter=125 turn=7 INFO: Turn 7/25
+[2026-04-05T12:03:56.882Z] iter=125 turn=7 INFO: think: OK so the subagent was cut off at the end but it gave very good analysis. Let me think about this carefully.
+
+The subage...
+[2026-04-05T12:03:56.882Z] iter=125 turn=8 INFO: Turn 8/25
+[2026-04-05T12:04:01.362Z] iter=125 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && for f in src/*.ts; do
+  basename=$(basename "$f" .ts)
+  # Check if this module is imported by any other src file (not tests)
+  importers=$(grep -rl "from.*['\"]...
+[2026-04-05T12:04:01.608Z] iter=125 turn=8 INFO:   -> exit=0 (1418 chars)
+[2026-04-05T12:04:01.609Z] iter=125 turn=9 INFO: Turn 9/25
+[2026-04-05T12:04:09.816Z] iter=125 turn=9 INFO: Agent: 
+
+**Goal status:**
+1. Review system health — **DONE** (tsc clean ✓, vitest 71 pass ✓, self-tests 698 pass ✓)
+2. Identify technical debt / gaps — **DONE** (found: `alignment.ts`, `phases.ts`, `self-reflection.ts` imported by 0 src files — likely dead or only used via dynamic imports)
+3. Identify next concrete coding task — **IN PROGRESS** (have strong candidate, need to verify)
+4. Write goals.md fo...
+[2026-04-05T12:04:09.817Z] iter=125 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "alignment\|self-reflection\|phases" src/agent.ts | head -20
+[2026-04-05T12:04:09.823Z] iter=125 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "alignment\|selfReflection\|self-reflection\|phases" src/*.ts scripts/*.ts | grep -i "import" | grep -v __tests__
+[2026-04-05T12:04:09.847Z] iter=125 turn=9 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:04:09.866Z] iter=125 turn=9 INFO:   -> exit=0 (114 chars)
+[2026-04-05T12:04:09.866Z] iter=125 turn=10 INFO: Turn 10/25
+[2026-04-05T12:04:12.444Z] iter=125 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "from.*alignment\|from.*self-reflection\|from.*phases" src/ scripts/ --include='*.ts' | grep -v __tests__
+[2026-04-05T12:04:12.478Z] iter=125 turn=10 INFO:   -> exit=1 (11 chars)
+[2026-04-05T12:04:12.479Z] iter=125 turn=11 INFO: Turn 11/25
+[2026-04-05T12:04:19.100Z] iter=125 turn=11 INFO: think: Confirmed: alignment.ts, self-reflection.ts, and phases.ts are imported by ZERO other files. They are dead code. That's ...
+[2026-04-05T12:04:19.101Z] iter=125 turn=12 INFO: Turn 12/25
+[2026-04-05T12:04:22.068Z] iter=125 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "alignment\|self-reflection\|selfReflection\|phases" src/ scripts/ --include='*.ts' | grep -v __tests__ | grep -v "^src/alignment\|^src/self-reflection...
+[2026-04-05T12:04:22.103Z] iter=125 turn=12 INFO:   -> exit=0 (384 chars)
+[2026-04-05T12:04:22.103Z] iter=125 turn=13 INFO: Turn 13/25
+[2026-04-05T12:04:26.265Z] iter=125 turn=13 INFO: Agent: These are just string references in comments/prompts — not actual imports. The files are confirmed dead code.
+
+Now let me also quickly check: do these files export anything that's re-exported or used indirectly?
+[2026-04-05T12:04:26.265Z] iter=125 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && head -5 src/alignment.ts src/self-reflection.ts src/phases.ts
+[2026-04-05T12:04:26.274Z] iter=125 turn=13 INFO:   -> exit=0 (662 chars)
+[2026-04-05T12:04:26.274Z] iter=125 turn=14 INFO: Turn 14/25
+[2026-04-05T12:04:29.851Z] iter=125 turn=14 INFO: Agent: All confirmed dead. These were older architectural components that got superseded by the expert rotation system. Now let me write goals.md.
+[2026-04-05T12:04:29.851Z] iter=125 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/alignment.ts src/self-reflection.ts src/phases.ts
+[2026-04-05T12:04:29.860Z] iter=125 turn=14 INFO:   -> exit=0 (96 chars)
+[2026-04-05T12:04:29.860Z] iter=125 turn=15 INFO: Turn 15/25
+[2026-04-05T12:04:43.777Z] iter=125 turn=15 INFO: Agent: 684 lines of dead code. Now write the goals and memory.
+[2026-04-05T12:04:43.777Z] iter=125 turn=15 INFO: write_file: goals.md (write)
+[2026-04-05T12:04:43.778Z] iter=125 turn=15 INFO:   -> ok: Updated goals.md (1851 chars, +13 lines delta)
+[2026-04-05T12:04:43.779Z] iter=125 turn=16 INFO: Turn 16/25
+[2026-04-05T12:04:47.872Z] iter=125 turn=16 INFO: Agent: 
+
+Right — this is an Architect iteration, no src/ changes expected. Goals are written. Let me finalize.
+[2026-04-05T12:04:47.873Z] iter=125 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
+[2026-04-05T12:04:48.608Z] iter=125 turn=16 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:04:48.608Z] iter=125 turn=17 INFO: Turn 17/25
+[2026-04-05T12:04:50.722Z] iter=125 turn=17 INFO: Agent: Now update memory:
+[2026-04-05T12:04:50.723Z] iter=125 turn=17 INFO: read_file: memory.md
+[2026-04-05T12:04:50.724Z] iter=125 turn=17 INFO:   -> ok (4025 chars)
+[2026-04-05T12:04:50.724Z] iter=125 turn=18 INFO: Turn 18/25
+[2026-04-05T12:05:01.980Z] iter=125 turn=18 INFO: write_file: memory.md (patch)
+[2026-04-05T12:05:01.982Z] iter=125 turn=18 INFO:   -> ok: Patched memory.md: -7 +23 lines
+
+Context after patch:
+66 | ---
+67 | 
+68 | 
+69 | ## Iteration 124 [Engineer]
+70 | 
+71 | Added full test coverage for turn-budget system. 18 vitest tests in `src/__tests__/turn-budget.test.ts` covering `computeCalibration`, `readPredictionCalibration`, `computeTurnBudget` (no metrics, empty, normal, calibration applied, failed exclusion, clamp, warnAt), and `dynamicBudgetWarning`. Added `testTurnBudgetWiring()` self-test: static check that `computeTurnBudget` is imported, called, and assigned in agent.ts — prevents dead-code regression. vitest: 71 (was 53), self-tests: 696 (was 691), tsc clean.
+72 | 
+73 | **[AUTO-SCORED] Iteration 124: predicted 20 turns, actual 20 turns, ratio 1.00**
+74 | 
+75 | ---
+76 | 
+77 | ## Iteration 125 [Architect] — Dead Code Audit
+78 | 
+79 | [Architect] System health check: tsc clean, 71 vitest pass, 698 self-tests pass. Prediction calibration at 1.00x.
+80 | 
+81 | **Dead code found:** 3 source files (684 lines, ~25K) imported by ZERO files:
+82 | - `src/alignment.ts` (238 lines) — old "inner critic" system, superseded by expert rotation
+83 | - `src/self-reflection.ts` (190 lines) — old "morning review" Opus call, superseded by orientation.ts
+84 | - `src/phases.ts` (256 lines) — old Planner/Builder/Reviewer 3-role system, superseded by experts.ts
+85 | 
+86 | String-only references exist in `src/experts.ts` (lines 118-130) and `src/messages.ts` (line 17) — comments/prompts only, no code dependencies.
+87 | 
+88 | **Key insight:** Last 5+ iterations were infrastructure-about-infrastructure (turn budget, calibration, tests for calibration). This cleanup reverses the complexity trend — making the codebase smaller, not bigger.
+89 | 
+90 | ## Next for Engineer
+91 | Delete the 3 dead files, update string references in experts.ts and messages.ts. See goals.md iteration 126 for exact steps and success criteria. Stretch: move code-analysis.ts to scripts/ if only used from there.
+92 | 
+[2026-04-05T12:05:01.983Z] iter=125 turn=19 INFO: Turn 19/25
+[2026-04-05T12:05:04.974Z] iter=125 turn=19 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T12:05:04.975Z] iter=125 turn=19 INFO: RESTART signal
+[2026-04-05T12:05:04.976Z] iter=125 turn=19 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:05:05.638Z] iter=125 turn=19 INFO: Compilation OK
+[2026-04-05T12:05:10.601Z] iter=125 turn=19 INFO: Cache persisted: 38 entries to .autoagent-cache.json
+[2026-04-05T12:05:10.601Z] iter=125 turn=19 INFO: Cache stats: 0 hits, 2 misses, 38 entries, 2 invalidations (1 entries removed)
+[2026-04-05T12:05:10.601Z] iter=125 turn=19 INFO: Tool cache stats
+[2026-04-05T12:05:10.601Z] iter=125 turn=19 INFO: Tool timing: subagent: 1x, avg=30532ms, total=30532ms; bash: 18x, avg=423ms, total=7612ms; list_files: 1x, avg=15ms, total=15ms; write_file: 2x, avg=3ms, total=5ms; think: 4x, avg=1ms, total=2ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-05T12:05:10.601Z] iter=125 turn=19 INFO: Tool timing stats
+[2026-04-05T12:05:14.685Z] iter=125 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 125: predicted 20 turns, actual 19 turns, ratio 0.95**
+[2026-04-05T12:05:14.705Z] iter=125 turn=19 INFO: Pre-commit review: no significant code changes to review
