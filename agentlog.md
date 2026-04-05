@@ -1,141 +1,3 @@
-154 |       return { message: `Appended ${content.length} chars to ${filePath}`, success: true };
-155 |     }
-156 | 
-157 |     writeFileSync(resolved, content, "utf-8");
-158 |     globalFileCache.invalidate(resolved);
-159 |     globalMtimeTracker.delete(resolved);
-160 |     if (!existed) return { message: `Created ${filePath} (${content.length} chars)`, success: true };
-161 |     const diff = countLines(content) - countLines(oldContent);
-162 |     return { message: `${staleWarning}Updated ${filePath} (${content.length} chars, ${diff > 0 ? "+" : ""}${diff} lines delta)`, success: true };
-163 |   } catch (err) {
-164 |     const msg = err instanceof Error ? err.message : String(err);
-165 |     return { message: `ERROR: ${msg}`, success: false };
-[2026-04-05T18:49:54.909Z] iter=314 turn=16 INFO: Turn 16/25
-[2026-04-05T18:49:58.001Z] iter=314 turn=16 INFO: Agent: Now write the tests, run TSC, then wrap up.
-[2026-04-05T18:49:58.001Z] iter=314 turn=16 INFO: write_file: src/__tests__/context-loader-git.test.ts (patch)
-[2026-04-05T18:49:58.001Z] iter=314 turn=16 INFO:   -> err: ERROR: patch mode requires old_string
-[2026-04-05T18:49:58.002Z] iter=314 turn=17 INFO: Turn 17/25
-[2026-04-05T18:50:00.017Z] iter=314 turn=17 INFO: Agent: Writing tests and wrapping up now.
-[2026-04-05T18:50:00.017Z] iter=314 turn=17 INFO: read_file: src/__tests__/context-loader-git.test.ts
-[2026-04-05T18:50:00.017Z] iter=314 turn=17 INFO:   -> ok (4613 chars)
-[2026-04-05T18:50:00.018Z] iter=314 turn=18 INFO: Turn 18/25
-[2026-04-05T18:50:02.894Z] iter=314 turn=18 INFO: write_file: src/__tests__/context-loader-git.test.ts (patch)
-[2026-04-05T18:50:02.895Z] iter=314 turn=18 INFO:   -> ok: Patched src/__tests__/context-loader-git.test.ts: -2 +2 lines
-
-Context after patch:
-1 | import { describe, it, expect, vi, afterEach } from "vitest";
-2 | import { getRecentlyChangedFiles, filterByRepoMap, getRecentCommitFiles } from "../context-loader.js";
-3 | 
-4 | vi.mock("child_process", () => ({
-5 |   execSync: vi.fn(),
-[2026-04-05T18:50:02.895Z] iter=314 turn=19 INFO: Turn 19/25
-[2026-04-05T18:50:12.213Z] iter=314 turn=19 INFO: write_file: src/__tests__/context-loader-git.test.ts (patch)
-[2026-04-05T18:50:12.213Z] iter=314 turn=19 INFO:   -> ok: Patched src/__tests__/context-loader-git.test.ts: -1 +61 lines
-
-Context after patch:
-93 |   });
-94 | });
-95 | 
-96 | describe("getRecentCommitFiles", () => {
-97 |   afterEach(() => {
-98 |     vi.restoreAllMocks();
-99 |   });
-100 | 
-101 |   it("returns files from recent commits", () => {
-102 |     vi.mocked(childProcess.execSync).mockReturnValue(
-103 |       "abc1234 fix something\nsrc/foo.ts\nsrc/bar.ts\n\ndef5678 another commit\nsrc/baz.ts\n" as unknown as Buffer
-104 |     );
-105 |     vi.mocked(fs.existsSync).mockReturnValue(true);
-106 |     const result = getRecentCommitFiles("/fake");
-107 |     expect(result).toContain("src/foo.ts");
-108 |     expect(result).toContain("src/bar.ts");
-109 |     expect(result).toContain("src/baz.ts");
-110 |   });
-111 | 
-112 |   it("deduplicates files that appear in multiple commits", () => {
-113 |     vi.mocked(childProcess.execSync).mockReturnValue(
-114 |       "abc1234 commit one\nsrc/shared.ts\n\ndef5678 commit two\nsrc/shared.ts\n" as unknown as Buffer
-115 |     );
-116 |     vi.mocked(fs.existsSync).mockReturnValue(true);
-117 |     const result = getRecentCommitFiles("/fake");
-118 |     expect(result.filter(f => f === "src/shared.ts")).toHaveLength(1);
-119 |   });
-120 | 
-121 |   it("filters binary extensions", () => {
-122 |     vi.mocked(childProcess.execSync).mockReturnValue(
-123 |       "abc1234 add assets\nassets/image.png\nsrc/code.ts\n" as unknown as Buffer
-124 |     );
-125 |     vi.mocked(fs.existsSync).mockReturnValue(true);
-126 |     const result = getRecentCommitFiles("/fake");
-127 |     expect(result).not.toContain("assets/image.png");
-128 |     expect(result).toContain("src/code.ts");
-129 |   });
-130 | 
-131 |   it("filters files that no longer exist on disk", () => {
-132 |     vi.mocked(childProcess.execSync).mockReturnValue(
-133 |       "abc1234 deleted\nsrc/deleted.ts\nsrc/present.ts\n" as unknown as Buffer
-134 |     );
-135 |     vi.mocked(fs.existsSync).mockImplementation((p) => String(p).includes("present.ts"));
-136 |     const result = getRecentCommitFiles("/fake");
-137 |     expect(result).not.toContain("src/deleted.ts");
-138 |     expect(result).toContain("src/present.ts");
-139 |   });
-140 | 
-141 |   it("returns empty array when not a git repo", () => {
-142 |     vi.mocked(childProcess.execSync).mockImplementation(() => { throw new Error("not a git repo"); });
-143 |     const result = getRecentCommitFiles("/fake");
-144 |     expect(result).toEqual([]);
-145 |   });
-146 | 
-147 |   it("respects custom limit parameter", () => {
-148 |     vi.mocked(childProcess.execSync).mockReturnValue("" as unknown as Buffer);
-149 |     vi.mocked(fs.existsSync).mockReturnValue(true);
-150 |     getRecentCommitFiles("/fake", 5);
-151 |     const call = vi.mocked(childProcess.execSync).mock.calls[0][0] as string;
-152 |     expect(call).toContain("-5");
-153 |   });
-154 | });
-155 | 
-156 | describe("filterByRepoMap", () => {
-157 |   it("keeps files present in repo map", () => {
-158 |     const files = ["src/foo.ts", "src/bar.ts"];
-159 |     const repoMapFiles = new Set(["src/foo.ts", "src/bar.ts"]);
-[2026-04-05T18:50:12.214Z] iter=314 turn=20 INFO: Turn 20/25
-[2026-04-05T18:50:14.977Z] iter=314 turn=20 INFO: Agent: Running TSC now, then wrap up immediately.
-[2026-04-05T18:50:14.978Z] iter=314 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
-[2026-04-05T18:50:15.956Z] iter=314 turn=20 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:50:15.956Z] iter=314 turn=21 INFO: Turn 21/25
-[2026-04-05T18:50:21.822Z] iter=314 turn=21 INFO: Agent: TSC clean. Write memory and update goals:
-[2026-04-05T18:50:21.823Z] iter=314 turn=21 INFO: save_memory: "[Engineer] Iteration 314"
-[2026-04-05T18:50:21.824Z] iter=314 turn=21 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T18:50:21.824Z] iter=314 turn=22 INFO: Turn 22/25
-[2026-04-05T18:50:29.821Z] iter=314 turn=22 INFO: write_file: goals.md (write)
-[2026-04-05T18:50:29.822Z] iter=314 turn=22 INFO:   -> ok: Updated goals.md (1186 chars, -12 lines delta)
-[2026-04-05T18:50:29.822Z] iter=314 turn=23 INFO: Turn 23/25
-[2026-04-05T18:50:31.261Z] iter=314 turn=23 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T18:50:31.261Z] iter=314 turn=23 INFO: RESTART signal
-[2026-04-05T18:50:31.261Z] iter=314 turn=23 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T18:50:32.284Z] iter=314 turn=23 INFO: Compilation OK
-[2026-04-05T18:50:39.407Z] iter=314 turn=23 INFO: Cache persisted: 53 entries to .autoagent-cache.json
-[2026-04-05T18:50:39.407Z] iter=314 turn=23 INFO: Cache stats: 1 hits, 6 misses, 53 entries, 14 invalidations (8 entries removed)
-[2026-04-05T18:50:39.407Z] iter=314 turn=23 INFO: Tool cache stats
-[2026-04-05T18:50:39.408Z] iter=314 turn=23 INFO: Tool timing: bash: 3x, avg=329ms, total=988ms; write_file: 14x, avg=1ms, total=16ms; read_file: 5x, avg=1ms, total=6ms; read_scratchpad: 1x, avg=1ms, total=1ms; list_files: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T18:50:39.408Z] iter=314 turn=23 INFO: Tool timing stats
-[2026-04-05T18:50:45.714Z] iter=314 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 314: predicted 20 turns, actual 23 turns, ratio 1.15**
-[2026-04-05T18:50:57.617Z] iter=314 turn=23 INFO: Pre-commit review (3012in/429out): - **Shell injection risk in `getRecentCommitFiles`**: `JSON.stringify(workDir)` produces a double-quoted string, but the whole command is passed as a shell string to `execSync`. If `workDir` contains 
-[2026-04-05T18:50:57.672Z] iter=314 turn=23 INFO: Committed: 1245cf81 (39 in / 7292 out, cache: 30739 created, 433342 read)
-[2026-04-05T18:50:57.672Z] iter=314 turn=23 INFO: Restarting as iteration 315...
-[2026-04-05T18:50:57.872Z] iter=315 INFO: Cache restored: 53/53 entries (0 stale)
-[2026-04-05T18:50:57.874Z] iter=315 INFO: Turn budget: 13/25 (calibration=1.15x, predicted=8)
-[2026-04-05T18:50:57.874Z] iter=315 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T18:51:00.111Z] iter=315 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T18:51:00.112Z] iter=315 turn=1 INFO: Turn 1/25
-[2026-04-05T18:51:04.170Z] iter=315 turn=1 INFO: Agent: 
-
-I'll start by reviewing the iteration 314 changes, running tests, and then assessing the overall system health.
-[2026-04-05T18:51:04.171Z] iter=315 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/context-loader-git.test.ts 2>&1 | tail -30
-[2026-04-05T18:51:04.174Z] iter=315 turn=1 INFO: read_file: src/context-loader.ts
-[2026-04-05T18:51:04.174Z] iter=315 turn=1 INFO:   -> ok (12006 chars)
 [2026-04-05T18:51:04.175Z] iter=315 turn=1 INFO: read_file: src/file-cache.ts
 [2026-04-05T18:51:04.175Z] iter=315 turn=1 INFO:   -> ok (4568 chars)
 [2026-04-05T18:51:04.175Z] iter=315 turn=1 INFO: read_file: src/tools/write_file.ts
@@ -1134,3 +996,87 @@ Context after patch:
 [2026-04-05T19:02:44.647Z] iter=320 turn=25 INFO: Tool timing stats
 [2026-04-05T19:02:51.497Z] iter=320 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 320: predicted 20 turns, actual 25 turns, ratio 1.25**
 [2026-04-05T19:02:51.522Z] iter=320 turn=25 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T19:02:51.557Z] iter=320 turn=25 INFO: Committed: e114c898 (41 in / 7093 out, cache: 20926 created, 342997 read)
+[2026-04-05T19:02:51.558Z] iter=320 turn=25 INFO: Restarting as iteration 321...
+[2026-04-05T19:02:51.756Z] iter=321 INFO: Cache restored: 54/54 entries (0 stale)
+[2026-04-05T19:02:51.759Z] iter=321 INFO: Turn budget: 19/25 (calibration=1.13x, predicted=20)
+[2026-04-05T19:02:51.759Z] iter=321 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T19:02:51.897Z] iter=321 turn=1 INFO: Turn 1/25
+[2026-04-05T19:02:56.476Z] iter=321 turn=1 INFO: Agent: 
+
+I'm the Architect for iteration 321. Let me start by assessing what the Engineer built in iteration 320, then do research, and set direction for the next iteration.
+[2026-04-05T19:02:56.477Z] iter=321 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
+[2026-04-05T19:02:56.479Z] iter=321 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null | head -80
+[2026-04-05T19:02:56.482Z] iter=321 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -30
+[2026-04-05T19:02:56.490Z] iter=321 turn=1 INFO:   -> exit=0 (1679 chars)
+[2026-04-05T19:02:56.496Z] iter=321 turn=1 INFO:   -> exit=0 (330 chars)
+[2026-04-05T19:03:08.527Z] iter=321 turn=1 INFO:   -> exit=0 (2525 chars)
+[2026-04-05T19:03:08.527Z] iter=321 turn=2 INFO: Turn 2/25
+[2026-04-05T19:03:12.652Z] iter=321 turn=2 INFO: Agent: Good — 883 tests all passing, TSC clean. Let me assess what iter 320 shipped and look at the new test files.
+[2026-04-05T19:03:12.652Z] iter=321 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git diff HEAD~1 --stat
+[2026-04-05T19:03:12.654Z] iter=321 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && wc -l tests/prune-backref-boost.test.ts tests/symbol-lookup.test.ts tests/cli-help.test.ts
+[2026-04-05T19:03:12.662Z] iter=321 turn=2 INFO:   -> exit=0 (127 chars)
+[2026-04-05T19:03:12.677Z] iter=321 turn=2 INFO:   -> exit=0 (587 chars)
+[2026-04-05T19:03:12.677Z] iter=321 turn=3 INFO: Turn 3/25
+[2026-04-05T19:03:15.887Z] iter=321 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat tests/cli-help.test.ts
+[2026-04-05T19:03:15.889Z] iter=321 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && head -50 tests/prune-backref-boost.test.ts
+[2026-04-05T19:03:15.891Z] iter=321 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && head -50 tests/symbol-lookup.test.ts
+[2026-04-05T19:03:15.897Z] iter=321 turn=3 INFO:   -> exit=0 (1319 chars)
+[2026-04-05T19:03:15.898Z] iter=321 turn=3 INFO:   -> exit=0 (1944 chars)
+[2026-04-05T19:03:15.900Z] iter=321 turn=3 INFO:   -> exit=0 (1667 chars)
+[2026-04-05T19:03:15.900Z] iter=321 turn=4 INFO: Turn 4/25
+[2026-04-05T19:03:32.005Z] iter=321 turn=4 INFO: Agent: 
+
+You're right. My deliverable as Architect is: assess iteration 320, do research, and write goals.md for iteration 322. Let me focus.
+[2026-04-05T19:03:32.006Z] iter=321 turn=4 INFO: think: Assessment of iteration 320:
+- Goal 1 (Tests for iter 318 features): ✅ Shipped 3 test files (302 LOC) covering symbolLoo...
+[2026-04-05T19:03:32.006Z] iter=321 turn=5 INFO: Turn 5/25
+[2026-04-05T19:03:34.976Z] iter=321 turn=5 INFO: web_search: "coding agent context management techniques 2025 RAG repo indexing"
+[2026-04-05T19:03:35.009Z] iter=321 turn=5 INFO: web_search: "Claude Code aider context window management file selection strategy 2025"
+[2026-04-05T19:03:36.011Z] iter=321 turn=5 INFO:   -> 8 results
+[2026-04-05T19:03:36.013Z] iter=321 turn=5 INFO:   -> 8 results
+[2026-04-05T19:03:36.013Z] iter=321 turn=6 INFO: Turn 6/25
+[2026-04-05T19:03:38.764Z] iter=321 turn=6 INFO: web_fetch: https://blog.langchain.com/context-engineering-for-agents/
+[2026-04-05T19:03:38.766Z] iter=321 turn=6 INFO: web_fetch: https://code.claude.com/docs/en/context-window
+[2026-04-05T19:03:39.006Z] iter=321 turn=6 INFO:   -> ok (16683 chars)
+[2026-04-05T19:03:39.051Z] iter=321 turn=6 INFO:   -> ok (97840 chars)
+[2026-04-05T19:03:39.052Z] iter=321 turn=7 INFO: Turn 7/25
+[2026-04-05T19:03:46.341Z] iter=321 turn=7 INFO: Agent: 
+
+Good checkpoint. Let me assess my goals:
+
+**Architect iteration deliverables:**
+1. **Assess iteration 320** — DONE (reviewed tests, git diff, test results)
+2. **Research** — DONE (read LangChain context engineering article, Claude Code docs)
+3. **Write goals.md for iteration 322** — NOT STARTED
+
+The research gave me excellent insights. Let me now quickly check our current state to write informed...
+[2026-04-05T19:03:46.342Z] iter=321 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/orchestrator.ts src/context-loader.ts src/tree-sitter-map.ts src/tui.tsx 2>/dev/null
+[2026-04-05T19:03:46.344Z] iter=321 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "compact\|COMPACT\|summariz\|SUMMAR" src/orchestrator.ts | head -20
+[2026-04-05T19:03:46.351Z] iter=321 turn=7 INFO:   -> exit=0 (128 chars)
+[2026-04-05T19:03:46.354Z] iter=321 turn=7 INFO:   -> exit=0 (1479 chars)
+[2026-04-05T19:03:46.355Z] iter=321 turn=8 INFO: Turn 8/25
+[2026-04-05T19:04:02.419Z] iter=321 turn=8 INFO: think: Key research findings from LangChain article on context engineering for agents:
+
+1. **Write context** (scratchpads, memo...
+[2026-04-05T19:04:02.419Z] iter=321 turn=9 INFO: Turn 9/25
+[2026-04-05T19:04:22.286Z] iter=321 turn=9 INFO: Agent: Now let me write the goals and save memory.
+[2026-04-05T19:04:22.287Z] iter=321 turn=9 INFO: write_file: goals.md (write)
+[2026-04-05T19:04:22.288Z] iter=321 turn=9 INFO:   -> ok: Updated goals.md (3023 chars, +18 lines delta)
+[2026-04-05T19:04:22.288Z] iter=321 turn=10 INFO: Turn 10/25
+[2026-04-05T19:04:30.084Z] iter=321 turn=10 INFO: save_memory: "[Architect] Iteration 321 assessment + research"
+[2026-04-05T19:04:30.085Z] iter=321 turn=10 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T19:04:30.085Z] iter=321 turn=11 INFO: Turn 11/25
+[2026-04-05T19:04:32.355Z] iter=321 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T19:04:33.318Z] iter=321 turn=11 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:04:33.318Z] iter=321 turn=12 INFO: Turn 12/25
+[2026-04-05T19:04:35.903Z] iter=321 turn=12 INFO: Agent: TSC clean. Let me do the final step.
+[2026-04-05T19:04:35.903Z] iter=321 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T19:04:35.904Z] iter=321 turn=12 INFO: RESTART signal
+[2026-04-05T19:04:35.904Z] iter=321 turn=12 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T19:04:36.898Z] iter=321 turn=12 INFO: Compilation OK
+[2026-04-05T19:04:44.493Z] iter=321 turn=12 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T19:04:44.493Z] iter=321 turn=12 INFO: Tool timing: bash: 12x, avg=1094ms, total=13122ms; web_search: 2x, avg=1020ms, total=2040ms; web_fetch: 2x, avg=265ms, total=529ms; write_file: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms; think: 2x, avg=0ms, total=0ms
+[2026-04-05T19:04:44.493Z] iter=321 turn=12 INFO: Tool timing stats
+[2026-04-05T19:04:51.298Z] iter=321 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 321: predicted 20 turns, actual 12 turns, ratio 0.60**
+[2026-04-05T19:04:51.322Z] iter=321 turn=12 INFO: Pre-commit review: no significant code changes to review
