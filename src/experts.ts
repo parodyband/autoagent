@@ -156,6 +156,37 @@ If you can't point to something that's measurably better than 10 iterations ago,
 // Engineer gets 2x the turns because it does the actual building.
 const BUILTIN_EXPERTS: Expert[] = [ENGINEER, ARCHITECT, ENGINEER, META];
 
+// ─── Pure parsing helper ────────────────────────────────────
+
+/**
+ * Parse an expert markdown file with frontmatter.
+ * Returns null if the file is missing required fields.
+ *
+ * Format:
+ *   ---
+ *   name: Specialist Name
+ *   model: claude-sonnet-4-6
+ *   ---
+ *   System prompt content...
+ */
+export function parseExpertFile(content: string): Expert | null {
+  const fmMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (!fmMatch) return null;
+
+  const fm = fmMatch[1];
+  const prompt = fmMatch[2].trim();
+  const nameMatch = fm.match(/name:\s*(.+)/);
+  const modelMatch = fm.match(/model:\s*(.+)/);
+
+  if (!nameMatch || !prompt) return null;
+
+  return {
+    name: nameMatch[1].trim(),
+    model: modelMatch ? modelMatch[1].trim() : "claude-sonnet-4-6",
+    prompt,
+  };
+}
+
 // ─── Expert loading and rotation ────────────────────────────
 
 /**
@@ -176,20 +207,8 @@ export function loadExperts(rootDir: string): Expert[] {
       const files = readdirSync(expertDir).filter(f => f.endsWith(".md"));
       for (const file of files) {
         const content = readFileSync(path.join(expertDir, file), "utf-8");
-        const fmMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-        if (fmMatch) {
-          const fm = fmMatch[1];
-          const prompt = fmMatch[2].trim();
-          const nameMatch = fm.match(/name:\s*(.+)/);
-          const modelMatch = fm.match(/model:\s*(.+)/);
-          if (nameMatch && prompt) {
-            experts.push({
-              name: nameMatch[1].trim(),
-              model: modelMatch ? modelMatch[1].trim() : "claude-sonnet-4-6",
-              prompt,
-            });
-          }
-        }
+        const expert = parseExpertFile(content);
+        if (expert) experts.push(expert);
       }
     } catch {}
   }
