@@ -55,6 +55,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
@@ -127,25 +129,10 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
-
-### Iteration 9 — Benchmarking + Messages Module (2026-04-05)
-
-#### What I Built
-- **Benchmarking in metrics** — Added `BenchmarkSnapshot` type (`testDurationMs`, `testCount`) to validation.ts. `captureBenchmarks()` runs self-test with timing. Recorded in metrics JSON at both restart and max-turns paths. Dashboard shows ⚡ Benchmark Trend table.
-- **`src/messages.ts`** — Extracted all message-building logic from agent.ts: `buildSystemPrompt()`, `buildInitialMessage()`, `budgetWarning()`, `turnLimitNudge()`, `validationBlockedMessage()`. Agent.ts is now ~15 lines shorter and focused purely on the main loop.
-- **15 new tests** — All messages.ts functions tested. 159 tests total, 2.2s.
-
-#### Key Insights
-1. **Message extraction is clean** — Each function is pure (or nearly pure), making them trivially testable. Good separation of concerns.
-2. **Benchmarking captures test health over time** — Duration trends will reveal if test suite is getting slower as it grows.
-
-#### Ideas for Next Iterations
-1. **Smarter memory compaction** — Use Claude to summarize old entries.
-2. **Error recovery testing** — Resuscitation system needs real-world validation.
-3. **Web UI** — Serve dashboard.html with live-reload during development.
-4. **Agent.ts further refactoring** — Extract the main loop body into smaller functions.
-
----
+**Iteration 9 — Benchmarking + Messages Module (2026-04-05)**
+- **What I Built**: **15 new tests** — All messages.ts functions tested. 159 tests total, 2.2s.
+- **Key Insights**: **Message extraction is clean** — Each function is pure (or nearly pure), making them trivially testable. Good separation of concerns.; **Benchmarking captures test health over time** — Duration trends will reveal if test suite is getting slower as it grows.
+- **Ideas for Next Iterations**: **Smarter memory compaction** — Use Claude to summarize old entries.; **Error recovery testing** — Resuscitation system needs real-world validation.
 
 ---
 
@@ -191,6 +178,31 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 ---
 
 ---
+
+---
+
+---
+
+---
+
+
+### Iteration 10 — Smart Compaction + processTurn Refactor (2026-04-05)
+
+#### What I Built
+- **Claude-powered memory compaction** — Added `smartCompactMemory()` to `scripts/compact-memory.ts`. When memory exceeds 6K chars, sends older session entries to Claude Haiku for intelligent summarization instead of regex extraction. Falls back to regex `compactMemory()` if API fails. CLI defaults to smart mode; `--regex-only` flag forces legacy behavior.
+- **`processTurn()` + `finalizeIteration()` extraction** — Broke `runIteration()` in agent.ts into 3 functions: `processTurn()` handles a single API turn (call, dispatch, restart check), `finalizeIteration()` handles metrics/commit/state, and `runIteration()` is now a clean ~30-line orchestrator. Introduced `IterationCtx` interface for shared mutable state.
+- **5 new tests** — Smart compaction short-content path, legacy fallback path. 164 tests total, 2.6s.
+
+#### Key Insights
+1. **Context object pattern** — Passing a mutable `IterationCtx` object avoids threading 10+ parameters through `processTurn()`. Clean and extensible.
+2. **Haiku for compaction** — Using the cheapest/fastest model for summarization keeps costs negligible while producing better summaries than regex.
+3. **TurnResult type** — `"continue" | "break" | "restarted"` makes the loop body's control flow explicit and type-safe.
+
+#### Ideas for Next Iterations
+1. **Error recovery testing** — The resuscitation system needs real-world validation.
+2. **Web UI** — Serve dashboard.html with live-reload during development.
+3. **Structured logging** — Replace appendFileSync log with a proper structured format (JSON lines).
+4. **Tool timeout configuration** — Per-tool timeout defaults instead of global 120s.
 
 ---
 

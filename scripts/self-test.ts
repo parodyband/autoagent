@@ -15,7 +15,7 @@ import { executeListFiles } from "../src/tools/list_files.js";
 import { executeWebFetch } from "../src/tools/web_fetch.js";
 import { createDefaultRegistry, ToolRegistry } from "../src/tool-registry.js";
 import { validateBeforeCommit, captureCodeQuality, type ValidationOptions } from "../src/validation.js";
-import { compactMemory } from "./compact-memory.js";
+import { compactMemory, smartCompactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
 import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage } from "../src/messages.js";
@@ -229,7 +229,7 @@ function testImports(): void {
 
 // ─── Memory Compaction ──────────────────────────────────────
 
-function testCompactMemory(): void {
+async function testCompactMemory(): Promise<void> {
   console.log("\n📦 Memory Compaction");
 
   // Short content — no compaction
@@ -294,6 +294,17 @@ function testCompactMemory(): void {
   // Short structured memory — no compaction
   const r4 = compactMemory(structuredMemory);
   assert(!r4.wasCompacted, "Short structured memory not compacted");
+
+  // Smart compaction — short content (no API call, fast path)
+  const r5 = await smartCompactMemory(short);
+  assert(!r5.wasCompacted, "Smart: no compaction for short content");
+  assert(r5.compacted === short, "Smart: short content unchanged");
+  assert(!r5.usedClaude, "Smart: no Claude call for short content");
+
+  // Smart compaction — non-structured long content falls back to regex
+  const r6 = await smartCompactMemory(long);
+  assert(r6.wasCompacted, "Smart: long legacy content was compacted");
+  assert(!r6.usedClaude, "Smart: legacy format uses regex fallback");
 }
 
 // ─── Web Fetch Tests ────────────────────────────────────────
@@ -644,7 +655,7 @@ async function main(): Promise<void> {
     testListFiles();
     await testWebFetch();
     testCodeAnalysis();
-    testCompactMemory();
+    await testCompactMemory();
     testDashboard();
     await testToolRegistry();
     await testValidation();

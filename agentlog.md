@@ -1478,3 +1478,139 @@ Let me add the tests and wrap up quickly.
 [2026-04-05T06:25:56.906Z] iter=9 RESTART signal
 [2026-04-05T06:25:56.908Z] iter=9 Validating: npx tsc --noEmit ...
 [2026-04-05T06:25:57.525Z] iter=9 Compilation OK
+[2026-04-05T06:26:00.798Z] iter=9 Committed: 6a6f16b3 (1214768 in / 11594 out, cache: 0 created, 0 read)
+[2026-04-05T06:26:00.798Z] iter=9 Restarting as iteration 10...
+[2026-04-05T06:26:00.970Z] iter=10 Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T06:26:00.978Z] iter=10 Turn 1/50
+[2026-04-05T06:26:05.546Z] iter=10 Agent: 
+
+I'll start by understanding the current state of the codebase, then execute each goal.
+[2026-04-05T06:26:05.547Z] iter=10 list_files: . (depth=2)
+[2026-04-05T06:26:05.564Z] iter=10   -> ok (3 dirs, 26 files)
+[2026-04-05T06:26:05.565Z] iter=10 read_file: scripts/compact-memory.ts
+[2026-04-05T06:26:05.565Z] iter=10   -> ok (10063 chars)
+[2026-04-05T06:26:05.565Z] iter=10 read_file: src/agent.ts
+[2026-04-05T06:26:05.565Z] iter=10   -> ok (14644 chars)
+[2026-04-05T06:26:05.565Z] iter=10 Turn 2/50
+[2026-04-05T06:26:15.464Z] iter=10 think: Let me analyze the goals:
+
+1. **Smart memory compaction** — Replace regex-based compactor with Claude-powered summarizer...
+[2026-04-05T06:26:15.464Z] iter=10 Turn 3/50
+[2026-04-05T06:26:19.360Z] iter=10 Agent: Let me examine the while loop more closely and understand the test file:
+[2026-04-05T06:26:19.361Z] iter=10 read_file: src/agent.ts
+[2026-04-05T06:26:19.361Z] iter=10   -> ok (3741 chars)
+[2026-04-05T06:26:19.362Z] iter=10 $ grep -n "compact" scripts/self-test.ts | head -20
+[2026-04-05T06:26:19.372Z] iter=10   -> exit=0 (1457 chars)
+[2026-04-05T06:26:19.372Z] iter=10 Turn 4/50
+[2026-04-05T06:26:22.118Z] iter=10 read_file: scripts/self-test.ts
+[2026-04-05T06:26:22.119Z] iter=10   -> ok (3357 chars)
+[2026-04-05T06:26:22.119Z] iter=10 Turn 5/50
+[2026-04-05T06:26:49.146Z] iter=10 think: Now I need to plan both changes:
+
+## Goal 1: Smart Memory Compaction
+
+The current `compactMemory()` function is synchron...
+[2026-04-05T06:26:49.147Z] iter=10 Turn 6/50
+[2026-04-05T06:26:52.321Z] iter=10 Agent: Now let me implement both goals. Starting with Goal 1: Smart Memory Compaction.
+[2026-04-05T06:26:52.322Z] iter=10 read_file: scripts/compact-memory.ts
+[2026-04-05T06:26:52.322Z] iter=10   -> ok (477 chars)
+[2026-04-05T06:26:52.322Z] iter=10 $ head -5 package.json
+[2026-04-05T06:26:52.334Z] iter=10   -> exit=0 (86 chars)
+[2026-04-05T06:26:52.334Z] iter=10 Turn 7/50
+[2026-04-05T06:26:55.790Z] iter=10 $ grep -n "anthropic" package.json
+[2026-04-05T06:26:55.805Z] iter=10   -> exit=0 (39 chars)
+[2026-04-05T06:26:55.805Z] iter=10 Turn 8/50
+[2026-04-05T06:27:00.128Z] iter=10 Agent: Good, Anthropic SDK is available. Now let me implement the smart compaction. I'll add the Claude-powered summarizer to `compact-memory.ts`:
+[2026-04-05T06:27:00.129Z] iter=10 write_file: scripts/compact-memory.ts (patch)
+[2026-04-05T06:27:00.130Z] iter=10   -> ok: Patched scripts/compact-memory.ts: -2 +3 lines
+[2026-04-05T06:27:00.131Z] iter=10 Turn 9/50
+[2026-04-05T06:27:03.587Z] iter=10 Agent: Now add the Claude summarizer function and the `smartCompactMemory` export. I'll add them after the existing `compactMemory` export:
+[2026-04-05T06:27:03.588Z] iter=10 read_file: scripts/compact-memory.ts
+[2026-04-05T06:27:03.589Z] iter=10   -> ok (4604 chars)
+[2026-04-05T06:27:03.590Z] iter=10 Turn 10/50
+[2026-04-05T06:27:25.658Z] iter=10 Agent: Now I'll add the smart compaction function and update the CLI:
+[2026-04-05T06:27:25.658Z] iter=10 write_file: scripts/compact-memory.ts (patch)
+[2026-04-05T06:27:25.659Z] iter=10   -> ok: Patched scripts/compact-memory.ts: -29 +142 lines
+[2026-04-05T06:27:25.659Z] iter=10 Turn 11/50
+[2026-04-05T06:27:28.468Z] iter=10 Agent: Now let me check the pre-commit script to see how compaction is invoked:
+[2026-04-05T06:27:28.468Z] iter=10 read_file: scripts/pre-commit-check.sh
+[2026-04-05T06:27:28.469Z] iter=10   -> ok (713 chars)
+[2026-04-05T06:27:28.470Z] iter=10 Turn 12/50
+[2026-04-05T06:27:38.198Z] iter=10 think: The pre-commit script runs `npx tsx scripts/compact-memory.ts` with a 30-second timeout. That's fine — the Claude call s...
+[2026-04-05T06:27:38.199Z] iter=10 Turn 13/50
+[2026-04-05T06:27:41.861Z] iter=10 Agent: Now let me add a test for the smart compaction fallback (short content path, which doesn't need API):
+[2026-04-05T06:27:41.862Z] iter=10 read_file: scripts/self-test.ts
+[2026-04-05T06:27:41.862Z] iter=10   -> ok (1370 chars)
+[2026-04-05T06:27:41.862Z] iter=10 Turn 14/50
+[2026-04-05T06:27:44.443Z] iter=10 read_file: scripts/self-test.ts
+[2026-04-05T06:27:44.444Z] iter=10   -> ok (698 chars)
+[2026-04-05T06:27:44.444Z] iter=10 Turn 15/50
+[2026-04-05T06:27:48.437Z] iter=10 Agent: I need to also import `smartCompactMemory` and add a test. Let me update the import and add the test:
+[2026-04-05T06:27:48.438Z] iter=10 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:27:48.439Z] iter=10   -> ok: Patched scripts/self-test.ts: -1 +1 lines
+[2026-04-05T06:27:48.440Z] iter=10 Turn 16/50
+[2026-04-05T06:27:52.838Z] iter=10 think: Let me be efficient. I need to:
+1. Add a test for smartCompactMemory (short content fallback path - no API call needed)
+...
+[2026-04-05T06:27:52.838Z] iter=10 Turn 17/50
+[2026-04-05T06:27:55.602Z] iter=10 read_file: scripts/self-test.ts
+[2026-04-05T06:27:55.604Z] iter=10   -> ok (228 chars)
+[2026-04-05T06:27:55.605Z] iter=10 Turn 18/50
+[2026-04-05T06:28:01.132Z] iter=10 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:28:01.133Z] iter=10   -> ok: Patched scripts/self-test.ts: -4 +15 lines
+[2026-04-05T06:28:01.133Z] iter=10 Turn 19/50
+[2026-04-05T06:28:06.867Z] iter=10 Agent: Now the test function `testCompactMemory` needs to be async. Let me check:
+[2026-04-05T06:28:06.868Z] iter=10 $ grep -n "function testCompactMemory" scripts/self-test.ts
+[2026-04-05T06:28:06.876Z] iter=10   -> exit=0 (41 chars)
+[2026-04-05T06:28:06.876Z] iter=10 Turn 20/50
+[2026-04-05T06:28:10.676Z] iter=10 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:28:10.677Z] iter=10   -> ok: Patched scripts/self-test.ts: -1 +1 lines
+[2026-04-05T06:28:10.678Z] iter=10 Turn 21/50
+[2026-04-05T06:28:14.341Z] iter=10 Agent: Now let me check how `testCompactMemory` is called to make sure it's awaited:
+[2026-04-05T06:28:14.341Z] iter=10 $ grep -n "testCompactMemory" scripts/self-test.ts
+[2026-04-05T06:28:14.357Z] iter=10   -> exit=0 (85 chars)
+[2026-04-05T06:28:14.357Z] iter=10 Turn 22/50
+[2026-04-05T06:28:16.959Z] iter=10 read_file: scripts/self-test.ts
+[2026-04-05T06:28:16.960Z] iter=10   -> ok (258 chars)
+[2026-04-05T06:28:16.960Z] iter=10 Turn 23/50
+[2026-04-05T06:28:20.599Z] iter=10 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:28:20.601Z] iter=10   -> ok: Patched scripts/self-test.ts: -1 +1 lines
+[2026-04-05T06:28:20.601Z] iter=10 Turn 24/50
+[2026-04-05T06:28:25.505Z] iter=10 Agent: Now Goal 2: Extract `processTurn()` from agent.ts. Let me do the refactor:
+[2026-04-05T06:28:25.506Z] iter=10 read_file: src/agent.ts
+[2026-04-05T06:28:25.507Z] iter=10   -> ok (4261 chars)
+[2026-04-05T06:28:25.507Z] iter=10 Turn 25/50
+[2026-04-05T06:28:28.576Z] iter=10 read_file: src/agent.ts
+[2026-04-05T06:28:28.578Z] iter=10   -> ok (1482 chars)
+[2026-04-05T06:28:28.578Z] iter=10 Turn 26/50
+[2026-04-05T06:28:34.105Z] iter=10 think: I need to be efficient. Let me do the agent.ts refactor now. I'll extract a `processTurn()` function and an `IterationCo...
+[2026-04-05T06:28:34.106Z] iter=10 Turn 27/50
+[2026-04-05T06:29:05.953Z] iter=10 write_file: src/agent.ts (patch)
+[2026-04-05T06:29:05.954Z] iter=10   -> ok: Patched src/agent.ts: -165 +176 lines
+[2026-04-05T06:29:05.955Z] iter=10 Turn 28/50
+[2026-04-05T06:29:08.797Z] iter=10 Agent: Now let's verify everything compiles:
+[2026-04-05T06:29:08.798Z] iter=10 $ npx tsc --noEmit 2>&1
+[2026-04-05T06:29:09.360Z] iter=10   -> exit=0 (11 chars)
+[2026-04-05T06:29:09.360Z] iter=10 Turn 29/50
+[2026-04-05T06:29:12.094Z] iter=10 Agent: TypeScript compiles clean. Now run self-tests:
+[2026-04-05T06:29:12.095Z] iter=10 $ npx tsx scripts/self-test.ts 2>&1
+[2026-04-05T06:29:15.129Z] iter=10   -> exit=0 (6460 chars)
+[2026-04-05T06:29:15.129Z] iter=10 Turn 30/50
+[2026-04-05T06:29:31.235Z] iter=10 Agent: All 164 tests pass (5 new ones). Now let me update memory and goals:
+[2026-04-05T06:29:31.236Z] iter=10 write_file: memory.md (append)
+[2026-04-05T06:29:31.236Z] iter=10   -> ok: Appended 1739 chars to memory.md
+[2026-04-05T06:29:31.237Z] iter=10 Turn 31/50
+[2026-04-05T06:29:40.973Z] iter=10 write_file: goals.md (write)
+[2026-04-05T06:29:40.974Z] iter=10   -> ok: Updated goals.md (1065 chars, 0 lines delta)
+[2026-04-05T06:29:40.974Z] iter=10 Turn 32/50
+[2026-04-05T06:29:45.272Z] iter=10 $ git add -A && git status
+[2026-04-05T06:29:45.296Z] iter=10   -> exit=0 (299 chars)
+[2026-04-05T06:29:45.297Z] iter=10 Turn 33/50
+[2026-04-05T06:29:51.974Z] iter=10 Agent: Everything looks clean. Final verification:
+[2026-04-05T06:29:51.975Z] iter=10 $ npx tsc --noEmit 2>&1 && echo "✅ TypeScript OK"
+[2026-04-05T06:29:52.635Z] iter=10   -> exit=0 (16 chars)
+[2026-04-05T06:29:52.635Z] iter=10 Turn 34/50
+[2026-04-05T06:29:54.936Z] iter=10 $ echo "AUTOAGENT_RESTART"
+[2026-04-05T06:29:54.936Z] iter=10 RESTART signal
+[2026-04-05T06:29:54.936Z] iter=10 Validating: npx tsc --noEmit ...
+[2026-04-05T06:29:55.585Z] iter=10 Compilation OK

@@ -9,6 +9,7 @@
 
 import { readFileSync, writeFileSync } from "fs";
 import path from "path";
+import Anthropic from "@anthropic-ai/sdk";
 
 const ROOT = process.cwd();
 const MEMORY_FILE = path.join(ROOT, "memory.md");
@@ -284,28 +285,141 @@ export function compactMemory(content: string, dryRun = false): { compacted: str
   return { compacted, saved, wasCompacted: true };
 }
 
+// ─── Claude-Powered Smart Compaction ────────────────────────
+
+/**
+ * Use Claude to summarize older session entries into a concise compacted history.
+ * Falls back to regex-based compaction if the API call fails.
+ */
+async function claudeSummarizeEntries(entries: MemorySection[]): Promise<string> {
+  const entriesText = entries.map(e => {
+    if (e.header.startsWith("### Compacted")) {
+      return e.body;  // Already compacted, pass through
+    }
+    return `${e.header}\n${e.body}`;
+  }).join("\n\n---\n\n");
+
+  const client = new Anthropic();
+  const response = await client.messages.create({
+    model: "claude-haiku-4-20250414",
+    max_tokens: 1500,
+    messages: [{
+      role: "user",
+      content: `You are summarizing session log entries from an AI agent's memory file. 
+Condense the following iteration entries into a compact summary. Rules:
+- Use format: **Iteration N — Title (date)** followed by a one-line summary
+- For already-compacted entries, preserve them as-is
+- Keep key facts: what was built, test counts, important insights
+- Each iteration summary should be 1-2 lines max
+- Preserve chronological order
+- Do NOT add any preamble or explanation — output ONLY the compacted entries
+
+Entries to summarize:
+
+${entriesText}`,
+    }],
+  });
+
+  const textBlock = response.content.find(b => b.type === "text");
+  if (!textBlock || textBlock.type !== "text") {
+    throw new Error("No text in Claude response");
+  }
+  return textBlock.text.trim();
+}
+
+/**
+ * Smart memory compaction: tries Claude summarization first, falls back to regex.
+ * Async because it may call the Claude API.
+ */
+export async function smartCompactMemory(content: string): Promise<{ compacted: string; saved: number; wasCompacted: boolean; usedClaude: boolean }> {
+  if (content.length <= THRESHOLD) {
+    return { compacted: content, saved: 0, wasCompacted: false, usedClaude: false };
+  }
+
+  const parsed = parseStructuredMemory(content);
+
+  if (!parsed.isStructured) {
+    // Legacy format — use regex compaction only
+    const result = compactMemory(content);
+    return { ...result, usedClaude: false };
+  }
+
+  const entries = parsed.entries;
+  const toCompact = entries.slice(0, Math.max(0, entries.length - KEEP_FULL));
+  const toKeepFull = entries.slice(Math.max(0, entries.length - KEEP_FULL));
+
+  if (toCompact.length === 0) {
+    const result = compactMemory(content);
+    return { ...result, usedClaude: false };
+  }
+
+  let compactedText: string;
+  let usedClaude = false;
+
+  try {
+    compactedText = await claudeSummarizeEntries(toCompact);
+    usedClaude = true;
+  } catch (err) {
+    // Fallback to regex compaction
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.log(`Claude summarization failed (${errMsg}), falling back to regex compaction`);
+    const result = compactMemory(content);
+    return { ...result, usedClaude: false };
+  }
+
+  // Rebuild the memory with Claude's summary
+  const parts: string[] = [parsed.preamble.trim()];
+
+  parts.push("\n\n## Architecture\n\n" + (parsed.architecture || "") + "\n\n---\n\n## Session Log\n");
+  if (parsed.sessionPreamble) {
+    parts.push(parsed.sessionPreamble + "\n");
+  }
+
+  parts.push("\n### Compacted History\n");
+  parts.push(compactedText + "\n");
+  parts.push("\n---\n");
+
+  for (const entry of toKeepFull) {
+    parts.push(`\n${entry.header}\n\n${entry.body}\n\n---\n`);
+  }
+
+  const compacted = parts.join("\n").replace(/\n{4,}/g, "\n\n\n");
+  const saved = content.length - compacted.length;
+  return { compacted, saved, wasCompacted: true, usedClaude };
+}
+
 // CLI entrypoint
 if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith("compact-memory.ts")) {
   const dryRun = process.argv.includes("--dry-run");
+  const useSmartCompaction = !process.argv.includes("--regex-only");
   
   try {
     const content = readFileSync(MEMORY_FILE, "utf-8");
     console.log(`Memory size: ${content.length} chars (threshold: ${THRESHOLD})`);
     
-    const { compacted, saved, wasCompacted } = compactMemory(content, dryRun);
+    let result: { compacted: string; saved: number; wasCompacted: boolean; usedClaude?: boolean };
     
-    if (!wasCompacted) {
+    if (useSmartCompaction) {
+      result = await smartCompactMemory(content);
+      if (result.usedClaude) {
+        console.log("Used Claude (haiku) for smart summarization");
+      }
+    } else {
+      result = { ...compactMemory(content), usedClaude: false };
+    }
+    
+    if (!result.wasCompacted) {
       console.log("No compaction needed.");
       process.exit(0);
     }
     
-    console.log(`Compacted: saved ${saved} chars (${content.length} → ${compacted.length})`);
+    console.log(`Compacted: saved ${result.saved} chars (${content.length} → ${result.compacted.length})`);
     
     if (dryRun) {
       console.log("\n--- DRY RUN OUTPUT ---\n");
-      console.log(compacted);
+      console.log(result.compacted);
     } else {
-      writeFileSync(MEMORY_FILE, compacted, "utf-8");
+      writeFileSync(MEMORY_FILE, result.compacted, "utf-8");
       console.log("Written to memory.md");
     }
   } catch (err) {

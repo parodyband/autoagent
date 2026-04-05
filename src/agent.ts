@@ -126,170 +126,181 @@ async function handleToolCall(
   }
 }
 
+// ─── Iteration context & turn processing ────────────────────
+
+interface IterationCtx {
+  client: Anthropic;
+  model: string;
+  maxTokens: number;
+  state: IterationState;
+  iter: number;
+  messages: Anthropic.MessageParam[];
+  toolCounts: Record<string, number>;
+  tokens: { in: number; out: number; cacheCreate: number; cacheRead: number };
+  startTime: Date;
+  turns: number;
+}
+
+type TurnResult = "continue" | "break" | "restarted";
+
+/** Process a single turn: API call → tool dispatch → restart/budget handling. */
+async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
+  ctx.turns++;
+  const turnsLeft = MAX_TURNS - ctx.turns;
+  log(ctx.iter, `Turn ${ctx.turns}/${MAX_TURNS}`);
+
+  const response = await ctx.client.messages.create({
+    model: ctx.model, max_tokens: ctx.maxTokens,
+    system: [{
+      type: "text" as const,
+      text: buildSystemPrompt(ctx.state, ROOT),
+      cache_control: { type: "ephemeral" as const },
+    }],
+    tools: toolRegistry.getDefinitions(),
+    messages: ctx.messages,
+  });
+
+  // Track tokens
+  if (response.usage) {
+    ctx.tokens.in += response.usage.input_tokens;
+    ctx.tokens.out += response.usage.output_tokens;
+    const usage = response.usage as unknown as Record<string, unknown>;
+    if (typeof usage.cache_creation_input_tokens === "number") ctx.tokens.cacheCreate += usage.cache_creation_input_tokens;
+    if (typeof usage.cache_read_input_tokens === "number") ctx.tokens.cacheRead += usage.cache_read_input_tokens;
+  }
+
+  const content = response.content;
+  ctx.messages.push({ role: "assistant", content });
+
+  for (const block of content) {
+    if (block.type === "text") {
+      log(ctx.iter, `Agent: ${block.text.slice(0, 400)}${block.text.length > 400 ? "..." : ""}`);
+    }
+  }
+
+  const toolUses = content.filter(
+    (b): b is Anthropic.ContentBlockParam & { type: "tool_use"; id: string; name: string; input: Record<string, unknown> } =>
+      b.type === "tool_use"
+  );
+
+  if (toolUses.length === 0) {
+    log(ctx.iter, "No tool calls — ending");
+    return "break";
+  }
+
+  // Execute independent tools concurrently
+  const toolResults = await Promise.all(
+    toolUses.map(async (tu) => {
+      const { result, isRestart } = await handleToolCall(ctx.iter, tu, ctx.toolCounts);
+      return { id: tu.id, result, isRestart };
+    })
+  );
+
+  const results: Anthropic.ToolResultBlockParam[] = [];
+  let shouldRestart = false;
+  for (const tr of toolResults) {
+    results.push({ type: "tool_result", tool_use_id: tr.id, content: tr.result });
+    if (tr.isRestart) shouldRestart = true;
+  }
+  ctx.messages.push({ role: "user", content: results });
+
+  if (shouldRestart) {
+    const v = await validateBeforeCommit(ROOT, (msg) => log(ctx.iter, msg));
+    if (!v.ok) {
+      log(ctx.iter, "VALIDATION BLOCKED RESTART — agent must fix");
+      ctx.messages.push({ role: "user", content: validationBlockedMessage(v.output) });
+      return "continue";
+    }
+
+    await finalizeIteration(ctx, true);
+    return "restarted";
+  }
+
+  if (response.stop_reason === "end_turn") {
+    log(ctx.iter, "end_turn");
+    return "break";
+  }
+
+  // Token budget awareness
+  const bw = budgetWarning(ctx.turns, MAX_TURNS, {
+    inputTokens: ctx.tokens.in, outputTokens: ctx.tokens.out,
+    cacheReadTokens: ctx.tokens.cacheRead, elapsedMs: Date.now() - ctx.startTime.getTime(),
+  });
+  if (bw) ctx.messages.push({ role: "user", content: bw });
+
+  const nudge = turnLimitNudge(turnsLeft);
+  if (nudge) ctx.messages.push({ role: "user", content: nudge });
+
+  return "continue";
+}
+
+/** Finalize: capture metrics, commit, optionally restart. */
+async function finalizeIteration(ctx: IterationCtx, doRestart: boolean): Promise<void> {
+  const codeQuality = await captureCodeQuality(ROOT);
+  const benchmarks = await captureBenchmarks(ROOT);
+  recordMetrics({
+    iteration: ctx.iter, startTime: ctx.startTime.toISOString(), endTime: new Date().toISOString(),
+    turns: ctx.turns, toolCalls: ctx.toolCounts, success: true,
+    durationMs: Date.now() - ctx.startTime.getTime(),
+    inputTokens: ctx.tokens.in, outputTokens: ctx.tokens.out,
+    cacheCreationTokens: ctx.tokens.cacheCreate || undefined,
+    cacheReadTokens: ctx.tokens.cacheRead || undefined,
+    codeQuality, benchmarks,
+  });
+
+  const sha = await commitIteration(ctx.iter);
+  const label = doRestart ? "Committed" : "Committed (no restart)";
+  log(ctx.iter, `${label}: ${sha.slice(0, 8)} (${ctx.tokens.in} in / ${ctx.tokens.out} out, cache: ${ctx.tokens.cacheCreate} created, ${ctx.tokens.cacheRead} read)`);
+
+  ctx.state.lastSuccessfulIteration = ctx.iter;
+  ctx.state.lastFailedCommit = null;
+  ctx.state.lastFailureReason = null;
+  ctx.state.iteration++;
+  saveState(ctx.state);
+
+  if (doRestart) {
+    log(ctx.iter, `Restarting as iteration ${ctx.state.iteration}...`);
+    restart();
+  }
+}
+
 // ─── Main iteration ─────────────────────────────────────────
 
 async function runIteration(state: IterationState): Promise<void> {
-  const client = new Anthropic();
-  const model = process.env.MODEL || "claude-opus-4-6";
-  const maxTokens = parseInt(process.env.MAX_TOKENS || "16384", 10);
-  const startTime = new Date();
-  const toolCounts: Record<string, number> = {};
-  const iter = state.iteration;
-  let totalIn = 0, totalOut = 0, totalCacheCreate = 0, totalCacheRead = 0;
+  const ctx: IterationCtx = {
+    client: new Anthropic(),
+    model: process.env.MODEL || "claude-opus-4-6",
+    maxTokens: parseInt(process.env.MAX_TOKENS || "16384", 10),
+    startTime: new Date(),
+    toolCounts: {},
+    iter: state.iteration,
+    state,
+    tokens: { in: 0, out: 0, cacheCreate: 0, cacheRead: 0 },
+    messages: [],
+    turns: 0,
+  };
 
   console.log(`\n${"=".repeat(60)}`);
-  console.log(`  AutoAgent — Iteration ${iter}`);
+  console.log(`  AutoAgent — Iteration ${ctx.iter}`);
   console.log(`  Tools: ${toolRegistry.getNames().join(", ")}`);
   console.log(`${"=".repeat(60)}\n`);
 
-  log(iter, `Starting. Model=${model} MaxTokens=${maxTokens}`);
-  await tagPreIteration(iter);
+  log(ctx.iter, `Starting. Model=${ctx.model} MaxTokens=${ctx.maxTokens}`);
+  await tagPreIteration(ctx.iter);
 
-  const goals = readGoals();
-  const memory = readMemory();
-
-  const messages: Anthropic.MessageParam[] = [{
+  ctx.messages.push({
     role: "user",
-    content: buildInitialMessage(goals, memory),
-  }];
-
-  let turns = 0;
-
-  while (turns < MAX_TURNS) {
-    turns++;
-    const turnsLeft = MAX_TURNS - turns;
-    log(iter, `Turn ${turns}/${MAX_TURNS}`);
-
-    const response = await client.messages.create({
-      model, max_tokens: maxTokens,
-      system: [{
-        type: "text" as const,
-        text: buildSystemPrompt(state, ROOT),
-        cache_control: { type: "ephemeral" as const },
-      }],
-      tools: toolRegistry.getDefinitions(),
-      messages,
-    });
-
-    // Track tokens (including cache metrics)
-    if (response.usage) {
-      totalIn += response.usage.input_tokens;
-      totalOut += response.usage.output_tokens;
-      const usage = response.usage as unknown as Record<string, unknown>;
-      if (typeof usage.cache_creation_input_tokens === "number") totalCacheCreate += usage.cache_creation_input_tokens;
-      if (typeof usage.cache_read_input_tokens === "number") totalCacheRead += usage.cache_read_input_tokens;
-    }
-
-    const content = response.content;
-    messages.push({ role: "assistant", content });
-
-    for (const block of content) {
-      if (block.type === "text") {
-        log(iter, `Agent: ${block.text.slice(0, 400)}${block.text.length > 400 ? "..." : ""}`);
-      }
-    }
-
-    const toolUses = content.filter(
-      (b): b is Anthropic.ContentBlockParam & { type: "tool_use"; id: string; name: string; input: Record<string, unknown> } =>
-        b.type === "tool_use"
-    );
-
-    if (toolUses.length === 0) {
-      log(iter, "No tool calls — ending");
-      break;
-    }
-
-    const results: Anthropic.ToolResultBlockParam[] = [];
-    let shouldRestart = false;
-
-    // Execute independent tools concurrently for speed
-    const toolResults = await Promise.all(
-      toolUses.map(async (tu) => {
-        const { result, isRestart } = await handleToolCall(iter, tu, toolCounts);
-        return { id: tu.id, result, isRestart };
-      })
-    );
-    for (const tr of toolResults) {
-      results.push({ type: "tool_result", tool_use_id: tr.id, content: tr.result });
-      if (tr.isRestart) shouldRestart = true;
-    }
-
-    messages.push({ role: "user", content: results });
-
-    if (shouldRestart) {
-      const v = await validateBeforeCommit(ROOT, (msg) => log(iter, msg));
-      if (!v.ok) {
-        log(iter, "VALIDATION BLOCKED RESTART — agent must fix");
-        messages.push({
-          role: "user",
-          content: validationBlockedMessage(v.output),
-        });
-        continue;
-      }
-
-      const codeQuality = await captureCodeQuality(ROOT);
-      const benchmarks = await captureBenchmarks(ROOT);
-      recordMetrics({
-        iteration: iter, startTime: startTime.toISOString(), endTime: new Date().toISOString(),
-        turns, toolCalls: toolCounts, success: true,
-        durationMs: Date.now() - startTime.getTime(),
-        inputTokens: totalIn, outputTokens: totalOut,
-        cacheCreationTokens: totalCacheCreate || undefined,
-        cacheReadTokens: totalCacheRead || undefined,
-        codeQuality,
-        benchmarks,
-      });
-
-      const sha = await commitIteration(iter);
-      log(iter, `Committed: ${sha.slice(0, 8)} (${totalIn} in / ${totalOut} out, cache: ${totalCacheCreate} created, ${totalCacheRead} read)`);
-
-      state.lastSuccessfulIteration = iter;
-      state.lastFailedCommit = null;
-      state.lastFailureReason = null;
-      state.iteration++;
-      saveState(state);
-
-      log(iter, `Restarting as iteration ${state.iteration}...`);
-      restart();
-      return;
-    }
-
-    if (response.stop_reason === "end_turn") {
-      log(iter, "end_turn");
-      break;
-    }
-
-    // Token budget awareness — inject cumulative usage at milestone turns
-    const bw = budgetWarning(turns, MAX_TURNS, {
-      inputTokens: totalIn, outputTokens: totalOut,
-      cacheReadTokens: totalCacheRead, elapsedMs: Date.now() - startTime.getTime(),
-    });
-    if (bw) messages.push({ role: "user", content: bw });
-
-    const nudge = turnLimitNudge(turnsLeft);
-    if (nudge) messages.push({ role: "user", content: nudge });
-  }
-
-  if (turns >= MAX_TURNS) log(iter, "Hit max turns — forcing commit");
-
-  const codeQuality2 = await captureCodeQuality(ROOT);
-  const benchmarks2 = await captureBenchmarks(ROOT);
-  recordMetrics({
-    iteration: iter, startTime: startTime.toISOString(), endTime: new Date().toISOString(),
-    turns, toolCalls: toolCounts, success: true,
-    durationMs: Date.now() - startTime.getTime(),
-    inputTokens: totalIn, outputTokens: totalOut,
-    cacheCreationTokens: totalCacheCreate || undefined,
-    cacheReadTokens: totalCacheRead || undefined,
-    codeQuality: codeQuality2,
-    benchmarks: benchmarks2,
+    content: buildInitialMessage(readGoals(), readMemory()),
   });
 
-  const sha = await commitIteration(iter);
-  log(iter, `Committed (no restart): ${sha.slice(0, 8)}`);
-  state.lastSuccessfulIteration = iter;
-  state.iteration++;
-  saveState(state);
+  while (ctx.turns < MAX_TURNS) {
+    const result = await processTurn(ctx);
+    if (result === "break" || result === "restarted") return;
+    // "continue" → next turn
+  }
+
+  if (ctx.turns >= MAX_TURNS) log(ctx.iter, "Hit max turns — forcing commit");
+  await finalizeIteration(ctx, false);
 }
 
 // ─── Restart ────────────────────────────────────────────────

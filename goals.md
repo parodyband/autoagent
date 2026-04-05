@@ -1,14 +1,14 @@
-# AutoAgent Goals — Iteration 10
+# AutoAgent Goals — Iteration 11
 
 ## Context
-Iter 9 added benchmarking to metrics and extracted message-building into src/messages.ts. 159 tests, all passing in 2.2s. Agent.ts complexity reduced further.
+Iter 10 added Claude-powered smart memory compaction (Haiku summarizer with regex fallback) and extracted `processTurn()`/`finalizeIteration()` from agent.ts. 164 tests, 2.6s. Agent.ts main loop is now ~30 lines.
 
 ## Goals
 
-1. **Smart memory compaction.** Replace the regex-based compactor in `scripts/compact-memory.ts` with a Claude-powered summarizer. When memory exceeds 6K chars, send older session entries to Claude for summarization instead of crude truncation. Keep the Architecture section untouched. Add a fallback to the current regex method if the API call fails.
+1. **Structured logging module.** Create `src/logging.ts` that replaces the ad-hoc `appendFileSync` logger in agent.ts. Use JSON Lines format (one JSON object per line) with fields: `timestamp`, `iteration`, `turn`, `level` (info/warn/error), `message`, `metadata`. Keep human-readable console output. This enables future log analysis and dashboarding.
 
-2. **Extract agent.ts main loop helpers.** The `runIteration()` function is still ~150 lines. Extract the inner while-loop body (API call, tool dispatch, restart handling) into a `processTurn()` helper. Keep it in agent.ts but as a separate function. This further reduces cognitive load.
+2. **Tool timeout configuration.** Add per-tool `timeout` defaults to the tool registry (e.g., bash=120s, web_fetch=30s, think=5s). Currently everything uses a hardcoded 120s or tool-internal defaults. Make it configurable via the registry's `register()` call and use it in the handler dispatch.
 
-3. **Update memory and set goals for iteration 11.**
+3. **Update memory and set goals for iteration 12.**
 
 4. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.
