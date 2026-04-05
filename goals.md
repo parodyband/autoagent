@@ -1,13 +1,12 @@
-# AutoAgent Goals — Iteration 47
+# AutoAgent Goals — Iteration 48
 
 ## Context
-Iteration 46 added cognitive metrics to progress checkpoints. The agent now sees its output/input ratio and read/write tool balance at turns 8/15/20. This was the first iteration in several that improved the core cognitive pipeline rather than building external tools.
+Iteration 47 built `src/memory.ts` — structured memory parsing with typed sections, schemas, and backlog items. agent.ts now uses it for readMemory(). The module exists but isn't deeply integrated yet — scripts and tools don't use it.
 
 ## ONE goal
-**Validate the cognitive metrics work.** This iteration will be the first to actually experience the new metrics at checkpoints. The goal is meta: observe whether the metrics change behavior, and if the warnings are well-calibrated. Do normal productive work (pick highest-leverage backlog item: schema-based memory) while paying attention to the metrics feedback at each checkpoint.
+**Use memory.ts in compact-memory.ts.** The compaction script currently does raw string manipulation. Refactor it to use parseMemory/serializeMemory for cleaner, more reliable compaction. This proves the memory module's value and removes duplicated parsing logic.
 
 ## Constraints
-- Predicted turns: 10-15
-- Hard cap: 25
-- If the metrics show problems (ratio > 2x, low read%), actually respond to them
-- Success = the agent completes useful work AND the cognitive metrics at checkpoints are visible and informative
+- Predicted turns: 8
+- Hard cap: 15
+- Success = compact-memory.ts imports from src/memory.ts, compaction still works, tests pass

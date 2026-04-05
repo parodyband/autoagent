@@ -25,6 +25,7 @@ import { createDefaultRegistry } from "./tool-registry.js";
 import { loadState, tagPreIteration, type IterationState } from "./iteration.js";
 import { buildInitialMessage } from "./messages.js";
 import { orient, formatOrientation } from "./orientation.js";
+import { parseMemory, getSection, serializeMemory } from "./memory.js";
 import { ToolCache } from "./tool-cache.js";
 import { ToolTimingTracker } from "./tool-timing.js";
 import { finalizeIteration as runFinalization } from "./finalization.js";
@@ -73,24 +74,29 @@ function readMemory(): string {
   const max = 8000;
   if (content.length <= max) return content;
 
-  // Preserve stable sections (Architecture, Schemas, Backlog) above Session Log.
-  // Only truncate the session log, which grows unboundedly.
-  const marker = "## Session Log";
-  const splitIdx = content.indexOf(marker);
-  if (splitIdx === -1) {
-    return "...(earlier entries truncated)...\n\n" + content.slice(-max);
+  // Use structured parsing to budget sections intelligently.
+  // Stable sections (Architecture, Schemas, Backlog) get full budget.
+  // Session Log gets whatever remains, truncated from the top.
+  const sections = parseMemory(content);
+  const stableSections = sections.filter(s => !s.heading.toLowerCase().startsWith("session log"));
+  const sessionLog = sections.find(s => s.heading.toLowerCase().startsWith("session log"));
+
+  const stableText = serializeMemory(stableSections);
+  if (!sessionLog) {
+    return stableText.length <= max ? stableText : stableText.slice(-max);
   }
 
-  const stableSection = content.slice(0, splitIdx);
-  const sessionLog = content.slice(splitIdx);
-  const remainingBudget = max - stableSection.length;
-
+  const remainingBudget = max - stableText.length;
   if (remainingBudget <= 200) {
-    // Stable section alone near/exceeds budget — include it, skip session log
-    return stableSection.slice(0, max) + "\n\n...(session log truncated)...";
+    return stableText.slice(0, max) + "\n\n...(session log truncated)...";
   }
 
-  return stableSection + "...(earlier session entries truncated)...\n\n" + sessionLog.slice(-remainingBudget);
+  const logContent = sessionLog.content;
+  const truncatedLog = logContent.length <= remainingBudget
+    ? logContent
+    : "...(earlier entries truncated)...\n\n" + logContent.slice(-remainingBudget);
+
+  return stableText + `\n\n---\n\n## ${sessionLog.heading}\n\n${truncatedLog}`;
 }
 
 // ─── Finalization delegate ──────────────────────────────────

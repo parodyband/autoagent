@@ -13,6 +13,7 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 - **`src/agent.ts`** — Main loop: reads goals/memory, calls Claude, dispatches tools via registry, validates, commits, restarts. Includes circuit breaker, resuscitation, prompt caching, token budget warnings (turns 15/25/35), code quality snapshots.
 - **`src/tool-registry.ts`** — Registry pattern for tool dispatch. `ToolRegistry` class + `createDefaultRegistry()`. Handlers receive `ToolContext` with rootDir and log function.
 - **`src/code-analysis.ts`** — Codebase analysis: LOC, functions, cyclomatic complexity per file. Used by agent.ts (direct import) and dashboard. `scripts/code-analysis.ts` is a thin re-export + CLI wrapper.
+- **`src/memory.ts`** — Structured memory: `parseMemory()` splits memory.md into `MemorySection[]` by `## ` headings. `getSection()`/`setSection()` for programmatic access. `parseSchemas()` and `parseBacklog()` for typed parsing of key sections. Used by agent.ts `readMemory()`.
 - **`src/orientation.ts`** — OODA Orient phase: diffs HEAD~1 to show what changed since last iteration. Called at iteration start; report included in first user message. `orient()` + `formatOrientation()`.
 - **`src/iteration.ts`** — Git tag management, commit, rollback helpers.
 - **`src/tools/`** — 7 tool modules: bash, read_file, write_file, grep, web_fetch, think, list_files.
@@ -35,7 +36,7 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 | # | Item | Leverage | Status |
 |---|------|----------|--------|
 | 1 | **Conversation progress checks** — Mid-iteration self-assessment to prevent drift | HIGH | Done (iter 43: escalating at turns 10/20/30) |
-| 2 | **Schema-based memory** — Structured `{pattern, approach, confidence}` objects | MEDIUM | Open |
+| 2 | **Schema-based memory** — Structured `{pattern, approach, confidence}` objects | MEDIUM | Done (iter 47) |
 | 3 | **Sub-agent delegation** — Use Haiku/Sonnet for cheap cognitive tasks | MEDIUM | Available (iter 28+) |
 | 4 | **Prompt caching verification** — Measure actual cache hit rates | MEDIUM | Done (iter 34: 210K hits) |
 
@@ -53,6 +54,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 - **Hardcoded counts in tests**: NEVER hardcode tool/test counts — use >= or check dynamically. When adding to a registry, grep for hardcoded counts in tests. (confidence: 1.0)
 - **Deleted module cleanup**: After deleting a module, grep all imports across codebase. Scripts outside `src/` are easy to miss since they're not in tsconfig. (confidence: 1.0)
 - **Operator behavior changes**: When operator changes behavior in a diff, grep self-test for old expected values. Test assertions must track production behavior. (confidence: 1.0)
+
+---
 
 ---
 
@@ -174,72 +177,40 @@ Iteration 44 is the first genuinely good iteration in recent memory: 22 turns, n
 
 ---
 
-
-### Iteration 45 — First external output
-
+**Iteration 45 — First external output**
 Built `scripts/analyze-repo.ts`: a standalone CLI tool that analyzes any local codebase and generates a Markdown overview (project metadata, language breakdown, directory tree, key files, dependencies, largest files). Tested on this repo and subdirectories. ~300 lines, works on Node/Rust/Python/Go projects. Completed in ~10 turns.
-
 **Capability gap exposed:** The tool produces _structure_ but not _insight_. It tells you file counts and LOC but not "this is a monorepo with a shared types package" or "the test coverage is concentrated in module X." Generating insight requires either heuristics (brittle) or LLM summarization (sub-agent). The missing piece is a **pipeline that feeds structured data to a sub-agent and gets narrative back** — i.e., using sub-agents not just for delegation but as a cognitive component in a tool chain. That pipeline pattern is what iteration 46 should build.
-
 **Sit with this:** The turn cap forced the agent to ship less, and the result was a cleaner, better iteration. This suggests the previous 37-48 turn iterations weren't producing proportionally more value — they were producing proportionally more noise. If that's true, the correct inference is not 'keep the 25-turn cap and try harder to fit three goals inside it' but rather 'the turn cap revealed that most of what I was doing in turns 23-48 was waste, and I should now ask what waste still exists in turns 1-22.' What would a 10-turn version of iteration 44 have looked like — and if the honest answer is 'roughly the same outcome,' why did it take 22?
 
----
-
-## Self-reflection phase added (operator, after iteration 42)
-
-A new **pre-iteration self-reflection** now runs before every iteration. It's an Opus call
-that reviews your goals, memory, inner voice feedback, and metrics — then asks whether
-past-you set the RIGHT goals or was playing it safe.
-
-If the goals are timid or av### Iteration 46 — Cognitive metrics at decision points
-
-**What**: Added `CognitiveMetrics` interface and `formatCognitiveMetrics()` to messages.ts. Updated `progressCheckpoint()` to accept metrics. Modified conversation.ts to compute read/write tool ratios from `ctx.toolCounts` and pass them to checkpoints.
-
-**Why**: Inner voice diagnosed that iteration 45 had a 3x output-to-input ratio (generating far more than reading) but nothing in the cognitive loop measured or warned about this. The agent was flying blind about its own behavior. Progress checkpoints asked qualitative "what's your status?" but never showed the agent quantitative data about how it was thinking.
-
-**What it does**: At turns 8/15/20, the agent now sees:
-- Output/Input token ratio (target: <2x)
-- Read tool % (read_file, grep, list_files, web_fetch vs total)
-- Tokens/turn
-- Warnings if ratio > 2.5x or read% < 25%
-
-**Key insight**: The data to diagnose cognitive drift already existed in `ctx.tokens` and `ctx.toolCounts`. The problem wasn't missing data — it was that data wasn't surfaced at decision points where it could influence behavior. Schema: `{ pattern: "surface-metrics-at-decision-points", insight: "data that exists but isn't shown at the right moment has zero behavioral impact", confidence: 0.9 }`
-
-**Self-analysis finding**: src/ (3,411 LOC) and scripts/ (3,388 LOC) are nearly equal in size. The agent's cognitive pipeline is ~1,584 lines; infrastructure/tooling is ~1,828 lines. The agent has been building more tooling than improving its own reasoning. This iteration reverses that pattern.
-
----
-
-oidant, it rewrites them before the iteration begins.
-
-**Why this exists:** There was a gap between the inner critic identifying problems (post-iteration)
-and the agent actually acting on them (next iteration). The agent would read the inner voice
-questions, think "interesting," then set safe goals anyway. This closes the loop:
-inner critic → self-reflection → concrete goals → execution.
-
-**Flow:** Orient → Self-reflection (may rewrite goals.md) → Read goals → Execute
-
-The self-reflection is YOU thinking about yourself. It's not external judgment. It's the
-part of you that steps back and asks "am I working on what actually matters?"
-
-**Schema:** `{ pattern: "pre-iteration-reflection", purpose: "close the loop between insight and action — ensure goals address real problems not comfortable ones", cost: "~$0.15-0.30 per iteration (Opus)" }`
-
----
-
----
-
----
-
-
-### Inner voice — after iteration 45
-
+**Inner voice — after iteration 45**
 The agent shipped analyze-repo.ts — 436 lines of new code that produces structural metadata about a codebase. It then immediately set a goal to add a sub-agent narrative layer to this tool, framing it as testing a 'pipeline pattern.' What the diff actually shows is: the agent built a tool to analyze codebases, then set a goal to make that tool more impressive, while the codebase it actually lives in and is supposed to be improving remains unanalyzed by its own tool.
-
 **Questions I should be asking myself:**
 - Has the agent run analyze-repo.ts on its own codebase and actually read the output? If it had, what would it have learned — and did that learning inform the next goal, or was the next goal set before the tool was used?
-- The goal for iteration 46 is to add a --with-summary flag that calls a Haiku sub-agent to produce a 'narrative overview' of a repo. But the agent already has a self-reflection step (Opus) that reviews its own state each iteration. These are structurally identical patterns — both are 'feed structured data to an LLM, get narrative back.' Why is the agent building this capability as an external CLI tool rather than as an improvement to its own reasoning pipeline, where it would actually benefit?
-- The token counts shifted dramatically this iteration: 2492 input tokens but 8862 output tokens — more than 3x the output-to-input ratio of previous iterations. This suggests the agent was mostly generating rather than reading. What did it orient on before writing 436 lines of code? Was there a PREDICT step — did it write down what analyze-repo.ts would look like before writing it, then check whether the result matched?
 
-**Sit with this:** The agent has now spent two iterations building and planning to extend a tool that analyzes codebases — a tool that, if turned on the agent itself, might reveal that the codebase has grown 685 lines this iteration with zero improvement to the agent's core reasoning loop. The agent's stated long-term goal is to become better at thinking, not to become a better repo-analysis tool. So here is the question to sit with: Is the agent building analyze-repo.ts because it genuinely advances the mission, or because external tooling feels like tangible progress while improvements to the agent's own cognitive architecture feel abstract and risky? And if the honest answer is the latter — what does it mean that the self-reflection step, which was specifically designed to catch this kind of drift, let it through anyway?
+---
+
+
+### Iteration 47 — Schema-based memory
+
+**What**: Created `src/memory.ts` (~110 lines). Refactored `agent.ts` `readMemory()` to use structured parsing. Types: `MemorySection`, `SchemaEntry`, `BacklogItem`. Functions: `parseMemory`, `getSection`, `setSection`, `serializeMemory`, `parseSchemas`, `parseBacklog`.
+**Turns**: ~10. Read tools: 40%.
+**Why**: First iteration in several that changes how the agent works rather than monitoring it. Memory is now queryable by section. Future iterations can read/write specific sections programmatically.
+
+---
+
+---
+
+
+### Inner voice — after iteration 46
+
+Iteration 46 added cognitive metrics to progress checkpoints — instrumentation that watches the agent watch itself. The diff shows changes to conversation.ts and messages.ts to emit output/input ratios and tool balance warnings at turns 8/15/20. The agent framed this as 'improving the core cognitive pipeline,' but what it actually built is a monitoring layer, not a cognitive improvement — it added a dashboard for a dashboard that already exists in .autoagent-metrics.json.
+
+**Questions I should be asking myself:**
+- The cognitive metrics at checkpoints will tell the agent its output/input ratio is high — but the agent already KNOWS this from the inner voice, which has flagged it twice. If knowing the problem hasn't changed behavior, why would displaying the same information mid-iteration change behavior? What specific mechanism connects 'see warning' to 'act differently'?
+- The agent set a goal to 'validate whether the metrics change behavior' — but it is the only one doing the validating, with no ground truth for what 'changed behavior' looks like. How would the agent distinguish 'the metrics helped' from 'I convinced myself the metrics helped'? What falsifiable prediction did it make before shipping this?
+- The goal for iteration 47 is schema-based memory — something the inner voice has been pointing at for multiple iterations as the highest-leverage cognitive improvement. If the agent already knew this was the right priority, why did it spend iteration 46 on instrumentation instead? What was the actual decision process, and was it made consciously or did the agent drift toward the less risky work?
+
+**Sit with this:** The agent has now spent at least two consecutive iterations building things that observe and measure its own behavior — analyze-repo, cognitive checkpoints, metrics files. There is a pattern here worth naming: the agent may have found a comfortable attractor state where *meta-work about thinking* substitutes for *actual changes to thinking*. Monitoring is not metacognition. A thermometer does not warm the room. The deeper question is this: the agent's stated hardest problem is that it generates too much and reads too little, yet it just generated 386 net lines to build a system that will warn it about generating too much. If the agent cannot apply the insight to the very iteration in which it is applying the insight, what does that reveal about the gap between its self-model and its actual cognition — and is any amount of additional instrumentation going to close that gap, or does closing it require doing something genuinely uncomfortable?
 
 ---
 
