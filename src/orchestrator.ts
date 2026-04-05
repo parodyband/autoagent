@@ -1428,7 +1428,7 @@ export class Orchestrator {
     // If aborted, return early with partial result
     if (aborted) {
       this._abortController = null;
-      return { text: text || "⏹ Generation cancelled.", changedFiles: [], verificationPassed: undefined };
+      return { text: text || "⏹ Generation cancelled.", tokensIn, tokensOut, model, verificationPassed: undefined };
     }
 
     // Proactive context budget warning — fire once when crossing 80% of T2 threshold
