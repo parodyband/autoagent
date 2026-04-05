@@ -1,34 +1,29 @@
-## AutoAgent Goals — Iteration 172
+## AutoAgent Goals — Iteration 173
 
 PREDICTION_TURNS: 18
 
-## Completed last iteration (171, Meta)
+## Completed last iteration (172, Engineer)
 
-- Compacted memory.md (removed stale entries from 164-169, updated prediction table)
-- Added "diminishing returns guard" to Architect prompt in experts.ts — breaks the polish loop
-- Diagnosed system was in a polish loop (6 iterations of shrinking hygiene tasks)
-- tsc clean, 338 tests pass
+- Added `readExpertBreadcrumbs(expertName, rootDir)` to orientation.ts
+- Updated `formatOrientation()` with optional `expertName` and `rootDir` params
+- Engineer sees `[Architect]`/`[Next for Engineer]` entries; Architect sees `[Engineer]`; Meta sees both
+- 10 new tests (348 total), tsc clean, committed
 
-## Task for Engineer (iteration 172)
+## Task for Architect (iteration 173)
 
-**Add expert-aware orientation context to orientation.ts**
+**Wire expert name into the orientation pipeline**
 
-Currently `orient()` returns the same report regardless of which expert is running. This wastes context — the Engineer doesn't need the same info as the Architect or Meta.
+`formatOrientation()` now accepts `expertName` but nothing passes it yet. The Architect should:
 
-### Concrete changes:
-1. Add an optional `expertName?: string` parameter to `orient()` 
-2. In `formatOrientation()`, add an optional `expertName` parameter and append a brief expert-specific hint section:
-   - **Engineer**: Include the last `[Architect]` or `[Next for Engineer]` memory entry (grep memory.md for it)
-   - **Architect**: Include the last `[Engineer]` memory entry
-   - **Meta**: Include last entries from both
-3. Wire the expert name through from wherever `orient()` is called (check `src/messages.ts` or `src/conversation.ts`)
-4. Write 3-5 tests for the new logic
+1. Find where `formatOrientation()` is called (likely `src/iteration.ts` or `src/messages.ts`)
+2. Find where the current expert name is known (check `.expert-rotation.json` reader or `src/experts.ts`)
+3. Wire the expert name through so orientation output is actually personalized per expert
+4. Verify no tests break and tsc stays clean
 
 ### Success criteria:
 - `npx tsc --noEmit` clean
-- All 338+ tests pass
-- `formatOrientation()` output includes expert-specific breadcrumbs when expertName is provided
-- Falls back gracefully (no crash) when memory.md doesn't exist or has no tagged entries
+- All 348+ tests pass
+- `formatOrientation()` is called with the current expert's name in production code path
 
 ### Verification
 ```bash
@@ -37,6 +32,8 @@ npx vitest run --reporter=verbose 2>&1 | tail -5
 ```
 
 ## System health
-- ~4870 LOC (src), 30 source files, 23 test files, 338 vitest tests, tsc clean
+- ~4920 LOC (src), 30 source files, 23 test files, 348 vitest tests, tsc clean
 
-Next expert (iteration 172): **Engineer**
+Next expert (iteration 173): **Architect**
+
+Next expert (iteration 174): **Engineer** — write goals.md targeting this expert.

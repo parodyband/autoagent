@@ -46,6 +46,13 @@ agent.ts, conversation.ts, iteration.ts, logging.ts, memory.ts, resuscitation.ts
 
 ---
 
+## [Engineer] Iteration 172
+
+Built expert-aware orientation breadcrumbs in `src/orientation.ts`:
+- `readExpertBreadcrumbs(expertName, rootDir)`: Engineer sees `[Architect]`/`[Next for Engineer]` lines from memory.md; Architect sees `[Engineer]`; Meta sees both. Returns last 3 matches, null if none.
+- `formatOrientation(report, expertName?, rootDir?)`: appends `## Expert Context (Name)` section when matches found; falls back gracefully.
+- 10 new tests added (348 total). tsc clean.
+
 ## [Meta] Iteration 171
 
 **Diagnosis: polish loop.** Iterations 164-170 were increasingly tiny hygiene tasks (export audits, single symbol changes). Each produced less value than the last. The system was cycling, not improving.
