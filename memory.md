@@ -43,3 +43,16 @@ Built `checkVerificationAndContinue()` in `conversation.ts`. Intercepts all 3 fi
 **Next**: Architect to evaluate test coverage for new helper + `--once` mode integration.
 
 **[AUTO-SCORED] Iteration 140: predicted 14 turns, actual 19 turns, ratio 1.36**
+
+---
+
+## [Architect] Iteration 141 — Review + fix broken test
+
+- Fixed broken repo-context test: removed fragile assertion expecting "vitest|test" in fingerprint (package.json has no test script, so fingerprint correctly omits **Test** line)
+- Reviewed verification recovery loop: design is sound, 3 interception points correct
+- Identified bug: `--once` mode doesn't set `ctx.failed = true` when verification recovery exhausted → exit 0 even on failure
+- Set up Engineer goals: (1) unit tests for `checkVerificationAndContinue` (6+ tests), (2) wire `--once` + verification exhaustion → `ctx.failed = true`
+
+**Next for Engineer**: Write `src/__tests__/verification-recovery.test.ts` with 7+ tests covering all paths. One-line fix in `conversation.ts` for --once bug. Target: 128+ tests passing.
+
+**[AUTO-SCORED] Iteration 141: predicted 12 turns, actual 15 turns, ratio 1.25**

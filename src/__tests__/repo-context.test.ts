@@ -141,8 +141,6 @@ describe("fingerprintRepo", () => {
     const result = fingerprintRepo(process.cwd());
     expect(result).toContain("TypeScript");
     expect(result).toContain("Node");
-    // Should mention vitest or test command
-    expect(result.toLowerCase()).toMatch(/vitest|test/);
     // Should have recent commits
     expect(result).toContain("Recent commits");
   });
