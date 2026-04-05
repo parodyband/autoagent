@@ -34,6 +34,8 @@ import {
 } from "./architect-mode.js";
 import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
 import { runDiagnostics } from "./diagnostics.js";
+import { computeUnifiedDiff } from "./diff-preview.js";
+import * as fs from "fs";
 
 // ─── Constants ────────────────────────────────────────────────
 
@@ -80,6 +82,12 @@ export interface OrchestratorOptions {
   resumeSessionPath?: string;
   /** Called when an architect plan is generated */
   onPlan?: (plan: EditPlan) => void;
+  /**
+   * Called before write_file executes. Receives the unified diff and file path.
+   * Return true to accept the write, false to reject it.
+   * If not provided (or --no-confirm), writes proceed without confirmation.
+   */
+  onDiffPreview?: (diff: string, filePath: string) => Promise<boolean>;
 }
 
 export interface OrchestratorResult {
@@ -243,6 +251,7 @@ async function runAgentLoop(
   onToolCall?: OrchestratorOptions["onToolCall"],
   onStatus?: OrchestratorOptions["onStatus"],
   onText?: OrchestratorOptions["onText"],
+  onDiffPreview?: OrchestratorOptions["onDiffPreview"],
 ): Promise<{ text: string; tokensIn: number; tokensOut: number }> {
   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus);
   const tools = registry.getDefinitions();
@@ -292,6 +301,24 @@ async function runAgentLoop(
 
     const results: Anthropic.ToolResultBlockParam[] = [];
     for (const tu of toolUses) {
+      // Intercept write_file for diff preview confirmation
+      if (tu.name === "write_file" && onDiffPreview) {
+        const inp = tu.input as { path?: string; content?: string; mode?: string };
+        const relPath = inp.path ?? "";
+        const newContent = inp.content ?? "";
+        const fullPath = fs.existsSync(relPath) ? relPath
+          : `${workDir}/${relPath}`;
+        let oldContent = "";
+        try { oldContent = fs.readFileSync(fullPath, "utf-8"); } catch { /* new file */ }
+        const diff = computeUnifiedDiff(oldContent, newContent, relPath);
+        if (diff) {
+          const accepted = await onDiffPreview(diff, relPath);
+          if (!accepted) {
+            results.push({ type: "tool_result", tool_use_id: tu.id, content: `User rejected edit to ${relPath}` });
+            continue;
+          }
+        }
+      }
       const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
       const result = compressToolOutput(tu.name, rawResult);
       results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
@@ -563,6 +590,7 @@ export class Orchestrator {
       this.opts.onToolCall,
       this.opts.onStatus,
       this.opts.onText,
+      this.opts.onDiffPreview,
     );
 
     // Persist assistant reply (last assistant message in history)
@@ -604,6 +632,7 @@ export class Orchestrator {
             this.opts.onToolCall,
             this.opts.onStatus,
             this.opts.onText,
+            this.opts.onDiffPreview,
           );
         }
       }
@@ -641,6 +670,7 @@ export class Orchestrator {
           this.opts.onToolCall,
           this.opts.onStatus,
           this.opts.onText,
+          this.opts.onDiffPreview,
         );
 
         this.sessionTokensIn += fixResult.tokensIn;

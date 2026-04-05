@@ -27,6 +27,9 @@ if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
   workDir = path.resolve(process.argv[dirIdx + 1]);
 }
 
+// --no-confirm flag: skip write_file diff confirmation
+const noConfirm = process.argv.includes("--no-confirm");
+
 // --continue / -c flag: auto-resume most recent session
 const continueFlag =
   process.argv.includes("--continue") || process.argv.includes("-c");
@@ -49,6 +52,12 @@ export interface Message {
   tokens?: { in: number; out: number };
   model?: string;
   verificationPassed?: boolean;
+}
+
+interface PendingDiff {
+  diff: string;
+  filePath: string;
+  resolve: (accepted: boolean) => void;
 }
 
 interface FooterStats {

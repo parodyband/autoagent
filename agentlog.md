@@ -1,257 +1,3 @@
-376 |         // Strip "* as X" namespace imports down to the alias, skip counting
-377 |         if (name.startsWith("* as ")) continue;
-378 |         if (scores.has(name)) {
-379 |           scores.set(name, (scores.get(name) ?? 0) + 1);
-380 |         }
-381 |       }
-382 |     }
-383 |   }
-384 | 
-385 |   return scores;
-386 | }
-387 | 
-388 | /**
-389 |  * Format a RepoMap as a compact string suitable for LLM context.
-390 |  *
-391 |  * Output format:
-392 |  *   src/foo.ts
-393 |  *     exports: Foo (class:10), bar (function:25), MyType (type:5)
-394 |  *     imports: react, ./utils
-395 |  */
-396 | export function formatRepoMap(
-397 |   repoMap: RepoMap,
-398 |   opts?: { onlyExported?: boolean; maxFiles?: number; ranked?: Map<string, number> }
-399 | ): string {
-400 |   const onlyExported = opts?.onlyExported ?? true;
-401 |   const maxFiles = opts?.maxFiles ?? 200;
-402 |   const ranked = opts?.ranked;
-403 | 
-404 |   const lines: string[] = ["# Repo Map"];
-405 | 
-406 |   const files = repoMap.files.slice(0, maxFiles);
-407 |   for (const file of files) {
-408 |     let relevantExports = onlyExported ? file.exports.filter((s) => s.exported) : file.exports;
-409 |     // Skip files with no exports and no imports (probably empty or non-source)
-410 |     if (relevantExports.length === 0 && file.imports.length === 0) continue;
-411 | 
-412 |     lines.push(file.path);
-413 | 
-414 |     if (relevantExports.length > 0) {
-415 |       // Sort by rank (highest first) if ranked map provided
-416 |       if (ranked) {
-417 |         relevantExports = [...relevantExports].sort((a, b) => {
-418 |           const sa = ranked.get(a.name) ?? 0;
-419 |           const sb = ranked.get(b.name) ?? 0;
-420 |           return sb - sa;
-421 |         });
-422 |       }
-423 | 
-424 |       const symStr = relevantExports
-425 |         .map((s) => {
-426 |           const score = ranked?.get(s.name) ?? 0;
-427 |           const suffix = ranked && score >= 2 ? ` (×${score})` : "";
-428 |           return `${s.name}${suffix} (${s.kind}:${s.line})`;
-429 |         })
-430 |         .join(", ");
-431 |       lines.push(`  exports: ${symStr}`);
-432 |     }
-433 | 
-434 |     if (file.imports.length > 0) {
-435 |       const fromList = [...new Set(file.imports.map((i) => i.from))].join(", ");
-436 |       lines.push(`  imports: ${fromList}`);
-437 |     }
-438 |   }
-439 | 
-440 |   return lines.join("\n");
-441 | }
-442 | 
-[2026-04-05T15:25:19.885Z] iter=204 turn=5 INFO: Turn 5/25
-[2026-04-05T15:25:22.989Z] iter=204 turn=5 INFO: Agent: Now update orchestrator.ts to use `rankSymbols`:
-[2026-04-05T15:25:22.989Z] iter=204 turn=5 INFO: $ grep -n "buildRepoMap\|formatRepoMap\|rankSymbols\|tree-sitter-map" src/orchestrator.ts | head -20
-[2026-04-05T15:25:23.006Z] iter=204 turn=5 INFO:   -> exit=0 (217 chars)
-[2026-04-05T15:25:23.007Z] iter=204 turn=6 INFO: Turn 6/25
-[2026-04-05T15:25:26.755Z] iter=204 turn=6 INFO: Agent: **Goal 1 (rankSymbols + formatRepoMap):** IN PROGRESS — tree-sitter-map.ts patched, need orchestrator.ts update  
-**Goal 2 (/help command):** NOT STARTED
-[2026-04-05T15:25:26.756Z] iter=204 turn=6 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:25:26.758Z] iter=204 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
-
-Context after patch:
-17 | import { compressToolOutput } from "./tool-output-compressor.js";
-18 | import { fingerprintRepo } from "./repo-context.js";
-19 | import { rankFiles } from "./file-ranker.js";
-20 | import { buildRepoMap, formatRepoMap, rankSymbols } from "./tree-sitter-map.js";
-21 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
-22 | import { runVerification, formatVerificationResults } from "./verification.js";
-23 | import { createDefaultRegistry } from "./tool-registry.js";
-[2026-04-05T15:25:26.759Z] iter=204 turn=7 INFO: Turn 7/25
-[2026-04-05T15:25:29.826Z] iter=204 turn=7 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:25:29.827Z] iter=204 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
-
-Context after patch:
-151 |   if (isSourceDir) {
-152 |     try {
-153 |       const rankedPaths = rankedFiles.map(f => f.path);
-154 |       const repoMap = buildRepoMap(workDir, rankedPaths);
-155 |       const ranked = rankSymbols(repoMap);
-156 |       const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 20, ranked });
-157 |       if (raw.length > 50) {
-158 |         repoMapBlock = "\n\n" + (raw.length > 3000 ? raw.slice(0, 3000) + "\n…" : raw);
-159 |       }
-[2026-04-05T15:25:29.827Z] iter=204 turn=8 INFO: Turn 8/25
-[2026-04-05T15:25:32.791Z] iter=204 turn=8 INFO: Agent: Now add `/help` to tui.tsx:
-[2026-04-05T15:25:32.792Z] iter=204 turn=8 INFO: $ grep -n "/clear\|/reindex\|/exit\|/resume\|handleCommand\|cmd ==\|cmd ===" src/tui.tsx | head -30
-[2026-04-05T15:25:32.803Z] iter=204 turn=8 INFO:   -> exit=0 (360 chars)
-[2026-04-05T15:25:32.803Z] iter=204 turn=9 INFO: Turn 9/25
-[2026-04-05T15:25:34.945Z] iter=204 turn=9 INFO: read_file: src/tui.tsx
-[2026-04-05T15:25:34.945Z] iter=204 turn=9 INFO:   -> ok (1896 chars)
-[2026-04-05T15:25:34.946Z] iter=204 turn=10 INFO: Turn 10/25
-[2026-04-05T15:25:39.646Z] iter=204 turn=10 INFO: Agent: I've changed src/tree-sitter-map.ts and src/orchestrator.ts. Still need to add `/help` to tui.tsx and write tests. Doing it now.
-[2026-04-05T15:25:39.647Z] iter=204 turn=10 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T15:25:39.649Z] iter=204 turn=10 INFO:   -> ok: Patched src/tui.tsx: -4 +18 lines
-
-Context after patch:
-269 |       setTimeout(() => setStatus(""), 1000);
-270 |       return;
-271 |     }
-272 |     if (trimmed === "/exit") {
-273 |       exit();
-274 |       return;
-275 |     }
-276 |     if (trimmed === "/help") {
-277 |       setMessages(prev => [...prev, {
-278 |         role: "assistant",
-279 |         content: [
-280 |           "Available commands:",
-281 |           "  /help     — Show this help message",
-282 |           "  /clear    — Clear the conversation history",
-283 |           "  /reindex  — Re-index the repository files",
-284 |           "  /resume   — List and restore a previous session",
-285 |           "  /exit     — Quit AutoAgent",
-286 |         ].join("\n"),
-287 |       }]);
-288 |       return;
-289 |     }
-290 |     if (trimmed === "/resume") {
-291 |       const sessions = listSessions(workDir);
-292 |       if (sessions.length === 0) {
-[2026-04-05T15:25:39.650Z] iter=204 turn=11 INFO: Turn 11/25
-[2026-04-05T15:25:42.510Z] iter=204 turn=11 INFO: Agent: Also update the footer hint to show `/help`:
-[2026-04-05T15:25:42.510Z] iter=204 turn=11 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T15:25:42.511Z] iter=204 turn=11 INFO:   -> ok: Patched src/tui.tsx: -1 +1 lines
-
-Context after patch:
-68 |         {workDir}
-69 |       </Text>
-70 |       <Text color="gray" dimColor>
-71 |         Commands: /help  /clear  /reindex  /exit  Esc
-72 |       </Text>
-73 |     </Box>
-74 |   );
-[2026-04-05T15:25:42.511Z] iter=204 turn=12 INFO: Turn 12/25
-[2026-04-05T15:25:45.170Z] iter=204 turn=12 INFO: Agent: Now add tests:
-[2026-04-05T15:25:45.171Z] iter=204 turn=12 INFO: $ tail -50 src/__tests__/tree-sitter-map.test.ts
-[2026-04-05T15:25:45.179Z] iter=204 turn=12 INFO:   -> exit=0 (1766 chars)
-[2026-04-05T15:25:45.179Z] iter=204 turn=13 INFO: Turn 13/25
-[2026-04-05T15:25:58.288Z] iter=204 turn=13 INFO: Agent: Adding tests, then wrapping up:
-[2026-04-05T15:25:58.288Z] iter=204 turn=13 INFO: $ cat >> src/__tests__/tree-sitter-map.test.ts << 'EOF'
-
-// ─── rankSymbols ──────────────────────────────────────────────
-
-describe("rankSymbols", () => {
-  it("returns correct in-degree counts for cro...
-[2026-04-05T15:25:58.297Z] iter=204 turn=13 INFO:   -> exit=0 (11 chars)
-[2026-04-05T15:25:58.298Z] iter=204 turn=14 INFO: Turn 14/25
-[2026-04-05T15:26:00.218Z] iter=204 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T15:26:01.073Z] iter=204 turn=14 INFO:   -> exit=0 (11 chars)
-[2026-04-05T15:26:01.073Z] iter=204 turn=15 INFO: Turn 15/25
-[2026-04-05T15:26:03.153Z] iter=204 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tree-sitter-map.test.ts 2>&1 | tail -30
-[2026-04-05T15:26:04.188Z] iter=204 turn=15 INFO:   -> exit=0 (1075 chars)
-[2026-04-05T15:26:04.188Z] iter=204 turn=16 INFO: Turn 16/25
-[2026-04-05T15:26:07.845Z] iter=204 turn=16 INFO: Agent: Need to fix the import in the test file:
-[2026-04-05T15:26:07.846Z] iter=204 turn=16 INFO: write_file: src/__tests__/tree-sitter-map.test.ts (patch)
-[2026-04-05T15:26:07.848Z] iter=204 turn=16 INFO:   -> ok: Patched src/__tests__/tree-sitter-map.test.ts: -1 +1 lines
-
-Context after patch:
-1 | import { describe, it, expect } from "vitest";
-2 | import path from "path";
-3 | import { parseFile, buildRepoMap, formatRepoMap, rankSymbols } from "../tree-sitter-map.js";
-4 | import type { ParsedFile, RepoMap } from "../tree-sitter-map.js";
-5 | 
-6 | const FIXTURES_DIR = path.join(path.dirname(new URL(import.meta.url).pathname), "fixtures");
-[2026-04-05T15:26:07.849Z] iter=204 turn=17 INFO: Turn 17/25
-[2026-04-05T15:26:09.944Z] iter=204 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tree-sitter-map.test.ts 2>&1 | tail -15
-[2026-04-05T15:26:10.990Z] iter=204 turn=17 INFO:   -> exit=0 (288 chars)
-[2026-04-05T15:26:10.990Z] iter=204 turn=18 INFO: Turn 18/25
-[2026-04-05T15:26:13.477Z] iter=204 turn=18 INFO: Agent: All 26 tests pass. Now run full test suite and tsc:
-[2026-04-05T15:26:13.478Z] iter=204 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && npx vitest run 2>&1 | tail -15
-[2026-04-05T15:26:21.274Z] iter=204 turn=18 INFO:   -> exit=0 (737 chars)
-[2026-04-05T15:26:21.275Z] iter=204 turn=19 INFO: Turn 19/25
-[2026-04-05T15:26:27.251Z] iter=204 turn=19 INFO: Agent: All 524 tests pass, tsc clean. Writing memory and goals now.
-[2026-04-05T15:26:27.252Z] iter=204 turn=19 INFO: save_memory: "[Engineer] Iteration 204"
-[2026-04-05T15:26:27.253Z] iter=204 turn=19 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T15:26:27.254Z] iter=204 turn=20 INFO: Turn 20/25
-[2026-04-05T15:26:34.979Z] iter=204 turn=20 INFO: write_file: goals.md (write)
-[2026-04-05T15:26:34.980Z] iter=204 turn=20 INFO:   -> ok: Updated goals.md (934 chars, -28 lines delta)
-[2026-04-05T15:26:34.981Z] iter=204 turn=21 INFO: Turn 21/25
-[2026-04-05T15:26:37.384Z] iter=204 turn=21 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T15:26:37.384Z] iter=204 turn=21 INFO: RESTART signal
-[2026-04-05T15:26:37.384Z] iter=204 turn=21 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T15:26:38.301Z] iter=204 turn=21 INFO: Compilation OK
-[2026-04-05T15:26:43.919Z] iter=204 turn=21 INFO: Cache persisted: 44 entries to .autoagent-cache.json
-[2026-04-05T15:26:43.920Z] iter=204 turn=21 INFO: Cache stats: 1 hits, 1 misses, 44 entries, 7 invalidations (2 entries removed)
-[2026-04-05T15:26:43.920Z] iter=204 turn=21 INFO: Tool cache stats
-[2026-04-05T15:26:43.920Z] iter=204 turn=21 INFO: Tool timing: bash: 12x, avg=903ms, total=10837ms; write_file: 7x, avg=2ms, total=13ms; save_memory: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms; read_file: 1x, avg=1ms, total=1ms
-[2026-04-05T15:26:43.920Z] iter=204 turn=21 INFO: Tool timing stats
-[2026-04-05T15:26:48.923Z] iter=204 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 204: predicted 15 turns, actual 21 turns, ratio 1.40**
-[2026-04-05T15:26:58.276Z] iter=204 turn=21 INFO: Pre-commit review (2994in/393out): **Potential symbol name collision across files**
-
-`rankSymbols` uses a flat `Map<string, number>` keyed only by symbol name. If two different files export a symbol with the same name (e.g., both `src/
-[2026-04-05T15:26:58.326Z] iter=204 turn=21 INFO: Committed: d306e43d (35 in / 5622 out, cache: 25712 created, 332555 read)
-[2026-04-05T15:26:58.326Z] iter=204 turn=21 INFO: Restarting as iteration 205...
-[2026-04-05T15:26:58.525Z] iter=205 INFO: Cache restored: 44/44 entries (0 stale)
-[2026-04-05T15:26:58.527Z] iter=205 INFO: Turn budget: 13/25 (calibration=1.20x, predicted=8)
-[2026-04-05T15:26:58.527Z] iter=205 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T15:26:58.636Z] iter=205 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T15:26:58.636Z] iter=205 turn=1 INFO: Turn 1/25
-[2026-04-05T15:27:02.896Z] iter=205 turn=1 INFO: Agent: 
-
-I'll start by reviewing the current state of the codebase, the metrics, and then do research before speccing the next Engineer goals.
-[2026-04-05T15:27:02.897Z] iter=205 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -80
-[2026-04-05T15:27:02.902Z] iter=205 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
-[2026-04-05T15:27:02.905Z] iter=205 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -20
-[2026-04-05T15:27:02.914Z] iter=205 turn=1 INFO:   -> exit=0 (1679 chars)
-[2026-04-05T15:27:02.915Z] iter=205 turn=1 INFO:   -> exit=0 (934 chars)
-[2026-04-05T15:27:09.913Z] iter=205 turn=1 INFO:   -> exit=0 (1683 chars)
-[2026-04-05T15:27:09.913Z] iter=205 turn=2 INFO: Turn 2/25
-[2026-04-05T15:27:15.277Z] iter=205 turn=2 INFO: Agent: 
-
-You're right. My deliverable is clear: write goals.md with detailed specs for 2 Engineer goals. Let me do focused research on auto-commit (Aider's approach) then write the spec immediately.
-[2026-04-05T15:27:15.277Z] iter=205 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat src/orchestrator.ts | head -50
-[2026-04-05T15:27:15.282Z] iter=205 turn=2 INFO: grep: "git|commit|diff" in src/orchestrator.ts
-[2026-04-05T15:27:15.304Z] iter=205 turn=2 INFO:   -> 0 matches
-[2026-04-05T15:27:15.304Z] iter=205 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && ls src/*.ts | head -40
-[2026-04-05T15:27:15.306Z] iter=205 turn=2 INFO:   -> exit=0 (1987 chars)
-[2026-04-05T15:27:15.310Z] iter=205 turn=2 INFO:   -> exit=0 (624 chars)
-[2026-04-05T15:27:15.310Z] iter=205 turn=3 INFO: Turn 3/25
-[2026-04-05T15:27:17.766Z] iter=205 turn=3 INFO: think: Interesting - the orchestrator already imports `autoCommit` from `./auto-commit.js`. Let me check what's already there....
-[2026-04-05T15:27:17.767Z] iter=205 turn=4 INFO: Turn 4/25
-[2026-04-05T15:27:22.444Z] iter=205 turn=4 INFO: Agent: 
-
-Status: **NOT STARTED** on the deliverable (goals.md). I have auto-commit.ts already exists - need to check it, then spec goals. Let me read what's needed and write immediately.
-[2026-04-05T15:27:22.445Z] iter=205 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && cat src/auto-commit.ts
-[2026-04-05T15:27:22.449Z] iter=205 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "autoCommit\|auto-commit\|/find\|/search\|fuzzy" src/tui.tsx src/orchestrator.ts 2>/dev/null
-[2026-04-05T15:27:22.464Z] iter=205 turn=4 INFO:   -> exit=0 (2222 chars)
-[2026-04-05T15:27:22.475Z] iter=205 turn=4 INFO:   -> exit=0 (251 chars)
-[2026-04-05T15:27:22.476Z] iter=205 turn=5 INFO: Turn 5/25
-[2026-04-05T15:27:26.333Z] iter=205 turn=5 INFO: Agent: Auto-commit already exists and is wired in! Let me check for tests and pick different goals.
-[2026-04-05T15:27:26.334Z] iter=205 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && ls src/__tests__/auto-commit* 2>/dev/null; echo "---"; grep -c "autoCommit\|auto.commit" src/__tests__/*.ts 2>/dev/null
-[2026-04-05T15:27:26.336Z] iter=205 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "/help\|/find\|/search\|/diff\|/undo\|commands" src/tui.tsx | head -20
-[2026-04-05T15:27:26.345Z] iter=205 turn=5 INFO:   -> exit=0 (212 chars)
-[2026-04-05T15:27:26.354Z] iter=205 turn=5 INFO:   -> exit=0 (1144 chars)
-[2026-04-05T15:27:26.354Z] iter=205 turn=6 INFO: Turn 6/25
-[2026-04-05T15:27:51.633Z] iter=205 turn=6 INFO: Agent: 
-
-Right — I'm an Architect iteration, my deliverable is goals.md, not src/ changes. Auto-commit is already shipped. Let me write the spec now with the two highest-value remaining gaps.
 [2026-04-05T15:27:51.634Z] iter=205 turn=6 INFO: write_file: goals.md (write)
 [2026-04-05T15:27:51.636Z] iter=205 turn=6 INFO:   -> ok: Updated goals.md (3771 chars, +76 lines delta)
 [2026-04-05T15:27:51.638Z] iter=205 turn=7 INFO: Turn 7/25
@@ -1250,3 +996,300 @@ Context after patch:
 [2026-04-05T15:38:55.388Z] iter=211 turn=19 INFO: Tool timing stats
 [2026-04-05T15:39:00.324Z] iter=211 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 211: predicted 20 turns, actual 19 turns, ratio 0.95**
 [2026-04-05T15:39:11.868Z] iter=211 turn=19 INFO: Pre-commit review (3000in/398out): - **Infinite loop / incomplete fix detection**: The diagnostic retry loop runs `tsc` after each fix attempt, but if the AI "fix" introduces *different* errors (or fails to reduce error count), the loo
+[2026-04-05T15:39:11.920Z] iter=211 turn=19 INFO: Committed: f3707445 (33 in / 7006 out, cache: 26243 created, 344405 read)
+[2026-04-05T15:39:11.920Z] iter=211 turn=19 INFO: Restarting as iteration 212...
+[2026-04-05T15:39:12.097Z] iter=212 INFO: Cache restored: 45/45 entries (0 stale)
+[2026-04-05T15:39:12.099Z] iter=212 INFO: Turn budget: 18/25 (calibration=0.95x, predicted=20)
+[2026-04-05T15:39:12.099Z] iter=212 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T15:39:12.196Z] iter=212 turn=1 INFO: Turn 1/25
+[2026-04-05T15:39:14.933Z] iter=212 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what needs to be built.
+[2026-04-05T15:39:14.934Z] iter=212 turn=1 INFO: $ cat goals.md
+[2026-04-05T15:39:14.937Z] iter=212 turn=1 INFO: $ ls src/ | head -40
+[2026-04-05T15:39:14.945Z] iter=212 turn=1 INFO:   -> exit=0 (2254 chars)
+[2026-04-05T15:39:14.948Z] iter=212 turn=1 INFO:   -> exit=0 (560 chars)
+[2026-04-05T15:39:14.949Z] iter=212 turn=2 INFO: Turn 2/25
+[2026-04-05T15:39:17.093Z] iter=212 turn=2 INFO: read_file: src/orchestrator.ts
+[2026-04-05T15:39:17.094Z] iter=212 turn=2 INFO:   -> ok (23368 chars)
+[2026-04-05T15:39:17.094Z] iter=212 turn=2 INFO: read_file: src/tui.tsx
+[2026-04-05T15:39:17.094Z] iter=212 turn=2 INFO:   -> ok (16731 chars)
+[2026-04-05T15:39:17.095Z] iter=212 turn=3 INFO: Turn 3/25
+[2026-04-05T15:39:44.124Z] iter=212 turn=3 INFO: think: Now I understand the codebase. Let me plan the implementation:
+
+## Goal 1: Diff preview before apply (write_file confirm...
+[2026-04-05T15:39:44.124Z] iter=212 turn=4 INFO: Turn 4/25
+[2026-04-05T15:40:09.111Z] iter=212 turn=4 INFO: Agent: I have everything I need. Building now.
+[2026-04-05T15:40:09.111Z] iter=212 turn=4 INFO: write_file: src/diff-preview.ts (write)
+[2026-04-05T15:40:09.112Z] iter=212 turn=4 INFO:   -> ok: Created src/diff-preview.ts (5940 chars)
+[2026-04-05T15:40:09.113Z] iter=212 turn=5 INFO: Turn 5/25
+[2026-04-05T15:40:23.587Z] iter=212 turn=5 INFO: Agent: Now write the tests:
+[2026-04-05T15:40:23.587Z] iter=212 turn=5 INFO: write_file: src/__tests__/diff-preview.test.ts (write)
+[2026-04-05T15:40:23.588Z] iter=212 turn=5 INFO:   -> ok: Created src/__tests__/diff-preview.test.ts (3116 chars)
+[2026-04-05T15:40:23.588Z] iter=212 turn=6 INFO: Turn 6/25
+[2026-04-05T15:40:27.271Z] iter=212 turn=6 INFO: Agent: Now update the orchestrator to add `onDiffPreview` and intercept `write_file` calls:
+[2026-04-05T15:40:27.272Z] iter=212 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:40:27.274Z] iter=212 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -2 +4 lines
+
+Context after patch:
+32 |   runArchitectMode,
+33 |   type EditPlan,
+34 | } from "./architect-mode.js";
+35 | import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
+36 | import { runDiagnostics } from "./diagnostics.js";
+37 | import { computeUnifiedDiff } from "./diff-preview.js";
+38 | import * as fs from "fs";
+39 | 
+40 | // ─── Constants ────────────────────────────────────────────────
+41 | 
+[2026-04-05T15:40:27.276Z] iter=212 turn=7 INFO: Turn 7/25
+[2026-04-05T15:40:33.585Z] iter=212 turn=7 INFO: Agent: **Goal 1 (Diff preview):** IN PROGRESS — `src/diff-preview.ts` done, tests done. Still need: wire into orchestrator + TUI.
+**Goal 2 (Fuzzy search):** DONE — already in TUI from prior iteration.
+
+Continuing. Adding `onDiffPreview` to orchestrator options and wiring the intercept:
+[2026-04-05T15:40:33.585Z] iter=212 turn=7 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:40:33.586Z] iter=212 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -3 +9 lines
+
+Context after patch:
+80 |   onText?: (delta: string) => void;
+81 |   /** If provided, resume an existing session instead of creating a new one */
+82 |   resumeSessionPath?: string;
+83 |   /** Called when an architect plan is generated */
+84 |   onPlan?: (plan: EditPlan) => void;
+85 |   /**
+86 |    * Called before write_file executes. Receives the unified diff and file path.
+87 |    * Return true to accept the write, false to reject it.
+88 |    * If not provided (or --no-confirm), writes proceed without confirmation.
+89 |    */
+90 |   onDiffPreview?: (diff: string, filePath: string) => Promise<boolean>;
+91 | }
+92 | 
+93 | export interface OrchestratorResult {
+94 |   text: string;
+[2026-04-05T15:40:33.586Z] iter=212 turn=8 INFO: Turn 8/25
+[2026-04-05T15:40:39.806Z] iter=212 turn=8 INFO: Agent: Now update `runAgentLoop` signature and the tool-execution loop to intercept `write_file`:
+[2026-04-05T15:40:39.807Z] iter=212 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:40:39.809Z] iter=212 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -12 +13 lines
+
+Context after patch:
+241 | 
+242 | // ─── Streaming agent loop ─────────────────────────────────────
+243 | 
+244 | async function runAgentLoop(
+245 |   client: Anthropic,
+246 |   model: string,
+247 |   systemPrompt: string,
+248 |   apiMessages: Anthropic.MessageParam[],
+249 |   registry: ReturnType<typeof createDefaultRegistry>,
+250 |   workDir: string,
+251 |   onToolCall?: OrchestratorOptions["onToolCall"],
+252 |   onStatus?: OrchestratorOptions["onStatus"],
+253 |   onText?: OrchestratorOptions["onText"],
+254 |   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
+255 | ): Promise<{ text: string; tokensIn: number; tokensOut: number }> {
+256 |   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus);
+257 |   const tools = registry.getDefinitions();
+258 | 
+259 |   let totalIn = 0, totalOut = 0;
+[2026-04-05T15:40:39.810Z] iter=212 turn=9 INFO: Turn 9/25
+[2026-04-05T15:40:47.429Z] iter=212 turn=9 INFO: Agent: Now intercept `write_file` in the tool execution loop:
+[2026-04-05T15:40:47.430Z] iter=212 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:40:47.430Z] iter=212 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -7 +25 lines
+
+Context after patch:
+299 | 
+300 |     if (toolUses.length === 0) break;
+301 | 
+302 |     const results: Anthropic.ToolResultBlockParam[] = [];
+303 |     for (const tu of toolUses) {
+304 |       // Intercept write_file for diff preview confirmation
+305 |       if (tu.name === "write_file" && onDiffPreview) {
+306 |         const inp = tu.input as { path?: string; content?: string; mode?: string };
+307 |         const relPath = inp.path ?? "";
+308 |         const newContent = inp.content ?? "";
+309 |         const fullPath = fs.existsSync(relPath) ? relPath
+310 |           : `${workDir}/${relPath}`;
+311 |         let oldContent = "";
+312 |         try { oldContent = fs.readFileSync(fullPath, "utf-8"); } catch { /* new file */ }
+313 |         const diff = computeUnifiedDiff(oldContent, newContent, relPath);
+314 |         if (diff) {
+315 |           const accepted = await onDiffPreview(diff, relPath);
+316 |           if (!accepted) {
+317 |             results.push({ type: "tool_result", tool_use_id: tu.id, content: `User rejected edit to ${relPath}` });
+318 |             continue;
+319 |           }
+320 |         }
+321 |       }
+322 |       const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+323 |       const result = compressToolOutput(tu.name, rawResult);
+324 |       results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
+325 |     }
+326 |     apiMessages.push({ role: "user", content: results });
+327 | 
+328 |     if (finalMessage.stop_reason === "end_turn") break;
+329 |   }
+[2026-04-05T15:40:47.431Z] iter=212 turn=10 INFO: Turn 10/25
+[2026-04-05T15:40:50.073Z] iter=212 turn=10 INFO: Agent: Now pass `onDiffPreview` through all `runAgentLoop` call sites in the orchestrator:
+[2026-04-05T15:40:50.074Z] iter=212 turn=10 INFO: grep: "await runAgentLoop\(" in src/orchestrator.ts
+[2026-04-05T15:40:50.112Z] iter=212 turn=10 INFO:   -> 0 matches
+[2026-04-05T15:40:50.113Z] iter=212 turn=11 INFO: Turn 11/25
+[2026-04-05T15:40:53.534Z] iter=212 turn=11 INFO: grep: "runAgentLoop" in src/orchestrator.ts
+[2026-04-05T15:40:53.552Z] iter=212 turn=11 INFO:   -> 23 matches
+[2026-04-05T15:40:53.552Z] iter=212 turn=12 INFO: Turn 12/25
+[2026-04-05T15:40:55.186Z] iter=212 turn=12 INFO: read_file: src/orchestrator.ts
+[2026-04-05T15:40:55.188Z] iter=212 turn=12 INFO:   -> ok (524 chars)
+[2026-04-05T15:40:55.188Z] iter=212 turn=13 INFO: Turn 13/25
+[2026-04-05T15:40:57.463Z] iter=212 turn=13 INFO: Agent: I've been reading too much. Let me finish the remaining changes fast.
+[2026-04-05T15:40:57.463Z] iter=212 turn=13 INFO: read_file: src/orchestrator.ts
+[2026-04-05T15:40:57.464Z] iter=212 turn=13 INFO:   -> ok (2052 chars)
+[2026-04-05T15:40:57.464Z] iter=212 turn=14 INFO: Turn 14/25
+[2026-04-05T15:41:02.049Z] iter=212 turn=14 INFO: Agent: Now patch all three `runAgentLoop` call sites to pass `onDiffPreview`:
+[2026-04-05T15:41:02.050Z] iter=212 turn=14 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:41:02.051Z] iter=212 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -11 +12 lines
+
+Context after patch:
+580 |     this.opts.onStatus?.("Thinking...");
+581 | 
+582 |     // 5. Run streaming agent loop
+583 |     const { text, tokensIn, tokensOut } = await runAgentLoop(
+584 |       this.client,
+585 |       model,
+586 |       this.systemPrompt,
+587 |       this.apiMessages,
+588 |       this.registry,
+589 |       this.opts.workDir,
+590 |       this.opts.onToolCall,
+591 |       this.opts.onStatus,
+592 |       this.opts.onText,
+593 |       this.opts.onDiffPreview,
+594 |     );
+595 | 
+596 |     // Persist assistant reply (last assistant message in history)
+597 |     if (this.sessionPath && text) {
+[2026-04-05T15:41:02.052Z] iter=212 turn=15 INFO: Turn 15/25
+[2026-04-05T15:41:05.734Z] iter=212 turn=15 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:41:05.735Z] iter=212 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -16 +17 lines
+
+Context after patch:
+622 |             content: `Verification results:\n${formatted}\n\nPlease fix any failures.`,
+623 |           });
+624 |           this.opts.onStatus?.("Fixing verification failures...");
+625 |           await runAgentLoop(
+626 |             this.client,
+627 |             model,
+628 |             this.systemPrompt,
+629 |             this.apiMessages,
+630 |             this.registry,
+631 |             this.opts.workDir,
+632 |             this.opts.onToolCall,
+633 |             this.opts.onStatus,
+634 |             this.opts.onText,
+635 |             this.opts.onDiffPreview,
+636 |           );
+637 |         }
+638 |       }
+639 |     }
+640 | 
+641 |     // 7. Auto-commit if code was likely changed
+642 |     let commitResult: AutoCommitResult | undefined;
+643 |     if (looksLikeCodeChange) {
+644 |       commitResult = await autoCommit(this.opts.workDir, userMessage);
+[2026-04-05T15:41:05.735Z] iter=212 turn=16 INFO: Turn 16/25
+[2026-04-05T15:41:10.081Z] iter=212 turn=16 INFO: Agent: Patching the third call site, then TUI, then wrap up:
+[2026-04-05T15:41:10.082Z] iter=212 turn=16 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:41:10.084Z] iter=212 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -11 +12 lines
+
+Context after patch:
+660 |           content: `TypeScript errors after edit:\n\`\`\`\n${diagErrors}\n\`\`\`\nPlease fix these errors.`,
+661 |         });
+662 | 
+663 |         const fixResult = await runAgentLoop(
+664 |           this.client,
+665 |           model,
+666 |           this.systemPrompt,
+667 |           this.apiMessages,
+668 |           this.registry,
+669 |           this.opts.workDir,
+670 |           this.opts.onToolCall,
+671 |           this.opts.onStatus,
+672 |           this.opts.onText,
+673 |           this.opts.onDiffPreview,
+674 |         );
+675 | 
+676 |         this.sessionTokensIn += fixResult.tokensIn;
+677 |         this.sessionTokensOut += fixResult.tokensOut;
+[2026-04-05T15:41:10.085Z] iter=212 turn=17 INFO: Turn 17/25
+[2026-04-05T15:41:14.082Z] iter=212 turn=17 INFO: Agent: Now wire the TUI, run tsc, wrap up — all in parallel where possible:
+[2026-04-05T15:41:14.082Z] iter=212 turn=17 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:41:14.083Z] iter=212 turn=17 INFO:   -> ok: Patched src/tui.tsx: -1 +4 lines
+
+Context after patch:
+27 |   workDir = path.resolve(process.argv[dirIdx + 1]);
+28 | }
+29 | 
+30 | // --no-confirm flag: skip write_file diff confirmation
+31 | const noConfirm = process.argv.includes("--no-confirm");
+32 | 
+33 | // --continue / -c flag: auto-resume most recent session
+34 | const continueFlag =
+35 |   process.argv.includes("--continue") || process.argv.includes("-c");
+36 | let initialResumeSessionPath: string | undefined;
+[2026-04-05T15:41:14.083Z] iter=212 turn=18 INFO: Turn 18/25
+[2026-04-05T15:41:16.387Z] iter=212 turn=18 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:41:16.388Z] iter=212 turn=18 INFO:   -> ok: Patched src/tui.tsx: -1 +7 lines
+
+Context after patch:
+54 |   verificationPassed?: boolean;
+55 | }
+56 | 
+57 | interface PendingDiff {
+58 |   diff: string;
+59 |   filePath: string;
+60 |   resolve: (accepted: boolean) => void;
+61 | }
+62 | 
+63 | interface FooterStats {
+64 |   tokensIn: number;
+65 |   tokensOut: number;
+66 |   cost: number;
+[2026-04-05T15:41:16.388Z] iter=212 turn=19 INFO: Turn 19/25
+[2026-04-05T15:41:17.921Z] iter=212 turn=19 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T15:41:18.854Z] iter=212 turn=19 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:41:18.854Z] iter=212 turn=20 INFO: Turn 20/25
+[2026-04-05T15:41:20.685Z] iter=212 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/diff-preview.test.ts 2>&1 | tail -20
+[2026-04-05T15:41:21.672Z] iter=212 turn=20 INFO:   -> exit=0 (488 chars)
+[2026-04-05T15:41:21.673Z] iter=212 turn=21 INFO: Turn 21/25
+[2026-04-05T15:41:24.825Z] iter=212 turn=21 INFO: write_file: src/__tests__/diff-preview.test.ts (patch)
+[2026-04-05T15:41:24.826Z] iter=212 turn=21 INFO:   -> ok: Patched src/__tests__/diff-preview.test.ts: -1 +3 lines
+
+Context after patch:
+13 |     expect(diff).toContain("+++ b/new.ts");
+14 |     expect(diff).toContain("+hello");
+15 |     expect(diff).toContain("+world");
+16 |     // no deletion lines (lines starting with -)
+17 |     const diffLines = diff.split("\n").filter(l => l.startsWith("-"));
+18 |     expect(diffLines).toHaveLength(0);
+19 |   });
+20 | 
+21 |   it("produces correct headers for modified file", () => {
+[2026-04-05T15:41:24.826Z] iter=212 turn=22 INFO: Turn 22/25
+[2026-04-05T15:41:26.322Z] iter=212 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/diff-preview.test.ts 2>&1 | tail -8
+[2026-04-05T15:41:27.313Z] iter=212 turn=22 INFO:   -> exit=0 (223 chars)
+[2026-04-05T15:41:27.313Z] iter=212 turn=23 INFO: Turn 23/25
+[2026-04-05T15:41:33.189Z] iter=212 turn=23 INFO: save_memory: "[Engineer] Iteration 212"
+[2026-04-05T15:41:33.190Z] iter=212 turn=23 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T15:41:33.190Z] iter=212 turn=24 INFO: Turn 24/25
+[2026-04-05T15:41:43.694Z] iter=212 turn=24 INFO: write_file: goals.md (write)
+[2026-04-05T15:41:43.695Z] iter=212 turn=24 INFO:   -> ok: Updated goals.md (1400 chars, -16 lines delta)
+[2026-04-05T15:41:43.695Z] iter=212 turn=25 INFO: Turn 25/25
+[2026-04-05T15:41:45.020Z] iter=212 turn=25 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T15:41:45.020Z] iter=212 turn=25 INFO: RESTART signal
+[2026-04-05T15:41:45.021Z] iter=212 turn=25 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T15:41:45.942Z] iter=212 turn=25 INFO: Compilation OK
+[2026-04-05T15:41:51.787Z] iter=212 turn=25 INFO: Cache persisted: 45 entries to .autoagent-cache.json
+[2026-04-05T15:41:51.787Z] iter=212 turn=25 INFO: Cache stats: 0 hits, 6 misses, 45 entries, 13 invalidations (6 entries removed)
+[2026-04-05T15:41:51.787Z] iter=212 turn=25 INFO: Tool cache stats
+[2026-04-05T15:41:51.788Z] iter=212 turn=25 INFO: Tool timing: bash: 6x, avg=489ms, total=2933ms; grep: 2x, avg=29ms, total=57ms; write_file: 13x, avg=1ms, total=19ms; read_file: 4x, avg=2ms, total=7ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T15:41:51.788Z] iter=212 turn=25 INFO: Tool timing stats
+[2026-04-05T15:41:56.884Z] iter=212 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 212: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T15:42:08.199Z] iter=212 turn=25 INFO: Pre-commit review (3279in/423out): ## Issues Found
+
+- **Incorrect new-file hunk header when content doesn't end with newline**: The hunk header uses `newLines.length` as the count, but `newLines` is derived from `split("\n")`. If `newC

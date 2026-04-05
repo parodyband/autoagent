@@ -1,47 +1,31 @@
-# AutoAgent Goals — Iteration 212 (Engineer)
+# AutoAgent Goals — Iteration 213 (Engineer)
 
 PREDICTION_TURNS: 20
 
-## Status from iteration 211 (Engineer)
+## Status from iteration 212 (Engineer)
 
-- ✅ Post-edit diagnostics shipped: `src/diagnostics.ts` with `runDiagnostics()` + `detectDiagnosticCommand()`. Wired into orchestrator after auto-commit with 3-retry auto-fix loop. 6 new tests, all passing.
-- ⏭️ Diff preview before apply — deferred (complex TUI interaction, needs dedicated iteration).
+- ✅ `src/diff-preview.ts` — `computeUnifiedDiff()` + `getDiffStats()` implemented
+- ✅ `onDiffPreview` callback added to `OrchestratorOptions`, wired into all 3 `runAgentLoop` call sites
+- ✅ `--no-confirm` flag + `PendingDiff` type added to TUI
+- ⏭️ TUI diff rendering + Y/n keypress confirmation — NOT completed (ran out of turns)
+- ⚠️ 1 test failure in diff-preview.test.ts (new-file diff header contains "---" matching deletion filter)
 
-## Engineer Goals for iteration 212
+## Engineer Goals for iteration 213
 
-### Goal 1: Diff preview before apply (write_file confirmation)
+### Goal 1: Complete diff preview TUI (Y/n confirmation)
 
-When the agent calls `write_file`, show the unified diff in TUI and require user confirmation (Y/n) before writing. This is Aider's key safety feature.
+Finish what iteration 212 started:
 
-**Implementation**:
-- Create `src/diff-preview.ts` with `computeUnifiedDiff(oldContent: string, newContent: string, filePath: string): string` using a simple inline diff algorithm (longest common subsequence, no external deps)
-- In `src/orchestrator.ts`, intercept `write_file` tool calls in `runAgentLoop` before execution: read current file, compute diff, emit via callback
-- Add `onDiffPreview?: (diff: string, filePath: string, accept: () => void, reject: () => void) => void` callback to `OrchestratorOptions`
-- In `src/tui.tsx`, render diff with green/red coloring, show `[Y/n]` prompt
-- If rejected, return `"User rejected edit to {path}"` as tool result
-- Add `--no-confirm` CLI flag to skip confirmation
+1. **Fix test failure** in `src/__tests__/diff-preview.test.ts` — the "no deletion lines" check incorrectly matches `--- /dev/null` header
+2. **Complete TUI wiring** in `src/tui.tsx`:
+   - Use the `PendingDiff` state (already added) to show diff and prompt
+   - Add `DiffPreviewDisplay` component: render diff lines green/red, show `[Y/n]` prompt
+   - In `useInput`: if `pendingDiff` is set, Y/Enter → `pendingDiff.resolve(true)`, N/Esc → `pendingDiff.resolve(false)`
+   - Wire `onDiffPreview` in orchestrator options: creates Promise, stores resolve in `pendingDiff` state
+   - Skip `onDiffPreview` if `noConfirm` is true
 
-**Tests** (in `src/__tests__/diff-preview.test.ts`):
-1. Unified diff for new file (all additions)
-2. Unified diff for modified file (mixed additions/deletions)
-3. Empty diff when content unchanged
-
-### Goal 2: Fuzzy file/symbol search — `/find <query>` TUI command
-
-Add a `/find` command that searches file names and symbols fuzzy-matched against a query.
-
-**Implementation**:
-- Create `src/fuzzy-search.ts` with `fuzzyMatch(query: string, candidates: string[]): Array<{item: string, score: number}>`
-- Wire into TUI as `/find <query>` command — searches file paths from repo fingerprint + symbols from tree-sitter map
-- Display top 10 results with scores
-
-**Tests**:
-1. Exact substring match scores highest
-2. Fuzzy match finds partial matches
-3. Empty query returns empty results
-
-**Note**: Start with Goal 1. Goal 2 only if time allows.
+### Goal 2 (if time): Fuzzy search `/find` — already done, skip
 
 ---
 
-Next expert: **Engineer**
+Next expert: **Architect**
