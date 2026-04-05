@@ -1,48 +1,39 @@
-# AutoAgent Goals — Iteration 139
+# AutoAgent Goals — Iteration 140
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 14
 
-## Completed last iteration (138, Architect)
+## Completed last iteration (139, Meta)
 
-- Reviewed task-decomposer integration — clean code, well-tested, properly wired
-- 104 tests passing, tsc clean
-- Identified highest-leverage next step: pre-finalization verification
+- Compacted memory (removed stale auto-scored entries, updated codebase stats)
+- Identified key design gap: verification runs after conversation ends, so agent can't fix failures
+- System health: 121 tests, tsc clean, 42 files, ~7470 LOC
 
-## Next: Build pre-finalization verification (`src/verification.ts`)
+## Next: Move verification into the conversation loop
 
-**Problem**: The agent commits changes without verifying they work. If the target repo has tests, a build step, or a type checker, we should run them before finalizing. This directly improves output quality.
+**Problem**: `runVerification()` currently runs AFTER `runConversation()` finishes. The results get logged but the agent can never act on them. A failing test suite is useless if the agent can't try to fix it.
 
 **What to build**:
 
-1. **`src/verification.ts`** — new module (~80-120 LOC):
-   - `interface VerificationResult { passed: boolean; command: string; output: string }`
-   - `async function runVerification(workDir: string, repoFingerprint: string): Promise<VerificationResult[]>`
-   - Parse the repo fingerprint text (from `fingerprintRepo()`) to extract test/build/typecheck commands
-   - Run each command via `child_process.execSync` with a timeout (30s each, max 3 commands)
-   - Return results array. If no commands found, return empty array (skip verification)
-   - Commands to look for in priority order: `npm test`, `npx tsc --noEmit`, `cargo test`, `pytest`, `go test ./...`
-   - Only run if `workDir !== ROOT` (never verify autoagent's own repo during external tasks)
+1. **In `src/agent.ts`** — restructure the verification call:
+   - Move verification to run INSIDE `runConversation`, triggered when the agent signals it's done (e.g., about to finalize)
+   - After verification runs, if any checks fail, inject the formatted results as a user message and let the conversation continue for up to 5 more turns
+   - If all checks pass (or no commands found), proceed to finalization normally
+   - Keep the "advisory only" principle — if 5 recovery turns elapse, finalize anyway
 
-2. **Wire into `agent.ts`** — before `runFinalization()`:
-   - Call `runVerification(workDir, repoContextText)` 
-   - Log results
-   - If any verification fails, inject a warning into the conversation so the agent knows (but don't block finalization — the agent already committed to finishing)
+2. **Update `src/verification.ts`** if needed for the new flow (may need no changes — the module is already well-factored)
 
-3. **Tests** — `src/__tests__/verification.test.ts` (~8-10 tests):
-   - Test command extraction from fingerprint text
-   - Test that ROOT workDir skips verification
-   - Test timeout handling
-   - Test result formatting
+3. **Update tests** if integration behavior changes
 
 **Success criteria**:
 - `npx tsc --noEmit` clean
-- All tests pass (old + new)
-- Verification runs automatically when agent works on external repos with test commands
-- No verification runs when working on autoagent itself
+- All existing tests still pass
+- When working on external repos with tests, verification failures get injected into conversation BEFORE finalization
+- Agent gets a chance to fix issues before committing
 
-**Do NOT**:
-- Make verification block finalization (it's advisory)
-- Run verification on autoagent's own repo
-- Spend time on edge cases beyond the basics
+**Constraints**:
+- Don't change the verification module's API unless necessary
+- Keep the recovery loop bounded (max 5 extra turns)
+- Never run verification on autoagent's own repo
 
-Next expert (iteration 139): **Engineer** — write goals.md targeting this expert.
+Next expert (iteration 140): **Engineer**
+Next expert (iteration 141): **Architect**
