@@ -21970,5 +21970,94 @@
       "totalMs": 1027
     },
     "predictedTurns": 8
+  },
+  {
+    "iteration": 336,
+    "startTime": "2026-04-05T19:34:25.611Z",
+    "endTime": "2026-04-05T19:36:08.498Z",
+    "turns": 15,
+    "toolCalls": {
+      "read_scratchpad": 1,
+      "read_file": 2,
+      "grep": 2,
+      "bash": 7,
+      "think": 1,
+      "write_file": 2,
+      "save_memory": 1
+    },
+    "success": true,
+    "durationMs": 102887,
+    "inputTokens": 23,
+    "outputTokens": 4072,
+    "cacheCreationTokens": 17235,
+    "cacheReadTokens": 171691,
+    "codeQuality": {
+      "totalLOC": 21617,
+      "codeLOC": 16027,
+      "fileCount": 115,
+      "functionCount": 972,
+      "complexity": 2266,
+      "testCount": 348
+    },
+    "benchmarks": {
+      "testDurationMs": 6699,
+      "testCount": 1124
+    },
+    "toolTimings": {
+      "tools": {
+        "read_scratchpad": {
+          "calls": 1,
+          "totalMs": 2,
+          "minMs": 2,
+          "maxMs": 2,
+          "avgMs": 2
+        },
+        "read_file": {
+          "calls": 2,
+          "totalMs": 3,
+          "minMs": 0,
+          "maxMs": 3,
+          "avgMs": 2
+        },
+        "grep": {
+          "calls": 2,
+          "totalMs": 33,
+          "minMs": 14,
+          "maxMs": 19,
+          "avgMs": 17
+        },
+        "bash": {
+          "calls": 7,
+          "totalMs": 15628,
+          "minMs": 1,
+          "maxMs": 13402,
+          "avgMs": 2233
+        },
+        "think": {
+          "calls": 1,
+          "totalMs": 0,
+          "minMs": 0,
+          "maxMs": 0,
+          "avgMs": 0
+        },
+        "write_file": {
+          "calls": 2,
+          "totalMs": 3,
+          "minMs": 1,
+          "maxMs": 2,
+          "avgMs": 2
+        },
+        "save_memory": {
+          "calls": 1,
+          "totalMs": 3,
+          "minMs": 3,
+          "maxMs": 3,
+          "avgMs": 3
+        }
+      },
+      "totalCalls": 16,
+      "totalMs": 15672
+    },
+    "predictedTurns": 20
   }
 ]

@@ -5,21 +5,18 @@
  *   npx tsx src/cli.ts                    # work in current directory
  *   npx tsx src/cli.ts --dir /path/to/repo  # work in a specific repo
  *
- * This is separate from the self-improvement loop. It uses the same
- * tool registry but doesn't touch memory, goals, metrics, or state.
+ * Powered by the Orchestrator — same pipeline as the TUI:
+ *   streaming, compaction, repo map, context loading, model routing,
+ *   abort, session stats, auto-commit, diagnostics, sub-agent delegation.
  */
 
-import Anthropic from "@anthropic-ai/sdk";
 import { createInterface } from "readline";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import "dotenv/config";
-import { createDefaultRegistry } from "./tool-registry.js";
+import { Orchestrator } from "./orchestrator.js";
 import { runInit } from "./init-command.js";
-
-const MODEL = "claude-sonnet-4-6";
-const MAX_TOKENS = 16384;
 
 // ─── Parse args ─────────────────────────────────────────────
 
@@ -31,7 +28,6 @@ if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
 
 // ─── /help subcommand ────────────────────────────────────────
 export function printHelp(): void {
-  // Read version from package.json if available
   let version = "unknown";
   try {
     const pkgPath = fileURLToPath(new URL("../package.json", import.meta.url));
@@ -97,100 +93,42 @@ if (process.argv[2] === "init") {
   }
 }
 
-// ─── Setup ──────────────────────────────────────────────────
+// ─── Orchestrator setup ─────────────────────────────────────
 
-const client = new Anthropic();
-const registry = createDefaultRegistry();
-const tools = registry.getDefinitions();
-const messages: Anthropic.MessageParam[] = [];
+let isResponding = false;
 
-const systemPrompt = `You are a coding assistant with direct access to the filesystem and shell.
+const orchestrator = new Orchestrator({
+  workDir,
 
-Working directory: ${workDir}
+  // Stream text deltas to stdout
+  onText: (delta: string) => {
+    process.stdout.write(delta);
+  },
 
-You have these tools: ${registry.getNames().join(", ")}
-
-Rules:
-- Be concise. Do the thing, show the result.
-- ESM/TypeScript project conventions: import not require, .js extensions in imports.
-- Use bash for commands, read_file/write_file for files, grep for search.
-- If the user asks you to do something, do it. Don't ask for confirmation.`;
-
-// ─── Tool dispatch ──────────────────────────────────────────
-
-async function handleTool(
-  name: string,
-  input: Record<string, unknown>
-): Promise<string> {
-  const tool = registry.get(name);
-  if (!tool) return `Unknown tool: ${name}`;
-
-  const ctx = {
-    rootDir: workDir,
-    log: (msg: string) => process.stderr.write(`  ${msg}\n`),
-    defaultTimeout: tool.defaultTimeout,
-  };
-
-  try {
-    const { result } = await tool.handler(input, ctx);
-    return result;
-  } catch (err) {
-    return `Error: ${err instanceof Error ? err.message : err}`;
-  }
-}
-
-// ─── Conversation turn ──────────────────────────────────────
-
-async function runTurn(): Promise<string> {
-  const response = await client.messages.create({
-    model: MODEL,
-    max_tokens: MAX_TOKENS,
-    system: systemPrompt,
-    tools,
-    messages,
-  });
-
-  const content = response.content;
-  messages.push({ role: "assistant", content });
-
-  // Collect text output
-  let textOutput = "";
-  for (const block of content) {
-    if (block.type === "text" && block.text.trim()) {
-      textOutput += block.text;
+  // Print status updates to stderr (dim)
+  onStatus: (status: string) => {
+    if (status) {
+      process.stderr.write(`\x1b[90m  ${status}\x1b[0m\n`);
     }
-  }
+  },
 
-  // Check for tool use
-  const toolUses = content.filter(
-    (b): b is Anthropic.ContentBlockParam & { type: "tool_use"; id: string; name: string; input: Record<string, unknown> } =>
-      b.type === "tool_use"
-  );
-
-  if (toolUses.length === 0) {
-    return textOutput;
-  }
-
-  // Execute tools
-  const results: Anthropic.ToolResultBlockParam[] = [];
-  for (const tu of toolUses) {
-    process.stderr.write(`  \x1b[90m${tu.name}: ${JSON.stringify(tu.input).slice(0, 100)}\x1b[0m\n`);
-    const result = await handleTool(tu.name, tu.input);
-    // Show truncated result
-    const preview = result.split("\n").slice(0, 3).join("\n");
-    if (preview.length > 200) {
-      process.stderr.write(`  \x1b[90m→ ${preview.slice(0, 200)}...\x1b[0m\n`);
-    } else if (preview) {
-      process.stderr.write(`  \x1b[90m→ ${preview}\x1b[0m\n`);
+  // Print tool calls to stderr (dim)
+  onToolCall: (name: string, input: string, result: string) => {
+    const inputPreview = input.slice(0, 100);
+    const resultPreview = result.split("\n").slice(0, 3).join("\n").slice(0, 200);
+    process.stderr.write(`\x1b[90m  ${name}: ${inputPreview}\x1b[0m\n`);
+    if (resultPreview) {
+      process.stderr.write(`\x1b[90m  → ${resultPreview}\x1b[0m\n`);
     }
-    results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
-  }
+  },
 
-  messages.push({ role: "user", content: results });
-
-  // Continue the conversation (model may want to use more tools or respond)
-  return (textOutput ? textOutput + "\n" : "") + await runTurn();
-}
+  // Warn when approaching context limit
+  onContextWarning: () => {
+    process.stderr.write(
+      `\x1b[33m  ⚠ Context approaching limit — compaction may occur\x1b[0m\n`
+    );
+  },
+});
 
 // ─── REPL ───────────────────────────────────────────────────
 
@@ -199,42 +137,78 @@ const rl = createInterface({
   output: process.stdout,
 });
 
-console.log(`\x1b[1mAutoAgent CLI\x1b[0m — ${MODEL}`);
+console.log(`\x1b[1mAutoAgent CLI\x1b[0m — powered by Orchestrator`);
 console.log(`Working directory: ${workDir}`);
-console.log(`Tools: ${registry.getNames().join(", ")}`);
-console.log(`Type your request. Ctrl+C to exit.\n`);
+console.log(`Type your request. /clear to reset, /cost for stats, Ctrl+C to exit.\n`);
+
+// Handle Ctrl+C: abort current request if responding, else exit
+process.on("SIGINT", () => {
+  if (isResponding) {
+    process.stderr.write("\x1b[33m  Aborting...\x1b[0m\n");
+    orchestrator.abort();
+  } else {
+    console.log("\nGoodbye!");
+    process.exit(0);
+  }
+});
 
 function prompt() {
   rl.question("\x1b[36m> \x1b[0m", async (input) => {
     const trimmed = input.trim();
     if (!trimmed) { prompt(); return; }
 
+    // ─── Slash commands ──────────────────────────────────
+
     if (trimmed === "/clear") {
-      messages.length = 0;
+      orchestrator.clearHistory();
       console.log("Conversation cleared.\n");
       prompt();
       return;
     }
 
     if (trimmed === "/cost") {
-      // rough token estimate from message sizes
-      const chars = JSON.stringify(messages).length;
-      console.log(`~${Math.round(chars / 4)} tokens in conversation history\n`);
+      const stats = orchestrator.getSessionStats();
+      const mins = Math.round(stats.durationMs / 60000);
+      console.log(
+        `Session: ${stats.turnCount} turn${stats.turnCount !== 1 ? "s" : ""}, ` +
+        `${mins} min, ` +
+        `avg $${stats.avgCostPerTurn.toFixed(4)}/turn, ` +
+        `trend ${stats.costTrend}\n`
+      );
       prompt();
       return;
     }
 
-    messages.push({ role: "user", content: trimmed });
+    // ─── Send to orchestrator ────────────────────────────
+
+    isResponding = true;
+    process.stdout.write("\n");
 
     try {
-      const response = await runTurn();
-      if (response) {
-        console.log(`\n${response}\n`);
-      } else {
-        console.log();
+      const result = await orchestrator.send(trimmed);
+
+      // Ensure we end on a newline after streaming
+      if (result.text && !result.text.endsWith("\n")) {
+        process.stdout.write("\n");
+      }
+      process.stdout.write("\n");
+
+      // Show auto-commit result if any
+      if (result.commitResult?.committed) {
+        process.stderr.write(
+          `\x1b[32m  ✓ Auto-committed: ${result.commitResult.message}\x1b[0m\n`
+        );
       }
     } catch (err) {
-      console.error(`\x1b[31mError: ${err instanceof Error ? err.message : err}\x1b[0m\n`);
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("aborted") || msg.includes("Aborted")) {
+        process.stderr.write(`\x1b[33m  Request aborted.\x1b[0m\n`);
+      } else {
+        console.error(`\x1b[31mError: ${msg}\x1b[0m`);
+      }
+      process.stdout.write("\n");
+    } finally {
+      isResponding = false;
     }
 
     prompt();

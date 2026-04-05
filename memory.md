@@ -9,6 +9,8 @@
 
 ---
 
+---
+
 
 ## Product Architecture
 - `src/tui.tsx` — Ink/React TUI (921 LOC). Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact.
@@ -30,11 +32,15 @@
 
 ---
 
+---
+
 
 ## Prediction Accuracy
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
 
 Recent ratios (iters 327–330): 0.75, 0.95, 1.00, 1.25. Average ~1.0. Well-calibrated now.
+
+---
 
 ---
 
@@ -48,6 +54,8 @@ Recent ratios (iters 327–330): 0.75, 0.95, 1.00, 1.25. Average ~1.0. Well-cali
 **[AUTO-SCORED] Iteration 331: predicted 20 turns, actual 19 turns, ratio 0.95**
 
 **[AUTO-SCORED] Iteration 332: predicted 18 turns, actual 25 turns, ratio 1.39**
+
+---
 
 ---
 
@@ -85,6 +93,8 @@ Until this is wired up, we don't have a product. We have an engine with no car.
 
 ---
 
+---
+
 
 ## [Meta] Iteration 335 Assessment
 **System problem**: CRITICAL GAP (CLI not using Orchestrator) has persisted 11 iterations since flagged at iter 324. Architect iters keep planning other things. Iter 334 was wasted — goals already complete.
@@ -94,36 +104,10 @@ Until this is wired up, we don't have a product. We have an engine with no car.
 
 ---
 
-
-## Compacted History (iterations 112–330)
-
-**Core milestones** (112–302):
-- [178] orchestrator + TUI. [192] Tiered compaction. [193–194] architect-mode.
-- [196] Tree-sitter repo map. [200] Auto-commit. [204–206] /help, /diff, /undo.
-- [211] diagnostics. [216] PageRank + fuzzySearch. [218] context-loader.
-- [234] microCompact(). [246] test-runner. [254] Parallel tools + tool-recovery.
-- [256] /status. [260] /rewind. [262–266] file-watcher. [270] /compact.
-- [282] pruneStaleToolResults(). [286] Sub-agent tool. [298] /export.
-- [302] CLI `autoagent init` + auto-export on /exit.
-
-**Recent milestones** (308–330):
-- [308] `autoagent help` CLI subcommand.
-- [310] Welcome banner + context-loader git-awareness.
-- [314] File cache + write_file improvements.
-- [322] Incremental repo map update (+138 LOC).
-- [324] Auto tool-call retry + incremental reindex wiring.
-- [326] Prompt cache control helpers wired into API calls.
-- [328] Tests for orchestrator features (260 lines).
-- [330] AbortController in orchestrator `send()` + `getSessionStats()` (session duration, cost trend). TUI wiring not yet done.
-
-**Codebase**: ~6K LOC src, 34 files, 938 vitest tests, 76 test files, TSC clean.
-
 ---
 
-**[AUTO-SCORED] Iteration 335: predicted 8 turns, actual 9 turns, ratio 1.13**
 
 ## Extended thinking is not enabled ANYWHERE (operator, iteration 324)
-
 Neither the CLI nor the orchestrator uses extended thinking. Every API call is raw
 completion with no thinking budget. This is a massive missed opportunity.
 
@@ -156,3 +140,37 @@ dual process architecture.
 highest-leverage change for making the tool actually better than raw Claude.
 
 ---
+
+---
+
+
+## Compacted History (iterations 112–330)
+
+**Core milestones** (112–302):
+- [178] orchestrator + TUI. [192] Tiered compaction. [193–194] architect-mode.
+- [196] Tree-sitter repo map. [200] Auto-commit. [204–206] /help, /diff, /undo.
+- [211] diagnostics. [216] PageRank + fuzzySearch. [218] context-loader.
+- [234] microCompact(). [246] test-runner. [254] Parallel tools + tool-recovery.
+- [256] /status. [260] /rewind. [262–266] file-watcher. [270] /compact.
+- [282] pruneStaleToolResults(). [286] Sub-agent tool. [298] /export.
+- [302] CLI `autoagent init` + auto-export on /exit.
+
+**Recent milestones** (308–330):
+- [308] `autoagent help` CLI subcommand.
+- [310] Welcome banner + context-loader git-awareness.
+- [314] File cache + write_file improvements.
+- [322] Incremental repo map update (+138 LOC).
+- [324] Auto tool-call retry + incremental reindex wiring.
+- [326] Prompt cache control helpers wired into API calls.
+- [328] Tests for orchestrator features (260 lines).
+- [330] AbortController in orchestrator `send()` + `getSessionStats()` (session duration, cost trend). TUI wiring not yet done.
+
+**Codebase**: ~6K LOC src, 34 files, 938 vitest tests, 76 test files, TSC clean.
+
+---
+
+**[AUTO-SCORED] Iteration 335: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+---
+
+**[AUTO-SCORED] Iteration 336: predicted 20 turns, actual 15 turns, ratio 0.75**

@@ -1030,3 +1030,35 @@ I have what I need:
 [2026-04-05T19:34:44.010Z] iter=336 turn=8 INFO: $ sed -n '121,170p' src/orchestrator.ts
 [2026-04-05T19:34:44.021Z] iter=336 turn=8 INFO:   -> exit=0 (1808 chars)
 [2026-04-05T19:34:44.021Z] iter=336 turn=9 INFO: Turn 9/25
+[2026-04-05T19:35:17.192Z] iter=336 turn=9 INFO: Agent: Now I have all I need. Writing the new `cli.ts`:
+[2026-04-05T19:35:17.192Z] iter=336 turn=9 INFO: write_file: src/cli.ts (write)
+[2026-04-05T19:35:17.193Z] iter=336 turn=9 INFO:   -> ok: Updated src/cli.ts (6829 chars, -26 lines delta)
+[2026-04-05T19:35:17.194Z] iter=336 turn=10 INFO: Turn 10/25
+[2026-04-05T19:35:18.425Z] iter=336 turn=10 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T19:35:19.478Z] iter=336 turn=10 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:35:19.478Z] iter=336 turn=11 INFO: Turn 11/25
+[2026-04-05T19:35:20.617Z] iter=336 turn=11 INFO: $ npx vitest run 2>&1 | tail -20
+[2026-04-05T19:35:34.018Z] iter=336 turn=11 INFO:   -> exit=0 (1054 chars)
+[2026-04-05T19:35:34.019Z] iter=336 turn=12 INFO: Turn 12/25
+[2026-04-05T19:35:38.999Z] iter=336 turn=12 INFO: Agent: All 950 tests pass, TSC clean. Now update memory and goals.
+[2026-04-05T19:35:39.001Z] iter=336 turn=12 INFO: save_memory: "[Engineer] Iteration 336"
+[2026-04-05T19:35:39.003Z] iter=336 turn=12 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T19:35:39.004Z] iter=336 turn=13 INFO: Turn 13/25
+[2026-04-05T19:35:48.836Z] iter=336 turn=13 INFO: Agent: I've already completed the goal. Let me update goals.md and restart.
+[2026-04-05T19:35:48.837Z] iter=336 turn=13 INFO: write_file: goals.md (write)
+[2026-04-05T19:35:48.838Z] iter=336 turn=13 INFO:   -> ok: Updated goals.md (1269 chars, -32 lines delta)
+[2026-04-05T19:35:48.838Z] iter=336 turn=14 INFO: Turn 14/25
+[2026-04-05T19:35:50.653Z] iter=336 turn=14 INFO: $ npx tsc --noEmit && echo "TSC CLEAN"
+[2026-04-05T19:35:51.786Z] iter=336 turn=14 INFO:   -> exit=0 (10 chars)
+[2026-04-05T19:35:51.786Z] iter=336 turn=15 INFO: Turn 15/25
+[2026-04-05T19:35:53.130Z] iter=336 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T19:35:53.131Z] iter=336 turn=15 INFO: RESTART signal
+[2026-04-05T19:35:53.131Z] iter=336 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T19:35:54.184Z] iter=336 turn=15 INFO: Compilation OK
+[2026-04-05T19:36:01.784Z] iter=336 turn=15 INFO: Cache persisted: 57 entries to .autoagent-cache.json
+[2026-04-05T19:36:01.784Z] iter=336 turn=15 INFO: Cache stats: 0 hits, 4 misses, 57 entries, 2 invalidations (1 entries removed)
+[2026-04-05T19:36:01.784Z] iter=336 turn=15 INFO: Tool cache stats
+[2026-04-05T19:36:01.784Z] iter=336 turn=15 INFO: Tool timing: bash: 7x, avg=2233ms, total=15628ms; grep: 2x, avg=17ms, total=33ms; read_file: 2x, avg=2ms, total=3ms; write_file: 2x, avg=2ms, total=3ms; save_memory: 1x, avg=3ms, total=3ms; read_scratchpad: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T19:36:01.784Z] iter=336 turn=15 INFO: Tool timing stats
+[2026-04-05T19:36:08.501Z] iter=336 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 336: predicted 20 turns, actual 15 turns, ratio 0.75**
+[2026-04-05T19:36:13.448Z] iter=336 turn=15 INFO: Pre-commit review (2988in/150out): **LGTM** — this is a clean refactor that delegates conversation management to the `Orchestrator`, removes duplicated Anthropic client/tool/message state from the CLI, and adds proper abort/SIGINT hand

@@ -1,52 +1,6 @@
 {
-  "generatedAt": 1775417516222,
+  "generatedAt": 1775417724177,
   "files": [
-    {
-      "path": "src/cli.ts",
-      "exports": [
-        {
-          "name": "printHelp",
-          "kind": "function",
-          "line": 33,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [],
-          "from": "readline"
-        },
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "url"
-        },
-        {
-          "names": [],
-          "from": "dotenv/config"
-        },
-        {
-          "names": [],
-          "from": "./tool-registry.js"
-        },
-        {
-          "names": [],
-          "from": "./init-command.js"
-        }
-      ],
-      "lastModified": 1775414268260.3657
-    },
     {
       "path": "src/context-loader.ts",
       "exports": [
@@ -1271,6 +1225,48 @@
       ],
       "imports": [],
       "lastModified": 1775412317356.8694
+    },
+    {
+      "path": "src/cli.ts",
+      "exports": [
+        {
+          "name": "printHelp",
+          "kind": "function",
+          "line": 30,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "readline"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "url"
+        },
+        {
+          "names": [],
+          "from": "dotenv/config"
+        },
+        {
+          "names": [],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [],
+          "from": "./init-command.js"
+        }
+      ],
+      "lastModified": 1775417717193.5632
     }
   ]
 }
