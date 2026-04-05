@@ -83,6 +83,45 @@ function extractSrcFiles(statOutput: string): string[] {
 }
 
 /**
+ * Read expert-specific breadcrumbs from memory.md.
+ * Engineer sees last [Architect] / [Next for Engineer] entries.
+ * Architect sees last [Engineer] entries.
+ * Meta sees both.
+ * Returns null if memory.md doesn't exist or no matching entries found.
+ */
+export function readExpertBreadcrumbs(expertName: string, rootDir: string = "."): string | null {
+  let tags: string[];
+  if (expertName === "Engineer") {
+    tags = ["[Architect]", "[Next for Engineer]"];
+  } else if (expertName === "Architect") {
+    tags = ["[Engineer]"];
+  } else if (expertName === "Meta") {
+    tags = ["[Architect]", "[Engineer]"];
+  } else {
+    return null;
+  }
+
+  try {
+    const content = readFileSync(`${rootDir}/memory.md`, "utf-8");
+    const lines = content.split("\n");
+
+    const matchingLines: string[] = [];
+    for (const line of lines) {
+      if (tags.some(tag => line.includes(tag))) {
+        matchingLines.push(line.trim());
+      }
+    }
+
+    if (matchingLines.length === 0) return null;
+
+    // Return up to 3 most recent matching lines
+    return matchingLines.slice(-3).join("\n");
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Compute what changed in the codebase since the last iteration.
  * Uses `git diff HEAD~1` to compare against the previous commit.
  *
@@ -254,9 +293,10 @@ function computeMetricsSummary(rootDir: string = "."): string | null {
 
 /**
  * Format the orientation report for inclusion in the agent's initial message.
- * Returns empty string if nothing notable happened.
+ * Accepts an optional expertName to append expert-specific breadcrumbs from memory.md.
+ * Falls back gracefully if memory.md is missing or has no matching entries.
  */
-export function formatOrientation(report: OrientationReport): string {
+export function formatOrientation(report: OrientationReport, expertName?: string, rootDir: string = "."): string {
   const parts: string[] = [];
 
   if (report.hasChanges && report.diffSummary) {
@@ -268,6 +308,13 @@ export function formatOrientation(report: OrientationReport): string {
 
   if (report.metricsSummary) {
     parts.push(`## Metrics Summary\n\n${report.metricsSummary}\n`);
+  }
+
+  if (expertName) {
+    const breadcrumbs = readExpertBreadcrumbs(expertName, rootDir);
+    if (breadcrumbs) {
+      parts.push(`## Expert Context (${expertName})\n\n${breadcrumbs}\n`);
+    }
   }
 
   return parts.join("\n");

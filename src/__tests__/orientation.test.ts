@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { orient, formatOrientation, type OrientationReport } from "../orientation.js";
+import { orient, formatOrientation, readExpertBreadcrumbs, type OrientationReport } from "../orientation.js";
+import { writeFileSync, mkdirSync, rmSync } from "fs";
+import { join } from "path";
 
 // Mock executeBash
 vi.mock("../tools/bash.js", () => ({
@@ -195,5 +197,128 @@ describe("formatOrientation", () => {
     const result = formatOrientation(report);
     expect(result).toContain("## Metrics Summary");
     expect(result).toContain("avg 10 turns");
+  });
+});
+
+describe("readExpertBreadcrumbs", () => {
+  const tmpDir = join("/tmp", "orient-breadcrumbs-test");
+
+  beforeEach(() => {
+    rmSync(tmpDir, { recursive: true, force: true });
+    mkdirSync(tmpDir, { recursive: true });
+  });
+
+  it("returns null when memory.md does not exist", () => {
+    const result = readExpertBreadcrumbs("Engineer", tmpDir);
+    expect(result).toBeNull();
+  });
+
+  it("returns null for unknown expert name", () => {
+    writeFileSync(join(tmpDir, "memory.md"), "[Architect] some note\n[Engineer] other note\n");
+    const result = readExpertBreadcrumbs("Unknown", tmpDir);
+    expect(result).toBeNull();
+  });
+
+  it("Engineer sees [Architect] and [Next for Engineer] entries", () => {
+    writeFileSync(
+      join(tmpDir, "memory.md"),
+      [
+        "## Some section",
+        "[Architect] Designed the new pipeline.",
+        "[Engineer] Built the pipeline.",
+        "[Next for Engineer] Add tests for the pipeline.",
+        "## Another section",
+        "[Architect] Review the tests.",
+      ].join("\n")
+    );
+    const result = readExpertBreadcrumbs("Engineer", tmpDir);
+    expect(result).not.toBeNull();
+    expect(result).toContain("[Architect]");
+    expect(result).toContain("[Next for Engineer]");
+    // Should NOT include [Engineer] entries (those are for Architect)
+    expect(result).not.toContain("Built the pipeline");
+  });
+
+  it("Architect sees [Engineer] entries", () => {
+    writeFileSync(
+      join(tmpDir, "memory.md"),
+      [
+        "[Architect] Designed the new pipeline.",
+        "[Engineer] Built the pipeline.",
+        "[Engineer] Added 10 tests.",
+      ].join("\n")
+    );
+    const result = readExpertBreadcrumbs("Architect", tmpDir);
+    expect(result).not.toBeNull();
+    expect(result).toContain("[Engineer]");
+    expect(result).toContain("Added 10 tests");
+    expect(result).not.toContain("Designed the new pipeline");
+  });
+
+  it("Meta sees both [Architect] and [Engineer] entries", () => {
+    writeFileSync(
+      join(tmpDir, "memory.md"),
+      [
+        "[Architect] Designed the new pipeline.",
+        "[Engineer] Built the pipeline.",
+      ].join("\n")
+    );
+    const result = readExpertBreadcrumbs("Meta", tmpDir);
+    expect(result).not.toBeNull();
+    expect(result).toContain("[Architect]");
+    expect(result).toContain("[Engineer]");
+  });
+
+  it("returns null when memory.md has no matching tagged entries", () => {
+    writeFileSync(join(tmpDir, "memory.md"), "## No tagged entries here\nJust plain text.\n");
+    const result = readExpertBreadcrumbs("Engineer", tmpDir);
+    expect(result).toBeNull();
+  });
+
+  it("limits output to last 3 matching lines", () => {
+    const lines = Array.from({ length: 10 }, (_, i) => `[Architect] Entry ${i + 1}.`);
+    writeFileSync(join(tmpDir, "memory.md"), lines.join("\n"));
+    const result = readExpertBreadcrumbs("Engineer", tmpDir);
+    expect(result).not.toBeNull();
+    const resultLines = result!.split("\n");
+    expect(resultLines.length).toBe(3);
+    expect(result).toContain("Entry 10");
+    expect(result).toContain("Entry 9");
+    expect(result).toContain("Entry 8");
+    expect(result).not.toContain("Entry 7.");
+  });
+});
+
+describe("formatOrientation with expertName", () => {
+  const tmpDir = join("/tmp", "orient-expert-test");
+
+  beforeEach(() => {
+    rmSync(tmpDir, { recursive: true, force: true });
+    mkdirSync(tmpDir, { recursive: true });
+  });
+
+  it("appends Expert Context section when expertName matches memory entries", () => {
+    writeFileSync(
+      join(tmpDir, "memory.md"),
+      "[Architect] Add expert-aware orientation.\n"
+    );
+    const report: OrientationReport = { diffSummary: null, hasChanges: false, error: null, metricsSummary: null };
+    const result = formatOrientation(report, "Engineer", tmpDir);
+    expect(result).toContain("## Expert Context (Engineer)");
+    expect(result).toContain("[Architect] Add expert-aware orientation.");
+  });
+
+  it("omits Expert Context section when memory.md missing (no crash)", () => {
+    const report: OrientationReport = { diffSummary: null, hasChanges: false, error: null, metricsSummary: null };
+    const result = formatOrientation(report, "Engineer", tmpDir);
+    expect(result).not.toContain("## Expert Context");
+    expect(result).toBe("");
+  });
+
+  it("omits Expert Context section when no expertName provided", () => {
+    writeFileSync(join(tmpDir, "memory.md"), "[Architect] Some note.\n");
+    const report: OrientationReport = { diffSummary: null, hasChanges: false, error: null, metricsSummary: null };
+    const result = formatOrientation(report);
+    expect(result).not.toContain("## Expert Context");
   });
 });
