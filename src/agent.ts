@@ -168,6 +168,7 @@ async function runIteration(state: IterationState): Promise<void> {
     registry: toolRegistry,
     log: (msg: string) => log(state.iteration, msg),
     onFinalize: doFinalize,
+    compressionConfig: null, // Disabled — prompt caching handles token cost; compression risks orphaning tool_result blocks
   };
 
   console.log(`\n${"=".repeat(60)}`);

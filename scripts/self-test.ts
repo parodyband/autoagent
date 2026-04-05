@@ -737,7 +737,13 @@ function testMessages(): void {
   assert(pc10 !== null, "progressCheckpoint fires at turn 10");
   assert(pc10!.includes("goals"), "progressCheckpoint asks about goals");
   assert(progressCheckpoint(5) === null, "progressCheckpoint null at turn 5");
-  assert(progressCheckpoint(20) === null, "progressCheckpoint null at turn 20");
+  const pc20 = progressCheckpoint(20);
+  assert(pc20 !== null, "progressCheckpoint fires at turn 20");
+  assert(pc20!.includes("Turn 20"), "progressCheckpoint turn 20 mentions turn number");
+  const pc30 = progressCheckpoint(30);
+  assert(pc30 !== null, "progressCheckpoint fires at turn 30");
+  assert(pc30!.includes("WRAP UP"), "progressCheckpoint turn 30 says wrap up");
+  assert(progressCheckpoint(25) === null, "progressCheckpoint null at turn 25");
 
   // validationBlockedMessage
   const vb = validationBlockedMessage("error: TS2345");

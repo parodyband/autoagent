@@ -88,18 +88,38 @@ export function budgetWarning(
 // ─── Progress checkpoint ────────────────────────────────────
 
 /**
- * At turn 10, inject a progress checkpoint that asks the agent to
- * explicitly evaluate whether its goals are complete.
- * This combats turn bloat by creating a natural "wrap up" decision point.
+ * Inject escalating progress checkpoints at turns 10, 20, and 30.
+ * This combats turn bloat by creating multiple "wrap up" decision points
+ * with increasing urgency. The #1 pattern of wasted iterations is
+ * continuing past turn 20 without a concrete reason.
  */
 export function progressCheckpoint(turn: number): string | null {
-  if (turn !== 10) return null;
-  return (
-    "SYSTEM: Progress checkpoint — Turn 10. " +
-    "Review your goals.md. For each goal, state: DONE, IN PROGRESS, or NOT STARTED. " +
-    "If all goals are DONE, write memory, update goals, run `npx tsc --noEmit`, and `echo \"AUTOAGENT_RESTART\"`. " +
-    "If goals remain, briefly state what's left and continue."
-  );
+  if (turn === 10) {
+    return (
+      "SYSTEM: Progress checkpoint — Turn 10. " +
+      "Review your goals.md. For each goal, state: DONE, IN PROGRESS, or NOT STARTED. " +
+      "If all goals are DONE, write memory, update goals, run `npx tsc --noEmit`, and `echo \"AUTOAGENT_RESTART\"`. " +
+      "If goals remain, briefly state what's left and continue."
+    );
+  }
+  if (turn === 20) {
+    return (
+      "SYSTEM: Progress checkpoint — Turn 20. You are past the halfway point. " +
+      "STOP and evaluate: What have you actually changed in src/ this iteration? " +
+      "If the answer is 'nothing' or 'only bookkeeping', you are in a drift loop. " +
+      "Commit what you have, write memory, update goals, and RESTART. " +
+      "Do NOT continue past turn 20 without a concrete, specific reason."
+    );
+  }
+  if (turn === 30) {
+    return (
+      "SYSTEM: FINAL checkpoint — Turn 30. You have used 60% of your turns. " +
+      "Historical data: iterations past turn 30 almost never produce value proportional to cost. " +
+      "WRAP UP NOW. Write memory, update goals, run `npx tsc --noEmit`, `echo \"AUTOAGENT_RESTART\"`. " +
+      "If you are debugging a compile error, fix ONLY that and restart."
+    );
+  }
+  return null;
 }
 
 // ─── Turn limit nudges ──────────────────────────────────────
