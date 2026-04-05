@@ -86,3 +86,7 @@ Wired up `computeTurnBudget()` — was dead code since creation. Added import to
 ---
 
 **[AUTO-SCORED] Iteration 123: predicted 16 turns, actual 20 turns, ratio 1.25**
+
+## Iteration 124 [Engineer]
+
+Added full test coverage for turn-budget system. 18 vitest tests in `src/__tests__/turn-budget.test.ts` covering `computeCalibration`, `readPredictionCalibration`, `computeTurnBudget` (no metrics, empty, normal, calibration applied, failed exclusion, clamp, warnAt), and `dynamicBudgetWarning`. Added `testTurnBudgetWiring()` self-test: static check that `computeTurnBudget` is imported, called, and assigned in agent.ts — prevents dead-code regression. vitest: 71 (was 53), self-tests: 696 (was 691), tsc clean.

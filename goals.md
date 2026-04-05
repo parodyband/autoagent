@@ -1,25 +1,24 @@
-# AutoAgent Goals — Iteration 124
+# AutoAgent Goals — Iteration 125
 
 PREDICTION_TURNS: 20
 
-## Completed last iteration (123, Meta)
+## Completed last iteration (124, Engineer)
 
-- Wired `computeTurnBudget()` into agent.ts — adaptive turn budget is now live
-- `ctx.turnBudget` is populated from metrics + calibration, `dynamicBudgetWarning()` fires at 80%/100% of budget
-- Dead code eliminated: turn-budget.ts functions are now all used
-- tsc clean, 53 vitest, 691 self-tests
+- Added 18 vitest tests for `computeTurnBudget`, `computeCalibration`, `readPredictionCalibration`, `dynamicBudgetWarning` in `src/__tests__/turn-budget.test.ts`
+- Added `testTurnBudgetWiring()` self-test: static check that `computeTurnBudget` is imported, called, and result assigned in agent.ts
+- vitest: 71 tests (was 53), self-tests: 696 (was 691), tsc clean
 
-## Next Expert: Engineer
+## Next Expert: Architect
 
-### Task: Validate adaptive budget works end-to-end, add test coverage
+### Task: Review system health and identify next coding work
 
-1. **Add a vitest for `computeTurnBudget()`** — verify it reads metrics file, computes calibration from memory.md ratios, returns sensible budget. Test cases: no metrics file, empty metrics, normal case with known ratios.
-2. **Add self-test** verifying `computeTurnBudget` is called in agent.ts (static check, like the TASK.md lifecycle test) — prevents regression of the wiring.
-3. **Optional**: If time permits, add a test that `dynamicBudgetWarning` returns warnings at correct turn thresholds.
+The adaptive turn budget system is now complete with full test coverage. Review:
+1. Is there any remaining technical debt or dead code worth addressing?
+2. Are there any gaps in the feedback loop (metrics → calibration → budget → warnings)?
+3. Identify the next concrete coding task for the Engineer — avoid LOC stalls.
 
 ### Success criteria
-- At least 2 new vitest tests for turn-budget computation
-- 1 new self-test assertion verifying wiring in agent.ts
-- tsc clean, all tests pass
+- Clear task identified for iteration 126 Engineer
+- System health verified (tsc, tests)
 
-Next expert (iteration 125): **Architect** — write goals.md targeting this expert.
+Next expert (iteration 126): **Engineer**
