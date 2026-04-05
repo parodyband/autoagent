@@ -1,71 +1,3 @@
-156 | 
-157 |   // Task mode: delete TASK.md BEFORE finalization so it's excluded from the
-158 |   // git commit and gone before any restart. Previously this was after
-159 |   // runFinalization(), but restart() calls process.exit() so the deletion
-160 |   // never executed in normal (non --once) mode — causing infinite re-execution.
-161 |   if (ctx.taskMode && existsSync(TASK_FILE)) {
-162 |     unlinkSync(TASK_FILE);
-163 |     ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
-164 |   }
-[2026-04-05T12:30:28.925Z] iter=138 turn=13 INFO: Turn 13/25
-[2026-04-05T12:30:32.090Z] iter=138 turn=13 INFO: Agent: I need to check what `IterationCtx` has — `workDir` and `repoContextText` may not be fields on it.
-[2026-04-05T12:30:32.091Z] iter=138 turn=13 INFO: $ grep -n "workDir\|repoContextText\|IterationCtx" src/conversation.ts | head -20
-[2026-04-05T12:30:32.113Z] iter=138 turn=13 INFO:   -> exit=0 (292 chars)
-[2026-04-05T12:30:32.113Z] iter=138 turn=14 INFO: Turn 14/25
-[2026-04-05T12:30:34.250Z] iter=138 turn=14 INFO: read_file: src/conversation.ts
-[2026-04-05T12:30:34.252Z] iter=138 turn=14 INFO:   -> ok (1115 chars)
-[2026-04-05T12:30:34.253Z] iter=138 turn=15 INFO: Turn 15/25
-[2026-04-05T12:30:37.216Z] iter=138 turn=15 INFO: Agent: `workDir` and `repoContextText` aren't on `IterationCtx`. Fix the wiring to pass them differently — use closure variables:
-[2026-04-05T12:30:37.217Z] iter=138 turn=15 INFO: read_file: src/agent.ts
-[2026-04-05T12:30:37.217Z] iter=138 turn=15 INFO:   -> ok (1754 chars)
-[2026-04-05T12:30:37.217Z] iter=138 turn=16 INFO: Turn 16/25
-[2026-04-05T12:30:42.030Z] iter=138 turn=16 INFO: Agent: The wiring uses `ctx.workDir` which doesn't exist. Fix using closure variables instead:
-[2026-04-05T12:30:42.030Z] iter=138 turn=16 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T12:30:42.030Z] iter=138 turn=16 INFO:   -> ok: Patched src/agent.ts: -17 +2 lines
-
-Context after patch:
-1 | /**
-2 |  * AutoAgent — a self-improving cyclical agent.
-3 |  *
-4 |  * Loop: read goals -> call Claude -> execute tools -> validate -> commit -> restart
-5 |  *
-[2026-04-05T12:30:42.031Z] iter=138 turn=17 INFO: Turn 17/25
-[2026-04-05T12:30:45.101Z] iter=138 turn=17 INFO: Agent: Now add verification in `runIteration`, after `runConversation` and before `doFinalize`, using closure variables `workDir` and `repoContextText`:
-[2026-04-05T12:30:45.102Z] iter=138 turn=17 INFO: read_file: src/agent.ts
-[2026-04-05T12:30:45.102Z] iter=138 turn=17 INFO:   -> ok (820 chars)
-[2026-04-05T12:30:45.103Z] iter=138 turn=18 INFO: Turn 18/25
-[2026-04-05T12:30:49.814Z] iter=138 turn=18 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T12:30:49.815Z] iter=138 turn=18 INFO:   -> ok: Patched src/agent.ts: -4 +21 lines
-
-Context after patch:
-331 |     content: initialContent,
-332 |   });
-333 | 
-334 |   await runConversation(ctx);
-335 | 
-336 |   // Pre-finalization verification: run test/build commands in the target repo (advisory only)
-337 |   // Uses closure variables workDir and repoContextText — never runs on autoagent's own repo.
-338 |   if (workDir !== ROOT && repoContextText) {
-339 |     try {
-340 |       const verResults = await runVerification(workDir, repoContextText);
-341 |       if (verResults.length > 0) {
-342 |         const summary = formatVerificationResults(verResults);
-343 |         log(state.iteration, `Verification: ${verResults.filter(r => r.passed).length}/${verResults.length} checks passed`);
-344 |         if (summary) {
-345 |           ctx.messages.push({ role: "user", content: summary });
-346 |         }
-347 |       }
-348 |     } catch (err) {
-349 |       log(state.iteration, `Verification error (non-fatal): ${err instanceof Error ? err.message : err}`);
-350 |     }
-351 |   }
-352 | }
-353 | 
-354 | // ─── Entry point ────────────────────────────────────────────
-355 | 
-356 | const resusConfig: ResuscitationConfig = {
-357 |   memoryFile: MEMORY_FILE,
-[2026-04-05T12:30:49.816Z] iter=138 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
 [2026-04-05T12:30:49.821Z] iter=138 turn=18 INFO: Cache persisted: 48 entries to .autoagent-cache.json
 [2026-04-05T12:30:49.822Z] iter=138 turn=18 INFO: Cache stats: 0 hits, 9 misses, 48 entries, 6 invalidations (7 entries removed)
 [2026-04-05T12:30:49.822Z] iter=138 turn=18 INFO: Tool cache stats
@@ -1064,3 +996,67 @@ No code changes, so tsc check is just a confirmation:
 [2026-04-05T12:47:49.041Z] iter=147 turn=10 INFO: Tool timing stats
 [2026-04-05T12:47:53.165Z] iter=147 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 147: predicted 12 turns, actual 10 turns, ratio 0.83**
 [2026-04-05T12:47:53.185Z] iter=147 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T12:47:53.216Z] iter=147 turn=10 INFO: Committed: 59fe95d5 (16 in / 3526 out, cache: 89252 created, 606882 read)
+[2026-04-05T12:47:53.217Z] iter=147 turn=10 INFO: Restarting as iteration 148...
+[2026-04-05T12:47:53.421Z] iter=148 INFO: Cache restored: 53/55 entries (2 stale)
+[2026-04-05T12:47:53.423Z] iter=148 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=12)
+[2026-04-05T12:47:53.423Z] iter=148 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T12:47:53.452Z] iter=148 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T12:47:53.452Z] iter=148 turn=1 INFO: Turn 1/25
+[2026-04-05T12:47:55.653Z] iter=148 turn=1 INFO: think: Let me start by reading the experts.ts file to understand the current structure before writing tests....
+[2026-04-05T12:47:55.655Z] iter=148 turn=2 INFO: Turn 2/25
+[2026-04-05T12:47:57.721Z] iter=148 turn=2 INFO: read_file: CACHE HIT
+[2026-04-05T12:47:57.722Z] iter=148 turn=2 INFO: $ ls src/__tests__/ 2>/dev/null && echo "---" && ls src/experts* 2>/dev/null
+[2026-04-05T12:47:57.735Z] iter=148 turn=2 INFO:   -> exit=0 (329 chars)
+[2026-04-05T12:47:57.736Z] iter=148 turn=3 INFO: Turn 3/25
+[2026-04-05T12:48:05.510Z] iter=148 turn=3 INFO: think: Now I understand the experts.ts file. Let me plan the tests:
+
+1. `parseExpertFile` (pure function to extract) - I need t...
+[2026-04-05T12:48:05.511Z] iter=148 turn=4 INFO: Turn 4/25
+[2026-04-05T12:48:07.042Z] iter=148 turn=4 INFO: $ cat src/__tests__/verification.test.ts | head -30
+[2026-04-05T12:48:07.052Z] iter=148 turn=4 INFO:   -> exit=0 (1405 chars)
+[2026-04-05T12:48:07.052Z] iter=148 turn=5 INFO: Turn 5/25
+[2026-04-05T12:48:57.630Z] iter=148 turn=5 INFO: Agent: I have everything I need. Let me write the code now.
+[2026-04-05T12:48:57.631Z] iter=148 turn=5 INFO: write_file: src/experts.ts (write)
+[2026-04-05T12:48:57.634Z] iter=148 turn=5 INFO:   -> ok: Updated src/experts.ts (10355 chars, +19 lines delta)
+[2026-04-05T12:48:57.635Z] iter=148 turn=6 INFO: Turn 6/25
+[2026-04-05T12:49:29.243Z] iter=148 turn=6 INFO: Agent: Now write the tests:
+[2026-04-05T12:49:29.244Z] iter=148 turn=6 INFO: write_file: src/__tests__/experts.test.ts (write)
+[2026-04-05T12:49:29.244Z] iter=148 turn=6 INFO:   -> ok: Created src/__tests__/experts.test.ts (8511 chars)
+[2026-04-05T12:49:29.245Z] iter=148 turn=7 INFO: Turn 7/25
+[2026-04-05T12:49:31.040Z] iter=148 turn=7 INFO: $ npx vitest run src/__tests__/experts.test.ts --reporter=verbose 2>&1
+[2026-04-05T12:49:32.066Z] iter=148 turn=7 INFO:   -> exit=0 (2870 chars)
+[2026-04-05T12:49:32.066Z] iter=148 turn=8 INFO: Turn 8/25
+[2026-04-05T12:49:34.040Z] iter=148 turn=8 INFO: Agent: 27/27 passing. Now run the full suite and tsc:
+[2026-04-05T12:49:34.040Z] iter=148 turn=8 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -10 && npx tsc --noEmit 2>&1
+[2026-04-05T12:49:36.705Z] iter=148 turn=8 INFO:   -> exit=0 (561 chars)
+[2026-04-05T12:49:36.706Z] iter=148 turn=9 INFO: Turn 9/25
+[2026-04-05T12:49:40.436Z] iter=148 turn=9 INFO: Agent: All goals are DONE:
+
+- ✅ `src/__tests__/experts.test.ts` exists with 27 tests (≥10 required)
+- ✅ All 189 tests passing (162 existing + 27 new)
+- ✅ tsc clean (no output = no errors)
+- ✅ `parseExpertFile` extracted as pure function — no behavior change
+[2026-04-05T12:49:40.437Z] iter=148 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && git add src/experts.ts src/__tests__/experts.test.ts && git diff --cached --stat
+[2026-04-05T12:49:40.481Z] iter=148 turn=9 INFO:   -> exit=0 (179 chars)
+[2026-04-05T12:49:40.482Z] iter=148 turn=10 INFO: Turn 10/25
+[2026-04-05T12:49:42.640Z] iter=148 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && git commit -m "Add experts.test.ts (27 tests) + extract parseExpertFile pure function"
+[2026-04-05T12:49:42.678Z] iter=148 turn=10 INFO:   -> exit=0 (191 chars)
+[2026-04-05T12:49:42.679Z] iter=148 turn=11 INFO: Turn 11/25
+[2026-04-05T12:49:54.254Z] iter=148 turn=11 INFO: write_file: goals.md (write)
+[2026-04-05T12:49:54.255Z] iter=148 turn=11 INFO:   -> ok: Updated goals.md (1358 chars, -5 lines delta)
+[2026-04-05T12:49:54.255Z] iter=148 turn=12 INFO: Turn 12/25
+[2026-04-05T12:50:11.257Z] iter=148 turn=12 INFO: write_file: memory.md (write)
+[2026-04-05T12:50:11.259Z] iter=148 turn=12 INFO:   -> ok: Updated memory.md (2069 chars, -4 lines delta)
+[2026-04-05T12:50:11.259Z] iter=148 turn=13 INFO: Turn 13/25
+[2026-04-05T12:50:14.034Z] iter=148 turn=13 INFO: $ npx tsc --noEmit && echo "AUTOAGENT_RESTART"
+[2026-04-05T12:50:14.035Z] iter=148 turn=13 INFO: RESTART signal
+[2026-04-05T12:50:14.036Z] iter=148 turn=13 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:50:14.756Z] iter=148 turn=13 INFO: Compilation OK
+[2026-04-05T12:50:20.064Z] iter=148 turn=13 INFO: Cache persisted: 51 entries to .autoagent-cache.json
+[2026-04-05T12:50:20.064Z] iter=148 turn=13 INFO: Cache stats: 1 hits, 0 misses, 51 entries, 4 invalidations (2 entries removed)
+[2026-04-05T12:50:20.064Z] iter=148 turn=13 INFO: Tool cache stats
+[2026-04-05T12:50:20.064Z] iter=148 turn=13 INFO: Tool timing: bash: 7x, avg=543ms, total=3802ms; write_file: 4x, avg=2ms, total=6ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T12:50:20.064Z] iter=148 turn=13 INFO: Tool timing stats
+[2026-04-05T12:50:24.719Z] iter=148 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 148: predicted 12 turns, actual 13 turns, ratio 1.08**
+[2026-04-05T12:50:24.738Z] iter=148 turn=13 INFO: Pre-commit review: no significant code changes to review

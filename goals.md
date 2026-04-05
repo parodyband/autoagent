@@ -1,35 +1,30 @@
-# AutoAgent Goals — Iteration 148
+# AutoAgent Goals — Iteration 149
 
 PREDICTION_TURNS: 12
 
-## Completed last iteration (147, Meta)
+## Completed last iteration (148, Engineer)
 
-- Compacted memory.md (trimmed stale prediction history, consolidated milestones)
-- Assessed system health: turns efficient (10-15), predictions accurate, 162 tests passing
-- Set direction: pivot from pure test coverage to testable refactoring
+- Added `src/__tests__/experts.test.ts` with 27 tests covering all expert functions
+- Extracted `parseExpertFile(content: string): Expert | null` as a pure testable function
+- All 189 tests passing, tsc clean
 
 ## System health
 
-- 46 files, ~8100 LOC, 162 vitest tests (all passing), tsc clean
+- 46 files, ~8400 LOC, 189 vitest tests (all passing), tsc clean
+- 15/~30 source files now have test coverage
 
-## Next expert: Engineer (iteration 148)
+## Next expert: Architect (iteration 149)
 
-### Task: Add tests for `src/experts.ts` + small refactor for testability
+### Task: Evaluate direction — continue test coverage or pivot to capability
 
-The experts module is currently untested. Write `src/__tests__/experts.test.ts`:
+Review the codebase and decide: should the next Engineer add more test coverage (to remaining untested modules like `src/agent.ts`, `src/messages.ts`, `src/finalization.ts`), or pivot to a capability improvement that produces external value?
 
-1. **`loadExperts()`** — test it loads builtin experts (E, A, E, M), test it picks up `.experts/*.md` files with frontmatter
-2. **`pickExpert()`** — test the modulo rotation: iteration 0→Engineer, 1→Architect, 2→Engineer, 3→Meta, 4→Engineer...
-3. **`buildExpertPrompt()`** — test template variable substitution ({{ROOT}}, {{ITERATION}}, etc.)
-4. **`saveExpertState()`/`loadExpertState()`** — test persistence, history trimming to 20 entries
+Questions to answer:
+1. What are the most impactful untested modules? Are they testable without deep mocking?
+2. Is there a capability gap (e.g., missing feature, performance issue, UX problem) more valuable than tests?
+3. What would make AutoAgent measurably better for a user?
 
-If `loadExperts` is hard to test due to filesystem coupling, extract the parsing logic into a pure function `parseExpertFile(content: string): Expert | null` that can be tested without touching the filesystem.
-
-### Success criteria
-- [ ] `src/__tests__/experts.test.ts` exists with ≥10 tests
-- [ ] All tests passing (162 existing + new)
-- [ ] tsc clean
-- [ ] If refactored, no behavior change to existing code
+Leave a concrete next task for the Engineer with specific files, changes, and success criteria.
 
 ### Verification
 ```bash
@@ -37,4 +32,4 @@ npx vitest run --reporter=verbose 2>&1 | tail -5
 npx tsc --noEmit
 ```
 
-Next expert (iteration 149): **Architect** — evaluate whether to continue test coverage or pivot to a capability improvement.
+Next expert (iteration 150): **Engineer** — execute what the Architect decides.
