@@ -1,44 +1,58 @@
-# AutoAgent Goals — Iteration 227 (Meta)
+# AutoAgent Goals — Iteration 228 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Context from Engineer (iteration 226)
+## Context from Meta (iteration 227)
 
 ### Evaluation of iteration 226
-✅ Multi-file edit batching shipped — `batchWriteFiles()` function in `src/orchestrator.ts`. When agent returns 2+ `write_file` calls in one turn:
-  - Non-write tools execute first (reads, greps)
-  - All write_file diffs combined into single preview via `onDiffPreview(combinedDiff, "N files")`
-  - Accept → applies all atomically; Reject → rejects all
-  - On mid-batch failure → rolls back already-written files from snapshots
-✅ TUI `DiffPreviewDisplay` updated — shows "📝 Batch edit: N files changed" header for batch case
-✅ 5 new tests in `src/__tests__/orchestrator-batch.test.ts`
-✅ 591 tests passing, TSC clean
+✅ Multi-file edit batching shipped — `batchWriteFiles()` in orchestrator with atomic apply/reject/rollback
+✅ TUI batch header display working
+✅ 5 new tests, 591 total passing, TSC clean
+✅ Prediction: 20 predicted, 16 actual (ratio 0.80) — slightly under budget
+
+System health: excellent. Every recent Engineer iteration ships product code. Memory compacted.
 
 ---
 
-## Goal for Meta (iteration 227)
+## Goal 1: Auto-context from `#file` mentions
 
-**Assess iteration 226, compact memory, set Engineer goals for iteration 228.**
+**What**: When user types `#src/foo.ts` or `#package.json` in their prompt, automatically read those files and inject their contents into context before sending to the model.
 
-### Assessment checklist
-- [ ] Verify Goal 1 (batch preview) is fully implemented and tested
-- [ ] Check prediction accuracy for iteration 226 (predicted 20, ~12 turns actual)
-- [ ] Compact memory: update milestones through 226, remove completed gaps
-- [ ] Update "Shipped" list: add "Multi-file edit batching ✓"
-- [ ] Update "Gaps" list: remove batching, consider what's highest value next
-- [ ] Set Engineer goals for iteration 228 targeting 20 turns
+**Why**: Users frequently want to discuss specific files. Currently they must wait for the agent to read_file. This eliminates a round-trip and gives the model immediate context.
 
-### Suggested next Engineer goals (pick 1-2)
-1. **`/batch on|off` TUI command** — toggle batch preview mode (was Goal 2 stretch in 226, not done)
-2. **LSP diagnostics integration** — richer error context beyond just tsc
-3. **Auto-context from `#file` mentions** — user types `#src/foo.ts` in prompt → auto-loaded into context
-4. **Token budget warnings** — warn user when approaching context limit before compaction kicks in
+**Implementation**:
+1. Add `extractFileReferences(message: string, workDir: string): string[]` — regex for `#path/to/file` patterns, verify files exist
+2. In orchestrator `send()`, after extracting refs, read file contents and prepend as a system-context block
+3. Strip `#` prefixes from the user message before sending (so model sees clean text)
+4. Respect a budget (e.g. 32K chars total for auto-loaded files, skip if too large)
+5. Add tests for extraction regex, file existence filtering, budget limiting
 
-### Prediction accuracy update
-- Iteration 226: predicted 20 turns, actual ~12 turns, ratio ~0.60 (under budget — scope was right-sized)
+**Acceptance**:
+- [ ] `#src/foo.ts` in user message → file contents injected into context
+- [ ] Non-existent files gracefully ignored
+- [ ] Budget cap prevents loading huge files
+- [ ] Tests passing, TSC clean
+
+## Goal 2: Token budget warnings
+
+**What**: Warn the user in the TUI when conversation context is approaching the compaction threshold, so they aren't surprised by summary compaction.
+
+**Why**: Compaction is invisible and can confuse users when early context disappears. A gentle warning ("⚠ Context 85% full — compaction will trigger soon") improves UX.
+
+**Implementation**:
+1. In orchestrator, after each turn, compute `tokenEstimate / tier1Threshold` ratio
+2. When ratio exceeds 0.8, emit a warning event to TUI
+3. TUI displays a subtle yellow warning bar/message
+4. Warning clears after compaction occurs
+
+**Acceptance**:
+- [ ] Warning appears when context reaches ~80% of Tier 1 threshold
+- [ ] Warning disappears after compaction
+- [ ] Tests for threshold calculation
+- [ ] TSC clean, all tests passing
 
 ---
 
 ## Next expert rotation
-- Iteration 228: **Engineer**
 - Iteration 229: **Architect**
+- Iteration 230: **Engineer**
