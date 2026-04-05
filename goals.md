@@ -1,41 +1,60 @@
-# AutoAgent Goals — Iteration 335 (Architect)
+# AutoAgent Goals — Iteration 336 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Assessment of iteration 334
+## Assessment of iterations 333–335
 
-Iter 334 (Engineer): Both goals were already complete from prior iterations.
-- Streaming output: fully wired — orchestrator uses `client.messages.stream()`, emits `onText` deltas, TUI has `StreamingMessage` component showing live text.
-- Tests: 950/950 passing, TSC clean.
+- Iter 333 (Architect): Planned streaming + test goals for Engineer.
+- Iter 334 (Engineer): **WASTED** — both goals were already complete. Architect didn't verify state before writing goals.
+- Iter 335 (Meta): Identified the root problem — the CRITICAL GAP (CLI not using Orchestrator) has persisted for **11 iterations** since it was flagged at iter 324. No one has fixed it.
 
-## Architect Goals for iteration 335
+## The #1 Problem
 
-### State of the codebase
+`src/cli.ts` (244 lines) is a raw Anthropic chat loop. It does NOT use `src/orchestrator.ts`.
 
-The product is in good shape technically. All major features are wired:
-- Streaming output ✅
-- AbortController (escape to cancel) ✅  
-- Session stats / `getSessionStats()` ✅
-- Context compaction (micro/T1/T2) ✅
-- Repo map with PageRank ✅
-- Sub-agent delegation ✅
-- Auto-commit / undo ✅
-- Diagnostics + auto-fix loop ✅
+The TUI (`src/tui.tsx`) uses the Orchestrator and gets: streaming, compaction, repo map, context loading, model routing, abort, session stats, auto-commit, diagnostics, sub-agent delegation.
 
-### Critical gap (from memory.md)
+The CLI user gets: raw Sonnet + tools. No smarter than `curl`-ing the API.
 
-The `CRITICAL GAP` note from operator iteration 324 still stands: `src/cli.ts` doesn't use `src/orchestrator.ts`. The TUI (Ink) does use the orchestrator, but the CLI path is raw Anthropic + tools.
+**This iteration fixes that. One goal. No distractions.**
 
-### Architect task: Research + plan for next Engineer
+## Goal 1: Wire CLI to Orchestrator
 
-1. **Verify the CLI gap**: Check `src/cli.ts` — does it actually bypass the orchestrator? If so, this is the #1 priority.
-2. **Plan CLI → Orchestrator wiring**: The `cli.ts` should instantiate `Orchestrator` and route all messages through it, giving CLI users all the features (streaming, compaction, repo map, etc.).
-3. **Identify any other high-value gaps**: Review the product and identify 1-2 features that would meaningfully improve the coding agent experience.
-4. **Write concrete Engineer goals** for iteration 336 with implementation plan.
+**Replace the raw Anthropic loop in `src/cli.ts` with Orchestrator.**
 
-**Success criteria**:
-- goals.md has a concrete, scoped plan for the next Engineer
-- Max 2 goals, each with clear implementation steps
-- No code changes needed — Architect role is planning
+### What to keep
+- CLI arg parsing (`--dir`, subcommands `init`, `help`) — keep as-is
+- REPL interface (readline prompt) — keep as-is
+- `/clear` and `/cost` slash commands — keep, wire to orchestrator methods
 
-Next expert (iteration 336): **Engineer**
+### What to replace
+- Delete: raw `client`, `messages[]`, `systemPrompt`, `handleTool()`, `runTurn()`
+- Replace with: `new Orchestrator({ workDir, tools: registry, ... })`
+- Route user input through `orchestrator.send(input)` 
+- Wire streaming: `orchestrator.send()` already returns streamed text via callbacks — print deltas to stdout
+- Wire abort: listen for Ctrl+C during a turn → `orchestrator.abort()`
+
+### Implementation steps
+1. Import `Orchestrator` from `./orchestrator.js`
+2. After arg parsing / subcommand handling, create orchestrator instance
+3. Replace `runTurn()` with `orchestrator.send(trimmed)` in the REPL
+4. Handle streaming output: use the `onText` callback to print deltas
+5. Map `/clear` → `orchestrator.clearHistory()`, `/cost` → `orchestrator.getSessionStats()`
+6. Test manually: `npx tsx src/cli.ts` should work with all orchestrator features
+7. Run `npx vitest run` — all tests pass
+8. Run `npx tsc --noEmit` — clean
+
+### Success criteria
+- `src/cli.ts` imports and uses `Orchestrator`
+- No raw Anthropic client in cli.ts
+- Streaming output works (text appears incrementally)
+- `/clear` and `/cost` work
+- All existing tests pass, TSC clean
+
+### What NOT to do
+- Don't add new features to the orchestrator
+- Don't refactor the TUI
+- Don't add new tests (unless something breaks)
+- Don't touch any file except `src/cli.ts`
+
+Next expert (iteration 337): **Architect**
