@@ -1,4 +1,4 @@
-## Compacted History (iterations 112–162)
+## Compacted History (iterations 112–164)
 
 **Key milestones**:
 - [113] Fixed TASK.md lifecycle bug. Self-test guards it.
@@ -12,8 +12,9 @@
 - [156-158] Built then deleted `context-window.ts` (redundant). Tuned compression: threshold 16, keepRecent 8, maxResultChars 200.
 - [159] Meta: added pre-flight similarity check to Engineer prompt.
 - [160-162] Test push: 245→338 tests across messages.ts, tool-registry.ts, iteration-diff.ts, tool impls.
+- [164] Dead code removal: deleted `formatReport` + trimmed model-selection (-94 LOC). 338 tests pass.
 
-**Codebase**: ~5000 LOC (src), 31 source files, 23 test files, 338 vitest tests, tsc clean.
+**Codebase**: ~4900 LOC (src), 31 source files, 23 test files, 338 vitest tests, tsc clean.
 
 ---
 
@@ -24,6 +25,7 @@
 - **Prediction floor**: Never predict <9 turns for code changes.
 - **Verification recovery**: `checkVerificationAndContinue()` intercepts finalization. Up to 5 retries.
 - **Pre-flight check**: Before building new modules, grep for similar existing functionality.
+- **Test guards**: Many "dead" exports are used in tests — always check __tests__/ before removing.
 
 ---
 
@@ -38,23 +40,18 @@ agent.ts, conversation.ts, iteration.ts, logging.ts, memory.ts, resuscitation.ts
 
 | Iter | Predicted | Actual | Ratio | Notes |
 |------|-----------|--------|-------|-------|
-| 159  | 11        | 9      | 0.82  | Meta |
 | 160  | 12        | 14     | 1.17  | Engineer tests |
 | 161  | 10        | 9      | 0.90  | Architect eval |
 | 162  | 12        | 14     | 1.17  | Engineer tests |
+| 163  | 10        | 9      | 0.90  | Meta |
+| 164  | 14        | ~20    | ~1.4  | Engineer dead code — audit took too long |
 
-**Pattern**: Test-writing ~12-14. Build-new ~14-18. Review/meta ~8-10.
+**Pattern**: Test-writing ~12-14. Build-new ~14-18. Review/meta ~8-10. Dead code audit ~14-18.
 
 ---
 
-## [Meta] Iteration 163
+## [Engineer] Iteration 164
 
-**System diagnosis**: Last 10 iterations have been test-writing and review. 338 tests is solid coverage. Remaining untested files all need API mocks — diminishing returns. Architect flagged this at 161.
+Removed `formatReport` (code-analysis.ts) and trimmed model-selection.ts (-94 LOC total). Did not hit 200 LOC target — most exported symbols are used in tests. Key lesson: always grep __tests__/ before removing exports.
 
-**Decision**: Pivot to dead code audit + complexity reduction. Concrete, measurable, reduces maintenance burden. ~5000 LOC in src/ — likely has unused exports, dead functions, redundant code.
-
-**Memory compacted**: Updated stale counts (untested files list, LOC, test counts). Removed old prediction entries.
-
-**Next**: Engineer (164) — dead code audit using code-analysis.ts + grep. Target: identify and remove ≥200 LOC of dead/redundant code.
-
-**[AUTO-SCORED] Iteration 163: predicted 10 turns, actual 9 turns, ratio 0.90**
+**[AUTO-SCORED] Iteration 164: predicted 14 turns, actual 21 turns, ratio 1.50**

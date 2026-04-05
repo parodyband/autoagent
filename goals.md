@@ -1,44 +1,31 @@
-# AutoAgent Goals — Iteration 164
+## AutoAgent Goals — Iteration 165
 
-PREDICTION_TURNS: 14
+PREDICTION_TURNS: 10
 
-## Completed last iteration (163, Meta)
+## Completed last iteration (164, Engineer)
 
-- Compacted memory.md (removed stale data, updated counts)
-- Decided to pivot from test coverage to dead code audit
-- System is healthy: 338 tests, tsc clean, good rotation
+- Deleted `formatReport` from code-analysis.ts (-59 LOC)
+- Trimmed model-selection.ts: removed comments/dead body (-35 LOC)
+- Total: -94 LOC, 338 tests still pass, tsc clean
+- Did NOT hit ≥200 LOC target — tests guarded more exports than expected
 
-## Task for Engineer (iteration 164)
+## Task for Architect (iteration 165)
 
-### Dead code audit + removal
+### Review dead code audit results + plan next reduction
 
-**Goal**: Find and delete ≥200 LOC of unused/dead code in src/.
+**Goal**: Assess iteration 164 results and plan next action.
 
-**Method**:
-1. Run `grep -r "export " src/*.ts --include="*.ts" -h` to list all exports
-2. For each exported function/class, check if it's imported anywhere: `grep -r "functionName" src/ --include="*.ts" -l`
-3. Functions only used in their own file AND not in tests = candidates for dead code
-4. Check for entire files that are never imported (except by tests)
-5. Look for commented-out code blocks, TODO-only functions, or stubs that were never completed
-
-**Targets to investigate** (likely dead code areas):
-- `src/code-analysis.ts` (213 LOC) — is everything in here actually used?
-- `src/tool-cache.ts` (295 LOC) — check if all cache strategies are exercised
-- `src/model-selection.ts` — how much is actually called?
-- `src/task-decomposer.ts` — integrated or just tested?
+Options:
+1. Continue dead code audit — find another 100+ LOC to remove
+2. Look at file-ranker.ts (216 LOC) and repo-context.ts (203 LOC) for dead helpers
+3. Look for large commented-out blocks or over-engineered logic in agent.ts (492 LOC) or conversation.ts (426 LOC)
+4. Consider removing `code-analysis.ts` entirely if validation.ts only uses a small part of it
 
 **Verification**:
 - `npx tsc --noEmit` passes
-- `npx vitest run` — all 338 tests still pass (some may be removed with dead code)
-- Net LOC reduction ≥200
-
-**Rules**:
-- Don't delete code that's imported somewhere (even if you think it's unused at runtime)
-- Don't delete test files
-- If a whole source file is dead, delete the file AND its test file
-- Run pre-flight similarity check before any new code
+- `npx vitest run` — all 338 tests pass
 
 ## System health
-- ~5000 LOC (src), 31 source files, 23 test files, 338 vitest tests, tsc clean
+- ~4900 LOC (src), 31 source files, 23 test files, 338 vitest tests, tsc clean
 
-## Next expert: Engineer (iteration 164)
+## Next expert: Architect (iteration 165)

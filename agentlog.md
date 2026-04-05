@@ -1,88 +1,3 @@
-140 |           .map((file, i) => `- **${file}**: ${summaries[i].response.trim()}`)
-141 |           .join("\n");
-142 | 
-143 |         const diffSummary =
-144 |           `Files changed:\n${rankedStatOutput}\n\nPer-file summaries (src):\n${perFileSummaries}`;
-145 | 
-146 |         return {
-147 |           diffSummary,
-[2026-04-05T12:57:31.891Z] iter=152 turn=8 INFO: Turn 8/25
-[2026-04-05T12:57:35.212Z] iter=152 turn=8 INFO: write_file: src/orientation.ts (patch)
-[2026-04-05T12:57:35.214Z] iter=152 turn=8 INFO:   -> ok: Patched src/orientation.ts: -3 +3 lines
-
-Context after patch:
-169 |     diffContent = diffContent.slice(0, maxDiffChars) + "\n... (truncated)";
-170 |   }
-171 | 
-172 |   const summary = diffContent
-173 |     ? `Files changed:\n${rankedStatOutput}\n\nDiff (src only):\n${diffContent}`
-174 |     : `Files changed:\n${rankedStatOutput}`;
-175 | 
-176 |   return {
-177 |     diffSummary: summary,
-[2026-04-05T12:57:35.214Z] iter=152 turn=9 INFO: Turn 9/25
-[2026-04-05T12:57:39.645Z] iter=152 turn=9 INFO: Agent: **Goal status:**
-- ✅ Import `rankFiles` from file-ranker
-- ✅ Add `rankChangedFiles()` helper  
-- ✅ Call it in `orient()` and use in both output paths
-- ⬜ Verify: tsc + tests pass
-
-Let me verify now:
-[2026-04-05T12:57:39.646Z] iter=152 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC_OK"
-[2026-04-05T12:57:40.323Z] iter=152 turn=9 INFO:   -> exit=0 (7 chars)
-[2026-04-05T12:57:40.323Z] iter=152 turn=10 INFO: Turn 10/25
-[2026-04-05T12:57:42.338Z] iter=152 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -20
-[2026-04-05T12:57:44.489Z] iter=152 turn=10 INFO:   -> exit=0 (880 chars)
-[2026-04-05T12:57:44.490Z] iter=152 turn=11 INFO: Turn 11/25
-[2026-04-05T12:57:47.924Z] iter=152 turn=11 INFO: Agent: All 231 tests pass. Let me do the manual check:
-[2026-04-05T12:57:47.925Z] iter=152 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && node -e "
-import('./dist/orientation.js').catch(() => 
-  import('./src/orientation.js').catch(() => null)
-)" 2>/dev/null || node --input-type=module <<'EOF'
-imp...
-[2026-04-05T12:57:47.969Z] iter=152 turn=11 INFO:   -> exit=0 (11 chars)
-[2026-04-05T12:57:47.969Z] iter=152 turn=12 INFO: Turn 12/25
-[2026-04-05T12:57:50.838Z] iter=152 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx -e "
-import { orient, formatOrientation } from './src/orientation.ts';
-const report = await orient(1000, false);
-console.log(formatOrientation(report));...
-[2026-04-05T12:57:51.084Z] iter=152 turn=12 INFO:   -> exit=0 (1331 chars)
-[2026-04-05T12:57:51.085Z] iter=152 turn=13 INFO: Turn 13/25
-[2026-04-05T12:57:53.448Z] iter=152 turn=13 INFO: Agent: tsc and tests pass. Let me commit and wrap up.
-[2026-04-05T12:57:53.449Z] iter=152 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && git add src/orientation.ts && git diff --cached --stat
-[2026-04-05T12:57:53.502Z] iter=152 turn=13 INFO:   -> exit=0 (121 chars)
-[2026-04-05T12:57:53.503Z] iter=152 turn=14 INFO: Turn 14/25
-[2026-04-05T12:57:57.288Z] iter=152 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && git commit -m "feat: integrate file-ranker into orientation — rank changed files by importance
-
-- Add rankChangedFiles() helper in orientation.ts
-- Import rankF...
-[2026-04-05T12:57:57.329Z] iter=152 turn=14 INFO:   -> exit=0 (147 chars)
-[2026-04-05T12:57:57.329Z] iter=152 turn=15 INFO: Turn 15/25
-[2026-04-05T12:58:05.891Z] iter=152 turn=15 INFO: write_file: goals.md (write)
-[2026-04-05T12:58:05.892Z] iter=152 turn=15 INFO:   -> ok: Updated goals.md (1080 chars, -2 lines delta)
-[2026-04-05T12:58:05.892Z] iter=152 turn=16 INFO: Turn 16/25
-[2026-04-05T12:58:23.347Z] iter=152 turn=16 INFO: Agent: Already committed. Writing memory and restarting.
-[2026-04-05T12:58:23.348Z] iter=152 turn=16 INFO: write_file: memory.md (write)
-[2026-04-05T12:58:23.351Z] iter=152 turn=16 INFO:   -> ok: Updated memory.md (2295 chars, -6 lines delta)
-[2026-04-05T12:58:23.351Z] iter=152 turn=17 INFO: Turn 17/25
-[2026-04-05T12:58:25.759Z] iter=152 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "TSC_OK" && git add goals.md memory.md && git commit -m "meta: update goals and memory for iter 153" && echo "AUTOAGENT_RESTART"
-[2026-04-05T12:58:25.759Z] iter=152 turn=17 INFO: RESTART signal
-[2026-04-05T12:58:25.759Z] iter=152 turn=17 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T12:58:26.433Z] iter=152 turn=17 INFO: Compilation OK
-[2026-04-05T12:58:31.618Z] iter=152 turn=17 INFO: Cache persisted: 53 entries to .autoagent-cache.json
-[2026-04-05T12:58:31.618Z] iter=152 turn=17 INFO: Cache stats: 0 hits, 2 misses, 53 entries, 7 invalidations (1 entries removed)
-[2026-04-05T12:58:31.618Z] iter=152 turn=17 INFO: Tool cache stats
-[2026-04-05T12:58:31.618Z] iter=152 turn=17 INFO: Tool timing: bash: 7x, avg=459ms, total=3214ms; write_file: 7x, avg=2ms, total=15ms; read_file: 2x, avg=2ms, total=3ms; think: 2x, avg=1ms, total=2ms
-[2026-04-05T12:58:31.618Z] iter=152 turn=17 INFO: Tool timing stats
-[2026-04-05T12:58:36.087Z] iter=152 turn=17 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 152: predicted 15 turns, actual 17 turns, ratio 1.13**
-[2026-04-05T12:58:36.106Z] iter=152 turn=17 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T12:58:36.138Z] iter=152 turn=17 INFO: Committed: aa6512a2 (29 in / 7417 out, cache: 17375 created, 231655 read)
-[2026-04-05T12:58:36.138Z] iter=152 turn=17 INFO: Restarting as iteration 153...
-[2026-04-05T12:58:36.338Z] iter=153 INFO: Cache restored: 53/53 entries (0 stale)
-[2026-04-05T12:58:36.339Z] iter=153 INFO: Turn budget: 15/25 (calibration=1.00x, predicted=11)
-[2026-04-05T12:58:36.340Z] iter=153 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T12:58:36.384Z] iter=153 INFO: Hard turn cap: 17 (1.5x prediction of 11)
-[2026-04-05T12:58:36.385Z] iter=153 turn=1 INFO: Turn 1/25
 [2026-04-05T12:58:40.007Z] iter=153 turn=1 INFO: Agent: 
 
 I'll start by evaluating what the Engineer built in iteration 152, then determine the highest-leverage next task.
@@ -1081,3 +996,118 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T13:18:02.578Z] iter=163 turn=9 INFO: Tool timing stats
 [2026-04-05T13:18:06.897Z] iter=163 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 163: predicted 10 turns, actual 9 turns, ratio 0.90**
 [2026-04-05T13:18:06.917Z] iter=163 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T13:18:06.949Z] iter=163 turn=9 INFO: Committed: ce3b471c (15 in / 3484 out, cache: 58245 created, 383033 read)
+[2026-04-05T13:18:06.949Z] iter=163 turn=9 INFO: Restarting as iteration 164...
+[2026-04-05T13:18:07.149Z] iter=164 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T13:18:07.151Z] iter=164 INFO: Turn budget: 14/25 (calibration=1.00x, predicted=14)
+[2026-04-05T13:18:07.151Z] iter=164 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T13:18:07.208Z] iter=164 INFO: Hard turn cap: 21 (1.5x prediction of 14)
+[2026-04-05T13:18:07.208Z] iter=164 turn=1 INFO: Turn 1/25
+[2026-04-05T13:18:10.460Z] iter=164 turn=1 INFO: Agent: I'll start with a comprehensive dead code audit. Let me first understand the codebase structure and then systematically find unused exports.
+[2026-04-05T13:18:10.461Z] iter=164 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && find src -name "*.ts" | grep -v ".test." | sort
+[2026-04-05T13:18:10.463Z] iter=164 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/*.ts src/**/*.ts 2>/dev/null | sort -rn | head -40
+[2026-04-05T13:18:10.472Z] iter=164 turn=1 INFO:   -> exit=0 (628 chars)
+[2026-04-05T13:18:10.476Z] iter=164 turn=1 INFO:   -> exit=0 (1369 chars)
+[2026-04-05T13:18:10.477Z] iter=164 turn=2 INFO: Turn 2/25
+[2026-04-05T13:18:13.852Z] iter=164 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^export " src/code-analysis.ts | head -30
+[2026-04-05T13:18:13.854Z] iter=164 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "code-analysis" src/ --include="*.ts" | grep -v "__tests__"
+[2026-04-05T13:18:13.864Z] iter=164 turn=2 INFO:   -> exit=0 (218 chars)
+[2026-04-05T13:18:13.872Z] iter=164 turn=2 INFO:   -> exit=0 (75 chars)
+[2026-04-05T13:18:13.872Z] iter=164 turn=3 INFO: Turn 3/25
+[2026-04-05T13:18:17.110Z] iter=164 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "code-analysis\|analyzeCodebase\|formatReport\|FileAnalysis\|CodebaseAnalysis" src/validation.ts
+[2026-04-05T13:18:17.113Z] iter=164 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "formatReport\|FileAnalysis\|CodebaseAnalysis" src/ --include="*.ts"
+[2026-04-05T13:18:17.121Z] iter=164 turn=3 INFO:   -> exit=0 (100 chars)
+[2026-04-05T13:18:17.137Z] iter=164 turn=3 INFO:   -> exit=0 (447 chars)
+[2026-04-05T13:18:17.138Z] iter=164 turn=4 INFO: Turn 4/25
+[2026-04-05T13:18:20.626Z] iter=164 turn=4 INFO: think: So `code-analysis.ts` exports:
+1. `FileAnalysis` interface - only used internally in code-analysis.ts
+2. `CodebaseAnalys...
+[2026-04-05T13:18:20.627Z] iter=164 turn=5 INFO: Turn 5/25
+[2026-04-05T13:18:24.414Z] iter=164 turn=5 INFO: think: Let me quickly assess what I've found so far and decide on deliverables:
+
+1. `formatReport` in code-analysis.ts - not us...
+[2026-04-05T13:18:24.415Z] iter=164 turn=6 INFO: Turn 6/25
+[2026-04-05T13:18:28.801Z] iter=164 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^export " src/model-selection.ts src/tool-cache.ts src/task-decomposer.ts src/tool-timing.ts src/file-ranker.ts src/repo-context.ts
+[2026-04-05T13:18:28.813Z] iter=164 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && for f in model-selection tool-cache task-decomposer tool-timing file-ranker repo-context; do echo "=== $f ==="; grep -rn "from.*${f}" src/ --include="*.ts" | gr...
+[2026-04-05T13:18:28.831Z] iter=164 turn=6 INFO:   -> exit=0 (1562 chars)
+[2026-04-05T13:18:28.875Z] iter=164 turn=6 INFO:   -> exit=0 (984 chars)
+[2026-04-05T13:18:28.875Z] iter=164 turn=7 INFO: Turn 7/25
+[2026-04-05T13:18:32.370Z] iter=164 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "selectModel\|TaskProfile\|autoSelectModel" src/ --include="*.ts" | grep -v "__tests__\|model-selection.ts"
+[2026-04-05T13:18:32.374Z] iter=164 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "formatReport\|CacheStats\|CacheEntry\|CACHEABLE_TOOLS\|extractPaths\|pathOverlaps" src/ --include="*.ts" | grep -v "__tests__\|tool-cache.ts\|code-ana...
+[2026-04-05T13:18:32.403Z] iter=164 turn=7 INFO:   -> exit=0 (272 chars)
+[2026-04-05T13:18:32.409Z] iter=164 turn=7 INFO:   -> exit=1 (11 chars)
+[2026-04-05T13:18:32.409Z] iter=164 turn=8 INFO: Turn 8/25
+[2026-04-05T13:18:41.380Z] iter=164 turn=8 INFO: think: So:
+1. `selectModel` and `TaskProfile` in model-selection.ts are NOT used outside model-selection.ts (only `autoSelectMo...
+[2026-04-05T13:18:41.380Z] iter=164 turn=9 INFO: Turn 9/25
+[2026-04-05T13:18:45.974Z] iter=164 turn=9 INFO: Agent: **Status:**
+- Dead code removal ≥200 LOC: **NOT STARTED** (still auditing)
+
+I have enough info. Let me start deleting now.
+
+Dead code identified:
+1. `selectModel` + `TaskProfile` in `model-selection.ts` (~40 LOC)
+2. `formatReport` in `code-analysis.ts` (~30 LOC)  
+3. Need to check `tool-cache.ts` internals quickly, then cut
+[2026-04-05T13:18:45.975Z] iter=164 turn=9 INFO: read_file: CACHE HIT
+[2026-04-05T13:18:45.976Z] iter=164 turn=9 INFO: read_file: CACHE HIT
+[2026-04-05T13:18:45.976Z] iter=164 turn=10 INFO: Turn 10/25
+[2026-04-05T13:19:03.743Z] iter=164 turn=10 INFO: Agent: Now I can see exactly what to remove. Let me make the cuts:
+[2026-04-05T13:19:03.745Z] iter=164 turn=10 INFO: write_file: src/model-selection.ts (write)
+[2026-04-05T13:19:03.747Z] iter=164 turn=10 INFO:   -> ok: Updated src/model-selection.ts (514 chars, -45 lines delta)
+[2026-04-05T13:19:03.747Z] iter=164 turn=10 INFO: write_file: src/code-analysis.ts (write)
+[2026-04-05T13:19:03.748Z] iter=164 turn=10 INFO:   -> ok: Updated src/code-analysis.ts (4623 chars, -59 lines delta)
+[2026-04-05T13:19:03.749Z] iter=164 turn=11 INFO: Turn 11/25
+[2026-04-05T13:19:10.668Z] iter=164 turn=11 INFO: Agent: Good — 104 LOC removed so far. Now check tool-cache.ts for dead exports and look at more candidates:
+[2026-04-05T13:19:10.670Z] iter=164 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "CacheStats\|CacheEntry\|CACHEABLE_TOOLS\|extractPaths\|pathOverlaps" src/tool-cache.ts | head -20
+[2026-04-05T13:19:10.674Z] iter=164 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "CacheStats\|CacheEntry\|CACHEABLE_TOOLS\|extractPaths\|pathOverlaps\|formatSubtasks\|Subtask\b\|formatRankedFiles\|RankedFile\b\|fingerprintRepo\|Timi...
+[2026-04-05T13:19:10.694Z] iter=164 turn=11 INFO:   -> exit=0 (593 chars)
+[2026-04-05T13:19:10.717Z] iter=164 turn=11 INFO:   -> exit=0 (892 chars)
+[2026-04-05T13:19:10.717Z] iter=164 turn=12 INFO: Turn 12/25
+[2026-04-05T13:19:20.813Z] iter=164 turn=12 INFO: think: - `CacheStats`, `CacheEntry`, `CACHEABLE_TOOLS`, `extractPaths`, `pathOverlaps` are all used internally within tool-cach...
+[2026-04-05T13:19:20.814Z] iter=164 turn=13 INFO: Turn 13/25
+[2026-04-05T13:19:24.737Z] iter=164 turn=13 INFO: Agent: Let me check what's in agent.ts for decomposition, then wrap up.
+[2026-04-05T13:19:24.737Z] iter=164 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "shouldDecompose\|decomposeTasks\|formatSubtasks" src/agent.ts
+[2026-04-05T13:19:24.739Z] iter=164 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "Subtask\b\|RankedFile\b\|ToolTimingEntry\b" src/ --include="*.ts" | grep -v "__tests__\|task-decomposer\.ts\|file-ranker\.ts\|tool-timing\.ts"
+[2026-04-05T13:19:24.749Z] iter=164 turn=13 INFO:   -> exit=0 (267 chars)
+[2026-04-05T13:19:24.764Z] iter=164 turn=13 INFO:   -> exit=1 (11 chars)
+[2026-04-05T13:19:24.764Z] iter=164 turn=14 INFO: Turn 14/25
+[2026-04-05T13:19:30.021Z] iter=164 turn=14 INFO: Agent: `Subtask`, `RankedFile`, `ToolTimingEntry` interfaces are exported but never imported outside their files. I can un-export them. Also check if `CacheStats`/`CacheEntry` are used in tests:
+[2026-04-05T13:19:30.021Z] iter=164 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "CacheStats\|CacheEntry\|CACHEABLE_TOOLS\|extractPaths\|pathOverlaps\|Subtask\b\|RankedFile\b\|ToolTimingEntry\b\|TimingStats\b\|FileAnalysis\b\|Codebas...
+[2026-04-05T13:19:30.046Z] iter=164 turn=14 INFO:   -> exit=0 (2861 chars)
+[2026-04-05T13:19:30.047Z] iter=164 turn=15 INFO: Turn 15/25
+[2026-04-05T13:19:33.691Z] iter=164 turn=15 INFO: Agent: I've removed 104 LOC (formatReport + selectModel/TaskProfile). Tests use the exports so can't un-export them. Let me wrap up.
+[2026-04-05T13:19:33.691Z] iter=164 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && npx vitest run 2>&1 | tail -5
+[2026-04-05T13:19:40.372Z] iter=164 turn=15 INFO:   -> exit=0 (211 chars)
+[2026-04-05T13:19:40.372Z] iter=164 turn=16 INFO: Turn 16/25
+[2026-04-05T13:19:42.546Z] iter=164 turn=16 INFO: Agent: Tests are failing. Let me check quickly:
+[2026-04-05T13:19:42.546Z] iter=164 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | grep "FAIL\|Error\|✗" | head -20
+[2026-04-05T13:19:48.473Z] iter=164 turn=16 INFO:   -> exit=0 (588 chars)
+[2026-04-05T13:19:48.473Z] iter=164 turn=17 INFO: Turn 17/25
+[2026-04-05T13:19:54.906Z] iter=164 turn=17 INFO: Agent: Tests use `selectModel`. I need to keep it. Restore it:
+[2026-04-05T13:19:54.906Z] iter=164 turn=17 INFO: write_file: src/model-selection.ts (write)
+[2026-04-05T13:19:54.907Z] iter=164 turn=17 INFO:   -> ok: Updated src/model-selection.ts (884 chars, +10 lines delta)
+[2026-04-05T13:19:54.908Z] iter=164 turn=18 INFO: Turn 18/25
+[2026-04-05T13:19:58.394Z] iter=164 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && npx vitest run 2>&1 | tail -5
+[2026-04-05T13:20:05.073Z] iter=164 turn=18 INFO:   -> exit=0 (189 chars)
+[2026-04-05T13:20:05.073Z] iter=164 turn=19 INFO: Turn 19/25
+[2026-04-05T13:20:08.025Z] iter=164 turn=19 INFO: Agent: All 338 tests pass. LOC removed: ~49 (formatReport from code-analysis, selectModel comments/dead body). Let me commit and wrap up:
+[2026-04-05T13:20:08.026Z] iter=164 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && git add src/code-analysis.ts src/model-selection.ts && git diff --cached --stat
+[2026-04-05T13:20:08.057Z] iter=164 turn=19 INFO:   -> exit=0 (174 chars)
+[2026-04-05T13:20:08.057Z] iter=164 turn=20 INFO: Turn 20/25
+[2026-04-05T13:20:11.448Z] iter=164 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && git commit -m "Dead code removal: delete formatReport, trim model-selection (-94 LOC)"
+[2026-04-05T13:20:11.492Z] iter=164 turn=20 INFO:   -> exit=0 (122 chars)
+[2026-04-05T13:20:11.493Z] iter=164 turn=21 INFO: Turn 21/25
+[2026-04-05T13:20:42.176Z] iter=164 turn=21 INFO: Agent: Writing memory and goals now.
+[2026-04-05T13:20:42.177Z] iter=164 turn=21 INFO: write_file: goals.md (write)
+[2026-04-05T13:20:42.178Z] iter=164 turn=21 INFO:   -> ok: Updated goals.md (1101 chars, -13 lines delta)
+[2026-04-05T13:20:42.179Z] iter=164 turn=21 INFO: write_file: memory.md (write)
+[2026-04-05T13:20:42.179Z] iter=164 turn=21 INFO:   -> ok: Updated memory.md (2799 chars, -5 lines delta)
+[2026-04-05T13:20:42.180Z] iter=164 turn=21 INFO: HARD TURN CAP REACHED: 21 turns (predicted 14, cap 21). Forcing commit.
+[2026-04-05T13:20:42.186Z] iter=164 turn=21 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T13:20:42.188Z] iter=164 turn=21 INFO: Cache stats: 2 hits, 0 misses, 53 entries, 5 invalidations (2 entries removed)
+[2026-04-05T13:20:42.189Z] iter=164 turn=21 INFO: Tool cache stats
+[2026-04-05T13:20:42.190Z] iter=164 turn=21 INFO: Tool timing: bash: 20x, avg=987ms, total=19748ms; write_file: 5x, avg=3ms, total=13ms; think: 4x, avg=1ms, total=3ms
+[2026-04-05T13:20:42.190Z] iter=164 turn=21 INFO: Tool timing stats
+[2026-04-05T13:20:42.584Z] iter=164 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 164: predicted 14 turns, actual 21 turns, ratio 1.50**
+[2026-04-05T13:20:42.604Z] iter=164 turn=21 INFO: Pre-commit review: no significant code changes to review
