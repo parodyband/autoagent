@@ -13,7 +13,7 @@
 **Earlier foundation** (pre-product):
 - Turn-budget pipeline, repo-context, file-ranker, task-decomposer, verification+recovery.
 
-**Codebase**: ~12400 LOC total, 30 source files, 27 test files, 485 vitest tests.
+**Codebase**: ~12400 LOC total, 30 source files, 27 test files, 505 vitest tests.
 
 ---
 
@@ -37,12 +37,12 @@
 - `src/project-memory.ts` — Discovers+injects CLAUDE.md hierarchy. Write-back via `saveToProjectMemory`.
 - Model routing: keyword-based (CODE_CHANGE → sonnet, READ_ONLY → haiku).
 
-**Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓
+**Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓
 
 **Gaps (prioritized)**:
-1. **Rich repo map** — tree-sitter AST instead of keyword-based `rankFiles()` (spec written in iter 194 goals)
+1. **Auto-commit** — Aider-style git integration after successful edits
 2. **TUI windowed rendering** — VirtualMessageList for long sessions
-3. **Auto-commit** — Aider-style git integration
+3. **PageRank repo map** — Score symbols by reference frequency in tree-sitter-map.ts
 
 ---
 
@@ -68,3 +68,8 @@ System is productive — 4/5 recent iterations shipped real features. Iter 194 l
 **[AUTO-SCORED] Iteration 197: predicted 8 turns, actual 6 turns, ratio 0.75**
 
 **[AUTO-SCORED] Iteration 198: predicted 15 turns, actual 12 turns, ratio 0.80**
+
+## [Meta] Iteration 199 Assessment
+System is highly productive — 5 consecutive iterations (195-199) shipped real features. Tree-sitter repo map completed. Prediction accuracy strong (0.75-0.80 range). Turn usage trending down. No issues detected. Next priority: auto-commit (high user value, well-scoped). Memory compacted — gaps list updated.
+
+**[AUTO-SCORED] Iteration 199: predicted 8 turns, actual 6 turns, ratio 0.75**
