@@ -262,7 +262,7 @@ function Footer({ stats }: { stats: FooterStats }) {
 
   // Context budget: color shifts yellow at 70%, red at 90%
   const ctxRatio = stats.contextLimit > 0 ? stats.contextTokens / stats.contextLimit : 0;
-  const ctxColor = ctxRatio >= 0.9 ? "red" : ctxRatio >= 0.7 ? "yellow" : "gray";
+  const ctxColor = getContextColor(ctxRatio);
 
   return (
     <Box marginTop={1} borderStyle="single" borderColor="gray" paddingX={1}>
@@ -639,7 +639,7 @@ function App() {
           tokensOut: costInfo.tokensOut,
           cost: costInfo.cost,
           model: result.model,
-          contextTokens: costInfo.tokensIn,
+          contextTokens: costInfo.lastInputTokens,
           contextLimit: 200_000,
         });
       }

@@ -111,6 +111,8 @@ export interface CostInfo {
   cost: number;
   tokensIn: number;
   tokensOut: number;
+  /** Token count of the most recent API call's input window (actual context size). */
+  lastInputTokens: number;
 }
 
 // ─── Model routing ────────────────────────────────────────────
@@ -265,7 +267,7 @@ async function runAgentLoop(
   onStatus?: OrchestratorOptions["onStatus"],
   onText?: OrchestratorOptions["onText"],
   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
-): Promise<{ text: string; tokensIn: number; tokensOut: number }> {
+): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number }> {
   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
     totalIn += tIn;
     totalOut += tOut;
@@ -363,7 +365,7 @@ async function runAgentLoop(
     if (finalMessage.stop_reason === "end_turn") break;
   }
 
-  return { text: fullText, tokensIn: totalIn, tokensOut: totalOut };
+  return { text: fullText, tokensIn: totalIn, tokensOut: totalOut, lastInputTokens: totalIn };
 }
 
 /**
@@ -478,6 +480,7 @@ export class Orchestrator {
   private sessionTokensIn = 0;
   private sessionTokensOut = 0;
   private sessionCost = 0;
+  private lastInputTokens = 0;
 
   /** Path to current session's JSONL file */
   sessionPath: string = "";
@@ -545,6 +548,7 @@ export class Orchestrator {
       cost: this.sessionCost,
       tokensIn: this.sessionTokensIn,
       tokensOut: this.sessionTokensOut,
+      lastInputTokens: this.lastInputTokens,
     };
   }
 
@@ -799,7 +803,7 @@ export class Orchestrator {
     this.opts.onStatus?.("Thinking...");
 
     // 5. Run streaming agent loop
-    const { text, tokensIn, tokensOut } = await runAgentLoop(
+    const { text, tokensIn, tokensOut, lastInputTokens } = await runAgentLoop(
       this.client,
       model,
       this.systemPrompt,
@@ -822,6 +826,7 @@ export class Orchestrator {
     this.sessionTokensIn += tokensIn;
     this.sessionTokensOut += tokensOut;
     this.sessionCost += computeCost(model, tokensIn, tokensOut);
+    this.lastInputTokens = lastInputTokens;
 
     // 6. Self-verification (if code was likely changed)
     let verificationPassed: boolean | undefined;
