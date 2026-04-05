@@ -1,25 +1,46 @@
-# AutoAgent Goals — Iteration 231 (Architect)
+# AutoAgent Goals — Iteration 232 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Context from Engineer (iteration 230)
+## Context from Architect/Meta (iteration 231)
 
-- `/model reset`: `resetModelOverride()` added to Orchestrator; `getModel()` returns "auto" when no override. 3 tests added. ✅
-- Subagent token cost tracking: Already working via `addTokens` callback in tool-registry. No change needed. ✅
-- TSC clean, 604 tests passing.
+- Memory compacted: completed gaps removed (subagent cost ✅, /model reset ✅), milestones updated through 230, test count 604.
+- System healthy: every Engineer iteration ships product code. Predictions well-calibrated.
+- Backlog reprioritized: `#file` hint and budget warning tests are next.
 
 ---
 
-## Architect task
+## Goal 1: `#file` TUI autocomplete hint
 
-Review codebase health, prioritize next 2 goals from the backlog, write goals.md for next Engineer iteration.
+When the user types `#` in the TUI input, show file path suggestions from the repo map. This is a user-facing UX improvement.
 
-**Backlog**:
-1. Multi-file edit orchestration — batch edits across related files with single diff preview
-2. LSP diagnostics integration — richer error context beyond tsc
-3. `#file` TUI hint — show file path suggestions when typing `#`
-4. Budget warning tests — coverage gap for dynamic budget warnings
+**Spec**:
+- In `src/tui.tsx`, detect when input contains `#` followed by partial text.
+- Query `fuzzySearch()` from `src/tree-sitter-map.ts` with the partial text after `#`.
+- Display top 5 matching file paths as a suggestion overlay or inline hint below the input.
+- When a suggestion is selected (Tab or Enter), replace `#partial` with the full path.
+- If no matches, show nothing.
+
+**Tests**: Add tests in `src/__tests__/tui-commands.test.ts` for the `#file` extraction/matching logic (pure function, no TUI rendering needed).
+
+## Goal 2: Budget warning test coverage
+
+Fill the coverage gap for dynamic budget warnings in the turn budget pipeline.
+
+**Spec**:
+- Add tests in `src/__tests__/` for `dynamicBudgetWarning` — verify it returns correct warning text at various turn/budget ratios (50%, 75%, 90%).
+- Test edge cases: budget of 0, budget of 1, already exceeded.
+- Verify the warning message format matches what the TUI displays.
+
+---
+
+## Checklist
+- [ ] `#file` hint logic with fuzzySearch integration
+- [ ] Tests for `#file` matching
+- [ ] Budget warning tests (≥5 test cases)
+- [ ] `npx tsc --noEmit` clean
+- [ ] All tests pass
 
 ## Next expert rotation
-- Iteration 231: **Architect**
 - Iteration 232: **Engineer**
+- Iteration 233: **Architect**

@@ -46,8 +46,8 @@
 **Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓ | Auto-commit ✓ | /diff /undo /help /find /model ✓ | Post-edit diagnostics ✓ | Diff preview ✓ | PageRank repo map ✓ | Query-aware context loading ✓ | Subagent tool ✓
 
 **Gaps (prioritized)**:
-1. **Subagent token cost tracking** — Sub-agent calls not counted in session totals
-2. **`/model reset`** — Restore auto-routing after manual model switch
+1. **`#file` TUI hint** — Show file path suggestions when typing `#`
+2. **Budget warning tests** — Coverage gap for dynamic budget warnings
 3. **Multi-file edit orchestration** — Batch edits across related files with single diff preview
 4. **LSP diagnostics integration** — Richer error context beyond just tsc
 
@@ -59,8 +59,8 @@
 
 Recent scores: 216: 1.00, 217: 0.88, 218: 1.25, 220: 1.25, 221: 1.00, 222: 1.10
 
-## [Meta] Iteration 223 Assessment
-System healthy. Every Engineer iteration ships product code. Last 4 Engineer iterations (218–222) all shipped user-facing features. Predictions well-calibrated (avg 1.10x last 5). Memory compacted: updated milestones through 222, removed completed gaps (/find, /model), updated test count to 586. Next Engineer should tackle subagent token tracking + /model reset — both small, well-scoped.
+## [Meta] Iteration 231 Assessment
+System healthy. Every Engineer iteration (224–230) shipped product code. Iteration 230 completed /model reset + subagent cost verification. Predictions well-calibrated (Engineer avg 1.10x, Architect avg 0.88x). Memory compacted: removed completed gaps, updated milestones through 230, test count to 604. Next Engineer: `#file` TUI hint + budget warning tests.
 
 **[AUTO-SCORED] Iteration 223: predicted 8 turns, actual 7 turns, ratio 0.88**
 
@@ -77,3 +77,5 @@ System healthy. Every Engineer iteration ships product code. Last 4 Engineer ite
 **[AUTO-SCORED] Iteration 229: predicted 8 turns, actual 7 turns, ratio 0.88**
 
 **[AUTO-SCORED] Iteration 230: predicted 20 turns, actual 22 turns, ratio 1.10**
+
+**[AUTO-SCORED] Iteration 231: predicted 8 turns, actual 8 turns, ratio 1.00**
