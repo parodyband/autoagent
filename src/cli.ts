@@ -14,6 +14,7 @@ import { createInterface } from "readline";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { execSync } from "child_process";
 import "dotenv/config";
 import { Orchestrator } from "./orchestrator.js";
 import { runInit } from "./init-command.js";
@@ -172,9 +173,76 @@ function prompt() {
       console.log(
         `Session: ${stats.turnCount} turn${stats.turnCount !== 1 ? "s" : ""}, ` +
         `${mins} min, ` +
-        `avg $${stats.avgCostPerTurn.toFixed(4)}/turn, ` +
+        `avg ${stats.avgCostPerTurn.toFixed(4)}/turn, ` +
         `trend ${stats.costTrend}\n`
       );
+      prompt();
+      return;
+    }
+
+    if (trimmed === "/help") {
+      console.log(
+        "\nAvailable slash commands:\n" +
+        "  /clear            Clear conversation history\n" +
+        "  /cost             Show session cost stats\n" +
+        "  /model [name]     Show or set model (sonnet/haiku/full model name)\n" +
+        "  /status           Show session stats + git status\n" +
+        "  /compact          Compact conversation history\n" +
+        "  /reindex          Re-index repo map\n" +
+        "  /help             Show this help\n"
+      );
+      prompt();
+      return;
+    }
+
+    if (trimmed.startsWith("/model")) {
+      const arg = trimmed.slice(6).trim();
+      if (!arg) {
+        const current = (orchestrator as unknown as { _modelOverride?: string })._modelOverride ?? "auto";
+        console.log(`Current model: ${current}\n`);
+      } else {
+        // Expand shorthand: "sonnet" → full name, "haiku" → full name
+        const modelMap: Record<string, string> = {
+          sonnet: "claude-sonnet-4-6",
+          haiku: "claude-haiku-4-5",
+        };
+        const resolved = modelMap[arg.toLowerCase()] ?? arg;
+        orchestrator.setModel(resolved);
+        console.log(`Model set to: ${resolved}\n`);
+      }
+      prompt();
+      return;
+    }
+
+    if (trimmed === "/status") {
+      const stats = orchestrator.getSessionStats();
+      const mins = Math.round(stats.durationMs / 60000);
+      console.log(
+        `\nSession: ${stats.turnCount} turn${stats.turnCount !== 1 ? "s" : ""}, ` +
+        `${mins} min, avg ${stats.avgCostPerTurn.toFixed(4)}/turn, trend ${stats.costTrend}`
+      );
+      try {
+        const gitOut = execSync("git status --short", { cwd: workDir, encoding: "utf8" }).trim();
+        console.log(`Git status:\n${gitOut || "  (clean)"}\n`);
+      } catch {
+        console.log("Git: not a git repo\n");
+      }
+      prompt();
+      return;
+    }
+
+    if (trimmed === "/compact") {
+      console.log("Compacting history...");
+      await (orchestrator as unknown as { compactHistory?: () => Promise<void> }).compactHistory?.();
+      console.log("Done.\n");
+      prompt();
+      return;
+    }
+
+    if (trimmed === "/reindex") {
+      console.log("Re-indexing repo map...");
+      await (orchestrator as unknown as { reindexRepoMap?: () => Promise<void> }).reindexRepoMap?.();
+      console.log("Done.\n");
       prompt();
       return;
     }

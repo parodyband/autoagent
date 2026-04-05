@@ -1,85 +1,3 @@
-[2026-04-05T19:20:28.843Z] iter=328 turn=18 INFO: Turn 18/25
-[2026-04-05T19:20:30.890Z] iter=328 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC_CLEAN"
-[2026-04-05T19:20:31.941Z] iter=328 turn=18 INFO:   -> exit=0 (10 chars)
-[2026-04-05T19:20:31.942Z] iter=328 turn=19 INFO: Turn 19/25
-[2026-04-05T19:20:34.108Z] iter=328 turn=19 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T19:20:34.109Z] iter=328 turn=19 INFO: RESTART signal
-[2026-04-05T19:20:34.109Z] iter=328 turn=19 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T19:20:35.103Z] iter=328 turn=19 INFO: Compilation OK
-[2026-04-05T19:20:42.179Z] iter=328 turn=19 INFO: Cache persisted: 53 entries to .autoagent-cache.json
-[2026-04-05T19:20:42.180Z] iter=328 turn=19 INFO: Tool timing: bash: 12x, avg=349ms, total=4193ms; write_file: 6x, avg=2ms, total=9ms; read_scratchpad: 1x, avg=4ms, total=4ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T19:20:42.180Z] iter=328 turn=19 INFO: Tool timing stats
-[2026-04-05T19:20:48.444Z] iter=328 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 328: predicted 20 turns, actual 19 turns, ratio 0.95**
-[2026-04-05T19:20:48.466Z] iter=328 turn=19 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T19:20:48.501Z] iter=328 turn=19 INFO: Committed: 30362f91 (31 in / 11202 out, cache: 22097 created, 320078 read)
-[2026-04-05T19:20:48.501Z] iter=328 turn=19 INFO: Restarting as iteration 329...
-[2026-04-05T19:20:48.709Z] iter=329 INFO: Cache restored: 53/53 entries (0 stale)
-[2026-04-05T19:20:48.712Z] iter=329 INFO: Turn budget: 11/25 (calibration=0.95x, predicted=8)
-[2026-04-05T19:20:48.712Z] iter=329 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T19:20:48.886Z] iter=329 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T19:20:48.887Z] iter=329 turn=1 INFO: Turn 1/25
-[2026-04-05T19:20:52.810Z] iter=329 turn=1 INFO: Agent: 
-
-I'll start by reviewing the current state of the product, then research what other coding agents are doing, and finally write goals for the next Engineer iteration.
-[2026-04-05T19:20:52.811Z] iter=329 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -80
-[2026-04-05T19:20:52.813Z] iter=329 turn=1 INFO: list_files: src (depth=2)
-[2026-04-05T19:20:52.815Z] iter=329 turn=1 INFO:   -> ok (2 dirs, 117 files)
-[2026-04-05T19:20:52.816Z] iter=329 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -30
-[2026-04-05T19:20:52.819Z] iter=329 turn=1 INFO:   -> exit=0 (1679 chars)
-[2026-04-05T19:21:05.086Z] iter=329 turn=1 INFO:   -> exit=0 (2549 chars)
-[2026-04-05T19:21:05.086Z] iter=329 turn=2 INFO: Turn 2/25
-[2026-04-05T19:21:10.522Z] iter=329 turn=2 INFO: Agent: 
-
-You're right. My deliverable is `goals.md` for the next Engineer iteration. Let me do focused research and write it.
-[2026-04-05T19:21:10.522Z] iter=329 turn=2 INFO: web_search: "Claude Code coding agent 2025 streaming tool results UX techniques"
-[2026-04-05T19:21:10.537Z] iter=329 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'streaming\|onChunk\|onToken\|partial' src/tui.tsx | head -20
-[2026-04-05T19:21:10.538Z] iter=329 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'timeout\|stall\|heartbeat\|abort' src/orchestrator.ts | head -20
-[2026-04-05T19:21:10.543Z] iter=329 turn=2 INFO:   -> exit=0 (820 chars)
-[2026-04-05T19:21:10.545Z] iter=329 turn=2 INFO:   -> exit=0 (38 chars)
-[2026-04-05T19:21:11.621Z] iter=329 turn=2 INFO:   -> 5 results
-[2026-04-05T19:21:11.622Z] iter=329 turn=3 INFO: Turn 3/25
-[2026-04-05T19:21:22.144Z] iter=329 turn=3 INFO: think: Let me look at that Medium article about 5 techniques from Claude Code for ideas, and also check what capabilities we're...
-[2026-04-05T19:21:22.144Z] iter=329 turn=4 INFO: Turn 4/25
-[2026-04-05T19:21:25.676Z] iter=329 turn=4 INFO: Agent: 
-
-Goals.md is NOT STARTED. Writing it now.
-[2026-04-05T19:21:25.676Z] iter=329 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'timeout\|TIMEOUT\|kill\|abort\|signal' src/tools/bash.ts | head -15
-[2026-04-05T19:21:25.678Z] iter=329 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'abort\|cancel\|interrupt\|ctrl.c\|SIGINT' src/orchestrator.ts | head -15
-[2026-04-05T19:21:25.682Z] iter=329 turn=4 INFO:   -> exit=0 (609 chars)
-[2026-04-05T19:21:25.687Z] iter=329 turn=4 INFO:   -> exit=0 (11 chars)
-[2026-04-05T19:21:25.687Z] iter=329 turn=5 INFO: Turn 5/25
-[2026-04-05T19:21:30.167Z] iter=329 turn=5 INFO: Agent: Good — bash tool already has timeout/stall protection. The orchestrator itself has no abort/cancel. Let me check for another high-value gap.
-[2026-04-05T19:21:30.167Z] iter=329 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'retry\|RETRY\|retryCount\|maxRetries' src/orchestrator.ts | head -15
-[2026-04-05T19:21:30.169Z] iter=329 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'cost\|usage\|inputTokens\|outputTokens\|totalCost' src/tui.tsx | head -20
-[2026-04-05T19:21:30.180Z] iter=329 turn=5 INFO:   -> exit=0 (419 chars)
-[2026-04-05T19:21:30.180Z] iter=329 turn=5 INFO:   -> exit=0 (1160 chars)
-[2026-04-05T19:21:30.180Z] iter=329 turn=6 INFO: Turn 6/25
-[2026-04-05T19:21:53.411Z] iter=329 turn=6 INFO: Agent: 
-
-Writing goals.md now — this is an Architect iteration, my deliverable is goals not src changes.
-[2026-04-05T19:21:53.411Z] iter=329 turn=6 INFO: write_file: goals.md (write)
-[2026-04-05T19:21:53.412Z] iter=329 turn=6 INFO:   -> ok: Updated goals.md (3434 chars, +22 lines delta)
-[2026-04-05T19:21:53.413Z] iter=329 turn=7 INFO: Turn 7/25
-[2026-04-05T19:21:58.137Z] iter=329 turn=7 INFO: save_memory: "[Architect] Iteration 329 priorities"
-[2026-04-05T19:21:58.137Z] iter=329 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T19:21:58.137Z] iter=329 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
-[2026-04-05T19:21:59.183Z] iter=329 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-05T19:21:59.183Z] iter=329 turn=8 INFO: Turn 8/25
-[2026-04-05T19:22:01.532Z] iter=329 turn=8 INFO: Agent: TSC clean. Goals written.
-[2026-04-05T19:22:01.533Z] iter=329 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T19:22:01.535Z] iter=329 turn=8 INFO: RESTART signal
-[2026-04-05T19:22:01.536Z] iter=329 turn=8 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T19:22:02.545Z] iter=329 turn=8 INFO: Compilation OK
-[2026-04-05T19:22:12.637Z] iter=329 turn=8 INFO: Cache persisted: 54 entries to .autoagent-cache.json
-[2026-04-05T19:22:12.637Z] iter=329 turn=8 INFO: Cache stats: 0 hits, 1 misses, 54 entries, 1 invalidations (0 entries removed)
-[2026-04-05T19:22:12.638Z] iter=329 turn=8 INFO: Tool cache stats
-[2026-04-05T19:22:12.638Z] iter=329 turn=8 INFO: Tool timing: bash: 10x, avg=1338ms, total=13379ms; web_search: 1x, avg=1100ms, total=1100ms; list_files: 1x, avg=5ms, total=5ms; save_memory: 1x, avg=2ms, total=2ms; write_file: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T19:22:12.638Z] iter=329 turn=8 INFO: Tool timing stats
-[2026-04-05T19:22:18.986Z] iter=329 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 329: predicted 8 turns, actual 8 turns, ratio 1.00**
-[2026-04-05T19:22:19.007Z] iter=329 turn=8 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T19:22:19.040Z] iter=329 turn=8 INFO: Committed: 32d5961a (18 in / 2581 out, cache: 14201 created, 75196 read)
-[2026-04-05T19:22:19.041Z] iter=329 turn=8 INFO: Restarting as iteration 330...
-[2026-04-05T19:22:19.243Z] iter=330 INFO: Cache restored: 54/54 entries (0 stale)
 [2026-04-05T19:22:19.245Z] iter=330 INFO: Turn budget: 22/25 (calibration=0.95x, predicted=20)
 [2026-04-05T19:22:19.246Z] iter=330 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
 [2026-04-05T19:22:19.409Z] iter=330 turn=1 INFO: Turn 1/25
@@ -1078,3 +996,254 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T19:37:54.197Z] iter=337 turn=8 INFO: Tool timing stats
 [2026-04-05T19:38:00.852Z] iter=337 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 337: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-05T19:38:00.874Z] iter=337 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T19:38:00.910Z] iter=337 turn=8 INFO: Committed: eb41de16 (18 in / 3159 out, cache: 30628 created, 141890 read)
+[2026-04-05T19:38:00.910Z] iter=337 turn=8 INFO: Restarting as iteration 338...
+[2026-04-05T19:38:01.090Z] iter=338 INFO: Cache restored: 58/58 entries (0 stale)
+[2026-04-05T19:38:01.093Z] iter=338 INFO: Turn budget: 18/25 (calibration=1.00x, predicted=20)
+[2026-04-05T19:38:01.093Z] iter=338 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T19:38:01.228Z] iter=338 turn=1 INFO: Turn 1/25
+[2026-04-05T19:38:03.392Z] iter=338 turn=1 INFO: read_scratchpad: 353 chars
+[2026-04-05T19:38:03.393Z] iter=338 turn=1 INFO: read_file: goals.md
+[2026-04-05T19:38:03.393Z] iter=338 turn=1 INFO:   -> ok (4180 chars)
+[2026-04-05T19:38:03.394Z] iter=338 turn=2 INFO: Turn 2/25
+[2026-04-05T19:38:05.480Z] iter=338 turn=2 INFO: $ cat src/orchestrator.ts | head -100
+[2026-04-05T19:38:05.484Z] iter=338 turn=2 INFO: $ grep -n "messages.create\|client\.messages\|max_tokens\|temperature\|_callModel\|_runAgentLoop" src/orchestrator.ts | head -50
+[2026-04-05T19:38:05.491Z] iter=338 turn=2 INFO:   -> exit=0 (4110 chars)
+[2026-04-05T19:38:05.495Z] iter=338 turn=2 INFO:   -> exit=0 (179 chars)
+[2026-04-05T19:38:05.495Z] iter=338 turn=3 INFO: Turn 3/25
+[2026-04-05T19:38:07.278Z] iter=338 turn=3 INFO: $ sed -n '340,420p' src/orchestrator.ts
+[2026-04-05T19:38:07.281Z] iter=338 turn=3 INFO: $ sed -n '460,560p' src/orchestrator.ts
+[2026-04-05T19:38:07.289Z] iter=338 turn=3 INFO:   -> exit=0 (2546 chars)
+[2026-04-05T19:38:07.289Z] iter=338 turn=3 INFO:   -> exit=0 (4295 chars)
+[2026-04-05T19:38:07.289Z] iter=338 turn=4 INFO: Turn 4/25
+[2026-04-05T19:38:13.936Z] iter=338 turn=4 INFO: think: I have enough context. Let me start building:
+
+1. Goal 1: Add extended thinking to orchestrator's streaming calls
+2. Goa...
+[2026-04-05T19:38:13.938Z] iter=338 turn=5 INFO: Turn 5/25
+[2026-04-05T19:38:17.106Z] iter=338 turn=5 INFO: $ sed -n '480,560p' src/orchestrator.ts
+[2026-04-05T19:38:17.109Z] iter=338 turn=5 INFO: $ grep -n "temperature\|top_k\|compactHistory\|reindexRepoMap\|setModel\|clearModel\|getSessionStats" src/orchestrator.ts | head -30
+[2026-04-05T19:38:17.116Z] iter=338 turn=5 INFO:   -> exit=0 (3446 chars)
+[2026-04-05T19:38:17.120Z] iter=338 turn=5 INFO:   -> exit=0 (201 chars)
+[2026-04-05T19:38:17.120Z] iter=338 turn=6 INFO: Turn 6/25
+[2026-04-05T19:38:23.253Z] iter=338 turn=6 INFO: Agent: Now I have what I need. Let me implement both goals:
+[2026-04-05T19:38:23.254Z] iter=338 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:38:23.257Z] iter=338 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -9 +19 lines
+
+Context after patch:
+488 |     const cachedSystem = buildCachedSystem(systemPrompt);
+489 |     const cachedMessages = injectMessageCacheBreakpoints(apiMessages);
+490 | 
+491 |     // Use streaming API with prompt-cache breakpoints (system as content blocks)
+492 |     // Extended thinking enabled: lets Claude reason before responding (better tool decisions, code, debugging)
+493 |     const streamParams = {
+494 |       model,
+495 |       max_tokens: MAX_TOKENS,
+496 |       system: cachedSystem as unknown as string,
+497 |       tools,
+498 |       messages: cachedMessages,
+499 |       thinking: {
+500 |         type: "enabled" as const,
+501 |         budget_tokens: 10_000,
+502 |       },
+503 |     };
+504 |     // Interleaved thinking beta: enables thinking between tool calls for Claude 4 models
+505 |     const stream = (client.messages as unknown as {
+506 |       stream(params: unknown, opts?: unknown): ReturnType<typeof client.messages.stream>
+507 |     }).stream(streamParams, {
+508 |       headers: { "anthropic-beta": "interleaved-thinking-2025-05-14" },
+509 |     }) as ReturnType<typeof client.messages.stream>;
+510 | 
+511 |     // Accumulate tool_use inputs (arrive as JSON deltas)
+512 |     const toolInputBuffers: Record<string, string> = {};
+[2026-04-05T19:38:23.259Z] iter=338 turn=7 INFO: Turn 7/25
+[2026-04-05T19:38:26.733Z] iter=338 turn=7 INFO: Agent: **Goal 1 (Extended Thinking)**: IN PROGRESS — added thinking param + beta header to stream call. Still need to handle `thinking_delta` in stream handler (don't pass to onText) and verify thinking blocks pass through message history.
+
+**Goal 2 (CLI Slash Commands)**: NOT STARTED
+[2026-04-05T19:38:26.734Z] iter=338 turn=7 INFO: $ sed -n '511,540p' src/orchestrator.ts
+[2026-04-05T19:38:26.744Z] iter=338 turn=7 INFO:   -> exit=0 (1262 chars)
+[2026-04-05T19:38:26.745Z] iter=338 turn=8 INFO: Turn 8/25
+[2026-04-05T19:38:35.128Z] iter=338 turn=8 INFO: Agent: The stream handler needs to handle thinking blocks (ignore `thinking_delta`, emit status on thinking start). The message history (`finalMessage.content`) already preserves thinking blocks naturally. Now let me patch the stream handler and then do the CLI:
+[2026-04-05T19:38:35.128Z] iter=338 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:38:35.130Z] iter=338 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -14 +18 lines
+
+Context after patch:
+511 |     // Accumulate tool_use inputs (arrive as JSON deltas)
+512 |     const toolInputBuffers: Record<string, string> = {};
+513 | 
+514 |     for await (const event of stream) {
+515 |       if (event.type === "content_block_start") {
+516 |         if (event.content_block.type === "tool_use") {
+517 |           toolInputBuffers[event.index] = "";
+518 |         } else if ((event.content_block as { type: string }).type === "thinking") {
+519 |           // Thinking block started — notify UI but don't stream thinking text to user
+520 |           onStatus?.("Thinking...");
+521 |         }
+522 |       } else if (event.type === "content_block_delta") {
+523 |         if (event.delta.type === "text_delta") {
+524 |           onText?.(event.delta.text);
+525 |           fullText += event.delta.text;
+526 |         } else if (event.delta.type === "input_json_delta") {
+527 |           toolInputBuffers[event.index] = (toolInputBuffers[event.index] ?? "") + event.delta.partial_json;
+528 |         }
+529 |         // thinking_delta: intentionally ignored — internal reasoning, not shown to users
+530 |       }
+531 |     }
+532 | 
+533 |     const finalMessage = await stream.finalMessage();
+534 | 
+[2026-04-05T19:38:35.130Z] iter=338 turn=9 INFO: Turn 9/25
+[2026-04-05T19:38:37.692Z] iter=338 turn=9 INFO: Agent: Now let me look at the CLI to add slash commands:
+[2026-04-05T19:38:37.692Z] iter=338 turn=9 INFO: $ grep -n "\/clear\|\/cost\|slash\|prompt\|readline\|orchestrator\|setModel\|getSessionStats\|compactHistory\|reindexRepoMap" src/cli.ts | head -40
+[2026-04-05T19:38:37.701Z] iter=338 turn=9 INFO:   -> exit=0 (750 chars)
+[2026-04-05T19:38:37.702Z] iter=338 turn=10 INFO: Turn 10/25
+[2026-04-05T19:38:44.039Z] iter=338 turn=10 INFO: $ sed -n '155,220p' src/cli.ts
+[2026-04-05T19:38:44.047Z] iter=338 turn=10 INFO:   -> exit=0 (1773 chars)
+[2026-04-05T19:38:44.048Z] iter=338 turn=11 INFO: Turn 11/25
+[2026-04-05T19:38:46.529Z] iter=338 turn=11 INFO: $ grep -n "execSync\|import.*child\|setModel\|resetModel\|clearModelOverride\|reindexRepoMap\|compactHistory\|MODEL_COMPLEX\|MODEL_SIMPLE" src/cli.ts src/orchestrator.ts | head -30
+[2026-04-05T19:38:46.543Z] iter=338 turn=11 INFO:   -> exit=0 (975 chars)
+[2026-04-05T19:38:46.543Z] iter=338 turn=12 INFO: Turn 12/25
+[2026-04-05T19:38:48.784Z] iter=338 turn=12 INFO: $ grep -n "reindexRepoMap\|compactHistory\|getSessionStats\|setModel\|resetModelOverride\|clearHistory" src/orchestrator.ts | head -20
+[2026-04-05T19:38:48.796Z] iter=338 turn=12 INFO:   -> exit=0 (310 chars)
+[2026-04-05T19:38:48.797Z] iter=338 turn=13 INFO: Turn 13/25
+[2026-04-05T19:38:52.038Z] iter=338 turn=13 INFO: think: I've made 2 patches to orchestrator.ts so far:
+1. Added thinking parameter + beta header to stream call
+2. Added thinkin...
+[2026-04-05T19:38:52.039Z] iter=338 turn=14 INFO: Turn 14/25
+[2026-04-05T19:38:53.785Z] iter=338 turn=14 INFO: Agent: I've patched orchestrator.ts (2 patches). Now adding CLI slash commands and running TSC.
+[2026-04-05T19:38:53.786Z] iter=338 turn=14 INFO: $ head -20 src/cli.ts
+[2026-04-05T19:38:53.793Z] iter=338 turn=14 INFO:   -> exit=0 (685 chars)
+[2026-04-05T19:38:53.793Z] iter=338 turn=15 INFO: Turn 15/25
+[2026-04-05T19:38:57.012Z] iter=338 turn=15 INFO: write_file: src/cli.ts (patch)
+[2026-04-05T19:38:57.013Z] iter=338 turn=15 INFO:   -> ok: Patched src/cli.ts: -7 +8 lines
+
+Context after patch:
+10 |  *   abort, session stats, auto-commit, diagnostics, sub-agent delegation.
+11 |  */
+12 | 
+13 | import { createInterface } from "readline";
+14 | import fs from "fs";
+15 | import path from "path";
+16 | import { fileURLToPath } from "url";
+17 | import { execSync } from "child_process";
+18 | import "dotenv/config";
+19 | import { Orchestrator } from "./orchestrator.js";
+20 | import { runInit } from "./init-command.js";
+21 | 
+22 | // ─── Parse args ─────────────────────────────────────────────
+23 | 
+[2026-04-05T19:38:57.014Z] iter=338 turn=16 INFO: Turn 16/25
+[2026-04-05T19:39:09.792Z] iter=338 turn=16 INFO: Agent: Now adding the CLI slash commands, then TSC check and wrap up:
+[2026-04-05T19:39:09.793Z] iter=338 turn=16 INFO: write_file: src/cli.ts (patch)
+[2026-04-05T19:39:09.794Z] iter=338 turn=16 INFO:   -> ok: Patched src/cli.ts: -14 +81 lines
+
+Context after patch:
+1 | /**
+2 |  * Interactive CLI — talk to the autoagent's tool system directly.
+3 |  *
+4 |  * Usage:
+5 |  *   npx tsx src/cli.ts                    # work in current directory
+6 |  *   npx tsx src/cli.ts --dir /path/to/repo  # work in a specific repo
+7 |  *
+8 |  * Powered by the Orchestrator — same pipeline as the TUI:
+9 |  *   streaming, compaction, repo map, context loading, model routing,
+10 |  *   abort, session stats, auto-commit, diagnostics, sub-agent delegation.
+11 |  */
+12 | 
+13 | import { createInterface } from "readline";
+14 | import fs from "fs";
+15 | import path from "path";
+16 | import { fileURLToPath } from "url";
+17 | import { execSync } from "child_process";
+18 | import "dotenv/config";
+19 | import { Orchestrator } from "./orchestrator.js";
+20 | import { runInit } from "./init-command.js";
+21 | 
+22 | // ─── Parse args ─────────────────────────────────────────────
+23 | 
+24 | let workDir = process.cwd();
+25 | const dirIdx = process.argv.indexOf("--dir");
+26 | if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
+27 |   workDir = path.resolve(process.argv[dirIdx + 1]);
+28 | }
+29 | 
+30 | // ─── /help subcommand ────────────────────────────────────────
+31 | export function printHelp(): void {
+32 |   let version = "unknown";
+33 |   try {
+34 |     const pkgPath = fileURLToPath(new URL("../package.json", import.meta.url));
+35 |     const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8")) as { version?: string };
+36 |     if (pkg.version) version = pkg.version;
+37 |   } catch { /* ignore */ }
+38 | 
+39 |   console.log(`
+40 | \x1b[1mAutoAgent\x1b[0m v${version}
+41 | An AI coding agent that's better than talking to Claude directly.
+42 | 
+43 | \x1b[1mUSAGE\x1b[0m
+44 |   autoagent              Start the interactive TUI
+45 |   autoagent init         Scaffold .autoagent.md project config
+46 |   autoagent help         Show this help message
+47 | 
+48 | \x1b[1mCLI SUBCOMMANDS\x1b[0m
+49 |   init                   Analyze repo and generate/update .autoagent.md
+50 |   help                   Print this help and exit
+51 | 
+52 | \x1b[1mTUI SLASH COMMANDS\x1b[0m
+53 |   /help                  Show available commands
+54 |   /clear                 Clear conversation history
+55 |   /init                  Scaffold .autoagent.md for current project
+56 |   /diff                  Show git diff of recent changes
+57 |   /undo                  Undo the last auto-commit
+58 |   /find <query>          Search the codebase for files/symbols
+59 |   /model [name]          Show or switch the active model
+60 |   /status                Show project status (git, diagnostics)
+61 |   /rewind [n]            Rewind conversation to a previous checkpoint
+62 |   /exit                  Exit and auto-export session log
+63 |   /export [file]         Export session to a markdown file
+64 |   /resume                Resume a previous session
+65 |   /reindex               Rebuild the repo symbol index
+66 |   /compact               Compact conversation history to save tokens
+67 | 
+68 | \x1b[1mEXAMPLES\x1b[0m
+69 |   autoagent              # Start chatting with the agent
+70 |   autoagent init         # Set up .autoagent.md for your project
+71 |   autoagent --dir ./app  # Work in a specific directory
+72 | `.trim());
+73 | }
+74 | 
+75 | if (process.argv[2] === "help") {
+76 |   printHelp();
+77 |   process.exit(0);
+78 | }
+79 | 
+80 | // ─── /init subcommand ────────────────────────────────────────
+81 | if (process.argv[2] === "init") {
+82 |   try {
+83 |     const result = await runInit(workDir, (msg) => console.log(`  ${msg}`));
+84 |     if (result.updated) {
+[2026-04-05T19:39:09.794Z] iter=338 turn=17 INFO: Turn 17/25
+[2026-04-05T19:39:11.789Z] iter=338 turn=17 INFO: Agent: Running TSC, writing memory, updating goals now.
+[2026-04-05T19:39:11.790Z] iter=338 turn=17 INFO: $ npx tsc --noEmit 2>&1 | head -40
+[2026-04-05T19:39:12.852Z] iter=338 turn=17 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:39:12.852Z] iter=338 turn=18 INFO: Turn 18/25
+[2026-04-05T19:39:20.545Z] iter=338 turn=18 INFO: Agent: TSC clean.
+[2026-04-05T19:39:20.546Z] iter=338 turn=18 INFO: save_memory: "[Engineer] Iteration 338"
+[2026-04-05T19:39:20.546Z] iter=338 turn=18 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T19:39:20.546Z] iter=338 turn=19 INFO: Turn 19/25
+[2026-04-05T19:39:27.046Z] iter=338 turn=19 INFO: write_file: goals.md (write)
+[2026-04-05T19:39:27.047Z] iter=338 turn=19 INFO:   -> ok: Updated goals.md (792 chars, -53 lines delta)
+[2026-04-05T19:39:27.047Z] iter=338 turn=20 INFO: Turn 20/25
+[2026-04-05T19:39:28.285Z] iter=338 turn=20 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T19:39:28.286Z] iter=338 turn=20 INFO: RESTART signal
+[2026-04-05T19:39:28.286Z] iter=338 turn=20 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T19:39:29.273Z] iter=338 turn=20 INFO: Compilation OK
+[2026-04-05T19:39:36.411Z] iter=338 turn=20 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T19:39:36.412Z] iter=338 turn=20 INFO: Cache stats: 0 hits, 1 misses, 53 entries, 5 invalidations (6 entries removed)
+[2026-04-05T19:39:36.412Z] iter=338 turn=20 INFO: Tool cache stats
+[2026-04-05T19:39:36.412Z] iter=338 turn=20 INFO: Tool timing: bash: 14x, avg=85ms, total=1191ms; write_file: 5x, avg=2ms, total=10ms; think: 2x, avg=2ms, total=3ms; read_scratchpad: 1x, avg=2ms, total=2ms; read_file: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=0ms, total=0ms
+[2026-04-05T19:39:36.412Z] iter=338 turn=20 INFO: Tool timing stats
+[2026-04-05T19:39:43.317Z] iter=338 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 338: predicted 20 turns, actual 20 turns, ratio 1.00**
+[2026-04-05T19:39:53.467Z] iter=338 turn=20 INFO: Pre-commit review (1933in/396out): **Issues found:**
+
+- **Stale model shorthand names**: `"claude-sonnet-4-6"` and `"claude-haiku-4-5"` look like incorrect/fabricated model identifiers. Anthropic's actual model names follow patterns li

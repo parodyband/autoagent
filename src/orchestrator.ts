@@ -489,14 +489,24 @@ async function runAgentLoop(
     const cachedMessages = injectMessageCacheBreakpoints(apiMessages);
 
     // Use streaming API with prompt-cache breakpoints (system as content blocks)
+    // Extended thinking enabled: lets Claude reason before responding (better tool decisions, code, debugging)
     const streamParams = {
       model,
       max_tokens: MAX_TOKENS,
       system: cachedSystem as unknown as string,
       tools,
       messages: cachedMessages,
+      thinking: {
+        type: "enabled" as const,
+        budget_tokens: 10_000,
+      },
     };
-    const stream = client.messages.stream(streamParams);
+    // Interleaved thinking beta: enables thinking between tool calls for Claude 4 models
+    const stream = (client.messages as unknown as {
+      stream(params: unknown, opts?: unknown): ReturnType<typeof client.messages.stream>
+    }).stream(streamParams, {
+      headers: { "anthropic-beta": "interleaved-thinking-2025-05-14" },
+    }) as ReturnType<typeof client.messages.stream>;
 
     // Accumulate tool_use inputs (arrive as JSON deltas)
     const toolInputBuffers: Record<string, string> = {};
@@ -505,6 +515,9 @@ async function runAgentLoop(
       if (event.type === "content_block_start") {
         if (event.content_block.type === "tool_use") {
           toolInputBuffers[event.index] = "";
+        } else if ((event.content_block as { type: string }).type === "thinking") {
+          // Thinking block started — notify UI but don't stream thinking text to user
+          onStatus?.("Thinking...");
         }
       } else if (event.type === "content_block_delta") {
         if (event.delta.type === "text_delta") {
@@ -513,6 +526,7 @@ async function runAgentLoop(
         } else if (event.delta.type === "input_json_delta") {
           toolInputBuffers[event.index] = (toolInputBuffers[event.index] ?? "") + event.delta.partial_json;
         }
+        // thinking_delta: intentionally ignored — internal reasoning, not shown to users
       }
     }
 

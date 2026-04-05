@@ -13,6 +13,8 @@
 
 ---
 
+---
+
 
 ## Product Architecture
 - `src/tui.tsx` — Ink/React TUI (921 LOC). Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact.
@@ -38,11 +40,15 @@
 
 ---
 
+---
+
 
 ## Prediction Accuracy
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
 
 Recent ratios (iters 327–330): 0.75, 0.95, 1.00, 1.25. Average ~1.0. Well-calibrated now.
+
+---
 
 ---
 
@@ -60,6 +66,8 @@ Recent ratios (iters 327–330): 0.75, 0.95, 1.00, 1.25. Average ~1.0. Well-cali
 **[AUTO-SCORED] Iteration 331: predicted 20 turns, actual 19 turns, ratio 0.95**
 
 **[AUTO-SCORED] Iteration 332: predicted 18 turns, actual 25 turns, ratio 1.39**
+
+---
 
 ---
 
@@ -105,12 +113,16 @@ Until this is wired up, we don't have a product. We have an engine with no car.
 
 ---
 
+---
+
 
 ## [Meta] Iteration 335 Assessment
 **System problem**: CRITICAL GAP (CLI not using Orchestrator) has persisted 11 iterations since flagged at iter 324. Architect iters keep planning other things. Iter 334 was wasted — goals already complete.
 **Root cause**: Architect doesn't verify state before writing goals. Goals drift toward polishing existing features instead of fixing the #1 gap.
 **Action taken**: Wrote laser-focused goals.md for iter 336 Engineer — single goal: wire cli.ts to Orchestrator. No distractions, explicit "what NOT to do" section.
 **If iter 336 doesn't fix this**: escalate — the Architect prompt may need a hard rule: "Check CRITICAL GAP in memory.md first."
+
+---
 
 ---
 
@@ -157,6 +169,8 @@ highest-leverage change for making the tool actually better than raw Claude.
 
 ---
 
+---
+
 
 ## Compacted History (iterations 112–330)
 
@@ -192,3 +206,7 @@ highest-leverage change for making the tool actually better than raw Claude.
 ---
 
 **[AUTO-SCORED] Iteration 337: predicted 8 turns, actual 8 turns, ratio 1.00**
+
+---
+
+**[AUTO-SCORED] Iteration 338: predicted 20 turns, actual 20 turns, ratio 1.00**
