@@ -12,7 +12,7 @@
 import { readFileSync } from "fs";
 import { executeBash } from "./tools/bash.js";
 import { parallelResearch } from "./tools/subagent.js";
-import { readPredictionCalibration, computeCalibration } from "./turn-budget.js";
+import { computeTurnBudget, calibrationSuggestion } from "./turn-budget.js";
 import { rankFiles } from "./file-ranker.js";
 
 export interface OrientationReport {
@@ -232,16 +232,15 @@ function computeMetricsSummary(rootDir: string = "."): string | null {
     const iterRange = `${recent[0].iteration}–${recent[recent.length - 1].iteration}`;
     const baseSummary = `Last 5 iterations (${iterRange}): avg ${avgTurns.toFixed(0)} turns | LOC stalls: ${stalledCount} | ${insights[0]}`;
 
-    // Append calibration hint when predictions are significantly off
+    // Append calibration advisory using the proper feedback mechanism
     try {
-      const ratios = readPredictionCalibration(rootDir);
-      const calibration = computeCalibration(ratios);
-      if (calibration > 1.1) {
-        const pct = Math.round((calibration - 1) * 100);
-        return `${baseSummary}\nTurn prediction calibration: ${calibration.toFixed(2)}x (your estimates tend to be ${pct}% low — predict higher)`;
-      } else if (calibration < 0.9) {
-        const pct = Math.round((1 - calibration) * 100);
-        return `${baseSummary}\nTurn prediction calibration: ${calibration.toFixed(2)}x (your estimates tend to be ${pct}% high — predict lower)`;
+      const metricsFile = `${rootDir}/.autoagent-metrics.json`;
+      const budget = computeTurnBudget(metricsFile, null);
+      const advisory = calibrationSuggestion(budget);
+      if (advisory) {
+        // Extract just the body (strip the ## header for inline use)
+        const body = advisory.replace(/^## Calibration Advisory\n\n/, "");
+        return `${baseSummary}\n${body}`;
       }
     } catch {
       // Calibration is optional — don't fail the whole summary

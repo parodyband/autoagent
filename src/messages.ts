@@ -69,7 +69,7 @@ ${state.lastFailureReason ? `- Last failure: ${state.lastFailureReason}` : ""}`;
 /**
  * Build the initial user message for the Builder from the plan.
  */
-export function buildBuilderMessage(plan: string, memorySummary: string): string {
+function buildBuilderMessage(plan: string, memorySummary: string): string {
   return `## Your Plan\n\n${plan}\n\n---\n\n## Brief Context\n\n${memorySummary.slice(0, 2000)}\n\n---\n\nExecute the plan. Run \`npx tsc --noEmit\` before restart. Final action: \`echo "AUTOAGENT_RESTART"\`.`;
 }
 
@@ -165,7 +165,7 @@ export interface CognitiveMetrics {
 /**
  * Compute derived ratios from raw cognitive metrics.
  */
-export function formatCognitiveMetrics(m: CognitiveMetrics): string {
+function formatCognitiveMetrics(m: CognitiveMetrics): string {
   const outInRatio = m.inputTokens > 0 ? (m.outputTokens / m.inputTokens).toFixed(1) : "∞";
   const tokensPerTurn = m.turns > 0 ? Math.round((m.inputTokens + m.outputTokens) / m.turns) : 0;
   const readPct = m.totalCalls > 0 ? Math.round((m.readCalls / m.totalCalls) * 100) : 0;

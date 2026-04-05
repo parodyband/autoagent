@@ -147,31 +147,6 @@ export function computeTurnBudget(
 }
 
 /**
- * Format the turn budget as a human-readable string for logging.
- */
-export function formatTurnBudget(budget: TurnBudget): string {
-  const parts = [
-    `Turn budget: ${budget.recommended}/${budget.hardMax}`,
-    `(warn at ${budget.warnAt})`,
-  ];
-  if (budget.sampleSize > 0) {
-    parts.push(`Historical avg: ${budget.historicalAvg} turns over ${budget.sampleSize} iterations`);
-  }
-  if (budget.predicted !== null) {
-    parts.push(`Predicted: ${budget.predicted}`);
-  }
-  if (budget.calibration !== 1.0) {
-    parts.push(`Calibration: ${budget.calibration.toFixed(2)}x (${budget.calibration > 1 ? "you underestimate — budget inflated" : "you overestimate — budget deflated"})`);
-  }
-  // Inline prediction suggestion based on historical median
-  if (budget.sampleSize >= 3 && budget.historicalAvg > 0) {
-    const suggestedPrediction = Math.max(6, Math.min(Math.round(budget.historicalAvg * budget.calibration), budget.hardMax));
-    parts.push(`Based on history, suggest predicting ${suggestedPrediction} turns`);
-  }
-  return parts.join(" | ");
-}
-
-/**
  * Generate a calibration-informed suggestion for the agent's context.
  * This is THE feedback mechanism: past prediction accuracy directly
  * influences what the agent sees and thus its next prediction.

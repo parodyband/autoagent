@@ -1,102 +1,3 @@
-- `tools-bash.test.ts` (9 tests): DONE ✓
-- `tools-write-file.test.ts` (11 tests): DONE ✓  
-- `tools-grep.test.ts`: IN PROGRESS — 1 test failing (the "no matches" test matches the test file itself)
-
-Fixing the failing test now:
-[2026-04-05T13:11:36.561Z] iter=160 turn=9 INFO: write_file: src/__tests__/tools-grep.test.ts (patch)
-[2026-04-05T13:11:36.562Z] iter=160 turn=9 INFO:   -> ok: Patched src/__tests__/tools-grep.test.ts: -6 +7 lines
-
-Context after patch:
-12 |     expect(result.matchCount).toBeGreaterThan(0);
-13 |   });
-14 | 
-15 |   it("returns no matches for a pattern that does not exist", () => {
-16 |     // Search only in bash.ts to avoid matching this test file's string
-17 |     const result = executeGrep("XYZZY_DOES_NOT_EXIST_12345", "src/tools/bash.ts", undefined, undefined, "content", 0, false, 100, false, ROOT);
-18 |     expect(result.success).toBe(true);
-19 |     expect(result.content).toContain("No matches found");
-20 |     expect(result.matchCount).toBe(0);
-21 |   });
-22 | 
-23 |   it("files output mode returns file paths only", () => {
-24 |     const result = executeGrep("executeGrep", "src/tools/grep.ts", undefined, undefined, "files", 0, false, 100, false, ROOT);
-[2026-04-05T13:11:36.563Z] iter=160 turn=10 INFO: Turn 10/25
-[2026-04-05T13:11:37.940Z] iter=160 turn=10 INFO: $ npx vitest run 2>&1 | tail -15
-[2026-04-05T13:11:40.059Z] iter=160 turn=10 INFO:   -> exit=0 (693 chars)
-[2026-04-05T13:11:40.060Z] iter=160 turn=11 INFO: Turn 11/25
-[2026-04-05T13:11:42.000Z] iter=160 turn=11 INFO: Agent: 273 tests, all passing (was 245). Now running tsc:
-[2026-04-05T13:11:42.001Z] iter=160 turn=11 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T13:11:42.685Z] iter=160 turn=11 INFO:   -> exit=0 (11 chars)
-[2026-04-05T13:11:42.685Z] iter=160 turn=12 INFO: Turn 12/25
-[2026-04-05T13:11:51.967Z] iter=160 turn=12 INFO: Agent: Clean. All goals done. Writing memory and goals now.
-[2026-04-05T13:11:51.968Z] iter=160 turn=12 INFO: write_file: goals.md (write)
-[2026-04-05T13:11:51.970Z] iter=160 turn=12 INFO:   -> ok: Updated goals.md (988 chars, -11 lines delta)
-[2026-04-05T13:11:51.970Z] iter=160 turn=13 INFO: Turn 13/25
-[2026-04-05T13:11:55.142Z] iter=160 turn=13 INFO: write_file: memory.md (patch)
-[2026-04-05T13:11:55.143Z] iter=160 turn=13 INFO:   -> ok: Patched memory.md: -1 +5 lines
-
-Context after patch:
-45 | 
-46 | ---
-47 | 
-48 | ## [Engineer] Iteration 160
-49 | 
-50 | Added 28 tests for tool implementations: tools-bash.test.ts (9), tools-grep.test.ts (8), tools-write-file.test.ts (11). Test count: 245→273. tsc clean. Untested files down from 15 to 12.
-51 | 
-52 | ## [Meta] Iteration 159
-53 | 
-54 | **System diagnosis**: Iterations 156-158 were a waste cycle — Engineer built context-window.ts, Architect said delete it, Engineer deleted it. 3 iterations for net-zero. Root cause: Engineer didn't check for existing similar functionality before building.
-55 | 
-[2026-04-05T13:11:55.144Z] iter=160 turn=14 INFO: Turn 14/25
-[2026-04-05T13:11:56.883Z] iter=160 turn=14 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T13:11:56.885Z] iter=160 turn=14 INFO: RESTART signal
-[2026-04-05T13:11:56.886Z] iter=160 turn=14 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T13:11:57.592Z] iter=160 turn=14 INFO: Compilation OK
-[2026-04-05T13:12:02.507Z] iter=160 turn=14 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-05T13:12:02.507Z] iter=160 turn=14 INFO: Tool timing: bash: 10x, avg=610ms, total=6101ms; write_file: 6x, avg=2ms, total=13ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T13:12:02.507Z] iter=160 turn=14 INFO: Tool timing stats
-[2026-04-05T13:12:07.676Z] iter=160 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 160: predicted 12 turns, actual 14 turns, ratio 1.17**
-[2026-04-05T13:12:17.363Z] iter=160 turn=14 INFO: Pre-commit review (2870in/334out): **tools-bash.test.ts**
-
-- The `skipGuards=true` test doesn't actually verify the bypass works — it uses a non-blocked command (`echo`), so the test passes even if `skipGuards` is completely ignored/br
-[2026-04-05T13:12:17.423Z] iter=160 turn=14 INFO: Committed: 87fbb0e5 (22 in / 4913 out, cache: 21927 created, 147186 read)
-[2026-04-05T13:12:17.423Z] iter=160 turn=14 INFO: Restarting as iteration 161...
-[2026-04-05T13:12:17.629Z] iter=161 INFO: Cache restored: 55/55 entries (0 stale)
-[2026-04-05T13:12:17.631Z] iter=161 INFO: Turn budget: 15/25 (calibration=1.17x, predicted=10)
-[2026-04-05T13:12:17.631Z] iter=161 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T13:12:17.681Z] iter=161 INFO: Hard turn cap: 15 (1.5x prediction of 10)
-[2026-04-05T13:12:17.682Z] iter=161 turn=1 INFO: Turn 1/25
-[2026-04-05T13:12:21.612Z] iter=161 turn=1 INFO: Agent: 
-
-I'll start by assessing the current state of the system, then determine the highest-leverage next step.
-[2026-04-05T13:12:21.613Z] iter=161 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -30
-[2026-04-05T13:12:21.615Z] iter=161 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -10
-[2026-04-05T13:12:21.618Z] iter=161 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json
-[2026-04-05T13:12:21.629Z] iter=161 turn=1 INFO:   -> exit=0 (100036 chars)
-[2026-04-05T13:12:22.356Z] iter=161 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-05T13:12:23.795Z] iter=161 turn=1 INFO:   -> exit=0 (2882 chars)
-[2026-04-05T13:12:23.795Z] iter=161 turn=2 INFO: Turn 2/25
-[2026-04-05T13:12:28.936Z] iter=161 turn=2 INFO: Agent: Good, 273 tests all passing, tsc clean. Now let me look at the current state more carefully — what files are untested and what's the highest-leverage next step.
-[2026-04-05T13:12:28.937Z] iter=161 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && ls src/*.ts src/**/*.ts 2>/dev/null | sort
-[2026-04-05T13:12:28.940Z] iter=161 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && ls src/__tests__/*.test.ts tests/*.test.ts 2>/dev/null | sort
-[2026-04-05T13:12:28.959Z] iter=161 turn=2 INFO:   -> exit=0 (1302 chars)
-[2026-04-05T13:12:28.960Z] iter=161 turn=2 INFO:   -> exit=0 (714 chars)
-[2026-04-05T13:12:28.961Z] iter=161 turn=3 INFO: Turn 3/25
-[2026-04-05T13:13:00.864Z] iter=161 turn=3 INFO: think: Let me figure out which source files have no tests:
-
-Source files (31):
-- agent.ts
-- api-retry.ts ✅ (api-retry.test.ts)
-...
-[2026-04-05T13:13:00.865Z] iter=161 turn=4 INFO: Turn 4/25
-[2026-04-05T13:13:05.323Z] iter=161 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/conversation.ts src/iteration.ts src/agent.ts src/memory.ts src/messages.ts src/tool-registry.ts src/tool-timing.ts src/logging.ts src/iteration-diff....
-[2026-04-05T13:13:05.326Z] iter=161 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && head -60 src/conversation.ts
-[2026-04-05T13:13:05.327Z] iter=161 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && head -60 src/messages.ts
-[2026-04-05T13:13:05.334Z] iter=161 turn=4 INFO:   -> exit=0 (438 chars)
-[2026-04-05T13:13:05.334Z] iter=161 turn=4 INFO:   -> exit=0 (2306 chars)
-[2026-04-05T13:13:05.336Z] iter=161 turn=4 INFO:   -> exit=0 (2576 chars)
-[2026-04-05T13:13:05.336Z] iter=161 turn=5 INFO: Turn 5/25
-[2026-04-05T13:13:28.115Z] iter=161 turn=5 INFO: Agent: 
 
 You're right. My deliverable is: **update goals.md with the next Engineer task**. Let me make my decision and write it now.
 [2026-04-05T13:13:28.116Z] iter=161 turn=5 INFO: think: Key decision: What's the highest-leverage next task?
@@ -1095,3 +996,182 @@ All done. tsc clean, goals written, memory updated. Let me restart.
 [2026-04-05T13:31:57.574Z] iter=169 turn=14 INFO: Tool timing stats
 [2026-04-05T13:32:01.921Z] iter=169 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 169: predicted 12 turns, actual 14 turns, ratio 1.17**
 [2026-04-05T13:32:01.942Z] iter=169 turn=14 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T13:32:01.973Z] iter=169 turn=14 INFO: Committed: f11136ff (22 in / 5738 out, cache: 18560 created, 164028 read)
+[2026-04-05T13:32:01.974Z] iter=169 turn=14 INFO: Restarting as iteration 170...
+[2026-04-05T13:32:02.167Z] iter=170 INFO: Cache restored: 51/51 entries (0 stale)
+[2026-04-05T13:32:02.168Z] iter=170 INFO: Turn budget: 19/25 (calibration=1.44x, predicted=16)
+[2026-04-05T13:32:02.169Z] iter=170 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T13:32:02.220Z] iter=170 INFO: Hard turn cap: 24 (1.5x prediction of 16)
+[2026-04-05T13:32:02.220Z] iter=170 turn=1 INFO: Turn 1/25
+[2026-04-05T13:32:04.564Z] iter=170 turn=1 INFO: think: Let me start by reading the relevant files to understand what needs to be done:
+1. Wire `calibrationSuggestion()` into o...
+[2026-04-05T13:32:04.565Z] iter=170 turn=2 INFO: Turn 2/25
+[2026-04-05T13:32:08.182Z] iter=170 turn=2 INFO: $ cat src/turn-budget.ts | grep -n "calibrationSuggestion\|formatTurnBudget" | head -30
+[2026-04-05T13:32:08.188Z] iter=170 turn=2 INFO: $ cat src/orientation.ts
+[2026-04-05T13:32:08.207Z] iter=170 turn=2 INFO:   -> exit=0 (146 chars)
+[2026-04-05T13:32:08.208Z] iter=170 turn=2 INFO:   -> exit=0 (9681 chars)
+[2026-04-05T13:32:08.208Z] iter=170 turn=3 INFO: Turn 3/25
+[2026-04-05T13:32:12.095Z] iter=170 turn=3 INFO: $ sed -n '150,220p' src/turn-budget.ts
+[2026-04-05T13:32:12.098Z] iter=170 turn=3 INFO: $ grep -n "buildBuilderMessage\|formatCognitiveMetrics\|parseBacklog\|parseSchemas\|serializeSchema\|setSection\|formatTurnBudget" src/messages.ts src/memory.ts src/turn-budget.ts | head -50
+[2026-04-05T13:32:12.106Z] iter=170 turn=3 INFO:   -> exit=0 (3443 chars)
+[2026-04-05T13:32:12.111Z] iter=170 turn=3 INFO:   -> exit=0 (778 chars)
+[2026-04-05T13:32:12.111Z] iter=170 turn=4 INFO: Turn 4/25
+[2026-04-05T13:32:14.863Z] iter=170 turn=4 INFO: $ grep -rn "calibrationSuggestion\|formatTurnBudget\|buildBuilderMessage\|formatCognitiveMetrics\|parseBacklog\|parseSchemas\|serializeSchema\|setSection" src/ scripts/ __tests__/ --include="*.ts" | gre...
+[2026-04-05T13:32:14.912Z] iter=170 turn=4 INFO:   -> exit=0 (11 chars)
+[2026-04-05T13:32:14.912Z] iter=170 turn=5 INFO: Turn 5/25
+[2026-04-05T13:32:41.200Z] iter=170 turn=5 INFO: Agent: My deliverables:
+1. Wire `calibrationSuggestion()` into `orientation.ts` 
+2. Unexport dead symbols in turn-budget.ts, messages.ts, memory.ts
+
+I have all the info I need. Writing now.
+[2026-04-05T13:32:41.201Z] iter=170 turn=5 INFO: think: From my research:
+
+1. `calibrationSuggestion()` needs to be called in orientation.ts. I need to:
+   - Import it from tur...
+[2026-04-05T13:32:41.202Z] iter=170 turn=6 INFO: Turn 6/25
+[2026-04-05T13:32:43.430Z] iter=170 turn=6 INFO: $ grep -n "parseBacklog\|parseSchemas\|serializeSchema\|setSection\|formatTurnBudget\|buildBuilderMessage" src/memory.ts src/turn-budget.ts src/messages.ts
+[2026-04-05T13:32:43.435Z] iter=170 turn=6 INFO: $ grep -n "computeTurnBudget" src/turn-budget.ts | head -10
+[2026-04-05T13:32:43.447Z] iter=170 turn=6 INFO:   -> exit=0 (38 chars)
+[2026-04-05T13:32:43.447Z] iter=170 turn=6 INFO:   -> exit=0 (553 chars)
+[2026-04-05T13:32:43.448Z] iter=170 turn=7 INFO: Turn 7/25
+[2026-04-05T13:32:45.616Z] iter=170 turn=7 INFO: $ sed -n '78,100p' src/turn-budget.ts
+[2026-04-05T13:32:45.627Z] iter=170 turn=7 INFO:   -> exit=0 (639 chars)
+[2026-04-05T13:32:45.628Z] iter=170 turn=8 INFO: Turn 8/25
+[2026-04-05T13:32:48.755Z] iter=170 turn=8 INFO: Agent: Now I have everything I need. Let me make all the changes:
+[2026-04-05T13:32:48.756Z] iter=170 turn=8 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T13:32:48.759Z] iter=170 turn=8 INFO:   -> ok: Patched src/orientation.ts: -1 +1 lines
+
+Context after patch:
+12 | import { readFileSync } from "fs";
+13 | import { executeBash } from "./tools/bash.js";
+14 | import { parallelResearch } from "./tools/subagent.js";
+15 | import { readPredictionCalibration, computeCalibration, computeTurnBudget, calibrationSuggestion } from "./turn-budget.js";
+16 | import { rankFiles } from "./file-ranker.js";
+17 | 
+18 | export interface OrientationReport {
+[2026-04-05T13:32:48.761Z] iter=170 turn=9 INFO: Turn 9/25
+[2026-04-05T13:32:59.764Z] iter=170 turn=9 INFO: Agent: **Goal status:**
+- Primary (wire calibrationSuggestion): IN PROGRESS — import added, still need to call it in the function
+- Secondary (unexport/delete dead symbols): NOT STARTED
+
+Continuing now:
+[2026-04-05T13:32:59.765Z] iter=170 turn=9 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T13:32:59.765Z] iter=170 turn=9 INFO:   -> ok: Patched src/orientation.ts: -16 +15 lines
+
+Context after patch:
+232 |     const iterRange = `${recent[0].iteration}–${recent[recent.length - 1].iteration}`;
+233 |     const baseSummary = `Last 5 iterations (${iterRange}): avg ${avgTurns.toFixed(0)} turns | LOC stalls: ${stalledCount} | ${insights[0]}`;
+234 | 
+235 |     // Append calibration advisory using the proper feedback mechanism
+236 |     try {
+237 |       const metricsFile = `${rootDir}/.autoagent-metrics.json`;
+238 |       const budget = computeTurnBudget(metricsFile, null);
+239 |       const advisory = calibrationSuggestion(budget);
+240 |       if (advisory) {
+241 |         // Extract just the body (strip the ## header for inline use)
+242 |         const body = advisory.replace(/^## Calibration Advisory\n\n/, "");
+243 |         return `${baseSummary}\n${body}`;
+244 |       }
+245 |     } catch {
+246 |       // Calibration is optional — don't fail the whole summary
+247 |     }
+248 | 
+249 |     return baseSummary;
+250 |   } catch {
+251 |     return null;
+252 |   }
+[2026-04-05T13:32:59.766Z] iter=170 turn=10 INFO: Turn 10/25
+[2026-04-05T13:33:03.224Z] iter=170 turn=10 INFO: Agent: Now the unused imports `readPredictionCalibration` and `computeCalibration` need to be removed since they're no longer used:
+[2026-04-05T13:33:03.225Z] iter=170 turn=10 INFO: $ grep -n "readPredictionCalibration\|computeCalibration" src/orientation.ts
+[2026-04-05T13:33:03.234Z] iter=170 turn=10 INFO:   -> exit=0 (127 chars)
+[2026-04-05T13:33:03.235Z] iter=170 turn=11 INFO: Turn 11/25
+[2026-04-05T13:33:06.296Z] iter=170 turn=11 INFO: Agent: They're only in the import now (no longer used in the body). Remove them:
+[2026-04-05T13:33:06.297Z] iter=170 turn=11 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T13:33:06.299Z] iter=170 turn=11 INFO:   -> ok: Patched src/orientation.ts: -1 +1 lines
+
+Context after patch:
+12 | import { readFileSync } from "fs";
+13 | import { executeBash } from "./tools/bash.js";
+14 | import { parallelResearch } from "./tools/subagent.js";
+15 | import { computeTurnBudget, calibrationSuggestion } from "./turn-budget.js";
+16 | import { rankFiles } from "./file-ranker.js";
+17 | 
+18 | export interface OrientationReport {
+[2026-04-05T13:33:06.300Z] iter=170 turn=12 INFO: Turn 12/25
+[2026-04-05T13:33:11.072Z] iter=170 turn=12 INFO: Agent: Now the secondary task — unexport/delete dead symbols. From the grep, none of `formatTurnBudget`, `buildBuilderMessage`, `parseBacklog`, `parseSchemas`, `serializeSchema`, `setSection` are called outside their own files. Let me check if they're called *inside* their own files before deleting:
+[2026-04-05T13:33:11.073Z] iter=170 turn=12 INFO: $ grep -n "formatTurnBudget\|buildBuilderMessage\|parseBacklog\|parseSchemas\|serializeSchema\|setSection" src/turn-budget.ts src/messages.ts src/memory.ts
+[2026-04-05T13:33:11.090Z] iter=170 turn=12 INFO:   -> exit=0 (553 chars)
+[2026-04-05T13:33:11.090Z] iter=170 turn=13 INFO: Turn 13/25
+[2026-04-05T13:33:13.890Z] iter=170 turn=13 INFO: Agent: None called internally (just defined). But must check `__tests__/` before deleting:
+[2026-04-05T13:33:13.891Z] iter=170 turn=13 INFO: $ grep -rn "formatTurnBudget\|buildBuilderMessage\|parseBacklog\|parseSchemas\|serializeSchema\|setSection\|formatCognitiveMetrics" __tests__/ 2>/dev/null | head -20
+[2026-04-05T13:33:13.911Z] iter=170 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-05T13:33:13.912Z] iter=170 turn=14 INFO: Turn 14/25
+[2026-04-05T13:33:17.428Z] iter=170 turn=14 INFO: Agent: Not used in tests either. Now make all the changes:
+
+**1. `formatTurnBudget` in turn-budget.ts — delete it:**
+[2026-04-05T13:33:17.428Z] iter=170 turn=14 INFO: $ sed -n '148,178p' src/turn-budget.ts
+[2026-04-05T13:33:17.437Z] iter=170 turn=14 INFO:   -> exit=0 (1273 chars)
+[2026-04-05T13:33:17.437Z] iter=170 turn=15 INFO: Turn 15/25
+[2026-04-05T13:33:22.514Z] iter=170 turn=15 INFO: write_file: src/turn-budget.ts (patch)
+[2026-04-05T13:33:22.515Z] iter=170 turn=15 INFO:   -> ok: Patched src/turn-budget.ts: -26 +1 lines
+
+Context after patch:
+1 | /**
+2 |  * Adaptive turn budgeting — the agent uses its own historical metrics
+3 |  * to set a dynamic turn budget for the current iteration.
+4 |  *
+[2026-04-05T13:33:22.516Z] iter=170 turn=16 INFO: Turn 16/25
+[2026-04-05T13:33:24.636Z] iter=170 turn=16 INFO: Agent: Good progress made. Let me finish the remaining secondary changes, then verify and commit.
+[2026-04-05T13:33:24.637Z] iter=170 turn=16 INFO: $ grep -n "buildBuilderMessage" src/messages.ts | head -5
+[2026-04-05T13:33:24.650Z] iter=170 turn=16 INFO:   -> exit=0 (86 chars)
+[2026-04-05T13:33:24.651Z] iter=170 turn=17 INFO: Turn 17/25
+[2026-04-05T13:33:29.305Z] iter=170 turn=17 INFO: Agent: Wrapping up now. Let me do all remaining changes + verify in parallel.
+[2026-04-05T13:33:29.306Z] iter=170 turn=17 INFO: $ sed -n '68,100p' src/messages.ts
+[2026-04-05T13:33:29.308Z] iter=170 turn=17 INFO: $ sed -n '165,210p' src/messages.ts
+[2026-04-05T13:33:29.310Z] iter=170 turn=17 INFO: $ sed -n '68,160p' src/memory.ts
+[2026-04-05T13:33:29.316Z] iter=170 turn=17 INFO:   -> exit=0 (1259 chars)
+[2026-04-05T13:33:29.318Z] iter=170 turn=17 INFO:   -> exit=0 (2127 chars)
+[2026-04-05T13:33:29.320Z] iter=170 turn=17 INFO:   -> exit=0 (2121 chars)
+[2026-04-05T13:33:29.321Z] iter=170 turn=18 INFO: Turn 18/25
+[2026-04-05T13:33:33.842Z] iter=170 turn=18 INFO: Agent: Now make all remaining changes at once:
+[2026-04-05T13:33:33.842Z] iter=170 turn=18 INFO: write_file: src/messages.ts (patch)
+[2026-04-05T13:33:33.843Z] iter=170 turn=18 INFO:   -> ok: Patched src/messages.ts: -6 +6 lines
+
+Context after patch:
+66 | ${state.lastFailureReason ? `- Last failure: ${state.lastFailureReason}` : ""}`;
+67 | }
+68 | 
+69 | /**
+70 |  * Build the initial user message for the Builder from the plan.
+71 |  */
+72 | function buildBuilderMessage(plan: string, memorySummary: string): string {
+73 |   return `## Your Plan\n\n${plan}\n\n---\n\n## Brief Context\n\n${memorySummary.slice(0, 2000)}\n\n---\n\nExecute the plan. Run \`npx tsc --noEmit\` before restart. Final action: \`echo "AUTOAGENT_RESTART"\`.`;
+74 | }
+75 | 
+76 | // ─── Initial user message ───────────────────────────────────
+77 | 
+[2026-04-05T13:33:33.843Z] iter=170 turn=19 INFO: Turn 19/25
+[2026-04-05T13:33:36.783Z] iter=170 turn=19 INFO: write_file: src/messages.ts (patch)
+[2026-04-05T13:33:36.785Z] iter=170 turn=19 INFO:   -> ok: Patched src/messages.ts: -1 +1 lines
+
+Context after patch:
+165 | /**
+166 |  * Compute derived ratios from raw cognitive metrics.
+167 |  */
+168 | function formatCognitiveMetrics(m: CognitiveMetrics): string {
+169 |   const outInRatio = m.inputTokens > 0 ? (m.outputTokens / m.inputTokens).toFixed(1) : "∞";
+170 |   const tokensPerTurn = m.turns > 0 ? Math.round((m.inputTokens + m.outputTokens) / m.turns) : 0;
+171 |   const readPct = m.totalCalls > 0 ? Math.round((m.readCalls / m.totalCalls) * 100) : 0;
+[2026-04-05T13:33:36.785Z] iter=170 turn=20 INFO: Turn 20/25
+[2026-04-05T13:33:39.647Z] iter=170 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && sed -i 's/^export function setSection/function setSection/' src/memory.ts && sed -i 's/^export function parseSchemas/function parseSchemas/' src/memory.ts && se...
+[2026-04-05T13:33:39.657Z] iter=170 turn=20 INFO:   -> exit=1 (71 chars)
+[2026-04-05T13:33:39.657Z] iter=170 turn=21 INFO: Turn 21/25
+[2026-04-05T13:33:41.592Z] iter=170 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && perl -i -pe 's/^export function (setSection|parseSchemas|serializeSchema|parseBacklog)\b/function $1/' src/memory.ts && npx tsc --noEmit 2>&1
+[2026-04-05T13:33:42.296Z] iter=170 turn=21 INFO:   -> exit=0 (11 chars)
+[2026-04-05T13:33:42.296Z] iter=170 turn=22 INFO: Turn 22/25
+[2026-04-05T13:33:43.951Z] iter=170 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -5
+[2026-04-05T13:33:49.994Z] iter=170 turn=22 INFO:   -> exit=0 (189 chars)
+[2026-04-05T13:33:49.994Z] iter=170 turn=23 INFO: Turn 23/25
+[2026-04-05T13:33:56.684Z] iter=170 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "Wire calibrationSuggestion into orientation; unexport/delete dead symbols
+
+- orientation.ts: call calibrationSuggestion(budget) via...

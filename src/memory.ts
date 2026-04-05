@@ -69,7 +69,7 @@ export function getSection(sections: MemorySection[], heading: string): string |
 /**
  * Set a section's content. If the section doesn't exist, append it.
  */
-export function setSection(sections: MemorySection[], heading: string, content: string): MemorySection[] {
+function setSection(sections: MemorySection[], heading: string, content: string): MemorySection[] {
   const lower = heading.toLowerCase();
   const idx = sections.findIndex(s => s.heading.toLowerCase().startsWith(lower));
   if (idx >= 0) {
@@ -96,7 +96,7 @@ export function serializeMemory(sections: MemorySection[]): string {
  * Parse Key Schemas section into typed entries.
  * Expects lines like: - **pattern**: insight (confidence: 0.9)
  */
-export function parseSchemas(content: string): SchemaEntry[] {
+function parseSchemas(content: string): SchemaEntry[] {
   const entries: SchemaEntry[] = [];
   const re = /^- \*\*(.+?)\*\*[.:]\s*(.+?)(?:\(confidence:\s*([\d.]+)\))?$/gm;
   let match;
@@ -113,14 +113,14 @@ export function parseSchemas(content: string): SchemaEntry[] {
 /**
  * Serialize a schema entry to markdown bullet format.
  */
-export function serializeSchema(entry: SchemaEntry): string {
+function serializeSchema(entry: SchemaEntry): string {
   return `- **${entry.pattern}**: ${entry.insight} (confidence: ${entry.confidence})`;
 }
 
 /**
  * Parse Backlog table into typed items.
  */
-export function parseBacklog(content: string): BacklogItem[] {
+function parseBacklog(content: string): BacklogItem[] {
   const items: BacklogItem[] = [];
   const lines = content.split("\n");
   for (const line of lines) {
