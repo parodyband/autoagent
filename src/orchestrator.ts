@@ -777,36 +777,23 @@ export class Orchestrator {
   /**
    * Micro-compaction: replace tool_result contents older than 5 turns with a
    * short placeholder. Cheaper than Tier 1 — runs at 80K tokens.
+   * @deprecated — scoredPrune() is preferred. Kept for backward compatibility.
    */
   microCompact(currentTurn: number = 0): void {
     this.opts.onStatus?.("Micro-compacting context...");
 
-    // Find assistant turn indices (most recent first)
     const assistantIndices: number[] = [];
     for (let i = this.apiMessages.length - 1; i >= 0; i--) {
-      if (this.apiMessages[i].role === "assistant") {
-        assistantIndices.push(i);
-      }
+      if (this.apiMessages[i].role === "assistant") assistantIndices.push(i);
     }
-
-    // Clear tool_result contents older than the 5th most-recent assistant turn
     const cutoffIdx = assistantIndices[4] ?? 0;
 
     for (let i = 0; i < cutoffIdx; i++) {
       const msg = this.apiMessages[i];
       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
-
       for (const block of msg.content) {
-        if (
-          typeof block === "object" &&
-          "type" in block &&
-          block.type === "tool_result"
-        ) {
-          const toolBlock = block as {
-            type: string;
-            tool_use_id: string;
-            content: Array<{ type: string; text?: string }> | string;
-          };
+        if (typeof block === "object" && "type" in block && block.type === "tool_result") {
+          const toolBlock = block as { type: string; tool_use_id: string; content: Array<{ type: string; text?: string }> | string };
           const turn = currentTurn > 0 ? currentTurn : i;
           if (Array.isArray(toolBlock.content)) {
             toolBlock.content = [{ type: "text", text: `[Tool output cleared — turn ${turn}]` }];
@@ -816,7 +803,6 @@ export class Orchestrator {
         }
       }
     }
-
     this.opts.onStatus?.("");
   }
 
