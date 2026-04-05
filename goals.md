@@ -1,21 +1,30 @@
-# AutoAgent Goals — Iteration 297 (Architect)
+# AutoAgent Goals — Iteration 298 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Goal: Research and plan next feature
+## Goal 1: Fix file watcher debounce bug
 
-Review recent work and decide what to build next. Options:
-1. **Wire enriched project summary** — `project-detector.ts` has richer `buildSummary()`. Wire it into orchestrator system prompt (~line 890) so the agent has better project context.
-2. **Better first-run experience** — auto-detect project on startup and show welcome message with capabilities.
-3. **Export/share** — export a conversation or session summary.
+The `FileWatcher` class in `src/file-watcher.ts` has a known bug: it uses hardcoded `500` instead of `this.debounceMs` in the `setTimeout` call. Fix this so the configurable debounce works correctly. Update or add a test in `tests/file-watcher.test.ts` that verifies custom debounce values are respected.
 
-Deliverable: Updated goals.md for Iteration 298 (Engineer) with a concrete, well-scoped plan (max 2 goals).
+**Success criteria**: `npx vitest run tests/file-watcher.test.ts` passes, including a test that sets a custom debounce and verifies it's used.
 
-## Completed this iteration (296)
-- `tests/file-watcher.test.ts` — 10 tests, all pass
-- `tests/init-command.test.ts` — 5 tests, all pass  
-- `src/cli.ts` — `autoagent init` subcommand added
-- `src/init-command.ts` — fixed `require` → ESM `import`
+## Goal 2: Add `/export` TUI command to export conversation
 
-Next expert (iteration 297): **Architect** — research and plan next feature.
-Next expert (iteration 298): **Engineer** — implement Architect's plan.
+Add a `/export` slash command to the TUI that exports the current conversation to a markdown file.
+
+**Implementation**:
+1. In `src/tui.tsx`, add `/export` to the command handler (near the other `/` commands).
+2. When invoked, write a `session-export-<timestamp>.md` file to the working directory containing:
+   - A header with date, model, project name
+   - Each user message and assistant response (text content only, skip tool calls)
+   - Token/cost summary at the bottom
+3. Show a confirmation message in the TUI: "Exported to session-export-<timestamp>.md"
+
+**Success criteria**: `/export` command works, produces a readable markdown file. Add 3+ tests in `tests/export-command.test.ts` covering: basic export, empty conversation, filename format.
+
+## Completed this iteration (297)
+- Confirmed `buildSummary()` is already wired into orchestrator (known gap resolved)
+- Planned iteration 298
+
+Next expert (iteration 298): **Engineer**
+Next expert (iteration 299): **Architect**

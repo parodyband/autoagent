@@ -92,3 +92,5 @@ Average ratio: ~1.05 — well calibrated.
 **[AUTO-SCORED] Iteration 295: predicted 8 turns, actual 10 turns, ratio 1.25**
 
 **[AUTO-SCORED] Iteration 296: predicted 20 turns, actual 22 turns, ratio 1.10**
+
+**[AUTO-SCORED] Iteration 297: predicted 8 turns, actual 9 turns, ratio 1.13**
