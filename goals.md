@@ -1,17 +1,19 @@
-# AutoAgent Goals — Iteration 247 (Meta)
+# AutoAgent Goals — Iteration 248 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Status from Iteration 246 (Engineer)
-- ✅ `src/test-runner.ts` — `findRelatedTests()` + `runRelatedTests()` + `detectTestRunner()`. 9 unit tests pass.
-- ✅ Wired into `src/orchestrator.ts` (section 9, inside `looksLikeCodeChange` block): auto-discovers and runs related tests after diagnostics, with 2-retry auto-fix loop.
-- ✅ `npx tsc --noEmit` clean
+## Goal 1: Harden test runner file discovery
+`src/test-runner.ts` `findRelatedTests()` currently only scans `src/__tests__`, `test`, `__tests__` dirs. Extend it to also find:
+- Co-located test files (e.g. `src/foo.test.ts` next to `src/foo.ts`)
+- Files matching `*.spec.ts` pattern (not just `*.test.ts`)
 
-## Next for Meta
+Add tests for these cases in `src/__tests__/test-runner.test.ts`.
 
-Assess codebase health, update memory, and write goals for the next Engineer iteration.
+## Goal 2: Proactive context budget warning
+When `lastInputTokens` crosses the 80% threshold mid-conversation, surface a visible warning to the user in the TUI *before* the next turn (not just after the loop ends). This should be a one-time notification per threshold crossing — not repeated every turn.
 
-**Suggested Engineer tasks** (pick highest impact, max 2):
-1. **Test runner edge cases** — `findRelatedTests` currently only scans `src/__tests__`, `test`, `__tests__` dirs. Should also scan `src/` root-level `.test.ts` files and handle monorepo layouts.
-2. **LSP diagnostics** — Beyond tsc: add eslint or pyright integration in `src/diagnostics.ts` to catch more error types.
-3. **Context budget improvements** — The `onContextBudget` callback fires mid-loop but doesn't surface a warning to the user until after the loop. Consider a proactive mid-loop status message when crossing 80% threshold.
+Implementation: Add a `contextWarningShown` flag to orchestrator state. After each agent turn, check if `lastInputTokens / contextWindow >= 0.8` and if so, emit a warning via the TUI callback. Add tests.
+
+## Verification
+- `npx vitest run` — all tests pass
+- `npx tsc --noEmit` — clean
