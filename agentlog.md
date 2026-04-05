@@ -1215,3 +1215,4 @@ Let me verify dashboard.ts works end-to-end:
 [2026-04-05T08:10:54.391Z] iter=28 turn=50 INFO: Tool cache stats
 [2026-04-05T08:10:54.391Z] iter=28 turn=50 INFO: Tool timing: bash: 25x, avg=574ms, total=14355ms; subagent: 1x, avg=3260ms, total=3260ms; grep: 4x, avg=29ms, total=117ms; write_file: 11x, avg=1ms, total=16ms; read_file: 5x, avg=2ms, total=9ms; think: 5x, avg=1ms, total=3ms
 [2026-04-05T08:10:54.391Z] iter=28 turn=50 INFO: Tool timing stats
+[2026-04-05T08:10:57.499Z] iter=28 turn=50 INFO: Committed (no restart): cbb9bc87 (563267 in / 10294 out, cache: 0 created, 0 read)

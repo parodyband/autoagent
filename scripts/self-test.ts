@@ -500,7 +500,7 @@ async function testToolRegistry(): Promise<void> {
   const registry = createDefaultRegistry();
 
   // Registry has all 7 tools
-  assert(registry.size() === 7, "registry: has 7 tools", `got ${registry.size()}`);
+  assert(registry.size() === 8, "registry: has 8 tools", `got ${registry.size()}`);
 
   // All tool names present
   const names = registry.getNames();
@@ -510,7 +510,7 @@ async function testToolRegistry(): Promise<void> {
 
   // getDefinitions returns Anthropic.Tool objects
   const defs = registry.getDefinitions();
-  assert(defs.length === 7, "registry: getDefinitions returns 7");
+  assert(defs.length === 8, "registry: getDefinitions returns 8");
   assert(defs.every(d => d.name && d.description && d.input_schema), "registry: definitions have required fields");
 
   // has() works
