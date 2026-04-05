@@ -1111,3 +1111,24 @@ Context after patch:
 [2026-04-05T09:47:01.423Z] iter=58 turn=20 INFO: Turn 20/25
 [2026-04-05T09:47:03.847Z] iter=58 turn=20 INFO: Agent: TypeScript clean. Now commit and restart:
 [2026-04-05T09:47:03.848Z] iter=58 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status --short
+[2026-04-05T09:47:03.884Z] iter=58 turn=20 INFO:   -> exit=0 (106 chars)
+[2026-04-05T09:47:03.884Z] iter=58 turn=21 INFO: Turn 21/25
+[2026-04-05T09:47:03.884Z] iter=58 turn=21 INFO: Context compressed: 31 → 16 messages (16 summarized)
+[2026-04-05T09:47:07.719Z] iter=58 turn=21 INFO: Agent: TURN 7/8 — Commit and restart.
+[2026-04-05T09:47:07.719Z] iter=58 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && git commit -m "iter-58: fix IterationCtx interface - add predictedTurns field
+
+- Added predictedTurns?: number | null to IterationCtx in conversation.ts
+- Fixes...
+[2026-04-05T09:47:07.751Z] iter=58 turn=21 INFO:   -> exit=0 (134 chars)
+[2026-04-05T09:47:07.752Z] iter=58 turn=22 INFO: Turn 22/25
+[2026-04-05T09:47:10.368Z] iter=58 turn=22 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T09:47:10.369Z] iter=58 turn=22 INFO: RESTART signal
+[2026-04-05T09:47:10.369Z] iter=58 turn=22 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T09:47:11.086Z] iter=58 turn=22 INFO: Compilation OK
+[2026-04-05T09:47:15.468Z] iter=58 turn=22 INFO: Cache persisted: 20 entries to .autoagent-cache.json
+[2026-04-05T09:47:15.468Z] iter=58 turn=22 INFO: Cache stats: 0 hits, 6 misses, 20 entries, 4 invalidations (6 entries removed)
+[2026-04-05T09:47:15.468Z] iter=58 turn=22 INFO: Tool cache stats
+[2026-04-05T09:47:15.469Z] iter=58 turn=22 INFO: Tool timing: bash: 13x, avg=699ms, total=9081ms; grep: 5x, avg=16ms, total=80ms; write_file: 4x, avg=1ms, total=4ms; think: 1x, avg=1ms, total=1ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-05T09:47:15.469Z] iter=58 turn=22 INFO: Tool timing stats
+[2026-04-05T09:47:20.769Z] iter=58 turn=22 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 58: predicted 8 turns, actual 22 turns, ratio 2.75**
+[2026-04-05T09:47:20.787Z] iter=58 turn=22 INFO: Pre-commit review: no significant code changes to review

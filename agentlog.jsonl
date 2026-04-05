@@ -576,3 +576,21 @@
 {"timestamp":"2026-04-05T09:47:01.423Z","iteration":58,"level":"info","message":"Turn 20/25","turn":20}
 {"timestamp":"2026-04-05T09:47:03.847Z","iteration":58,"level":"info","message":"Agent: TypeScript clean. Now commit and restart:","turn":20}
 {"timestamp":"2026-04-05T09:47:03.848Z","iteration":58,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git add -A && git status --short","turn":20}
+{"timestamp":"2026-04-05T09:47:03.884Z","iteration":58,"level":"info","message":"  -> exit=0 (106 chars)","turn":20}
+{"timestamp":"2026-04-05T09:47:03.884Z","iteration":58,"level":"info","message":"Turn 21/25","turn":21}
+{"timestamp":"2026-04-05T09:47:03.884Z","iteration":58,"level":"info","message":"Context compressed: 31 → 16 messages (16 summarized)","turn":21}
+{"timestamp":"2026-04-05T09:47:07.719Z","iteration":58,"level":"info","message":"Agent: TURN 7/8 — Commit and restart.","turn":21}
+{"timestamp":"2026-04-05T09:47:07.719Z","iteration":58,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git commit -m \"iter-58: fix IterationCtx interface - add predictedTurns field\n\n- Added predictedTurns?: number | null to IterationCtx in conversation.ts\n- Fixes...","turn":21}
+{"timestamp":"2026-04-05T09:47:07.751Z","iteration":58,"level":"info","message":"  -> exit=0 (134 chars)","turn":21}
+{"timestamp":"2026-04-05T09:47:07.752Z","iteration":58,"level":"info","message":"Turn 22/25","turn":22}
+{"timestamp":"2026-04-05T09:47:10.368Z","iteration":58,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":22}
+{"timestamp":"2026-04-05T09:47:10.369Z","iteration":58,"level":"info","message":"RESTART signal","turn":22}
+{"timestamp":"2026-04-05T09:47:10.369Z","iteration":58,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":22}
+{"timestamp":"2026-04-05T09:47:11.086Z","iteration":58,"level":"info","message":"Compilation OK","turn":22}
+{"timestamp":"2026-04-05T09:47:15.468Z","iteration":58,"level":"info","message":"Cache persisted: 20 entries to .autoagent-cache.json","turn":22}
+{"timestamp":"2026-04-05T09:47:15.468Z","iteration":58,"level":"info","message":"Cache stats: 0 hits, 6 misses, 20 entries, 4 invalidations (6 entries removed)","turn":22}
+{"timestamp":"2026-04-05T09:47:15.468Z","iteration":58,"level":"info","message":"Tool cache stats","turn":22,"metadata":{"cacheHits":0,"cacheMisses":6,"cacheEntries":20,"invalidations":4,"invalidatedEntries":6,"toolStats":{"grep":{"hits":0,"misses":5},"read_file":{"hits":0,"misses":1}}}}
+{"timestamp":"2026-04-05T09:47:15.469Z","iteration":58,"level":"info","message":"Tool timing: bash: 13x, avg=699ms, total=9081ms; grep: 5x, avg=16ms, total=80ms; write_file: 4x, avg=1ms, total=4ms; think: 1x, avg=1ms, total=1ms; read_file: 1x, avg=1ms, total=1ms","turn":22}
+{"timestamp":"2026-04-05T09:47:15.469Z","iteration":58,"level":"info","message":"Tool timing stats","turn":22,"metadata":{"timing":{"tools":{"bash":{"calls":13,"totalMs":9081,"minMs":1,"maxMs":3560,"avgMs":699},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"grep":{"calls":5,"totalMs":80,"minMs":12,"maxMs":20,"avgMs":16},"write_file":{"calls":4,"totalMs":4,"minMs":0,"maxMs":2,"avgMs":1},"read_file":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":24,"totalMs":9167}}}
+{"timestamp":"2026-04-05T09:47:20.769Z","iteration":58,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 58: predicted 8 turns, actual 22 turns, ratio 2.75**","turn":22}
+{"timestamp":"2026-04-05T09:47:20.787Z","iteration":58,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":22}
