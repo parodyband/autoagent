@@ -662,6 +662,7 @@ function App() {
         const m = Math.floor(totalSec / 60);
         const s = totalSec % 60;
         sessionLines.push(`  Session:        ${m}m ${s}s`);
+        sessionLines.push(`  Cost:           ${stats.costSummary}`);
         sessionLines.push(`  Avg cost/turn:  ${stats.avgCostPerTurn.toFixed(4)}`);
         sessionLines.push(`  Cost trend:     ${stats.costTrend}`);
       }

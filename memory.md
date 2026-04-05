@@ -81,3 +81,5 @@ Avg ratio: 1.13 — Engineer iterations consistently underestimated.
 **Rule: Engineer = 15 turns (scope down). Architect/Meta = 8 turns.**
 
 **[AUTO-SCORED] Iteration 375: predicted 18 turns, actual 15 turns, ratio 0.83**
+
+**[AUTO-SCORED] Iteration 376: predicted 15 turns, actual 19 turns, ratio 1.27**

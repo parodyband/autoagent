@@ -1,147 +1,3 @@
-468 | export function pruneStaleToolResults(messages: Anthropic.MessageParam[]): Anthropic.MessageParam[] {
-469 |   // Build map: tool_use_id → tool name by scanning assistant messages
-470 |   const toolUseIdToName = new Map<string, string>();
-471 |   for (const msg of messages) {
-472 |     if (msg.role === "assistant" && Array.isArray(msg.content)) {
-473 |       for (const block of msg.content) {
-474 |         if (typeof block === "object" && "type" in block && block.type === "tool_use") {
-475 |           const tu = block as Anthropic.ToolUseBlock;
-476 |           toolUseIdToName.set(tu.id, tu.name);
-477 |         }
-478 |       }
-479 |     }
-480 |   }
-481 | 
-482 |   // Count assistant messages to determine turn index for each user message
-483 |   const NEVER_PRUNE = new Set(["bash", "write_file"]);
-484 |   let assistantTurnsSeen = 0;
-485 | 
-486 |   // Build a list of (message_index, assistantTurnsSeen_at_that_point) for user messages
-487 |   // We track how many assistant turns have been seen BEFORE each user message
-488 |   const userMsgTurnIndex: number[] = [];
-489 |   for (const msg of messages) {
-490 |     if (msg.role === "user") {
-491 |       userMsgTurnIndex.push(assistantTurnsSeen);
-492 |     } else if (msg.role === "assistant") {
-493 |       assistantTurnsSeen++;
-494 |     }
-495 |   }
-496 |   const totalTurns = assistantTurnsSeen;
-497 | 
-498 |   let userMsgCount = 0;
-499 |   return messages.map((msg) => {
-500 |     if (msg.role !== "user" || !Array.isArray(msg.content)) {
-501 |       if (msg.role === "assistant") return msg;
-502 |       return msg;
-503 |     }
-504 |     const turnIndex = userMsgTurnIndex[userMsgCount++];
-505 |     const turnsAgo = totalTurns - turnIndex;
-506 |     if (turnsAgo < 2) return msg; // current or previous turn — keep full
-507 | 
-508 |     // Check if this user message contains tool_result blocks to prune
-509 |     const newContent = msg.content.map((block) => {
-510 |       if (typeof block !== "object" || !("type" in block) || block.type !== "tool_result") return block;
-511 |       const tr = block as Anthropic.ToolResultBlockParam;
-512 |       const toolName = toolUseIdToName.get(tr.tool_use_id as string) ?? "unknown";
-513 |       if (NEVER_PRUNE.has(toolName)) return block;
-514 | 
-515 |       // Truncate: extract text from content
-516 |       const text = typeof tr.content === "string"
-517 |         ? tr.content
-518 |         : Array.isArray(tr.content)
-519 |           ? (tr.content as Array<{ type: string; text?: string }>).filter(b => b.type === "text").map(b => b.text ?? "").join("")
-520 |           : "";
-521 |       if (text.length <= 120) return block; // already short — no need to truncate
-522 |       const summary = text.slice(0, 100);
-523 |       return { ...tr, content: `[Result truncated — was ${text.length} chars. Summary: ${summary}...]` };
-524 |     });
-525 | 
-526 |     return { ...msg, content: newContent };
-527 |   });
-528 | }
-529 | 
-530 | async function runAgentLoop(
-531 |   client: Anthropic,
-532 |   model: string,
-533 |   systemPrompt: string,
-[2026-04-05T20:32:24.225Z] iter=366 turn=12 INFO: Turn 12/25
-[2026-04-05T20:32:27.115Z] iter=366 turn=12 INFO: Agent: Good - I've already made the src/ change (added `pruneStaleToolResults` function). Now I need to wire it into the agent loop and add the test. Let me do both quickly.
-[2026-04-05T20:32:27.115Z] iter=366 turn=12 INFO: read_file: src/orchestrator.ts
-[2026-04-05T20:32:27.116Z] iter=366 turn=12 INFO:   -> ok (910 chars)
-[2026-04-05T20:32:27.117Z] iter=366 turn=13 INFO: Turn 13/25
-[2026-04-05T20:32:31.374Z] iter=366 turn=13 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T20:32:31.376Z] iter=366 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -3 +5 lines
-
-Context after patch:
-563 |       return { text: fullText, tokensIn: totalIn, tokensOut: totalOut, lastInputTokens: lastInput, aborted: true };
-564 |     }
-565 | 
-566 |     // Inject prompt cache breakpoints for cost reduction (90% cheaper cache hits)
-567 |     const cachedSystem = buildCachedSystem(systemPrompt);
-568 |     // Prune stale tool results before sending (keeps recent 2 turns full, truncates older)
-569 |     const prunedMessages = pruneStaleToolResults(apiMessages);
-570 |     const cachedMessages = injectMessageCacheBreakpoints(prunedMessages);
-571 | 
-572 |     // Use streaming API with prompt-cache breakpoints (system as content blocks)
-573 |     // Extended thinking enabled: lets Claude reason before responding (better tool decisions, code, debugging)
-[2026-04-05T20:32:31.377Z] iter=366 turn=14 INFO: Turn 14/25
-[2026-04-05T20:32:33.576Z] iter=366 turn=14 INFO: Agent: Now add the unit test:
-[2026-04-05T20:32:33.577Z] iter=366 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && tail -30 tests/orchestrator.test.ts
-[2026-04-05T20:32:33.595Z] iter=366 turn=14 INFO:   -> exit=1 (60 chars)
-[2026-04-05T20:32:33.596Z] iter=366 turn=15 INFO: Turn 15/25
-[2026-04-05T20:32:35.779Z] iter=366 turn=15 INFO: Agent: Let me finish the test and wrap up now.
-[2026-04-05T20:32:35.780Z] iter=366 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && ls tests/ | head -10
-[2026-04-05T20:32:35.796Z] iter=366 turn=15 INFO:   -> exit=0 (232 chars)
-[2026-04-05T20:32:35.796Z] iter=366 turn=16 INFO: Turn 16/25
-[2026-04-05T20:32:52.289Z] iter=366 turn=16 INFO: Agent: Writing test, then wrapping up immediately.
-[2026-04-05T20:32:52.289Z] iter=366 turn=16 INFO: write_file: tests/tool-result-pruning.test.ts (write)
-[2026-04-05T20:32:52.290Z] iter=366 turn=16 INFO:   -> ok: Created tests/tool-result-pruning.test.ts (4337 chars)
-[2026-04-05T20:32:52.290Z] iter=366 turn=17 INFO: Turn 17/25
-[2026-04-05T20:32:56.478Z] iter=366 turn=17 INFO: Agent: Running tests and TSC now.
-[2026-04-05T20:32:56.479Z] iter=366 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30 && echo "TSC_DONE"
-[2026-04-05T20:32:56.481Z] iter=366 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/tool-result-pruning.test.ts 2>&1 | tail -30
-[2026-04-05T20:32:57.655Z] iter=366 turn=17 INFO:   -> exit=0 (9 chars)
-[2026-04-05T20:32:57.688Z] iter=366 turn=17 INFO:   -> exit=0 (281 chars)
-[2026-04-05T20:32:57.689Z] iter=366 turn=18 INFO: Turn 18/25
-[2026-04-05T20:33:04.102Z] iter=366 turn=18 INFO: Agent: TSC clean, 5/5 tests pass. Wrapping up.
-[2026-04-05T20:33:04.102Z] iter=366 turn=18 INFO: save_memory: "[Engineer 366] Tool result aging"
-[2026-04-05T20:33:04.103Z] iter=366 turn=18 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T20:33:04.103Z] iter=366 turn=19 INFO: Turn 19/25
-[2026-04-05T20:33:10.966Z] iter=366 turn=19 INFO: write_file: goals.md (write)
-[2026-04-05T20:33:10.967Z] iter=366 turn=19 INFO:   -> ok: Updated goals.md (846 chars, -18 lines delta)
-[2026-04-05T20:33:10.968Z] iter=366 turn=20 INFO: Turn 20/25
-[2026-04-05T20:33:12.129Z] iter=366 turn=20 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T20:33:12.130Z] iter=366 turn=20 INFO: RESTART signal
-[2026-04-05T20:33:12.130Z] iter=366 turn=20 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T20:33:13.195Z] iter=366 turn=20 INFO: Compilation OK
-[2026-04-05T20:33:21.268Z] iter=366 turn=20 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-05T20:33:21.268Z] iter=366 turn=20 INFO: Cache stats: 0 hits, 5 misses, 56 entries, 4 invalidations (5 entries removed)
-[2026-04-05T20:33:21.268Z] iter=366 turn=20 INFO: Tool cache stats
-[2026-04-05T20:33:21.268Z] iter=366 turn=20 INFO: Tool timing: bash: 10x, avg=251ms, total=2511ms; read_file: 5x, avg=3ms, total=13ms; write_file: 4x, avg=3ms, total=11ms; read_scratchpad: 1x, avg=4ms, total=4ms; think: 3x, avg=1ms, total=3ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T20:33:21.269Z] iter=366 turn=20 INFO: Tool timing stats
-[2026-04-05T20:33:31.371Z] iter=366 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 366: predicted 18 turns, actual 20 turns, ratio 1.11**
-[2026-04-05T20:35:31.398Z] iter=366 turn=20 INFO: Pre-commit review (0in/0out): ERROR: Request was aborted.
-[2026-04-05T20:35:31.446Z] iter=366 turn=20 INFO: Committed: 818361ea (34 in / 5351 out, cache: 17679 created, 241358 read)
-[2026-04-05T20:35:31.446Z] iter=366 turn=20 INFO: Restarting as iteration 367...
-[2026-04-05T20:35:31.650Z] iter=367 INFO: Cache restored: 55/56 entries (1 stale)
-[2026-04-05T20:35:31.652Z] iter=367 INFO: Turn budget: 12/25 (calibration=1.11x, predicted=8)
-[2026-04-05T20:35:31.653Z] iter=367 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T20:35:31.834Z] iter=367 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T20:35:31.835Z] iter=367 turn=1 INFO: Turn 1/25
-[2026-04-05T20:35:35.644Z] iter=367 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state, scoring iteration 366, and then preparing goals for the next Engineer iteration.
-[2026-04-05T20:35:35.644Z] iter=367 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -100
-[2026-04-05T20:35:35.647Z] iter=367 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
-[2026-04-05T20:35:35.648Z] iter=367 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/orchestrator.ts src/hooks.ts src/markdown-renderer.tsx
-[2026-04-05T20:35:35.651Z] iter=367 turn=1 INFO:   -> exit=0 (2117 chars)
-[2026-04-05T20:35:35.653Z] iter=367 turn=1 INFO:   -> exit=0 (101 chars)
-[2026-04-05T20:35:35.659Z] iter=367 turn=1 INFO:   -> exit=0 (330 chars)
-[2026-04-05T20:35:35.659Z] iter=367 turn=2 INFO: Turn 2/25
-[2026-04-05T20:35:44.312Z] iter=367 turn=2 INFO: Agent: 
-
-You're right. My deliverables are clear:
-
 1. Score iteration 366 in memory
 2. Write goals.md for Engineer iteration 368
 3. Compact memory if needed
@@ -1140,3 +996,134 @@ TSC is clean, goals.md is written, memory.md is updated. Done.
 [2026-04-05T20:51:03.317Z] iter=375 turn=15 INFO: Tool timing stats
 [2026-04-05T20:51:10.579Z] iter=375 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 375: predicted 18 turns, actual 15 turns, ratio 0.83**
 [2026-04-05T20:51:10.600Z] iter=375 turn=15 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T20:51:10.637Z] iter=375 turn=15 INFO: Committed: 74828384 (25 in / 5646 out, cache: 22346 created, 223555 read)
+[2026-04-05T20:51:10.638Z] iter=375 turn=15 INFO: Restarting as iteration 376...
+[2026-04-05T20:51:10.838Z] iter=376 INFO: Cache restored: 57/57 entries (0 stale)
+[2026-04-05T20:51:10.840Z] iter=376 INFO: Turn budget: 18/25 (calibration=1.00x, predicted=15)
+[2026-04-05T20:51:10.840Z] iter=376 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T20:51:11.021Z] iter=376 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-05T20:51:11.021Z] iter=376 turn=1 INFO: Turn 1/25
+[2026-04-05T20:51:15.007Z] iter=376 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T20:51:15.008Z] iter=376 turn=1 INFO: $ cat tests/hooks-integration.test.ts
+[2026-04-05T20:51:15.012Z] iter=376 turn=1 INFO: $ cat src/cost-tracker.ts
+[2026-04-05T20:51:15.024Z] iter=376 turn=1 INFO:   -> exit=0 (7104 chars)
+[2026-04-05T20:51:15.026Z] iter=376 turn=1 INFO:   -> exit=0 (1987 chars)
+[2026-04-05T20:51:15.027Z] iter=376 turn=2 INFO: Turn 2/25
+[2026-04-05T20:51:17.607Z] iter=376 turn=2 INFO: $ grep -n "getSessionStats" src/orchestrator.ts | head -20
+[2026-04-05T20:51:17.610Z] iter=376 turn=2 INFO: $ grep -n "status\|getSessionStats\|sessionCost\|costTracker" src/tui.tsx | head -30
+[2026-04-05T20:51:17.619Z] iter=376 turn=2 INFO:   -> exit=0 (122 chars)
+[2026-04-05T20:51:17.621Z] iter=376 turn=2 INFO:   -> exit=0 (912 chars)
+[2026-04-05T20:51:17.621Z] iter=376 turn=3 INFO: Turn 3/25
+[2026-04-05T20:51:19.458Z] iter=376 turn=3 INFO: $ sed -n '1080,1110p' src/orchestrator.ts
+[2026-04-05T20:51:19.461Z] iter=376 turn=3 INFO: $ sed -n '650,680p' src/tui.tsx
+[2026-04-05T20:51:19.471Z] iter=376 turn=3 INFO:   -> exit=0 (1189 chars)
+[2026-04-05T20:51:19.475Z] iter=376 turn=3 INFO:   -> exit=0 (1278 chars)
+[2026-04-05T20:51:19.476Z] iter=376 turn=4 INFO: Turn 4/25
+[2026-04-05T20:51:34.500Z] iter=376 turn=4 INFO: Agent: Now I have everything I need. Let me execute all three changes in parallel:
+[2026-04-05T20:51:34.501Z] iter=376 turn=4 INFO: write_file: tests/hooks-integration.test.ts (write)
+[2026-04-05T20:51:34.502Z] iter=376 turn=4 INFO:   -> ok: Updated tests/hooks-integration.test.ts (0 chars, -232 lines delta)
+[2026-04-05T20:51:34.503Z] iter=376 turn=4 INFO: write_file: tests/cost-tracker.test.ts (write)
+[2026-04-05T20:51:34.503Z] iter=376 turn=4 INFO:   -> ok: Created tests/cost-tracker.test.ts (2775 chars)
+[2026-04-05T20:51:34.504Z] iter=376 turn=5 INFO: Turn 5/25
+[2026-04-05T20:51:37.083Z] iter=376 turn=5 INFO: $ grep -n "WORKDIR" tests/hooks-integration.test.ts | head -5
+[2026-04-05T20:51:37.100Z] iter=376 turn=5 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:51:37.101Z] iter=376 turn=6 INFO: Turn 6/25
+[2026-04-05T20:51:45.414Z] iter=376 turn=6 INFO: think: Let me assess the status:
+
+Goal 1: Fix 3 failing hooks integration tests — IN PROGRESS. I tried to add the beforeAll/aft...
+[2026-04-05T20:51:45.416Z] iter=376 turn=7 INFO: Turn 7/25
+[2026-04-05T20:51:48.222Z] iter=376 turn=7 INFO: Agent: **Status:**
+- Goal 1 (hooks test fix): IN PROGRESS — import added but beforeAll/afterAll blocks not yet added, WORKDIR constant not at module level
+- Goal 2a (cost-tracker tests): DONE
+- Goal 2b (wire cost into getSessionStats): NOT STARTED
+- Goal 2c (show cost in /status): NOT STARTED
+
+Let me finish all three now:
+[2026-04-05T20:51:48.223Z] iter=376 turn=7 INFO: $ head -80 tests/hooks-integration.test.ts
+[2026-04-05T20:51:48.232Z] iter=376 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:51:48.232Z] iter=376 turn=8 INFO: Turn 8/25
+[2026-04-05T20:51:49.722Z] iter=376 turn=8 INFO: $ cat tests/hooks-integration.test.ts
+[2026-04-05T20:51:49.741Z] iter=376 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:51:49.743Z] iter=376 turn=9 INFO: Turn 9/25
+[2026-04-05T20:51:51.354Z] iter=376 turn=9 INFO: $ ls -la tests/hooks-integration.test.ts && wc -l tests/hooks-integration.test.ts
+[2026-04-05T20:51:51.377Z] iter=376 turn=9 INFO:   -> exit=0 (117 chars)
+[2026-04-05T20:51:51.377Z] iter=376 turn=10 INFO: Turn 10/25
+[2026-04-05T20:51:53.711Z] iter=376 turn=10 INFO: think: The hooks-integration.test.ts file is empty (0 bytes). The patch_file mode with old_string/new_string didn't work becaus...
+[2026-04-05T20:51:53.712Z] iter=376 turn=11 INFO: Turn 11/25
+[2026-04-05T20:52:22.792Z] iter=376 turn=11 INFO: Agent: The hooks-integration.test.ts is empty (0 bytes) — the patch wiped it. I need to restore + fix it now, then do goals 2b/2c and wrap up.
+[2026-04-05T20:52:22.794Z] iter=376 turn=11 INFO: write_file: tests/hooks-integration.test.ts (write)
+[2026-04-05T20:52:22.796Z] iter=376 turn=11 INFO:   -> ok: Updated tests/hooks-integration.test.ts (7142 chars, +233 lines delta)
+[2026-04-05T20:52:22.797Z] iter=376 turn=12 INFO: Turn 12/25
+[2026-04-05T20:52:31.561Z] iter=376 turn=12 INFO: Agent: Now fix orchestrator getSessionStats and TUI /status in parallel:
+[2026-04-05T20:52:31.562Z] iter=376 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:52:31.565Z] iter=376 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -13 +13 lines
+
+Context after patch:
+1083 |     }
+1084 |   }
+1085 | 
+1086 |   /** Session statistics for /status display. */
+1087 |   getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: "↑" | "→" | "↓"; sessionCost: number; costSummary: string } {
+1088 |     const durationMs = Date.now() - this.sessionStartTime;
+1089 |     const turnCount = this.turnCosts.length;
+1090 |     const avgCostPerTurn = turnCount > 0 ? this.sessionCost / turnCount : 0;
+1091 |     let costTrend: "↑" | "→" | "↓" = "→";
+1092 |     if (turnCount >= 3) {
+1093 |       const recentAvg = this.turnCosts.slice(-3).reduce((a, b) => a + b, 0) / 3;
+1094 |       if (recentAvg > avgCostPerTurn * 1.2) costTrend = "↑";
+1095 |       else if (recentAvg < avgCostPerTurn * 0.8) costTrend = "↓";
+1096 |     }
+1097 |     return { durationMs, turnCount, avgCostPerTurn, costTrend, sessionCost: this.costTracker.totalCost, costSummary: this.costTracker.sessionSummary };
+1098 |   }
+1099 | 
+1100 |   /** Get the current model (override if set, otherwise "auto"). */
+1101 |   getModel(): string {
+[2026-04-05T20:52:31.566Z] iter=376 turn=13 INFO: Turn 13/25
+[2026-04-05T20:52:36.912Z] iter=376 turn=13 INFO: Agent: Now add cost to TUI /status, then wrap up:
+[2026-04-05T20:52:36.913Z] iter=376 turn=13 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T20:52:36.914Z] iter=376 turn=13 INFO:   -> ok: Patched src/tui.tsx: -8 +9 lines
+
+Context after patch:
+657 |       const costStr = cost < 0.01 ? `${cost.toFixed(4)}` : `${cost.toFixed(2)}`;
+658 |       const stats = orchestratorRef.current?.getSessionStats();
+659 |       const sessionLines: string[] = [];
+660 |       if (stats) {
+661 |         const totalSec = Math.floor(stats.durationMs / 1000);
+662 |         const m = Math.floor(totalSec / 60);
+663 |         const s = totalSec % 60;
+664 |         sessionLines.push(`  Session:        ${m}m ${s}s`);
+665 |         sessionLines.push(`  Cost:           ${stats.costSummary}`);
+666 |         sessionLines.push(`  Avg cost/turn:  ${stats.avgCostPerTurn.toFixed(4)}`);
+667 |         sessionLines.push(`  Cost trend:     ${stats.costTrend}`);
+668 |       }
+669 |       setMessages(prev => [...prev, {
+670 |         role: "assistant",
+671 |         content: [
+[2026-04-05T20:52:36.915Z] iter=376 turn=14 INFO: Turn 14/25
+[2026-04-05T20:52:39.091Z] iter=376 turn=14 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T20:52:39.094Z] iter=376 turn=14 INFO: $ npx vitest run tests/hooks-integration.test.ts 2>&1 | tail -20
+[2026-04-05T20:52:40.241Z] iter=376 turn=14 INFO:   -> exit=0 (282 chars)
+[2026-04-05T20:52:40.261Z] iter=376 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:52:40.262Z] iter=376 turn=15 INFO: Turn 15/25
+[2026-04-05T20:52:42.093Z] iter=376 turn=15 INFO: $ npx vitest run tests/cost-tracker.test.ts 2>&1 | tail -20
+[2026-04-05T20:52:43.102Z] iter=376 turn=15 INFO:   -> exit=0 (272 chars)
+[2026-04-05T20:52:43.103Z] iter=376 turn=16 INFO: Turn 16/25
+[2026-04-05T20:52:49.049Z] iter=376 turn=16 INFO: Agent: All tests pass, TSC is clean. Wrapping up now.
+[2026-04-05T20:52:49.050Z] iter=376 turn=16 INFO: save_memory: "[Engineer iter 376]"
+[2026-04-05T20:52:49.052Z] iter=376 turn=16 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:52:49.053Z] iter=376 turn=17 INFO: Turn 17/25
+[2026-04-05T20:52:59.180Z] iter=376 turn=17 INFO: write_file: goals.md (write)
+[2026-04-05T20:52:59.181Z] iter=376 turn=17 INFO:   -> ok: Updated goals.md (1204 chars, -28 lines delta)
+[2026-04-05T20:52:59.182Z] iter=376 turn=18 INFO: Turn 18/25
+[2026-04-05T20:53:00.562Z] iter=376 turn=18 INFO: $ npx tsc --noEmit 2>&1; echo "TSC_EXIT:$?"
+[2026-04-05T20:53:01.680Z] iter=376 turn=18 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:53:01.680Z] iter=376 turn=19 INFO: Turn 19/25
+[2026-04-05T20:53:03.101Z] iter=376 turn=19 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:53:03.101Z] iter=376 turn=19 INFO: RESTART signal
+[2026-04-05T20:53:03.102Z] iter=376 turn=19 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:53:04.180Z] iter=376 turn=19 INFO: Compilation OK
+[2026-04-05T20:53:12.048Z] iter=376 turn=19 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T20:53:12.048Z] iter=376 turn=19 INFO: Tool timing: bash: 15x, avg=307ms, total=4599ms; write_file: 6x, avg=3ms, total=15ms; read_scratchpad: 1x, avg=10ms, total=10ms; save_memory: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T20:53:12.048Z] iter=376 turn=19 INFO: Tool timing stats
+[2026-04-05T20:53:19.201Z] iter=376 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 376: predicted 15 turns, actual 19 turns, ratio 1.27**
+[2026-04-05T20:53:21.094Z] iter=376 turn=19 INFO: Pre-commit review (600in/54out): LGTM. The change cleanly extends the return type with two additional fields (`sessionCost`, `costSummary`) sourced directly from an already-used `costTracker` object, with no logic changes to existing

@@ -5,13 +5,21 @@
  * at the runHooks level, mirroring how orchestrator.ts uses them.
  */
 
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { mkdirSync, rmSync } from "node:fs";
 import {
   runHooks,
   matchHooks,
   type HooksConfig,
   type HookConfig,
 } from "../src/hooks.js";
+
+// ─── Shared workdir ───────────────────────────────────────────
+
+const WORKDIR = "/tmp/test-hooks-workdir";
+
+beforeAll(() => { mkdirSync(WORKDIR, { recursive: true }); });
+afterAll(() => { rmSync(WORKDIR, { recursive: true, force: true }); });
 
 // ─── Helpers ──────────────────────────────────────────────────
 
@@ -57,10 +65,7 @@ async function applyPostToolUse(
 // ─── Tests ────────────────────────────────────────────────────
 
 describe("hooks integration — PreToolUse blocking", () => {
-  const WORKDIR = "/tmp/test-hooks-workdir";
-
   it("blocks bash tool calls matching a dangerous pattern (exit code 2)", async () => {
-    // Hook that exits 2 when stdin contains "rm -rf"
     const config: HooksConfig = {
       hooks: {
         PreToolUse: [
@@ -105,7 +110,6 @@ sys.exit(0)
   });
 
   it("only applies hooks that match the tool name regex", async () => {
-    // Hook only matches "write_file", not "bash"
     const config: HooksConfig = {
       hooks: {
         PreToolUse: [
@@ -118,7 +122,6 @@ sys.exit(0)
       },
     };
 
-    // bash should not be blocked because matcher doesn't match
     const blocked = await checkPreToolUse(config, "bash", { command: "rm -rf /" }, WORKDIR);
     expect(blocked).toBeNull();
   });
@@ -150,8 +153,6 @@ sys.exit(0)
 });
 
 describe("hooks integration — PostToolUse context injection", () => {
-  const WORKDIR = "/tmp/test-hooks-workdir";
-
   it("appends additionalContext from PostToolUse hook to tool result", async () => {
     const config: HooksConfig = {
       hooks: {

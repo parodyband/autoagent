@@ -1084,7 +1084,7 @@ export class Orchestrator {
   }
 
   /** Session statistics for /status display. */
-  getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: "↑" | "→" | "↓" } {
+  getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: "↑" | "→" | "↓"; sessionCost: number; costSummary: string } {
     const durationMs = Date.now() - this.sessionStartTime;
     const turnCount = this.turnCosts.length;
     const avgCostPerTurn = turnCount > 0 ? this.sessionCost / turnCount : 0;
@@ -1094,7 +1094,7 @@ export class Orchestrator {
       if (recentAvg > avgCostPerTurn * 1.2) costTrend = "↑";
       else if (recentAvg < avgCostPerTurn * 0.8) costTrend = "↓";
     }
-    return { durationMs, turnCount, avgCostPerTurn, costTrend };
+    return { durationMs, turnCount, avgCostPerTurn, costTrend, sessionCost: this.costTracker.totalCost, costSummary: this.costTracker.sessionSummary };
   }
 
   /** Get the current model (override if set, otherwise "auto"). */
