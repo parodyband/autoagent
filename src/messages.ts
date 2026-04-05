@@ -14,8 +14,7 @@ import type { IterationState } from "./iteration.js";
 
 /**
  * Build the system prompt from system-prompt.md, injecting iteration state.
- * The agent fully owns this file. A separate alignment meta-layer (alignment.ts)
- * monitors for drift and writes feedback to memory if the agent goes off-rails.
+ * The agent fully owns this file.
  */
 export function buildSystemPrompt(state: IterationState, rootDir: string): string {
   const filePath = path.join(rootDir, "system-prompt.md");
