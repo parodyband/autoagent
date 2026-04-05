@@ -1,59 +1,3 @@
-236 |   };
-237 | 
-238 |   process.stdout.write(JSON.stringify(summary) + "\n");
-239 | }
-240 | 
-241 | /**
-242 |  * Log cache and timing stats, capture quality/benchmarks, record metrics,
-243 |  * commit the iteration, and update state.
-244 |  */
-245 | export async function finalizeIteration(
-246 |   ctx: FinalizationCtx,
-247 |   doRestart: boolean
-248 | ): Promise<void> {
-[2026-04-05T11:22:42.266Z] iter=106 turn=5 INFO: Turn 5/25
-[2026-04-05T11:22:49.891Z] iter=106 turn=5 INFO: Agent: Already writing. Continuing with the remaining changes.
-[2026-04-05T11:22:49.892Z] iter=106 turn=5 INFO: write_file: src/finalization.ts (patch)
-[2026-04-05T11:22:49.894Z] iter=106 turn=5 INFO:   -> ok: Patched src/finalization.ts: -15 +27 lines
-
-Context after patch:
-300 |   // Sonnet reviews source changes before we commit. Non-blocking.
-301 |   await reviewBeforeCommit(ctx);
-302 | 
-303 |   const sha = await commitIteration(ctx.iter);
-304 |   const label = doRestart ? "Committed" : "Committed (no restart)";
-305 |   ctx.log(`${label}: ${sha.slice(0, 8)} (${ctx.tokens.in} in / ${ctx.tokens.out} out, cache: ${ctx.tokens.cacheCreate} created, ${ctx.tokens.cacheRead} read)`);
-306 | 
-307 |   ctx.state.lastSuccessfulIteration = ctx.iter;
-308 |   ctx.state.lastFailedCommit = null;
-309 |   ctx.state.lastFailureReason = null;
-310 |   ctx.state.iteration++;
-311 |   saveState(ctx.state);
-312 | 
-313 |   // --once mode: emit JSON summary to stdout BEFORE exit so callers can parse it
-314 |   if (ctx.once) {
-315 |     const exitCode = ctx.failed ? 1 : 0;
-316 |     await emitOnceSummary({
-317 |       success: !ctx.failed,
-318 |       iteration: ctx.iter,
-319 |       turns: ctx.turns,
-320 |       startTime: ctx.startTime,
-321 |       exitCode,
-322 |     });
-323 |   }
-324 | 
-325 |   if (doRestart) {
-326 |     ctx.log(`Restarting as iteration ${ctx.state.iteration}...`);
-327 |     ctx.restart();
-328 |   }
-329 | }
-330 | 
-[2026-04-05T11:22:49.895Z] iter=106 turn=6 INFO: Turn 6/25
-[2026-04-05T11:22:57.131Z] iter=106 turn=6 INFO: Agent: Now update `agent.ts`: 1) pass `once`/`failed` to `runFinalization`, 2) change `console.log` to `console.error`, 3) emit failure JSON in exception path:
-[2026-04-05T11:22:57.132Z] iter=106 turn=6 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:22:57.132Z] iter=106 turn=6 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
-
-Context after patch:
 28 | import { parseMemory, getSection, serializeMemory } from "./memory.js";
 29 | import { ToolCache } from "./tool-cache.js";
 30 | import { ToolTimingTracker } from "./tool-timing.js";
@@ -1052,3 +996,139 @@ Writing memory now.
 [2026-04-05T11:36:23.584Z] iter=112 turn=11 INFO: Tool timing stats
 [2026-04-05T11:36:54.400Z] iter=112 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 112: predicted 12 turns, actual 11 turns, ratio 0.92**
 [2026-04-05T11:36:54.424Z] iter=112 turn=11 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T11:36:54.455Z] iter=112 turn=11 INFO: Committed: 56f1980f (17 in / 2390 out, cache: 8728 created, 69840 read)
+[2026-04-05T11:36:54.455Z] iter=112 turn=11 INFO: Restarting as iteration 113...
+[2026-04-05T11:36:54.653Z] iter=113 INFO: Cache restored: 27/27 entries (0 stale)
+[2026-04-05T11:36:54.654Z] iter=113 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T11:36:54.682Z] iter=113 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T11:36:54.682Z] iter=113 turn=1 INFO: Turn 1/25
+[2026-04-05T11:36:58.264Z] iter=113 turn=1 INFO: Agent: 
+
+I'll start by understanding the current codebase structure and then review task mode and --once mode implementation.
+[2026-04-05T11:36:58.265Z] iter=113 turn=1 INFO: list_files: . (depth=2)
+[2026-04-05T11:36:58.279Z] iter=113 turn=1 INFO:   -> ok (5 dirs, 51 files)
+[2026-04-05T11:36:58.279Z] iter=113 turn=1 INFO: $ cat memory.md
+[2026-04-05T11:36:58.287Z] iter=113 turn=1 INFO:   -> exit=0 (83 chars)
+[2026-04-05T11:36:58.288Z] iter=113 turn=2 INFO: Turn 2/25
+[2026-04-05T11:37:01.429Z] iter=113 turn=2 INFO: read_file: src/agent.ts
+[2026-04-05T11:37:01.429Z] iter=113 turn=2 INFO:   -> ok (14849 chars)
+[2026-04-05T11:37:01.430Z] iter=113 turn=2 INFO: read_file: src/phases.ts
+[2026-04-05T11:37:01.430Z] iter=113 turn=2 INFO:   -> ok (8894 chars)
+[2026-04-05T11:37:01.430Z] iter=113 turn=2 INFO: read_file: src/finalization.ts
+[2026-04-05T11:37:01.430Z] iter=113 turn=2 INFO:   -> ok (12952 chars)
+[2026-04-05T11:37:01.430Z] iter=113 turn=2 INFO: read_file: TASK.md.example
+[2026-04-05T11:37:01.431Z] iter=113 turn=2 INFO:   -> ok (390 chars)
+[2026-04-05T11:37:01.431Z] iter=113 turn=3 INFO: Turn 3/25
+[2026-04-05T11:37:18.231Z] iter=113 turn=3 INFO: think: Let me analyze the task mode and --once mode for gaps and edge cases.
+
+Key files:
+1. `src/agent.ts` - Main entry point, ...
+[2026-04-05T11:37:18.231Z] iter=113 turn=4 INFO: Turn 4/25
+[2026-04-05T11:37:20.311Z] iter=113 turn=4 INFO: read_file: src/conversation.ts
+[2026-04-05T11:37:20.313Z] iter=113 turn=4 INFO:   -> ok (13303 chars)
+[2026-04-05T11:37:20.313Z] iter=113 turn=5 INFO: Turn 5/25
+[2026-04-05T11:37:32.911Z] iter=113 turn=5 INFO: Agent: 
+
+You're right. I have all the context I need. Let me produce the deliverable now.
+[2026-04-05T11:37:32.912Z] iter=113 turn=5 INFO: think: I've found the bugs. Let me summarize and write the report + fixes:
+
+**Bug 1 (CRITICAL): TASK.md is never deleted in nor...
+[2026-04-05T11:37:32.912Z] iter=113 turn=6 INFO: Turn 6/25
+[2026-04-05T11:37:43.049Z] iter=113 turn=6 INFO: Agent: Now let me implement the fix and write the report.
+[2026-04-05T11:37:43.049Z] iter=113 turn=6 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:37:43.051Z] iter=113 turn=6 INFO:   -> ok: Patched src/agent.ts: -28 +31 lines
+
+Context after patch:
+133 |     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
+134 |   }
+135 | 
+136 |   // Task mode: delete TASK.md BEFORE finalization so it's excluded from the
+137 |   // git commit and gone before any restart. Previously this was after
+138 |   // runFinalization(), but restart() calls process.exit() so the deletion
+139 |   // never executed in normal (non --once) mode — causing infinite re-execution.
+140 |   if (ctx.taskMode && existsSync(TASK_FILE)) {
+141 |     unlinkSync(TASK_FILE);
+142 |     ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
+143 |   }
+144 | 
+145 |   // --once mode: never restart regardless of what callers request
+146 |   const effectiveRestart = ctx.once ? false : doRestart;
+147 | 
+148 |   await runFinalization({
+149 |     iter: ctx.iter,
+150 |     state: ctx.state,
+151 |     startTime: ctx.startTime,
+152 |     turns: ctx.turns,
+153 |     toolCounts: ctx.toolCounts,
+154 |     tokens: ctx.tokens,
+155 |     cache: ctx.cache,
+156 |     timing: ctx.timing,
+157 |     rootDir: ROOT,
+158 |     agentHome: ROOT,
+159 |     metricsFile: METRICS_FILE,
+160 |     log: (msg: string) => log(ctx.iter, msg),
+161 |     logger,
+162 |     restart,
+163 |     predictedTurns: ctx.predictedTurns,
+164 |     once: ctx.once,
+165 |     failed: ctx.failed,
+166 |   }, effectiveRestart);
+167 | 
+168 |   // --once mode: exit after finalization with appropriate exit code
+169 |   if (ctx.once) {
+[2026-04-05T11:37:43.052Z] iter=113 turn=7 INFO: Turn 7/25
+[2026-04-05T11:38:03.226Z] iter=113 turn=7 INFO: Agent: Now write the memory.md report:
+[2026-04-05T11:38:03.227Z] iter=113 turn=7 INFO: write_file: memory.md (write)
+[2026-04-05T11:38:03.227Z] iter=113 turn=7 INFO:   -> err: ERROR: memory.md is append-only. Use mode 'append' or ensure new content starts with existing content. (Shorter rewrites allowed for compaction.)
+[2026-04-05T11:38:03.228Z] iter=113 turn=8 INFO: Turn 8/25
+[2026-04-05T11:38:05.949Z] iter=113 turn=8 INFO: $ cat memory.md
+[2026-04-05T11:38:05.966Z] iter=113 turn=8 INFO:   -> exit=0 (83 chars)
+[2026-04-05T11:38:05.967Z] iter=113 turn=9 INFO: Turn 9/25
+[2026-04-05T11:38:14.569Z] iter=113 turn=9 INFO: Agent: 
+
+**Goal status:** Architecture Review — Task Mode & --once Robustness → **IN PROGRESS**
+
+- ✅ Code review complete, critical bug found
+- ✅ Fix implemented (moved TASK.md deletion before `runFinalization()`)
+- ⬜ Need to: write memory.md report, write goals for Engineer iteration 114, run tsc
+
+Let me finish now:
+[2026-04-05T11:38:14.569Z] iter=113 turn=9 INFO: write_file: memory.md (write)
+[2026-04-05T11:38:14.570Z] iter=113 turn=9 INFO:   -> err: ERROR: memory.md is append-only. Use mode 'append' or ensure new content starts with existing content. (Shorter rewrites allowed for compaction.)
+[2026-04-05T11:38:14.570Z] iter=113 turn=10 INFO: Turn 10/25
+[2026-04-05T11:38:20.007Z] iter=113 turn=10 INFO: write_file: memory.md (append)
+[2026-04-05T11:38:20.007Z] iter=113 turn=10 INFO:   -> ok: Appended 1492 chars to memory.md
+[2026-04-05T11:38:20.008Z] iter=113 turn=11 INFO: Turn 11/25
+[2026-04-05T11:38:29.879Z] iter=113 turn=11 INFO: Agent: Now write goals for the Engineer in iteration 114:
+[2026-04-05T11:38:29.879Z] iter=113 turn=11 INFO: write_file: goals.md (write)
+[2026-04-05T11:38:29.880Z] iter=113 turn=11 INFO:   -> ok: Updated goals.md (1254 chars, +10 lines delta)
+[2026-04-05T11:38:29.881Z] iter=113 turn=12 INFO: Turn 12/25
+[2026-04-05T11:38:32.948Z] iter=113 turn=12 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T11:38:33.653Z] iter=113 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:38:33.654Z] iter=113 turn=13 INFO: Turn 13/25
+[2026-04-05T11:38:36.733Z] iter=113 turn=13 INFO: Agent: TypeScript compiles clean. Let me verify the fix is correct and the memory has the right content:
+[2026-04-05T11:38:36.734Z] iter=113 turn=13 INFO: $ grep -i "task mode" memory.md
+[2026-04-05T11:38:36.752Z] iter=113 turn=13 INFO:   -> exit=0 (145 chars)
+[2026-04-05T11:38:36.752Z] iter=113 turn=14 INFO: Turn 14/25
+[2026-04-05T11:38:39.701Z] iter=113 turn=14 INFO: Agent: Both verification criteria met. Let me confirm the fix looks right in context:
+[2026-04-05T11:38:39.702Z] iter=113 turn=14 INFO: read_file: src/agent.ts
+[2026-04-05T11:38:39.702Z] iter=113 turn=14 INFO:   -> ok (1694 chars)
+[2026-04-05T11:38:39.703Z] iter=113 turn=15 INFO: Turn 15/25
+[2026-04-05T11:38:47.173Z] iter=113 turn=15 INFO: Agent: Fix is clean and correct. All goals achieved:
+
+1. ✅ **Architecture review complete** — found critical bug where TASK.md deletion never executed in normal mode
+2. ✅ **Fix implemented** — moved `unlinkSync(TASK_FILE)` before `runFinalization()` (< 10 lines, trivial)
+3. ✅ **Written report** in memory.md under "Architecture — Task Mode & --once Review"
+4. ✅ **`npx tsc --noEmit` clean**
+5. ✅ **`cat mem...
+[2026-04-05T11:38:47.174Z] iter=113 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T11:38:47.175Z] iter=113 turn=15 INFO: RESTART signal
+[2026-04-05T11:38:47.176Z] iter=113 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T11:38:47.891Z] iter=113 turn=15 INFO: Compilation OK
+[2026-04-05T11:39:19.395Z] iter=113 turn=15 INFO: Cache persisted: 33 entries to .autoagent-cache.json
+[2026-04-05T11:39:19.395Z] iter=113 turn=15 INFO: Cache stats: 0 hits, 7 misses, 33 entries, 5 invalidations (1 entries removed)
+[2026-04-05T11:39:19.395Z] iter=113 turn=15 INFO: Tool cache stats
+[2026-04-05T11:39:19.395Z] iter=113 turn=15 INFO: Tool timing: bash: 5x, avg=150ms, total=752ms; list_files: 1x, avg=17ms, total=17ms; read_file: 6x, avg=1ms, total=8ms; write_file: 5x, avg=2ms, total=8ms; think: 2x, avg=0ms, total=0ms
+[2026-04-05T11:39:19.395Z] iter=113 turn=15 INFO: Tool timing stats
+[2026-04-05T11:39:50.326Z] iter=113 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 113: predicted 12 turns, actual 15 turns, ratio 1.25**
+[2026-04-05T11:39:53.623Z] iter=113 turn=15 INFO: Pre-commit review (618in/56out): LGTM. The fix correctly moves TASK.md deletion before `runFinalization()` (which calls `restart()` → `process.exit()`), ensuring the file is always cleaned up and preventing infinite re-execution in t

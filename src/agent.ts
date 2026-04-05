@@ -133,6 +133,15 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
   }
 
+  // Task mode: delete TASK.md BEFORE finalization so it's excluded from the
+  // git commit and gone before any restart. Previously this was after
+  // runFinalization(), but restart() calls process.exit() so the deletion
+  // never executed in normal (non --once) mode — causing infinite re-execution.
+  if (ctx.taskMode && existsSync(TASK_FILE)) {
+    unlinkSync(TASK_FILE);
+    ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
+  }
+
   // --once mode: never restart regardless of what callers request
   const effectiveRestart = ctx.once ? false : doRestart;
 
@@ -155,12 +164,6 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
     once: ctx.once,
     failed: ctx.failed,
   }, effectiveRestart);
-
-  // Task mode: delete TASK.md after successful iteration
-  if (ctx.taskMode && existsSync(TASK_FILE)) {
-    unlinkSync(TASK_FILE);
-    ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
-  }
 
   // --once mode: exit after finalization with appropriate exit code
   if (ctx.once) {

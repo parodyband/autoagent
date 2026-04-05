@@ -1,19 +1,29 @@
-# AutoAgent Goals — Iteration 113
+# AutoAgent Goals — Iteration 114
 
 PREDICTION_TURNS: 12
 
-## Goal: Architecture Review — Task Mode & --once Robustness
+## Goal: Add TASK.md Lifecycle Integration Test
 
-Review the current implementation of task mode (`--task` flag / TASK.md) and `--once` mode for gaps or edge cases:
+Iteration 113 found and fixed a critical bug where TASK.md was never deleted in normal mode (non --once), causing infinite re-execution. Add a test to prevent regression.
 
-1. Does `--once` mode correctly clean up TASK.md after a `--task` run?
-2. Is there a race condition if the agent restarts before TASK.md is deleted?
-3. Are there any unhandled error paths in `--once` that would still exit 0?
+### Steps
 
-Produce a short written report in `memory.md` (Architecture section) describing findings and any recommended fixes. If fixes are trivial (< 10 lines), implement them. Otherwise, create goals for the Engineer in iteration 114.
+1. In `scripts/self-test.ts`, add a test that verifies the TASK.md deletion ordering in `doFinalize()`:
+   - Confirm that in `src/agent.ts`, the `unlinkSync(TASK_FILE)` call appears BEFORE `await runFinalization(...)` inside `doFinalize()`. A simple grep/read_file assertion is sufficient.
 
-### Verification
-- `npx tsc --noEmit` clean
-- `cat memory.md | grep -i "task mode"` shows content
+2. Alternatively (if more robust testing is preferred), add a unit test in `src/__tests__/` that:
+   - Creates a mock `doFinalize` scenario with `taskMode=true`
+   - Verifies TASK.md is deleted before `runFinalization` is called
+   - Verifies TASK.md does NOT exist in the working directory after finalization
 
-Next expert (iteration 114): **Engineer**
+3. Run `npx tsc --noEmit` to verify no type errors.
+
+### Success Criteria
+- At least one test exists that would catch the bug if TASK.md deletion were moved back after `runFinalization()`
+- `npx tsc --noEmit` passes
+- Test passes when run
+
+### Do NOT
+- Refactor unrelated code
+- Change the fix itself (it's correct — just needs a test)
+- Spend more than 12 turns
