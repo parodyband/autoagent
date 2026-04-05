@@ -66,9 +66,60 @@ export interface IterationCtx {
   once?: boolean;
   /** Set to true when the iteration has failed (used by --once exit code) */
   failed?: boolean;
+  /**
+   * Optional async function that runs verification checks before finalization.
+   * Returns a formatted failure message string if checks failed, or null if all passed.
+   * Only called when operating on an external repo (workDir !== ROOT).
+   */
+  verificationFn?: () => Promise<string | null>;
+  /** Max extra turns allowed for verification recovery. Default: 5. */
+  maxVerificationTurns?: number;
+  /** Tracks how many verification recovery turns have been consumed. */
+  verificationTurnsUsed?: number;
 }
 
 export type TurnResult = "continue" | "break" | "restarted";
+
+// ─── Verification recovery ──────────────────────────────────
+
+/**
+ * Run pre-finalization verification if configured. If checks fail and recovery
+ * turns remain, inject the failure message into ctx.messages and return true
+ * (caller should continue the loop). Returns false to proceed with finalization.
+ *
+ * Advisory only: if max recovery turns are exhausted, logs a warning and
+ * returns false so finalization proceeds regardless.
+ */
+export async function checkVerificationAndContinue(ctx: IterationCtx): Promise<boolean> {
+  if (!ctx.verificationFn) return false;
+
+  const maxRecovery = ctx.maxVerificationTurns ?? 5;
+  const used = ctx.verificationTurnsUsed ?? 0;
+
+  // Don't re-run verification if recovery turns already exhausted
+  if (used >= maxRecovery) {
+    ctx.log(`Verification recovery turns exhausted (${used}/${maxRecovery}) — finalizing anyway`);
+    return false;
+  }
+
+  let failureMsg: string | null = null;
+  try {
+    failureMsg = await ctx.verificationFn();
+  } catch (err) {
+    ctx.log(`Verification error (non-fatal): ${err instanceof Error ? err.message : err}`);
+    return false;
+  }
+
+  if (!failureMsg) {
+    ctx.log("Verification passed — proceeding to finalize");
+    return false;
+  }
+
+  ctx.verificationTurnsUsed = used + 1;
+  ctx.log(`Verification failed (recovery turn ${ctx.verificationTurnsUsed}/${maxRecovery}) — giving agent a chance to fix`);
+  ctx.messages.push({ role: "user", content: failureMsg });
+  return true; // tell caller to continue the loop
+}
 
 // ─── Tool dispatch ──────────────────────────────────────────
 
@@ -251,6 +302,7 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
         ctx.messages.push({ role: "user", content: validationBlockedMessage(v.output) });
         return "continue";
       }
+      if (await checkVerificationAndContinue(ctx)) return "continue";
       await ctx.onFinalize(ctx, true);
       return "restarted";
     }
@@ -284,6 +336,7 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
       return "continue";
     }
 
+    if (await checkVerificationAndContinue(ctx)) return "continue";
     await ctx.onFinalize(ctx, true);
     return "restarted";
   }
@@ -354,6 +407,7 @@ export async function runConversation(ctx: IterationCtx): Promise<void> {
     const result = await processTurn(ctx);
     if (result === "restarted") return; // already finalized + restarted
     if (result === "break") {
+      if (await checkVerificationAndContinue(ctx)) continue; // give agent recovery turns
       ctx.log("Agent stopped — committing and restarting");
       await ctx.onFinalize(ctx, true);
       return;

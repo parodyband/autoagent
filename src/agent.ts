@@ -300,6 +300,22 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
   // Expert gets its own system prompt
   ctx.systemPromptBuilder = (s, r) => buildExpertPrompt(expert, s, r);
 
+  // Wire up verification: runs before finalization, gives agent a chance to fix failures.
+  // Only active when operating on an external repo (workDir !== ROOT).
+  if (workDir !== ROOT && repoContextText) {
+    ctx.verificationFn = async (): Promise<string | null> => {
+      const verResults = await runVerification(workDir, repoContextText);
+      if (verResults.length === 0) return null;
+      const passed = verResults.filter(r => r.passed).length;
+      log(state.iteration, `Verification: ${passed}/${verResults.length} checks passed`);
+      const allPassed = verResults.every(r => r.passed);
+      if (allPassed) return null;
+      return formatVerificationResults(verResults);
+    };
+    ctx.maxVerificationTurns = 5;
+    ctx.verificationTurnsUsed = 0;
+  }
+
   // Task decomposition: if TASK.md is complex, break it into subtasks and inject
   let subtasksText: string | undefined;
   if (taskMode) {
@@ -332,23 +348,6 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
   });
 
   await runConversation(ctx);
-
-  // Pre-finalization verification: run test/build commands in the target repo (advisory only)
-  // Uses closure variables workDir and repoContextText — never runs on autoagent's own repo.
-  if (workDir !== ROOT && repoContextText) {
-    try {
-      const verResults = await runVerification(workDir, repoContextText);
-      if (verResults.length > 0) {
-        const summary = formatVerificationResults(verResults);
-        log(state.iteration, `Verification: ${verResults.filter(r => r.passed).length}/${verResults.length} checks passed`);
-        if (summary) {
-          ctx.messages.push({ role: "user", content: summary });
-        }
-      }
-    } catch (err) {
-      log(state.iteration, `Verification error (non-fatal): ${err instanceof Error ? err.message : err}`);
-    }
-  }
 }
 
 // ─── Entry point ────────────────────────────────────────────
