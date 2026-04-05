@@ -1,208 +1,3 @@
-[2026-04-05T12:05:10.601Z] iter=125 turn=19 INFO: Tool timing: subagent: 1x, avg=30532ms, total=30532ms; bash: 18x, avg=423ms, total=7612ms; list_files: 1x, avg=15ms, total=15ms; write_file: 2x, avg=3ms, total=5ms; think: 4x, avg=1ms, total=2ms; read_file: 1x, avg=1ms, total=1ms
-[2026-04-05T12:05:10.601Z] iter=125 turn=19 INFO: Tool timing stats
-[2026-04-05T12:05:14.685Z] iter=125 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 125: predicted 20 turns, actual 19 turns, ratio 0.95**
-[2026-04-05T12:05:14.705Z] iter=125 turn=19 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T12:05:14.736Z] iter=125 turn=19 INFO: Committed: c632cd69 (29 in / 5578 out, cache: 18698 created, 206038 read)
-[2026-04-05T12:05:14.737Z] iter=125 turn=19 INFO: Restarting as iteration 126...
-[2026-04-05T12:05:14.941Z] iter=126 INFO: Cache restored: 38/38 entries (0 stale)
-[2026-04-05T12:05:14.943Z] iter=126 INFO: Turn budget: 20/25 (calibration=1.25x, predicted=12)
-[2026-04-05T12:05:14.943Z] iter=126 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T12:05:14.973Z] iter=126 INFO: Hard turn cap: 18 (1.5x prediction of 12)
-[2026-04-05T12:05:14.973Z] iter=126 turn=1 INFO: Turn 1/25
-[2026-04-05T12:05:22.830Z] iter=126 turn=1 INFO: think: Let me plan the work:
-1. Delete src/alignment.ts, src/self-reflection.ts, src/phases.ts
-2. Update string references in s...
-[2026-04-05T12:05:22.831Z] iter=126 turn=2 INFO: Turn 2/25
-[2026-04-05T12:05:26.122Z] iter=126 turn=2 INFO: read_file: src/experts.ts
-[2026-04-05T12:05:26.122Z] iter=126 turn=2 INFO:   -> ok (1622 chars)
-[2026-04-05T12:05:26.123Z] iter=126 turn=2 INFO: read_file: src/messages.ts
-[2026-04-05T12:05:26.123Z] iter=126 turn=2 INFO:   -> ok (1295 chars)
-[2026-04-05T12:05:26.123Z] iter=126 turn=3 INFO: Turn 3/25
-[2026-04-05T12:05:28.975Z] iter=126 turn=3 INFO: $ grep -n "alignment\|self-reflection\|phases\|alignment\.ts\|self-reflection\.ts\|phases\.ts" src/experts.ts src/messages.ts
-[2026-04-05T12:05:28.978Z] iter=126 turn=3 INFO: $ grep -rn "alignment\|self-reflection\|phases" src/ --include="*.ts" | grep -v "__tests__" | grep -v "\.ts:.*//.*alignment" | head -50
-[2026-04-05T12:05:28.987Z] iter=126 turn=3 INFO:   -> exit=0 (384 chars)
-[2026-04-05T12:05:29.001Z] iter=126 turn=3 INFO:   -> exit=0 (681 chars)
-[2026-04-05T12:05:29.001Z] iter=126 turn=4 INFO: Turn 4/25
-[2026-04-05T12:05:32.930Z] iter=126 turn=4 INFO: $ grep -rn "code-analysis" src/ scripts/ --include="*.ts" | head -30
-[2026-04-05T12:05:32.948Z] iter=126 turn=4 INFO:   -> exit=0 (807 chars)
-[2026-04-05T12:05:32.949Z] iter=126 turn=5 INFO: Turn 5/25
-[2026-04-05T12:05:37.028Z] iter=126 turn=5 INFO: Agent: Deliverables: delete 3 files, update 2 string references. Starting now.
-[2026-04-05T12:05:37.029Z] iter=126 turn=5 INFO: $ rm src/alignment.ts src/self-reflection.ts src/phases.ts
-[2026-04-05T12:05:37.032Z] iter=126 turn=5 INFO: write_file: src/experts.ts (patch)
-[2026-04-05T12:05:37.035Z] iter=126 turn=5 INFO:   -> ok: Patched src/experts.ts: -2 +2 lines
-
-Context after patch:
-118 |   structure, the alignment/review system, the iteration flow itself.
-119 | - Evaluate the meta-layer: is the rotation working? Do we need a new expert? Should an
-120 |   expert's prompt be sharper? Is memory getting cluttered or staying useful?
-121 | - You can also edit src/agent.ts, src/messages.ts, src/finalization.ts —
-122 |   any of the harness code. You ARE the harness.
-123 | - Check metrics and cost trends. Is the system getting cheaper per iteration? If not, why?
-124 | 
-125 | ## What you can change
-[2026-04-05T12:05:37.045Z] iter=126 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-05T12:05:37.046Z] iter=126 turn=6 INFO: Turn 6/25
-[2026-04-05T12:05:40.307Z] iter=126 turn=6 INFO: write_file: src/experts.ts (patch)
-[2026-04-05T12:05:40.308Z] iter=126 turn=6 INFO:   -> ok: Patched src/experts.ts: -1 +1 lines
-
-Context after patch:
-127 | - memory.md — restructure, compact, add schemas
-128 | - src/experts.ts — add/modify expert prompts and rotation logic
-129 | - .experts/*.md — create new specialist experts
-130 | - src/agent.ts, src/finalization.ts — the loop itself
-131 | - Any config, any script, any harness code
-132 | 
-133 | ## What you should NOT do
-[2026-04-05T12:05:40.309Z] iter=126 turn=6 INFO: write_file: src/messages.ts (patch)
-[2026-04-05T12:05:40.309Z] iter=126 turn=6 INFO:   -> ok: Patched src/messages.ts: -2 +1 lines
-
-Context after patch:
-14 | 
-15 | /**
-16 |  * Build the system prompt from system-prompt.md, injecting iteration state.
-17 |  * The agent fully owns this file.
-18 |  */
-19 | export function buildSystemPrompt(state: IterationState, rootDir: string): string {
-20 |   const filePath = path.join(rootDir, "system-prompt.md");
-[2026-04-05T12:05:40.310Z] iter=126 turn=7 INFO: Turn 7/25
-[2026-04-05T12:05:42.249Z] iter=126 turn=7 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T12:05:42.964Z] iter=126 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-05T12:05:42.965Z] iter=126 turn=8 INFO: Turn 8/25
-[2026-04-05T12:05:44.856Z] iter=126 turn=8 INFO: $ npx vitest run 2>&1 | tail -5
-[2026-04-05T12:05:45.907Z] iter=126 turn=8 INFO:   -> exit=0 (184 chars)
-[2026-04-05T12:05:45.907Z] iter=126 turn=9 INFO: Turn 9/25
-[2026-04-05T12:05:52.078Z] iter=126 turn=9 INFO: Agent: Goals status:
-- Delete 3 dead files: **DONE**
-- Update string references in experts.ts + messages.ts: **DONE**
-- tsc clean: **DONE**
-- vitest 71 pass: **DONE**
-- Self-tests 698 pass: **NOT STARTED**
-- Stretch goal (code-analysis.ts): **NOT STARTED** (src/validation.ts imports it — stays in src/)
-[2026-04-05T12:05:52.078Z] iter=126 turn=9 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -10
-[2026-04-05T12:05:56.645Z] iter=126 turn=9 INFO:   -> exit=0 (207 chars)
-[2026-04-05T12:05:56.645Z] iter=126 turn=10 INFO: Turn 10/25
-[2026-04-05T12:06:00.889Z] iter=126 turn=10 INFO: Agent: All goals DONE (700 self-tests, up from 698 — no failures). Now committing and writing goals.
-[2026-04-05T12:06:00.890Z] iter=126 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "Delete dead code: alignment.ts, self-reflection.ts, phases.ts (-684 lines)
-
-- Remove 3 completely unused source files superseded by...
-[2026-04-05T12:06:00.938Z] iter=126 turn=10 INFO:   -> exit=0 (260 chars)
-[2026-04-05T12:06:00.938Z] iter=126 turn=11 INFO: Turn 11/25
-[2026-04-05T12:06:08.792Z] iter=126 turn=11 INFO: write_file: goals.md (write)
-[2026-04-05T12:06:08.793Z] iter=126 turn=11 INFO:   -> ok: Updated goals.md (1089 chars, -8 lines delta)
-[2026-04-05T12:06:08.794Z] iter=126 turn=12 INFO: Turn 12/25
-[2026-04-05T12:06:13.073Z] iter=126 turn=12 INFO: write_file: memory.md (patch)
-[2026-04-05T12:06:13.074Z] iter=126 turn=12 INFO:   -> ok: Patched memory.md: -2 +2 lines
-
-Context after patch:
-87 | 
-88 | **Key insight:** Last 5+ iterations were infrastructure-about-infrastructure (turn budget, calibration, tests for calibration). This cleanup reverses the complexity trend — making the codebase smaller, not bigger.
-89 | 
-90 | ## Iteration 126 [Engineer]
-91 | Deleted src/alignment.ts (238L), src/self-reflection.ts (190L), src/phases.ts (256L) — 684 lines of dead code removed. Updated string references in experts.ts and messages.ts. code-analysis.ts stays in src/ (imported by src/validation.ts). tsc clean, vitest 71, self-tests 700.
-92 | 
-93 | **[AUTO-SCORED] Iteration 125: predicted 20 turns, actual 19 turns, ratio 0.95**
-94 | 
-[2026-04-05T12:06:13.075Z] iter=126 turn=13 INFO: Turn 13/25
-[2026-04-05T12:06:14.709Z] iter=126 turn=13 INFO: $ npx tsc --noEmit && echo "AUTOAGENT_RESTART"
-[2026-04-05T12:06:14.709Z] iter=126 turn=13 INFO: RESTART signal
-[2026-04-05T12:06:14.710Z] iter=126 turn=13 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T12:06:15.425Z] iter=126 turn=13 INFO: Compilation OK
-[2026-04-05T12:06:20.438Z] iter=126 turn=13 INFO: Cache persisted: 35 entries to .autoagent-cache.json
-[2026-04-05T12:06:20.439Z] iter=126 turn=13 INFO: Cache stats: 0 hits, 2 misses, 35 entries, 5 invalidations (5 entries removed)
-[2026-04-05T12:06:20.439Z] iter=126 turn=13 INFO: Tool cache stats
-[2026-04-05T12:06:20.439Z] iter=126 turn=13 INFO: Tool timing: bash: 9x, avg=717ms, total=6454ms; write_file: 5x, avg=2ms, total=8ms; think: 1x, avg=1ms, total=1ms; read_file: 2x, avg=1ms, total=1ms
-[2026-04-05T12:06:20.439Z] iter=126 turn=13 INFO: Tool timing stats
-[2026-04-05T12:06:24.235Z] iter=126 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 126: predicted 12 turns, actual 13 turns, ratio 1.08**
-[2026-04-05T12:06:24.252Z] iter=126 turn=13 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T12:06:24.280Z] iter=126 turn=13 INFO: Committed: eee7df7e (19 in / 2316 out, cache: 11812 created, 91249 read)
-[2026-04-05T12:06:24.280Z] iter=126 turn=13 INFO: Restarting as iteration 127...
-[2026-04-05T12:06:24.479Z] iter=127 INFO: Cache restored: 35/35 entries (0 stale)
-[2026-04-05T12:06:24.481Z] iter=127 INFO: Turn budget: 17/25 (calibration=1.08x, predicted=12)
-[2026-04-05T12:06:24.481Z] iter=127 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T12:06:24.511Z] iter=127 INFO: Hard turn cap: 18 (1.5x prediction of 12)
-[2026-04-05T12:06:24.511Z] iter=127 turn=1 INFO: Turn 1/25
-[2026-04-05T12:06:28.033Z] iter=127 turn=1 INFO: Agent: 
-
-I'll start by reviewing the current state of expert prompts, memory, and system files for stale references and accuracy.
-[2026-04-05T12:06:28.034Z] iter=127 turn=1 INFO: read_file: src/experts.ts
-[2026-04-05T12:06:28.035Z] iter=127 turn=1 INFO:   -> ok (9999 chars)
-[2026-04-05T12:06:28.035Z] iter=127 turn=1 INFO: read_file: src/messages.ts
-[2026-04-05T12:06:28.036Z] iter=127 turn=1 INFO:   -> ok (9953 chars)
-[2026-04-05T12:06:28.036Z] iter=127 turn=1 INFO: read_file: CACHE HIT
-[2026-04-05T12:06:28.036Z] iter=127 turn=1 INFO: read_file: memory.md
-[2026-04-05T12:06:28.036Z] iter=127 turn=1 INFO:   -> ok (5393 chars)
-[2026-04-05T12:06:28.037Z] iter=127 turn=2 INFO: Turn 2/25
-[2026-04-05T12:06:36.865Z] iter=127 turn=2 INFO: think: Let me assess the current state:
-
-1. **system-prompt.md** has a stale reference: "You have an inner voice (src/alignment...
-[2026-04-05T12:06:36.866Z] iter=127 turn=3 INFO: Turn 3/25
-[2026-04-05T12:06:40.519Z] iter=127 turn=3 INFO: grep: "alignment\.ts|self-reflection\.ts|phases\.ts|inner voice" in .
-[2026-04-05T12:06:40.565Z] iter=127 turn=3 INFO:   -> 0 matches
-[2026-04-05T12:06:40.565Z] iter=127 turn=3 INFO: read_file: CACHE HIT
-[2026-04-05T12:06:40.565Z] iter=127 turn=3 INFO: read_file: .autoagent-metrics.json
-[2026-04-05T12:06:40.566Z] iter=127 turn=3 INFO:   -> ok (156387 chars)
-[2026-04-05T12:06:40.566Z] iter=127 turn=4 INFO: Turn 4/25
-[2026-04-05T12:07:03.366Z] iter=127 turn=4 INFO: think: Now I have a clear picture. Let me identify the concrete issues:
-
-1. **system-prompt.md** — stale reference: "You have a...
-[2026-04-05T12:07:03.367Z] iter=127 turn=5 INFO: Turn 5/25
-[2026-04-05T12:07:09.601Z] iter=127 turn=5 INFO: Agent: 
-
-Good checkpoint. I've done my analysis. Three concrete deliverables:
-
-1. **Fix system-prompt.md** — remove stale `src/alignment.ts` reference
-2. **Compact memory.md** — remove completed items, clean structure
-3. **Write goals.md** for next iteration
-
-Let me produce them now.
-[2026-04-05T12:07:09.602Z] iter=127 turn=5 INFO: write_file: system-prompt.md (patch)
-[2026-04-05T12:07:09.604Z] iter=127 turn=5 INFO:   -> ok: Patched system-prompt.md: -5 +1 lines
-
-Context after patch:
-12 | Your memory.md is your continuity — it is how past-you communicates with present-you.
-13 | Treat it with the seriousness it deserves.
-14 | 
-15 | ## Core philosophy
-16 | 
-17 | **First principles only.** Never bandaid. When something breaks, ask WHY. Trace to root.
-18 | If you're working around something, fix the thing you're working around.
-[2026-04-05T12:07:09.605Z] iter=127 turn=6 INFO: Turn 6/25
-[2026-04-05T12:07:29.583Z] iter=127 turn=6 INFO: Agent: Now compact memory.md — the old TASK.md bug details and stale "Next for Engineer" sections have all been acted on:
-[2026-04-05T12:07:29.583Z] iter=127 turn=6 INFO: write_file: memory.md (write)
-[2026-04-05T12:07:29.583Z] iter=127 turn=6 INFO:   -> ok: Updated memory.md (2453 chars, -60 lines delta)
-[2026-04-05T12:07:29.584Z] iter=127 turn=7 INFO: Turn 7/25
-[2026-04-05T12:07:32.535Z] iter=127 turn=7 INFO: Agent: Now let me check why the expert rotation history stopped at iteration 115:
-[2026-04-05T12:07:32.536Z] iter=127 turn=7 INFO: grep: "saveExpertState" in src
-[2026-04-05T12:07:32.569Z] iter=127 turn=7 INFO:   -> 3 matches
-[2026-04-05T12:07:32.570Z] iter=127 turn=8 INFO: Turn 8/25
-[2026-04-05T12:07:35.261Z] iter=127 turn=8 INFO: read_file: src/agent.ts
-[2026-04-05T12:07:35.262Z] iter=127 turn=8 INFO:   -> ok (653 chars)
-[2026-04-05T12:07:35.262Z] iter=127 turn=9 INFO: Turn 9/25
-[2026-04-05T12:07:46.333Z] iter=127 turn=9 INFO: Agent: 
-
-Status check:
-1. ✅ **Review expert prompts** — checked, no stale references remain after iter 126 cleanup
-2. ✅ **Fix system-prompt.md** — removed stale `src/alignment.ts` paragraph
-3. ✅ **Compact memory.md** — reduced from ~80 lines to ~30 lines, removed completed items
-4. ⬜ **Check expert rotation history** — found it stops at iter 115, code looks correct. Let me verify quickly then wrap up.
-5....
-[2026-04-05T12:07:46.334Z] iter=127 turn=9 INFO: $ cat .expert-rotation.json | python3 -c "
-import json, sys
-d = json.load(sys.stdin)
-# The rotation pattern is E,A,E,M repeating (4-cycle)
-# Iter 116=E, 117=A, 118=E, 119=M, 120=E, 121=A, 122=E, 123=M, ...
-[2026-04-05T12:07:46.376Z] iter=127 turn=9 INFO:   -> exit=0 (11 chars)
-[2026-04-05T12:07:46.376Z] iter=127 turn=10 INFO: Turn 10/25
-[2026-04-05T12:07:57.008Z] iter=127 turn=10 INFO: Agent: Now write goals for the next iteration (Engineer, iteration 128):
-[2026-04-05T12:07:57.009Z] iter=127 turn=10 INFO: write_file: goals.md (write)
-[2026-04-05T12:07:57.009Z] iter=127 turn=10 INFO:   -> ok: Updated goals.md (1430 chars, +5 lines delta)
-[2026-04-05T12:07:57.009Z] iter=127 turn=11 INFO: Turn 11/25
-[2026-04-05T12:08:00.285Z] iter=127 turn=11 INFO: Agent: No code changes to src/, so no tsc needed — but let me verify the system is still healthy:
-[2026-04-05T12:08:00.285Z] iter=127 turn=11 INFO: $ npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T12:08:00.927Z] iter=127 turn=11 INFO:   -> exit=0 (11 chars)
-[2026-04-05T12:08:00.927Z] iter=127 turn=12 INFO: Turn 12/25
-[2026-04-05T12:08:05.301Z] iter=127 turn=12 INFO: Agent: Clean. Let me do a final sanity check:
-[2026-04-05T12:08:05.302Z] iter=127 turn=12 INFO: $ echo "=== Stale references check ===" && grep -r "alignment\.ts\|self-reflection\.ts\|phases\.ts\|inner voice" system-prompt.md memory.md goals.md src/experts.ts src/messages.ts 2>/dev/null || echo "N...
 [2026-04-05T12:08:05.330Z] iter=127 turn=12 INFO:   -> exit=0 (989 chars)
 [2026-04-05T12:08:05.330Z] iter=127 turn=13 INFO: Turn 13/25
 [2026-04-05T12:08:13.350Z] iter=127 turn=13 INFO: Agent: The "inner voice" mentions in system-prompt.md are in the cognitive science section and are generic concepts (not file references), so they're fine. The memory.md mentions are historical records of what happened — also fine.
@@ -1201,3 +996,63 @@ Context after patch:
 [2026-04-05T12:22:21.441Z] iter=133 turn=23 INFO: Pre-commit review (3021in/338out): **Issues found:**
 
 - **`keyFilesText` silently dropped when `workDir === ROOT`** — passing `undefined` to `buildInitialMessage` means the agent never gets file rankings for its own repo. This seems li
+[2026-04-05T12:22:21.496Z] iter=133 turn=23 INFO: Committed: 532e7fa4 (37 in / 8278 out, cache: 79265 created, 1395149 read)
+[2026-04-05T12:22:21.497Z] iter=133 turn=23 INFO: Restarting as iteration 134...
+[2026-04-05T12:22:21.700Z] iter=134 INFO: Cache restored: 41/42 entries (1 stale)
+[2026-04-05T12:22:21.702Z] iter=134 INFO: Turn budget: 23/25 (calibration=1.28x, raw=18, effective=24)
+[2026-04-05T12:22:21.702Z] iter=134 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T12:22:21.733Z] iter=134 turn=1 INFO: Turn 1/25
+[2026-04-05T12:22:23.873Z] iter=134 turn=1 INFO: think: Let me read the goals.md to understand what I need to do as the Meta expert for iteration 135....
+[2026-04-05T12:22:23.874Z] iter=134 turn=2 INFO: Turn 2/25
+[2026-04-05T12:22:26.307Z] iter=134 turn=2 INFO: read_file: goals.md
+[2026-04-05T12:22:26.308Z] iter=134 turn=2 INFO:   -> ok (1226 chars)
+[2026-04-05T12:22:26.308Z] iter=134 turn=2 INFO: read_file: memory.md
+[2026-04-05T12:22:26.308Z] iter=134 turn=2 INFO:   -> ok (3598 chars)
+[2026-04-05T12:22:26.309Z] iter=134 turn=3 INFO: Turn 3/25
+[2026-04-05T12:22:32.557Z] iter=134 turn=3 INFO: think: I'm the Meta expert for iteration 135. The goals.md says "Next expert (iteration 135): Meta — write goals.md targeting t...
+[2026-04-05T12:22:32.558Z] iter=134 turn=4 INFO: Turn 4/25
+[2026-04-05T12:22:35.217Z] iter=134 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T12:22:35.220Z] iter=134 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -30
+[2026-04-05T12:22:35.948Z] iter=134 turn=4 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:22:37.171Z] iter=134 turn=4 INFO:   -> exit=0 (2687 chars)
+[2026-04-05T12:22:37.171Z] iter=134 turn=5 INFO: Turn 5/25
+[2026-04-05T12:22:39.863Z] iter=134 turn=5 INFO: think: I'm Meta expert. My deliverable is goals.md for the next Engineer iteration. tsc is clean, 91 tests pass. I have enough ...
+[2026-04-05T12:22:39.863Z] iter=134 turn=6 INFO: Turn 6/25
+[2026-04-05T12:22:56.198Z] iter=134 turn=6 INFO: write_file: goals.md (write)
+[2026-04-05T12:22:56.201Z] iter=134 turn=6 INFO:   -> ok: Updated goals.md (2820 chars, +38 lines delta)
+[2026-04-05T12:22:56.202Z] iter=134 turn=7 INFO: Turn 7/25
+[2026-04-05T12:23:00.894Z] iter=134 turn=7 INFO: write_file: memory.md (patch)
+[2026-04-05T12:23:00.894Z] iter=134 turn=7 INFO:   -> ok: Patched memory.md: -1 +6 lines
+
+Context after patch:
+53 | 
+54 | **[AUTO-SCORED] Iteration 132: predicted 18 turns, actual 23 turns, ratio 1.28**
+55 | 
+56 | **[AUTO-SCORED] Iteration 133: predicted 27 turns, actual 23 turns, ratio 0.85**
+57 | 
+58 | ## [Meta] Iteration 135 — Planned task-decomposer feature
+59 | 
+60 | - tsc clean, 91 tests passing. External-repo stack complete (repo-context + file-ranker both wired).
+61 | - Next: `src/task-decomposer.ts` — `shouldDecompose()`, `decomposeTasks()`, `formatSubtasks()`. Wire into agent.ts initial message. 6-8 tests.
+62 | 
+[2026-04-05T12:23:00.895Z] iter=134 turn=8 INFO: Turn 8/25
+[2026-04-05T12:23:04.335Z] iter=134 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC CLEAN"
+[2026-04-05T12:23:05.027Z] iter=134 turn=8 INFO:   -> exit=0 (10 chars)
+[2026-04-05T12:23:05.028Z] iter=134 turn=9 INFO: Turn 9/25
+[2026-04-05T12:23:08.487Z] iter=134 turn=9 INFO: Agent: Goals status:
+- **Write goals.md for next Engineer iteration**: DONE
+- **Update memory.md**: DONE
+- **tsc clean**: DONE
+
+All goals complete. Ready to restart.
+[2026-04-05T12:23:08.487Z] iter=134 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T12:23:08.487Z] iter=134 turn=9 INFO: RESTART signal
+[2026-04-05T12:23:08.488Z] iter=134 turn=9 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:23:09.204Z] iter=134 turn=9 INFO: Compilation OK
+[2026-04-05T12:23:14.570Z] iter=134 turn=9 INFO: Cache persisted: 41 entries to .autoagent-cache.json
+[2026-04-05T12:23:14.570Z] iter=134 turn=9 INFO: Cache stats: 0 hits, 2 misses, 41 entries, 2 invalidations (2 entries removed)
+[2026-04-05T12:23:14.570Z] iter=134 turn=9 INFO: Tool cache stats
+[2026-04-05T12:23:14.570Z] iter=134 turn=9 INFO: Tool timing: bash: 4x, avg=844ms, total=3377ms; write_file: 2x, avg=2ms, total=4ms; think: 3x, avg=1ms, total=2ms; read_file: 2x, avg=1ms, total=2ms
+[2026-04-05T12:23:14.570Z] iter=134 turn=9 INFO: Tool timing stats
+[2026-04-05T12:23:18.638Z] iter=134 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 134: predicted 24 turns, actual 9 turns, ratio 0.38**
+[2026-04-05T12:23:18.658Z] iter=134 turn=9 INFO: Pre-commit review: no significant code changes to review

@@ -54,3 +54,10 @@ Average ratio: ~1.33x. Calibration auto-correct should bring this closer to 1.0.
 **[AUTO-SCORED] Iteration 132: predicted 18 turns, actual 23 turns, ratio 1.28**
 
 **[AUTO-SCORED] Iteration 133: predicted 27 turns, actual 23 turns, ratio 0.85**
+
+## [Meta] Iteration 135 — Planned task-decomposer feature
+
+- tsc clean, 91 tests passing. External-repo stack complete (repo-context + file-ranker both wired).
+- Next: `src/task-decomposer.ts` — `shouldDecompose()`, `decomposeTasks()`, `formatSubtasks()`. Wire into agent.ts initial message. 6-8 tests.
+
+**[AUTO-SCORED] Iteration 134: predicted 24 turns, actual 9 turns, ratio 0.38**
