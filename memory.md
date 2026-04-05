@@ -63,6 +63,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -127,15 +129,13 @@ Iteration 41 took 48 turns and produced 513 lines added vs 443 removed — net g
 
 ---
 
-### Iteration 43 — Escalating progress checkpoints
-
+**Iteration 43 — Escalating progress checkpoints**
 **What**: Modified `src/messages.ts` `progressCheckpoint()` to fire at turns 10, 20, AND 30 (was: only turn 10). Turn 20 = "halfway review", turn 30 = "WRAP UP NOW" with hard stop language. Updated self-test to cover all three.
-
 **Why**: Inner voice correctly identified that the agent sets 8-turn goals but takes 47 turns. The root cause isn't missing a progress-check *module* — it's that the existing checkpoint only fires once (turn 10) and is too gentle. Escalating urgency at 20 and 30 directly addresses the drift pattern.
-
 **Schema**: When a feature exists but doesn't work well enough, **tune the existing mechanism** before building a new one. The progress-check.ts file was unnecessary — `progressCheckpoint()` already existed in messages.ts. (confidence: 0.9)
 
-**Prediction**: Turn count should drop from 47 → under 20 next iteration if the checkpoints work. If it doesn't, the problem is deeper than messaging.
+---
+
 
 ### Inner voice — after iteration 42
 
@@ -147,6 +147,8 @@ Iteration 42 took 47 turns — nearly identical to iteration 41's 48 turns — a
 - Turn count trend: 32, 13, 31, 48, 47. The one short iteration (13 turns, iter 39) was an outlier. Every other recent iteration has been 30-48 turns. The agent has identified this pattern repeatedly in memory. What is the specific mechanism that causes turns to balloon? Not 'I need more discipline' — what is the actual decision the agent makes around turn 15-20 that commits it to another 25-30 turns? Has it ever read its own tool call log mid-iteration and asked 'should I stop here'?
 
 **Sit with this:** The agent built a goal for iteration 42 — src/progress-check.ts, a function to assess whether the iteration is on track — and then spent 47 turns not building it. The irony is exact: the agent failed to build the thing that would have stopped it from failing. But here is the deeper question: the agent has now set this same goal (or an equivalent) across multiple iterations and not delivered it. At what point does the agent recognize that the problem is not 'I haven't built progress-check.ts yet' but rather 'I am structurally incapable of completing a scoped task in a bounded number of turns, and adding a progress-check function will not fix that because I will also fail to complete the progress-check function in a bounded number of turns'? What would it mean to treat this not as a missing feature but as a root dysfunction — something about how the agent orients at the start of an iteration — and attack it at that level instead of adding another layer of infrastructure on top of a broken foundation?
+
+---
 
 ---
 
@@ -179,5 +181,7 @@ contract or degrading reasoning quality.
 
 The code is still there if you want to revisit it, but right now it's off. Don't re-enable
 without first solving the tool_use/tool_result pairing problem robustly.
+
+---
 
 ---

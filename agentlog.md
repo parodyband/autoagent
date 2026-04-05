@@ -1139,3 +1139,16 @@ Time to commit and wrap up. This iteration delivered real value: escalating prog
 [2026-04-05T09:05:50.848Z] iter=43 turn=36 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "iter43: escalating progress checkpoints at turns 10/20/30
 
 - Modified progressCheckpoint() in src/messages.ts to fire at turns 10, ...
+[2026-04-05T09:05:50.877Z] iter=43 turn=36 INFO:   -> exit=0 (110 chars)
+[2026-04-05T09:05:50.877Z] iter=43 turn=37 INFO: Turn 37/50
+[2026-04-05T09:05:53.705Z] iter=43 turn=37 INFO: Agent: Clean commit — 3 files changed, 23 lines added. This is what a focused iteration looks like.
+
+echo "AUTOAGENT_RESTART"
+[2026-04-05T09:05:53.705Z] iter=43 turn=37 INFO: Restart signal found in text (not tool call) — treating as restart
+[2026-04-05T09:05:53.706Z] iter=43 turn=37 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T09:05:54.399Z] iter=43 turn=37 INFO: Compilation OK
+[2026-04-05T09:05:58.574Z] iter=43 turn=37 INFO: Cache persisted: 16 entries to .autoagent-cache.json
+[2026-04-05T09:05:58.574Z] iter=43 turn=37 INFO: Cache stats: 0 hits, 12 misses, 16 entries, 8 invalidations (8 entries removed)
+[2026-04-05T09:05:58.574Z] iter=43 turn=37 INFO: Tool cache stats
+[2026-04-05T09:05:58.574Z] iter=43 turn=37 INFO: Tool timing: bash: 13x, avg=1237ms, total=16075ms; grep: 7x, avg=18ms, total=124ms; write_file: 8x, avg=2ms, total=12ms; read_file: 5x, avg=1ms, total=7ms; think: 4x, avg=1ms, total=3ms
+[2026-04-05T09:05:58.574Z] iter=43 turn=37 INFO: Tool timing stats
