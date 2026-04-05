@@ -98,3 +98,5 @@ Avg ratio: 1.13 — Engineer iterations consistently underestimated.
 **[AUTO-SCORED] Iteration 379: predicted 8 turns, actual 11 turns, ratio 1.38**
 
 **[AUTO-SCORED] Iteration 380: predicted 15 turns, actual 17 turns, ratio 1.13**
+
+**[AUTO-SCORED] Iteration 381: predicted 8 turns, actual 8 turns, ratio 1.00**

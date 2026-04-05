@@ -1,107 +1,3 @@
-131 |     }
-132 |     setLoading?.(true);
-133 |     setStatus?.("Creating dry-run plan...");
-134 |     try {
-135 |       let projectContext = `Working directory: ${workDir}`;
-136 |       try {
-137 |         const info = detectProject(workDir);
-138 |         if (info.name) {
-139 |           projectContext += `\n\nProject: ${info.name} (${info.type}, ${info.language})`;
-140 |         }
-141 |       } catch {
-142 |         // non-fatal
-143 |       }
-144 |       const plan = await createPlan(description, projectContext);
-145 |       const lines: string[] = [
-146 |         `🔍 Dry-run plan for: "${description}"`,
-147 |         "",
-148 |         formatPlan(plan),
-149 |         "",
-150 |         "Tasks that would execute (in order):",
-151 |       ];
-152 |       // Show execution order respecting dependencies
-153 |       const remaining = plan.tasks.map((t) => ({ ...t }));
-154 |       const ordered: string[] = [];
-155 |       const done = new Set<string>();
-156 |       let iterations = 0;
-157 |       while (remaining.some((t) => t.status === "pending") && iterations < 20) {
-158 |         iterations++;
-159 |         for (const task of remaining) {
-160 |           if (task.status !== "pending") continue;
-161 |           if (task.dependsOn.every((dep) => done.has(dep))) {
-162 |             ordered.push(`  ${ordered.length + 1}. [${task.id}] ${task.title}`);
-163 |             ordered.push(`     ${task.description}`);
-164 |             task.status = "done";
-165 |             done.add(task.id);
-166 |           }
-167 |         }
-168 |       }
-169 |       lines.push(...ordered);
-170 |       lines.push("");
-171 |       lines.push("(Dry run — no tasks were executed)");
-172 |       addMessage(lines.join("\n"));
-173 |     } catch (err) {
-174 |       addMessage(`Dry-run error: ${err instanceof Error ? err.message : String(err)}`);
-175 |     }
-176 |     setLoading?.(false);
-177 |     setStatus?.("");
-178 |     return;
-179 |   }
-180 | 
-181 |   // /plan <description> — unknown single-word subcommands fall through to create
-182 |   const description = trimmed;
-183 |   if (!description) {
-184 |     addMessage("Usage: /plan <description>");
-185 |     return;
-186 |   }
-187 | 
-188 |   // Build project context
-189 |   let projectContext = `Working directory: ${workDir}`;
-[2026-04-05T20:44:10.741Z] iter=372 turn=10 INFO: Turn 10/25
-[2026-04-05T20:44:14.795Z] iter=372 turn=10 INFO: Agent: Now add the help text for `--dry-run`:
-[2026-04-05T20:44:14.795Z] iter=372 turn=10 INFO: write_file: src/plan-commands.ts (patch)
-[2026-04-05T20:44:14.796Z] iter=372 turn=10 INFO:   -> ok: Patched src/plan-commands.ts: -6 +7 lines
-
-Context after patch:
-44 | 
-45 |   // /plan or /plan help
-46 |   if (trimmed === "" || trimmed === "help") {
-47 |     addMessage(
-48 |       "Usage:\n" +
-49 |         "  /plan <description> — Create and execute a task plan\n" +
-50 |         "  /plan --dry-run <description> — Show what tasks would run without executing\n" +
-51 |         "  /plan list — Show saved plans\n" +
-52 |         "  /plan resume — Resume most recent incomplete plan"
-53 |     );
-54 |     return;
-55 |   }
-56 | 
-[2026-04-05T20:44:14.796Z] iter=372 turn=11 INFO: Turn 11/25
-[2026-04-05T20:44:16.947Z] iter=372 turn=11 INFO: Agent: Now add tests for dry-run. Let me check the existing plan-executor test to understand the mocking pattern:
-[2026-04-05T20:44:16.948Z] iter=372 turn=11 INFO: $ head -60 tests/plan-executor.test.ts
-[2026-04-05T20:44:16.962Z] iter=372 turn=11 INFO:   -> exit=0 (2262 chars)
-[2026-04-05T20:44:16.962Z] iter=372 turn=12 INFO: Turn 12/25
-[2026-04-05T20:44:18.716Z] iter=372 turn=12 INFO: Agent: Now write the dry-run tests. I'll add them to the existing plan-executor test or create a new file for plan-commands:
-[2026-04-05T20:44:18.717Z] iter=372 turn=12 INFO: $ ls tests/ | grep plan
-[2026-04-05T20:44:18.729Z] iter=372 turn=12 INFO:   -> exit=0 (51 chars)
-[2026-04-05T20:44:18.730Z] iter=372 turn=13 INFO: Turn 13/25
-[2026-04-05T20:44:22.075Z] iter=372 turn=13 INFO: think: I've made 2 src/ changes:
-1. Created tests/hooks-integration.test.ts (Goal 1)
-2. Modified src/plan-commands.ts to add --...
-[2026-04-05T20:44:22.076Z] iter=372 turn=14 INFO: Turn 14/25
-[2026-04-05T20:44:24.791Z] iter=372 turn=14 INFO: Agent: src/ changes so far:
-- `src/plan-commands.ts`: +56 LOC (--dry-run feature) ✅
-- `tests/hooks-integration.test.ts`: created ✅
-
-Now run tests and wrap up:
-[2026-04-05T20:44:24.791Z] iter=372 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/hooks-integration.test.ts 2>&1 | tail -30
-[2026-04-05T20:44:25.836Z] iter=372 turn=14 INFO:   -> exit=0 (938 chars)
-[2026-04-05T20:44:25.837Z] iter=372 turn=15 INFO: Turn 15/25
-[2026-04-05T20:44:27.393Z] iter=372 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/hooks-integration.test.ts 2>&1 | grep "FAIL\|Error\|fail" | head -20
-[2026-04-05T20:44:28.413Z] iter=372 turn=15 INFO:   -> exit=0 (797 chars)
-[2026-04-05T20:44:28.414Z] iter=372 turn=16 INFO: Turn 16/25
-[2026-04-05T20:44:34.097Z] iter=372 turn=16 INFO: Agent: The `blocked` value is a string (not null) but `toMatch` needs a string — the issue is `checkPreToolUse` returning the string correctly but the hook not executing fast enough, OR `blocked` is null. Let me fix the tests quickly:
-[2026-04-05T20:44:34.099Z] iter=372 turn=16 INFO: write_file: tests/hooks-integration.test.ts (patch)
 [2026-04-05T20:44:34.101Z] iter=372 turn=16 INFO:   -> ok: Patched tests/hooks-integration.test.ts: -3 +4 lines
 
 Context after patch:
@@ -1100,3 +996,74 @@ Context after patch:
 [2026-04-05T20:59:14.619Z] iter=380 turn=17 INFO: Tool timing stats
 [2026-04-05T20:59:22.149Z] iter=380 turn=17 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 380: predicted 15 turns, actual 17 turns, ratio 1.13**
 [2026-04-05T20:59:24.380Z] iter=380 turn=17 INFO: Pre-commit review (476in/60out): LGTM. Both changes are cleanups: the type is correctly broadened from `ToolResultBlockParam[]` to `ContentBlockParam[]` (which is a supertype that includes text blocks), allowing the `as unknown as` c
+[2026-04-05T20:59:24.455Z] iter=380 turn=17 INFO: Committed: d8041bc4 (29 in / 2607 out, cache: 12442 created, 186658 read)
+[2026-04-05T20:59:24.455Z] iter=380 turn=17 INFO: Restarting as iteration 381...
+[2026-04-05T20:59:24.645Z] iter=381 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T20:59:24.647Z] iter=381 INFO: Turn budget: 13/25 (calibration=1.13x, predicted=8)
+[2026-04-05T20:59:24.648Z] iter=381 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T20:59:24.826Z] iter=381 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T20:59:24.827Z] iter=381 turn=1 INFO: Turn 1/25
+[2026-04-05T20:59:29.134Z] iter=381 turn=1 INFO: Agent: 
+
+I'll start by evaluating what happened in iteration 380, then research to pick the highest-value next feature, and write concrete Engineer goals.
+[2026-04-05T20:59:29.135Z] iter=381 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | tail -30
+[2026-04-05T20:59:29.140Z] iter=381 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/*.ts src/**/*.ts 2>/dev/null | tail -5
+[2026-04-05T20:59:29.144Z] iter=381 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T20:59:29.159Z] iter=381 turn=1 INFO:   -> exit=0 (141 chars)
+[2026-04-05T20:59:29.162Z] iter=381 turn=1 INFO:   -> exit=0 (560 chars)
+[2026-04-05T20:59:30.249Z] iter=381 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:59:30.250Z] iter=381 turn=2 INFO: Turn 2/25
+[2026-04-05T20:59:37.906Z] iter=381 turn=2 INFO: Agent: 
+
+Good checkpoint. My deliverable is **goals.md** for Engineer iteration 382. Let me do focused research on the highest-value option, then write it.
+[2026-04-05T20:59:37.907Z] iter=381 turn=2 INFO: think: The three options are:
+A) TUI /plan enrichment - task decomposition
+B) Semantic search / embeddings - context quality
+C)...
+[2026-04-05T20:59:37.908Z] iter=381 turn=3 INFO: Turn 3/25
+[2026-04-05T20:59:41.130Z] iter=381 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/task-planner.ts && head -60 src/task-planner.ts
+[2026-04-05T20:59:41.133Z] iter=381 turn=3 INFO: web_search: "coding agent task decomposition planning 2024 best practices SWE-agent OpenHands"
+[2026-04-05T20:59:41.157Z] iter=381 turn=3 INFO:   -> exit=0 (1786 chars)
+[2026-04-05T20:59:42.132Z] iter=381 turn=3 INFO:   -> 8 results
+[2026-04-05T20:59:42.133Z] iter=381 turn=4 INFO: Turn 4/25
+[2026-04-05T20:59:47.050Z] iter=381 turn=4 INFO: Agent: 
+
+Status: **NOT STARTED** on goals.md. Let me write it now. I have enough context — task-planner exists (336 LOC), /plan is wired in TUI but executor isn't connected to real orchestrator, and tests are missing.
+
+Let me fetch the Anthropic article quickly for research notes, then write goals.md immediately.
+[2026-04-05T20:59:47.051Z] iter=381 turn=4 INFO: web_fetch: https://medium.com/codex/a-deep-dive-into-ai-coding-agents-task-decomposition-architecture-bd42db97bab8
+[2026-04-05T20:59:47.174Z] iter=381 turn=4 INFO:   -> err (58 chars)
+[2026-04-05T20:59:47.174Z] iter=381 turn=5 INFO: Turn 5/25
+[2026-04-05T20:59:51.022Z] iter=381 turn=5 INFO: Agent: Medium is blocked. Let me just write the goals now — I have sufficient context from the search results and codebase knowledge.
+[2026-04-05T20:59:51.023Z] iter=381 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "executePlan\|TaskExecutor\|replanOnFailure" src/task-planner.ts | head -20
+[2026-04-05T20:59:51.033Z] iter=381 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "plan" src/orchestrator.ts | head -20
+[2026-04-05T20:59:51.054Z] iter=381 turn=5 INFO:   -> exit=0 (175 chars)
+[2026-04-05T20:59:51.055Z] iter=381 turn=5 INFO:   -> exit=0 (1392 chars)
+[2026-04-05T20:59:51.055Z] iter=381 turn=6 INFO: Turn 6/25
+[2026-04-05T21:00:17.448Z] iter=381 turn=6 INFO: Agent: 
+
+I'm the Architect — my deliverable is goals.md, not src/ changes. Writing it now.
+[2026-04-05T21:00:17.450Z] iter=381 turn=6 INFO: write_file: goals.md (write)
+[2026-04-05T21:00:17.452Z] iter=381 turn=6 INFO:   -> ok: Updated goals.md (2987 chars, +32 lines delta)
+[2026-04-05T21:00:17.453Z] iter=381 turn=7 INFO: Turn 7/25
+[2026-04-05T21:00:24.369Z] iter=381 turn=7 INFO: Agent: 
+
+Wrapping up now.
+[2026-04-05T21:00:24.370Z] iter=381 turn=7 INFO: save_memory: "[Architect 381] Task planner next steps"
+[2026-04-05T21:00:24.371Z] iter=381 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T21:00:24.371Z] iter=381 turn=7 INFO: save_memory: "[Research 381] Task decomposition in coding agents"
+[2026-04-05T21:00:24.372Z] iter=381 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T21:00:24.373Z] iter=381 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
+[2026-04-05T21:00:25.389Z] iter=381 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-05T21:00:25.389Z] iter=381 turn=8 INFO: Turn 8/25
+[2026-04-05T21:00:28.235Z] iter=381 turn=8 INFO: Agent: TSC clean. Goals written. Memory saved.
+
+echo "AUTOAGENT_RESTART"
+[2026-04-05T21:00:28.236Z] iter=381 turn=8 INFO: Restart signal found in text (not tool call) — treating as restart
+[2026-04-05T21:00:28.236Z] iter=381 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T21:00:29.314Z] iter=381 turn=8 INFO: Compilation OK
+[2026-04-05T21:00:37.321Z] iter=381 turn=8 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T21:00:37.321Z] iter=381 turn=8 INFO: Tool timing: bash: 7x, avg=321ms, total=2248ms; web_search: 1x, avg=1000ms, total=1000ms; web_fetch: 1x, avg=123ms, total=123ms; save_memory: 2x, avg=8ms, total=15ms; write_file: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T21:00:37.321Z] iter=381 turn=8 INFO: Tool timing stats
+[2026-04-05T21:00:44.574Z] iter=381 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 381: predicted 8 turns, actual 8 turns, ratio 1.00**
+[2026-04-05T21:00:44.598Z] iter=381 turn=8 INFO: Pre-commit review: no significant code changes to review

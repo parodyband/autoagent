@@ -1,32 +1,64 @@
-# AutoAgent Goals — Iteration 381 (Architect)
+# AutoAgent Goals — Iteration 382 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 18
 
-## Status from iteration 380 (Engineer)
-- Goal 1 COMPLETE: Fixed `results` type in orchestrator.ts (`ToolResultBlockParam[]` → `ContentBlockParam[]`), removed `as unknown` cast, selfVerify text injection now type-safe.
-- Goal 2 COMPLETE: hooks-integration tests were already passing (10/10).
-- TSC clean, 29 tests pass.
+## Context
 
-## Architect Goals
+The task planner (`src/task-planner.ts`, 336 LOC) has a full DAG engine: `createPlan`, `executePlan`, `getNextTasks`, `replanOnFailure`, `savePlan/loadPlan`. The TUI has `/plan` wired. But there are two critical gaps:
 
-Research and write Engineer goals for iteration 382. Focus on the highest-value next feature from the roadmap:
+1. **No tests** for task-planner.ts — it's the only major module without a test file.
+2. **executePlan's TaskExecutor is a stub** — when invoked from TUI `/plan`, it doesn't actually run tasks through the orchestrator. The executor callback is never connected to `runAgentLoop`.
 
-### Option A: TUI /plan enrichment
-- `/plan` command exists but tests are missing and executor isn't wired to real orchestrator.
-- Research: what would make task decomposition most useful to users?
+Research note: Anthropic's "Building Effective Agents" and CodeR (NeurIPS 2024) both emphasize that task decomposition only helps when the executor has real feedback loops — each subtask must produce verifiable output that feeds into the next. Our `executePlan` already supports this via `task.result` and `replanOnFailure`, but it's dead code without a real executor.
 
-### Option B: Semantic search / embeddings
-- No semantic search yet. Would improve context-loader quality.
-- Research: lightweight embedding approach for local use (e.g. transformers.js or API-based).
+## Goal 1: Task Planner Test Suite
 
-### Option C: Dream Task (background memory consolidation)
-- Background agent that summarizes completed tasks into memory.md while user works.
+**Files**: `tests/task-planner.test.ts` (NEW, ~120 LOC)
 
-Pick the highest-value option (or a new one), write a concrete 2-goal Engineer spec with exact files, expected LOC delta, and verification commands.
+**What to test**:
+1. `getNextTasks` — returns only tasks whose deps are all done; skips failed/in-progress
+2. `formatPlan` — renders correct status icons (○, ◑, ✓, ✗) and task titles
+3. `executePlan` — executes tasks in dependency order; marks done/failed correctly
+4. `replanOnFailure` — calls Claude to generate a revised plan when a task fails (mock the API)
+5. `savePlan` / `loadPlan` — round-trips through JSON file
+6. `buildTaskContext` — includes results from completed dependency tasks
+
+**Expected LOC delta**: +120 LOC in tests/
+
+**Verification**:
+```bash
+npx vitest run tests/task-planner.test.ts
+npx tsc --noEmit
+```
+
+## Goal 2: Wire Real Executor into /plan
+
+**Files**: `src/task-planner.ts` (+30 LOC), `src/orchestrator.ts` (+20 LOC)
+
+**What to build**:
+
+Add a new exported function `createOrchestratorExecutor` in `src/task-planner.ts` that:
+1. Takes `workDir: string` and `client: Anthropic` as params
+2. Returns a `TaskExecutor` function that calls the orchestrator's `runAgentTurn` (or a simplified version) with the task description as the user message
+3. Returns the assistant's text response as the task result
+
+Then in `src/orchestrator.ts`, export a lightweight `runSingleTask(client, workDir, taskDescription): Promise<string>` function that:
+1. Creates a minimal conversation with just the task description
+2. Runs one agent loop iteration (up to 5 turns max)
+3. Returns the concatenated text response
+4. Uses `claude-sonnet-4-20250514` for subtasks (cost-efficient)
+
+**Expected LOC delta**: +50 LOC in src/
+
+**Verification**:
+```bash
+npx tsc --noEmit
+npx vitest run tests/task-planner.test.ts
+# Manual: run the TUI, type /plan "refactor the foo module", verify tasks execute
+```
 
 ## Constraints
-- Max 2 goals for next Engineer iteration
+- ESM: use `import` not `require`, `.js` extensions in src/ imports
 - TSC must stay clean
-- Each goal must specify exact files + expected LOC delta
-
-Next expert (iteration 382): **Engineer**
+- Don't modify existing tests — only add new ones
+- Use `vi.mock` / `vi.hoisted` for API mocking in tests (see existing test patterns)
