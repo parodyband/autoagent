@@ -736,9 +736,11 @@ async function runAgentLoop(
         if (postWriteResult.additionalContext) {
           rawResult += "\n\n[Hook context]: " + postWriteResult.additionalContext;
         }
+        const writtenPath = (tu.input as { path?: string }).path ?? "";
         if (onFileWatch) {
-          onFileWatch("write", (tu.input as { path?: string }).path ?? "");
+          onFileWatch("write", writtenPath);
         }
+        this.sessionFilesModified.add(writtenPath);
         const result = compressToolOutput(tu.name, rawResult);
         results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
       }
@@ -897,6 +899,8 @@ export class Orchestrator {
   private sessionStartTime = Date.now();
   /** Cost of each completed turn, for trend analysis. */
   private turnCosts: number[] = [];
+  /** Files written during this session. */
+  private sessionFilesModified = new Set<string>();
 
   /** AbortController for the current send() call. Null when idle. */
   _abortController: AbortController | null = null;
@@ -1125,7 +1129,7 @@ export class Orchestrator {
       if (recentAvg > avgCostPerTurn * 1.2) costTrend = "↑";
       else if (recentAvg < avgCostPerTurn * 0.8) costTrend = "↓";
     }
-    return { durationMs, turnCount, avgCostPerTurn, costTrend, sessionCost: this.costTracker.totalCost, costSummary: this.costTracker.sessionSummary };
+    return { durationMs, turnCount, avgCostPerTurn, costTrend, sessionCost: this.costTracker.totalCost, costSummary: this.costTracker.sessionSummary, filesModified: Array.from(this.sessionFilesModified) };
   }
 
   /** Get the current model (override if set, otherwise "auto"). */

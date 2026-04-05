@@ -1,71 +1,3 @@
-[2026-04-05T21:11:12.994Z] iter=388 turn=2 INFO: $ grep -n "setModel\|_modelOverride\|model" src/tui.tsx | head -30
-[2026-04-05T21:11:13.009Z] iter=388 turn=2 INFO:   -> exit=0 (1878 chars)
-[2026-04-05T21:11:13.011Z] iter=388 turn=2 INFO:   -> exit=0 (323 chars)
-[2026-04-05T21:11:13.012Z] iter=388 turn=3 INFO: Turn 3/25
-[2026-04-05T21:11:19.326Z] iter=388 turn=3 INFO: think: I have enough context. Let me implement the --model CLI flag now.
-
-From what I've read:
-1. `src/orchestrator.ts` has `se...
-[2026-04-05T21:11:19.326Z] iter=388 turn=4 INFO: Turn 4/25
-[2026-04-05T21:11:21.398Z] iter=388 turn=4 INFO: Agent: I have enough context. Implementing now.
-[2026-04-05T21:11:21.399Z] iter=388 turn=4 INFO: $ grep -n "modelMap\|opus\|haiku\|sonnet" src/tui.tsx | grep -i "map\|resolve\|opus" | head -20
-[2026-04-05T21:11:21.412Z] iter=388 turn=4 INFO:   -> exit=0 (142 chars)
-[2026-04-05T21:11:21.412Z] iter=388 turn=5 INFO: Turn 5/25
-[2026-04-05T21:11:29.747Z] iter=388 turn=5 INFO: Agent: Now I have everything. Let me patch `src/cli.ts` and write the test file:
-[2026-04-05T21:11:29.749Z] iter=388 turn=5 INFO: write_file: src/cli.ts (patch)
-[2026-04-05T21:11:29.752Z] iter=388 turn=5 INFO:   -> ok: Patched src/cli.ts: -5 +38 lines
-
-Context after patch:
-21 | 
-22 | // ─── Parse args ─────────────────────────────────────────────
-23 | 
-24 | let workDir = process.cwd();
-25 | const dirIdx = process.argv.indexOf("--dir");
-26 | if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
-27 |   workDir = path.resolve(process.argv[dirIdx + 1]);
-28 | }
-29 | 
-30 | // ─── Resolve --model flag ────────────────────────────────────
-31 | 
-32 | /** Expand shorthand model aliases to full model IDs. */
-33 | export function resolveModelAlias(alias: string): string {
-34 |   const modelMap: Record<string, string> = {
-35 |     haiku: "claude-haiku-4-5",
-36 |     sonnet: "claude-sonnet-4-6",
-37 |     opus: "claude-opus-4-5",
-38 |   };
-39 |   return modelMap[alias.toLowerCase()] ?? alias;
-40 | }
-41 | 
-42 | const VALID_ALIASES = new Set(["haiku", "sonnet", "opus"]);
-43 | 
-44 | let initialModel: string | null = null;
-45 | const modelIdx = process.argv.indexOf("--model");
-46 | if (modelIdx !== -1) {
-47 |   const modelArg = process.argv[modelIdx + 1];
-48 |   if (!modelArg || modelArg.startsWith("-")) {
-49 |     console.error("Error: --model requires a value (e.g. --model sonnet)");
-50 |     process.exit(1);
-51 |   }
-52 |   // Accept known aliases OR any full claude-* model ID
-53 |   if (!VALID_ALIASES.has(modelArg.toLowerCase()) && !modelArg.startsWith("claude-")) {
-54 |     console.error(
-55 |       `Error: unknown model "${modelArg}". ` +
-56 |       `Use: haiku, sonnet, opus, or a full model ID (e.g. claude-sonnet-4-6).`
-57 |     );
-58 |     process.exit(1);
-59 |   }
-60 |   initialModel = resolveModelAlias(modelArg);
-61 | }
-62 | 
-63 | // ─── /help subcommand ────────────────────────────────────────
-64 | export function printHelp(): void {
-[2026-04-05T21:11:29.754Z] iter=388 turn=6 INFO: Turn 6/25
-[2026-04-05T21:11:33.744Z] iter=388 turn=6 INFO: Agent: **Goal status:**
-- `src/cli.ts` — `--model` flag parsing + `resolveModelAlias`: **DONE**
-- Apply `initialModel` to orchestrator after creation: **NOT STARTED**
-- `tests/cli-model-flag.test.ts`: **NOT STARTED**
-
 Finishing now:
 [2026-04-05T21:11:33.745Z] iter=388 turn=6 INFO: write_file: src/cli.ts (patch)
 [2026-04-05T21:11:33.748Z] iter=388 turn=6 INFO:   -> ok: Patched src/cli.ts: -2 +3 lines
@@ -1064,3 +996,114 @@ TSC clean. Memory and goals already written. Done.
 [2026-04-05T22:09:03.684Z] iter=395 turn=7 INFO: Tool timing stats
 [2026-04-05T22:09:11.500Z] iter=395 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 395: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T22:09:11.526Z] iter=395 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T22:09:11.568Z] iter=395 turn=7 INFO: Committed: 63d07f5f (17 in / 3260 out, cache: 11707 created, 51494 read)
+[2026-04-05T22:09:11.568Z] iter=395 turn=7 INFO: Restarting as iteration 396...
+[2026-04-05T22:09:11.752Z] iter=396 INFO: Cache restored: 56/56 entries (0 stale)
+[2026-04-05T22:09:11.754Z] iter=396 INFO: Turn budget: 16/25 (calibration=1.07x, predicted=15)
+[2026-04-05T22:09:11.754Z] iter=396 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T22:09:11.926Z] iter=396 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-05T22:09:11.927Z] iter=396 turn=1 INFO: Turn 1/25
+[2026-04-05T22:09:14.218Z] iter=396 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T22:09:14.219Z] iter=396 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-05T22:09:14.238Z] iter=396 turn=1 INFO:   -> exit=0 (1571 chars)
+[2026-04-05T22:09:14.239Z] iter=396 turn=2 INFO: Turn 2/25
+[2026-04-05T22:09:16.927Z] iter=396 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "semantic_search\|searchIndex\|CodeSearchIndex\|buildSearchIndex" src/orchestrator.ts | head -40
+[2026-04-05T22:09:16.930Z] iter=396 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "/search\|searchIndex\|semantic" src/tui.tsx | head -40
+[2026-04-05T22:09:16.942Z] iter=396 turn=2 INFO:   -> exit=0 (429 chars)
+[2026-04-05T22:09:16.943Z] iter=396 turn=2 INFO:   -> exit=0 (404 chars)
+[2026-04-05T22:09:16.943Z] iter=396 turn=3 INFO: Turn 3/25
+[2026-04-05T22:09:22.221Z] iter=396 turn=3 INFO: think: Let me quickly assess what I need to do:
+
+1. Goal 1: Wire `/search` into orchestrator as a tool - the agent itself can c...
+[2026-04-05T22:09:22.222Z] iter=396 turn=4 INFO: Turn 4/25
+[2026-04-05T22:09:24.241Z] iter=396 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "semantic_search\|_searchIndexHolder" src/orchestrator.ts src/tool-registry.ts | head -50
+[2026-04-05T22:09:24.264Z] iter=396 turn=4 INFO:   -> exit=0 (687 chars)
+[2026-04-05T22:09:24.265Z] iter=396 turn=5 INFO: Turn 5/25
+[2026-04-05T22:09:26.218Z] iter=396 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "case \"semantic_search\"\|semantic_search" src/orchestrator.ts | head -20
+[2026-04-05T22:09:26.230Z] iter=396 turn=5 INFO:   -> exit=0 (90 chars)
+[2026-04-05T22:09:26.231Z] iter=396 turn=6 INFO: Turn 6/25
+[2026-04-05T22:09:30.277Z] iter=396 turn=6 INFO: Agent: Goal 1 (semantic_search tool in orchestrator): NOT STARTED - need to add tool dispatch
+Goal 2 (session file tracking + /status): NOT STARTED
+
+Let me look at the orchestrator tool dispatch section quickly, then write both changes:
+[2026-04-05T22:09:30.279Z] iter=396 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "case \"write_file\"\|case \"read_file\"\|case \"bash\"\|case \"grep\"\|dispatchTool\|runTool\|tool_use\|toolName" src/orchestrator.ts | head -30
+[2026-04-05T22:09:30.306Z] iter=396 turn=6 INFO:   -> exit=0 (2403 chars)
+[2026-04-05T22:09:30.307Z] iter=396 turn=7 INFO: Turn 7/25
+[2026-04-05T22:09:32.190Z] iter=396 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '680,760p' src/orchestrator.ts
+[2026-04-05T22:09:32.214Z] iter=396 turn=7 INFO:   -> exit=0 (3770 chars)
+[2026-04-05T22:09:32.215Z] iter=396 turn=8 INFO: Turn 8/25
+[2026-04-05T22:09:35.232Z] iter=396 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "createDefaultRegistry\|execTool\|executeToolsInParallel\|readOnlyTools\|writeTools\|const tools" src/orchestrator.ts | head -30
+[2026-04-05T22:09:35.255Z] iter=396 turn=8 INFO:   -> exit=0 (1249 chars)
+[2026-04-05T22:09:35.256Z] iter=396 turn=9 INFO: Turn 9/25
+[2026-04-05T22:09:37.172Z] iter=396 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '640,660p' src/orchestrator.ts
+[2026-04-05T22:09:37.196Z] iter=396 turn=9 INFO:   -> exit=0 (964 chars)
+[2026-04-05T22:09:37.198Z] iter=396 turn=10 INFO: Turn 10/25
+[2026-04-05T22:09:41.533Z] iter=396 turn=10 INFO: think: I've been reading but not writing. The tool dispatch already routes through `execTool` via `registry`, and `semantic_sea...
+[2026-04-05T22:09:41.535Z] iter=396 turn=11 INFO: Turn 11/25
+[2026-04-05T22:09:44.140Z] iter=396 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '310,370p' src/tool-registry.ts
+[2026-04-05T22:09:44.144Z] iter=396 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "sessionFilesChanged\|filesChanged\|filesModified\|getSessionStats" src/orchestrator.ts | head -20
+[2026-04-05T22:09:44.151Z] iter=396 turn=11 INFO:   -> exit=0 (1869 chars)
+[2026-04-05T22:09:44.155Z] iter=396 turn=11 INFO:   -> exit=0 (164 chars)
+[2026-04-05T22:09:44.155Z] iter=396 turn=12 INFO: Turn 12/25
+[2026-04-05T22:09:49.094Z] iter=396 turn=12 INFO: think: OK so `semantic_search` is already fully registered in tool-registry.ts with a proper handler. And the orchestrator uses...
+[2026-04-05T22:09:49.095Z] iter=396 turn=13 INFO: Turn 13/25
+[2026-04-05T22:09:52.407Z] iter=396 turn=13 INFO: Agent: I'm stopping exploration and writing code now.
+[2026-04-05T22:09:52.407Z] iter=396 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1115,1145p' src/orchestrator.ts
+[2026-04-05T22:09:52.409Z] iter=396 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "filesModified\|sessionFiles\|/status\|getSessionStats" src/tui.tsx | head -20
+[2026-04-05T22:09:52.419Z] iter=396 turn=13 INFO:   -> exit=0 (1273 chars)
+[2026-04-05T22:09:52.420Z] iter=396 turn=13 INFO:   -> exit=0 (265 chars)
+[2026-04-05T22:09:52.420Z] iter=396 turn=14 INFO: Turn 14/25
+[2026-04-05T22:09:55.482Z] iter=396 turn=14 INFO: Agent: Writing both changes now in parallel:
+[2026-04-05T22:09:55.483Z] iter=396 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '669,710p' src/tui.tsx
+[2026-04-05T22:09:55.485Z] iter=396 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onFileWatch\|write.*path\|filesWritten\|sessionFiles" src/orchestrator.ts | grep -v "//\|log\|onFileWatch(" | head -20
+[2026-04-05T22:09:55.495Z] iter=396 turn=14 INFO:   -> exit=0 (1903 chars)
+[2026-04-05T22:09:55.500Z] iter=396 turn=14 INFO:   -> exit=0 (597 chars)
+[2026-04-05T22:09:55.501Z] iter=396 turn=15 INFO: Turn 15/25
+[2026-04-05T22:10:00.251Z] iter=396 turn=15 INFO: Agent: Now I have enough context. Let me make both changes:
+
+**Goal 2**: Add `sessionFilesModified` Set to orchestrator and expose via `getSessionStats()`, then update `/status` in TUI.
+[2026-04-05T22:10:00.252Z] iter=396 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "private sessionStartTime\|private turnCosts\|private modelOverride\|private costTracker\|private registry" src/orchestrator.ts | head -10
+[2026-04-05T22:10:00.266Z] iter=396 turn=15 INFO:   -> exit=0 (249 chars)
+[2026-04-05T22:10:00.266Z] iter=396 turn=16 INFO: Turn 16/25
+[2026-04-05T22:10:03.553Z] iter=396 turn=16 INFO: Agent: Making both changes now:
+[2026-04-05T22:10:03.554Z] iter=396 turn=16 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T22:10:03.555Z] iter=396 turn=16 INFO:   -> err: ERROR: old_string not found in src/orchestrator.ts. Must match exactly.
+[2026-04-05T22:10:03.556Z] iter=396 turn=17 INFO: Turn 17/25
+[2026-04-05T22:10:05.319Z] iter=396 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "sessionStartTime\|turnCosts" src/orchestrator.ts | head -5
+[2026-04-05T22:10:05.333Z] iter=396 turn=17 INFO:   -> exit=0 (285 chars)
+[2026-04-05T22:10:05.333Z] iter=396 turn=18 INFO: Turn 18/25
+[2026-04-05T22:10:08.187Z] iter=396 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '897,901p' src/orchestrator.ts | cat -A | head -5
+[2026-04-05T22:10:08.192Z] iter=396 turn=18 INFO:   -> exit=0 (59 chars)
+[2026-04-05T22:10:08.193Z] iter=396 turn=19 INFO: Turn 19/25
+[2026-04-05T22:10:17.841Z] iter=396 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && python3 -c "
+content = open('src/orchestrator.ts').read()
+old = '  private sessionStartTime = Date.now();\n\n  private turnCosts: number[] = [];'
+new = '  priva...
+[2026-04-05T22:10:17.874Z] iter=396 turn=19 INFO:   -> exit=0 (123 chars)
+[2026-04-05T22:10:17.875Z] iter=396 turn=20 INFO: Turn 20/25
+[2026-04-05T22:10:22.974Z] iter=396 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && python3 -c "
+content = open('src/orchestrator.ts').read()
+old = '  private sessionStartTime = Date.now();\n  /** Cost of each completed turn, for trend analysis...
+[2026-04-05T22:10:23.014Z] iter=396 turn=20 INFO:   -> exit=0 (3 chars)
+[2026-04-05T22:10:23.014Z] iter=396 turn=21 INFO: Turn 21/25
+[2026-04-05T22:10:26.413Z] iter=396 turn=21 INFO: Agent: Now track files on write and patch the TUI `/status` display:
+[2026-04-05T22:10:26.415Z] iter=396 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onFileWatch.*write\|sessionFilesModified" src/orchestrator.ts | head -10
+[2026-04-05T22:10:26.437Z] iter=396 turn=21 INFO:   -> exit=0 (541 chars)
+[2026-04-05T22:10:26.438Z] iter=396 turn=22 INFO: Turn 22/25
+[2026-04-05T22:10:29.019Z] iter=396 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '735,745p' src/orchestrator.ts
+[2026-04-05T22:10:29.034Z] iter=396 turn=22 INFO:   -> exit=0 (437 chars)
+[2026-04-05T22:10:29.035Z] iter=396 turn=23 INFO: Turn 23/25
+[2026-04-05T22:10:38.606Z] iter=396 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && python3 -c "
+content = open('src/orchestrator.ts').read()
+# Track files on write in the single write_file path
+old = '''        if (onFileWatch) {
+          onF...
+[2026-04-05T22:10:38.672Z] iter=396 turn=23 INFO:   -> exit=0 (417 chars)
+[2026-04-05T22:10:38.672Z] iter=396 turn=23 INFO: HARD TURN CAP REACHED: 23 turns (predicted 15, cap 23). Forcing commit.
+[2026-04-05T22:10:38.673Z] iter=396 turn=23 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-05T22:10:38.674Z] iter=396 turn=23 INFO: Tool timing: bash: 23x, avg=21ms, total=473ms; read_scratchpad: 1x, avg=9ms, total=9ms; think: 3x, avg=1ms, total=3ms; write_file: 1x, avg=2ms, total=2ms
+[2026-04-05T22:10:38.674Z] iter=396 turn=23 INFO: Tool timing stats
+[2026-04-05T22:10:46.414Z] iter=396 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 396: predicted 15 turns, actual 23 turns, ratio 1.53**
+[2026-04-05T22:10:53.163Z] iter=396 turn=23 INFO: Pre-commit review (756in/259out): **Bug: `this` context in a standalone function**
+
+`runAgentLoop` appears to be a standalone `async function` (not a class method), yet the diff adds `this.sessionFilesModified.add(writtenPath)` inside

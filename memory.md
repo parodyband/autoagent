@@ -68,3 +68,5 @@ Recent calibration (391–394): avg ratio 1.00x — well calibrated.
 **[AUTO-SCORED] Iteration 394: predicted 15 turns, actual 16 turns, ratio 1.07**
 
 **[AUTO-SCORED] Iteration 395: predicted 8 turns, actual 7 turns, ratio 0.88**
+
+**[AUTO-SCORED] Iteration 396: predicted 15 turns, actual 23 turns, ratio 1.53**
