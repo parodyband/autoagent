@@ -1,56 +1,3 @@
-207 |     const toolMap = new Map<string, string>();
-208 | 
-209 |     // 12 old bash exchanges (age = far from end)
-210 |     for (let i = 0; i < 12; i++) {
-211 |       const id = `tool_old_${i}`;
-212 |       toolMap.set(id, "bash");
-213 |       msgs.push({
-214 |         role: "user",
-215 |         content: [{ type: "tool_result", tool_use_id: id, content: [{ type: "text", text: `Old bash result ${i} `.repeat(10) }] } as unknown as Anthropic.ToolResultBlockParam],
-216 |       });
-217 |       msgs.push(makeAssistantMsg());
-218 |     }
-219 | 
-220 |     // 3 recent read_file exchanges (priority 0 — always lowest score; pruned first regardless)
-221 |     // Use write_file for recent to test age effect on same tool type:
-222 |     // 3 recent write_file (priority 2, fresh) — should NOT be pruned before old bash
-223 |     for (let i = 0; i < 3; i++) {
-224 |       const id = `tool_new_${i}`;
-225 |       toolMap.set(id, "write_file");
-226 |       msgs.push({
-227 |         role: "user",
-228 |         content: [{ type: "tool_result", tool_use_id: id, content: [{ type: "text", text: `Recent write_file result ${i} `.repeat(10) }] } as unknown as Anthropic.ToolResultBlockParam],
-229 |       });
-230 |       msgs.push(makeAssistantMsg());
-231 |     }
-232 | 
-233 |     // Capture old bash text refs before pruning
-234 |     const oldBashTexts: Array<{ type: string; text?: string }> = [];
-235 |     for (let i = 0; i < msgs.length; i++) {
-236 |       const msg = msgs[i];
-237 |       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
-238 |       for (const block of msg.content) {
-239 |         const tb = block as { type: string; tool_use_id?: string; content?: Array<{ type: string; text?: string }> };
-240 |         if (tb.type === "tool_result" && tb.tool_use_id?.startsWith("tool_old_") && Array.isArray(tb.content)) {
-241 |           for (const cb of tb.content) oldBashTexts.push(cb);
-242 |         }
-243 |       }
-244 |     }
-245 | 
-246 |     pruneStaleToolResults(msgs, 8, toolMap);
-247 | 
-248 |     // Old bash results (beyond cutoff) should be pruned
-249 |     const prunedOld = oldBashTexts.filter(cb => cb.text?.startsWith("[pruned"));
-250 |     expect(prunedOld.length).toBeGreaterThan(0);
-251 |   });
-252 | });
-253 | 
-[2026-04-05T18:09:21.621Z] iter=290 turn=12 INFO: Turn 12/25
-[2026-04-05T18:09:24.587Z] iter=290 turn=12 INFO: Agent: Let me run tests and TSC now:
-[2026-04-05T18:09:24.587Z] iter=290 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T18:09:24.589Z] iter=290 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/context-pruning.test.ts 2>&1 | tail -20
-[2026-04-05T18:09:25.591Z] iter=290 turn=12 INFO:   -> exit=0 (283 chars)
-[2026-04-05T18:09:25.631Z] iter=290 turn=12 INFO:   -> exit=0 (11 chars)
 [2026-04-05T18:09:25.632Z] iter=290 turn=12 INFO: HARD TURN CAP REACHED: 12 turns (predicted 8, cap 12). Forcing commit.
 [2026-04-05T18:09:25.633Z] iter=290 turn=12 INFO: Cache persisted: 48 entries to .autoagent-cache.json
 [2026-04-05T18:09:25.633Z] iter=290 turn=12 INFO: Cache stats: 0 hits, 1 misses, 48 entries, 4 invalidations (1 entries removed)
@@ -1049,3 +996,61 @@ Meta expert doesn't change src/ — my job is memory compaction and goal-setting
 [2026-04-05T18:23:51.072Z] iter=299 turn=8 INFO: Tool timing stats
 [2026-04-05T18:23:57.481Z] iter=299 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 299: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-05T18:23:57.503Z] iter=299 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T18:23:57.537Z] iter=299 turn=8 INFO: Committed: c74327f0 (18 in / 3398 out, cache: 173490 created, 706608 read)
+[2026-04-05T18:23:57.537Z] iter=299 turn=8 INFO: Restarting as iteration 300...
+[2026-04-05T18:23:57.741Z] iter=300 INFO: Cache restored: 48/49 entries (1 stale)
+[2026-04-05T18:23:57.743Z] iter=300 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
+[2026-04-05T18:23:57.743Z] iter=300 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T18:23:57.873Z] iter=300 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T18:23:57.873Z] iter=300 turn=1 INFO: Turn 1/25
+[2026-04-05T18:23:59.828Z] iter=300 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T18:23:59.829Z] iter=300 turn=1 INFO: read_file: goals.md
+[2026-04-05T18:23:59.830Z] iter=300 turn=1 INFO:   -> ok (1431 chars)
+[2026-04-05T18:23:59.830Z] iter=300 turn=2 INFO: Turn 2/25
+[2026-04-05T18:24:03.115Z] iter=300 turn=2 INFO: think: I'm the Engineer for iteration 300. My goal is to implement `autoagent init` based on the Architect's design. Let me qui...
+[2026-04-05T18:24:03.115Z] iter=300 turn=3 INFO: Turn 3/25
+[2026-04-05T18:24:05.605Z] iter=300 turn=3 INFO: $ grep -n "argv\|args\|command\|init\|cli" src/index.ts 2>/dev/null | head -40; echo "---"; ls src/*.ts | head -20
+[2026-04-05T18:24:05.608Z] iter=300 turn=3 INFO: $ cat src/project-detector.ts | head -100
+[2026-04-05T18:24:05.616Z] iter=300 turn=3 INFO:   -> exit=0 (3677 chars)
+[2026-04-05T18:24:05.620Z] iter=300 turn=3 INFO:   -> exit=0 (392 chars)
+[2026-04-05T18:24:05.620Z] iter=300 turn=4 INFO: Turn 4/25
+[2026-04-05T18:24:08.369Z] iter=300 turn=4 INFO: Agent: **Goal: Implement `autoagent init`** — IN PROGRESS (just started reading)
+
+I see `src/init-command.ts` already exists! Let me check it and the CLI entry point quickly.
+[2026-04-05T18:24:08.369Z] iter=300 turn=4 INFO: $ cat src/init-command.ts; echo "==="; cat src/cli.ts
+[2026-04-05T18:24:08.383Z] iter=300 turn=4 INFO:   -> exit=0 (11634 chars)
+[2026-04-05T18:24:08.383Z] iter=300 turn=5 INFO: Turn 5/25
+[2026-04-05T18:24:14.643Z] iter=300 turn=5 INFO: think: The `autoagent init` command is ALREADY FULLY IMPLEMENTED! Both `src/init-command.ts` and the CLI wiring in `src/cli.ts`...
+[2026-04-05T18:24:14.643Z] iter=300 turn=6 INFO: Turn 6/25
+[2026-04-05T18:24:17.655Z] iter=300 turn=6 INFO: Agent: I've changed nothing. Let me check what's actually missing vs what's already done, then write code.
+[2026-04-05T18:24:17.656Z] iter=300 turn=6 INFO: $ grep -n "init\|/init" src/tui.tsx | head -20; echo "==="; cat package.json | grep -A5 '"bin"'
+[2026-04-05T18:24:17.675Z] iter=300 turn=6 INFO:   -> exit=1 (565 chars)
+[2026-04-05T18:24:17.675Z] iter=300 turn=7 INFO: Turn 7/25
+[2026-04-05T18:24:20.818Z] iter=300 turn=7 INFO: Agent: The `autoagent init` command is already fully implemented. Let me check what's actually needed and ship something real.
+[2026-04-05T18:24:20.819Z] iter=300 turn=7 INFO: $ grep -n "exit\|onExit\|useInput.*q\|process.exit" src/tui.tsx | head -20
+[2026-04-05T18:24:20.829Z] iter=300 turn=7 INFO:   -> exit=0 (263 chars)
+[2026-04-05T18:24:20.830Z] iter=300 turn=8 INFO: Turn 8/25
+[2026-04-05T18:24:23.093Z] iter=300 turn=8 INFO: $ grep -n "exit\|/export\|exportSession" src/tui.tsx | grep -i "exit\|export" | head -30
+[2026-04-05T18:24:23.112Z] iter=300 turn=8 INFO:   -> exit=0 (421 chars)
+[2026-04-05T18:24:23.113Z] iter=300 turn=9 INFO: Turn 9/25
+[2026-04-05T18:24:25.016Z] iter=300 turn=9 INFO: $ sed -n '420,445p' src/tui.tsx
+[2026-04-05T18:24:25.037Z] iter=300 turn=9 INFO:   -> exit=0 (679 chars)
+[2026-04-05T18:24:25.037Z] iter=300 turn=10 INFO: Turn 10/25
+[2026-04-05T18:24:28.090Z] iter=300 turn=10 INFO: Agent: Auto-export on exit is feasible. Let me implement it now - wire `/export` into the exit path in tui.tsx.
+[2026-04-05T18:24:28.090Z] iter=300 turn=10 INFO: $ sed -n '468,480p' src/tui.tsx
+[2026-04-05T18:24:28.092Z] iter=300 turn=10 INFO: $ sed -n '705,745p' src/tui.tsx
+[2026-04-05T18:24:28.099Z] iter=300 turn=10 INFO:   -> exit=0 (362 chars)
+[2026-04-05T18:24:28.100Z] iter=300 turn=10 INFO:   -> exit=0 (1532 chars)
+[2026-04-05T18:24:28.100Z] iter=300 turn=11 INFO: Turn 11/25
+[2026-04-05T18:24:30.254Z] iter=300 turn=11 INFO: $ sed -n '745,775p' src/tui.tsx
+[2026-04-05T18:24:30.263Z] iter=300 turn=11 INFO:   -> exit=0 (1106 chars)
+[2026-04-05T18:24:30.263Z] iter=300 turn=12 INFO: Turn 12/25
+[2026-04-05T18:24:34.130Z] iter=300 turn=12 INFO: think: The `autoagent init` command is already fully implemented. Auto-export on exit is feasible - I need to wire it into the ...
+[2026-04-05T18:24:34.131Z] iter=300 turn=12 INFO: HARD TURN CAP REACHED: 12 turns (predicted 8, cap 12). Forcing commit.
+[2026-04-05T18:24:34.134Z] iter=300 turn=12 INFO: Cache persisted: 49 entries to .autoagent-cache.json
+[2026-04-05T18:24:34.134Z] iter=300 turn=12 INFO: Cache stats: 0 hits, 1 misses, 49 entries, 0 invalidations (0 entries removed)
+[2026-04-05T18:24:34.135Z] iter=300 turn=12 INFO: Tool cache stats
+[2026-04-05T18:24:34.135Z] iter=300 turn=12 INFO: Tool timing: bash: 10x, avg=14ms, total=135ms; read_scratchpad: 1x, avg=2ms, total=2ms; think: 3x, avg=1ms, total=2ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-05T18:24:34.135Z] iter=300 turn=12 INFO: Tool timing stats
+[2026-04-05T18:24:40.301Z] iter=300 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 300: predicted 8 turns, actual 12 turns, ratio 1.50**
+[2026-04-05T18:24:40.323Z] iter=300 turn=12 INFO: Pre-commit review: no significant code changes to review

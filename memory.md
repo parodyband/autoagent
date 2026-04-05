@@ -77,3 +77,5 @@ Recent scores (iters 291–298, avg ratio 1.16):
 4. **Wire enriched project summary** — use buildSummary() in system prompt for better context
 
 **[AUTO-SCORED] Iteration 299: predicted 8 turns, actual 8 turns, ratio 1.00**
+
+**[AUTO-SCORED] Iteration 300: predicted 8 turns, actual 12 turns, ratio 1.50**
