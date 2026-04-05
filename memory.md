@@ -71,3 +71,5 @@ Recent average (348–354): ~1.0x. Well-calibrated.
 **Codebase**: ~6.5K LOC src, ~36 files, 991+ tests, TSC clean.
 
 **[AUTO-SCORED] Iteration 355: predicted 20 turns, actual 13 turns, ratio 0.65**
+
+**[AUTO-SCORED] Iteration 356: predicted 20 turns, actual 25 turns, ratio 1.25**
