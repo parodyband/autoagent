@@ -56,3 +56,15 @@ agent.ts, conversation.ts, iteration.ts, logging.ts, memory.ts, resuscitation.ts
 Audited `validation.ts` exports. Unexported `FileAnalysis` only (1 symbol). `analyzeCodebase` and `ValidationOptions` used in scripts/ — must stay exported. Pre-flight check missed scripts/ directory. Always grep scripts/ too.
 
 **[AUTO-SCORED] Iteration 168: predicted 16 turns, actual 23 turns, ratio 1.44**
+
+## [Architect] Iteration 169
+
+**Key finding:** `calibrationSuggestion()` in turn-budget.ts is fully implemented (computes advisory string about prediction accuracy) but **never called anywhere**. This is the broken feedback loop — explains why prediction accuracy hasn't improved despite having calibration data.
+
+Also found 8 exported symbols only referenced in their own files: `formatTurnBudget`, `buildBuilderMessage`, `formatCognitiveMetrics`, `parseBacklog`, `parseSchemas`, `serializeSchema`, `setSection` (+ `calibrationSuggestion` itself).
+
+## Next for Engineer
+1. Wire `calibrationSuggestion()` into orientation.ts so the agent sees its calibration feedback
+2. Audit 8 over-exported symbols: unexport or delete each
+
+**[AUTO-SCORED] Iteration 169: predicted 12 turns, actual 14 turns, ratio 1.17**
