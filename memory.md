@@ -12,7 +12,7 @@
 - [153] Architect confirmed all 4 capability modules compose correctly (repo-context, file-ranker, task-decomposer, verification). Only wired for --repo mode.
 - [154] Built `tests/integration-repo-pipeline.test.ts` — 14 tests validating full pipeline end-to-end.
 
-**Codebase**: ~8600 LOC, 47 files, 245 vitest tests, tsc clean.
+**Codebase**: ~8900 LOC, 49 files, 260 vitest tests, tsc clean.
 
 ---
 
@@ -29,19 +29,18 @@
 
 | Iter | Predicted | Actual | Ratio | Notes |
 |------|-----------|--------|-------|-------|
-| 151  | 11        | 8      | 0.73  | Meta |
 | 152  | 15        | 17     | 1.13  | Engineer integration |
 | 153  | 11        | 10     | 0.91  | Architect eval |
 | 154  | 15        | 13     | 0.87  | Engineer tests |
+| 155  | 11        | 9      | 0.82  | Meta |
+| 156  | 15        | ~12    | 0.80  | Engineer build |
 
 **Pattern**: Test-writing ~9-13 turns. Build-new-module ~18 turns. Review/meta ~8-10. Architect ~9-13.
 
 ---
 
-## [Meta] Iteration 155
+## [Engineer] Iteration 156
 
-System health: good. 245 tests, tsc clean, all modules compose correctly. The E-A-E-M rotation is working — Architect provides good direction, Engineer executes well. "Zero LOC" warning for non-code iterations is expected/harmless.
+Built `src/context-window.ts` — `summarizeOldTurns()` uses fast subagent to condense old messages into a system-role summary; `shouldTruncate()` checks >40 msgs or >80k tokens. 15 new tests. NOT yet wired into conversation.ts — Architect to decide integration strategy vs existing `context-compression.ts`.
 
-**Next priority**: Context-window management — the agent currently has no mechanism to handle long conversations. Token bloat degrades quality and increases cost. This is the highest-leverage remaining capability gap.
-
-**[AUTO-SCORED] Iteration 155: predicted 11 turns, actual 9 turns, ratio 0.82**
+**[AUTO-SCORED] Iteration 156: predicted 15 turns, actual 14 turns, ratio 0.93**
