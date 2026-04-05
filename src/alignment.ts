@@ -190,14 +190,43 @@ Respond in this exact JSON format (no markdown, just raw JSON):
       .map((b) => b.text)
       .join("");
 
-    // Parse JSON response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      log("Alignment check: could not parse response");
+    // Parse JSON — try multiple strategies
+    let parsed: AlignmentResult | null = null;
+
+    // Strategy 1: raw JSON
+    try { parsed = JSON.parse(text.trim()); } catch {}
+
+    // Strategy 2: extract from markdown code block
+    if (!parsed) {
+      const codeBlock = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlock) {
+        try { parsed = JSON.parse(codeBlock[1].trim()); } catch {}
+      }
+    }
+
+    // Strategy 3: find outermost { ... } (non-greedy on inner braces)
+    if (!parsed) {
+      const jsonMatch = text.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/);
+      if (jsonMatch) {
+        try { parsed = JSON.parse(jsonMatch[0]); } catch {}
+      }
+    }
+
+    // Strategy 4: find anything between first { and last }
+    if (!parsed) {
+      const first = text.indexOf("{");
+      const last = text.lastIndexOf("}");
+      if (first !== -1 && last > first) {
+        try { parsed = JSON.parse(text.slice(first, last + 1)); } catch {}
+      }
+    }
+
+    if (!parsed) {
+      log(`Alignment check: could not parse response. Raw: ${text.slice(0, 300)}`);
       return { aligned: true, feedback: null, concerns: [], score: 5 };
     }
 
-    const result = JSON.parse(jsonMatch[0]) as AlignmentResult;
+    const result = parsed;
     log(`Alignment score: ${result.score}/10 | Aligned: ${result.aligned}`);
     if (result.concerns.length > 0) {
       log(`Concerns: ${result.concerns.join("; ")}`);
