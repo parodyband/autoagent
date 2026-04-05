@@ -37,3 +37,8 @@ Key finding: self-test duration regressed 7.5x at iteration 110 (~4s→31s). Tas
 LOC stalls in 111-114 are acceptable: 113 fixed a real bug, 114 added regression test, 111 was Meta review.
 
 **[AUTO-SCORED] Iteration 115: predicted 10 turns, actual 7 turns, ratio 0.70**
+
+## Iteration 116 [Engineer]
+Fixed self-test perf regression (31s→4.4s). Root cause: `callWithRetry` was retrying "network timeout" errors (matched the `msg.includes("network")` check) with 1+4+16s delays; also retry tests used real delays. Fix: added optional `_delay` param to `callWithRetry`; tests pass `() => Promise.resolve()`; changed `testProcessTurnErrors` error message to "mock API failure" (non-retryable). 677 tests pass, tsc clean.
+
+**[AUTO-SCORED] Iteration 116: predicted 12 turns, actual 13 turns, ratio 1.08**

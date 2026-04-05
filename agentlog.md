@@ -1,62 +1,3 @@
-[2026-04-05T11:26:00.848Z] iter=108 turn=1 INFO:   -> ok (12277 chars)
-[2026-04-05T11:26:00.848Z] iter=108 turn=1 INFO: read_file: src/agent.ts
-[2026-04-05T11:26:00.849Z] iter=108 turn=1 INFO:   -> ok (14749 chars)
-[2026-04-05T11:26:00.849Z] iter=108 turn=2 INFO: Turn 2/25
-[2026-04-05T11:26:15.529Z] iter=108 turn=2 INFO: think: Now I understand the current state. I need to:
-
-1. Add `commitSha` to `emitOnceSummary()` — grab `git rev-parse HEAD` an...
-[2026-04-05T11:26:15.530Z] iter=108 turn=3 INFO: Turn 3/25
-[2026-04-05T11:26:23.065Z] iter=108 turn=3 INFO: Agent: Now I'll make the changes:
-[2026-04-05T11:26:23.066Z] iter=108 turn=3 INFO: write_file: src/finalization.ts (patch)
-[2026-04-05T11:26:23.067Z] iter=108 turn=3 INFO:   -> ok: Patched src/finalization.ts: -24 +36 lines
-
-Context after patch:
-213 | // Emitted to stdout when --once is set so callers can parse results.
-214 | // All other log output goes to stderr / log files, keeping stdout clean.
-215 | 
-216 | export async function emitOnceSummary(params: {
-217 |   success: boolean;
-218 |   iteration: number;
-219 |   turns: number;
-220 |   startTime: Date;
-221 |   exitCode: number;
-222 |   tokensUsed?: { input: number; output: number; cacheRead: number; cacheCreation: number };
-223 |   commitSha?: string;
-224 | }): Promise<void> {
-225 |   let filesChanged: string[] = [];
-226 |   try {
-227 |     const result = await executeBash("git diff --name-only HEAD~1", 30, undefined, true);
-228 |     filesChanged = result.output.trim().split("\n").filter(Boolean);
-229 |   } catch { /* ignore — commit may not exist yet */ }
-230 | 
-231 |   let commitSha = params.commitSha ?? "";
-232 |   if (!commitSha) {
-233 |     try {
-234 |       const shaResult = await executeBash("git rev-parse HEAD", 30, undefined, true);
-235 |       commitSha = shaResult.output.trim();
-236 |     } catch { /* ignore — no commit yet */ }
-237 |   }
-238 | 
-239 |   const summary = {
-240 |     success: params.success,
-241 |     iteration: params.iteration,
-242 |     turns: params.turns,
-243 |     durationMs: Date.now() - params.startTime.getTime(),
-244 |     filesChanged,
-245 |     commitSha,
-246 |     tokensUsed: params.tokensUsed ?? { input: 0, output: 0, cacheRead: 0, cacheCreation: 0 },
-247 |     exitCode: params.exitCode,
-248 |   };
-249 | 
-250 |   process.stdout.write(JSON.stringify(summary) + "\n");
-251 | }
-252 | 
-253 | /**
-254 |  * Log cache and timing stats, capture quality/benchmarks, record metrics,
-[2026-04-05T11:26:23.067Z] iter=108 turn=4 INFO: Turn 4/25
-[2026-04-05T11:26:29.620Z] iter=108 turn=4 INFO: Agent: Now update the `finalizeIteration()` call site to pass `tokensUsed` and `commitSha`:
-[2026-04-05T11:26:29.621Z] iter=108 turn=4 INFO: write_file: src/finalization.ts (patch)
-[2026-04-05T11:26:29.623Z] iter=108 turn=4 INFO:   -> ok: Patched src/finalization.ts: -11 +18 lines
 
 Context after patch:
 322 |   ctx.state.iteration++;
@@ -1055,3 +996,277 @@ You're right. My deliverable is clear: **write goals.md for iteration 116 target
 [2026-04-05T11:44:08.690Z] iter=115 turn=7 INFO: Tool timing stats
 [2026-04-05T11:44:39.905Z] iter=115 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 115: predicted 10 turns, actual 7 turns, ratio 0.70**
 [2026-04-05T11:44:39.938Z] iter=115 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T11:44:39.975Z] iter=115 turn=7 INFO: Committed: 7241e1ae (3861 in / 2637 out, cache: 68101 created, 326506 read)
+[2026-04-05T11:44:39.975Z] iter=115 turn=7 INFO: Restarting as iteration 116...
+[2026-04-05T11:44:40.162Z] iter=116 INFO: Cache restored: 35/37 entries (2 stale)
+[2026-04-05T11:44:40.164Z] iter=116 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T11:44:40.190Z] iter=116 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T11:44:40.190Z] iter=116 turn=1 INFO: Turn 1/25
+[2026-04-05T11:44:43.525Z] iter=116 turn=1 INFO: Agent: I'll start by investigating the self-test performance regression. Let me run the self-test with timing and examine the script simultaneously.
+[2026-04-05T11:44:43.526Z] iter=116 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && time npx tsx scripts/self-test.ts 2>&1
+[2026-04-05T11:44:43.530Z] iter=116 turn=1 INFO: read_file: scripts/self-test.ts
+[2026-04-05T11:44:43.531Z] iter=116 turn=1 INFO:   -> ok (97034 chars)
+[2026-04-05T11:45:14.982Z] iter=116 turn=1 INFO:   -> exit=0 (26360 chars)
+[2026-04-05T11:45:14.983Z] iter=116 turn=2 INFO: Turn 2/25
+[2026-04-05T11:45:45.201Z] iter=116 turn=2 INFO: think: Looking at the output, there are a few slow sections:
+
+1. `⚠️ processTurn Error Handling Tests` - I can see:
+```
+[api-re...
+[2026-04-05T11:45:45.201Z] iter=116 turn=3 INFO: Turn 3/25
+[2026-04-05T11:45:47.481Z] iter=116 turn=3 INFO: $ cat /Users/austin/Documents/autoagent/src/api-retry.ts
+[2026-04-05T11:45:47.488Z] iter=116 turn=3 INFO: $ grep -n "callWithRetry" /Users/austin/Documents/autoagent/src/conversation.ts | head -20
+[2026-04-05T11:45:47.496Z] iter=116 turn=3 INFO:   -> exit=0 (2181 chars)
+[2026-04-05T11:45:47.498Z] iter=116 turn=3 INFO:   -> exit=0 (108 chars)
+[2026-04-05T11:45:47.499Z] iter=116 turn=4 INFO: Turn 4/25
+[2026-04-05T11:46:04.641Z] iter=116 turn=4 INFO: think: Now I understand the issue clearly.
+
+The delays causing slowness:
+1. `testProcessTurnErrors` test 1: `new Error("network...
+[2026-04-05T11:46:04.642Z] iter=116 turn=5 INFO: Turn 5/25
+[2026-04-05T11:46:13.428Z] iter=116 turn=5 INFO: Agent: I have the diagnosis. Making the fixes now.
+[2026-04-05T11:46:13.428Z] iter=116 turn=5 INFO: write_file: src/api-retry.ts (patch)
+[2026-04-05T11:46:13.430Z] iter=116 turn=5 INFO:   -> ok: Patched src/api-retry.ts: -36 +39 lines
+
+Context after patch:
+34 |   return false;
+35 | }
+36 | 
+37 | /**
+38 |  * Call the Anthropic messages API with exponential backoff retry.
+39 |  *
+40 |  * @param client  - Anthropic client instance
+41 |  * @param params  - Message creation params
+42 |  * @param maxRetries - Max retry attempts (default 3). Total attempts = maxRetries + 1.
+43 |  * @param _delay  - Optional delay function (default: real setTimeout). Pass `() => Promise.resolve()` in tests.
+44 |  */
+45 | export async function callWithRetry(
+46 |   client: Anthropic,
+47 |   params: Anthropic.MessageCreateParams,
+48 |   maxRetries: number = DEFAULT_MAX_RETRIES,
+49 |   _delay?: (ms: number) => Promise<void>
+50 | ): Promise<Anthropic.Message> {
+51 |   const sleep = _delay ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+52 |   let lastError: unknown;
+53 | 
+54 |   for (let attempt = 0; attempt <= maxRetries; attempt++) {
+55 |     try {
+56 |       return await client.messages.create(params) as Anthropic.Message;
+57 |     } catch (err) {
+58 |       lastError = err;
+59 | 
+60 |       if (!isRetryable(err) || attempt === maxRetries) {
+61 |         throw err;
+62 |       }
+63 | 
+64 |       const delayMs = BACKOFF_BASE_MS * Math.pow(BACKOFF_MULTIPLIER, attempt);
+65 |       const status = err instanceof Anthropic.APIError ? ` (status ${err.status})` : "";
+66 |       console.error(
+67 |         `[api-retry] Attempt ${attempt + 1}/${maxRetries + 1} failed${status}. Retrying in ${delayMs}ms...`
+68 |       );
+69 | 
+70 |       await sleep(delayMs);
+71 |     }
+72 |   }
+73 | 
+74 |   throw lastError;
+75 | }
+76 | 
+[2026-04-05T11:46:13.430Z] iter=116 turn=6 INFO: Turn 6/25
+[2026-04-05T11:46:21.164Z] iter=116 turn=6 INFO: Agent: Now fix the self-test: change "network timeout" error message to avoid retry logic, and pass zero-delay to `callWithRetry` tests:
+[2026-04-05T11:46:21.165Z] iter=116 turn=6 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T11:46:21.166Z] iter=116 turn=6 INFO:   -> ok: Patched scripts/self-test.ts: -18 +19 lines
+
+Context after patch:
+1619 | async function testProcessTurnErrors(): Promise<void> {
+1620 |   console.log("\n⚠️ processTurn Error Handling Tests");
+1621 | 
+1622 |   // 1. API call throws error → propagates (processTurn doesn't catch API errors)
+1623 |   // Use a non-retryable message so callWithRetry doesn't add retry delays
+1624 |   {
+1625 |     const client = {
+1626 |       messages: {
+1627 |         create: async () => { throw new Error("mock API failure"); },
+1628 |       },
+1629 |     };
+1630 |     const ctx = makeMockCtx({ client: client as any });
+1631 |     let threw = false;
+1632 |     try {
+1633 |       await processTurn(ctx);
+1634 |     } catch (e: any) {
+1635 |       threw = true;
+1636 |       assert(e.message === "mock API failure", "error: API error message preserved");
+1637 |     }
+1638 |     assert(threw, "error: API network error propagates from processTurn");
+1639 |     assert(ctx.turns === 1, "error: turns still incremented before API call");
+1640 |   }
+1641 | 
+1642 |   // 2. Tool handler throws → error caught, tool_result contains error message
+1643 |   {
+[2026-04-05T11:46:21.168Z] iter=116 turn=7 INFO: Turn 7/25
+[2026-04-05T11:46:46.544Z] iter=116 turn=7 INFO: Agent: Now update `testApiRetry` to use zero-delay:
+[2026-04-05T11:46:46.545Z] iter=116 turn=7 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T11:46:46.547Z] iter=116 turn=7 INFO:   -> ok: Patched scripts/self-test.ts: -125 +125 lines
+
+Context after patch:
+2026 | async function testApiRetry(): Promise<void> {
+2027 |   console.log("\n🔄 callWithRetry Tests");
+2028 | 
+2029 |   // Use zero-delay for all retry tests to avoid real sleep delays
+2030 |   const noDelay = () => Promise.resolve();
+2031 | 
+2032 |   // Test 1: Succeeds on first try — no retry needed
+2033 |   {
+2034 |     let callCount = 0;
+2035 |     const mockClient = {
+2036 |       messages: {
+2037 |         create: async (_params: unknown) => {
+2038 |           callCount++;
+2039 |           return {
+2040 |             content: [{ type: "text", text: "ok" }],
+2041 |             usage: { input_tokens: 10, output_tokens: 5 },
+2042 |             stop_reason: "end_turn",
+2043 |             role: "assistant",
+2044 |             type: "message",
+2045 |             model: "test",
+2046 |             id: "msg_test1",
+2047 |           };
+2048 |         },
+2049 |       },
+2050 |     } as any;
+2051 |     const result = await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3, noDelay);
+2052 |     assert(callCount === 1, "retry: succeeds on first try with no retries");
+2053 |     assert(result.content[0].type === "text", "retry: returns valid response");
+2054 |   }
+2055 | 
+2056 |   // Test 2: Retries on 429, succeeds on 2nd attempt
+2057 |   {
+2058 |     let callCount = 0;
+2059 |     const mockClient = {
+2060 |       messages: {
+2061 |         create: async (_params: unknown) => {
+2062 |           callCount++;
+2063 |           if (callCount === 1) {
+2064 |             const err = Object.assign(new Error("Rate limit"), { status: 429 });
+2065 |             Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
+2066 |             throw err;
+2067 |           }
+2068 |           return {
+2069 |             content: [{ type: "text", text: "ok after retry" }],
+2070 |             usage: { input_tokens: 10, output_tokens: 5 },
+2071 |             stop_reason: "end_turn",
+2072 |             role: "assistant",
+2073 |             type: "message",
+2074 |             model: "test",
+2075 |             id: "msg_test2",
+2076 |           };
+2077 |         },
+2078 |       },
+2079 |     } as any;
+2080 |     const result = await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 1, noDelay);
+2081 |     assert(callCount === 2, "retry: retries once on 429 then succeeds", `callCount=${callCount}`);
+2082 |     assert((result.content[0] as any).text === "ok after retry", "retry: returns response from second attempt");
+2083 |   }
+2084 | 
+2085 |   // Test 3: Gives up after maxRetries and throws
+2086 |   {
+2087 |     let callCount = 0;
+2088 |     const mockClient = {
+2089 |       messages: {
+2090 |         create: async (_params: unknown) => {
+2091 |           callCount++;
+2092 |           const err = Object.assign(new Error("Overloaded"), { status: 529 });
+2093 |           Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
+2094 |           throw err;
+2095 |         },
+2096 |       },
+2097 |     } as any;
+2098 |     let threw = false;
+2099 |     try {
+2100 |       await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 2, noDelay);
+2101 |     } catch {
+2102 |       threw = true;
+2103 |     }
+2104 |     assert(threw, "retry: throws after maxRetries exhausted");
+2105 |     assert(callCount === 3, "retry: made exactly maxRetries+1 attempts", `callCount=${callCount}`);
+2106 |   }
+2107 | 
+2108 |   // Test 4: Does NOT retry on 400
+2109 |   {
+2110 |     let callCount = 0;
+2111 |     const mockClient = {
+2112 |       messages: {
+2113 |         create: async (_params: unknown) => {
+2114 |           callCount++;
+2115 |           const err = Object.assign(new Error("Bad request"), { status: 400 });
+2116 |           Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
+2117 |           throw err;
+2118 |         },
+2119 |       },
+2120 |     } as any;
+2121 |     let threw = false;
+2122 |     try {
+2123 |       await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3, noDelay);
+2124 |     } catch {
+2125 |       threw = true;
+2126 |     }
+2127 |     assert(threw, "retry: throws immediately on 400");
+2128 |     assert(callCount === 1, "retry: does NOT retry on 400 (client error)", `callCount=${callCount}`);
+2129 |   }
+2130 | 
+2131 |   // Test 5: Does NOT retry on 401
+2132 |   {
+2133 |     let callCount = 0;
+2134 |     const mockClient = {
+2135 |       messages: {
+2136 |         create: async (_params: unknown) => {
+2137 |           callCount++;
+2138 |           const err = Object.assign(new Error("Unauthorized"), { status: 401 });
+2139 |           Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
+2140 |           throw err;
+2141 |         },
+2142 |       },
+2143 |     } as any;
+2144 |     let threw = false;
+2145 |     try {
+2146 |       await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3, noDelay);
+2147 |     } catch {
+2148 |       threw = true;
+2149 |     }
+2150 |     assert(threw, "retry: throws immediately on 401");
+2151 |     assert(callCount === 1, "retry: does NOT retry on 401 (auth error)", `callCount=${callCount}`);
+2152 |   }
+2153 | }
+2154 | 
+2155 | // ─── TASK.md Lifecycle Tests ────────────────────────────────
+2156 | 
+[2026-04-05T11:46:46.548Z] iter=116 turn=8 INFO: Turn 8/25
+[2026-04-05T11:46:49.671Z] iter=116 turn=8 INFO: Agent: Now verify with TypeScript and run the self-test:
+[2026-04-05T11:46:49.672Z] iter=116 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T11:46:50.407Z] iter=116 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:46:50.407Z] iter=116 turn=9 INFO: Turn 9/25
+[2026-04-05T11:46:54.948Z] iter=116 turn=9 INFO: Agent: **Goal status: DONE** — TypeScript passes, fixes are in place. Running the self-test to verify:
+[2026-04-05T11:46:54.949Z] iter=116 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && time npx tsx scripts/self-test.ts 2>&1 | tail -5
+[2026-04-05T11:46:59.751Z] iter=116 turn=9 INFO:   -> exit=0 (158 chars)
+[2026-04-05T11:46:59.751Z] iter=116 turn=10 INFO: Turn 10/25
+[2026-04-05T11:47:03.607Z] iter=116 turn=10 INFO: Agent: 4.4s — under the 5s target. Committing and restarting.
+[2026-04-05T11:47:03.608Z] iter=116 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && git add src/api-retry.ts scripts/self-test.ts && git commit -m "fix: self-test perf regression — inject zero-delay in retry tests (31s→4s)"
+[2026-04-05T11:47:03.649Z] iter=116 turn=10 INFO:   -> exit=0 (144 chars)
+[2026-04-05T11:47:03.649Z] iter=116 turn=11 INFO: Turn 11/25
+[2026-04-05T11:47:08.922Z] iter=116 turn=11 INFO: write_file: goals.md (write)
+[2026-04-05T11:47:08.924Z] iter=116 turn=11 INFO:   -> ok: Updated goals.md (512 chars, -12 lines delta)
+[2026-04-05T11:47:08.924Z] iter=116 turn=12 INFO: Turn 12/25
+[2026-04-05T11:47:14.930Z] iter=116 turn=12 INFO: write_file: memory.md (append)
+[2026-04-05T11:47:14.930Z] iter=116 turn=12 INFO:   -> ok: Appended 446 chars to memory.md
+[2026-04-05T11:47:14.931Z] iter=116 turn=13 INFO: Turn 13/25
+[2026-04-05T11:47:16.606Z] iter=116 turn=13 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T11:47:16.606Z] iter=116 turn=13 INFO: RESTART signal
+[2026-04-05T11:47:16.607Z] iter=116 turn=13 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T11:47:17.343Z] iter=116 turn=13 INFO: Compilation OK
+[2026-04-05T11:47:22.240Z] iter=116 turn=13 INFO: Cache persisted: 35 entries to .autoagent-cache.json
+[2026-04-05T11:47:22.241Z] iter=116 turn=13 INFO: Cache stats: 0 hits, 1 misses, 35 entries, 5 invalidations (1 entries removed)
+[2026-04-05T11:47:22.241Z] iter=116 turn=13 INFO: Tool cache stats
+[2026-04-05T11:47:22.241Z] iter=116 turn=13 INFO: Tool timing: bash: 7x, avg=5294ms, total=37061ms; write_file: 5x, avg=2ms, total=9ms; read_file: 1x, avg=1ms, total=1ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T11:47:22.241Z] iter=116 turn=13 INFO: Tool timing stats
+[2026-04-05T11:47:26.492Z] iter=116 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 116: predicted 12 turns, actual 13 turns, ratio 1.08**
+[2026-04-05T11:47:26.510Z] iter=116 turn=13 INFO: Pre-commit review: no significant code changes to review
