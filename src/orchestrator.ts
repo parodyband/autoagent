@@ -823,7 +823,7 @@ export class Orchestrator {
 
   /** Return true if the text contains error indicators we must preserve. */
   private hasErrorIndicator(text: string): boolean {
-    return /Error|FAIL|error:|ERR!/i.test(text) && /Error|FAIL|error:|ERR!/.test(text);
+    return /\bError\b|FAIL|error:|ERR!/.test(text);
   }
 
   /**

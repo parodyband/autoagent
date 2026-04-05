@@ -3,6 +3,7 @@ import {
   needsArchitectMode,
   generateEditPlan,
   formatPlanForEditor,
+  runArchitectMode,
   parsePlan,
   type EditPlan,
 } from "../architect-mode.js";
@@ -169,5 +170,27 @@ describe("formatPlanForEditor", () => {
     const formatted = formatPlanForEditor(plan);
     expect(formatted).toContain("1.");
     expect(formatted).toContain("2.");
+  });
+});
+
+describe("runArchitectMode — repo map injection", () => {
+  it("includes repo map in generated prompt when provided", async () => {
+    let capturedPrompt = "";
+    const mockCaller = vi.fn(async (prompt: string) => {
+      capturedPrompt = prompt;
+      return JSON.stringify({
+        summary: "Add feature",
+        steps: [{ file: "src/foo.ts", action: "modify", description: "Update foo" }],
+      });
+    });
+    const repoMap = "src/foo.ts\nsrc/bar.ts\nsrc/baz.ts";
+    await runArchitectMode(
+      "implement a new feature and refactor the existing code",
+      "",
+      mockCaller,
+      repoMap,
+    );
+    expect(capturedPrompt).toContain("src/foo.ts");
+    expect(capturedPrompt).toContain("Project structure");
   });
 });

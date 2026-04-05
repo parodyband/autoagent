@@ -116,6 +116,9 @@ Rules:
 Repo context (key files and symbols):
 {REPO_CONTEXT}
 
+Project structure (truncated):
+{REPO_MAP}
+
 Task:
 {USER_MESSAGE}`;
 
@@ -128,9 +131,11 @@ export async function generateEditPlan(
   userMessage: string,
   repoContext: string,
   callModel: (prompt: string) => Promise<string>,
+  repoMap?: string,
 ): Promise<EditPlan> {
   const prompt = PLAN_PROMPT_TEMPLATE
     .replace("{REPO_CONTEXT}", repoContext.slice(0, 4000))
+    .replace("{REPO_MAP}", repoMap ? repoMap.slice(0, 8000) : "(not available)")
     .replace("{USER_MESSAGE}", userMessage);
 
   try {
@@ -240,17 +245,19 @@ export function formatPlanForEditor(plan: EditPlan): string {
  * @param userMessage  - the raw user request
  * @param repoContext  - repo map / file list string for plan context
  * @param callModel    - cheap model caller (haiku via makeSimpleCaller)
+ * @param repoMap      - optional repo map string (truncated to 8K) injected into plan prompt
  */
 export async function runArchitectMode(
   userMessage: string,
   repoContext: string,
   callModel: (prompt: string) => Promise<string>,
+  repoMap?: string,
 ): Promise<ArchitectResult> {
   if (!needsArchitectMode(userMessage)) {
     return { plan: { summary: "", steps: [] }, prefill: "", activated: false };
   }
 
-  const plan = await generateEditPlan(userMessage, repoContext, callModel);
+  const plan = await generateEditPlan(userMessage, repoContext, callModel, repoMap);
 
   // If the plan came back empty, don't inject anything
   if (!plan.summary && plan.steps.length === 0) {

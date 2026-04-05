@@ -108,7 +108,7 @@ describe("autoLoadContext", () => {
       "/workspace",
     );
     const matches = (result.match(/--- file:/g) ?? []).length;
-    expect(matches).toBeLessThanOrEqual(3);
+    expect(matches).toBeLessThanOrEqual(5);
   });
 
   it("deduplicates files that match multiple keywords", () => {
@@ -131,7 +131,7 @@ describe("autoLoadContext", () => {
     const bigContent = "x".repeat(40_000);
     mockReadFileSync.mockReturnValue(bigContent as unknown as Buffer);
     const result = autoLoadContext(repoMap, "largeFunction refactor", "/workspace");
-    expect(result.length).toBeLessThanOrEqual(32_500); // small overhead for headers
+    expect(result.length).toBeLessThanOrEqual(48_500); // small overhead for headers
   });
 
   it("skips files already mentioned in conversation", () => {
@@ -161,5 +161,23 @@ describe("autoLoadContext", () => {
     const result = autoLoadContext(repoMap, "Button Input refactor", "/workspace");
     expect(result).not.toContain("src/Button.tsx");
     expect(result).toContain("src/Input.tsx");
+  });
+});
+
+describe("autoLoadContext — MAX_FILES=5 budget", () => {
+  it("loads up to 5 files when available", () => {
+    const repoMap = makeRepoMap([
+      { path: "src/a.ts", symbols: ["alpha"] },
+      { path: "src/b.ts", symbols: ["beta"] },
+      { path: "src/c.ts", symbols: ["alpha", "beta"] },
+      { path: "src/d.ts", symbols: ["alpha"] },
+      { path: "src/e.ts", symbols: ["beta"] },
+      { path: "src/f.ts", symbols: ["alpha"] },
+    ]);
+    mockReadFileSync.mockReturnValue("export const x = 1;" as unknown as Buffer);
+    const result = autoLoadContext(repoMap, "alpha beta", "/workspace");
+    // Should include up to 5 files (not capped at 3)
+    const matches = (result.match(/--- file:/g) ?? []).length;
+    expect(matches).toBeGreaterThanOrEqual(4);
   });
 });

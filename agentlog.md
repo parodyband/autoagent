@@ -1,74 +1,3 @@
-[2026-04-05T17:49:28.309Z] iter=280 turn=7 INFO:   -> ok: Patched src/file-watcher.test.ts: -1 +33 lines
-
-Context after patch:
-100 |     expect(calls.length).toBe(1);
-101 |   });
-102 | 
-103 |   it("globalFileCache.invalidate is called when a watched file changes", async () => {
-104 |     const dir = makeTmp();
-105 |     const file = path.join(dir, "g.txt");
-106 |     fs.writeFileSync(file, "init");
-107 |     watcher = new FileWatcher(50);
-108 |     const spy = vi.spyOn(globalFileCache, "invalidate");
-109 |     watcher.watch(file);
-110 |     await sleep(100);
-111 |     fs.writeFileSync(file, "changed");
-112 |     await sleep(300);
-113 |     expect(spy).toHaveBeenCalledWith(file);
-114 |     spy.mockRestore();
-115 |   });
-116 | 
-117 |   it("globalFileCache.invalidate fires before onChange callback", async () => {
-118 |     const dir = makeTmp();
-119 |     const file = path.join(dir, "h.txt");
-120 |     fs.writeFileSync(file, "init");
-121 |     watcher = new FileWatcher(50);
-122 |     const order: string[] = [];
-123 |     const spy = vi.spyOn(globalFileCache, "invalidate").mockImplementation(() => {
-124 |       order.push("invalidate");
-125 |     });
-126 |     watcher.onChange = () => order.push("onChange");
-127 |     watcher.watch(file);
-128 |     await sleep(100);
-129 |     fs.writeFileSync(file, "changed");
-130 |     await sleep(300);
-131 |     expect(order.indexOf("invalidate")).toBeLessThan(order.indexOf("onChange"));
-132 |     spy.mockRestore();
-133 |   });
-134 | 
-135 |   it("accessors return correct state", () => {
-136 |     const dir = makeTmp();
-137 |     const f1 = path.join(dir, "f1.txt");
-138 |     const f2 = path.join(dir, "f2.txt");
-[2026-04-05T17:49:28.310Z] iter=280 turn=8 INFO: Turn 8/25
-[2026-04-05T17:49:33.811Z] iter=280 turn=8 INFO: Agent: Now run tests:
-[2026-04-05T17:49:33.811Z] iter=280 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/scratchpad.test.ts src/file-watcher.test.ts 2>&1 | tail -40
-[2026-04-05T17:49:37.945Z] iter=280 turn=8 INFO:   -> exit=0 (758 chars)
-[2026-04-05T17:49:37.946Z] iter=280 turn=9 INFO: Turn 9/25
-[2026-04-05T17:49:43.290Z] iter=280 turn=9 INFO: Agent: All 12 tests pass. Now full suite + TSC:
-[2026-04-05T17:49:43.290Z] iter=280 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -10
-[2026-04-05T17:49:43.292Z] iter=280 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T17:49:44.480Z] iter=280 turn=9 INFO:   -> exit=0 (11 chars)
-[2026-04-05T17:49:53.284Z] iter=280 turn=9 INFO:   -> exit=0 (458 chars)
-[2026-04-05T17:49:53.285Z] iter=280 turn=10 INFO: Turn 10/25
-[2026-04-05T17:49:58.921Z] iter=280 turn=10 INFO: Agent: 764 tests pass, TSC clean. Both goals done.
-[2026-04-05T17:49:58.923Z] iter=280 turn=10 INFO: save_memory: "[Engineer] Iteration 280"
-[2026-04-05T17:49:58.925Z] iter=280 turn=10 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T17:49:58.926Z] iter=280 turn=11 INFO: Turn 11/25
-[2026-04-05T17:50:07.184Z] iter=280 turn=11 INFO: write_file: goals.md (write)
-[2026-04-05T17:50:07.186Z] iter=280 turn=11 INFO:   -> ok: Updated goals.md (921 chars, -14 lines delta)
-[2026-04-05T17:50:07.187Z] iter=280 turn=12 INFO: Turn 12/25
-[2026-04-05T17:50:09.038Z] iter=280 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T17:50:09.039Z] iter=280 turn=12 INFO: RESTART signal
-[2026-04-05T17:50:09.040Z] iter=280 turn=12 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T17:50:10.012Z] iter=280 turn=12 INFO: Compilation OK
-[2026-04-05T17:50:16.383Z] iter=280 turn=12 INFO: Cache persisted: 52 entries to .autoagent-cache.json
-[2026-04-05T17:50:16.383Z] iter=280 turn=12 INFO: Tool timing: bash: 8x, avg=1926ms, total=15404ms; write_file: 4x, avg=2ms, total=7ms; read_scratchpad: 1x, avg=5ms, total=5ms; save_memory: 1x, avg=3ms, total=3ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T17:50:16.383Z] iter=280 turn=12 INFO: Tool timing stats
-[2026-04-05T17:50:22.066Z] iter=280 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 280: predicted 20 turns, actual 12 turns, ratio 0.60**
-[2026-04-05T17:50:32.487Z] iter=280 turn=12 INFO: Pre-commit review (1567in/429out): **Issue 1: `clearScratchpad` may fail if file doesn't exist yet**
-In `beforeEach`, `clearScratchpad(workDir)` is called on a freshly created temp dir where the scratchpad file doesn't exist yet. If `c
-[2026-04-05T17:50:32.555Z] iter=280 turn=12 INFO: Committed: 71abda98 (18 in / 2762 out, cache: 19675 created, 102725 read)
 [2026-04-05T17:50:32.555Z] iter=280 turn=12 INFO: Restarting as iteration 281...
 [2026-04-05T17:50:32.754Z] iter=281 INFO: Cache restored: 52/52 entries (0 stale)
 [2026-04-05T17:50:32.756Z] iter=281 INFO: Turn budget: 13/25 (calibration=1.13x, predicted=8)
@@ -1067,3 +996,248 @@ Now compact memory and finish.
 [2026-04-05T18:04:15.350Z] iter=287 turn=9 INFO: Tool timing stats
 [2026-04-05T18:04:23.300Z] iter=287 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 287: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-05T18:04:23.319Z] iter=287 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T18:04:23.348Z] iter=287 turn=9 INFO: Committed: d5a9e5d8 (19 in / 4737 out, cache: 23857 created, 130462 read)
+[2026-04-05T18:04:23.349Z] iter=287 turn=9 INFO: Restarting as iteration 288...
+[2026-04-05T18:04:23.535Z] iter=288 INFO: Cache restored: 50/50 entries (0 stale)
+[2026-04-05T18:04:23.537Z] iter=288 INFO: Turn budget: 17/25 (calibration=0.90x, predicted=20)
+[2026-04-05T18:04:23.538Z] iter=288 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T18:04:23.685Z] iter=288 turn=1 INFO: Turn 1/25
+[2026-04-05T18:04:26.701Z] iter=288 turn=1 INFO: Agent: I'll start by reading the current state of the files I need to modify.
+[2026-04-05T18:04:26.702Z] iter=288 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T18:04:26.702Z] iter=288 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-05T18:04:26.711Z] iter=288 turn=1 INFO:   -> exit=0 (2648 chars)
+[2026-04-05T18:04:26.712Z] iter=288 turn=2 INFO: Turn 2/25
+[2026-04-05T18:04:28.471Z] iter=288 turn=2 INFO: read_file: src/context-loader.ts
+[2026-04-05T18:04:28.473Z] iter=288 turn=2 INFO:   -> ok (6784 chars)
+[2026-04-05T18:04:28.473Z] iter=288 turn=2 INFO: read_file: src/architect-mode.ts
+[2026-04-05T18:04:28.474Z] iter=288 turn=2 INFO:   -> ok (9055 chars)
+[2026-04-05T18:04:28.474Z] iter=288 turn=3 INFO: Turn 3/25
+[2026-04-05T18:04:31.183Z] iter=288 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "hasErrorIndicator" src/orchestrator.ts | head -20
+[2026-04-05T18:04:31.187Z] iter=288 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && ls src/tests/ | grep -E "context-loader|architect"
+[2026-04-05T18:04:31.201Z] iter=288 turn=3 INFO:   -> exit=0 (122 chars)
+[2026-04-05T18:04:31.204Z] iter=288 turn=3 INFO:   -> exit=1 (42 chars)
+[2026-04-05T18:04:31.205Z] iter=288 turn=4 INFO: Turn 4/25
+[2026-04-05T18:04:35.711Z] iter=288 turn=4 INFO: think: I have enough context. Let me make all 4 changes now:
+
+1. context-loader.ts: MAX_FILES 3→5, CONTEXT_BUDGET 32K→48K, fuzz...
+[2026-04-05T18:04:35.712Z] iter=288 turn=5 INFO: Turn 5/25
+[2026-04-05T18:04:38.037Z] iter=288 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && find . -name "*.test.ts" | grep -E "context-loader|architect" | head -10
+[2026-04-05T18:04:38.040Z] iter=288 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '820,835p' src/orchestrator.ts
+[2026-04-05T18:04:38.055Z] iter=288 turn=5 INFO:   -> exit=0 (558 chars)
+[2026-04-05T18:04:38.097Z] iter=288 turn=5 INFO:   -> exit=0 (78 chars)
+[2026-04-05T18:04:38.098Z] iter=288 turn=6 INFO: Turn 6/25
+[2026-04-05T18:04:43.248Z] iter=288 turn=6 INFO: Agent: Now I have everything. Let me make all changes in parallel:
+[2026-04-05T18:04:43.248Z] iter=288 turn=6 INFO: write_file: src/context-loader.ts (patch)
+[2026-04-05T18:04:43.249Z] iter=288 turn=6 INFO:   -> ok: Patched src/context-loader.ts: -2 +2 lines
+
+Context after patch:
+24 |   "fix", "run", "put", "set", "let", "try", "via", "any", "help",
+25 | ]);
+26 | 
+27 | const MAX_CONTEXT_CHARS = 48_000; // ~12000 tokens
+28 | const MAX_FILES = 5;
+29 | const MAX_LINES_PER_FILE = 500;
+30 | 
+31 | /** Budget cap for #file auto-loading (same as query-aware loading). */
+[2026-04-05T18:04:43.250Z] iter=288 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T18:04:43.251Z] iter=288 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+823 | 
+824 |   /** Return true if the text contains error indicators we must preserve. */
+825 |   private hasErrorIndicator(text: string): boolean {
+826 |     return /\bError\b|FAIL|error:|ERR!/.test(text);
+827 |   }
+828 | 
+829 |   /**
+[2026-04-05T18:04:43.252Z] iter=288 turn=7 INFO: Turn 7/25
+[2026-04-05T18:04:48.306Z] iter=288 turn=7 INFO: Agent: **Goal 1 (context-loader MAX_FILES/BUDGET)**: IN PROGRESS — need fuzzySearch 20→30 change + tests
+**Goal 2 (hasErrorIndicator fix)**: DONE ✓
+**Goal 2B (architect repo-map injection)**: NOT STARTED
+
+Continuing with all remaining changes:
+[2026-04-05T18:04:48.306Z] iter=288 turn=7 INFO: write_file: src/context-loader.ts (patch)
+[2026-04-05T18:04:48.307Z] iter=288 turn=7 INFO:   -> ok: Patched src/context-loader.ts: -1 +1 lines
+
+Context after patch:
+155 |   // Count keyword hits per file path
+156 |   const hitCounts = new Map<string, number>();
+157 |   for (const keyword of keywords) {
+158 |     const results = fuzzySearch(repoMap, keyword, 30);
+159 |     for (const r of results) {
+160 |       hitCounts.set(r.file, (hitCounts.get(r.file) ?? 0) + 1);
+161 |     }
+[2026-04-05T18:04:48.307Z] iter=288 turn=8 INFO: Turn 8/25
+[2026-04-05T18:04:51.701Z] iter=288 turn=8 INFO: Agent: Now add `{REPO_MAP}` to architect-mode.ts:
+[2026-04-05T18:04:51.702Z] iter=288 turn=8 INFO: write_file: src/architect-mode.ts (patch)
+[2026-04-05T18:04:51.702Z] iter=288 turn=8 INFO:   -> ok: Patched src/architect-mode.ts: -5 +8 lines
+
+Context after patch:
+113 | - Keep descriptions concise but specific (mention function names, not just "update file")
+114 | - Use "create" for new files, "modify" for existing, "delete" for removal
+115 | 
+116 | Repo context (key files and symbols):
+117 | {REPO_CONTEXT}
+118 | 
+119 | Project structure (truncated):
+120 | {REPO_MAP}
+121 | 
+122 | Task:
+123 | {USER_MESSAGE}`;
+124 | 
+125 | /**
+126 |  * Generate a structured edit plan from a user request.
+[2026-04-05T18:04:51.702Z] iter=288 turn=9 INFO: Turn 9/25
+[2026-04-05T18:04:54.135Z] iter=288 turn=9 INFO: Agent: Now update `generateEditPlan` to accept and inject repoMap:
+[2026-04-05T18:04:54.136Z] iter=288 turn=9 INFO: read_file: src/architect-mode.ts
+[2026-04-05T18:04:54.137Z] iter=288 turn=9 INFO:   -> ok (941 chars)
+[2026-04-05T18:04:54.138Z] iter=288 turn=10 INFO: Turn 10/25
+[2026-04-05T18:04:58.536Z] iter=288 turn=10 INFO: write_file: src/architect-mode.ts (patch)
+[2026-04-05T18:04:58.538Z] iter=288 turn=10 INFO:   -> ok: Patched src/architect-mode.ts: -8 +10 lines
+
+Context after patch:
+127 |  * Uses the provided cheap model caller (typically haiku).
+128 |  * Returns an empty plan on any failure (graceful degradation).
+129 |  */
+130 | export async function generateEditPlan(
+131 |   userMessage: string,
+132 |   repoContext: string,
+133 |   callModel: (prompt: string) => Promise<string>,
+134 |   repoMap?: string,
+135 | ): Promise<EditPlan> {
+136 |   const prompt = PLAN_PROMPT_TEMPLATE
+137 |     .replace("{REPO_CONTEXT}", repoContext.slice(0, 4000))
+138 |     .replace("{REPO_MAP}", repoMap ? repoMap.slice(0, 8000) : "(not available)")
+139 |     .replace("{USER_MESSAGE}", userMessage);
+140 | 
+141 |   try {
+142 |     const raw = await callModel(prompt);
+[2026-04-05T18:04:58.538Z] iter=288 turn=11 INFO: Turn 11/25
+[2026-04-05T18:05:01.310Z] iter=288 turn=11 INFO: Agent: Now update `runArchitectMode` to accept and pass repoMap:
+[2026-04-05T18:05:01.310Z] iter=288 turn=11 INFO: read_file: src/architect-mode.ts
+[2026-04-05T18:05:01.311Z] iter=288 turn=11 INFO:   -> ok (9199 chars)
+[2026-04-05T18:05:01.311Z] iter=288 turn=12 INFO: Turn 12/25
+[2026-04-05T18:05:04.075Z] iter=288 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "runArchitectMode" src/architect-mode.ts | tail -5
+[2026-04-05T18:05:04.085Z] iter=288 turn=12 INFO:   -> exit=0 (125 chars)
+[2026-04-05T18:05:04.085Z] iter=288 turn=13 INFO: Turn 13/25
+[2026-04-05T18:05:09.401Z] iter=288 turn=13 INFO: think: Let me assess what I've actually done:
+1. ✅ context-loader.ts: MAX_FILES 3→5, CONTEXT_BUDGET 32K→48K, fuzzySearch 20→30
+...
+[2026-04-05T18:05:09.401Z] iter=288 turn=14 INFO: Turn 14/25
+[2026-04-05T18:05:11.600Z] iter=288 turn=14 INFO: read_file: src/architect-mode.ts
+[2026-04-05T18:05:11.600Z] iter=288 turn=14 INFO:   -> ok (818 chars)
+[2026-04-05T18:05:11.601Z] iter=288 turn=15 INFO: Turn 15/25
+[2026-04-05T18:05:17.356Z] iter=288 turn=15 INFO: Agent: Wrapping up fast. Update runArchitectMode, add tests, TSC, done.
+[2026-04-05T18:05:17.356Z] iter=288 turn=15 INFO: write_file: src/architect-mode.ts (patch)
+[2026-04-05T18:05:17.357Z] iter=288 turn=15 INFO:   -> ok: Patched src/architect-mode.ts: -14 +16 lines
+
+Context after patch:
+242 |  *   - If activated: inject prefill as assistant message before the agent loop
+243 |  *   - If not activated: proceed normally (no plan overhead)
+244 |  *
+245 |  * @param userMessage  - the raw user request
+246 |  * @param repoContext  - repo map / file list string for plan context
+247 |  * @param callModel    - cheap model caller (haiku via makeSimpleCaller)
+248 |  * @param repoMap      - optional repo map string (truncated to 8K) injected into plan prompt
+249 |  */
+250 | export async function runArchitectMode(
+251 |   userMessage: string,
+252 |   repoContext: string,
+253 |   callModel: (prompt: string) => Promise<string>,
+254 |   repoMap?: string,
+255 | ): Promise<ArchitectResult> {
+256 |   if (!needsArchitectMode(userMessage)) {
+257 |     return { plan: { summary: "", steps: [] }, prefill: "", activated: false };
+258 |   }
+259 | 
+260 |   const plan = await generateEditPlan(userMessage, repoContext, callModel, repoMap);
+261 | 
+262 |   // If the plan came back empty, don't inject anything
+263 |   if (!plan.summary && plan.steps.length === 0) {
+[2026-04-05T18:05:17.357Z] iter=288 turn=16 INFO: Turn 16/25
+[2026-04-05T18:05:20.665Z] iter=288 turn=16 INFO: Agent: Now add tests and run TSC:
+[2026-04-05T18:05:20.666Z] iter=288 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && tail -30 src/__tests__/context-loader.test.ts
+[2026-04-05T18:05:20.668Z] iter=288 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && tail -30 src/__tests__/architect-mode.test.ts
+[2026-04-05T18:05:20.675Z] iter=288 turn=16 INFO:   -> exit=0 (1103 chars)
+[2026-04-05T18:05:20.677Z] iter=288 turn=16 INFO:   -> exit=0 (1012 chars)
+[2026-04-05T18:05:20.677Z] iter=288 turn=17 INFO: Turn 17/25
+[2026-04-05T18:05:29.776Z] iter=288 turn=17 INFO: Agent: Adding tests then wrapping up immediately:
+[2026-04-05T18:05:29.776Z] iter=288 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && cat >> src/__tests__/context-loader.test.ts << 'EOF'
+
+describe("autoLoadContext — MAX_FILES=5 budget", () => {
+  it("loads up to 5 files when available", () => ...
+[2026-04-05T18:05:29.779Z] iter=288 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && cat >> src/__tests__/architect-mode.test.ts << 'EOF'
+
+describe("runArchitectMode — repo map injection", () => {
+  it("includes repo map in generated prompt when...
+[2026-04-05T18:05:29.787Z] iter=288 turn=17 INFO:   -> exit=0 (5 chars)
+[2026-04-05T18:05:29.788Z] iter=288 turn=17 INFO:   -> exit=0 (5 chars)
+[2026-04-05T18:05:29.788Z] iter=288 turn=18 INFO: Turn 18/25
+[2026-04-05T18:05:31.416Z] iter=288 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T18:05:32.422Z] iter=288 turn=18 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:05:32.422Z] iter=288 turn=19 INFO: Turn 19/25
+[2026-04-05T18:05:34.063Z] iter=288 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/context-loader.test.ts src/__tests__/architect-mode.test.ts 2>&1 | tail -15
+[2026-04-05T18:05:35.072Z] iter=288 turn=19 INFO:   -> exit=0 (530 chars)
+[2026-04-05T18:05:35.072Z] iter=288 turn=20 INFO: Turn 20/25
+[2026-04-05T18:05:37.287Z] iter=288 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/context-loader.test.ts src/__tests__/architect-mode.test.ts 2>&1 | grep "FAIL\|Error\|expect" | head -20
+[2026-04-05T18:05:38.279Z] iter=288 turn=20 INFO:   -> exit=0 (756 chars)
+[2026-04-05T18:05:38.280Z] iter=288 turn=21 INFO: Turn 21/25
+[2026-04-05T18:05:41.467Z] iter=288 turn=21 INFO: Agent: Fix existing tests that used old constants, and add missing import:
+[2026-04-05T18:05:41.468Z] iter=288 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "toBeLessThanOrEqual(3)\|toBeLessThanOrEqual(32\|runArchitectMode" src/__tests__/context-loader.test.ts src/__tests__/architect-mode.test.ts | head -20
+[2026-04-05T18:05:41.478Z] iter=288 turn=21 INFO:   -> exit=0 (379 chars)
+[2026-04-05T18:05:41.478Z] iter=288 turn=22 INFO: Turn 22/25
+[2026-04-05T18:05:43.671Z] iter=288 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && head -5 src/__tests__/architect-mode.test.ts
+[2026-04-05T18:05:43.680Z] iter=288 turn=22 INFO:   -> exit=0 (125 chars)
+[2026-04-05T18:05:43.680Z] iter=288 turn=23 INFO: Turn 23/25
+[2026-04-05T18:05:49.132Z] iter=288 turn=23 INFO: write_file: src/__tests__/context-loader.test.ts (patch)
+[2026-04-05T18:05:49.133Z] iter=288 turn=23 INFO:   -> ok: Patched src/__tests__/context-loader.test.ts: -1 +1 lines
+
+Context after patch:
+108 |       "/workspace",
+109 |     );
+110 |     const matches = (result.match(/--- file:/g) ?? []).length;
+111 |     expect(matches).toBeLessThanOrEqual(5);
+112 |   });
+113 | 
+114 |   it("deduplicates files that match multiple keywords", () => {
+[2026-04-05T18:05:49.134Z] iter=288 turn=23 INFO: write_file: src/__tests__/context-loader.test.ts (patch)
+[2026-04-05T18:05:49.135Z] iter=288 turn=23 INFO:   -> ok: Patched src/__tests__/context-loader.test.ts: -1 +1 lines
+
+Context after patch:
+131 |     const bigContent = "x".repeat(40_000);
+132 |     mockReadFileSync.mockReturnValue(bigContent as unknown as Buffer);
+133 |     const result = autoLoadContext(repoMap, "largeFunction refactor", "/workspace");
+134 |     expect(result.length).toBeLessThanOrEqual(48_500); // small overhead for headers
+135 |   });
+136 | 
+137 |   it("skips files already mentioned in conversation", () => {
+[2026-04-05T18:05:49.135Z] iter=288 turn=23 INFO: write_file: src/__tests__/architect-mode.test.ts (patch)
+[2026-04-05T18:05:49.136Z] iter=288 turn=23 INFO:   -> ok: Patched src/__tests__/architect-mode.test.ts: -4 +5 lines
+
+Context after patch:
+1 | import { describe, it, expect, vi } from "vitest";
+2 | import {
+3 |   needsArchitectMode,
+4 |   generateEditPlan,
+5 |   formatPlanForEditor,
+6 |   runArchitectMode,
+7 |   parsePlan,
+8 |   type EditPlan,
+9 | } from "../architect-mode.js";
+[2026-04-05T18:05:49.137Z] iter=288 turn=24 INFO: Turn 24/25
+[2026-04-05T18:05:51.283Z] iter=288 turn=24 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5 && npx vitest run src/__tests__/context-loader.test.ts src/__tests__/architect-mode.test.ts 2>&1 | tail -5
+[2026-04-05T18:05:53.233Z] iter=288 turn=24 INFO:   -> exit=0 (181 chars)
+[2026-04-05T18:05:53.233Z] iter=288 turn=25 INFO: Turn 25/25
+[2026-04-05T18:05:59.064Z] iter=288 turn=25 INFO: Agent: All tests pass. TSC clean.
+[2026-04-05T18:05:59.065Z] iter=288 turn=25 INFO: save_memory: "[Engineer] Iteration 288"
+[2026-04-05T18:05:59.065Z] iter=288 turn=25 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T18:05:59.066Z] iter=288 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T18:05:59.068Z] iter=288 turn=25 INFO: Cache persisted: 48 entries to .autoagent-cache.json
+[2026-04-05T18:05:59.068Z] iter=288 turn=25 INFO: Cache stats: 0 hits, 5 misses, 48 entries, 9 invalidations (7 entries removed)
+[2026-04-05T18:05:59.069Z] iter=288 turn=25 INFO: Tool cache stats
+[2026-04-05T18:05:59.069Z] iter=288 turn=25 INFO: Tool timing: bash: 16x, avg=322ms, total=5145ms; write_file: 9x, avg=2ms, total=18ms; read_file: 5x, avg=2ms, total=8ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T18:05:59.069Z] iter=288 turn=25 INFO: Tool timing stats
+[2026-04-05T18:06:04.877Z] iter=288 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 288: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T18:06:14.821Z] iter=288 turn=25 INFO: Pre-commit review (2395in/418out): **Issues found:**
+
+- **Logic bug in `hasErrorIndicator`**: The original double-check (case-insensitive + case-sensitive) was likely intentional to avoid false positives on words like "error-free" or "

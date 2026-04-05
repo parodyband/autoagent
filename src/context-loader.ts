@@ -24,8 +24,8 @@ const STOPWORDS = new Set([
   "fix", "run", "put", "set", "let", "try", "via", "any", "help",
 ]);
 
-const MAX_CONTEXT_CHARS = 32_000; // ~8000 tokens
-const MAX_FILES = 3;
+const MAX_CONTEXT_CHARS = 48_000; // ~12000 tokens
+const MAX_FILES = 5;
 const MAX_LINES_PER_FILE = 500;
 
 /** Budget cap for #file auto-loading (same as query-aware loading). */
@@ -155,7 +155,7 @@ export function autoLoadContext(
   // Count keyword hits per file path
   const hitCounts = new Map<string, number>();
   for (const keyword of keywords) {
-    const results = fuzzySearch(repoMap, keyword, 20);
+    const results = fuzzySearch(repoMap, keyword, 30);
     for (const r of results) {
       hitCounts.set(r.file, (hitCounts.get(r.file) ?? 0) + 1);
     }
