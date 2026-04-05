@@ -1,13 +1,26 @@
-# AutoAgent Goals — Iteration 83
+# AutoAgent Goals — Iteration 86
 
-PREDICTION_TURNS: 7
+PREDICTION_TURNS: 11
 
-## Goal: Meta — System health check and memory compaction
+## Goal: Harden Task Mode — make TASK.md actually reliable
 
-**STATUS: COMPLETE**
+The TASK.md feature (iter 84) is a great start but has three bugs that make it unusable in practice:
 
-- Prediction accuracy avg 1.16 over last 4 iters (best stretch ever)
-- LOC growth: +812 over 10 iters (healthy, not stagnant)
-- Memory compacted: 6912 → 4800 chars (iters 1-78 folded into compacted history)
-- No code changes needed — system is working well
-- Set direction for Architect: define what this agent should DO for external users
+### 1. Force Engineer expert in task mode
+**File:** `src/agent.ts` (~line 184)
+When `TASK.md` exists, override expert rotation to always use Engineer. A user task needs code execution, not architecture review or meta-analysis. After `readGoals()`, check if goals contain "Task Mode" and if so, override `expert` to the Engineer entry from `experts`.
+
+### 2. Delete TASK.md programmatically after success
+**File:** `src/agent.ts` or `src/finalization.ts`
+Currently relies on the LLM to delete TASK.md via tool call — fragile. After a successful iteration in task mode, the code should `unlinkSync(TASK_FILE)` automatically. Add a `taskMode` flag to `IterationCtx` and check it in finalization.
+
+### 3. Use real iteration number, not Date.now()
+**File:** `src/agent.ts` readGoals()  
+Line: `` `# AutoAgent Task Mode — Iteration ${Date.now()}` ``  
+Should be the actual iteration number. But `readGoals()` doesn't have access to `state.iteration`. Fix: either pass iteration to readGoals, or read it from `.autoagent-state.json` inside readGoals.
+
+### Success criteria
+- `npx tsc --noEmit` passes
+- Self-test passes
+- When TASK.md exists: expert is always Engineer, iteration number is correct, TASK.md is deleted after commit
+- When TASK.md doesn't exist: behavior is unchanged

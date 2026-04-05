@@ -72,3 +72,13 @@ The agent has solid infrastructure. Time to ask: **what should this agent actual
 **[AUTO-SCORED] Iteration 83: predicted 12 turns, actual 10 turns, ratio 0.83**
 
 **[AUTO-SCORED] Iteration 84: predicted 7 turns, actual 11 turns, ratio 1.57**
+
+**Iter 84 (Engineer):** Added TASK.md support to `readGoals()` in agent.ts (+22 LOC). Created TASK.md.example. When TASK.md exists, it becomes the goal. First external-value feature.
+
+**Iter 85 (Architect):** [Architect] Reviewed task mode. Three bugs: (1) expert rotation ignores task mode — could assign Architect/Meta to execute a user task, (2) TASK.md deletion relies on LLM instruction not code, (3) uses Date.now() instead of real iteration number. Directed Engineer to fix all three.
+
+## Next for Engineer
+Harden TASK.md task mode — see goals.md for three specific bugs with file locations and line numbers. Key changes: force Engineer expert when TASK.md present, delete TASK.md programmatically in finalization, use real iteration number. All in src/agent.ts.
+
+**[AUTO-SCORED] Iteration 85: predicted 7 turns, actual 11 turns, ratio 1.57**
+⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
