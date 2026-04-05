@@ -1,85 +1,3 @@
-233 |     expect(occurrences).toBe(1);
-234 |   });
-235 | });
-236 | 
-237 | describe("filterByRepoMap", () => {
-238 |   it("keeps files present in repo map", () => {
-239 |     const files = ["src/foo.ts", "src/bar.ts"];
-240 |     const repoMapFiles = new Set(["src/foo.ts", "src/bar.ts"]);
-[2026-04-05T18:53:34.599Z] iter=316 turn=11 INFO: Turn 11/25
-[2026-04-05T18:53:37.157Z] iter=316 turn=11 INFO: Agent: Now run the tests to see if they pass:
-[2026-04-05T18:53:37.158Z] iter=316 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tools-write-file.test.ts src/__tests__/context-loader-git.test.ts 2>&1 | tail -50
-[2026-04-05T18:53:38.202Z] iter=316 turn=11 INFO:   -> exit=0 (2155 chars)
-[2026-04-05T18:53:38.203Z] iter=316 turn=12 INFO: Turn 12/25
-[2026-04-05T18:53:42.904Z] iter=316 turn=12 INFO: think: The issue is that `autoLoadContext` is not imported at the top of context-loader-git.test.ts - only `getRecentlyChangedF...
-[2026-04-05T18:53:42.905Z] iter=316 turn=13 INFO: Turn 13/25
-[2026-04-05T18:53:46.479Z] iter=316 turn=13 INFO: Agent: I have real changes in src/. Let me fix the failing tests and wrap up.
-
-The issue: `require()` doesn't work in ESM. Need to use the top-level import:
-[2026-04-05T18:53:46.479Z] iter=316 turn=13 INFO: write_file: src/__tests__/context-loader-git.test.ts (patch)
-[2026-04-05T18:53:46.479Z] iter=316 turn=13 INFO:   -> ok: Patched src/__tests__/context-loader-git.test.ts: -1 +1 lines
-
-Context after patch:
-1 | import { describe, it, expect, vi, afterEach } from "vitest";
-2 | import { getRecentlyChangedFiles, filterByRepoMap, getRecentCommitFiles, autoLoadContext } from "../context-loader.js";
-3 | 
-4 | vi.mock("child_process", () => ({
-5 |   execSync: vi.fn(),
-[2026-04-05T18:53:46.480Z] iter=316 turn=14 INFO: Turn 14/25
-[2026-04-05T18:53:59.992Z] iter=316 turn=14 INFO: Agent: Now replace the `require()` calls with the imported function:
-[2026-04-05T18:53:59.993Z] iter=316 turn=14 INFO: write_file: src/__tests__/context-loader-git.test.ts (patch)
-[2026-04-05T18:53:59.993Z] iter=316 turn=14 INFO:   -> ok: Patched src/__tests__/context-loader-git.test.ts: -52 +49 lines
-
-Context after patch:
-176 |       return "" as unknown as Buffer;
-177 |     });
-178 | 
-179 |     const repoMap = {
-180 |       files: [
-181 |         { path: "src/diff-file.ts", symbols: ["diffFunc"] },
-182 |         { path: "src/log-file.ts", symbols: ["logFunc"] },
-183 |       ],
-184 |     };
-185 |     const result = autoLoadContext(repoMap, "fix the diffFunc and logFunc", "/fake");
-186 |     expect(result).toContain("log-file.ts");
-187 |     expect(result).toContain("diff-file.ts");
-188 |   });
-189 | 
-190 |   it("excludes git-log files already in alreadyMentioned", () => {
-191 |     vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
-192 |       const c = cmd as string;
-193 |       if (c.includes("git log")) {
-194 |         return "abc1234 recent commit\nsrc/already-known.ts\nsrc/new-file.ts\n" as unknown as Buffer;
-195 |       }
-196 |       return "" as unknown as Buffer;
-197 |     });
-198 |     vi.mocked(fs.existsSync).mockReturnValue(true);
-199 |     vi.mocked(fs.readFileSync).mockReturnValue("content" as unknown as Buffer);
-200 | 
-201 |     const repoMap = {
-202 |       files: [
-203 |         { path: "src/already-known.ts", symbols: ["knownFunc"] },
-204 |         { path: "src/new-file.ts", symbols: ["newFunc"] },
-205 |       ],
-206 |     };
-207 |     const alreadyMentioned = new Set(["src/already-known.ts"]);
-208 |     const result = autoLoadContext(repoMap, "fix knownFunc and newFunc", "/fake", alreadyMentioned);
-209 |     expect(result).not.toContain("already-known.ts");
-210 |     expect(result).toContain("new-file.ts");
-211 |   });
-212 | 
-213 |   it("git-log files don't duplicate git-diff files", () => {
-214 |     const sharedFile = "src/shared.ts";
-215 |     vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
-216 |       const c = cmd as string;
-217 |       if (c.includes("git log")) {
-218 |         return `abc1234 recent\n${sharedFile}\n` as unknown as Buffer;
-219 |       }
-220 |       // git diff also returns same file
-221 |       return `${sharedFile}\n` as unknown as Buffer;
-222 |     });
-223 |     vi.mocked(fs.existsSync).mockReturnValue(true);
-224 |     vi.mocked(fs.readFileSync).mockReturnValue("shared content" as unknown as Buffer);
 225 | 
 226 |     const repoMap = { files: [{ path: sharedFile, symbols: ["sharedFunc"] }] };
 227 |     const result = autoLoadContext(repoMap, "fix sharedFunc", "/fake");
@@ -1078,3 +996,275 @@ Context after patch:
 [2026-04-05T19:08:53.745Z] iter=323 turn=9 INFO: Tool timing stats
 [2026-04-05T19:09:00.181Z] iter=323 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 323: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-05T19:09:00.203Z] iter=323 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T19:09:00.238Z] iter=323 turn=9 INFO: Committed: 6064094b (19 in / 2345 out, cache: 13750 created, 88085 read)
+[2026-04-05T19:09:00.238Z] iter=323 turn=9 INFO: Restarting as iteration 324...
+[2026-04-05T19:09:00.433Z] iter=324 INFO: Cache restored: 54/55 entries (1 stale)
+[2026-04-05T19:09:00.436Z] iter=324 INFO: Turn budget: 20/25 (calibration=1.13x, predicted=20)
+[2026-04-05T19:09:00.436Z] iter=324 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T19:09:00.589Z] iter=324 turn=1 INFO: Turn 1/25
+[2026-04-05T19:09:02.666Z] iter=324 turn=1 INFO: Agent: I'll start by reading the scratchpad and understanding the current codebase state before implementing the goals.
+[2026-04-05T19:09:02.667Z] iter=324 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T19:09:02.668Z] iter=324 turn=1 INFO: $ cat goals.md
+[2026-04-05T19:09:02.673Z] iter=324 turn=1 INFO:   -> exit=0 (2141 chars)
+[2026-04-05T19:09:02.674Z] iter=324 turn=2 INFO: Turn 2/25
+[2026-04-05T19:09:05.925Z] iter=324 turn=2 INFO: $ grep -n "reindex\|updateRepoMapIncremental\|getStaleFiles\|buildRepoMap\|onChange\|file.watcher\|fileWatcher" src/orchestrator.ts | head -60
+[2026-04-05T19:09:05.929Z] iter=324 turn=2 INFO: $ grep -n "updateRepoMapIncremental\|getStaleFiles\|staleFiles\|cacheEntry\|repoMapCache" src/tree-sitter-map.ts | head -40
+[2026-04-05T19:09:05.938Z] iter=324 turn=2 INFO:   -> exit=0 (185 chars)
+[2026-04-05T19:09:05.939Z] iter=324 turn=2 INFO:   -> exit=0 (834 chars)
+[2026-04-05T19:09:05.939Z] iter=324 turn=3 INFO: Turn 3/25
+[2026-04-05T19:09:08.157Z] iter=324 turn=3 INFO: $ sed -n '650,780p' src/orchestrator.ts
+[2026-04-05T19:09:08.160Z] iter=324 turn=3 INFO: $ sed -n '720,810p' src/tree-sitter-map.ts
+[2026-04-05T19:09:08.168Z] iter=324 turn=3 INFO:   -> exit=0 (4259 chars)
+[2026-04-05T19:09:08.168Z] iter=324 turn=3 INFO:   -> exit=0 (2641 chars)
+[2026-04-05T19:09:08.168Z] iter=324 turn=4 INFO: Turn 4/25
+[2026-04-05T19:09:13.617Z] iter=324 turn=4 INFO: think: I have enough context. Let me plan the two deliverables:
+
+**Goal 1: Incremental repo-map cache invalidation**
+- `reindex...
+[2026-04-05T19:09:13.618Z] iter=324 turn=5 INFO: Turn 5/25
+[2026-04-05T19:09:16.810Z] iter=324 turn=5 INFO: $ grep -n "executeTool\|tool_use\|tool_result\|enhanceToolError\|runTool\|isError" src/orchestrator.ts | head -40
+[2026-04-05T19:09:16.811Z] iter=324 turn=5 INFO: $ grep -n "enhanceToolError\|ToolError\|toolError" src/tool-recovery.ts | head -20
+[2026-04-05T19:09:16.816Z] iter=324 turn=5 INFO:   -> exit=0 (38 chars)
+[2026-04-05T19:09:16.817Z] iter=324 turn=5 INFO:   -> exit=0 (2741 chars)
+[2026-04-05T19:09:16.817Z] iter=324 turn=6 INFO: Turn 6/25
+[2026-04-05T19:09:18.633Z] iter=324 turn=6 INFO: $ sed -n '455,520p' src/orchestrator.ts
+[2026-04-05T19:09:18.634Z] iter=324 turn=6 INFO: $ sed -n '237,290p' src/tool-recovery.ts
+[2026-04-05T19:09:18.638Z] iter=324 turn=6 INFO:   -> exit=0 (2929 chars)
+[2026-04-05T19:09:18.638Z] iter=324 turn=6 INFO:   -> exit=0 (706 chars)
+[2026-04-05T19:09:18.638Z] iter=324 turn=7 INFO: Turn 7/25
+[2026-04-05T19:09:22.093Z] iter=324 turn=7 INFO: Agent: **Goal 1: NOT STARTED** — Need to wire `reindex()` to use `updateRepoMapIncremental()` and file-watcher onChange to invalidate cache
+**Goal 2: NOT STARTED** — Need auto retry with `enhanceToolError()`
+
+I have enough context. Writing now.
+[2026-04-05T19:09:22.093Z] iter=324 turn=7 INFO: $ sed -n '230,260p' src/orchestrator.ts
+[2026-04-05T19:09:22.102Z] iter=324 turn=7 INFO:   -> exit=0 (1364 chars)
+[2026-04-05T19:09:22.102Z] iter=324 turn=8 INFO: Turn 8/25
+[2026-04-05T19:09:26.423Z] iter=324 turn=8 INFO: Agent: Now I have enough context. Let me look at the orchestrator's fields and `reindex()` method, then write all changes:
+[2026-04-05T19:09:26.424Z] iter=324 turn=8 INFO: $ grep -n "private repoMap\|private cache\|repoMapBlock\|repoFingerprint\|this\.repoMap\|this\.cache" src/orchestrator.ts | head -30
+[2026-04-05T19:09:26.436Z] iter=324 turn=8 INFO:   -> exit=0 (1194 chars)
+[2026-04-05T19:09:26.437Z] iter=324 turn=9 INFO: Turn 9/25
+[2026-04-05T19:09:27.683Z] iter=324 turn=9 INFO: $ sed -n '615,655p' src/orchestrator.ts
+[2026-04-05T19:09:27.692Z] iter=324 turn=9 INFO:   -> exit=0 (1441 chars)
+[2026-04-05T19:09:27.692Z] iter=324 turn=10 INFO: Turn 10/25
+[2026-04-05T19:09:36.177Z] iter=324 turn=10 INFO: Agent: Now I have full context. Let me implement both goals:
+
+**Goal 1**: Add `cachedRepoMap` field, update `onChange` to mark stale files, update `reindex()` to use incremental update.
+
+**Goal 2**: Add retry logic around tool execution.
+[2026-04-05T19:09:36.177Z] iter=324 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:09:36.178Z] iter=324 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -16 +22 lines
+
+Context after patch:
+646 |   private checkpoints: ConversationCheckpoint[] = [];
+647 |   private nextCheckpointId = 0;
+648 | 
+649 |   /** FileWatcher instance — tracks externally modified files. */
+650 |   private fileWatcher = new FileWatcher();
+651 |   /** Paths changed externally since last send(). */
+652 |   private externallyChangedFiles = new Set<string>();
+653 |   /** Cached repo map for incremental reindex — null means full rebuild needed. */
+654 |   private cachedRepoMap: import("./tree-sitter-map.js").RepoMap | null = null;
+655 |   /** Paths that have been changed externally and need incremental re-parse. */
+656 |   private staleRepoPaths = new Set<string>();
+657 | 
+658 |   constructor(opts: OrchestratorOptions) {
+659 |     this.opts = opts;
+660 |     this.client = new Anthropic();
+661 |     this.registry = createDefaultRegistry();
+662 | 
+663 |     // Wire up file watcher callback
+664 |     this.fileWatcher.onChange = (filePath: string) => {
+665 |       this.externallyChangedFiles.add(filePath);
+666 |       // Mark this path stale in the incremental repo map cache
+667 |       this.staleRepoPaths.add(filePath);
+668 |       this.opts.onExternalFileChange?.([...this.externallyChangedFiles]);
+669 |     };
+670 |   }
+671 | 
+672 |   /** Initialize repo context (call once before first message). */
+673 |   async init(): Promise<void> {
+[2026-04-05T19:09:36.178Z] iter=324 turn=11 INFO: Turn 11/25
+[2026-04-05T19:09:38.459Z] iter=324 turn=11 INFO: Agent: Now update `reindex()` to use incremental update:
+[2026-04-05T19:09:38.459Z] iter=324 turn=11 INFO: $ sed -n '758,775p' src/orchestrator.ts
+[2026-04-05T19:09:38.468Z] iter=324 turn=11 INFO:   -> exit=0 (576 chars)
+[2026-04-05T19:09:38.469Z] iter=324 turn=12 INFO: Turn 12/25
+[2026-04-05T19:09:49.231Z] iter=324 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:09:49.232Z] iter=324 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -6 +41 lines
+
+Context after patch:
+761 |     return [...this.checkpoints];
+762 |   }
+763 | 
+764 |   /** Re-index the repo (after significant changes). Uses incremental update when possible. */
+765 |   reindex(): void {
+766 |     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
+767 |     if (this.cachedRepoMap && this.staleRepoPaths.size > 0) {
+768 |       // Incremental: only re-parse changed files
+769 |       const changedFiles = [...this.staleRepoPaths];
+770 |       this.staleRepoPaths.clear();
+771 |       this.cachedRepoMap = updateRepoMapIncremental(
+772 |         this.opts.workDir,
+773 |         this.cachedRepoMap,
+774 |         changedFiles,
+775 |       );
+776 |       saveRepoMapCache(this.opts.workDir, this.cachedRepoMap);
+777 |       // Rebuild system prompt using updated cache
+778 |       ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
+779 |         buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
+780 |     } else if (this.cachedRepoMap && this.staleRepoPaths.size === 0) {
+781 |       // Nothing stale — no-op for repo map, just refresh fingerprint/system prompt
+782 |       this.staleRepoPaths.clear();
+783 |       ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
+784 |         buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
+785 |     } else {
+786 |       // No cache — full rebuild
+787 |       ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
+788 |         buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
+789 |     }
+790 |   }
+791 | 
+792 |   /**
+793 |    * Store the most recently built repo map for use in incremental reindex.
+794 |    * Called by buildSystemPrompt internals via the orchestrator init flow.
+795 |    */
+796 |   setRepoMapCache(repoMap: import("./tree-sitter-map.js").RepoMap): void {
+797 |     this.cachedRepoMap = repoMap;
+798 |     this.staleRepoPaths.clear();
+799 |   }
+800 | 
+801 |   /** Get the current cached repo map (null if not yet built). */
+802 |   getRepoMapCache(): import("./tree-sitter-map.js").RepoMap | null {
+803 |     return this.cachedRepoMap;
+804 |   }
+805 | 
+806 |   /** Get current session cost info. */
+807 |   getCost(): CostInfo {
+[2026-04-05T19:09:49.233Z] iter=324 turn=13 INFO: Turn 13/25
+[2026-04-05T19:09:51.529Z] iter=324 turn=13 INFO: Agent: I've been writing but haven't finished either goal yet. Let me finish both goals fast.
+[2026-04-05T19:09:51.529Z] iter=324 turn=13 INFO: $ grep -n "rawRepoMap\|setRepoMapCache\|buildSystemPrompt" src/orchestrator.ts | head -20
+[2026-04-05T19:09:51.540Z] iter=324 turn=13 INFO:   -> exit=0 (767 chars)
+[2026-04-05T19:09:51.541Z] iter=324 turn=14 INFO: Turn 14/25
+[2026-04-05T19:09:54.677Z] iter=324 turn=14 INFO: Agent: Good - `buildSystemPrompt` returns `rawRepoMap`. Now wire `setRepoMapCache` in `init()`:
+[2026-04-05T19:09:54.678Z] iter=324 turn=14 INFO: $ sed -n '675,690p' src/orchestrator.ts
+[2026-04-05T19:09:54.687Z] iter=324 turn=14 INFO:   -> exit=0 (639 chars)
+[2026-04-05T19:09:54.687Z] iter=324 turn=15 INFO: Turn 15/25
+[2026-04-05T19:09:58.588Z] iter=324 turn=15 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:09:58.589Z] iter=324 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -4 +6 lines
+
+Context after patch:
+672 |   /** Initialize repo context (call once before first message). */
+673 |   async init(): Promise<void> {
+674 |     if (this.initialized) return;
+675 |     this.opts.onStatus?.("Indexing repo...");
+676 |     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
+677 |     const initBuildResult = buildSystemPrompt(this.opts.workDir, this.repoFingerprint);
+678 |     this.systemPrompt = initBuildResult.systemPrompt;
+679 |     this.repoMapBlock = initBuildResult.repoMapBlock;
+680 |     if (initBuildResult.rawRepoMap) this.setRepoMapCache(initBuildResult.rawRepoMap);
+681 |     // Cache project summary and inject into system prompt
+682 |     try {
+683 |       const projectInfo = detectProject(this.opts.workDir);
+[2026-04-05T19:09:58.590Z] iter=324 turn=16 INFO: Turn 16/25
+[2026-04-05T19:10:01.161Z] iter=324 turn=16 INFO: Agent: Let me finish Goal 2 (retry logic) and write tests, then wrap up.
+[2026-04-05T19:10:01.162Z] iter=324 turn=16 INFO: $ sed -n '460,480p' src/orchestrator.ts
+[2026-04-05T19:10:01.174Z] iter=324 turn=16 INFO:   -> exit=0 (1129 chars)
+[2026-04-05T19:10:01.174Z] iter=324 turn=17 INFO: Turn 17/25
+[2026-04-05T19:10:05.020Z] iter=324 turn=17 INFO: think: I need to wrap up. I've partially implemented Goal 1 (incremental reindex). Goal 2 (auto retry) is not done. Let me do w...
+[2026-04-05T19:10:05.020Z] iter=324 turn=18 INFO: Turn 18/25
+[2026-04-05T19:10:12.575Z] iter=324 turn=18 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:10:12.577Z] iter=324 turn=18 INFO:   -> ok: Patched src/orchestrator.ts: -9 +26 lines
+
+Context after patch:
+463 | 
+464 |     const results: Anthropic.ToolResultBlockParam[] = [];
+465 | 
+466 |     // Execute non-write tools (reads, greps, etc.) — parallel-safe ones run concurrently
+467 |     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
+468 |       const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+469 |       const enhanced = enhanceToolError(tu.name, tu.input as Record<string, unknown>, rawResult, workDir);
+470 |       // Auto-retry once if the result looks like an error and enhancement added suggestions
+471 |       if (enhanced !== rawResult && isToolError(rawResult)) {
+472 |         const retryResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+473 |         if (!isToolError(retryResult)) {
+474 |           // Retry succeeded — return clean result transparently
+475 |           if (tu.name === "read_file" && onFileWatch) {
+476 |             onFileWatch("read", (tu.input as { path?: string }).path ?? "");
+477 |           }
+478 |           return compressToolOutput(tu.name, retryResult);
+479 |         }
+480 |         // Both attempts failed — return enhanced error with suggestions
+481 |         const enhancedRetry = enhanceToolError(tu.name, tu.input as Record<string, unknown>, retryResult, workDir);
+482 |         if (tu.name === "read_file" && onFileWatch) {
+483 |           onFileWatch("read", (tu.input as { path?: string }).path ?? "");
+484 |         }
+485 |         return compressToolOutput(tu.name, `${enhanced}\n\n[Retry also failed]: ${enhancedRetry}`);
+486 |       }
+487 |       if (tu.name === "read_file" && onFileWatch) {
+488 |         onFileWatch("read", (tu.input as { path?: string }).path ?? "");
+489 |       }
+490 |       return compressToolOutput(tu.name, enhanced);
+491 |     });
+492 |     results.push(...parallelResults);
+493 | 
+494 |     // Handle write_file tools — batch if 2+ and onDiffPreview is set
+[2026-04-05T19:10:12.578Z] iter=324 turn=19 INFO: Turn 19/25
+[2026-04-05T19:10:15.158Z] iter=324 turn=19 INFO: Agent: Now add the `isToolError` helper and export it for tests:
+[2026-04-05T19:10:15.158Z] iter=324 turn=19 INFO: $ grep -n "^function compressToolOutput\|^export function compressToolOutput\|^async function executeToolsParallel\|^export function executeToolsParallel" src/orchestrator.ts | head -10
+[2026-04-05T19:10:15.176Z] iter=324 turn=19 INFO:   -> exit=0 (41 chars)
+[2026-04-05T19:10:15.177Z] iter=324 turn=20 INFO: Turn 20/25
+[2026-04-05T19:10:17.614Z] iter=324 turn=20 INFO: $ grep -n "^function compressToolOutput\|^export function compressToolOutput\|compressToolOutput" src/orchestrator.ts | head -5
+[2026-04-05T19:10:17.624Z] iter=324 turn=20 INFO:   -> exit=0 (359 chars)
+[2026-04-05T19:10:17.625Z] iter=324 turn=21 INFO: Turn 21/25
+[2026-04-05T19:10:19.791Z] iter=324 turn=21 INFO: Agent: I need to stop and wrap up immediately.
+[2026-04-05T19:10:19.792Z] iter=324 turn=21 INFO: $ grep -n "^export\|^async function\|^function" src/orchestrator.ts | grep -i "isToolError" | head -5
+[2026-04-05T19:10:19.806Z] iter=324 turn=21 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:10:19.806Z] iter=324 turn=22 INFO: Turn 22/25
+[2026-04-05T19:10:21.842Z] iter=324 turn=22 INFO: $ sed -n '338,346p' src/orchestrator.ts
+[2026-04-05T19:10:21.857Z] iter=324 turn=22 INFO:   -> exit=0 (418 chars)
+[2026-04-05T19:10:21.858Z] iter=324 turn=23 INFO: Turn 23/25
+[2026-04-05T19:10:25.158Z] iter=324 turn=23 INFO: $ 
+# Add isToolError helper before executeToolsParallel
+sed -i '338i /**\n * Returns true if a tool result string looks like an error.\n */\nexport function isToolError(result: string): boolean {\n  con...
+[2026-04-05T19:10:26.220Z] iter=324 turn=23 INFO:   -> exit=0 (233 chars)
+[2026-04-05T19:10:26.220Z] iter=324 turn=24 INFO: Turn 24/25
+[2026-04-05T19:10:30.313Z] iter=324 turn=24 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:10:30.315Z] iter=324 turn=24 INFO:   -> ok: Patched src/orchestrator.ts: -6 +20 lines
+
+Context after patch:
+335 | 
+336 | // ─── Streaming agent loop ─────────────────────────────────────
+337 | 
+338 | /**
+339 |  * Returns true if a tool result string looks like an error.
+340 |  */
+341 | export function isToolError(result: string): boolean {
+342 |   const lower = result.toLowerCase();
+343 |   return (
+344 |     lower.startsWith("error") ||
+345 |     lower.includes("enoent") ||
+346 |     lower.includes("no such file") ||
+347 |     lower.includes("command failed") ||
+348 |     lower.includes("cannot find")
+349 |   );
+350 | }
+351 | 
+352 | /**
+353 |  * Execute tool_use blocks with parallelism for read-only tools.
+354 |  * - Read-only tools (in PARALLEL_SAFE_TOOLS) run concurrently via Promise.all
+355 |  * - Side-effecting tools run sequentially after parallel reads complete
+356 |  * - Results are returned in the original tool_use order
+357 |  */
+358 | async function executeToolsParallel(
+359 |   tools: Anthropic.ToolUseBlock[],
+360 |   executeTool: (tu: Anthropic.ToolUseBlock) => Promise<string>,
+[2026-04-05T19:10:30.315Z] iter=324 turn=25 INFO: Turn 25/25
+[2026-04-05T19:10:32.156Z] iter=324 turn=25 INFO: $ npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T19:10:33.211Z] iter=324 turn=25 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:10:33.211Z] iter=324 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T19:10:33.212Z] iter=324 turn=25 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T19:10:33.213Z] iter=324 turn=25 INFO: Tool timing: bash: 22x, avg=105ms, total=2319ms; write_file: 5x, avg=2ms, total=9ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T19:10:33.213Z] iter=324 turn=25 INFO: Tool timing stats
+[2026-04-05T19:10:40.221Z] iter=324 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 324: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T19:10:50.693Z] iter=324 turn=25 INFO: Pre-commit review (2138in/410out): Here are the actual issues:
+
+- **Retry logic is flawed for parallel read-only tools**: The retry re-runs the tool with identical inputs and no delay. If the error is deterministic (e.g., `ENOENT` — fi

@@ -336,6 +336,20 @@ function makeExecTool(
 // ─── Streaming agent loop ─────────────────────────────────────
 
 /**
+ * Returns true if a tool result string looks like an error.
+ */
+export function isToolError(result: string): boolean {
+  const lower = result.toLowerCase();
+  return (
+    lower.startsWith("error") ||
+    lower.includes("enoent") ||
+    lower.includes("no such file") ||
+    lower.includes("command failed") ||
+    lower.includes("cannot find")
+  );
+}
+
+/**
  * Execute tool_use blocks with parallelism for read-only tools.
  * - Read-only tools (in PARALLEL_SAFE_TOOLS) run concurrently via Promise.all
  * - Side-effecting tools run sequentially after parallel reads complete
@@ -467,6 +481,23 @@ async function runAgentLoop(
     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
       const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
       const enhanced = enhanceToolError(tu.name, tu.input as Record<string, unknown>, rawResult, workDir);
+      // Auto-retry once if the result looks like an error and enhancement added suggestions
+      if (enhanced !== rawResult && isToolError(rawResult)) {
+        const retryResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+        if (!isToolError(retryResult)) {
+          // Retry succeeded — return clean result transparently
+          if (tu.name === "read_file" && onFileWatch) {
+            onFileWatch("read", (tu.input as { path?: string }).path ?? "");
+          }
+          return compressToolOutput(tu.name, retryResult);
+        }
+        // Both attempts failed — return enhanced error with suggestions
+        const enhancedRetry = enhanceToolError(tu.name, tu.input as Record<string, unknown>, retryResult, workDir);
+        if (tu.name === "read_file" && onFileWatch) {
+          onFileWatch("read", (tu.input as { path?: string }).path ?? "");
+        }
+        return compressToolOutput(tu.name, `${enhanced}\n\n[Retry also failed]: ${enhancedRetry}`);
+      }
       if (tu.name === "read_file" && onFileWatch) {
         onFileWatch("read", (tu.input as { path?: string }).path ?? "");
       }
@@ -650,6 +681,10 @@ export class Orchestrator {
   private fileWatcher = new FileWatcher();
   /** Paths changed externally since last send(). */
   private externallyChangedFiles = new Set<string>();
+  /** Cached repo map for incremental reindex — null means full rebuild needed. */
+  private cachedRepoMap: import("./tree-sitter-map.js").RepoMap | null = null;
+  /** Paths that have been changed externally and need incremental re-parse. */
+  private staleRepoPaths = new Set<string>();
 
   constructor(opts: OrchestratorOptions) {
     this.opts = opts;
@@ -659,6 +694,8 @@ export class Orchestrator {
     // Wire up file watcher callback
     this.fileWatcher.onChange = (filePath: string) => {
       this.externallyChangedFiles.add(filePath);
+      // Mark this path stale in the incremental repo map cache
+      this.staleRepoPaths.add(filePath);
       this.opts.onExternalFileChange?.([...this.externallyChangedFiles]);
     };
   }
@@ -668,8 +705,10 @@ export class Orchestrator {
     if (this.initialized) return;
     this.opts.onStatus?.("Indexing repo...");
     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
-    ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
-      buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
+    const initBuildResult = buildSystemPrompt(this.opts.workDir, this.repoFingerprint);
+    this.systemPrompt = initBuildResult.systemPrompt;
+    this.repoMapBlock = initBuildResult.repoMapBlock;
+    if (initBuildResult.rawRepoMap) this.setRepoMapCache(initBuildResult.rawRepoMap);
     // Cache project summary and inject into system prompt
     try {
       const projectInfo = detectProject(this.opts.workDir);
@@ -755,11 +794,46 @@ export class Orchestrator {
     return [...this.checkpoints];
   }
 
-  /** Re-index the repo (after significant changes). */
+  /** Re-index the repo (after significant changes). Uses incremental update when possible. */
   reindex(): void {
     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
-    ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
-      buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
+    if (this.cachedRepoMap && this.staleRepoPaths.size > 0) {
+      // Incremental: only re-parse changed files
+      const changedFiles = [...this.staleRepoPaths];
+      this.staleRepoPaths.clear();
+      this.cachedRepoMap = updateRepoMapIncremental(
+        this.opts.workDir,
+        this.cachedRepoMap,
+        changedFiles,
+      );
+      saveRepoMapCache(this.opts.workDir, this.cachedRepoMap);
+      // Rebuild system prompt using updated cache
+      ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
+        buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
+    } else if (this.cachedRepoMap && this.staleRepoPaths.size === 0) {
+      // Nothing stale — no-op for repo map, just refresh fingerprint/system prompt
+      this.staleRepoPaths.clear();
+      ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
+        buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
+    } else {
+      // No cache — full rebuild
+      ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
+        buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
+    }
+  }
+
+  /**
+   * Store the most recently built repo map for use in incremental reindex.
+   * Called by buildSystemPrompt internals via the orchestrator init flow.
+   */
+  setRepoMapCache(repoMap: import("./tree-sitter-map.js").RepoMap): void {
+    this.cachedRepoMap = repoMap;
+    this.staleRepoPaths.clear();
+  }
+
+  /** Get the current cached repo map (null if not yet built). */
+  getRepoMapCache(): import("./tree-sitter-map.js").RepoMap | null {
+    return this.cachedRepoMap;
   }
 
   /** Get current session cost info. */
