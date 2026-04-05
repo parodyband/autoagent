@@ -64,3 +64,5 @@ Engineer iterations consistently overshoot. Recent ratios:
 System is productive — 6 consecutive iterations shipped real features (200-206). Auto-commit, /diff, /undo, /help all shipped. Engineer iterations running 1.4x over budget (15→21) — bumping default Engineer prediction to 20. Memory compacted from 92 to ~55 lines. Gaps list updated. No structural issues detected.
 
 **[AUTO-SCORED] Iteration 207: predicted 8 turns, actual 7 turns, ratio 0.88**
+
+**[AUTO-SCORED] Iteration 208: predicted 8 turns, actual 7 turns, ratio 0.88**

@@ -1,49 +1,3 @@
-{"timestamp":"2026-04-05T15:18:39.955Z","iteration":200,"level":"info","message":"  -> exit=0 (681 chars)","turn":2}
-{"timestamp":"2026-04-05T15:18:39.955Z","iteration":200,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-05T15:18:44.012Z","iteration":200,"level":"info","message":"think: I have enough context. Let me build the deliverables:\n1. src/auto-commit.ts\n2. src/__tests__/auto-commit.test.ts\n3. Wire...","turn":3}
-{"timestamp":"2026-04-05T15:18:44.013Z","iteration":200,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-05T15:18:58.248Z","iteration":200,"level":"info","message":"Agent: Writing all three files now:","turn":4}
-{"timestamp":"2026-04-05T15:18:58.249Z","iteration":200,"level":"info","message":"write_file: src/auto-commit.ts (write)","turn":4}
-{"timestamp":"2026-04-05T15:18:58.251Z","iteration":200,"level":"info","message":"  -> ok: Created src/auto-commit.ts (2222 chars)","turn":4}
-{"timestamp":"2026-04-05T15:18:58.252Z","iteration":200,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-05T15:19:10.410Z","iteration":200,"level":"info","message":"write_file: src/__tests__/auto-commit.test.ts (write)","turn":5}
-{"timestamp":"2026-04-05T15:19:10.412Z","iteration":200,"level":"info","message":"  -> ok: Created src/__tests__/auto-commit.test.ts (3421 chars)","turn":5}
-{"timestamp":"2026-04-05T15:19:10.413Z","iteration":200,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-05T15:19:15.041Z","iteration":200,"level":"info","message":"Agent: **Goal 1 (auto-commit.ts + tests): DONE**\n**Goal 2 (wire into orchestrator + TUI): IN PROGRESS**\n\nWiring now:","turn":6}
-{"timestamp":"2026-04-05T15:19:15.042Z","iteration":200,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":6}
-{"timestamp":"2026-04-05T15:19:15.044Z","iteration":200,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -4 +5 lines\n\nContext after patch:\n28 |   loadSession,\n29 |   cleanOldSessions,\n30 | } from \"./session-store.js\";\n31 | import {\n32 |   runArchitectMode,\n33 |   type EditPlan,\n34 | } from \"./architect-mode.js\";\n35 | import { autoCommit, type AutoCommitResult } from \"./auto-commit.js\";\n36 | \n37 | // ─── Constants ────────────────────────────────────────────────\n38 | ","turn":6}
-{"timestamp":"2026-04-05T15:19:15.045Z","iteration":200,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-05T15:19:18.012Z","iteration":200,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":7}
-{"timestamp":"2026-04-05T15:19:18.014Z","iteration":200,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -7 +8 lines\n\nContext after patch:\n81 |   onPlan?: (plan: EditPlan) => void;\n82 | }\n83 | \n84 | export interface OrchestratorResult {\n85 |   text: string;\n86 |   tokensIn: number;\n87 |   tokensOut: number;\n88 |   model: string;\n89 |   verificationPassed?: boolean;\n90 |   commitResult?: AutoCommitResult;\n91 | }\n92 | \n93 | export interface CostInfo {\n94 |   cost: number;","turn":7}
-{"timestamp":"2026-04-05T15:19:18.015Z","iteration":200,"level":"info","message":"Turn 8/25","turn":8}
-{"timestamp":"2026-04-05T15:19:23.174Z","iteration":200,"level":"info","message":"Agent: Now add auto-commit call at end of `send()`:","turn":8}
-{"timestamp":"2026-04-05T15:19:23.175Z","iteration":200,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":8}
-{"timestamp":"2026-04-05T15:19:23.175Z","iteration":200,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -4 +13 lines\n\nContext after patch:\n607 |       }\n608 |     }\n609 | \n610 |     // 7. Auto-commit if code was likely changed\n611 |     let commitResult: AutoCommitResult | undefined;\n612 |     if (looksLikeCodeChange) {\n613 |       commitResult = await autoCommit(this.opts.workDir, userMessage);\n614 |       if (commitResult.committed) {\n615 |         this.opts.onStatus?.(`✓ Committed ${commitResult.hash}: ${commitResult.message}`);\n616 |       }\n617 |     }\n618 | \n619 |     this.opts.onStatus?.(\"\");\n620 |     return { text, tokensIn, tokensOut, model, verificationPassed, commitResult };\n621 |   }\n622 | }\n623 | ","turn":8}
-{"timestamp":"2026-04-05T15:19:23.176Z","iteration":200,"level":"info","message":"Turn 9/25","turn":9}
-{"timestamp":"2026-04-05T15:19:28.353Z","iteration":200,"level":"info","message":"Agent: Now wire into TUI — check the footer area:","turn":9}
-{"timestamp":"2026-04-05T15:19:28.353Z","iteration":200,"level":"info","message":"$ grep -n \"footer\\|status\\|commitResult\\|tokensIn\\|verificationPassed\\|onStatus\\|onPlan\" src/tui.tsx | head -40","turn":9}
-{"timestamp":"2026-04-05T15:19:28.363Z","iteration":200,"level":"info","message":"  -> exit=0 (913 chars)","turn":9}
-{"timestamp":"2026-04-05T15:19:28.364Z","iteration":200,"level":"info","message":"Turn 10/25","turn":10}
-{"timestamp":"2026-04-05T15:19:32.858Z","iteration":200,"level":"info","message":"Agent: I've changed src/auto-commit.ts (new), src/__tests__/auto-commit.test.ts (new), src/orchestrator.ts (wired in). Still need TUI display + tests + tsc. Finishing now.","turn":10}
-{"timestamp":"2026-04-05T15:19:32.860Z","iteration":200,"level":"info","message":"$ grep -n \"commitResult\\|Message\\|interface.*Msg\" src/tui.tsx | head -20","turn":10}
-{"timestamp":"2026-04-05T15:19:32.885Z","iteration":200,"level":"info","message":"  -> exit=0 (1136 chars)","turn":10}
-{"timestamp":"2026-04-05T15:19:32.886Z","iteration":200,"level":"info","message":"Turn 11/25","turn":11}
-{"timestamp":"2026-04-05T15:19:35.827Z","iteration":200,"level":"info","message":"read_file: src/tui.tsx","turn":11}
-{"timestamp":"2026-04-05T15:19:35.827Z","iteration":200,"level":"info","message":"  -> ok (416 chars)","turn":11}
-{"timestamp":"2026-04-05T15:19:35.828Z","iteration":200,"level":"info","message":"Turn 12/25","turn":12}
-{"timestamp":"2026-04-05T15:19:40.176Z","iteration":200,"level":"info","message":"read_file: src/tui.tsx","turn":12}
-{"timestamp":"2026-04-05T15:19:40.177Z","iteration":200,"level":"info","message":"  -> ok (1149 chars)","turn":12}
-{"timestamp":"2026-04-05T15:19:40.177Z","iteration":200,"level":"info","message":"Turn 13/25","turn":13}
-{"timestamp":"2026-04-05T15:19:45.187Z","iteration":200,"level":"info","message":"Agent: Adding commit display to TUI, then wrapping up:","turn":13}
-{"timestamp":"2026-04-05T15:19:45.188Z","iteration":200,"level":"info","message":"write_file: src/tui.tsx (patch)","turn":13}
-{"timestamp":"2026-04-05T15:19:45.190Z","iteration":200,"level":"info","message":"  -> ok: Patched src/tui.tsx: -10 +19 lines\n\nContext after patch:\n323 |       // Flush streaming buffer → final message\n324 |       setStreamBuffer(\"\");\n325 | \n326 |       if (result.text) {\n327 |         const assistantMsg: Message = {\n328 |           role: \"assistant\",\n329 |           content: result.text,\n330 |           tokens: { in: result.tokensIn, out: result.tokensOut },\n331 |           model: result.model,\n332 |           verificationPassed: result.verificationPassed,\n333 |         };\n334 |         setMessages(prev => [...prev, assistantMsg]);\n335 |       }\n336 | \n337 |       // Show commit info if auto-commit fired\n338 |       if (result.commitResult?.committed) {\n339 |         const { hash, message } = result.commitResult;\n340 |         setMessages(prev => [...prev, {\n341 |           role: \"assistant\",\n342 |           content: `✓ Committed ${hash}: ${message}`,\n343 |         }]);\n344 |       }\n345 | \n346 |       // Update footer stats from orchestrator\n347 |       const costInfo = orchestratorRef.current?.getCost();","turn":13}
-{"timestamp":"2026-04-05T15:19:45.191Z","iteration":200,"level":"info","message":"Turn 14/25","turn":14}
-{"timestamp":"2026-04-05T15:19:47.295Z","iteration":200,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30","turn":14}
-{"timestamp":"2026-04-05T15:19:48.186Z","iteration":200,"level":"info","message":"  -> exit=0 (11 chars)","turn":14}
-{"timestamp":"2026-04-05T15:19:48.186Z","iteration":200,"level":"info","message":"Turn 15/25","turn":15}
-{"timestamp":"2026-04-05T15:19:51.533Z","iteration":200,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/auto-commit.test.ts 2>&1 | tail -20","turn":15}
-{"timestamp":"2026-04-05T15:19:52.811Z","iteration":200,"level":"info","message":"  -> exit=0 (283 chars)","turn":15}
-{"timestamp":"2026-04-05T15:19:52.811Z","iteration":200,"level":"info","message":"Turn 16/25","turn":16}
 {"timestamp":"2026-04-05T15:19:57.637Z","iteration":200,"level":"info","message":"Agent: All tests pass, tsc clean. Writing memory and goals now.","turn":16}
 {"timestamp":"2026-04-05T15:19:57.638Z","iteration":200,"level":"info","message":"save_memory: \"[Engineer] Iteration 200\"","turn":16}
 {"timestamp":"2026-04-05T15:19:57.639Z","iteration":200,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":16}
@@ -542,3 +496,46 @@
 {"timestamp":"2026-04-05T15:32:11.856Z","iteration":207,"level":"info","message":"Tool timing stats","turn":7,"metadata":{"timing":{"tools":{"bash":{"calls":8,"totalMs":1038,"minMs":1,"maxMs":921,"avgMs":130},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":2,"totalMs":4,"minMs":1,"maxMs":3,"avgMs":2}},"totalCalls":11,"totalMs":1043}}}
 {"timestamp":"2026-04-05T15:32:16.648Z","iteration":207,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 207: predicted 8 turns, actual 7 turns, ratio 0.88**","turn":7}
 {"timestamp":"2026-04-05T15:32:16.666Z","iteration":207,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":7}
+{"timestamp":"2026-04-05T15:32:16.694Z","iteration":207,"level":"info","message":"Committed: d8f62db6 (17 in / 3318 out, cache: 11798 created, 54616 read)","turn":7}
+{"timestamp":"2026-04-05T15:32:16.694Z","iteration":207,"level":"info","message":"Restarting as iteration 208...","turn":7}
+{"timestamp":"2026-04-05T15:32:16.878Z","iteration":208,"level":"info","message":"Cache restored: 44/44 entries (0 stale)"}
+{"timestamp":"2026-04-05T15:32:16.880Z","iteration":208,"level":"info","message":"Turn budget: 11/25 (calibration=1.00x, predicted=8)"}
+{"timestamp":"2026-04-05T15:32:16.880Z","iteration":208,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
+{"timestamp":"2026-04-05T15:32:16.988Z","iteration":208,"level":"info","message":"Hard turn cap: 12 (1.5x prediction of 8)"}
+{"timestamp":"2026-04-05T15:32:16.988Z","iteration":208,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-05T15:32:20.541Z","iteration":208,"level":"info","message":"think: Let me read the goals.md to understand what the Architect specified for iteration 208, and then review the current codeb...","turn":1}
+{"timestamp":"2026-04-05T15:32:20.542Z","iteration":208,"level":"info","message":"read_file: goals.md","turn":1}
+{"timestamp":"2026-04-05T15:32:20.542Z","iteration":208,"level":"info","message":"  -> ok (1209 chars)","turn":1}
+{"timestamp":"2026-04-05T15:32:20.543Z","iteration":208,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-05T15:32:23.805Z","iteration":208,"level":"info","message":"think: I'm the Architect in iteration 208. My deliverable is goals.md for the Engineer (iteration 209). I need to pick 1-2 feat...","turn":2}
+{"timestamp":"2026-04-05T15:32:23.806Z","iteration":208,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-05T15:32:31.172Z","iteration":208,"level":"info","message":"Agent: My deliverable: **goals.md** with specs for the Engineer (iteration 209). I'll pick the top 2 features: Fuzzy file/symbol search (`/find`) and PageRank repo map. Let me do a quick targeted check, then write the spec.","turn":3}
+{"timestamp":"2026-04-05T15:32:31.174Z","iteration":208,"level":"info","message":"$ grep -n \"find\\|search\\|fuzzy\\|pagerank\\|PageRank\\|score\\|rank\" src/tree-sitter-map.ts | head -30","turn":3}
+{"timestamp":"2026-04-05T15:32:31.180Z","iteration":208,"level":"info","message":"$ grep -n \"find\\|/find\" src/tui.tsx | head -20","turn":3}
+{"timestamp":"2026-04-05T15:32:31.195Z","iteration":208,"level":"info","message":"  -> exit=0 (1981 chars)","turn":3}
+{"timestamp":"2026-04-05T15:32:31.201Z","iteration":208,"level":"info","message":"  -> exit=0 (11 chars)","turn":3}
+{"timestamp":"2026-04-05T15:32:31.201Z","iteration":208,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-05T15:32:51.472Z","iteration":208,"level":"info","message":"Agent: Good - I have enough context. `rankSymbols` already exists in tree-sitter-map.ts, so PageRank is partially done. `/find` is not started. Writing goals.md now.","turn":4}
+{"timestamp":"2026-04-05T15:32:51.473Z","iteration":208,"level":"info","message":"write_file: goals.md (write)","turn":4}
+{"timestamp":"2026-04-05T15:32:51.476Z","iteration":208,"level":"info","message":"  -> ok: Updated goals.md (3252 chars, +60 lines delta)","turn":4}
+{"timestamp":"2026-04-05T15:32:51.477Z","iteration":208,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-05T15:32:56.140Z","iteration":208,"level":"info","message":"Agent: Goals:\n- **Goal 1 spec (fuzzy search)**: DONE ✓\n- **Goal 2 spec (rankSymbols wiring)**: DONE ✓","turn":5}
+{"timestamp":"2026-04-05T15:32:56.141Z","iteration":208,"level":"info","message":"save_memory: \"[Architect] Iteration 208 — specs written\"","turn":5}
+{"timestamp":"2026-04-05T15:32:56.142Z","iteration":208,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":5}
+{"timestamp":"2026-04-05T15:32:56.142Z","iteration":208,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-05T15:32:58.349Z","iteration":208,"level":"info","message":"Agent: This is an **Architect** iteration — the deliverable is goals.md, not src/ changes. That's complete. Wrapping up now.","turn":6}
+{"timestamp":"2026-04-05T15:32:58.350Z","iteration":208,"level":"info","message":"$ npx tsc --noEmit 2>&1 | tail -5","turn":6}
+{"timestamp":"2026-04-05T15:32:59.275Z","iteration":208,"level":"info","message":"  -> exit=0 (11 chars)","turn":6}
+{"timestamp":"2026-04-05T15:32:59.276Z","iteration":208,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-05T15:33:01.208Z","iteration":208,"level":"info","message":"Agent: TypeScript clean. Done.","turn":7}
+{"timestamp":"2026-04-05T15:33:01.209Z","iteration":208,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":7}
+{"timestamp":"2026-04-05T15:33:01.210Z","iteration":208,"level":"info","message":"RESTART signal","turn":7}
+{"timestamp":"2026-04-05T15:33:01.211Z","iteration":208,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":7}
+{"timestamp":"2026-04-05T15:33:02.105Z","iteration":208,"level":"info","message":"Compilation OK","turn":7}
+{"timestamp":"2026-04-05T15:33:07.777Z","iteration":208,"level":"info","message":"Cache persisted: 44 entries to .autoagent-cache.json","turn":7}
+{"timestamp":"2026-04-05T15:33:07.777Z","iteration":208,"level":"info","message":"Cache stats: 0 hits, 1 misses, 44 entries, 1 invalidations (1 entries removed)","turn":7}
+{"timestamp":"2026-04-05T15:33:07.778Z","iteration":208,"level":"info","message":"Tool cache stats","turn":7,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":44,"invalidations":1,"invalidatedEntries":1,"toolStats":{"read_file":{"hits":0,"misses":1}}}}
+{"timestamp":"2026-04-05T15:33:07.778Z","iteration":208,"level":"info","message":"Tool timing: bash: 4x, avg=243ms, total=970ms; write_file: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms; save_memory: 1x, avg=1ms, total=1ms; read_file: 1x, avg=0ms, total=0ms","turn":7}
+{"timestamp":"2026-04-05T15:33:07.778Z","iteration":208,"level":"info","message":"Tool timing stats","turn":7,"metadata":{"timing":{"tools":{"think":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"read_file":{"calls":1,"totalMs":0,"minMs":0,"maxMs":0,"avgMs":0},"bash":{"calls":4,"totalMs":970,"minMs":1,"maxMs":926,"avgMs":243},"write_file":{"calls":1,"totalMs":3,"minMs":3,"maxMs":3,"avgMs":3},"save_memory":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":9,"totalMs":976}}}
+{"timestamp":"2026-04-05T15:33:12.949Z","iteration":208,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 208: predicted 8 turns, actual 7 turns, ratio 0.88**","turn":7}
+{"timestamp":"2026-04-05T15:33:12.969Z","iteration":208,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":7}
