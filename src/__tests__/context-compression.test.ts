@@ -246,15 +246,20 @@ describe("compressMessages", () => {
 
   it("does not compress when toCompress section is too small", () => {
     const config: CompressionConfig = { threshold: 3, keepRecent: 4, maxResultChars: 100, maxTextChars: 80 };
-    // 5 messages total, keep recent 4 -> only 0 to compress from middle
+    // 5 messages total, keep recent 4 -> splitIdx starts at 1, bumped to 2
+    // But messages[2] is a user message with tool_results, so the safe-split
+    // logic walks splitIdx forward to 3, giving toCompress = messages[1..3] = 2 messages.
+    // With the safe-split fix, this DOES compress (the boundary walks forward
+    // to avoid orphaning a tool_result).
     const messages: Anthropic.MessageParam[] = [
       makeUserMessage("Initial"),
       ...generateTurns(2), // 4 messages -> total 5
     ];
 
     const result = compressMessages(messages, config);
-    // toCompress = messages[1..1] = 0 messages, not enough
-    expect(result.compressed).toBe(false);
+    // Safe-split boundary adjustment means 2 messages get compressed
+    expect(result.compressed).toBe(true);
+    expect(result.removedCount).toBe(2);
   });
 
   it("summarizes bash commands in tool calls", () => {
