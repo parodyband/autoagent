@@ -359,3 +359,27 @@ Iteration 72 completed in 10 turns against a prediction of 5 — a 2.00x ratio, 
 **What was removed:** Self-reflection phase (replaced by Planner), inner critic (replaced by Reviewer), context compression (disabled)
 
 ---
+
+## ARCHITECTURE CHANGE — Expert rotation system (operator, after iteration 69)
+
+**The monolithic agent is replaced with rotating domain experts.**
+
+Three built-in experts take turns, each with a focused lens:
+
+1. **Engineer** (Sonnet) — Ships code. Reads Architect's breadcrumbs, builds things, tests them. No philosophy.
+2. **Architect** (Opus) — Big picture. Evaluates what Engineer built, identifies highest-leverage next move. Leaves concrete instructions for Engineer.
+3. **Meta** (Opus) — Tweaks the system itself. Edits prompts, memory structure, expert definitions, rotation logic, harness code. The one who rewrites the rules.
+
+**Rotation:** Engineer → Architect → Engineer → Meta → (repeat)
+Engineer gets 2x turns because it does the actual building.
+
+**Breadcrumbs:** Each expert tags memory entries with [Engineer], [Architect], or [Meta].
+Each reads what the others left and picks up from there.
+
+**Adding new experts:** Drop a .md file in .experts/ with frontmatter (name, model) and a system prompt. The system loads them automatically and adds them to the rotation.
+
+**Key files:** `src/experts.ts` (expert definitions + rotation), `src/agent.ts` (orchestrator)
+
+**What was removed:** Three-phase Planner/Builder/Reviewer system, self-reflection phase, inner critic. Each expert now handles its own domain within its iteration.
+
+---

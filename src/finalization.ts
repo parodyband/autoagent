@@ -18,7 +18,7 @@ import {
   type BenchmarkSnapshot,
 } from "./validation.js";
 import { commitIteration, saveState, type IterationState } from "./iteration.js";
-import { runReviewer } from "./phases.js";
+
 import { executeSubagent } from "./tools/subagent.js";
 import { executeBash } from "./tools/bash.js";
 import type { ToolCache } from "./tool-cache.js";
@@ -274,22 +274,6 @@ export async function finalizeIteration(
   saveState(ctx.state);
 
   if (doRestart) {
-    // ─── Phase 3: Reviewer (Opus) ───
-    // After commit, before restart. Reviews what was built vs what was planned.
-    // Writes structured feedback to memory.md for the next Planner.
-    try {
-      const review = await runReviewer({
-        iteration: ctx.iter,
-        rootDir: ctx.rootDir,
-        log: ctx.log,
-      });
-      if (review.inputTokens > 0) {
-        ctx.log(`Reviewer: ${review.inputTokens} in / ${review.outputTokens} out tokens`);
-      }
-    } catch (err) {
-      ctx.log(`Reviewer error (non-fatal): ${err instanceof Error ? err.message : err}`);
-    }
-
     ctx.log(`Restarting as iteration ${ctx.state.iteration}...`);
     ctx.restart();
   }

@@ -23,14 +23,14 @@ import "dotenv/config";
 import { executeBash } from "./tools/bash.js";
 import { createDefaultRegistry } from "./tool-registry.js";
 import { loadState, tagPreIteration, type IterationState } from "./iteration.js";
-import { buildBuilderSystemPrompt, buildBuilderMessage } from "./messages.js";
+import { buildInitialMessage } from "./messages.js";
 import { orient, formatOrientation } from "./orientation.js";
 import { parseMemory, getSection, serializeMemory } from "./memory.js";
 import { ToolCache } from "./tool-cache.js";
 import { ToolTimingTracker } from "./tool-timing.js";
 import { finalizeIteration as runFinalization } from "./finalization.js";
 import { runConversation, type IterationCtx } from "./conversation.js";
-import { runPlanner, runReviewer } from "./phases.js";
+import { loadExperts, pickExpert, buildExpertPrompt, saveExpertState } from "./experts.js";
 import {
   countConsecutiveFailures,
   resuscitate,
@@ -157,9 +157,13 @@ async function runIteration(state: IterationState): Promise<void> {
     log(state.iteration, `Cache restore error (non-fatal): ${err instanceof Error ? err.message : err}`);
   }
 
+  // Pick which expert runs this iteration
+  const experts = loadExperts(ROOT);
+  const expert = pickExpert(state.iteration, experts);
+
   const ctx: IterationCtx = {
     client: new Anthropic(),
-    model: "claude-sonnet-4-6", // Builder uses Sonnet — Planner/Reviewer use Opus
+    model: expert.model,
     maxTokens: parseInt(process.env.MAX_TOKENS || "16384", 10),
     startTime: new Date(),
     toolCounts: {},
@@ -181,34 +185,24 @@ async function runIteration(state: IterationState): Promise<void> {
 
   console.log(`\n${"=".repeat(60)}`);
   console.log(`  AutoAgent — Iteration ${ctx.iter}`);
-  console.log(`  Architecture: Planner (Opus) → Builder (Sonnet) → Reviewer (Opus)`);
+  console.log(`  Expert: ${expert.name} (${expert.model})`);
   console.log(`${"=".repeat(60)}\n`);
 
-  logger.info(`Starting. Builder model=${ctx.model} MaxTokens=${ctx.maxTokens}`);
+  logger.info(`Starting. Expert=${expert.name} Model=${expert.model}`);
   await tagPreIteration(ctx.iter);
+  saveExpertState(ROOT, expert.name, ctx.iter);
 
-  // ─── Phase 1: Planner (Opus) ───
+  // Orient: detect changes since last iteration
   const orientReport = await orient();
   const orientationText = formatOrientation(orientReport);
 
-  const planResult = await runPlanner({
-    iteration: ctx.iter,
-    rootDir: ROOT,
-    memory: readMemory(),
-    orientation: orientationText || "",
-    log: (msg: string) => log(ctx.iter, msg),
-  });
+  // Expert gets its own system prompt
+  ctx.systemPromptBuilder = (s, r) => buildExpertPrompt(expert, s, r);
 
-  // Track planner tokens as overhead
-  ctx.tokens.in += planResult.inputTokens;
-  ctx.tokens.out += planResult.outputTokens;
-  logger.info(`Planner: ${planResult.inputTokens} in / ${planResult.outputTokens} out tokens`);
-
-  // ─── Phase 2: Builder (Sonnet) ───
-  ctx.systemPromptBuilder = buildBuilderSystemPrompt;
+  // Build initial message with goals, memory, and orientation
   ctx.messages.push({
     role: "user",
-    content: buildBuilderMessage(planResult.plan, readMemory()),
+    content: buildInitialMessage(readGoals(), readMemory(), orientationText || undefined),
   });
 
   await runConversation(ctx);
