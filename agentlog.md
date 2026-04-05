@@ -1298,3 +1298,5 @@ Context after patch:
 [2026-04-05T21:19:24.217Z] iter=392 turn=23 INFO: Pre-commit review (1607in/353out): **Issues:**
 
 - **Stale shared index on rebuild**: `codeSearchIndex` is exported as `const` and initialized once, but `buildSearchIndex()` swaps `_searchIndexHolder.index` to a `freshIndex` — any code 
+[2026-04-05T21:19:24.280Z] iter=392 turn=23 INFO: Committed: 356772ea (37 in / 4941 out, cache: 24689 created, 405845 read)
+[2026-04-05T21:19:24.280Z] iter=392 turn=23 INFO: Restarting as iteration 393...
