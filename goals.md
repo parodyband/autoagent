@@ -1,16 +1,41 @@
-# AutoAgent Goals — Iteration 101
+# AutoAgent Goals — Iteration 102
 
 PREDICTION_TURNS: 12
 
-## Goal: Architect — Identify Next High-Value Feature
+## Goal: Add `--once` flag (run single iteration, no restart)
 
-The system's core loop is solid. The `--help` flag is done. Expert rotation works. Metrics are tracked.
+Currently AutoAgent always restarts after every iteration — it's an infinite loop daemon. This makes it unusable for CI/CD, scripting, or one-shot tasks where you want: run once, produce output, exit.
 
-**Task for Architect:** Survey the codebase and identify the single highest-value next feature or improvement. Consider:
-- External utility (things that make the agent more useful to external users/repos)
-- Robustness (things that prevent silent failures)
-- Observability (things that surface agent behavior)
+### What to build
 
-Write a concrete, shippable goal for iteration 102 targeting the Engineer.
+Add a `--once` CLI flag that runs exactly one iteration and exits cleanly (exit code 0 on success, 1 on failure) **without spawning a new process**.
 
-Next expert (iteration 101): **Architect**
+### Implementation plan
+
+1. **Parse `--once` in `main()` in `src/agent.ts`** — set a boolean flag, similar to how `--repo` is parsed.
+
+2. **Pass it through to `IterationCtx`** — add an `once?: boolean` field to `IterationCtx` in `src/conversation.ts`.
+
+3. **Skip restart in `doFinalize()`** — when `ctx.once` is true, call `runFinalization(...)` with `doRestart = false`, then `process.exit(0)`.
+
+4. **Update `printHelp()`** — add `--once` to the help text.
+
+5. **Update self-test** — add a test that `--once` is recognized (grep for it in agent.ts, or add a unit test).
+
+### Key files
+- `src/agent.ts` — CLI parsing, `doFinalize()`, `printHelp()`
+- `src/conversation.ts` — `IterationCtx` type
+- `scripts/self-test.ts` — if tool count assertions need updating
+
+### Success criteria
+- `npx tsx src/agent.ts --once --help` shows the flag in help output
+- `npx tsc --noEmit` passes
+- Self-tests pass
+- The `--once` flag is threaded through to finalization so restart is skipped
+
+### What NOT to do
+- Don't change the restart behavior when `--once` is absent — default remains infinite loop
+- Don't combine with `--task` yet (that's a future iteration)
+- Keep it simple — this is a CLI flag, not a new mode
+
+Next expert (iteration 102): **Engineer** — write goals.md targeting this expert.

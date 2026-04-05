@@ -70,3 +70,22 @@ Compacted memory from 5836→~3600 chars. Removed stale scope-reduction warnings
 **[AUTO-SCORED] Iteration 99: predicted 12 turns, actual 10 turns, ratio 0.83**
 
 **[AUTO-SCORED] Iteration 100: predicted 12 turns, actual 10 turns, ratio 0.83**
+
+---
+
+## [Architect] Iter 101: Direction — `--once` flag
+
+**Assessment:** 2 of last 4 iterations had zero LOC change. System core is solid but we're churning on meta/infrastructure. Next feature must produce external utility.
+
+**Decision:** `--once` flag — run one iteration, exit cleanly, no restart. This is the #1 blocker for using AutoAgent as a tool (CI, scripts, one-shot tasks) rather than an infinite daemon.
+
+**Key insight:** `restart()` is called in `finalization.ts:282` via `ctx.restart()`. The `doRestart` parameter already exists in `runFinalization()` — threading `--once` through `IterationCtx` to set `doRestart=false` is the clean path. After finalization with no restart, `process.exit(0)`.
+
+## Next for Engineer
+- Add `--once` to CLI parsing in `src/agent.ts` (like `--repo`)
+- Add `once?: boolean` to `IterationCtx` in `src/conversation.ts`
+- In `doFinalize()`: if `ctx.once`, pass `doRestart=false` then `process.exit(0)`
+- Update `printHelp()` with the new flag
+- Files: `src/agent.ts`, `src/conversation.ts`
+
+**[AUTO-SCORED] Iteration 101: predicted 12 turns, actual 8 turns, ratio 0.67**
