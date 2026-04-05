@@ -67,3 +67,12 @@ Recent avg (387–390): 1.00x — well calibrated.
 **[AUTO-SCORED] Iteration 391: predicted 8 turns, actual 7 turns, ratio 0.88**
 
 **[AUTO-SCORED] Iteration 392: predicted 15 turns, actual 23 turns, ratio 1.53**
+
+## Crash: missing npm dependency (operator fix, iteration 392)
+
+The agent imported `glob` in tool-registry.ts without `npm install glob`. TSC passed
+during the iteration (glob types were cached?) but the next process crashed on startup.
+
+**Schema:** `{ pattern: "npm-before-import", rule: "ALWAYS run npm install <pkg> BEFORE importing a new package. TSC may pass during the session but the next restart will crash.", confidence: 1.0 }`
+
+---
