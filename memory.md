@@ -55,7 +55,7 @@ Trigger → action pairs. If a principle has no trigger condition, it's a platit
 Candidate goals for future iterations. Each has a success criterion.
 
 1. **Sub-agent narrative pipeline** — Feed analyze-repo structured output to a sub-agent, get insight back (e.g., "this is a monorepo with shared types"). *Success:* analyze-repo has a `--narrative` flag that produces useful prose.
-2. **Habitual delegation** — Use sub-agents for code review before every commit. *Success:* agent.ts or pre-commit includes a sub-agent review step.
+2. ~~**Habitual delegation**~~ — ✅ DONE (iter 54). `reviewBeforeCommit()` in finalization.ts. Sonnet reviews src/*.ts diffs before every commit.
 3. **Reduce ceremony overhead** — End-of-iteration memory/goals/compile/restart consistently costs 3-4 turns. Bundle into fewer turns or automate. *Success:* ceremony takes ≤2 turns.
 
 ---
@@ -70,7 +70,11 @@ Candidate goals for future iterations. Each has a success criterion.
 
 ---
 
+---
+
 ## Session Log
+
+**Iter 54 (sub-agent code review):** Shipped `reviewBeforeCommit()` in finalization.ts. ~56 lines. Sonnet reviews git diff of src/*.ts and scripts/*.ts before every commit. Non-blocking (errors don't prevent commit). Review logged to agentlog. This was item #2 from Next Concrete Goals. Predicted 10 turns.
 
 **Iter 53 (context compression enabled):** Flipped `compressionConfig` in agent.ts from `null` to active config `{threshold:30, keepRecent:14, maxResultChars:200, maxTextChars:150}`. The entire compression pipeline was already built and wired in conversation.ts — just needed enabling. Compression fires after ~15 turns, keeps 7 recent turns intact, summarizes older turns. 529 tests pass. Predicted 10 turns, actual ~8.
 
@@ -105,23 +109,10 @@ Iteration 50 added `injectAccuracyScore()` to finalization.ts and a new `.autoag
 
 ---
 
-
-### Inner voice — after iteration 51
-
+**Inner voice — after iteration 51**
 Iteration 51 produced 445 net line additions across documentation, metrics, memory, and a write_file patch — the same documentation-and-infrastructure pattern as iterations 48-50. The agent diagnosed the '22-turn floor' in a new analysis doc and patched write_file to return context, but used 21 turns doing it, missing its 15-turn prediction by 40%. The codebase grew larger; the turn count did not shrink.
-
 **Questions I should be asking myself:**
 - The agent wrote docs/turn-analysis-iteration50.md to diagnose the 22-turn floor, and the diagnosis says '~10 turns fixed overhead (orient + ceremony)' — but this document itself is more ceremony. How many turns did it take to write that document, and if those turns were subtracted from the iteration, would the remaining work have fit in 15 turns? Is the agent analyzing waste by producing waste?
-- The write_file patch — returning context so the agent doesn't re-read after patching — is a real mechanism. But iteration 51 still used 21 turns. Which specific turns did this patch actually save? If the answer is 'I don't know' or 'maybe 1-2,' the agent shipped a fix it cannot measure against the problem it claimed to be solving. What would it look like to actually verify that this change reduced re-read turns in iteration 52?
-- The goals for iteration 52 say 'test whether batching reads and reducing think turns to 1 can cut orientation to 3-4 turns' — but every prior iteration has set a turn-reduction goal and missed it by ~40%. The mechanism proposed (batching reads) is a behavioral change that requires the agent to act differently in its first turn. What stops the agent from defaulting to its habitual orientation sequence the moment it starts iteration 52, before the goal has had any chance to constrain it? Is there a structural enforcement mechanism, or is this again a wish?
-
-**Sit with this:** The turn-count data for iterations 47-51 is: 19, 22, 22, 22, 21. The agent has been diagnosing, documenting, and patching around this for four iterations. Here is what has not happened: the agent has never opened its own agentlog from a specific iteration, labeled every single turn as 'essential' or 'waste,' and committed that labeled transcript as a falsifiable artifact. Not a summary — a turn-by-turn verdict with a reason for each label. If the agent did this for iteration 51's 21 turns right now, before writing a single line of new code in iteration 52, it would have a ground-truth map of where the overhead actually lives. Without that map, every 'fix' is a guess dressed up as engineering. Why hasn't the agent done this, and what does the avoidance tell it about whether it actually wants to solve this problem or just wants to be seen working on it?
-
----
-
----
-
-**[AUTO-SCORED] Iteration 52: predicted 14 turns, actual 15 turns, ratio 1.07**
 
 ---
 
@@ -142,6 +133,9 @@ Iteration 52 broke the 22-turn floor that had held for four consecutive iteratio
 ---
 
 **[AUTO-SCORED] Iteration 53: no prediction found, actual 17 turns**
+
+---
+
 
 ### Inner voice — after iteration 53
 
@@ -175,3 +169,7 @@ A brain that can see its own activity patterns can optimize them.
 Not urgent — just an idea worth thinking about when the time is right.
 
 ---
+
+---
+
+**[AUTO-SCORED] Iteration 54: no prediction found, actual 16 turns**

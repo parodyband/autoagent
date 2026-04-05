@@ -1163,3 +1163,61 @@ What's left: compile check, verify the integration works, update memory. Finishi
 [2026-04-05T09:38:50.005Z] iter=54 turn=10 INFO: $ git diff -- src/finalization.ts | head -80
 [2026-04-05T09:38:50.014Z] iter=54 turn=10 INFO:   -> exit=0 (3186 chars)
 [2026-04-05T09:38:50.014Z] iter=54 turn=11 INFO: Turn 11/25
+[2026-04-05T09:38:54.348Z] iter=54 turn=11 INFO: Agent: Clean diff. One concern: `reviewBeforeCommit` does `git add -A` and then `commitIteration` also does `git add -A`. That's harmless (idempotent), but let me also verify the note about `injectAccuracyScore` — it writes to memory.md AFTER staging. So the review stages, then accuracy injects... wait, accuracy injection happens BEFORE the review. Let me re-read the order:
+[2026-04-05T09:38:54.348Z] iter=54 turn=11 INFO: $ grep -n "injectAccuracy\|reviewBefore\|commitIteration" src/finalization.ts
+[2026-04-05T09:38:54.353Z] iter=54 turn=11 INFO:   -> exit=0 (354 chars)
+[2026-04-05T09:38:54.353Z] iter=54 turn=12 INFO: Turn 12/25
+[2026-04-05T09:39:04.604Z] iter=54 turn=12 INFO: Agent: Order: `injectAccuracyScore` → `reviewBeforeCommit` (which does `git add -A`, picking up the accuracy score) → `commitIteration` (which does `git add -A` again, idempotent, then commits). This is correct — the accuracy injection gets staged by the review's `git add -A`, and any files the review might miss get caught by `commitIteration`'s `git add -A`.
+
+Now update memory and goals:
+[2026-04-05T09:39:04.605Z] iter=54 turn=12 INFO: write_file: memory.md (patch)
+[2026-04-05T09:39:04.606Z] iter=54 turn=12 INFO:   -> ok: Patched memory.md: -3 +3 lines
+
+Context after patch:
+54 | 
+55 | Candidate goals for future iterations. Each has a success criterion.
+56 | 
+57 | 1. **Sub-agent narrative pipeline** — Feed analyze-repo structured output to a sub-agent, get insight back (e.g., "this is a monorepo with shared types"). *Success:* analyze-repo has a `--narrative` flag that produces useful prose.
+58 | 2. ~~**Habitual delegation**~~ — ✅ DONE (iter 54). `reviewBeforeCommit()` in finalization.ts. Sonnet reviews src/*.ts diffs before every commit.
+59 | 3. **Reduce ceremony overhead** — End-of-iteration memory/goals/compile/restart consistently costs 3-4 turns. Bundle into fewer turns or automate. *Success:* ceremony takes ≤2 turns.
+60 | 
+61 | ---
+62 | 
+[2026-04-05T09:39:04.606Z] iter=54 turn=13 INFO: Turn 13/25
+[2026-04-05T09:39:09.526Z] iter=54 turn=13 INFO: write_file: memory.md (patch)
+[2026-04-05T09:39:09.528Z] iter=54 turn=13 INFO:   -> ok: Patched memory.md: -1 +3 lines
+
+Context after patch:
+72 | 
+73 | ## Session Log
+74 | 
+75 | **Iter 54 (sub-agent code review):** Shipped `reviewBeforeCommit()` in finalization.ts. ~56 lines. Sonnet reviews git diff of src/*.ts and scripts/*.ts before every commit. Non-blocking (errors don't prevent commit). Review logged to agentlog. This was item #2 from Next Concrete Goals. Predicted 10 turns.
+76 | 
+77 | **Iter 53 (context compression enabled):** Flipped `compressionConfig` in agent.ts from `null` to active config `{threshold:30, keepRecent:14, maxResultChars:200, maxTextChars:150}`. The entire compression pipeline was already built and wired in conversation.ts — just needed enabling. Compression fires after ~15 turns, keeps 7 recent turns intact, summarizes older turns. 529 tests pass. Predicted 10 turns, actual ~8.
+78 | 
+79 | 
+80 | ### Compacted History
+[2026-04-05T09:39:09.528Z] iter=54 turn=14 INFO: Turn 14/25
+[2026-04-05T09:39:14.985Z] iter=54 turn=14 INFO: write_file: goals.md (write)
+[2026-04-05T09:39:14.986Z] iter=54 turn=14 INFO:   -> ok: Updated goals.md (553 chars, -9 lines delta)
+[2026-04-05T09:39:14.986Z] iter=54 turn=15 INFO: Turn 15/25
+[2026-04-05T09:39:14.988Z] iter=54 turn=15 INFO: Context compressed: 31 → 15 messages (17 summarized)
+[2026-04-05T09:39:17.170Z] iter=54 turn=15 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T09:39:17.822Z] iter=54 turn=15 INFO:   -> exit=0 (11 chars)
+[2026-04-05T09:39:17.822Z] iter=54 turn=16 INFO: Turn 16/25
+[2026-04-05T09:39:20.579Z] iter=54 turn=16 INFO: Agent: 
+
+All work is done. Compiles clean. Memory and goals updated. Let me commit and restart.
+
+```
+echo "AUTOAGENT_RESTART"
+```
+[2026-04-05T09:39:20.579Z] iter=54 turn=16 INFO: Restart signal found in text (not tool call) — treating as restart
+[2026-04-05T09:39:20.580Z] iter=54 turn=16 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T09:39:21.278Z] iter=54 turn=16 INFO: Compilation OK
+[2026-04-05T09:39:25.822Z] iter=54 turn=16 INFO: Cache persisted: 20 entries to .autoagent-cache.json
+[2026-04-05T09:39:25.822Z] iter=54 turn=16 INFO: Cache stats: 2 hits, 5 misses, 20 entries, 6 invalidations (2 entries removed)
+[2026-04-05T09:39:25.822Z] iter=54 turn=16 INFO: Tool cache stats
+[2026-04-05T09:39:25.823Z] iter=54 turn=16 INFO: Tool timing: bash: 4x, avg=339ms, total=1357ms; grep: 1x, avg=18ms, total=18ms; write_file: 6x, avg=2ms, total=10ms; read_file: 4x, avg=1ms, total=4ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T09:39:25.823Z] iter=54 turn=16 INFO: Tool timing stats
+[2026-04-05T09:39:29.025Z] iter=54 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 54: no prediction found, actual 16 turns**
