@@ -1,95 +1,3 @@
-9 |  * This module implements the OODA "Orient" phase.
-10 |  */
-11 | 
-12 | import { readFileSync } from "fs";
-13 | import { executeBash } from "./tools/bash.js";
-14 | import { parallelResearch } from "./tools/subagent.js";
-15 | import { readPredictionCalibration, computeCalibration } from "./turn-budget.js";
-16 | import { rankFiles } from "./file-ranker.js";
-17 | 
-18 | export interface OrientationReport {
-19 |   /** Summary of files changed since last iteration commit */
-[2026-04-05T12:57:15.372Z] iter=152 turn=5 INFO: Turn 5/25
-[2026-04-05T12:57:22.162Z] iter=152 turn=5 INFO: Agent: I've already started. Let me continue with the remaining patches.
-[2026-04-05T12:57:22.164Z] iter=152 turn=5 INFO: write_file: src/orientation.ts (patch)
-[2026-04-05T12:57:22.166Z] iter=152 turn=5 INFO:   -> ok: Patched src/orientation.ts: -5 +40 lines
-
-Context after patch:
-36 |   codeQuality?: { totalLOC: number };
-37 | }
-38 | 
-39 | /**
-40 |  * Re-order changed files in git diff stat output by importance score.
-41 |  * Truncates to top 10 files if more than 10 changed, with "(and N more)" note.
-42 |  */
-43 | function rankChangedFiles(statOutput: string, cwd: string = "."): string {
-44 |   const lines = statOutput.split("\n");
-45 |   const fileLines = lines.filter(line => line.includes("|"));
-46 |   const otherLines = lines.filter(line => !line.includes("|") && line.trim());
-47 | 
-48 |   if (fileLines.length <= 1) return statOutput;
-49 | 
-50 |   const ranked = rankFiles(cwd);
-51 |   const scoreMap = new Map<string, number>(ranked.map(f => [f.path, f.score]));
-52 | 
-53 |   const scoredLines = fileLines.map(line => ({
-54 |     line,
-55 |     score: scoreMap.get(line.trim().split("|")[0].trim()) ?? -1,
-56 |   }));
-57 |   scoredLines.sort((a, b) => b.score - a.score);
-58 | 
-59 |   const MAX_FILES = 10;
-60 |   const orderedLines = scoredLines.map(s => s.line);
-61 |   let truncationNote = "";
-62 |   if (orderedLines.length > MAX_FILES) {
-63 |     const remaining = orderedLines.length - MAX_FILES;
-64 |     orderedLines.splice(MAX_FILES);
-65 |     truncationNote = `... (and ${remaining} more)`;
-66 |   }
-67 | 
-68 |   const parts = [...orderedLines];
-69 |   if (truncationNote) parts.push(truncationNote);
-70 |   parts.push(...otherLines);
-71 |   return parts.join("\n");
-72 | }
-73 | 
-74 | /**
-75 |  * Extract src filenames from a git diff --stat output.
-76 |  * Returns only lines that look like file paths (contain a pipe character).
-77 |  */
-78 | function extractSrcFiles(statOutput: string): string[] {
-79 |   return statOutput
-80 |     .split("\n")
-81 |     .filter(line => line.includes("|") && line.trim().startsWith("src/"))
-[2026-04-05T12:57:22.167Z] iter=152 turn=6 INFO: Turn 6/25
-[2026-04-05T12:57:28.136Z] iter=152 turn=6 INFO: Agent: Now add the `rankChangedFiles` call in `orient()` and use it in both code paths:
-[2026-04-05T12:57:28.137Z] iter=152 turn=6 INFO: write_file: src/orientation.ts (patch)
-[2026-04-05T12:57:28.139Z] iter=152 turn=6 INFO:   -> ok: Patched src/orientation.ts: -8 +11 lines
-
-Context after patch:
-110 |     return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary(cwd) };
-111 |   }
-112 | 
-113 |   const statOutput = statResult.output.trim();
-114 |   if (!statOutput) {
-115 |     return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary(cwd) };
-116 |   }
-117 | 
-118 |   // Rank changed files by importance so the most relevant appear first
-119 |   const rankedStatOutput = rankChangedFiles(statOutput, cwd ?? ".");
-120 | 
-121 |   // Try parallel subagent summaries when 5+ src files changed
-122 |   if (useSubagentSummaries) {
-123 |     const srcFiles = extractSrcFiles(statOutput);
-124 |     if (srcFiles.length >= 5) {
-125 |       try {
-126 |         const fileDiffs = await Promise.all(
-[2026-04-05T12:57:28.141Z] iter=152 turn=7 INFO: Turn 7/25
-[2026-04-05T12:57:31.890Z] iter=152 turn=7 INFO: Agent: Now use `rankedStatOutput` in both output paths:
-[2026-04-05T12:57:31.890Z] iter=152 turn=7 INFO: write_file: src/orientation.ts (patch)
-[2026-04-05T12:57:31.891Z] iter=152 turn=7 INFO:   -> ok: Patched src/orientation.ts: -2 +2 lines
-
-Context after patch:
 140 |           .map((file, i) => `- **${file}**: ${summaries[i].response.trim()}`)
 141 |           .join("\n");
 142 | 
@@ -1088,3 +996,88 @@ Context after patch:
 [2026-04-05T13:16:16.893Z] iter=162 turn=14 INFO: Tool timing stats
 [2026-04-05T13:16:21.212Z] iter=162 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 162: predicted 12 turns, actual 14 turns, ratio 1.17**
 [2026-04-05T13:16:24.050Z] iter=162 turn=14 INFO: Pre-commit review (2915in/80out): **LGTM** — Tests are well-structured, use `.js` extensions correctly for ESM, cover edge cases (same SHA, invalid SHA, null fields), and avoid unnecessary complexity. The dynamic `import()` in the `ge
+[2026-04-05T13:16:24.101Z] iter=162 turn=14 INFO: Committed: 765a46ac (22 in / 8401 out, cache: 28278 created, 215870 read)
+[2026-04-05T13:16:24.102Z] iter=162 turn=14 INFO: Restarting as iteration 163...
+[2026-04-05T13:16:24.284Z] iter=163 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T13:16:24.285Z] iter=163 INFO: Turn budget: 14/25 (calibration=1.17x, predicted=10)
+[2026-04-05T13:16:24.286Z] iter=163 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T13:16:24.329Z] iter=163 INFO: Hard turn cap: 15 (1.5x prediction of 10)
+[2026-04-05T13:16:24.329Z] iter=163 turn=1 INFO: Turn 1/25
+[2026-04-05T13:16:29.182Z] iter=163 turn=1 INFO: Agent: 
+
+I'll start by assessing the current state of the system — what's working, what's not, and where to direct the next iteration.
+[2026-04-05T13:16:29.184Z] iter=163 turn=1 INFO: $ cat .autoagent-metrics.json
+[2026-04-05T13:16:29.189Z] iter=163 turn=1 INFO: $ cat .expert-rotation.json
+[2026-04-05T13:16:29.193Z] iter=163 turn=1 INFO: $ cat goals.md
+[2026-04-05T13:16:29.199Z] iter=163 turn=1 INFO: read_file: memory.md
+[2026-04-05T13:16:29.201Z] iter=163 turn=1 INFO:   -> ok (4414 chars)
+[2026-04-05T13:16:29.203Z] iter=163 turn=1 INFO:   -> exit=0 (1310 chars)
+[2026-04-05T13:16:29.204Z] iter=163 turn=1 INFO:   -> exit=0 (100036 chars)
+[2026-04-05T13:16:29.208Z] iter=163 turn=1 INFO:   -> exit=0 (1396 chars)
+[2026-04-05T13:16:29.208Z] iter=163 turn=2 INFO: Turn 2/25
+[2026-04-05T13:16:42.284Z] iter=163 turn=2 INFO: think: Let me assess the system state and decide what to do.
+
+**Current state:**
+- 338 tests, 23 test files, 31 source files, ~...
+[2026-04-05T13:16:42.284Z] iter=163 turn=3 INFO: Turn 3/25
+[2026-04-05T13:16:45.355Z] iter=163 turn=3 INFO: $ cat system-prompt.md
+[2026-04-05T13:16:45.358Z] iter=163 turn=3 INFO: $ cat src/experts.ts
+[2026-04-05T13:16:45.363Z] iter=163 turn=3 INFO: $ ls src/*.ts | head -40
+[2026-04-05T13:16:45.371Z] iter=163 turn=3 INFO:   -> exit=0 (6682 chars)
+[2026-04-05T13:16:45.374Z] iter=163 turn=3 INFO:   -> exit=0 (10684 chars)
+[2026-04-05T13:16:45.379Z] iter=163 turn=3 INFO:   -> exit=0 (457 chars)
+[2026-04-05T13:16:45.379Z] iter=163 turn=4 INFO: Turn 4/25
+[2026-04-05T13:16:49.491Z] iter=163 turn=4 INFO: Agent: Now let me look at what capabilities exist and what would actually improve the agent's effectiveness:
+[2026-04-05T13:16:49.492Z] iter=163 turn=4 INFO: $ wc -l src/*.ts | sort -rn | head -15
+[2026-04-05T13:16:49.493Z] iter=163 turn=4 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -20
+[2026-04-05T13:16:49.495Z] iter=163 turn=4 INFO: $ # Check what the orientation phase actually shows the agent
+head -80 src/orientation.ts
+[2026-04-05T13:16:49.505Z] iter=163 turn=4 INFO:   -> exit=0 (404 chars)
+[2026-04-05T13:16:49.506Z] iter=163 turn=4 INFO:   -> exit=0 (2669 chars)
+[2026-04-05T13:16:55.481Z] iter=163 turn=4 INFO:   -> exit=0 (1670 chars)
+[2026-04-05T13:16:55.482Z] iter=163 turn=5 INFO: Turn 5/25
+[2026-04-05T13:17:13.037Z] iter=163 turn=5 INFO: Agent: 
+
+You're right. My deliverables are:
+
+1. **Compact memory.md** (stale data)
+2. **Write goals.md** for Engineer iteration 164 with a concrete capability task
+3. **Any small prompt tweaks** if warranted
+
+Let me produce them now.
+[2026-04-05T13:17:13.037Z] iter=163 turn=5 INFO: think: What should the Engineer build next? The Architect said pivot from tests to capability improvement. 
+
+Looking at what wo...
+[2026-04-05T13:17:13.038Z] iter=163 turn=6 INFO: Turn 6/25
+[2026-04-05T13:17:36.153Z] iter=163 turn=6 INFO: write_file: memory.md (write)
+[2026-04-05T13:17:36.157Z] iter=163 turn=6 INFO:   -> ok: Updated memory.md (2916 chars, -24 lines delta)
+[2026-04-05T13:17:36.159Z] iter=163 turn=7 INFO: Turn 7/25
+[2026-04-05T13:17:48.821Z] iter=163 turn=7 INFO: write_file: goals.md (write)
+[2026-04-05T13:17:48.822Z] iter=163 turn=7 INFO:   -> ok: Updated goals.md (1725 chars, +14 lines delta)
+[2026-04-05T13:17:48.823Z] iter=163 turn=8 INFO: Turn 8/25
+[2026-04-05T13:17:51.413Z] iter=163 turn=8 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T13:17:52.154Z] iter=163 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-05T13:17:52.154Z] iter=163 turn=9 INFO: Turn 9/25
+[2026-04-05T13:17:56.719Z] iter=163 turn=9 INFO: Agent: 
+
+Status:
+- **Compact memory.md**: DONE
+- **Write goals.md for Engineer 164**: DONE
+- **Prompt tweaks**: Not needed — system is working well, rotation is clean
+
+All goals are DONE. Let me finish.
+
+```
+echo "AUTOAGENT_RESTART"
+```
+[2026-04-05T13:17:56.720Z] iter=163 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T13:17:56.720Z] iter=163 turn=9 INFO: RESTART signal
+[2026-04-05T13:17:56.720Z] iter=163 turn=9 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T13:17:57.380Z] iter=163 turn=9 INFO: Compilation OK
+[2026-04-05T13:18:02.577Z] iter=163 turn=9 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T13:18:02.577Z] iter=163 turn=9 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 2 invalidations (1 entries removed)
+[2026-04-05T13:18:02.578Z] iter=163 turn=9 INFO: Tool cache stats
+[2026-04-05T13:18:02.578Z] iter=163 turn=9 INFO: Tool timing: bash: 11x, avg=623ms, total=6853ms; write_file: 2x, avg=3ms, total=6ms; read_file: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T13:18:02.578Z] iter=163 turn=9 INFO: Tool timing stats
+[2026-04-05T13:18:06.897Z] iter=163 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 163: predicted 10 turns, actual 9 turns, ratio 0.90**
+[2026-04-05T13:18:06.917Z] iter=163 turn=9 INFO: Pre-commit review: no significant code changes to review
