@@ -1102,3 +1102,101 @@ All 123 tests pass, TypeScript compiles cleanly. Let me stage and restart.
 [2026-04-05T06:04:25.550Z] iter=7 RESTART signal
 [2026-04-05T06:04:25.550Z] iter=7 Validating: npx tsc --noEmit ...
 [2026-04-05T06:04:26.201Z] iter=7 Compilation OK
+[2026-04-05T06:04:28.293Z] iter=7 Committed: 92058cf1 (722422 in / 8704 out, cache: 0 created, 0 read)
+[2026-04-05T06:04:28.293Z] iter=7 Restarting as iteration 8...
+[2026-04-05T06:04:28.471Z] iter=8 Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T06:04:28.479Z] iter=8 Turn 1/50
+[2026-04-05T06:04:31.140Z] iter=8 Agent: 
+
+I'll execute the goals for iteration 8. Let me start by understanding the current codebase structure.
+[2026-04-05T06:04:31.141Z] iter=8 list_files: src (depth=2)
+[2026-04-05T06:04:31.155Z] iter=8   -> ok (1 dirs, 12 files)
+[2026-04-05T06:04:31.156Z] iter=8 read_file: goals.md
+[2026-04-05T06:04:31.156Z] iter=8   -> ok (809 chars)
+[2026-04-05T06:04:31.156Z] iter=8 Turn 2/50
+[2026-04-05T06:04:33.038Z] iter=8 read_file: src/agent.ts
+[2026-04-05T06:04:33.040Z] iter=8   -> ok (17336 chars)
+[2026-04-05T06:04:33.040Z] iter=8 Turn 3/50
+[2026-04-05T06:04:38.525Z] iter=8 think: Let me plan the extraction:
+
+1. **Extract validation module** — `validateBeforeCommit` function from agent.ts into `src/...
+[2026-04-05T06:04:38.526Z] iter=8 Turn 4/50
+[2026-04-05T06:04:41.138Z] iter=8 read_file: scripts/self-test.ts
+[2026-04-05T06:04:41.139Z] iter=8   -> ok (24441 chars)
+[2026-04-05T06:04:41.140Z] iter=8 Turn 5/50
+[2026-04-05T06:04:47.277Z] iter=8 think: Now I understand the codebase. Let me plan the changes:
+
+**Goal 1: Extract validation module**
+
+Create `src/validation.t...
+[2026-04-05T06:04:47.278Z] iter=8 Turn 6/50
+[2026-04-05T06:04:59.772Z] iter=8 Agent: Let me create the validation module and update agent.ts:
+[2026-04-05T06:04:59.773Z] iter=8 write_file: src/validation.ts (write)
+[2026-04-05T06:04:59.774Z] iter=8   -> ok: Created src/validation.ts (2491 chars)
+[2026-04-05T06:04:59.774Z] iter=8 Turn 7/50
+[2026-04-05T06:05:03.132Z] iter=8 Agent: Now update agent.ts to import from the validation module:
+[2026-04-05T06:05:03.134Z] iter=8 write_file: src/agent.ts (patch)
+[2026-04-05T06:05:03.136Z] iter=8   -> ok: Patched src/agent.ts: -4 +8 lines
+[2026-04-05T06:05:03.137Z] iter=8 Turn 8/50
+[2026-04-05T06:05:08.129Z] iter=8 Agent: Now remove the old `CodeQualitySnapshot` interface, `captureCodeQuality` function, and `validateBeforeCommit` function from agent.ts:
+[2026-04-05T06:05:08.129Z] iter=8 write_file: src/agent.ts (patch)
+[2026-04-05T06:05:08.130Z] iter=8   -> ok: Patched src/agent.ts: -12 +3 lines
+[2026-04-05T06:05:08.130Z] iter=8 Turn 9/50
+[2026-04-05T06:05:12.271Z] iter=8 write_file: src/agent.ts (patch)
+[2026-04-05T06:05:12.273Z] iter=8   -> ok: Patched src/agent.ts: -24 +1 lines
+[2026-04-05T06:05:12.274Z] iter=8 Turn 10/50
+[2026-04-05T06:05:17.741Z] iter=8 Agent: Now remove the old `validateBeforeCommit` function:
+[2026-04-05T06:05:17.742Z] iter=8 write_file: src/agent.ts (patch)
+[2026-04-05T06:05:17.743Z] iter=8   -> ok: Patched src/agent.ts: -20 +1 lines
+[2026-04-05T06:05:17.743Z] iter=8 Turn 11/50
+[2026-04-05T06:05:20.235Z] iter=8 Agent: Now I need to update the calls to `validateBeforeCommit` and `captureCodeQuality` in agent.ts to pass the appropriate arguments:
+[2026-04-05T06:05:20.236Z] iter=8 grep: "validateBeforeCommit|captureCodeQuality" in src/agent.ts
+[2026-04-05T06:05:20.267Z] iter=8   -> 0 matches
+[2026-04-05T06:05:20.268Z] iter=8 Turn 12/50
+[2026-04-05T06:05:23.323Z] iter=8 grep: "validate|codeQuality|CodeQuality" in src/agent.ts
+[2026-04-05T06:05:23.339Z] iter=8   -> 0 matches
+[2026-04-05T06:05:23.339Z] iter=8 Turn 13/50
+[2026-04-05T06:05:26.527Z] iter=8 think: The grep didn't find the function calls? Let me check the exact text in agent.ts for the call sites. The function names ...
+[2026-04-05T06:05:26.528Z] iter=8 Turn 14/50
+[2026-04-05T06:05:29.672Z] iter=8 grep: "validate|captureCode|codeQuality" in src/agent.ts
+[2026-04-05T06:05:29.698Z] iter=8   -> 0 matches
+[2026-04-05T06:05:29.698Z] iter=8 Turn 15/50
+[2026-04-05T06:05:31.721Z] iter=8 read_file: src/agent.ts
+[2026-04-05T06:05:31.722Z] iter=8   -> ok (688 chars)
+[2026-04-05T06:05:31.722Z] iter=8 Turn 16/50
+[2026-04-05T06:05:33.826Z] iter=8 $ grep -n "validateBeforeCommit\|captureCodeQuality\|CodeQualitySnapshot\|codeQuality" src/agent.ts
+[2026-04-05T06:05:33.836Z] iter=8   -> exit=0 (350 chars)
+[2026-04-05T06:05:33.836Z] iter=8 Turn 17/50
+[2026-04-05T06:05:38.651Z] iter=8 Agent: Good, the imports are there. Now I need to update the call sites to pass `ROOT` and a log function:
+[2026-04-05T06:05:38.652Z] iter=8 read_file: src/agent.ts
+[2026-04-05T06:05:38.652Z] iter=8   -> ok (1200 chars)
+[2026-04-05T06:05:38.652Z] iter=8 Turn 18/50
+[2026-04-05T06:05:41.187Z] iter=8 write_file: src/agent.ts (patch)
+[2026-04-05T06:05:41.188Z] iter=8   -> ok: Patched src/agent.ts: -1 +1 lines
+[2026-04-05T06:05:41.188Z] iter=8 Turn 19/50
+[2026-04-05T06:05:43.087Z] iter=8 $ grep -n "captureCodeQuality()" src/agent.ts
+[2026-04-05T06:05:43.103Z] iter=8   -> exit=0 (113 chars)
+[2026-04-05T06:05:43.103Z] iter=8 Turn 20/50
+[2026-04-05T06:05:45.594Z] iter=8 $ sed -i '' 's/await captureCodeQuality()/await captureCodeQuality(ROOT)/g' src/agent.ts
+[2026-04-05T06:05:45.611Z] iter=8   -> exit=0 (11 chars)
+[2026-04-05T06:05:45.611Z] iter=8 Turn 21/50
+[2026-04-05T06:05:48.165Z] iter=8 Agent: Now let's check compilation:
+[2026-04-05T06:05:48.165Z] iter=8 $ npx tsc --noEmit 2>&1
+[2026-04-05T06:05:48.806Z] iter=8   -> exit=0 (11 chars)
+[2026-04-05T06:05:48.806Z] iter=8 Turn 22/50
+[2026-04-05T06:05:53.226Z] iter=8 Agent: Compiles clean. Now add tests for both the validation module and parallel execution to self-test.ts:
+[2026-04-05T06:05:53.226Z] iter=8 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:05:53.227Z] iter=8   -> ok: Patched scripts/self-test.ts: -2 +3 lines
+[2026-04-05T06:05:53.228Z] iter=8 Turn 23/50
+[2026-04-05T06:06:09.814Z] iter=8 Agent: Now add the validation and parallel execution test functions before the Main section:
+[2026-04-05T06:06:09.814Z] iter=8 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:06:09.816Z] iter=8   -> ok: Patched scripts/self-test.ts: -1 +78 lines
+[2026-04-05T06:06:09.816Z] iter=8 Turn 24/50
+[2026-04-05T06:06:13.602Z] iter=8 Agent: Now wire the new tests into the main function:
+[2026-04-05T06:06:13.602Z] iter=8 write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:06:13.604Z] iter=8   -> ok: Patched scripts/self-test.ts: -2 +4 lines
+[2026-04-05T06:06:13.604Z] iter=8 Turn 25/50
+[2026-04-05T06:06:15.968Z] iter=8 Agent: Now run self-tests:
+[2026-04-05T06:06:15.968Z] iter=8 $ npx tsx scripts/self-test.ts 2>&1
+[2026-04-05T06:16:44.725Z] iter=8   -> exit=-1 (4799 chars)
+[2026-04-05T06:16:44.726Z] iter=8 Turn 26/50

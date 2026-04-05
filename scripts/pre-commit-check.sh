@@ -1,17 +1,22 @@
 #!/usr/bin/env bash
 # Pre-commit validation script for AutoAgent.
-# Called by agent.ts before committing each iteration.
-# Runs the runtime self-test suite, memory compaction, and dashboard generation.
+# Each step has a timeout to prevent hanging.
 
 set -e
 
+# macOS-compatible timeout using perl
+run_with_timeout() {
+  local secs=$1; shift
+  perl -e "alarm $secs; exec @ARGV" "$@"
+}
+
 echo "Running AutoAgent self-test suite..."
-npx tsx scripts/self-test.ts
+run_with_timeout 60 npx tsx scripts/self-test.ts || { echo "SELF-TEST FAILED OR TIMED OUT"; exit 1; }
 
 echo "Running memory compaction..."
-npx tsx scripts/compact-memory.ts
+run_with_timeout 30 npx tsx scripts/compact-memory.ts || { echo "MEMORY COMPACTION FAILED OR TIMED OUT"; exit 1; }
 
 echo "Generating dashboard..."
-npx tsx scripts/dashboard.ts
+run_with_timeout 30 npx tsx scripts/dashboard.ts || { echo "DASHBOARD FAILED OR TIMED OUT"; exit 1; }
 
 echo "Pre-commit checks passed."

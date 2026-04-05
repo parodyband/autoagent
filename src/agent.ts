@@ -14,7 +14,11 @@ import path from "path";
 import "dotenv/config";
 import { executeBash } from "./tools/bash.js";
 import { createDefaultRegistry } from "./tool-registry.js";
-import { analyzeCodebase } from "./code-analysis.js";
+import {
+  validateBeforeCommit,
+  captureCodeQuality,
+  type CodeQualitySnapshot,
+} from "./validation.js";
 import {
   loadState,
   saveState,
@@ -43,15 +47,6 @@ function log(iter: number, msg: string): void {
 
 // ─── Metrics ────────────────────────────────────────────────
 
-interface CodeQualitySnapshot {
-  totalLOC: number;
-  codeLOC: number;
-  fileCount: number;
-  functionCount: number;
-  complexity: number;
-  testCount: number;
-}
-
 interface IterationMetrics {
   iteration: number;
   startTime: string;
@@ -65,29 +60,6 @@ interface IterationMetrics {
   cacheCreationTokens?: number;
   cacheReadTokens?: number;
   codeQuality?: CodeQualitySnapshot;
-}
-
-async function captureCodeQuality(): Promise<CodeQualitySnapshot | undefined> {
-  try {
-    // Direct import — no subprocess needed
-    const analysis = analyzeCodebase();
-    const totals = analysis.totals;
-    // Count tests
-    const testR = await executeBash(
-      `grep -c "^  assert(" scripts/self-test.ts || echo 0`,
-      10, ROOT
-    );
-    const testCount = parseInt(testR.output.trim(), 10) || 0;
-    return {
-      totalLOC: totals.totalLines,
-      codeLOC: totals.codeLines,
-      fileCount: totals.fileCount,
-      functionCount: totals.functionCount,
-      complexity: totals.complexity,
-      testCount,
-    };
-  } catch {}
-  return undefined;
 }
 
 function recordMetrics(m: IterationMetrics): void {
@@ -158,25 +130,6 @@ async function handleToolCall(
     log(iter, `TOOL ERROR (${toolUse.name}): ${errMsg}`);
     return { result: `Error executing ${toolUse.name}: ${errMsg}`, isRestart: false };
   }
-}
-
-// ─── Validation gate ────────────────────────────────────────
-
-async function validateBeforeCommit(iter: number): Promise<{ ok: boolean; output: string }> {
-  log(iter, "Validating: npx tsc --noEmit ...");
-  const tsc = await executeBash("npx tsc --noEmit 2>&1", 60, ROOT);
-  if (tsc.exitCode !== 0) {
-    log(iter, `COMPILE FAILED:\n${tsc.output}`);
-    return { ok: false, output: tsc.output };
-  }
-  log(iter, "Compilation OK");
-
-  const checkScript = path.join(ROOT, "scripts/pre-commit-check.sh");
-  if (existsSync(checkScript)) {
-    const pc = await executeBash(`bash "${checkScript}"`, 60, ROOT);
-    if (pc.exitCode !== 0) return { ok: false, output: `pre-commit-check failed:\n${pc.output}` };
-  }
-  return { ok: true, output: "ok" };
 }
 
 // ─── Main iteration ─────────────────────────────────────────
@@ -270,7 +223,7 @@ async function runIteration(state: IterationState): Promise<void> {
     messages.push({ role: "user", content: results });
 
     if (shouldRestart) {
-      const v = await validateBeforeCommit(iter);
+      const v = await validateBeforeCommit(ROOT, (msg) => log(iter, msg));
       if (!v.ok) {
         log(iter, "VALIDATION BLOCKED RESTART — agent must fix");
         messages.push({
@@ -280,7 +233,7 @@ async function runIteration(state: IterationState): Promise<void> {
         continue;
       }
 
-      const codeQuality = await captureCodeQuality();
+      const codeQuality = await captureCodeQuality(ROOT);
       recordMetrics({
         iteration: iter, startTime: startTime.toISOString(), endTime: new Date().toISOString(),
         turns, toolCalls: toolCounts, success: true,
@@ -333,7 +286,7 @@ async function runIteration(state: IterationState): Promise<void> {
 
   if (turns >= MAX_TURNS) log(iter, "Hit max turns — forcing commit");
 
-  const codeQuality2 = await captureCodeQuality();
+  const codeQuality2 = await captureCodeQuality(ROOT);
   recordMetrics({
     iteration: iter, startTime: startTime.toISOString(), endTime: new Date().toISOString(),
     turns, toolCalls: toolCounts, success: true,

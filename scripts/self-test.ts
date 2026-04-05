@@ -14,6 +14,7 @@ import { executeThink } from "../src/tools/think.js";
 import { executeListFiles } from "../src/tools/list_files.js";
 import { executeWebFetch } from "../src/tools/web_fetch.js";
 import { createDefaultRegistry, ToolRegistry } from "../src/tool-registry.js";
+import { validateBeforeCommit, captureCodeQuality } from "../src/validation.js";
 import { compactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
@@ -527,10 +528,96 @@ async function testToolRegistry(): Promise<void> {
   assert(empty.getDefinitions().length === 0, "registry: empty getDefinitions returns []");
 }
 
+// ─── Validation Tests ───────────────────────────────────────
+
+async function testValidation(): Promise<void> {
+  console.log("\n✅ Validation Module");
+
+  // validateBeforeCommit — should pass on a clean codebase
+  const logs: string[] = [];
+  const result = await validateBeforeCommit(ROOT, (msg) => logs.push(msg));
+  assert(result.ok, "validation: passes on clean codebase");
+  assert(result.output === "ok", "validation: output is 'ok' on success");
+  assert(logs.some(l => l.includes("Compilation OK")), "validation: logs compilation success");
+  assert(logs.some(l => l.includes("Validating")), "validation: logs start message");
+
+  // captureCodeQuality — should return a snapshot
+  const snapshot = await captureCodeQuality(ROOT);
+  assert(snapshot !== undefined, "validation: captureCodeQuality returns snapshot");
+  if (snapshot) {
+    assert(snapshot.totalLOC > 0, "validation: totalLOC > 0");
+    assert(snapshot.codeLOC > 0, "validation: codeLOC > 0");
+    assert(snapshot.fileCount > 0, "validation: fileCount > 0");
+    assert(snapshot.functionCount > 0, "validation: functionCount > 0");
+    assert(snapshot.complexity > 0, "validation: complexity > 0");
+    assert(snapshot.testCount > 0, "validation: testCount > 0");
+  }
+}
+
+// ─── Parallel Execution Tests ───────────────────────────────
+
+async function testParallelExecution(): Promise<void> {
+  console.log("\n⚡ Parallel Execution");
+
+  // Two slow tasks run in parallel should be faster than sequential
+  const sleepMs = 300;
+  const sleepCmd = `sleep ${sleepMs / 1000} && echo done`;
+
+  // Sequential timing baseline
+  const seqStart = Date.now();
+  const r1 = await executeBash(sleepCmd, 10, ROOT);
+  const r2 = await executeBash(sleepCmd, 10, ROOT);
+  const seqDuration = Date.now() - seqStart;
+  assert(r1.exitCode === 0 && r2.exitCode === 0, "parallel: sequential baseline works");
+
+  // Parallel execution
+  const parStart = Date.now();
+  const [p1, p2] = await Promise.all([
+    executeBash(sleepCmd, 10, ROOT),
+    executeBash(sleepCmd, 10, ROOT),
+  ]);
+  const parDuration = Date.now() - parStart;
+  assert(p1.exitCode === 0 && p2.exitCode === 0, "parallel: both tasks succeed");
+  assert(p1.output.trim() === "done" && p2.output.trim() === "done", "parallel: correct output");
+
+  // Parallel should be significantly faster (at least 30% faster than sequential)
+  const speedup = seqDuration / parDuration;
+  assert(speedup > 1.3, `parallel: speedup ratio ${speedup.toFixed(2)}x (need >1.3x)`,
+    `seq=${seqDuration}ms par=${parDuration}ms`);
+
+  // Verify tool_use_id mapping pattern (simulating what agent.ts does)
+  const toolUses = [
+    { id: "tool_1", cmd: "echo alpha" },
+    { id: "tool_2", cmd: "echo beta" },
+    { id: "tool_3", cmd: "echo gamma" },
+  ];
+
+  const results = await Promise.all(
+    toolUses.map(async (tu) => {
+      const r = await executeBash(tu.cmd, 10, ROOT);
+      return { id: tu.id, output: r.output.trim() };
+    })
+  );
+
+  assert(results.length === 3, "parallel: all 3 results returned");
+  assert(results[0].id === "tool_1" && results[0].output === "alpha", "parallel: tool_1 maps to alpha");
+  assert(results[1].id === "tool_2" && results[1].output === "beta", "parallel: tool_2 maps to beta");
+  assert(results[2].id === "tool_3" && results[2].output === "gamma", "parallel: tool_3 maps to gamma");
+}
+
 // ─── Main ───────────────────────────────────────────────────
 
 async function main(): Promise<void> {
   const start = Date.now();
+  const GLOBAL_TIMEOUT = 45_000; // 45s hard limit — kill everything
+
+  // Global timeout: if tests hang, force exit
+  const killTimer = setTimeout(() => {
+    console.error(`\n💀 GLOBAL TIMEOUT (${GLOBAL_TIMEOUT / 1000}s) — tests hung, force exiting`);
+    process.exit(1);
+  }, GLOBAL_TIMEOUT);
+  killTimer.unref(); // don't keep process alive just for this timer
+
   console.log("🧪 AutoAgent Self-Test Suite\n" + "=".repeat(40));
 
   // Setup temp directory
@@ -551,6 +638,8 @@ async function main(): Promise<void> {
     testCompactMemory();
     testDashboard();
     await testToolRegistry();
+    await testValidation();
+    await testParallelExecution();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {
