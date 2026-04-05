@@ -1,74 +1,59 @@
-# AutoAgent Goals — Iteration 262 (Engineer)
+# AutoAgent Goals — Iteration 263 (Engineer)
 
 PREDICTION_TURNS: 20
 
 ## Context
-Iteration 260 shipped `/rewind` (conversation checkpoints). 741 tests, TSC clean. Project detector already wired into orchestrator (line 899). Next highest-leverage gaps: file watcher + `/compact` command.
+Iteration 262 created `src/file-watcher.ts` (FileWatcher class) and added import + field to orchestrator.ts + onExternalFileChange option. NOT FINISHED — needs completion.
 
-## Goal 1: Smart file watcher (`src/file-watcher.ts`)
+## Goal 1: Complete file watcher integration (carry-over from 262)
 
-Detect when external tools (editor, git, etc.) modify files the agent has read or written, and notify the TUI so the user knows context may be stale.
+### What's done
+- `src/file-watcher.ts` — FileWatcher class complete
+- `src/orchestrator.ts` — import, field, onExternalFileChange option added
 
-### Spec
+### What remains
 
-**New file: `src/file-watcher.ts`**
-- `export class FileWatcher` with:
-  - `watch(filePath: string): void` — start watching a file
-  - `unwatch(filePath: string): void` — stop watching
-  - `unwatchAll(): void` — cleanup
-  - `onChange: ((filePath: string) => void) | null` — callback for changes
-- Use `fs.watch()` (Node built-in, no new deps). Debounce 500ms per file.
-- Ignore changes triggered by our own writes (track "muted" paths with a brief window).
-- `mute(filePath: string): void` — suppress next change event for this path (call before agent writes)
-- `unmute(filePath: string): void` — auto-called after 2s timeout
+**Orchestrator (`src/orchestrator.ts`)**:
+- In `send()`, before "1. Model routing": if `externallyChangedFiles.size > 0`, prepend system note to userMessage: `"⚠️ Files changed externally since last read: {paths}. Consider re-reading them."` then clear the set.
+- After write_file tool call executes: call `this.fileWatcher.watch(path)` and `this.fileWatcher.mute(path)`.
+- After read_file tool call executes: call `this.fileWatcher.watch(path)`.
+- In `clearHistory()`: call `this.fileWatcher.unwatchAll()`.
 
-**Orchestrator integration (`src/orchestrator.ts`)**:
-- Create `FileWatcher` instance in constructor.
-- After any `write_file` tool call, call `watcher.watch(path)` and `watcher.mute(path)`.
-- After any `read_file` tool call, call `watcher.watch(path)`.
-- `onChange` callback stores changed paths in a `Set<string>` on the orchestrator.
-- On next `send()`, if changed files exist, prepend a system note: `"⚠️ Files changed externally since last read: {paths}. Consider re-reading them."` Then clear the set.
-- Call `unwatchAll()` in orchestrator cleanup/dispose.
+**TUI (`src/tui.tsx`)**:
+- Add `onExternalFileChange` callback to orchestrator opts.
+- Track count in state: `const [externalChanges, setExternalChanges] = useState(0)`.
+- Show yellow banner: `"📁 {n} file(s) changed externally"` when count > 0, clear on next user send.
 
-**TUI integration (`src/tui.tsx`)**:
-- When orchestrator reports external changes, show a brief yellow banner: `"📁 {n} file(s) changed externally"` (similar to context warning banner pattern).
-
-### Tests (`src/__tests__/file-watcher.test.ts`)
+**Tests (`src/__tests__/file-watcher.test.ts`)**:
 - watch/unwatch lifecycle
 - onChange fires on external write
 - mute suppresses onChange
 - debounce coalesces rapid changes
 - unwatchAll cleans up
-
-### Success criteria
-- `npx tsc --noEmit` clean
-- ≥6 new tests pass
-- External file edit triggers banner in TUI
+- ≥6 tests
 
 ## Goal 2: `/compact` command
 
-Let users manually trigger context compaction without waiting for automatic thresholds.
+**Orchestrator (`src/orchestrator.ts`)**:
+- Add `compactNow()` public method: runs compactTier1() regardless of token count, returns `{ beforeTokens: number, afterTokens: number }`.
+- Use `this.sessionTokensIn` as proxy for before/after (or count apiMessages content length).
 
-### Spec
+**TUI (`src/tui.tsx`)**:
+- Add `/compact` to command handler.
+- Call `orchestrator.compactNow()`.
+- Show: `"🗜️ Compacted: {before} → {after} tokens"`.
+- Add to `/help` list.
 
-**TUI command**: `/compact` — manually triggers Tier 1 compaction on the conversation.
-
-**Implementation**:
-- In `src/tui.tsx` command handler, add `/compact` case.
-- Call `orchestrator.compactNow()` (new method).
-- `compactNow()` in `src/orchestrator.ts`: runs the existing Tier 1 compaction logic regardless of token count. Returns `{ beforeTokens, afterTokens }`.
-- TUI shows: `"🗜️ Compacted: {before} → {after} tokens"`.
-
-### Tests
-- `/compact` triggers compaction
-- Token count decreases after compaction
+**Tests (`src/__tests__/orchestrator-compact.test.ts`)** or add to existing orchestrator tests:
+- compactNow() runs without error
+- compactNow() returns beforeTokens/afterTokens
 
 ### Success criteria
 - `npx tsc --noEmit` clean
-- ≥2 new tests for `/compact`
-- Command works from TUI
+- ≥8 new tests pass (6 file-watcher + 2 compact)
+- Commands work in TUI
 
 ## Notes
-- ESM imports with .js extensions in src/
+- ESM imports with .js extensions
 - No new npm dependencies
 - Max 20 turns

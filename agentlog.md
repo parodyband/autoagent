@@ -1,74 +1,3 @@
-339 |   }
-340 | 
-341 |   return results;
-342 | }
-343 | 
-344 | async function runAgentLoop(
-345 |   client: Anthropic,
-346 |   model: string,
-347 |   systemPrompt: string,
-[2026-04-05T16:56:50.366Z] iter=254 turn=11 INFO: Turn 11/25
-[2026-04-05T16:56:53.041Z] iter=254 turn=11 INFO: Agent: Now replace the sequential loop with `executeToolsParallel()` and wire `enhanceToolError`. First I need to see how `execTool` is called to update the interface:
-[2026-04-05T16:56:53.041Z] iter=254 turn=11 INFO: read_file: src/orchestrator.ts
-[2026-04-05T16:56:53.042Z] iter=254 turn=11 INFO:   -> ok (1165 chars)
-[2026-04-05T16:56:53.042Z] iter=254 turn=12 INFO: Turn 12/25
-[2026-04-05T16:56:54.587Z] iter=254 turn=12 INFO: read_file: src/orchestrator.ts
-[2026-04-05T16:56:54.589Z] iter=254 turn=12 INFO:   -> ok (883 chars)
-[2026-04-05T16:56:54.590Z] iter=254 turn=13 INFO: Turn 13/25
-[2026-04-05T16:56:59.524Z] iter=254 turn=13 INFO: think: Let me assess what I've actually done:
-1. Created src/tool-recovery.ts ✅
-2. Added import for enhanceToolError in orchest...
-[2026-04-05T16:56:59.525Z] iter=254 turn=14 INFO: Turn 14/25
-[2026-04-05T16:57:06.018Z] iter=254 turn=14 INFO: Agent: I've changed: `src/tool-recovery.ts` (created), `src/orchestrator.ts` (import + PARALLEL_SAFE_TOOLS + executeToolsParallel). Still need: wire the loop + write tests. Doing it now.
-[2026-04-05T16:57:06.018Z] iter=254 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "Execute non-write tools first\|for (const tu of nonWriteTools)" src/orchestrator.ts
-[2026-04-05T16:57:06.034Z] iter=254 turn=14 INFO:   -> exit=0 (106 chars)
-[2026-04-05T16:57:06.035Z] iter=254 turn=15 INFO: Turn 15/25
-[2026-04-05T16:57:08.255Z] iter=254 turn=15 INFO: Agent: Wrapping up fast. Let me wire the loop, write tests, then finish.
-[2026-04-05T16:57:08.255Z] iter=254 turn=15 INFO: read_file: src/orchestrator.ts
-[2026-04-05T16:57:08.256Z] iter=254 turn=15 INFO:   -> ok (1545 chars)
-[2026-04-05T16:57:08.256Z] iter=254 turn=16 INFO: Turn 16/25
-[2026-04-05T16:57:12.801Z] iter=254 turn=16 INFO: Agent: Wiring the loop and tests in one shot:
-[2026-04-05T16:57:12.801Z] iter=254 turn=16 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T16:57:12.803Z] iter=254 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -6 +7 lines
-
-Context after patch:
-425 | 
-426 |     const results: Anthropic.ToolResultBlockParam[] = [];
-427 | 
-428 |     // Execute non-write tools (reads, greps, etc.) — parallel-safe ones run concurrently
-429 |     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
-430 |       const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
-431 |       const enhanced = enhanceToolError(tu.name, tu.input as Record<string, unknown>, rawResult, workDir);
-432 |       return compressToolOutput(tu.name, enhanced);
-433 |     });
-434 |     results.push(...parallelResults);
-435 | 
-436 |     // Handle write_file tools — batch if 2+ and onDiffPreview is set
-437 |     if (writeTools.length >= 2 && onDiffPreview) {
-[2026-04-05T16:57:12.803Z] iter=254 turn=17 INFO: Turn 17/25
-[2026-04-05T16:57:27.446Z] iter=254 turn=17 INFO: Agent: Writing tests and finishing now.
-[2026-04-05T16:57:27.446Z] iter=254 turn=17 INFO: write_file: src/__tests__/parallel-tools.test.ts (write)
-[2026-04-05T16:57:27.447Z] iter=254 turn=17 INFO:   -> ok: Created src/__tests__/parallel-tools.test.ts (3416 chars)
-[2026-04-05T16:57:27.447Z] iter=254 turn=18 INFO: Turn 18/25
-[2026-04-05T16:57:39.101Z] iter=254 turn=18 INFO: Agent: Writing tests, running tsc, finishing now.
-[2026-04-05T16:57:39.103Z] iter=254 turn=18 INFO: write_file: src/__tests__/tool-recovery.test.ts (write)
-[2026-04-05T16:57:39.104Z] iter=254 turn=18 INFO:   -> ok: Created src/__tests__/tool-recovery.test.ts (2893 chars)
-[2026-04-05T16:57:39.105Z] iter=254 turn=19 INFO: Turn 19/25
-[2026-04-05T16:57:44.238Z] iter=254 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30 && echo "TSC_DONE"
-[2026-04-05T16:57:44.771Z] iter=254 turn=19 INFO:   -> exit=0 (147 chars)
-[2026-04-05T16:57:44.771Z] iter=254 turn=20 INFO: Turn 20/25
-[2026-04-05T16:57:46.437Z] iter=254 turn=20 INFO: read_file: src/test-runner.ts
-[2026-04-05T16:57:46.437Z] iter=254 turn=20 INFO:   -> ok (431 chars)
-[2026-04-05T16:57:46.437Z] iter=254 turn=21 INFO: Turn 21/25
-[2026-04-05T16:57:48.333Z] iter=254 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '100,110p' src/test-runner.ts | cat -A
-[2026-04-05T16:57:48.342Z] iter=254 turn=21 INFO:   -> exit=1 (59 chars)
-[2026-04-05T16:57:48.342Z] iter=254 turn=22 INFO: Turn 22/25
-[2026-04-05T16:57:49.871Z] iter=254 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '100,112p' src/test-runner.ts | od -c | head -30
-[2026-04-05T16:57:49.902Z] iter=254 turn=22 INFO:   -> exit=0 (2190 chars)
-[2026-04-05T16:57:49.903Z] iter=254 turn=23 INFO: Turn 23/25
-[2026-04-05T16:57:51.816Z] iter=254 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | grep "test-runner" | head -5
-[2026-04-05T16:57:52.342Z] iter=254 turn=23 INFO:   -> exit=0 (138 chars)
-[2026-04-05T16:57:52.342Z] iter=254 turn=24 INFO: Turn 24/25
 [2026-04-05T16:57:53.864Z] iter=254 turn=24 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '101,107p' src/test-runner.ts
 [2026-04-05T16:57:53.886Z] iter=254 turn=24 INFO:   -> exit=0 (330 chars)
 [2026-04-05T16:57:53.887Z] iter=254 turn=25 INFO: Turn 25/25
@@ -1067,3 +996,174 @@ TSC clean. Goals written. Memory saved. Done.
 [2026-04-05T17:12:43.736Z] iter=261 turn=7 INFO: Tool timing stats
 [2026-04-05T17:12:49.264Z] iter=261 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 261: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T17:12:49.285Z] iter=261 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T17:12:49.317Z] iter=261 turn=7 INFO: Committed: 792809d8 (17 in / 2370 out, cache: 13572 created, 61386 read)
+[2026-04-05T17:12:49.318Z] iter=261 turn=7 INFO: Restarting as iteration 262...
+[2026-04-05T17:12:49.519Z] iter=262 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T17:12:49.521Z] iter=262 INFO: Turn budget: 20/25 (calibration=0.88x, predicted=20)
+[2026-04-05T17:12:49.521Z] iter=262 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T17:12:49.656Z] iter=262 turn=1 INFO: Turn 1/25
+[2026-04-05T17:12:52.673Z] iter=262 turn=1 INFO: think: Let me start by reading the current state of the codebase to understand what's there, then build the two goals:
+1. Smart...
+[2026-04-05T17:12:52.676Z] iter=262 turn=2 INFO: Turn 2/25
+[2026-04-05T17:12:55.051Z] iter=262 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && ls src/ | head -40 && echo "---" && wc -l src/orchestrator.ts src/tui.tsx
+[2026-04-05T17:12:55.057Z] iter=262 turn=2 INFO: read_file: /Users/austin/Documents/autoagent/goals.md
+[2026-04-05T17:12:55.058Z] iter=262 turn=2 INFO:   -> ok (3035 chars)
+[2026-04-05T17:12:55.077Z] iter=262 turn=2 INFO:   -> exit=0 (674 chars)
+[2026-04-05T17:12:55.078Z] iter=262 turn=3 INFO: Turn 3/25
+[2026-04-05T17:12:58.179Z] iter=262 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "compactTier1\|compactMessages\|microCompact\|tieredCompact\|Tier 1\|Tier1" src/orchestrator.ts | head -30
+[2026-04-05T17:12:58.182Z] iter=262 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "contextWarning\|warningBanner\|externalChange\|changedFiles\|rewind\|checkpoint" src/tui.tsx | head -30
+[2026-04-05T17:12:58.192Z] iter=262 turn=3 INFO:   -> exit=0 (745 chars)
+[2026-04-05T17:12:58.192Z] iter=262 turn=3 INFO:   -> exit=0 (1245 chars)
+[2026-04-05T17:12:58.193Z] iter=262 turn=4 INFO: Turn 4/25
+[2026-04-05T17:13:01.460Z] iter=262 turn=4 INFO: Agent: Starting to build now. Let me grab the key sections I need from orchestrator.ts and tui.tsx, then write all files.
+[2026-04-05T17:13:01.461Z] iter=262 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '790,840p' src/orchestrator.ts
+[2026-04-05T17:13:01.466Z] iter=262 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '50,80p' src/orchestrator.ts && echo "---" && sed -n '900,940p' src/orchestrator.ts
+[2026-04-05T17:13:01.481Z] iter=262 turn=4 INFO:   -> exit=0 (1749 chars)
+[2026-04-05T17:13:01.488Z] iter=262 turn=4 INFO:   -> exit=0 (3081 chars)
+[2026-04-05T17:13:01.489Z] iter=262 turn=5 INFO: Turn 5/25
+[2026-04-05T17:13:05.041Z] iter=262 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '760,815p' src/tui.tsx
+[2026-04-05T17:13:05.043Z] iter=262 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onContextBudget\|onStatus\|onChunk\|OrchestratorOpts\|FileWatcher\|externalChange" src/orchestrator.ts | head -30
+[2026-04-05T17:13:05.051Z] iter=262 turn=5 INFO:   -> exit=0 (1615 chars)
+[2026-04-05T17:13:05.055Z] iter=262 turn=5 INFO:   -> exit=0 (1683 chars)
+[2026-04-05T17:13:05.055Z] iter=262 turn=6 INFO: Turn 6/25
+[2026-04-05T17:13:10.675Z] iter=262 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '115,155p' src/orchestrator.ts
+[2026-04-05T17:13:10.680Z] iter=262 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "write_file\|read_file" src/orchestrator.ts | head -20
+[2026-04-05T17:13:10.694Z] iter=262 turn=6 INFO:   -> exit=0 (1511 chars)
+[2026-04-05T17:13:10.697Z] iter=262 turn=6 INFO:   -> exit=0 (1058 chars)
+[2026-04-05T17:13:10.698Z] iter=262 turn=7 INFO: Turn 7/25
+[2026-04-05T17:13:26.801Z] iter=262 turn=7 INFO: Agent: **Goal 1 (file watcher)**: NOT STARTED  
+**Goal 2 (/compact command)**: NOT STARTED
+
+I've been reading context. Starting to write now.
+[2026-04-05T17:13:26.803Z] iter=262 turn=7 INFO: write_file: /Users/austin/Documents/autoagent/src/file-watcher.ts (write)
+[2026-04-05T17:13:26.805Z] iter=262 turn=7 INFO:   -> ok: Created /Users/austin/Documents/autoagent/src/file-watcher.ts (3247 chars)
+[2026-04-05T17:13:26.806Z] iter=262 turn=8 INFO: Turn 8/25
+[2026-04-05T17:13:30.107Z] iter=262 turn=8 INFO: Agent: Now integrate into orchestrator. Let me grab the constructor and the tool execution section:
+[2026-04-05T17:13:30.108Z] iter=262 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '590,660p' src/orchestrator.ts
+[2026-04-05T17:13:30.123Z] iter=262 turn=8 INFO:   -> exit=0 (2351 chars)
+[2026-04-05T17:13:30.124Z] iter=262 turn=9 INFO: Turn 9/25
+[2026-04-05T17:13:32.618Z] iter=262 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '430,500p' src/orchestrator.ts
+[2026-04-05T17:13:32.635Z] iter=262 turn=9 INFO:   -> exit=0 (3105 chars)
+[2026-04-05T17:13:32.635Z] iter=262 turn=10 INFO: Turn 10/25
+[2026-04-05T17:13:36.895Z] iter=262 turn=10 INFO: Agent: Now I have enough context. Let me make the orchestrator changes:
+[2026-04-05T17:13:36.895Z] iter=262 turn=10 INFO: write_file: /Users/austin/Documents/autoagent/src/orchestrator.ts (patch)
+[2026-04-05T17:13:36.896Z] iter=262 turn=10 INFO:   -> err: ERROR: old_string not found in /Users/austin/Documents/autoagent/src/orchestrator.ts. Must match exactly.
+[2026-04-05T17:13:36.896Z] iter=262 turn=11 INFO: Turn 11/25
+[2026-04-05T17:13:38.834Z] iter=262 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && head -30 src/orchestrator.ts
+[2026-04-05T17:13:38.850Z] iter=262 turn=11 INFO:   -> exit=0 (1290 chars)
+[2026-04-05T17:13:38.851Z] iter=262 turn=12 INFO: Turn 12/25
+[2026-04-05T17:13:41.103Z] iter=262 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^import" src/orchestrator.ts | tail -20
+[2026-04-05T17:13:41.121Z] iter=262 turn=12 INFO:   -> exit=0 (1172 chars)
+[2026-04-05T17:13:41.121Z] iter=262 turn=13 INFO: Turn 13/25
+[2026-04-05T17:13:45.921Z] iter=262 turn=13 INFO: think: I've only written `src/file-watcher.ts` so far. I need to:
+1. Add FileWatcher import + integration to orchestrator.ts
+2....
+[2026-04-05T17:13:45.923Z] iter=262 turn=14 INFO: Turn 14/25
+[2026-04-05T17:13:49.075Z] iter=262 turn=14 INFO: Agent: I wrote `src/file-watcher.ts`. Now finishing orchestrator + TUI + tests in bulk:
+[2026-04-05T17:13:49.076Z] iter=262 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '42,45p' src/orchestrator.ts
+[2026-04-05T17:13:49.094Z] iter=262 turn=14 INFO:   -> exit=0 (94 chars)
+[2026-04-05T17:13:49.095Z] iter=262 turn=15 INFO: Turn 15/25
+[2026-04-05T17:13:52.964Z] iter=262 turn=15 INFO: write_file: /Users/austin/Documents/autoagent/src/orchestrator.ts (patch)
+[2026-04-05T17:13:52.966Z] iter=262 turn=15 INFO:   -> ok: Patched /Users/austin/Documents/autoagent/src/orchestrator.ts: -3 +4 lines
+
+Context after patch:
+39 | import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences } from "./context-loader.js";
+40 | import { enhanceToolError } from "./tool-recovery.js";
+41 | import { detectProject } from "./project-detector.js";
+42 | import * as fs from "fs";
+43 | import { FileWatcher } from "./file-watcher.js";
+44 | 
+45 | // ─── Constants ────────────────────────────────────────────────
+46 | 
+47 | /**
+48 |  * Tools that are safe to run in parallel — read-only, no side effects.
+[2026-04-05T17:13:52.967Z] iter=262 turn=16 INFO: Turn 16/25
+[2026-04-05T17:13:55.727Z] iter=262 turn=16 INFO: Agent: Let me write all remaining changes now.
+[2026-04-05T17:13:55.727Z] iter=262 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "private checkpoints\|private nextCheckpointId\|constructor(opts" src/orchestrator.ts
+[2026-04-05T17:13:55.737Z] iter=262 turn=16 INFO:   -> exit=0 (141 chars)
+[2026-04-05T17:13:55.738Z] iter=262 turn=17 INFO: Turn 17/25
+[2026-04-05T17:13:57.989Z] iter=262 turn=17 INFO: Agent: I need to finish the implementation fast. Writing all remaining changes now:
+[2026-04-05T17:13:57.990Z] iter=262 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '613,625p' src/orchestrator.ts
+[2026-04-05T17:13:58.010Z] iter=262 turn=17 INFO:   -> exit=0 (416 chars)
+[2026-04-05T17:13:58.010Z] iter=262 turn=18 INFO: Turn 18/25
+[2026-04-05T17:14:11.685Z] iter=262 turn=18 INFO: write_file: /Users/austin/Documents/autoagent/src/orchestrator.ts (patch)
+[2026-04-05T17:14:11.686Z] iter=262 turn=18 INFO:   -> ok: Patched /Users/austin/Documents/autoagent/src/orchestrator.ts: -8 +19 lines
+
+Context after patch:
+610 |   sessionPath: string = "";
+611 | 
+612 |   /** Conversation checkpoints for /rewind command. */
+613 |   private checkpoints: ConversationCheckpoint[] = [];
+614 |   private nextCheckpointId = 0;
+615 | 
+616 |   /** FileWatcher instance — tracks externally modified files. */
+617 |   private fileWatcher = new FileWatcher();
+618 |   /** Paths changed externally since last send(). */
+619 |   private externallyChangedFiles = new Set<string>();
+620 | 
+621 |   constructor(opts: OrchestratorOptions) {
+622 |     this.opts = opts;
+623 |     this.client = new Anthropic();
+624 |     this.registry = createDefaultRegistry();
+625 | 
+626 |     // Wire up file watcher callback
+627 |     this.fileWatcher.onChange = (filePath: string) => {
+628 |       this.externallyChangedFiles.add(filePath);
+629 |       this.opts.onExternalFileChange?.(this.externallyChangedFiles.size);
+630 |     };
+631 |   }
+632 | 
+633 |   /** Initialize repo context (call once before first message). */
+634 |   async init(): Promise<void> {
+[2026-04-05T17:14:11.686Z] iter=262 turn=19 INFO: Turn 19/25
+[2026-04-05T17:14:17.361Z] iter=262 turn=19 INFO: Agent: Now add `onExternalFileChange` to OrchestratorOptions and wire read/write_file + compactNow + cleanup:
+[2026-04-05T17:14:17.363Z] iter=262 turn=19 INFO: write_file: /Users/austin/Documents/autoagent/src/orchestrator.ts (patch)
+[2026-04-05T17:14:17.365Z] iter=262 turn=19 INFO:   -> ok: Patched /Users/austin/Documents/autoagent/src/orchestrator.ts: -6 +11 lines
+
+Context after patch:
+139 |    * TUI uses this to show a warning when approaching compaction threshold.
+140 |    */
+141 |   onContextBudget?: (ratio: number) => void;
+142 |   /**
+143 |    * Called once when lastInputTokens crosses 80% of the context window.
+144 |    * One-time notification per threshold crossing (resets on clearHistory).
+145 |    */
+146 |   onContextWarning?: () => void;
+147 |   /**
+148 |    * Called when one or more watched files are changed externally.
+149 |    * Receives the count of changed files since last send().
+150 |    */
+151 |   onExternalFileChange?: (count: number) => void;
+152 | }
+153 | 
+154 | export interface OrchestratorResult {
+155 |   text: string;
+[2026-04-05T17:14:17.366Z] iter=262 turn=20 INFO: Turn 20/25
+[2026-04-05T17:14:27.034Z] iter=262 turn=20 INFO: Agent: Now find the send() method start to inject changed-files notice, and the clearHistory to call unwatchAll:
+[2026-04-05T17:14:27.034Z] iter=262 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "async send\|clearHistory\|unwatchAll\|// 1. Model routing" src/orchestrator.ts | head -20
+[2026-04-05T17:14:27.048Z] iter=262 turn=20 INFO:   -> exit=0 (206 chars)
+[2026-04-05T17:14:27.048Z] iter=262 turn=21 INFO: Turn 21/25
+[2026-04-05T17:14:31.468Z] iter=262 turn=21 INFO: Agent: I need to stop and wrap up now. Let me do a quick TSC check on what's been built, write memory, update goals, and restart.
+[2026-04-05T17:14:31.469Z] iter=262 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -20
+[2026-04-05T17:14:32.495Z] iter=262 turn=21 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:14:32.496Z] iter=262 turn=22 INFO: Turn 22/25
+[2026-04-05T17:14:38.943Z] iter=262 turn=22 INFO: Agent: TSC is clean. Now write memory and goals:
+[2026-04-05T17:14:38.945Z] iter=262 turn=22 INFO: save_memory: "[Engineer] Iteration 262 — partial: file-watcher.ts written, orchestrator integration incomplete"
+[2026-04-05T17:14:38.948Z] iter=262 turn=22 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T17:14:38.948Z] iter=262 turn=23 INFO: Turn 23/25
+[2026-04-05T17:14:55.557Z] iter=262 turn=23 INFO: write_file: /Users/austin/Documents/autoagent/goals.md (write)
+[2026-04-05T17:14:55.559Z] iter=262 turn=23 INFO:   -> ok: Updated /Users/austin/Documents/autoagent/goals.md (2340 chars, -15 lines delta)
+[2026-04-05T17:14:55.560Z] iter=262 turn=24 INFO: Turn 24/25
+[2026-04-05T17:14:57.423Z] iter=262 turn=24 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T17:14:57.423Z] iter=262 turn=24 INFO: RESTART signal
+[2026-04-05T17:14:57.424Z] iter=262 turn=24 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T17:14:58.408Z] iter=262 turn=24 INFO: Compilation OK
+[2026-04-05T17:15:04.567Z] iter=262 turn=24 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T17:15:04.567Z] iter=262 turn=24 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 6 invalidations (1 entries removed)
+[2026-04-05T17:15:04.567Z] iter=262 turn=24 INFO: Tool cache stats
+[2026-04-05T17:15:04.567Z] iter=262 turn=24 INFO: Tool timing: bash: 19x, avg=69ms, total=1311ms; write_file: 6x, avg=2ms, total=14ms; think: 2x, avg=3ms, total=5ms; save_memory: 1x, avg=3ms, total=3ms; read_file: 1x, avg=2ms, total=2ms
+[2026-04-05T17:15:04.567Z] iter=262 turn=24 INFO: Tool timing stats
+[2026-04-05T17:15:10.101Z] iter=262 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 262: predicted 20 turns, actual 24 turns, ratio 1.20**
+[2026-04-05T17:15:15.189Z] iter=262 turn=24 INFO: Pre-commit review (1952in/149out): **LGTM** — the implementation is clean, well-structured, and the ESM import uses the correct `.js` extension; the debounce, mute, and cleanup logic are all correct with no obvious races or leaks.
+
+One

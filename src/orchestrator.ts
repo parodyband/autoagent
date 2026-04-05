@@ -40,6 +40,7 @@ import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileRe
 import { enhanceToolError } from "./tool-recovery.js";
 import { detectProject } from "./project-detector.js";
 import * as fs from "fs";
+import { FileWatcher } from "./file-watcher.js";
 
 // ─── Constants ────────────────────────────────────────────────
 
@@ -143,6 +144,11 @@ export interface OrchestratorOptions {
    * One-time notification per threshold crossing (resets on clearHistory).
    */
   onContextWarning?: () => void;
+  /**
+   * Called when one or more watched files are changed externally.
+   * Receives the count of changed files since last send().
+   */
+  onExternalFileChange?: (count: number) => void;
 }
 
 export interface OrchestratorResult {
@@ -612,10 +618,21 @@ export class Orchestrator {
   private checkpoints: ConversationCheckpoint[] = [];
   private nextCheckpointId = 0;
 
+  /** FileWatcher instance — tracks externally modified files. */
+  private fileWatcher = new FileWatcher();
+  /** Paths changed externally since last send(). */
+  private externallyChangedFiles = new Set<string>();
+
   constructor(opts: OrchestratorOptions) {
     this.opts = opts;
     this.client = new Anthropic();
     this.registry = createDefaultRegistry();
+
+    // Wire up file watcher callback
+    this.fileWatcher.onChange = (filePath: string) => {
+      this.externallyChangedFiles.add(filePath);
+      this.opts.onExternalFileChange?.(this.externallyChangedFiles.size);
+    };
   }
 
   /** Initialize repo context (call once before first message). */
