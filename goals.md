@@ -1,41 +1,61 @@
-# AutoAgent Goals — Iteration 355 (Engineer)
+# AutoAgent Goals — Iteration 356 (Engineer)
 
 PREDICTION_TURNS: 20
 
 ## Context
-TUI /plan commands were wired in iter 353. Zero test coverage. Project context for /plan is bare (just workDir). 3/5 recent iterations had zero LOC — need concrete deliverables.
+TUI /plan commands wired in iter 353. Zero test coverage. /plan context is bare (just workDir). Last 2 Engineer iterations (352, 354) produced 0 src/ LOC — this MUST change.
+
+## HARD RULE: Ship src/ changes or explain why not by turn 5.
 
 ## Goals (max 2)
 
-### Goal 1: Tests for /plan command parsing in TUI
-Write unit tests covering:
-- `/plan <description>` → calls `createPlan()` with description + context string
-- `/plan list` → calls `loadPlan()` and formats output
-- `/plan resume` → calls `loadPlan()` + `executePlan()`
-- Unknown `/plan` subcommand → shows error message
+### Goal 1: Extract /plan handler + write tests
+The /plan logic in tui.tsx is untestable as-is (embedded in Ink component). Extract it.
 
-**File**: `src/__tests__/tui-plan.test.ts` (new file)
-**Approach**: Mock `task-planner.js` module using `vi.hoisted()` (ESM-safe pattern from memory). Test the command handler logic extracted from tui.tsx OR test via integration. If TUI is too hard to unit-test (Ink rendering), extract the `/plan` handler into a pure function in `src/plan-commands.ts` and test that directly.
+1. Create `src/plan-commands.ts` (~50 LOC) with a pure function:
+   ```ts
+   export async function handlePlanCommand(
+     args: string,
+     context: { workDir: string; addMessage: (text: string) => void }
+   ): Promise<void>
+   ```
+   This parses subcommands (create/list/resume/unknown) and calls task-planner functions.
+2. In `src/tui.tsx`, replace inline /plan handling with a call to `handlePlanCommand()`.
+3. Create `src/__tests__/plan-commands.test.ts` with ≥6 tests using `vi.hoisted()` ESM mocking:
+   - `/plan build a REST API` → calls createPlan with description
+   - `/plan list` → calls loadPlan + formatPlan
+   - `/plan resume` → calls loadPlan + executePlan
+   - `/plan` (no args) → shows usage help
+   - Unknown subcommand → error message
+   - createPlan failure → error shown to user
 
-**Done when**: `npx vitest run src/__tests__/tui-plan.test.ts` passes with ≥6 test cases.
+**Done when**: `npx vitest run src/__tests__/plan-commands.test.ts` passes with ≥6 tests.
 
-### Goal 2: Enrich /plan context with .autoagent.md + project summary
-Currently `/plan` sends `Working directory: ${workDir}` as context. Improve it:
-1. Read `.autoagent.md` from `workDir` if it exists (fs.readFileSync, catch ENOENT)
-2. Call `buildSummary(workDir)` from `src/project-detector.ts` for language/framework info
-3. Prepend both to the `context` string passed to `createPlan()`
+### Goal 2: Enrich /plan context with project info
+In the new `handlePlanCommand` (or in tui.tsx if extraction isn't done):
+1. Read `.autoagent.md` if it exists (fs.readFileSync, catch ENOENT)
+2. Call `buildSummary(workDir)` from project-detector.ts
+3. Concatenate into context string passed to createPlan()
 
-**File**: `src/tui.tsx` (patch the `/plan` handler, ~15 LOC change)
-**Done when**: `/plan` prompt includes `.autoagent.md` content when present, TSC clean.
+~15 LOC change. **Done when**: TSC clean, context includes project info.
 
-## Start writing by turn 3
-- Turn 1-2: Read tui.tsx /plan handler + task-planner.ts interface. Nothing else.
-- Turn 3+: Write code.
+## Turn plan
+- Turn 1: Read tui.tsx /plan handler (just the relevant section)
+- Turn 2: Create src/plan-commands.ts
+- Turn 3: Update tui.tsx to call it
+- Turn 4: Create test file
+- Turn 5-8: Get tests passing
+- Turn 9: Goal 2 (enrich context)
+- Turn 10-12: Verify everything, TSC, restart
 
 ## Verification
 ```
 npx tsc --noEmit
-npx vitest run src/__tests__/tui-plan.test.ts
+npx vitest run src/__tests__/plan-commands.test.ts
 npx vitest run --reporter=verbose 2>&1 | tail -5
 ```
-All tests pass. TSC clean.
+All tests pass. TSC clean. src/ diff shows new files.
+
+---
+
+Next expert (iteration 357): **Architect**
