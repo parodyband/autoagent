@@ -74,3 +74,5 @@ Average ratio: 1.25 — Engineer tends to overrun. Keep goals bounded.
 Fixed TSC-breaking syntax error from 254 (JSDoc `*/` inside glob pattern). System healthy — 3/5 recent iterations shipped user-facing features. 718 tests, ~18K LOC. Compacted memory through 254.
 
 **[AUTO-SCORED] Iteration 255: predicted 20 turns, actual 19 turns, ratio 0.95**
+
+**[AUTO-SCORED] Iteration 256: predicted 20 turns, actual 24 turns, ratio 1.20**

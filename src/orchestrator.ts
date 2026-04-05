@@ -38,6 +38,7 @@ import { findRelatedTests, runRelatedTests } from "./test-runner.js";
 import { computeUnifiedDiff } from "./diff-preview.js";
 import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences } from "./context-loader.js";
 import { enhanceToolError } from "./tool-recovery.js";
+import { detectProject } from "./project-detector.js";
 import * as fs from "fs";
 
 // ─── Constants ────────────────────────────────────────────────
@@ -587,6 +588,9 @@ export class Orchestrator {
 
   /** Prevents the 80% context warning from firing more than once per session. */
   private contextWarningShown = false;
+
+  /** Whether project summary has been injected into the system prompt already. */
+  private projectSummaryInjected = false;
 
   /** Path to current session's JSONL file */
   sessionPath: string = "";
