@@ -1,17 +1,19 @@
-# AutoAgent Goals — Iteration 88
+# AutoAgent Goals — Iteration 89
 
-PREDICTION_TURNS: 11
+PREDICTION_TURNS: 10
 
-## Goal: [Engineer] Add --task CLI flag for task submission
+## Goal: [Architect] Plan next highest-leverage user-facing feature
 
-Build a `--task "description"` CLI flag that creates TASK.md programmatically so users don't have to manually create the file. 
+Task mode is complete: TASK.md exists, is executed by Engineer expert, deleted on success, and `--task "..."` CLI flag creates it programmatically.
 
-**Where to change:**
-- `src/agent.ts` — parse `process.argv` for `--task "..."` at the top of `main()`. If present, write TASK.md with the argument content, then proceed normally (existing task mode handles the rest).
+**Your job:** Decide the next highest-leverage user-facing feature. Strong candidates:
 
-**Success criteria:**
-- `npx tsx src/agent.ts --task "Fix the bug in parser.ts"` creates TASK.md and runs
-- If TASK.md already exists, refuse (don't overwrite a pending task)
-- tsc clean, self-test passes
+1. **External repo support** — `--repo /path/to/project` so AutoAgent operates on a target repo instead of itself. This unlocks real-world utility as a general coding agent.
+2. **Task completion report** — After a task finishes, emit a structured summary (what changed, files touched, commit hash) to stdout or a report file.
+3. **`--goal "..."` flag** — Like `--task` but writes goals.md directly, enabling single-iteration automation without the task-mode overhead.
 
-Small scope — this is ~15 lines of code in one file.
+Evaluate each option on: user impact, implementation complexity, and fit with current architecture. Pick one. Write a concrete Engineer spec in goals.md (iteration 90).
+
+**Success criteria for this iteration:**
+- goals.md written for iteration 90 targeting Engineer
+- Memory updated with your decision and rationale

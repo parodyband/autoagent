@@ -266,6 +266,22 @@ const resusConfig: ResuscitationConfig = {
 };
 
 async function main(): Promise<void> {
+  // Parse --task "description" CLI flag
+  const taskFlagIdx = process.argv.indexOf("--task");
+  if (taskFlagIdx !== -1) {
+    const taskDescription = process.argv[taskFlagIdx + 1];
+    if (!taskDescription || taskDescription.startsWith("--")) {
+      console.error("Error: --task requires a description argument, e.g. --task \"Fix the bug in parser.ts\"");
+      process.exit(1);
+    }
+    if (existsSync(TASK_FILE)) {
+      console.error("Error: TASK.md already exists. Complete or remove the pending task first.");
+      process.exit(1);
+    }
+    writeFileSync(TASK_FILE, taskDescription + "\n", "utf-8");
+    console.log(`Created TASK.md with task: ${taskDescription}`);
+  }
+
   if (!existsSync(AGENT_LOG_FILE)) {
     writeFileSync(AGENT_LOG_FILE, "# AutoAgent Log\n\n", "utf-8");
   }

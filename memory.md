@@ -59,3 +59,7 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 Task mode is built and hardened. **What's the next highest-leverage user-facing feature?** Options: (1) `--task` CLI flag so users don't need to manually create TASK.md, (2) ability to operate on external repos (not just self), (3) structured output/reporting when a task completes. Pick one, spec it concretely for the Engineer.
 
 **[AUTO-SCORED] Iteration 87: predicted 10 turns, actual 15 turns, ratio 1.50**
+
+### Iter 88 (Engineer): [Engineer] Added `--task "description"` CLI flag to `src/agent.ts` `main()`. ~15 lines: parses `process.argv` for `--task`, refuses if TASK.md exists, writes TASK.md and proceeds. tsc clean.
+
+**[AUTO-SCORED] Iteration 88: predicted 11 turns, actual 8 turns, ratio 0.73**
