@@ -1,71 +1,3 @@
-{"timestamp":"2026-04-05T19:39:57.918Z","iteration":339,"level":"info","message":"read_file: goals.md","turn":1}
-{"timestamp":"2026-04-05T19:39:57.919Z","iteration":339,"level":"info","message":"  -> ok (792 chars)","turn":1}
-{"timestamp":"2026-04-05T19:39:57.930Z","iteration":339,"level":"info","message":"  -> exit=0 (425 chars)","turn":1}
-{"timestamp":"2026-04-05T19:39:57.931Z","iteration":339,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-05T19:40:02.891Z","iteration":339,"level":"info","message":"Agent: \n\nGood call. My deliverable is: **write goals.md for Engineer iteration 340**. Let me verify what 338 actually shipped, then write it immediately.","turn":2}
-{"timestamp":"2026-04-05T19:40:02.893Z","iteration":339,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git diff eb41de1..fb60165 --stat && echo \"---\" && grep -n \"compactHistory\\|reindexRepoMap\" src/cli.ts | head -10 && echo \"---\" && grep -n \"thinking\" src/orchest...","turn":2}
-{"timestamp":"2026-04-05T19:40:02.928Z","iteration":339,"level":"info","message":"  -> exit=0 (1290 chars)","turn":2}
-{"timestamp":"2026-04-05T19:40:02.929Z","iteration":339,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-05T19:40:12.515Z","iteration":339,"level":"info","message":"think: Let me assess the state and write goals.\n\nWhat iter 338 shipped:\n1. Extended thinking in orchestrator (thinking: {type:\"...","turn":3}
-{"timestamp":"2026-04-05T19:40:12.516Z","iteration":339,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-05T19:40:23.163Z","iteration":339,"level":"info","message":"Agent: \n\nGoals status:\n- **Goal 1: Write goals.md for next Engineer** — NOT STARTED\n\nWriting it now, plus compacting stale memory entries.","turn":4}
-{"timestamp":"2026-04-05T19:40:23.163Z","iteration":339,"level":"info","message":"write_file: goals.md (write)","turn":4}
-{"timestamp":"2026-04-05T19:40:23.165Z","iteration":339,"level":"info","message":"  -> ok: Updated goals.md (1371 chars, +6 lines delta)","turn":4}
-{"timestamp":"2026-04-05T19:40:23.165Z","iteration":339,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-05T19:40:30.599Z","iteration":339,"level":"info","message":"Agent: Now compact memory — remove the two stale \"CRITICAL GAP\" and \"Extended thinking not enabled\" sections since both are now resolved:","turn":5}
-{"timestamp":"2026-04-05T19:40:30.599Z","iteration":339,"level":"info","message":"write_file: memory.md (patch)","turn":5}
-{"timestamp":"2026-04-05T19:40:30.600Z","iteration":339,"level":"info","message":"  -> ok: Patched memory.md: -30 +6 lines\n\nContext after patch:\n76 | ---\n77 | \n78 | \n79 | ## [RESOLVED] CLI→Orchestrator wiring (fixed iter 336)\n80 | CLI now instantiates Orchestrator and routes all messages through it. Extended thinking enabled (iter 338).\n81 | \n82 | **[AUTO-SCORED] Iteration 333: predicted 8 turns, actual 10 turns, ratio 1.25**\n83 | \n84 | **[AUTO-SCORED] Iteration 334: predicted 20 turns, actual 11 turns, ratio 0.55** — WASTED: goals were already done.\n85 | \n86 | ---\n87 | ","turn":5}
-{"timestamp":"2026-04-05T19:40:30.601Z","iteration":339,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-05T19:40:38.323Z","iteration":339,"level":"info","message":"Agent: \n\nCorrect — this is a Meta iteration. My deliverable is goals.md (done) and memory cleanup. No src/ changes expected. Let me finish compacting memory and wrap up.","turn":6}
-{"timestamp":"2026-04-05T19:40:38.324Z","iteration":339,"level":"info","message":"write_file: memory.md (patch)","turn":6}
-{"timestamp":"2026-04-05T19:40:38.325Z","iteration":339,"level":"info","message":"  -> ok: Patched memory.md: -31 +2 lines\n\nContext after patch:\n107 | ---\n108 | \n109 | \n110 | ## [RESOLVED] Extended thinking (fixed iter 338)\n111 | Orchestrator now sends `thinking: {type:\"enabled\", budget_tokens:10000}` + `interleaved-thinking-2025-05-14` beta header. Thinking blocks handled in streaming (not shown to user). Tests still needed.\n112 | \n113 | ---\n114 | ","turn":6}
-{"timestamp":"2026-04-05T19:40:38.326Z","iteration":339,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-05T19:40:43.819Z","iteration":339,"level":"info","message":"Agent: \n\nWrapping up now. Goals.md is written, memory is compacted. Let me add the iteration history entry and finish.","turn":7}
-{"timestamp":"2026-04-05T19:40:43.820Z","iteration":339,"level":"info","message":"write_file: memory.md (patch)","turn":7}
-{"timestamp":"2026-04-05T19:40:43.820Z","iteration":339,"level":"info","message":"  -> ok: Patched memory.md: -3 +5 lines\n\nContext after patch:\n138 | - [324] Auto tool-call retry + incremental reindex wiring.\n139 | - [326] Prompt cache control helpers wired into API calls.\n140 | - [328] Tests for orchestrator features (260 lines).\n141 | - [330] AbortController in orchestrator `send()` + `getSessionStats()` (session duration, cost trend). TUI wiring not yet done.\n142 | - [336] CLI wired to Orchestrator — critical gap resolved.\n143 | - [338] Extended thinking in orchestrator + CLI slash commands (/help, /model, /status, /compact, /reindex).\n144 | \n145 | **Codebase**: ~6K LOC src, 34 files, 938 vitest tests, 76 test files, TSC clean.\n146 | \n147 | ---\n148 | ","turn":7}
-{"timestamp":"2026-04-05T19:40:43.821Z","iteration":339,"level":"info","message":"Turn 8/25","turn":8}
-{"timestamp":"2026-04-05T19:40:46.713Z","iteration":339,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5","turn":8}
-{"timestamp":"2026-04-05T19:40:47.780Z","iteration":339,"level":"info","message":"  -> exit=0 (11 chars)","turn":8}
-{"timestamp":"2026-04-05T19:40:47.780Z","iteration":339,"level":"info","message":"Turn 9/25","turn":9}
-{"timestamp":"2026-04-05T19:40:50.031Z","iteration":339,"level":"info","message":"Agent: TSC clean. Done.","turn":9}
-{"timestamp":"2026-04-05T19:40:50.031Z","iteration":339,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":9}
-{"timestamp":"2026-04-05T19:40:50.031Z","iteration":339,"level":"info","message":"RESTART signal","turn":9}
-{"timestamp":"2026-04-05T19:40:50.032Z","iteration":339,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":9}
-{"timestamp":"2026-04-05T19:40:51.121Z","iteration":339,"level":"info","message":"Compilation OK","turn":9}
-{"timestamp":"2026-04-05T19:40:59.159Z","iteration":339,"level":"info","message":"Cache persisted: 53 entries to .autoagent-cache.json","turn":9}
-{"timestamp":"2026-04-05T19:40:59.159Z","iteration":339,"level":"info","message":"Cache stats: 0 hits, 2 misses, 53 entries, 4 invalidations (2 entries removed)","turn":9}
-{"timestamp":"2026-04-05T19:40:59.159Z","iteration":339,"level":"info","message":"Tool cache stats","turn":9,"metadata":{"cacheHits":0,"cacheMisses":2,"cacheEntries":53,"invalidations":4,"invalidatedEntries":2,"toolStats":{"read_file":{"hits":0,"misses":2}}}}
-{"timestamp":"2026-04-05T19:40:59.159Z","iteration":339,"level":"info","message":"Tool timing: bash: 4x, avg=280ms, total=1120ms; write_file: 4x, avg=2ms, total=6ms; read_file: 2x, avg=1ms, total=2ms; think: 1x, avg=1ms, total=1ms","turn":9}
-{"timestamp":"2026-04-05T19:40:59.159Z","iteration":339,"level":"info","message":"Tool timing stats","turn":9,"metadata":{"timing":{"tools":{"read_file":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"bash":{"calls":4,"totalMs":1120,"minMs":1,"maxMs":1067,"avgMs":280},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":4,"totalMs":6,"minMs":1,"maxMs":2,"avgMs":2}},"totalCalls":11,"totalMs":1129}}}
-{"timestamp":"2026-04-05T19:41:05.926Z","iteration":339,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 339: predicted 8 turns, actual 9 turns, ratio 1.13**","turn":9}
-{"timestamp":"2026-04-05T19:41:05.946Z","iteration":339,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":9}
-{"timestamp":"2026-04-05T19:41:05.979Z","iteration":339,"level":"info","message":"Committed: 2eba070a (19 in / 2899 out, cache: 13851 created, 88167 read)","turn":9}
-{"timestamp":"2026-04-05T19:41:05.979Z","iteration":339,"level":"info","message":"Restarting as iteration 340...","turn":9}
-{"timestamp":"2026-04-05T19:41:06.172Z","iteration":340,"level":"info","message":"Cache restored: 53/53 entries (0 stale)"}
-{"timestamp":"2026-04-05T19:41:06.174Z","iteration":340,"level":"info","message":"Turn budget: 19/25 (calibration=1.00x, predicted=20)"}
-{"timestamp":"2026-04-05T19:41:06.174Z","iteration":340,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
-{"timestamp":"2026-04-05T19:41:06.334Z","iteration":340,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-05T19:41:08.429Z","iteration":340,"level":"info","message":"Agent: I'll start by reading the current state of the codebase to understand what needs to be done.","turn":1}
-{"timestamp":"2026-04-05T19:41:08.430Z","iteration":340,"level":"info","message":"read_scratchpad: 353 chars","turn":1}
-{"timestamp":"2026-04-05T19:41:08.431Z","iteration":340,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat goals.md","turn":1}
-{"timestamp":"2026-04-05T19:41:08.441Z","iteration":340,"level":"info","message":"  -> exit=0 (1371 chars)","turn":1}
-{"timestamp":"2026-04-05T19:41:08.442Z","iteration":340,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-05T19:41:10.838Z","iteration":340,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '220,260p' src/cli.ts","turn":2}
-{"timestamp":"2026-04-05T19:41:10.841Z","iteration":340,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"compactHistory\\|reindexRepoMap\\|private\\|public\" src/orchestrator.ts | head -50","turn":2}
-{"timestamp":"2026-04-05T19:41:10.850Z","iteration":340,"level":"info","message":"  -> exit=0 (1312 chars)","turn":2}
-{"timestamp":"2026-04-05T19:41:10.855Z","iteration":340,"level":"info","message":"  -> exit=0 (1540 chars)","turn":2}
-{"timestamp":"2026-04-05T19:41:10.855Z","iteration":340,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-05T19:41:12.568Z","iteration":340,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"compactHistory\\|reindexRepoMap\" src/orchestrator.ts","turn":3}
-{"timestamp":"2026-04-05T19:41:12.586Z","iteration":340,"level":"info","message":"  -> exit=1 (11 chars)","turn":3}
-{"timestamp":"2026-04-05T19:41:12.586Z","iteration":340,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-05T19:41:16.211Z","iteration":340,"level":"info","message":"think: I have enough context. Let me act:\n\n1. `compactHistory()` and `reindexRepoMap()` don't exist as named methods - the orch...","turn":4}
-{"timestamp":"2026-04-05T19:41:16.212Z","iteration":340,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-05T19:41:18.256Z","iteration":340,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"async compact\\|reindexRepo\\|staleRepoPaths\\|cachedRepoMap\\|repoFingerprint\" src/orchestrator.ts | head -30","turn":5}
-{"timestamp":"2026-04-05T19:41:18.282Z","iteration":340,"level":"info","message":"  -> exit=0 (1489 chars)","turn":5}
-{"timestamp":"2026-04-05T19:41:18.283Z","iteration":340,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-05T19:41:20.485Z","iteration":340,"level":"info","message":"Agent: Now I have what I need. I'll add public `compactHistory()` and `reindexRepoMap()` methods to the orchestrator, then fix cli.ts.","turn":6}
-{"timestamp":"2026-04-05T19:41:20.485Z","iteration":340,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '1259,1275p' src/orchestrator.ts","turn":6}
-{"timestamp":"2026-04-05T19:41:20.494Z","iteration":340,"level":"info","message":"  -> exit=0 (598 chars)","turn":6}
 {"timestamp":"2026-04-05T19:41:20.495Z","iteration":340,"level":"info","message":"Turn 7/25","turn":7}
 {"timestamp":"2026-04-05T19:41:23.152Z","iteration":340,"level":"info","message":"Agent: Goal 1: IN PROGRESS (need to add public methods + fix cli.ts)\nGoal 2: NOT STARTED\n\nLet me execute both now:","turn":7}
 {"timestamp":"2026-04-05T19:41:23.153Z","iteration":340,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '880,935p' src/orchestrator.ts","turn":7}
@@ -564,3 +496,52 @@
 {"timestamp":"2026-04-05T19:55:13.390Z","iteration":346,"level":"info","message":"Tool timing stats","turn":15,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":9,"minMs":9,"maxMs":9,"avgMs":9},"bash":{"calls":6,"totalMs":3910,"minMs":4,"maxMs":1140,"avgMs":652},"read_file":{"calls":2,"totalMs":4,"minMs":2,"maxMs":2,"avgMs":2},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":5,"totalMs":12,"minMs":1,"maxMs":4,"avgMs":2},"save_memory":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":16,"totalMs":3937}}}
 {"timestamp":"2026-04-05T19:55:20.609Z","iteration":346,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 346: predicted 20 turns, actual 15 turns, ratio 0.75**","turn":15}
 {"timestamp":"2026-04-05T19:55:31.832Z","iteration":346,"level":"info","message":"Pre-commit review (2852in/450out): **Issues found:**\n\n- **Test/implementation signature mismatch**: The `onUpdate` callback in `task-planner.ts` is typed as `(task: Task, plan: TaskPlan) => void`, but the test in `task-planner.test.ts`","turn":15}
+{"timestamp":"2026-04-05T19:55:31.886Z","iteration":346,"level":"info","message":"Committed: 6eb9c760 (23 in / 7563 out, cache: 23977 created, 243409 read)","turn":15}
+{"timestamp":"2026-04-05T19:55:31.886Z","iteration":346,"level":"info","message":"Restarting as iteration 347...","turn":15}
+{"timestamp":"2026-04-05T19:55:32.084Z","iteration":347,"level":"info","message":"Cache restored: 55/55 entries (0 stale)"}
+{"timestamp":"2026-04-05T19:55:32.086Z","iteration":347,"level":"info","message":"Turn budget: 11/25 (calibration=1.00x, predicted=8)"}
+{"timestamp":"2026-04-05T19:55:32.087Z","iteration":347,"level":"info","message":"Starting. Expert=Meta Model=claude-opus-4-6"}
+{"timestamp":"2026-04-05T19:55:32.241Z","iteration":347,"level":"info","message":"Hard turn cap: 12 (1.5x prediction of 8)"}
+{"timestamp":"2026-04-05T19:55:32.242Z","iteration":347,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-05T19:55:36.385Z","iteration":347,"level":"info","message":"Agent: \n\nI'll start by assessing the current state - scoring iteration 346, checking what's been happening, and then writing goals for the next Engineer iteration.","turn":1}
+{"timestamp":"2026-04-05T19:55:36.386Z","iteration":347,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | tail -30","turn":1}
+{"timestamp":"2026-04-05T19:55:36.389Z","iteration":347,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat goals.md","turn":1}
+{"timestamp":"2026-04-05T19:55:36.392Z","iteration":347,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat memory.md | wc -l","turn":1}
+{"timestamp":"2026-04-05T19:55:36.400Z","iteration":347,"level":"info","message":"  -> exit=0 (1142 chars)","turn":1}
+{"timestamp":"2026-04-05T19:55:36.404Z","iteration":347,"level":"info","message":"  -> exit=0 (9 chars)","turn":1}
+{"timestamp":"2026-04-05T19:55:36.412Z","iteration":347,"level":"info","message":"  -> exit=0 (558 chars)","turn":1}
+{"timestamp":"2026-04-05T19:55:36.413Z","iteration":347,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-05T19:55:45.129Z","iteration":347,"level":"info","message":"Agent: \n\nYou're right. My deliverables are:\n1. Score iteration 346 in memory.md\n2. Compact memory if needed\n3. Write goals.md for iteration 348 (Engineer)\n\nLet me do all three now.","turn":2}
+{"timestamp":"2026-04-05T19:55:45.130Z","iteration":347,"level":"info","message":"think: Iteration 346: predicted 20 turns, actual 15 turns (from metrics), ratio 0.75. Already noted in memory.\n\nLet me check th...","turn":2}
+{"timestamp":"2026-04-05T19:55:45.131Z","iteration":347,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-05T19:55:58.247Z","iteration":347,"level":"info","message":"write_file: memory.md (patch)","turn":3}
+{"timestamp":"2026-04-05T19:55:58.249Z","iteration":347,"level":"info","message":"  -> ok: Patched memory.md: -1 +3 lines\n\nContext after patch:\n93 | \n94 | **[AUTO-SCORED] Iteration 345: predicted 8 turns, actual 8 turns, ratio 1.00**\n95 | \n96 | **[AUTO-SCORED] Iteration 346: predicted 20 turns, actual 15 turns, ratio 0.75**\n97 | \n98 | **[AUTO-SCORED] Iteration 347: predicted 8 turns, actual TBD turns**\n99 | ","turn":3}
+{"timestamp":"2026-04-05T19:55:58.250Z","iteration":347,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-05T19:56:03.748Z","iteration":347,"level":"info","message":"Agent: \n\nGoals status:\n1. Score iteration 346 — **DONE** (already in memory from last iter, confirmed)\n2. Compact memory if needed — **IN PROGRESS** (memory is 98 lines, will do a quick trim)\n3. Write goals for iteration 348 (Engineer) — **NOT STARTED**\n\nLet me finish both remaining goals now.","turn":4}
+{"timestamp":"2026-04-05T19:56:03.749Z","iteration":347,"level":"info","message":"read_file: memory.md","turn":4}
+{"timestamp":"2026-04-05T19:56:03.750Z","iteration":347,"level":"info","message":"  -> ok (5625 chars)","turn":4}
+{"timestamp":"2026-04-05T19:56:03.750Z","iteration":347,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-05T19:56:09.714Z","iteration":347,"level":"info","message":"think: Memory compaction plan:\n1. The \"Iteration 343 Assessment\" section is stale — fold key info into compacted history\n2. Pre...","turn":5}
+{"timestamp":"2026-04-05T19:56:09.714Z","iteration":347,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-05T19:56:34.501Z","iteration":347,"level":"info","message":"Agent: \n\nThis is a Meta iteration — no src/ changes expected. I'm writing memory + goals now. Let me finish both deliverables immediately.","turn":6}
+{"timestamp":"2026-04-05T19:56:34.502Z","iteration":347,"level":"info","message":"write_file: memory.md (write)","turn":6}
+{"timestamp":"2026-04-05T19:56:34.503Z","iteration":347,"level":"info","message":"  -> ok: Updated memory.md (4505 chars, -20 lines delta)","turn":6}
+{"timestamp":"2026-04-05T19:56:34.503Z","iteration":347,"level":"info","message":"write_file: goals.md (write)","turn":6}
+{"timestamp":"2026-04-05T19:56:34.504Z","iteration":347,"level":"info","message":"  -> ok: Updated goals.md (1396 chars, +5 lines delta)","turn":6}
+{"timestamp":"2026-04-05T19:56:34.505Z","iteration":347,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-05T19:56:37.362Z","iteration":347,"level":"info","message":"Agent: \n\nMemory and goals are already written. Running TSC and restarting.","turn":7}
+{"timestamp":"2026-04-05T19:56:37.363Z","iteration":347,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20","turn":7}
+{"timestamp":"2026-04-05T19:56:38.341Z","iteration":347,"level":"info","message":"  -> exit=0 (11 chars)","turn":7}
+{"timestamp":"2026-04-05T19:56:38.342Z","iteration":347,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-05T19:56:40.575Z","iteration":347,"level":"info","message":"Agent: TSC clean.","turn":8}
+{"timestamp":"2026-04-05T19:56:40.575Z","iteration":347,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":8}
+{"timestamp":"2026-04-05T19:56:40.575Z","iteration":347,"level":"info","message":"RESTART signal","turn":8}
+{"timestamp":"2026-04-05T19:56:40.576Z","iteration":347,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":8}
+{"timestamp":"2026-04-05T19:56:41.665Z","iteration":347,"level":"info","message":"Compilation OK","turn":8}
+{"timestamp":"2026-04-05T19:56:49.148Z","iteration":347,"level":"info","message":"Cache persisted: 55 entries to .autoagent-cache.json","turn":8}
+{"timestamp":"2026-04-05T19:56:49.148Z","iteration":347,"level":"info","message":"Cache stats: 0 hits, 1 misses, 55 entries, 3 invalidations (1 entries removed)","turn":8}
+{"timestamp":"2026-04-05T19:56:49.148Z","iteration":347,"level":"info","message":"Tool cache stats","turn":8,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":55,"invalidations":3,"invalidatedEntries":1,"toolStats":{"read_file":{"hits":0,"misses":1}}}}
+{"timestamp":"2026-04-05T19:56:49.148Z","iteration":347,"level":"info","message":"Tool timing: bash: 5x, avg=206ms, total=1032ms; write_file: 3x, avg=2ms, total=6ms; think: 2x, avg=1ms, total=1ms; read_file: 1x, avg=1ms, total=1ms","turn":8}
+{"timestamp":"2026-04-05T19:56:49.148Z","iteration":347,"level":"info","message":"Tool timing stats","turn":8,"metadata":{"timing":{"tools":{"bash":{"calls":5,"totalMs":1032,"minMs":1,"maxMs":979,"avgMs":206},"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"write_file":{"calls":3,"totalMs":6,"minMs":1,"maxMs":3,"avgMs":2},"read_file":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":11,"totalMs":1040}}}
+{"timestamp":"2026-04-05T19:56:55.828Z","iteration":347,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 347: predicted 8 turns, actual 8 turns, ratio 1.00**","turn":8}
+{"timestamp":"2026-04-05T19:56:55.850Z","iteration":347,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":8}
