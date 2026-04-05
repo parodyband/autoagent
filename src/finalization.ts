@@ -74,6 +74,10 @@ export interface FinalizationCtx {
   restart: () => never;
   /** Predicted turns captured at iteration start (before goals.md gets rewritten) */
   predictedTurns?: number | null;
+  /** Whether running in --once mode (emit JSON summary before exit) */
+  once?: boolean;
+  /** Whether the iteration failed (affects exitCode in summary) */
+  failed?: boolean;
 }
 
 // ─── Prediction accuracy scoring ────────────────────────────
@@ -205,6 +209,35 @@ ${truncatedDiff}
   }
 }
 
+// ─── Once-mode JSON summary ──────────────────────────────────
+// Emitted to stdout when --once is set so callers can parse results.
+// All other log output goes to stderr / log files, keeping stdout clean.
+
+export async function emitOnceSummary(params: {
+  success: boolean;
+  iteration: number;
+  turns: number;
+  startTime: Date;
+  exitCode: number;
+}): Promise<void> {
+  let filesChanged: string[] = [];
+  try {
+    const result = await executeBash("git diff --name-only HEAD~1", 30, undefined, true);
+    filesChanged = result.output.trim().split("\n").filter(Boolean);
+  } catch { /* ignore — commit may not exist yet */ }
+
+  const summary = {
+    success: params.success,
+    iteration: params.iteration,
+    turns: params.turns,
+    durationMs: Date.now() - params.startTime.getTime(),
+    filesChanged,
+    exitCode: params.exitCode,
+  };
+
+  process.stdout.write(JSON.stringify(summary) + "\n");
+}
+
 /**
  * Log cache and timing stats, capture quality/benchmarks, record metrics,
  * commit the iteration, and update state.
@@ -276,6 +309,18 @@ export async function finalizeIteration(
   ctx.state.lastFailureReason = null;
   ctx.state.iteration++;
   saveState(ctx.state);
+
+  // --once mode: emit JSON summary to stdout BEFORE exit so callers can parse it
+  if (ctx.once) {
+    const exitCode = ctx.failed ? 1 : 0;
+    await emitOnceSummary({
+      success: !ctx.failed,
+      iteration: ctx.iter,
+      turns: ctx.turns,
+      startTime: ctx.startTime,
+      exitCode,
+    });
+  }
 
   if (doRestart) {
     ctx.log(`Restarting as iteration ${ctx.state.iteration}...`);

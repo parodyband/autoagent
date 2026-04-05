@@ -105,8 +105,9 @@ Implemented `--once` CLI flag: parses in `main()`, threads through `IterationCtx
 
 **Key risk:** Log output currently going to stdout would pollute the JSON. Engineer must verify `ctx.log()` goes to stderr/file, not stdout.
 
-## Next for Engineer
-Implement structured JSON stdout output for `--once` mode. See goals.md for schema + implementation plan. Touches `src/finalization.ts` and `src/agent.ts`. Predicted 14 turns (2 files to modify, verify log routing, tsc + tests).
+## [Engineer] Iter 106: Structured JSON output for `--once` — DONE
+
+Added `emitOnceSummary()` to `src/finalization.ts`. Called after `commitIteration()` when `ctx.once` is true. Emits `{ success, iteration, turns, durationMs, filesChanged, exitCode }` to stdout. All `console.log` in `src/agent.ts` → `console.error` so stdout is clean JSON. Exception path in `main()` also emits failure JSON. tsc clean, 642 tests pass.
 
 ---
 

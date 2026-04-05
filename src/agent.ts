@@ -28,7 +28,7 @@ import { orient, formatOrientation } from "./orientation.js";
 import { parseMemory, getSection, serializeMemory } from "./memory.js";
 import { ToolCache } from "./tool-cache.js";
 import { ToolTimingTracker } from "./tool-timing.js";
-import { finalizeIteration as runFinalization } from "./finalization.js";
+import { finalizeIteration as runFinalization, emitOnceSummary } from "./finalization.js";
 import { runConversation, type IterationCtx } from "./conversation.js";
 import { loadExperts, pickExpert, buildExpertPrompt, saveExpertState } from "./experts.js";
 import {
@@ -57,7 +57,7 @@ function log(iter: number, msg: string): void {
     logger.info(msg);
   } else {
     const line = `[${new Date().toISOString()}] iter=${iter} ${msg}\n`;
-    console.log(`  ${msg}`);
+    console.error(`  ${msg}`);
     try { appendFileSync(AGENT_LOG_FILE, line, "utf-8"); } catch {}
   }
 }
@@ -152,6 +152,8 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
     logger,
     restart,
     predictedTurns: ctx.predictedTurns,
+    once: ctx.once,
+    failed: ctx.failed,
   }, effectiveRestart);
 
   // Task mode: delete TASK.md after successful iteration
@@ -249,10 +251,10 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
     once: onceMode,
   };
 
-  console.log(`\n${"=".repeat(60)}`);
-  console.log(`  AutoAgent — Iteration ${ctx.iter}`);
-  console.log(`  Expert: ${expert.name} (${expert.model})`);
-  console.log(`${"=".repeat(60)}\n`);
+  console.error(`\n${"=".repeat(60)}`);
+  console.error(`  AutoAgent — Iteration ${ctx.iter}`);
+  console.error(`  Expert: ${expert.name} (${expert.model})`);
+  console.error(`${"=".repeat(60)}\n`);
 
   logger.info(`Starting. Expert=${expert.name} Model=${expert.model}`);
   await tagPreIteration(ctx.iter);
@@ -341,7 +343,7 @@ async function main(): Promise<void> {
       process.exit(1);
     }
     WORK_DIR = resolved;
-    console.log(`Repo mode: operating on ${WORK_DIR}`);
+    console.error(`Repo mode: operating on ${WORK_DIR}`);
   }
 
   // Parse --task "description" CLI flag
@@ -357,14 +359,14 @@ async function main(): Promise<void> {
       process.exit(1);
     }
     writeFileSync(TASK_FILE, taskDescription + "\n", "utf-8");
-    console.log(`Created TASK.md with task: ${taskDescription}`);
+    console.error(`Created TASK.md with task: ${taskDescription}`);
   }
 
   if (!existsSync(AGENT_LOG_FILE)) {
     writeFileSync(AGENT_LOG_FILE, "# AutoAgent Log\n\n", "utf-8");
   }
 
-  console.log("AutoAgent starting...");
+  console.error("AutoAgent starting...");
 
   const gitCheck = await executeBash("git status --porcelain", 120, undefined, true);
   if (gitCheck.exitCode !== 0) {
@@ -381,12 +383,21 @@ async function main(): Promise<void> {
     return;
   }
 
+  const iterStartTime = new Date();
   try {
     await runIteration(state, WORK_DIR, onceMode);
   } catch (err) {
     if (onceMode) {
       const reason = err instanceof Error ? err.message : String(err);
       console.error("--once iteration failed:", reason);
+      // Emit failure JSON to stdout so callers can parse it
+      await emitOnceSummary({
+        success: false,
+        iteration: state.iteration,
+        turns: 0,
+        startTime: iterStartTime,
+        exitCode: 1,
+      });
       process.exit(1);
     }
     await handleIterationFailure(state, err, resusConfig);

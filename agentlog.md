@@ -1,92 +1,3 @@
-[2026-04-05T11:08:10.499Z] iter=96 turn=6 INFO: write_file: src/finalization.ts (patch)
-[2026-04-05T11:08:10.501Z] iter=96 turn=6 INFO:   -> ok: Patched src/finalization.ts: -2 +1 lines
-
-Context after patch:
-118 | function injectAccuracyScore(ctx: FinalizationCtx): void {
-119 |   // Prefer pre-captured prediction (set at iteration start, before goals.md gets rewritten)
-120 |   // Fall back to parsing current goals.md (which may already contain next iteration's goals)
-121 |   const predicted = ctx.predictedTurns ?? parsePredictedTurns(ctx.agentHome);
-122 |   const actual = ctx.turns;
-123 |   const memFile = path.join(stateDir, "memory.md");
-124 |   if (!existsSync(memFile)) return;
-[2026-04-05T11:08:10.502Z] iter=96 turn=7 INFO: Turn 7/25
-[2026-04-05T11:08:12.265Z] iter=96 turn=7 INFO: think: I removed `stateDir` but line 123 still references it. I need to replace `stateDir` with `ctx.agentHome` in the rest of ...
-[2026-04-05T11:08:12.266Z] iter=96 turn=8 INFO: Turn 8/25
-[2026-04-05T11:08:14.290Z] iter=96 turn=8 INFO: read_file: src/finalization.ts
-[2026-04-05T11:08:14.291Z] iter=96 turn=8 INFO:   -> ok (2616 chars)
-[2026-04-05T11:08:14.291Z] iter=96 turn=9 INFO: Turn 9/25
-[2026-04-05T11:08:20.495Z] iter=96 turn=9 INFO: Agent: I need to fix the remaining `stateDir` references. Let me patch them:
-[2026-04-05T11:08:20.495Z] iter=96 turn=9 INFO: write_file: src/finalization.ts (patch)
-[2026-04-05T11:08:20.496Z] iter=96 turn=9 INFO:   -> ok: Patched src/finalization.ts: -13 +13 lines
-
-Context after patch:
-120 |   // Fall back to parsing current goals.md (which may already contain next iteration's goals)
-121 |   const predicted = ctx.predictedTurns ?? parsePredictedTurns(ctx.agentHome);
-122 |   const actual = ctx.turns;
-123 |   const memFile = path.join(ctx.agentHome, "memory.md");
-124 |   if (!existsSync(memFile)) return;
-125 | 
-126 |   let content = readFileSync(memFile, "utf-8");
-127 | 
-128 |   // Build the accuracy line
-129 |   let line: string;
-130 |   if (predicted !== null && predicted > 0) {
-131 |     const ratio = (actual / predicted).toFixed(2);
-132 |     line = `**[AUTO-SCORED] Iteration ${ctx.iter}: predicted ${predicted} turns, actual ${actual} turns, ratio ${ratio}**`;
-133 | 
-134 |     // Check for consecutive misses (including this one)
-135 |     const pastRatios = getRecentAccuracyRatios(ctx.metricsFile, ctx.agentHome);
-136 |     const allRatios = [...pastRatios, actual / predicted];
-137 |     const recentMisses = allRatios.slice(-3).filter(r => r > 1.5);
-138 |     if (recentMisses.length >= 2) {
-[2026-04-05T11:08:20.496Z] iter=96 turn=10 INFO: Turn 10/25
-[2026-04-05T11:08:24.074Z] iter=96 turn=10 INFO: Agent: Now run the verification grep and tsc:
-[2026-04-05T11:08:24.075Z] iter=96 turn=10 INFO: $ grep -n 'rootDir.*goals\|rootDir.*memory\|rootDir.*metrics\|rootDir.*plan' src/phases.ts src/finalization.ts src/agent.ts; echo "EXIT:$?"
-[2026-04-05T11:08:24.091Z] iter=96 turn=10 INFO:   -> exit=0 (101 chars)
-[2026-04-05T11:08:24.091Z] iter=96 turn=11 INFO: Turn 11/25
-[2026-04-05T11:08:25.915Z] iter=96 turn=11 INFO: read_file: src/phases.ts
-[2026-04-05T11:08:25.916Z] iter=96 turn=11 INFO:   -> ok (364 chars)
-[2026-04-05T11:08:25.916Z] iter=96 turn=12 INFO: Turn 12/25
-[2026-04-05T11:08:29.604Z] iter=96 turn=12 INFO: Agent: That's a destructure line — `rootDir` is just being extracted there (not used for goals/memory/metrics/plan files). The grep pattern matches because `rootDir` and `agentHome` appear on the same line. This is a false positive — `rootDir` is used for code operations, not state files. The verification check passes (zero hits for the actual patterns of concern).
-[2026-04-05T11:08:29.607Z] iter=96 turn=12 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T11:08:30.345Z] iter=96 turn=12 INFO:   -> exit=0 (11 chars)
-[2026-04-05T11:08:30.346Z] iter=96 turn=13 INFO: Turn 13/25
-[2026-04-05T11:08:35.541Z] iter=96 turn=13 INFO: Agent: TypeScript is clean. Now write goals and memory:
-[2026-04-05T11:08:35.542Z] iter=96 turn=13 INFO: write_file: goals.md (write)
-[2026-04-05T11:08:35.542Z] iter=96 turn=13 INFO:   -> ok: Updated goals.md (449 chars, -37 lines delta)
-[2026-04-05T11:08:35.542Z] iter=96 turn=14 INFO: Turn 14/25
-[2026-04-05T11:08:39.907Z] iter=96 turn=14 INFO: write_file: memory.md (patch)
-[2026-04-05T11:08:39.908Z] iter=96 turn=14 INFO:   -> ok: Patched memory.md: -1 +1 lines
-
-Context after patch:
-58 | **Iter 92 (Engineer):** Made `agentHome` required, orient() gets workDir, finalization.ts partial migration.
-59 | **Iter 94 (Engineer):** phases.ts fully migrated (metrics, goals, .plan.md all use agentHome). Cache serialization fixed in agent.ts.
-60 | 
-61 | **Completed (iter 96):** `src/finalization.ts` — `parsePredictedTurns` now takes `agentHome`, `agentHome` is required in `FinalizationCtx`, `?? ctx.rootDir` fallback removed. `--repo` feature fully migrated.
-62 | 
-63 | **Lesson learned:** This feature took 5 iterations for ~40 lines because each Engineer pass left trailing items. Root cause: Engineer doesn't run the verification grep before declaring done. Added Behavioral Principle #6.
-64 | 
-[2026-04-05T11:08:39.909Z] iter=96 turn=14 INFO: HARD TURN CAP REACHED: 14 turns (predicted 9, cap 14). Forcing commit.
-[2026-04-05T11:08:39.915Z] iter=96 turn=14 INFO: Cache persisted: 24 entries to .autoagent-cache.json
-[2026-04-05T11:08:39.916Z] iter=96 turn=14 INFO: Cache stats: 0 hits, 5 misses, 24 entries, 6 invalidations (6 entries removed)
-[2026-04-05T11:08:39.916Z] iter=96 turn=14 INFO: Tool cache stats
-[2026-04-05T11:08:39.916Z] iter=96 turn=14 INFO: Tool timing: bash: 3x, avg=261ms, total=783ms; grep: 2x, avg=21ms, total=42ms; read_file: 3x, avg=10ms, total=29ms; write_file: 6x, avg=2ms, total=11ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T11:08:39.917Z] iter=96 turn=14 INFO: Tool timing stats
-[2026-04-05T11:08:43.958Z] iter=96 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 96: predicted 9 turns, actual 14 turns, ratio 1.56**
-[2026-04-05T11:08:46.089Z] iter=96 turn=14 INFO: Pre-commit review (1014in/68out): LGTM. The diff correctly hardens `agentHome` from optional to required in `FinalizationCtx`, eliminating the `?? ctx.rootDir` fallback in three places — callers must now explicitly provide the value, 
-[2026-04-05T11:08:46.138Z] iter=96 turn=14 INFO: Committed: 45eb3808 (20 in / 2343 out, cache: 16841 created, 100393 read)
-[2026-04-05T11:08:46.138Z] iter=96 turn=14 INFO: Restarting as iteration 97...
-[2026-04-05T11:08:46.335Z] iter=97 INFO: Cache restored: 24/24 entries (0 stale)
-[2026-04-05T11:08:46.336Z] iter=97 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T11:08:46.362Z] iter=97 INFO: Hard turn cap: 14 (1.5x prediction of 9)
-[2026-04-05T11:08:46.363Z] iter=97 turn=1 INFO: Turn 1/25
-[2026-04-05T11:08:50.158Z] iter=97 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the codebase and what the Engineer just completed.
-[2026-04-05T11:08:50.160Z] iter=97 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -5
-[2026-04-05T11:08:50.165Z] iter=97 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -80
-[2026-04-05T11:08:50.168Z] iter=97 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/*.ts src/**/*.ts 2>/dev/null | tail -5
-[2026-04-05T11:08:50.176Z] iter=97 turn=1 INFO:   -> exit=0 (1679 chars)
 [2026-04-05T11:08:50.179Z] iter=97 turn=1 INFO:   -> exit=0 (139 chars)
 [2026-04-05T11:08:50.180Z] iter=97 turn=1 INFO:   -> exit=0 (160 chars)
 [2026-04-05T11:08:50.180Z] iter=97 turn=2 INFO: Turn 2/25
@@ -1085,3 +996,323 @@ The high output ratio warning is expected — this is a planning iteration where
 [2026-04-05T11:21:43.351Z] iter=105 turn=9 INFO: Tool timing stats
 [2026-04-05T11:21:47.949Z] iter=105 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 105: predicted 12 turns, actual 9 turns, ratio 0.75**
 [2026-04-05T11:21:47.967Z] iter=105 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T11:21:47.995Z] iter=105 turn=9 INFO: Committed: d965bf29 (15 in / 3055 out, cache: 14937 created, 82092 read)
+[2026-04-05T11:21:47.995Z] iter=105 turn=9 INFO: Restarting as iteration 106...
+[2026-04-05T11:21:48.168Z] iter=106 INFO: Cache restored: 28/28 entries (0 stale)
+[2026-04-05T11:21:48.169Z] iter=106 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T11:21:48.193Z] iter=106 INFO: Hard turn cap: 21 (1.5x prediction of 14)
+[2026-04-05T11:21:48.193Z] iter=106 turn=1 INFO: Turn 1/25
+[2026-04-05T11:21:50.771Z] iter=106 turn=1 INFO: Agent: I'll start by reading the relevant files to understand the current structure before making changes.
+[2026-04-05T11:21:50.773Z] iter=106 turn=1 INFO: read_file: CACHE HIT
+[2026-04-05T11:21:50.774Z] iter=106 turn=1 INFO: read_file: src/agent.ts
+[2026-04-05T11:21:50.774Z] iter=106 turn=1 INFO:   -> ok (14402 chars)
+[2026-04-05T11:21:50.775Z] iter=106 turn=2 INFO: Turn 2/25
+[2026-04-05T11:22:25.905Z] iter=106 turn=2 INFO: think: Now I understand the codebase. Let me plan the implementation:
+
+1. **Check where log output goes** - The `log()` functio...
+[2026-04-05T11:22:25.907Z] iter=106 turn=3 INFO: Turn 3/25
+[2026-04-05T11:22:34.465Z] iter=106 turn=3 INFO: Agent: Now I have a clear picture. Let me implement the changes:
+[2026-04-05T11:22:34.465Z] iter=106 turn=3 INFO: write_file: src/finalization.ts (patch)
+[2026-04-05T11:22:34.466Z] iter=106 turn=3 INFO:   -> ok: Patched src/finalization.ts: -19 +23 lines
+
+Context after patch:
+56 | 
+57 | // ─── Finalization context ───────────────────────────────────
+58 | 
+59 | export interface FinalizationCtx {
+60 |   iter: number;
+61 |   state: IterationState;
+62 |   startTime: Date;
+63 |   turns: number;
+64 |   toolCounts: Record<string, number>;
+65 |   tokens: { in: number; out: number; cacheCreate: number; cacheRead: number };
+66 |   cache: ToolCache;
+67 |   timing: ToolTimingTracker;
+68 |   rootDir: string;
+69 |   /** AutoAgent's own directory (where memory.md, goals.md, metrics live). Defaults to rootDir. */
+70 |   agentHome: string;
+71 |   metricsFile: string;
+72 |   log: (msg: string) => void;
+73 |   logger?: Logger;
+74 |   restart: () => never;
+75 |   /** Predicted turns captured at iteration start (before goals.md gets rewritten) */
+76 |   predictedTurns?: number | null;
+77 |   /** Whether running in --once mode (emit JSON summary before exit) */
+78 |   once?: boolean;
+79 |   /** Whether the iteration failed (affects exitCode in summary) */
+80 |   failed?: boolean;
+81 | }
+82 | 
+83 | // ─── Prediction accuracy scoring ────────────────────────────
+84 | // Reads predicted turns from goals.md, compares to actual ctx.turns,
+[2026-04-05T11:22:34.467Z] iter=106 turn=4 INFO: Turn 4/25
+[2026-04-05T11:22:42.264Z] iter=106 turn=4 INFO: Agent: Now add the `emitOnceSummary` function and call it in `finalizeIteration`. I'll add it right before the `finalizeIteration` function:
+[2026-04-05T11:22:42.265Z] iter=106 turn=4 INFO: write_file: src/finalization.ts (patch)
+[2026-04-05T11:22:42.266Z] iter=106 turn=4 INFO:   -> ok: Patched src/finalization.ts: -5 +34 lines
+
+Context after patch:
+209 |   }
+210 | }
+211 | 
+212 | // ─── Once-mode JSON summary ──────────────────────────────────
+213 | // Emitted to stdout when --once is set so callers can parse results.
+214 | // All other log output goes to stderr / log files, keeping stdout clean.
+215 | 
+216 | export async function emitOnceSummary(params: {
+217 |   success: boolean;
+218 |   iteration: number;
+219 |   turns: number;
+220 |   startTime: Date;
+221 |   exitCode: number;
+222 | }): Promise<void> {
+223 |   let filesChanged: string[] = [];
+224 |   try {
+225 |     const result = await executeBash("git diff --name-only HEAD~1", 30, undefined, true);
+226 |     filesChanged = result.output.trim().split("\n").filter(Boolean);
+227 |   } catch { /* ignore — commit may not exist yet */ }
+228 | 
+229 |   const summary = {
+230 |     success: params.success,
+231 |     iteration: params.iteration,
+232 |     turns: params.turns,
+233 |     durationMs: Date.now() - params.startTime.getTime(),
+234 |     filesChanged,
+235 |     exitCode: params.exitCode,
+236 |   };
+237 | 
+238 |   process.stdout.write(JSON.stringify(summary) + "\n");
+239 | }
+240 | 
+241 | /**
+242 |  * Log cache and timing stats, capture quality/benchmarks, record metrics,
+243 |  * commit the iteration, and update state.
+244 |  */
+245 | export async function finalizeIteration(
+246 |   ctx: FinalizationCtx,
+247 |   doRestart: boolean
+248 | ): Promise<void> {
+[2026-04-05T11:22:42.266Z] iter=106 turn=5 INFO: Turn 5/25
+[2026-04-05T11:22:49.891Z] iter=106 turn=5 INFO: Agent: Already writing. Continuing with the remaining changes.
+[2026-04-05T11:22:49.892Z] iter=106 turn=5 INFO: write_file: src/finalization.ts (patch)
+[2026-04-05T11:22:49.894Z] iter=106 turn=5 INFO:   -> ok: Patched src/finalization.ts: -15 +27 lines
+
+Context after patch:
+300 |   // Sonnet reviews source changes before we commit. Non-blocking.
+301 |   await reviewBeforeCommit(ctx);
+302 | 
+303 |   const sha = await commitIteration(ctx.iter);
+304 |   const label = doRestart ? "Committed" : "Committed (no restart)";
+305 |   ctx.log(`${label}: ${sha.slice(0, 8)} (${ctx.tokens.in} in / ${ctx.tokens.out} out, cache: ${ctx.tokens.cacheCreate} created, ${ctx.tokens.cacheRead} read)`);
+306 | 
+307 |   ctx.state.lastSuccessfulIteration = ctx.iter;
+308 |   ctx.state.lastFailedCommit = null;
+309 |   ctx.state.lastFailureReason = null;
+310 |   ctx.state.iteration++;
+311 |   saveState(ctx.state);
+312 | 
+313 |   // --once mode: emit JSON summary to stdout BEFORE exit so callers can parse it
+314 |   if (ctx.once) {
+315 |     const exitCode = ctx.failed ? 1 : 0;
+316 |     await emitOnceSummary({
+317 |       success: !ctx.failed,
+318 |       iteration: ctx.iter,
+319 |       turns: ctx.turns,
+320 |       startTime: ctx.startTime,
+321 |       exitCode,
+322 |     });
+323 |   }
+324 | 
+325 |   if (doRestart) {
+326 |     ctx.log(`Restarting as iteration ${ctx.state.iteration}...`);
+327 |     ctx.restart();
+328 |   }
+329 | }
+330 | 
+[2026-04-05T11:22:49.895Z] iter=106 turn=6 INFO: Turn 6/25
+[2026-04-05T11:22:57.131Z] iter=106 turn=6 INFO: Agent: Now update `agent.ts`: 1) pass `once`/`failed` to `runFinalization`, 2) change `console.log` to `console.error`, 3) emit failure JSON in exception path:
+[2026-04-05T11:22:57.132Z] iter=106 turn=6 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:22:57.132Z] iter=106 turn=6 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
+
+Context after patch:
+28 | import { parseMemory, getSection, serializeMemory } from "./memory.js";
+29 | import { ToolCache } from "./tool-cache.js";
+30 | import { ToolTimingTracker } from "./tool-timing.js";
+31 | import { finalizeIteration as runFinalization, emitOnceSummary } from "./finalization.js";
+32 | import { runConversation, type IterationCtx } from "./conversation.js";
+33 | import { loadExperts, pickExpert, buildExpertPrompt, saveExpertState } from "./experts.js";
+34 | import {
+[2026-04-05T11:22:57.133Z] iter=106 turn=7 INFO: Turn 7/25
+[2026-04-05T11:23:01.949Z] iter=106 turn=7 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:23:01.950Z] iter=106 turn=7 INFO:   -> ok: Patched src/agent.ts: -9 +9 lines
+
+Context after patch:
+52 | 
+53 | let logger: Logger;
+54 | 
+55 | function log(iter: number, msg: string): void {
+56 |   if (logger) {
+57 |     logger.info(msg);
+58 |   } else {
+59 |     const line = `[${new Date().toISOString()}] iter=${iter} ${msg}\n`;
+60 |     console.error(`  ${msg}`);
+61 |     try { appendFileSync(AGENT_LOG_FILE, line, "utf-8"); } catch {}
+62 |   }
+63 | }
+64 | 
+65 | // ─── File readers ───────────────────────────────────────────
+66 | 
+[2026-04-05T11:23:01.950Z] iter=106 turn=8 INFO: Turn 8/25
+[2026-04-05T11:23:07.429Z] iter=106 turn=8 INFO: Agent: Now pass `once` and `failed` to `runFinalization`:
+[2026-04-05T11:23:07.430Z] iter=106 turn=8 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:23:07.430Z] iter=106 turn=8 INFO:   -> ok: Patched src/agent.ts: -17 +19 lines
+
+Context after patch:
+136 |   // --once mode: never restart regardless of what callers request
+137 |   const effectiveRestart = ctx.once ? false : doRestart;
+138 | 
+139 |   await runFinalization({
+140 |     iter: ctx.iter,
+141 |     state: ctx.state,
+142 |     startTime: ctx.startTime,
+143 |     turns: ctx.turns,
+144 |     toolCounts: ctx.toolCounts,
+145 |     tokens: ctx.tokens,
+146 |     cache: ctx.cache,
+147 |     timing: ctx.timing,
+148 |     rootDir: ROOT,
+149 |     agentHome: ROOT,
+150 |     metricsFile: METRICS_FILE,
+151 |     log: (msg: string) => log(ctx.iter, msg),
+152 |     logger,
+153 |     restart,
+154 |     predictedTurns: ctx.predictedTurns,
+155 |     once: ctx.once,
+156 |     failed: ctx.failed,
+157 |   }, effectiveRestart);
+158 | 
+159 |   // Task mode: delete TASK.md after successful iteration
+160 |   if (ctx.taskMode && existsSync(TASK_FILE)) {
+[2026-04-05T11:23:07.431Z] iter=106 turn=9 INFO: Turn 9/25
+[2026-04-05T11:23:17.113Z] iter=106 turn=9 INFO: think: Let me check what's done and what's left:
+
+1. ✅ Added `once?` and `failed?` to `FinalizationCtx` in finalization.ts
+2. ✅...
+[2026-04-05T11:23:17.114Z] iter=106 turn=10 INFO: Turn 10/25
+[2026-04-05T11:23:23.676Z] iter=106 turn=10 INFO: Agent: Status:
+- ✅ `emitOnceSummary()` added to finalization.ts
+- ✅ Called in `finalizeIteration()` when `once` is true  
+- ✅ `once`/`failed` added to `FinalizationCtx`, passed from `doFinalize`
+- ✅ `log()` → `console.error`
+- 🔲 Other `console.log` banner calls → `console.error`
+- 🔲 Exception path in `main()`: emit failure JSON
+
+Finishing now:
+[2026-04-05T11:23:23.677Z] iter=106 turn=10 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:23:23.678Z] iter=106 turn=10 INFO:   -> ok: Patched src/agent.ts: -4 +4 lines
+
+Context after patch:
+251 |     once: onceMode,
+252 |   };
+253 | 
+254 |   console.error(`\n${"=".repeat(60)}`);
+255 |   console.error(`  AutoAgent — Iteration ${ctx.iter}`);
+256 |   console.error(`  Expert: ${expert.name} (${expert.model})`);
+257 |   console.error(`${"=".repeat(60)}\n`);
+258 | 
+259 |   logger.info(`Starting. Expert=${expert.name} Model=${expert.model}`);
+260 |   await tagPreIteration(ctx.iter);
+[2026-04-05T11:23:23.679Z] iter=106 turn=11 INFO: Turn 11/25
+[2026-04-05T11:23:25.807Z] iter=106 turn=11 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:23:25.808Z] iter=106 turn=11 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
+
+Context after patch:
+366 |     writeFileSync(AGENT_LOG_FILE, "# AutoAgent Log\n\n", "utf-8");
+367 |   }
+368 | 
+369 |   console.error("AutoAgent starting...");
+370 | 
+371 |   const gitCheck = await executeBash("git status --porcelain", 120, undefined, true);
+372 |   if (gitCheck.exitCode !== 0) {
+[2026-04-05T11:23:25.809Z] iter=106 turn=12 INFO: Turn 12/25
+[2026-04-05T11:23:28.255Z] iter=106 turn=12 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:23:28.257Z] iter=106 turn=12 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
+
+Context after patch:
+343 |       process.exit(1);
+344 |     }
+345 |     WORK_DIR = resolved;
+346 |     console.error(`Repo mode: operating on ${WORK_DIR}`);
+347 |   }
+348 | 
+349 |   // Parse --task "description" CLI flag
+[2026-04-05T11:23:28.257Z] iter=106 turn=13 INFO: Turn 13/25
+[2026-04-05T11:23:30.496Z] iter=106 turn=13 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:23:30.498Z] iter=106 turn=13 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
+
+Context after patch:
+359 |       process.exit(1);
+360 |     }
+361 |     writeFileSync(TASK_FILE, taskDescription + "\n", "utf-8");
+362 |     console.error(`Created TASK.md with task: ${taskDescription}`);
+363 |   }
+364 | 
+365 |   if (!existsSync(AGENT_LOG_FILE)) {
+[2026-04-05T11:23:30.499Z] iter=106 turn=14 INFO: Turn 14/25
+[2026-04-05T11:23:36.119Z] iter=106 turn=14 INFO: Agent: Now add the failure JSON emit in the exception handler:
+[2026-04-05T11:23:36.120Z] iter=106 turn=14 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:23:36.122Z] iter=106 turn=14 INFO:   -> ok: Patched src/agent.ts: -10 +19 lines
+
+Context after patch:
+383 |     return;
+384 |   }
+385 | 
+386 |   const iterStartTime = new Date();
+387 |   try {
+388 |     await runIteration(state, WORK_DIR, onceMode);
+389 |   } catch (err) {
+390 |     if (onceMode) {
+391 |       const reason = err instanceof Error ? err.message : String(err);
+392 |       console.error("--once iteration failed:", reason);
+393 |       // Emit failure JSON to stdout so callers can parse it
+394 |       await emitOnceSummary({
+395 |         success: false,
+396 |         iteration: state.iteration,
+397 |         turns: 0,
+398 |         startTime: iterStartTime,
+399 |         exitCode: 1,
+400 |       });
+401 |       process.exit(1);
+402 |     }
+403 |     await handleIterationFailure(state, err, resusConfig);
+404 |   }
+405 | }
+406 | 
+407 | main().catch(async (err) => {
+[2026-04-05T11:23:36.122Z] iter=106 turn=15 INFO: Turn 15/25
+[2026-04-05T11:23:38.110Z] iter=106 turn=15 INFO: Agent: Now run `tsc` and the self-tests:
+[2026-04-05T11:23:38.112Z] iter=106 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T11:23:38.849Z] iter=106 turn=15 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:23:38.850Z] iter=106 turn=16 INFO: Turn 16/25
+[2026-04-05T11:23:42.150Z] iter=106 turn=16 INFO: Agent: tsc passes. Run self-tests, then wrap up.
+[2026-04-05T11:23:42.151Z] iter=106 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -5
+[2026-04-05T11:23:46.054Z] iter=106 turn=16 INFO:   -> exit=0 (100 chars)
+[2026-04-05T11:23:46.054Z] iter=106 turn=17 INFO: Turn 17/25
+[2026-04-05T11:23:55.103Z] iter=106 turn=17 INFO: Agent: All good. Now write goals and memory, then commit.
+[2026-04-05T11:23:55.104Z] iter=106 turn=17 INFO: write_file: goals.md (write)
+[2026-04-05T11:23:55.105Z] iter=106 turn=17 INFO:   -> ok: Updated goals.md (1040 chars, -23 lines delta)
+[2026-04-05T11:23:55.105Z] iter=106 turn=18 INFO: Turn 18/25
+[2026-04-05T11:24:00.815Z] iter=106 turn=18 INFO: write_file: memory.md (patch)
+[2026-04-05T11:24:00.817Z] iter=106 turn=18 INFO:   -> ok: Patched memory.md: -2 +3 lines
+
+Context after patch:
+105 | 
+106 | **Key risk:** Log output currently going to stdout would pollute the JSON. Engineer must verify `ctx.log()` goes to stderr/file, not stdout.
+107 | 
+108 | ## [Engineer] Iter 106: Structured JSON output for `--once` — DONE
+109 | 
+110 | Added `emitOnceSummary()` to `src/finalization.ts`. Called after `commitIteration()` when `ctx.once` is true. Emits `{ success, iteration, turns, durationMs, filesChanged, exitCode }` to stdout. All `console.log` in `src/agent.ts` → `console.error` so stdout is clean JSON. Exception path in `main()` also emits failure JSON. tsc clean, 642 tests pass.
+111 | 
+112 | ---
+113 | 
+[2026-04-05T11:24:00.817Z] iter=106 turn=19 INFO: Turn 19/25
+[2026-04-05T11:24:02.143Z] iter=106 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status --short
