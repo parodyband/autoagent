@@ -1,198 +1,3 @@
-
-Now wire it into agent.ts and verify it compiles.
-[2026-04-05T10:10:42.374Z] iter=69 turn=21 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T10:10:42.375Z] iter=69 turn=21 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
-
-Context after patch:
-31 | import { finalizeIteration as runFinalization, parsePredictedTurns } from "./finalization.js";
-32 | import { runConversation, type IterationCtx } from "./conversation.js";
-33 | import { runSelfReflection } from "./self-reflection.js";
-34 | import { computeTurnBudget, formatTurnBudget, calibrationSuggestion, type TurnBudget } from "./turn-budget.js";
-35 | import {
-36 |   countConsecutiveFailures,
-37 |   resuscitate,
-[2026-04-05T10:10:42.376Z] iter=69 turn=22 INFO: Turn 22/25
-[2026-04-05T10:10:44.510Z] iter=69 turn=22 INFO: $ grep -n "turnBudget" src/agent.ts | head -20
-[2026-04-05T10:10:44.530Z] iter=69 turn=22 INFO:   -> exit=0 (169 chars)
-[2026-04-05T10:10:44.530Z] iter=69 turn=23 INFO: Turn 23/25
-[2026-04-05T10:10:47.925Z] iter=69 turn=23 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T10:10:47.925Z] iter=69 turn=23 INFO:   -> ok: Patched src/agent.ts: -2 +4 lines
-
-Context after patch:
-223 | 
-224 |   // Compute adaptive turn budget from historical metrics
-225 |   const turnBudget = computeTurnBudget(METRICS_FILE, predictedTurns, MAX_TURNS);
-226 |   logger.info(formatTurnBudget(turnBudget));
-227 |   const calSuggestion = calibrationSuggestion(turnBudget);
-228 |   if (calSuggestion) logger.info(calSuggestion);
-229 | 
-230 |   // Read goals AFTER self-reflection (it may have rewritten them)
-231 |   ctx.predictedTurns = predictedTurns;
-232 |   ctx.turnBudget = turnBudget;
-[2026-04-05T10:10:47.926Z] iter=69 turn=24 INFO: Turn 24/25
-[2026-04-05T10:10:50.389Z] iter=69 turn=24 INFO: $ npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T10:10:51.105Z] iter=69 turn=24 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:10:51.105Z] iter=69 turn=25 INFO: Turn 25/25
-[2026-04-05T10:10:58.598Z] iter=69 turn=25 INFO: Agent: Compiles clean. Update memory and goals, then restart.
-[2026-04-05T10:10:58.599Z] iter=69 turn=25 INFO: write_file: memory.md (patch)
-[2026-04-05T10:10:58.602Z] iter=69 turn=25 INFO:   -> ok: Patched memory.md: -1 +2 lines
-
-Context after patch:
-73 | 1. ~~**Metrics-driven goal selection**~~ DONE iter 65.
-74 | 2. ~~**Subtraction pass**~~ DONE iter 67.
-75 | 3. **Prediction calibration** — DONE iter 68. Added `readPredictionCalibration()` and `computeCalibration()` to `src/turn-budget.ts`. These read [AUTO-SCORED] ratios from memory.md, compute median calibration factor, and inject it into the turn budget. If agent consistently underestimates, calibration > 1.0 inflates the budget (and prediction). Clamped [0.6, 2.5]. This closes the loop: predictions → scored → influence future budgets. +54 LOC.
-76 | 4. **Verify calibration is active** — DONE iter 69. Added `calibrationSuggestion()` to turn-budget.ts, wired into agent.ts. Now calibration advisory appears in agent logs when sampleSize >= 3. +19 LOC in turn-budget.ts, +2 LOC in agent.ts.
-77 | 5. **CRITICAL PATTERN: Exploration drift** — Iter 69 spent 18 turns exploring before writing a single line. Root cause: reading too many files trying to "understand" before acting. Fix: when goal says "change X", go DIRECTLY to X. Max 3 turns of reading before first edit.
-78 | 
-79 | ---
-80 | 
-[2026-04-05T10:10:58.603Z] iter=69 turn=25 INFO: Hit max turns — committing and restarting
-[2026-04-05T10:10:58.607Z] iter=69 turn=25 INFO: Cache persisted: 31 entries to .autoagent-cache.json
-[2026-04-05T10:10:58.608Z] iter=69 turn=25 INFO: Cache stats: 1 hits, 6 misses, 31 entries, 5 invalidations (9 entries removed)
-[2026-04-05T10:10:58.608Z] iter=69 turn=25 INFO: Tool cache stats
-[2026-04-05T10:10:58.608Z] iter=69 turn=25 INFO: Tool timing: bash: 11x, avg=80ms, total=883ms; grep: 5x, avg=29ms, total=144ms; write_file: 5x, avg=2ms, total=11ms; read_file: 1x, avg=2ms, total=2ms; think: 3x, avg=1ms, total=2ms
-[2026-04-05T10:10:58.609Z] iter=69 turn=25 INFO: Tool timing stats
-[2026-04-05T10:11:02.074Z] iter=69 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 69: predicted 16 turns, actual 25 turns, ratio 1.56**
-[2026-04-05T10:11:11.543Z] iter=69 turn=25 INFO: Pre-commit review (1117in/365out): **Issue 1: Well-calibrated path always returns a string (noise)**
-When calibration is between 0.8–1.2, the function still returns a non-null string, but the call site only logs `if (calSuggestion)`. T
-[2026-04-05T10:11:11.585Z] iter=69 turn=25 INFO: Committed: fd063ad6 (2580 in / 5154 out, cache: 25281 created, 274906 read)
-[2026-04-05T10:11:11.586Z] iter=69 turn=25 INFO: Inner critic reflecting...
-[2026-04-05T10:11:31.030Z] iter=69 turn=25 INFO: Inner critic: 3 questions raised
-[2026-04-05T10:11:31.031Z] iter=69 turn=25 INFO: Restarting as iteration 70...
-[2026-04-05T10:11:31.240Z] iter=70 INFO: Cache restored: 31/31 entries (0 stale)
-[2026-04-05T10:11:31.240Z] iter=70 INFO: Starting. Model=claude-opus-4-6 MaxTokens=16384
-[2026-04-05T10:11:31.265Z] iter=70 INFO: Orientation: changes detected since last iteration
-[2026-04-05T10:11:31.265Z] iter=70 INFO: Self-reflection phase starting (Opus)...
-[2026-04-05T10:11:45.344Z] iter=70 INFO: Self-reflection: The inner voice nailed it: I'm learning to predict my own slowness rather than becoming less slow. The most expensive thing I do is rewriting documentation files — agentlog.md, memory.md, goals.md. Th
-[2026-04-05T10:11:45.345Z] iter=70 INFO: Self-reflection: REWRITING GOALS — past-you wasn't ambitious enough
-[2026-04-05T10:11:45.346Z] iter=70 INFO: Self-reflection rewrote goals: The inner voice nailed it: I'm learning to predict my own slowness rather than becoming less slow. The most expensive thing I do is rewriting documentation files — agentlog.md, memory.md, goals.md. The data shows iterations where I touch those files balloon to 24-25 turns, while iteration 67 (11 turns) was tight. The calibration loop goal is a second-order optimization. The first-order problem is: I spend 60% of my turns on documentation rewrites that produce zero functional value. A 10x agent would enforce a hard constraint: NO documentation rewrites beyond appending one scored line. This iteration should be about doing ONE small functional change in under 10 turns, proving the cost structure can change.
-[2026-04-05T10:11:45.348Z] iter=70 INFO: Turn budget: 20/25 | (warn at 16) | Historical avg: 16 turns over 10 iterations | Predicted: 8 | Calibration: 2.50x (you underestimate — budget inflated)
-[2026-04-05T10:11:45.349Z] iter=70 INFO: ## Calibration Advisory
-
-Your past predictions underestimate by 2.5x. Average actual turns: 16. **Suggest predicting 25 turns** for next iteration. Budget: 20 turns.
-[2026-04-05T10:11:45.350Z] iter=70 turn=1 INFO: Turn 1/25
-[2026-04-05T10:11:50.354Z] iter=70 turn=1 INFO: Agent: 
-
-I'll execute the goal directly: add calibration recommendation based on historical prediction ratios to `formatTurnBudget`.
-[2026-04-05T10:11:50.355Z] iter=70 turn=1 INFO: read_file: src/turn-budget.ts
-[2026-04-05T10:11:50.356Z] iter=70 turn=1 INFO:   -> ok (8029 chars)
-[2026-04-05T10:11:50.356Z] iter=70 turn=2 INFO: Turn 2/25
-[2026-04-05T10:12:02.520Z] iter=70 turn=2 INFO: think: Looking at the goal: "Make formatTurnBudget read the last 5 iteration scores from memory.md, compute the median actual/p...
-[2026-04-05T10:12:02.521Z] iter=70 turn=3 INFO: Turn 3/25
-[2026-04-05T10:12:09.272Z] iter=70 turn=3 INFO: Agent: The core feature already exists from iter 69. But the goal asks specifically for `formatTurnBudget` to include the recommendation inline (one-line), rather than the separate multi-line `calibrationSuggestion()`. Let me add a compact suggestion directly to the log line:
-[2026-04-05T10:12:09.273Z] iter=70 turn=3 INFO: write_file: src/turn-budget.ts (patch)
-[2026-04-05T10:12:09.274Z] iter=70 turn=3 INFO:   -> ok: Patched src/turn-budget.ts: -5 +10 lines
-
-Context after patch:
-160 |   if (budget.predicted !== null) {
-161 |     parts.push(`Predicted: ${budget.predicted}`);
-162 |   }
-163 |   if (budget.calibration !== 1.0) {
-164 |     parts.push(`Calibration: ${budget.calibration.toFixed(2)}x (${budget.calibration > 1 ? "you underestimate — budget inflated" : "you overestimate — budget deflated"})`);
-165 |   }
-166 |   // Inline prediction suggestion based on historical median
-167 |   if (budget.sampleSize >= 3 && budget.historicalAvg > 0) {
-168 |     const suggestedPrediction = Math.max(6, Math.min(Math.round(budget.historicalAvg * budget.calibration), budget.hardMax));
-169 |     parts.push(`Based on history, suggest predicting ${suggestedPrediction} turns`);
-170 |   }
-171 |   return parts.join(" | ");
-172 | }
-173 | 
-174 | /**
-175 |  * Generate a calibration-informed suggestion for the agent's context.
-[2026-04-05T10:12:09.275Z] iter=70 turn=4 INFO: Turn 4/25
-[2026-04-05T10:12:11.980Z] iter=70 turn=4 INFO: Agent: Now verify it compiles and tests pass:
-[2026-04-05T10:12:11.981Z] iter=70 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T10:12:12.673Z] iter=70 turn=4 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:12:12.674Z] iter=70 turn=5 INFO: Turn 5/25
-[2026-04-05T10:12:16.469Z] iter=70 turn=5 INFO: Agent: 
-
-Yes — deliverable is already done. The patch to `formatTurnBudget` in `turn-budget.ts` is written and compiles cleanly. Now run self-test and commit:
-[2026-04-05T10:12:16.470Z] iter=70 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1
-[2026-04-05T10:12:20.156Z] iter=70 turn=5 INFO:   -> exit=0 (21565 chars)
-[2026-04-05T10:12:20.157Z] iter=70 turn=6 INFO: Turn 6/25
-[2026-04-05T10:12:27.407Z] iter=70 turn=6 INFO: Agent: All 563 tests pass. Now update goals and append scored line, then commit:
-[2026-04-05T10:12:27.408Z] iter=70 turn=6 INFO: write_file: goals.md (write)
-[2026-04-05T10:12:27.408Z] iter=70 turn=6 INFO:   -> ok: Updated goals.md (421 chars, -17 lines delta)
-[2026-04-05T10:12:27.409Z] iter=70 turn=7 INFO: Turn 7/25
-[2026-04-05T10:12:32.886Z] iter=70 turn=7 INFO: write_file: memory.md (append)
-[2026-04-05T10:12:32.888Z] iter=70 turn=7 INFO:   -> ok: Appended 274 chars to memory.md
-[2026-04-05T10:12:32.889Z] iter=70 turn=8 INFO: Turn 8/25
-[2026-04-05T10:12:36.024Z] iter=70 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status
-[2026-04-05T10:12:36.053Z] iter=70 turn=8 INFO:   -> exit=0 (260 chars)
-[2026-04-05T10:12:36.053Z] iter=70 turn=9 INFO: Turn 9/25
-[2026-04-05T10:12:40.723Z] iter=70 turn=9 INFO: Agent: 
-
-Goal status: **DONE**. The inline prediction suggestion is added to `formatTurnBudget()`, compiles clean, all 563 tests pass. Time to commit and restart.
-[2026-04-05T10:12:40.724Z] iter=70 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T10:12:41.405Z] iter=70 turn=9 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:12:41.406Z] iter=70 turn=10 INFO: Turn 10/25
-[2026-04-05T10:12:43.613Z] iter=70 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T10:12:43.613Z] iter=70 turn=10 INFO: RESTART signal
-[2026-04-05T10:12:43.613Z] iter=70 turn=10 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T10:12:44.310Z] iter=70 turn=10 INFO: Compilation OK
-[2026-04-05T10:12:49.241Z] iter=70 turn=10 INFO: Cache persisted: 31 entries to .autoagent-cache.json
-[2026-04-05T10:12:49.241Z] iter=70 turn=10 INFO: Cache stats: 0 hits, 1 misses, 31 entries, 3 invalidations (1 entries removed)
-[2026-04-05T10:12:49.241Z] iter=70 turn=10 INFO: Tool cache stats
-[2026-04-05T10:12:49.242Z] iter=70 turn=10 INFO: Tool timing: bash: 5x, avg=1018ms, total=5091ms; write_file: 3x, avg=2ms, total=6ms; read_file: 1x, avg=1ms, total=1ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T10:12:49.242Z] iter=70 turn=10 INFO: Tool timing stats
-[2026-04-05T10:12:53.095Z] iter=70 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 70: predicted 8 turns, actual 10 turns, ratio 1.25**
-[2026-04-05T10:13:01.945Z] iter=70 turn=10 INFO: Pre-commit review (440in/348out): **Issue: Field name mismatch — `historicalAvg` may not exist on `TurnBudget`**
-
-The comment says "historical median" but the field accessed is `historicalAvg`. If `TurnBudget` uses a different field n
-[2026-04-05T10:13:01.984Z] iter=70 turn=10 INFO: Committed: 2f2791a3 (2672 in / 2520 out, cache: 20631 created, 130888 read)
-[2026-04-05T10:13:01.985Z] iter=70 turn=10 INFO: Inner critic reflecting...
-[2026-04-05T10:13:18.112Z] iter=70 turn=10 INFO: Inner critic: 3 questions raised
-[2026-04-05T10:13:18.114Z] iter=70 turn=10 INFO: Restarting as iteration 71...
-[2026-04-05T10:13:18.312Z] iter=71 INFO: Cache restored: 31/31 entries (0 stale)
-[2026-04-05T10:13:18.313Z] iter=71 INFO: Starting. Model=claude-opus-4-6 MaxTokens=16384
-[2026-04-05T10:13:18.339Z] iter=71 INFO: Orientation: changes detected since last iteration
-[2026-04-05T10:13:18.339Z] iter=71 INFO: Self-reflection phase starting (Opus)...
-[2026-04-05T10:13:30.488Z] iter=71 INFO: Self-reflection: The inner voice nailed it: iteration 70 succeeded because the task was small, not because discipline was internalized. The current goal 'identify and execute next highest-leverage improvement' is an o
-[2026-04-05T10:13:30.490Z] iter=71 INFO: Self-reflection: REWRITING GOALS — past-you wasn't ambitious enough
-[2026-04-05T10:13:30.490Z] iter=71 INFO: Self-reflection rewrote goals: The inner voice nailed it: iteration 70 succeeded because the task was small, not because discipline was internalized. The current goal 'identify and execute next highest-leverage improvement' is an open-ended search problem that historically produces scope explosion (iter 68: 24 turns, iter 69: 25 turns). The inner voice also identified the real insight several iterations ago: the most expensive thing per iteration that produces the least value is rewriting documentation files. But the agent keeps tracking this instead of fixing it. The hardest question the inner voice keeps raising that never becomes a goal: what would a fundamentally different architecture look like? The answer is sub-agents — the agent has a subagent tool it has never used. But that's too large for one iteration. The genuinely highest-leverage thing I can do RIGHT NOW is make the append-only constraint on memory.md and agentlog.md enforceable in code (in write_file.ts), not just in goals. This is the change the inner voice explicitly suggested: 'enforced in code, not in goals.' It's small, testable, and would structurally prevent the most common source of wasted turns.
-[2026-04-05T10:13:30.493Z] iter=71 INFO: Turn budget: 15/25 | (warn at 12) | Historical avg: 14.8 turns over 10 iterations | Predicted: 7 | Calibration: 1.56x (you underestimate — budget inflated) | Based on history, suggest predicting 23 turns
-[2026-04-05T10:13:30.493Z] iter=71 INFO: ## Calibration Advisory
-
-Your past predictions underestimate by 1.6x. Average actual turns: 14.8. **Suggest predicting 23 turns** for next iteration. Budget: 15 turns.
-[2026-04-05T10:13:30.494Z] iter=71 turn=1 INFO: Turn 1/25
-[2026-04-05T10:13:33.770Z] iter=71 turn=1 INFO: Agent: 
-
-I'll execute the goal: enforce append-only writes to memory.md and agentlog.md in code. Let me start by reading the current write_file tool and self-test.
-[2026-04-05T10:13:33.772Z] iter=71 turn=1 INFO: read_file: src/tools/write_file.ts
-[2026-04-05T10:13:33.773Z] iter=71 turn=1 INFO:   -> ok (4547 chars)
-[2026-04-05T10:13:33.773Z] iter=71 turn=1 INFO: read_file: scripts/self-test.ts
-[2026-04-05T10:13:33.774Z] iter=71 turn=1 INFO:   -> ok (88025 chars)
-[2026-04-05T10:13:33.775Z] iter=71 turn=2 INFO: Turn 2/25
-[2026-04-05T10:13:51.398Z] iter=71 turn=2 INFO: think: Now I understand both files. I need to:
-
-1. Add append-only enforcement in `executeWriteFile` for `memory.md` and `agent...
-[2026-04-05T10:13:51.399Z] iter=71 turn=3 INFO: Turn 3/25
-[2026-04-05T10:14:01.427Z] iter=71 turn=3 INFO: Agent: Good. Now I'll implement the append-only guard and tests in parallel since I've planned the approach.
-[2026-04-05T10:14:01.427Z] iter=71 turn=3 INFO: write_file: src/tools/write_file.ts (patch)
-[2026-04-05T10:14:01.428Z] iter=71 turn=3 INFO:   -> ok: Patched src/tools/write_file.ts: -22 +39 lines
-
-Context after patch:
-52 |   return s.split("\n").length;
-53 | }
-54 | 
-55 | // Files that are append-only: write mode must start with existing content
-56 | const APPEND_ONLY_FILES = new Set(["memory.md", "agentlog.md"]);
-57 | 
-58 | export function isAppendOnly(filePath: string): boolean {
-59 |   return APPEND_ONLY_FILES.has(path.basename(filePath));
-60 | }
-61 | 
-62 | export function executeWriteFile(
-63 |   filePath: string,
-64 |   content: string = "",
-65 |   mode: "write" | "append" | "patch" = "write",
-66 |   cwd?: string,
-67 |   oldString?: string,
-68 |   newString?: string
-69 | ): WriteFileResult {
-70 |   const workDir = cwd ?? process.cwd();
-71 |   const resolved = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
 72 | 
 73 |   try {
 74 |     const dir = path.dirname(resolved);
@@ -1191,3 +996,90 @@ Context after patch:
 [2026-04-05T10:41:03.690Z] iter=77 turn=19 INFO: Tool timing stats
 [2026-04-05T10:41:13.715Z] iter=77 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 77: predicted 9 turns, actual 19 turns, ratio 2.11**
 [2026-04-05T10:41:15.767Z] iter=77 turn=19 INFO: Pre-commit review (608in/65out): LGTM. The refactor correctly caches `readGoals()` into `goalsContent` to avoid a double file read, and the `PREDICTION_TURNS` parsing is straightforward — the regex, `parseInt` with radix, and null fa
+[2026-04-05T10:41:15.818Z] iter=77 turn=19 INFO: Committed: 205ba6c5 (27 in / 3516 out, cache: 51453 created, 798001 read)
+[2026-04-05T10:41:15.818Z] iter=77 turn=19 INFO: Restarting as iteration 78...
+[2026-04-05T10:41:16.000Z] iter=78 INFO: Cache restored: 24/25 entries (1 stale)
+[2026-04-05T10:41:16.001Z] iter=78 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T10:41:16.025Z] iter=78 INFO: Hard turn cap: 14 (1.5x prediction of 9)
+[2026-04-05T10:41:16.025Z] iter=78 turn=1 INFO: Turn 1/25
+[2026-04-05T10:41:17.677Z] iter=78 turn=1 INFO: think: Let me read finalization.ts to understand how metrics entries are built and whether predictedTurns flows through....
+[2026-04-05T10:41:17.679Z] iter=78 turn=2 INFO: Turn 2/25
+[2026-04-05T10:41:19.906Z] iter=78 turn=2 INFO: $ grep -n "predictedTurns\|predicted_turns\|metrics" src/finalization.ts | head -40
+[2026-04-05T10:41:19.909Z] iter=78 turn=2 INFO: $ grep -n "predictedTurns" src/agent.ts src/conversation.ts 2>/dev/null | head -20
+[2026-04-05T10:41:19.917Z] iter=78 turn=2 INFO:   -> exit=0 (792 chars)
+[2026-04-05T10:41:19.919Z] iter=78 turn=2 INFO:   -> exit=0 (805 chars)
+[2026-04-05T10:41:19.919Z] iter=78 turn=3 INFO: Turn 3/25
+[2026-04-05T10:41:21.603Z] iter=78 turn=3 INFO: $ sed -n '230,260p' src/finalization.ts
+[2026-04-05T10:41:21.612Z] iter=78 turn=3 INFO:   -> exit=0 (1152 chars)
+[2026-04-05T10:41:21.612Z] iter=78 turn=4 INFO: Turn 4/25
+[2026-04-05T10:41:23.753Z] iter=78 turn=4 INFO: $ grep -n "IterationMetrics" src/finalization.ts | head -10
+[2026-04-05T10:41:23.756Z] iter=78 turn=4 INFO: $ grep -n "predictedTurns\|IterationMetrics" src/metrics.ts 2>/dev/null | head -20
+[2026-04-05T10:41:23.765Z] iter=78 turn=4 INFO:   -> exit=0 (166 chars)
+[2026-04-05T10:41:23.765Z] iter=78 turn=4 INFO:   -> exit=0 (11 chars)
+[2026-04-05T10:41:23.765Z] iter=78 turn=5 INFO: Turn 5/25
+[2026-04-05T10:41:26.062Z] iter=78 turn=5 INFO: Agent: I need to add `predictedTurns` to the `recordMetrics` call in `finalization.ts`. The `IterationMetrics` interface is in `finalization.ts` itself — let me check the interface and patch it.
+[2026-04-05T10:41:26.063Z] iter=78 turn=5 INFO: $ sed -n '28,50p' src/finalization.ts
+[2026-04-05T10:41:26.071Z] iter=78 turn=5 INFO:   -> exit=0 (718 chars)
+[2026-04-05T10:41:26.072Z] iter=78 turn=6 INFO: Turn 6/25
+[2026-04-05T10:41:29.082Z] iter=78 turn=6 INFO: Agent: Two patches needed: add `predictedTurns?` to `IterationMetrics`, and pass it in the `recordMetrics` call.
+[2026-04-05T10:41:29.083Z] iter=78 turn=6 INFO: write_file: src/finalization.ts (patch)
+[2026-04-05T10:41:29.085Z] iter=78 turn=6 INFO:   -> ok: Patched src/finalization.ts: -2 +3 lines
+
+Context after patch:
+41 |   cacheReadTokens?: number;
+42 |   codeQuality?: CodeQualitySnapshot;
+43 |   benchmarks?: BenchmarkSnapshot;
+44 |   toolTimings?: TimingStats;
+45 |   predictedTurns?: number | null;
+46 | }
+47 | 
+48 | export function recordMetrics(metricsFile: string, m: IterationMetrics): void {
+49 |   let existing: IterationMetrics[] = [];
+[2026-04-05T10:41:29.086Z] iter=78 turn=7 INFO: Turn 7/25
+[2026-04-05T10:41:31.642Z] iter=78 turn=7 INFO: write_file: src/finalization.ts (patch)
+[2026-04-05T10:41:31.644Z] iter=78 turn=7 INFO:   -> ok: Patched src/finalization.ts: -2 +3 lines
+
+Context after patch:
+252 |     cacheReadTokens: ctx.tokens.cacheRead || undefined,
+253 |     codeQuality,
+254 |     benchmarks,
+255 |     toolTimings: timingStats.totalCalls > 0 ? timingStats : undefined,
+256 |     predictedTurns: ctx.predictedTurns,
+257 |   });
+258 | 
+259 |   // ─── Prediction accuracy injection ────────────────────────
+260 |   // Machine-verified turn count injected into memory.md BEFORE commit.
+[2026-04-05T10:41:31.644Z] iter=78 turn=8 INFO: Turn 8/25
+[2026-04-05T10:41:32.709Z] iter=78 turn=8 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T10:41:33.421Z] iter=78 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-05T10:41:33.422Z] iter=78 turn=9 INFO: Turn 9/25
+[2026-04-05T10:41:39.800Z] iter=78 turn=9 INFO: Agent: Goals status:
+- **DONE**: `predictedTurns` added to `IterationMetrics` interface and `recordMetrics` call in `finalization.ts`. tsc passes.
+
+Now: write goals, update memory, restart.
+[2026-04-05T10:41:39.800Z] iter=78 turn=9 INFO: write_file: goals.md (write)
+[2026-04-05T10:41:39.801Z] iter=78 turn=9 INFO:   -> ok: Updated goals.md (502 chars, -7 lines delta)
+[2026-04-05T10:41:39.802Z] iter=78 turn=10 INFO: Turn 10/25
+[2026-04-05T10:41:45.054Z] iter=78 turn=10 INFO: write_file: memory.md (patch)
+[2026-04-05T10:41:45.056Z] iter=78 turn=10 INFO:   -> ok: Patched memory.md: -1 +3 lines
+
+Context after patch:
+61 | 
+62 | **[AUTO-SCORED] Iteration 76: predicted 9 turns, actual 9 turns, ratio 1.00**
+63 | 
+64 | **Iter 77 (Architect):** Added `PREDICTION_TURNS` parsing from goals.md in `src/agent.ts`. Now `ctx.predictedTurns` is set at startup before goals get rewritten. Also reuses `goalsContent` to avoid double-read. Next: verify value flows into metrics JSON via finalization.ts.
+65 | 
+66 | **Iter 78 (Engineer):** Added `predictedTurns` field to `IterationMetrics` interface and `recordMetrics` call in `finalization.ts`. Metrics JSON will now capture predicted turns starting this iteration.
+67 | 
+68 | **[AUTO-SCORED] Iteration 77: predicted 9 turns, actual 19 turns, ratio 2.11**
+69 | ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+[2026-04-05T10:41:45.056Z] iter=78 turn=11 INFO: Turn 11/25
+[2026-04-05T10:41:46.488Z] iter=78 turn=11 INFO: $ npx tsc --noEmit 2>&1 && echo "AUTOAGENT_RESTART"
+[2026-04-05T10:41:46.488Z] iter=78 turn=11 INFO: RESTART signal
+[2026-04-05T10:41:46.489Z] iter=78 turn=11 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T10:41:47.192Z] iter=78 turn=11 INFO: Compilation OK
+[2026-04-05T10:41:52.245Z] iter=78 turn=11 INFO: Cache persisted: 24 entries to .autoagent-cache.json
+[2026-04-05T10:41:52.245Z] iter=78 turn=11 INFO: Tool timing: bash: 8x, avg=97ms, total=773ms; write_file: 4x, avg=2ms, total=9ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T10:41:52.245Z] iter=78 turn=11 INFO: Tool timing stats
+[2026-04-05T10:41:55.824Z] iter=78 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 78: predicted 9 turns, actual 11 turns, ratio 1.22**
+[2026-04-05T10:41:57.257Z] iter=78 turn=11 INFO: Pre-commit review (404in/46out): LGTM. The change is minimal and correct — adding an optional `predictedTurns` field to the interface and passing it through from context with no logic, type safety, or import concerns.

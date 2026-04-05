@@ -42,6 +42,7 @@ export interface IterationMetrics {
   codeQuality?: CodeQualitySnapshot;
   benchmarks?: BenchmarkSnapshot;
   toolTimings?: TimingStats;
+  predictedTurns?: number | null;
 }
 
 export function recordMetrics(metricsFile: string, m: IterationMetrics): void {
@@ -252,6 +253,7 @@ export async function finalizeIteration(
     codeQuality,
     benchmarks,
     toolTimings: timingStats.totalCalls > 0 ? timingStats : undefined,
+    predictedTurns: ctx.predictedTurns,
   });
 
   // ─── Prediction accuracy injection ────────────────────────

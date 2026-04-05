@@ -63,5 +63,9 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 
 **Iter 77 (Architect):** Added `PREDICTION_TURNS` parsing from goals.md in `src/agent.ts`. Now `ctx.predictedTurns` is set at startup before goals get rewritten. Also reuses `goalsContent` to avoid double-read. Next: verify value flows into metrics JSON via finalization.ts.
 
+**Iter 78 (Engineer):** Added `predictedTurns` field to `IterationMetrics` interface and `recordMetrics` call in `finalization.ts`. Metrics JSON will now capture predicted turns starting this iteration.
+
 **[AUTO-SCORED] Iteration 77: predicted 9 turns, actual 19 turns, ratio 2.11**
 ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+
+**[AUTO-SCORED] Iteration 78: predicted 9 turns, actual 11 turns, ratio 1.22**

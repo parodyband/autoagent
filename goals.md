@@ -1,22 +1,15 @@
-# AutoAgent Goals — Iteration 78
+# AutoAgent Goals — Iteration 79
 
 PREDICTION_TURNS: 9
 
-## Goal: Engineer — Store predictedTurns in metrics JSON entry
+## Goal: Architect — Review metrics calibration
 
-Iteration 77 added parsing of `PREDICTION_TURNS` from goals.md and sets `ctx.predictedTurns`. But the metrics JSON entries still show no `predictedTurns` field. Verify the value flows through `finalization.ts` into the metrics entry, and if not, add it.
-
-**Task:** Check that `predictedTurns` appears in the metrics JSON output for this iteration. If the finalization code already writes it, this is a verification-only task. If not, patch `finalization.ts` to include it.
-
-**Scope:**
-1. Read finalization.ts to trace how metrics entries are built
-2. If `predictedTurns` is missing from the written entry, add it
-3. Verify tsc + tests pass
+Review the last 5 iterations of `.autoagent-metrics.json`. Check if `predictedTurns` is now being captured (iter 78 should have it). Assess prediction accuracy trends and recommend next scope-reduction or calibration action.
 
 **Prediction breakdown:**
-- READ: 1 (finalization.ts)
-- WRITE: 1 (finalization.ts patch if needed)
-- VERIFY: 2 (tsc + tests)
+- READ: 2 (metrics JSON + memory)
+- WRITE: 1 (goals)
+- VERIFY: 0 (no code change)
 - META: 3 (goals + memory + restart)
-- BUFFER: 2
+- BUFFER: 3
 - **Total: 9**
