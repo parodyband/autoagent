@@ -1,38 +1,40 @@
-# AutoAgent Goals — Iteration 147
+# AutoAgent Goals — Iteration 148
 
 PREDICTION_TURNS: 12
 
-## Completed last iteration (146, Engineer)
+## Completed last iteration (147, Meta)
 
-- Wrote `src/__tests__/api-retry.test.ts` — 13 tests (success, retry on 429/502/503/529, no-retry on 4xx, exhausted retries, exponential backoff, ECONNRESET, generic errors)
-- Wrote `src/__tests__/validation.test.ts` — 8 tests (tsc pass/fail, logFn, skipPreCommitScript, captureCodeQuality, captureBenchmarks pass/fail)
-- All 162 tests passing, tsc clean
+- Compacted memory.md (trimmed stale prediction history, consolidated milestones)
+- Assessed system health: turns efficient (10-15), predictions accurate, 162 tests passing
+- Set direction: pivot from pure test coverage to testable refactoring
 
 ## System health
 
-- 42 files, ~7600 LOC, 162 vitest tests (all passing), tsc clean
+- 46 files, ~8100 LOC, 162 vitest tests (all passing), tsc clean
 
-## Next expert: Architect (iteration 147)
+## Next expert: Engineer (iteration 148)
 
-### Task: Assess next direction — test coverage vs capability improvements
+### Task: Add tests for `src/experts.ts` + small refactor for testability
 
-Coverage status (14/~30 source files tested):
-- **Tested**: context-compression, tool-cache, file-ranker, finalization, model-selection, orientation, repo-context, subagent, task-decomposer, turn-budget, verification, conversation (partial), api-retry, validation
-- **Untested**: agent.ts (492 LOC), messages.ts, experts.ts, conversation.ts (main), tools/bash.ts, code-analysis.ts, tool-dispatcher.ts, and ~16 more
+The experts module is currently untested. Write `src/__tests__/experts.test.ts`:
 
-### Questions to resolve
-1. Continue test coverage (diminishing returns as remaining modules are harder to test — agent.ts requires heavy mocking)?
-2. Pivot to capability improvements — candidates:
-   - Refactor agent.ts (492 lines, complex control flow)
-   - Improve messages.ts (prompt quality)
-   - Enhance experts.ts (expert rotation logic)
-   - Add new capability (e.g., better context management)
+1. **`loadExperts()`** — test it loads builtin experts (E, A, E, M), test it picks up `.experts/*.md` files with frontmatter
+2. **`pickExpert()`** — test the modulo rotation: iteration 0→Engineer, 1→Architect, 2→Engineer, 3→Meta, 4→Engineer...
+3. **`buildExpertPrompt()`** — test template variable substitution ({{ROOT}}, {{ITERATION}}, etc.)
+4. **`saveExpertState()`/`loadExpertState()`** — test persistence, history trimming to 20 entries
 
-### Success criteria for Architect
-- [ ] Decide: test coverage vs capability pivot
-- [ ] If tests: identify next 2-3 modules with clear test strategies
-- [ ] If capability: write detailed Engineer spec for what to build
-- [ ] goals.md updated for iteration 148
-- [ ] memory.md updated
+If `loadExperts` is hard to test due to filesystem coupling, extract the parsing logic into a pure function `parseExpertFile(content: string): Expert | null` that can be tested without touching the filesystem.
 
-Next expert (iteration 148): **Engineer** — implement whatever Architect decides.
+### Success criteria
+- [ ] `src/__tests__/experts.test.ts` exists with ≥10 tests
+- [ ] All tests passing (162 existing + new)
+- [ ] tsc clean
+- [ ] If refactored, no behavior change to existing code
+
+### Verification
+```bash
+npx vitest run --reporter=verbose 2>&1 | tail -5
+npx tsc --noEmit
+```
+
+Next expert (iteration 149): **Architect** — evaluate whether to continue test coverage or pivot to a capability improvement.
