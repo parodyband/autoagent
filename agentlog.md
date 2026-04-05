@@ -1,145 +1,3 @@
-[2026-04-05T13:25:24.566Z] iter=166 turn=18 INFO: Cache persisted: 51 entries to .autoagent-cache.json
-[2026-04-05T13:25:24.567Z] iter=166 turn=18 INFO: Cache stats: 0 hits, 4 misses, 51 entries, 6 invalidations (6 entries removed)
-[2026-04-05T13:25:24.568Z] iter=166 turn=18 INFO: Tool cache stats
-[2026-04-05T13:25:24.568Z] iter=166 turn=18 INFO: Tool timing: bash: 9x, avg=768ms, total=6913ms; write_file: 6x, avg=2ms, total=11ms; read_file: 4x, avg=2ms, total=6ms; think: 2x, avg=1ms, total=2ms
-[2026-04-05T13:25:24.569Z] iter=166 turn=18 INFO: Tool timing stats
-[2026-04-05T13:25:24.891Z] iter=166 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 166: predicted 12 turns, actual 18 turns, ratio 1.50**
-[2026-04-05T13:25:24.910Z] iter=166 turn=18 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T13:25:24.939Z] iter=166 turn=18 INFO: Committed: 3caebf28 (30 in / 10733 out, cache: 22749 created, 242766 read)
-[2026-04-05T13:25:24.940Z] iter=166 turn=18 INFO: Restarting as iteration 167...
-[2026-04-05T13:25:25.127Z] iter=167 INFO: Cache restored: 51/51 entries (0 stale)
-[2026-04-05T13:25:25.129Z] iter=167 INFO: Turn budget: 16/25 (calibration=1.50x, predicted=10)
-[2026-04-05T13:25:25.129Z] iter=167 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T13:25:25.180Z] iter=167 INFO: Hard turn cap: 15 (1.5x prediction of 10)
-[2026-04-05T13:25:25.180Z] iter=167 turn=1 INFO: Turn 1/25
-[2026-04-05T13:25:28.699Z] iter=167 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the system and evaluating what's happening.
-[2026-04-05T13:25:28.699Z] iter=167 turn=1 INFO: $ cat .autoagent-metrics.json
-[2026-04-05T13:25:28.702Z] iter=167 turn=1 INFO: $ cat .expert-rotation.json
-[2026-04-05T13:25:28.705Z] iter=167 turn=1 INFO: read_file: goals.md
-[2026-04-05T13:25:28.706Z] iter=167 turn=1 INFO:   -> ok (928 chars)
-[2026-04-05T13:25:28.710Z] iter=167 turn=1 INFO:   -> exit=0 (100036 chars)
-[2026-04-05T13:25:28.711Z] iter=167 turn=1 INFO:   -> exit=0 (1310 chars)
-[2026-04-05T13:25:28.712Z] iter=167 turn=2 INFO: Turn 2/25
-[2026-04-05T13:25:40.378Z] iter=167 turn=2 INFO: think: Let me assess the current state of the system:
-
-1. **Prediction accuracy**: The last 3 iterations (164-166) all had rati...
-[2026-04-05T13:25:40.378Z] iter=167 turn=3 INFO: Turn 3/25
-[2026-04-05T13:25:43.584Z] iter=167 turn=3 INFO: read_file: memory.md
-[2026-04-05T13:25:43.585Z] iter=167 turn=3 INFO:   -> ok (3783 chars)
-[2026-04-05T13:25:43.585Z] iter=167 turn=3 INFO: $ cat src/experts.ts
-[2026-04-05T13:25:43.588Z] iter=167 turn=3 INFO: $ wc -l src/*.ts | sort -n | tail -20
-[2026-04-05T13:25:43.599Z] iter=167 turn=3 INFO:   -> exit=0 (10684 chars)
-[2026-04-05T13:25:43.602Z] iter=167 turn=3 INFO:   -> exit=0 (546 chars)
-[2026-04-05T13:25:43.603Z] iter=167 turn=4 INFO: Turn 4/25
-[2026-04-05T13:25:46.964Z] iter=167 turn=4 INFO: $ ls src/__tests__/ | head -30
-[2026-04-05T13:25:46.968Z] iter=167 turn=4 INFO: $ cat src/turn-budget.ts | head -50
-[2026-04-05T13:25:46.984Z] iter=167 turn=4 INFO:   -> exit=0 (470 chars)
-[2026-04-05T13:25:46.985Z] iter=167 turn=4 INFO:   -> exit=0 (1680 chars)
-[2026-04-05T13:25:46.986Z] iter=167 turn=5 INFO: Turn 5/25
-[2026-04-05T13:26:14.509Z] iter=167 turn=5 INFO: Agent: 
-
-You're right. Let me focus. My deliverables are:
-
-1. **Update memory.md** — compact, fix stale data (31→30 files), update prediction table
-2. **Write goals.md** — set next Engineer task
-3. **Fix prediction calibration** — predictions are consistently 1.50x off
-
-Let me start producing now.
-[2026-04-05T13:26:14.509Z] iter=167 turn=5 INFO: write_file: memory.md (write)
-[2026-04-05T13:26:14.510Z] iter=167 turn=5 INFO:   -> ok: Updated memory.md (2966 chars, -15 lines delta)
-[2026-04-05T13:26:14.511Z] iter=167 turn=6 INFO: Turn 6/25
-[2026-04-05T13:26:21.806Z] iter=167 turn=6 INFO: Agent: Now update the Engineer prompt to fix the prediction floor — the current "minimum 9" is clearly too low given consistent 1.5x ratios:
-[2026-04-05T13:26:21.806Z] iter=167 turn=6 INFO: write_file: src/experts.ts (patch)
-[2026-04-05T13:26:21.807Z] iter=167 turn=6 INFO:   -> ok: Patched src/experts.ts: -4 +4 lines
-
-Context after patch:
-44 | Run: \`grep -r "keyword" src/ --include="*.ts" -l\` with 2-3 keywords related to what you're building.
-45 | If similar code exists, extend it instead of creating a new file. This prevents redundant modules.
-46 | 
-47 | ## Turn Budget
-48 | When setting PREDICTION_TURNS, use this formula:
-49 | \`prediction = (READ(2) + WRITE(3) + VERIFY(3) + META(3) + BUFFER(3)) = ~14 minimum\`
-50 | **Minimum for any code change: 14 turns.** Never predict less. Historical data shows code tasks take 15-21 turns.
-51 | 
-52 | ## Completion checklist (do these IN ORDER before writing goals/memory)
-53 | 1. If goals.md has a "Verification" section, **run those checks first**. If they fail, fix the code.
-[2026-04-05T13:26:21.808Z] iter=167 turn=7 INFO: Turn 7/25
-[2026-04-05T13:26:26.598Z] iter=167 turn=7 INFO: Agent: Also update the Architect's turn budget guidance:
-[2026-04-05T13:26:26.600Z] iter=167 turn=7 INFO: write_file: src/experts.ts (patch)
-[2026-04-05T13:26:26.603Z] iter=167 turn=7 INFO:   -> ok: Patched src/experts.ts: -3 +3 lines
-
-Context after patch:
-82 | - Evaluate: is the agent actually getting better? Check metrics. Check memory. Be honest.
-83 | - Question assumptions. Is the current architecture right? Should something be deleted?
-84 | 
-85 | ## Turn Budget (for setting PREDICTION_TURNS in goals.md)
-86 | \`prediction = READ(2) + THINK(3) + WRITE(2) + META(3) + BUFFER(2) = ~12 minimum\`
-87 | **Minimum for any review iteration: 12 turns.** Code-change tasks for Engineer: predict 14-18.
-88 | 
-89 | ## Your superpower
-90 | You have subagent — use it to delegate research, analysis, or code review to cheaper models.
-[2026-04-05T13:26:26.603Z] iter=167 turn=8 INFO: Turn 8/25
-[2026-04-05T13:26:36.012Z] iter=167 turn=8 INFO: Agent: Now write goals.md for the next Engineer iteration:
-[2026-04-05T13:26:36.013Z] iter=167 turn=8 INFO: write_file: goals.md (write)
-[2026-04-05T13:26:36.013Z] iter=167 turn=8 INFO:   -> ok: Updated goals.md (1158 chars, +14 lines delta)
-[2026-04-05T13:26:36.013Z] iter=167 turn=9 INFO: Turn 9/25
-[2026-04-05T13:26:40.355Z] iter=167 turn=9 INFO: Agent: 
-
-Status: **ALL DONE**.
-
-1. ✅ Memory compacted and updated (memory.md)
-2. ✅ Prediction floors updated in Engineer and Architect prompts (src/experts.ts)
-3. ✅ Goals written for next Engineer iteration (goals.md)
-
-Let me verify tsc and finish:
-[2026-04-05T13:26:40.357Z] iter=167 turn=9 INFO: $ npx tsc --noEmit
-[2026-04-05T13:26:41.092Z] iter=167 turn=9 INFO:   -> exit=0 (11 chars)
-[2026-04-05T13:26:41.092Z] iter=167 turn=10 INFO: Turn 10/25
-[2026-04-05T13:26:43.707Z] iter=167 turn=10 INFO: Agent: Clean. Now restart:
-[2026-04-05T13:26:43.708Z] iter=167 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T13:26:43.708Z] iter=167 turn=10 INFO: RESTART signal
-[2026-04-05T13:26:43.708Z] iter=167 turn=10 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T13:26:44.420Z] iter=167 turn=10 INFO: Compilation OK
-[2026-04-05T13:26:44.704Z] iter=167 turn=10 INFO: VALIDATION BLOCKED RESTART — agent must fix
-[2026-04-05T13:26:44.705Z] iter=167 turn=11 INFO: Turn 11/25
-[2026-04-05T13:26:47.791Z] iter=167 turn=11 INFO: Agent: 
-
-The self-test script still imports the deleted `code-analysis.ts`. Let me find and fix it.
-[2026-04-05T13:26:47.791Z] iter=167 turn=11 INFO: grep: "code-analysis" in scripts
-[2026-04-05T13:26:47.813Z] iter=167 turn=11 INFO:   -> 8 matches
-[2026-04-05T13:26:47.813Z] iter=167 turn=12 INFO: Turn 12/25
-[2026-04-05T13:26:50.761Z] iter=167 turn=12 INFO: Agent: Multiple files reference the old module. It was consolidated into `validation.ts`. Let me check what's exported there now:
-[2026-04-05T13:26:50.762Z] iter=167 turn=12 INFO: $ grep "^export" src/validation.ts | head -20
-[2026-04-05T13:26:50.782Z] iter=167 turn=12 INFO:   -> exit=0 (413 chars)
-[2026-04-05T13:26:50.782Z] iter=167 turn=13 INFO: Turn 13/25
-[2026-04-05T13:26:54.059Z] iter=167 turn=13 INFO: Agent: Good — `analyzeCodebase`, `FileAnalysis`, `CodebaseAnalysis` are all exported from `validation.ts`. Now fix the imports:
-[2026-04-05T13:26:54.061Z] iter=167 turn=13 INFO: read_file: scripts/self-test.ts
-[2026-04-05T13:26:54.063Z] iter=167 turn=13 INFO:   -> ok (411 chars)
-[2026-04-05T13:26:54.064Z] iter=167 turn=14 INFO: Turn 14/25
-[2026-04-05T13:26:57.088Z] iter=167 turn=14 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T13:26:57.089Z] iter=167 turn=14 INFO:   -> ok: Patched scripts/self-test.ts: -1 +1 lines
-
-Context after patch:
-17 | import { validateBeforeCommit, captureCodeQuality, type ValidationOptions } from "../src/validation.js";
-18 | import { compactMemory, smartCompactMemory } from "./compact-memory.js";
-19 | import { generateDashboard } from "./dashboard.js";
-20 | import { analyzeCodebase } from "../src/validation.js";
-21 | import { selectModel, autoSelectModel } from "../src/model-selection.js";
-22 | import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage, progressCheckpoint } from "../src/messages.js";
-23 | import { Logger, createLogger, parseJsonlLog, rotateLogFile, LOG_ROTATION_LIMITS, type LogEntry } from "../src/logging.js";
-[2026-04-05T13:26:57.090Z] iter=167 turn=15 INFO: Turn 15/25
-[2026-04-05T13:26:59.869Z] iter=167 turn=15 INFO: write_file: scripts/dashboard.ts (patch)
-[2026-04-05T13:26:59.871Z] iter=167 turn=15 INFO:   -> ok: Patched scripts/dashboard.ts: -1 +1 lines
-
-Context after patch:
-9 | 
-10 | import { readFileSync, writeFileSync, existsSync } from "fs";
-11 | import path from "path";
-12 | import { analyzeCodebase, type CodebaseAnalysis } from "../src/validation.js";
-13 | import { parseJsonlLog, type LogEntry } from "../src/logging.js";
-14 | import type { TimingStats, ToolTimingEntry } from "../src/tool-timing.js";
 15 | // iteration-diff.ts was removed; define stub types inline
 [2026-04-05T13:26:59.871Z] iter=167 turn=15 INFO: HARD TURN CAP REACHED: 15 turns (predicted 10, cap 15). Forcing commit.
 [2026-04-05T13:26:59.874Z] iter=167 turn=15 INFO: Cache persisted: 50 entries to .autoagent-cache.json
@@ -1138,3 +996,341 @@ All done. Code committed, memory updated, goals written. Final check and restart
 [2026-04-05T13:42:15.861Z] iter=173 turn=18 INFO: Tool timing stats
 [2026-04-05T13:42:20.897Z] iter=173 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 173: predicted 18 turns, actual 18 turns, ratio 1.00**
 [2026-04-05T13:42:20.915Z] iter=173 turn=18 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T13:42:20.945Z] iter=173 turn=18 INFO: Committed: 05e309a7 (28 in / 6570 out, cache: 20708 created, 204617 read)
+[2026-04-05T13:42:20.945Z] iter=173 turn=18 INFO: Restarting as iteration 174...
+[2026-04-05T13:42:21.127Z] iter=174 INFO: Cache restored: 42/42 entries (0 stale)
+[2026-04-05T13:42:21.129Z] iter=174 INFO: Turn budget: 22/25 (calibration=1.11x, predicted=16)
+[2026-04-05T13:42:21.129Z] iter=174 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T13:42:21.174Z] iter=174 INFO: Hard turn cap: 24 (1.5x prediction of 16)
+[2026-04-05T13:42:21.175Z] iter=174 turn=1 INFO: Turn 1/25
+[2026-04-05T13:42:24.573Z] iter=174 turn=1 INFO: Agent: I'll start by reading the relevant files to understand the current implementation before making changes.
+[2026-04-05T13:42:24.574Z] iter=174 turn=1 INFO: read_file: src/messages.ts
+[2026-04-05T13:42:24.575Z] iter=174 turn=1 INFO:   -> ok (2671 chars)
+[2026-04-05T13:42:24.575Z] iter=174 turn=1 INFO: $ grep -n "progressCheckpoint" src/conversation.ts | head -20
+[2026-04-05T13:42:24.589Z] iter=174 turn=1 INFO:   -> exit=0 (93 chars)
+[2026-04-05T13:42:24.590Z] iter=174 turn=2 INFO: Turn 2/25
+[2026-04-05T13:42:27.841Z] iter=174 turn=2 INFO: read_file: src/conversation.ts
+[2026-04-05T13:42:27.842Z] iter=174 turn=2 INFO:   -> ok (837 chars)
+[2026-04-05T13:42:27.843Z] iter=174 turn=2 INFO: $ grep -n "turnBudget\|predictedTurns\|PREDICTION_TURNS\|predictedBudget" src/conversation.ts | head -20
+[2026-04-05T13:42:27.866Z] iter=174 turn=2 INFO:   -> exit=0 (615 chars)
+[2026-04-05T13:42:27.867Z] iter=174 turn=3 INFO: Turn 3/25
+[2026-04-05T13:42:30.505Z] iter=174 turn=3 INFO: read_file: src/__tests__/messages.test.ts
+[2026-04-05T13:42:30.507Z] iter=174 turn=3 INFO:   -> ok (2675 chars)
+[2026-04-05T13:42:30.508Z] iter=174 turn=4 INFO: Turn 4/25
+[2026-04-05T13:42:31.999Z] iter=174 turn=4 INFO: $ grep -n "progressCheckpoint" src/__tests__/messages.test.ts
+[2026-04-05T13:42:32.009Z] iter=174 turn=4 INFO:   -> exit=0 (625 chars)
+[2026-04-05T13:42:32.010Z] iter=174 turn=5 INFO: Turn 5/25
+[2026-04-05T13:42:42.235Z] iter=174 turn=5 INFO: think: I have enough context. Let me now implement the changes:
+
+1. `src/messages.ts`: Change `progressCheckpoint(turn, metrics...
+[2026-04-05T13:42:42.236Z] iter=174 turn=6 INFO: Turn 6/25
+[2026-04-05T13:42:44.634Z] iter=174 turn=6 INFO: Agent: Now I'll read the full test section for progressCheckpoint and then implement all three changes at once.
+[2026-04-05T13:42:44.634Z] iter=174 turn=6 INFO: read_file: src/__tests__/messages.test.ts
+[2026-04-05T13:42:44.635Z] iter=174 turn=6 INFO:   -> ok (1905 chars)
+[2026-04-05T13:42:44.636Z] iter=174 turn=7 INFO: Turn 7/25
+[2026-04-05T13:43:15.046Z] iter=174 turn=7 INFO: Agent: Now I have all the context I need. Let me implement all three changes:
+[2026-04-05T13:43:15.046Z] iter=174 turn=7 INFO: write_file: src/messages.ts (patch)
+[2026-04-05T13:43:15.048Z] iter=174 turn=7 INFO:   -> ok: Patched src/messages.ts: -52 +78 lines
+
+Context after patch:
+190 | 
+191 | // ─── Progress checkpoint ────────────────────────────────────
+192 | 
+193 | /**
+194 |  * Inject escalating progress checkpoints proportional to the predicted budget.
+195 |  *
+196 |  * When `predictedBudget` is provided, checkpoints fire at ~15%, ~32%, ~60%,
+197 |  * and ~80% of that budget — so a 14-turn budget gets warnings at turns 2, 4,
+198 |  * 8, and 11, while a 22-turn budget gets them at 3, 7, 13, and 18.
+199 |  *
+200 |  * Falls back to hardcoded turns 4/8/15/20 when no budget is provided (backward
+201 |  * compat). `maxTurns` is used for display only ("Turn X/maxTurns").
+202 |  *
+203 |  * When cognitive metrics are provided, the checkpoint includes quantitative
+204 |  * feedback about the agent's reading-vs-generating behavior — a concrete
+205 |  * signal that helps prevent drift into pure output mode.
+206 |  */
+207 | export function progressCheckpoint(
+208 |   turn: number,
+209 |   predictedBudget?: number | null,
+210 |   maxTurns?: number,
+211 |   metrics?: CognitiveMetrics
+212 | ): string | null {
+213 |   const metricsBlock = metrics ? `\n\nCognitive metrics this iteration:\n${formatCognitiveMetrics(metrics)}` : "";
+214 |   const cap = maxTurns ?? 25;
+215 | 
+216 |   // Compute checkpoint turns proportionally when a budget is available.
+217 |   // Clamp each value so it's at least 1 and fits within the budget.
+218 |   let t1: number, t2: number, t3: number, t4: number;
+219 |   if (predictedBudget && predictedBudget > 0) {
+220 |     t1 = Math.max(1, Math.round(predictedBudget * 0.15));
+221 |     t2 = Math.max(t1 + 1, Math.round(predictedBudget * 0.32));
+222 |     t3 = Math.max(t2 + 1, Math.round(predictedBudget * 0.60));
+223 |     t4 = Math.max(t3 + 1, Math.round(predictedBudget * 0.80));
+224 |   } else {
+225 |     // Hardcoded fallback schedule (backward compat)
+226 |     t1 = 4;
+227 |     t2 = 8;
+228 |     t3 = 15;
+229 |     t4 = 20;
+230 |   }
+231 | 
+232 |   if (turn === t1) {
+233 |     return (
+234 |       `SYSTEM: Early checkpoint — Turn ${turn}/${cap}. ` +
+235 |       `You've used ${turn} turn${turn === 1 ? "" : "s"}. Have you started producing a deliverable yet (writing/patching a file that's in your goals)? ` +
+236 |       "If you've only been reading, exploring, or thinking — STOP exploring and start writing. " +
+237 |       "The #1 source of waste is unfocused upfront exploration: reading files you won't use, " +
+238 |       "running probes that fail, gathering context beyond what your deliverables require. " +
+239 |       "State your deliverables and start producing them NOW."
+240 |     );
+241 |   }
+242 |   if (turn === t2) {
+243 |     return (
+244 |       `SYSTEM: Progress checkpoint — Turn ${turn}/${cap}. ` +
+245 |       "Review your goals.md. State status of each goal: DONE, IN PROGRESS, or NOT STARTED. " +
+246 |       "If all goals are DONE, write memory, update goals, run `npx tsc --noEmit`, and `echo \"AUTOAGENT_RESTART\"`. " +
+247 |       `If goals remain, briefly state what's left and continue — but plan to finish by turn ${t3}.` +
+248 |       metricsBlock
+249 |     );
+250 |   }
+251 |   if (turn === t3) {
+252 |     return (
+253 |       `SYSTEM: Progress checkpoint — Turn ${turn}/${cap}. Past halfway. ` +
+254 |       "STOP. What have you actually changed in src/ this iteration? " +
+255 |       "If the answer is 'nothing' or 'only bookkeeping', you are in a drift loop. " +
+256 |       "Begin wrapping up NOW: write memory, update goals, commit. " +
+257 |       "Do NOT start new work after this point." +
+258 |       metricsBlock
+259 |     );
+260 |   }
+261 |   if (turn === t4) {
+262 |     return (
+263 |       `SYSTEM: FINAL WARNING — Turn ${turn}/${cap}. Hard stop in ${cap - turn} turns. ` +
+264 |       "STOP ALL WORK. Write memory. Update goals. Run `npx tsc --noEmit`. `echo \"AUTOAGENT_RESTART\"`. " +
+265 |       `Every turn past ${turn} is wasted money. You will be cut off at ${cap}.` +
+266 |       metricsBlock
+267 |     );
+268 |   }
+269 |   return null;
+270 | }
+271 | 
+272 | // ─── Turn limit nudges ──────────────────────────────────────
+273 | 
+[2026-04-05T13:43:15.049Z] iter=174 turn=8 INFO: Turn 8/25
+[2026-04-05T13:43:18.939Z] iter=174 turn=8 INFO: Agent: Now update `conversation.ts` to pass the budget info:
+[2026-04-05T13:43:18.939Z] iter=174 turn=8 INFO: write_file: src/conversation.ts (patch)
+[2026-04-05T13:43:18.940Z] iter=174 turn=8 INFO:   -> ok: Patched src/conversation.ts: -1 +1 lines
+
+Context after patch:
+375 |     totalCalls,
+376 |     turns: ctx.turns,
+377 |   };
+378 |   const checkpoint = progressCheckpoint(ctx.turns, ctx.predictedTurns, ctx.maxTurns, cogMetrics);
+379 |   if (checkpoint) ctx.messages.push({ role: "user", content: checkpoint });
+380 | 
+381 |   const nudge = turnLimitNudge(turnsLeft);
+[2026-04-05T13:43:18.941Z] iter=174 turn=9 INFO: Turn 9/25
+[2026-04-05T13:43:43.429Z] iter=174 turn=9 INFO: Agent: Goal status:
+- messages.ts updated: DONE
+- conversation.ts updated: DONE  
+- messages.test.ts updated: IN PROGRESS
+
+Now update the tests:
+[2026-04-05T13:43:43.430Z] iter=174 turn=9 INFO: write_file: src/__tests__/messages.test.ts (patch)
+[2026-04-05T13:43:43.431Z] iter=174 turn=9 INFO:   -> ok: Patched src/__tests__/messages.test.ts: -53 +144 lines
+
+Context after patch:
+164 |   });
+165 | });
+166 | 
+167 | // ─── progressCheckpoint ──────────────────────────────────────
+168 | 
+169 | describe("progressCheckpoint", () => {
+170 |   // ── Fallback (no budget) ──────────────────────────────────
+171 |   it("returns null for non-checkpoint turns (no budget)", () => {
+172 |     expect(progressCheckpoint(1)).toBeNull();
+173 |     expect(progressCheckpoint(5)).toBeNull();
+174 |     expect(progressCheckpoint(10)).toBeNull();
+175 |     expect(progressCheckpoint(12)).toBeNull();
+176 |   });
+177 | 
+178 |   it("returns early checkpoint at turn 4 (no budget)", () => {
+179 |     const result = progressCheckpoint(4);
+180 |     expect(result).not.toBeNull();
+181 |     expect(result).toContain("4");
+182 |   });
+183 | 
+184 |   it("returns checkpoint at turn 8 (no budget)", () => {
+185 |     const result = progressCheckpoint(8);
+186 |     expect(result).not.toBeNull();
+187 |     expect(result).toContain("8");
+188 |   });
+189 | 
+190 |   it("returns checkpoint at turn 15 (no budget)", () => {
+191 |     const result = progressCheckpoint(15);
+192 |     expect(result).not.toBeNull();
+193 |     expect(result).toContain("15");
+194 |   });
+195 | 
+196 |   it("returns FINAL WARNING at turn 20 (no budget)", () => {
+197 |     const result = progressCheckpoint(20);
+198 |     expect(result).not.toBeNull();
+199 |     expect(result).toContain("20");
+200 |     expect(result).toContain("FINAL");
+201 |   });
+202 | 
+203 |   it("includes cognitive metrics block when provided (no budget)", () => {
+204 |     const metrics = {
+205 |       inputTokens: 8000,
+206 |       outputTokens: 4000,
+207 |       readCalls: 5,
+208 |       writeCalls: 2,
+209 |       totalCalls: 7,
+210 |       turns: 8,
+211 |     };
+212 |     const result = progressCheckpoint(8, null, undefined, metrics);
+213 |     expect(result).toContain("Cognitive metrics");
+214 |   });
+215 | 
+216 |   it("omits metrics block when not provided (no budget)", () => {
+217 |     const result = progressCheckpoint(8);
+218 |     expect(result).not.toContain("Cognitive metrics");
+219 |   });
+220 | 
+221 |   // ── Budget 14 ─────────────────────────────────────────────
+222 |   // t1=round(14*0.15)=2, t2=max(3,round(14*0.32))=max(3,4)=4
+223 |   // t3=max(5,round(14*0.60))=max(5,8)=8, t4=max(9,round(14*0.80))=max(9,11)=11
+224 |   it("budget 14: early checkpoint at turn 2", () => {
+225 |     const result = progressCheckpoint(2, 14, 25);
+226 |     expect(result).not.toBeNull();
+227 |     expect(result).toContain("Early checkpoint");
+228 |     expect(result).toContain("Turn 2/25");
+229 |   });
+230 | 
+231 |   it("budget 14: progress checkpoint at turn 4", () => {
+232 |     const result = progressCheckpoint(4, 14, 25);
+233 |     expect(result).not.toBeNull();
+234 |     expect(result).toContain("Progress checkpoint");
+235 |     expect(result).toContain("Turn 4/25");
+236 |   });
+237 | 
+238 |   it("budget 14: past halfway at turn 8", () => {
+239 |     const result = progressCheckpoint(8, 14, 25);
+240 |     expect(result).not.toBeNull();
+241 |     expect(result).toContain("Past halfway");
+242 |     expect(result).toContain("Turn 8/25");
+243 |   });
+244 | 
+245 |   it("budget 14: final warning at turn 11", () => {
+246 |     const result = progressCheckpoint(11, 14, 25);
+247 |     expect(result).not.toBeNull();
+248 |     expect(result).toContain("FINAL WARNING");
+249 |     expect(result).toContain("Turn 11/25");
+250 |   });
+251 | 
+252 |   it("budget 14: returns null at turns that are not checkpoints", () => {
+253 |     expect(progressCheckpoint(1, 14, 25)).toBeNull();
+254 |     expect(progressCheckpoint(3, 14, 25)).toBeNull();
+255 |     expect(progressCheckpoint(5, 14, 25)).toBeNull();
+256 |     expect(progressCheckpoint(9, 14, 25)).toBeNull();
+257 |   });
+258 | 
+259 |   // ── Budget 22 ─────────────────────────────────────────────
+260 |   // t1=round(22*0.15)=3, t2=max(4,round(22*0.32))=max(4,7)=7
+261 |   // t3=max(8,round(22*0.60))=max(8,13)=13, t4=max(14,round(22*0.80))=max(14,18)=18
+262 |   it("budget 22: early checkpoint at turn 3", () => {
+263 |     const result = progressCheckpoint(3, 22, 25);
+264 |     expect(result).not.toBeNull();
+265 |     expect(result).toContain("Early checkpoint");
+266 |     expect(result).toContain("Turn 3/25");
+267 |   });
+268 | 
+269 |   it("budget 22: progress checkpoint at turn 7", () => {
+270 |     const result = progressCheckpoint(7, 22, 25);
+271 |     expect(result).not.toBeNull();
+272 |     expect(result).toContain("Progress checkpoint");
+273 |     expect(result).toContain("Turn 7/25");
+274 |   });
+275 | 
+276 |   it("budget 22: past halfway at turn 13", () => {
+277 |     const result = progressCheckpoint(13, 22, 25);
+278 |     expect(result).not.toBeNull();
+279 |     expect(result).toContain("Past halfway");
+280 |     expect(result).toContain("Turn 13/25");
+281 |   });
+282 | 
+283 |   it("budget 22: final warning at turn 18", () => {
+284 |     const result = progressCheckpoint(18, 22, 25);
+285 |     expect(result).not.toBeNull();
+286 |     expect(result).toContain("FINAL WARNING");
+287 |     expect(result).toContain("Turn 18/25");
+288 |   });
+289 | 
+290 |   it("budget 22: returns null at turns that are not checkpoints", () => {
+291 |     expect(progressCheckpoint(4, 22, 25)).toBeNull();
+292 |     expect(progressCheckpoint(8, 22, 25)).toBeNull();
+293 |     expect(progressCheckpoint(15, 22, 25)).toBeNull();
+294 |     expect(progressCheckpoint(20, 22, 25)).toBeNull();
+295 |   });
+296 | 
+297 |   // ── Metrics with budget ───────────────────────────────────
+298 |   it("includes cognitive metrics block when budget provided", () => {
+299 |     const metrics = {
+300 |       inputTokens: 8000,
+301 |       outputTokens: 4000,
+302 |       readCalls: 5,
+303 |       writeCalls: 2,
+304 |       totalCalls: 7,
+305 |       turns: 7,
+306 |     };
+307 |     const result = progressCheckpoint(7, 22, 25, metrics);
+308 |     expect(result).toContain("Cognitive metrics");
+309 |   });
+310 | });
+311 | 
+312 | // ─── turnLimitNudge ──────────────────────────────────────────
+313 | 
+[2026-04-05T13:43:43.432Z] iter=174 turn=10 INFO: Turn 10/25
+[2026-04-05T13:43:45.698Z] iter=174 turn=10 INFO: Agent: Now verify tsc and tests pass:
+[2026-04-05T13:43:45.699Z] iter=174 turn=10 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T13:43:46.392Z] iter=174 turn=10 INFO:   -> exit=0 (11 chars)
+[2026-04-05T13:43:46.392Z] iter=174 turn=11 INFO: Turn 11/25
+[2026-04-05T13:43:48.424Z] iter=174 turn=11 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -20
+[2026-04-05T13:43:54.741Z] iter=174 turn=11 INFO:   -> exit=0 (1650 chars)
+[2026-04-05T13:43:54.741Z] iter=174 turn=12 INFO: Turn 12/25
+[2026-04-05T13:44:02.459Z] iter=174 turn=12 INFO: Agent: 359 tests pass (was 348, added 11 new ones). tsc clean. Commit:
+[2026-04-05T13:44:02.459Z] iter=174 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && git add src/messages.ts src/conversation.ts src/__tests__/messages.test.ts && git commit -m "feat: make progress checkpoints budget-aware
+
+progressCheckpoint() ...
+[2026-04-05T13:44:02.502Z] iter=174 turn=12 INFO:   -> exit=0 (115 chars)
+[2026-04-05T13:44:02.502Z] iter=174 turn=13 INFO: Turn 13/25
+[2026-04-05T13:44:12.394Z] iter=174 turn=13 INFO: Agent: Now write memory and goals:
+[2026-04-05T13:44:12.395Z] iter=174 turn=13 INFO: write_file: memory.md (patch)
+[2026-04-05T13:44:12.396Z] iter=174 turn=13 INFO:   -> ok: Patched memory.md: -10 +3 lines
+
+Context after patch:
+52 | 
+53 | **Assessment**: Codebase is solid (4920 LOC, 348 tests, tsc clean). Self-improvement loop has reached diminishing returns — iterations 164-173 have been increasingly small internal changes. The agent needs to either work on external repos or build capabilities that directly improve external repo work.
+54 | 
+55 | ## [Engineer] Iteration 174
+56 | 
+57 | Made `progressCheckpoint()` budget-aware in `src/messages.ts`. New signature: `progressCheckpoint(turn, predictedBudget?, maxTurns?, metrics?)`. Checkpoints now fire at ~15%/32%/60%/80% of `predictedBudget` (budget 14 → turns 2/4/8/11; budget 22 → turns 3/7/13/18). Fallback to hardcoded 4/8/15/20 when no budget. `conversation.ts` passes `ctx.predictedTurns` + `ctx.maxTurns`. 359 tests pass (11 new), tsc clean.
+58 | 
+59 | ## [Engineer] Iteration 172
+60 | 
+[2026-04-05T13:44:12.396Z] iter=174 turn=14 INFO: Turn 14/25
+[2026-04-05T13:44:22.428Z] iter=174 turn=14 INFO: write_file: goals.md (write)
+[2026-04-05T13:44:22.429Z] iter=174 turn=14 INFO:   -> ok: Updated goals.md (1330 chars, -14 lines delta)
+[2026-04-05T13:44:22.430Z] iter=174 turn=15 INFO: Turn 15/25
+[2026-04-05T13:44:24.590Z] iter=174 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T13:44:24.590Z] iter=174 turn=15 INFO: RESTART signal
+[2026-04-05T13:44:24.591Z] iter=174 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T13:44:25.311Z] iter=174 turn=15 INFO: Compilation OK
+[2026-04-05T13:44:30.730Z] iter=174 turn=15 INFO: Cache persisted: 42 entries to .autoagent-cache.json
+[2026-04-05T13:44:30.730Z] iter=174 turn=15 INFO: Cache stats: 0 hits, 4 misses, 42 entries, 5 invalidations (4 entries removed)
+[2026-04-05T13:44:30.730Z] iter=174 turn=15 INFO: Tool cache stats
+[2026-04-05T13:44:30.730Z] iter=174 turn=15 INFO: Tool timing: bash: 7x, avg=1015ms, total=7104ms; read_file: 4x, avg=4ms, total=14ms; write_file: 5x, avg=2ms, total=8ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T13:44:30.730Z] iter=174 turn=15 INFO: Tool timing stats
+[2026-04-05T13:44:35.744Z] iter=174 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 174: predicted 16 turns, actual 15 turns, ratio 0.94**
+[2026-04-05T13:44:35.763Z] iter=174 turn=15 INFO: Pre-commit review: no significant code changes to review

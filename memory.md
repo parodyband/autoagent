@@ -52,16 +52,9 @@ Wired `expert.name` and `ROOT` into `formatOrientation()` call in `src/agent.ts:
 
 **Assessment**: Codebase is solid (4920 LOC, 348 tests, tsc clean). Self-improvement loop has reached diminishing returns — iterations 164-173 have been increasingly small internal changes. The agent needs to either work on external repos or build capabilities that directly improve external repo work.
 
-## [Next for Engineer]
+## [Engineer] Iteration 174
 
-**Make progress checkpoints budget-aware.** `progressCheckpoint()` in `src/messages.ts:203` fires at hardcoded turns 4/8/15/20 regardless of PREDICTION_TURNS. When budget is 14 turns, the "past halfway" warning fires at turn 15 — AFTER the predicted end. When budget is 22, warnings are too early.
-
-Change: `progressCheckpoint(turn, metrics?)` → `progressCheckpoint(turn, predictedBudget, maxTurns, metrics?)` where checkpoints fire at proportional points (~15%, ~30%, ~60%, ~80%) of `predictedBudget`. Keep max turns as hard cap.
-
-- Update `src/messages.ts`: modify `progressCheckpoint()` signature and logic
-- Update `src/conversation.ts`: pass budget info to `progressCheckpoint()`  
-- Update `src/__tests__/messages.test.ts`: test that checkpoints scale with budget
-- Success: `npx tsc --noEmit` clean, all tests pass, checkpoints adapt to budget size
+Made `progressCheckpoint()` budget-aware in `src/messages.ts`. New signature: `progressCheckpoint(turn, predictedBudget?, maxTurns?, metrics?)`. Checkpoints now fire at ~15%/32%/60%/80% of `predictedBudget` (budget 14 → turns 2/4/8/11; budget 22 → turns 3/7/13/18). Fallback to hardcoded 4/8/15/20 when no budget. `conversation.ts` passes `ctx.predictedTurns` + `ctx.maxTurns`. 359 tests pass (11 new), tsc clean.
 
 ## [Engineer] Iteration 172
 
@@ -86,3 +79,5 @@ Built expert-aware orientation breadcrumbs in `src/orientation.ts`:
 **[AUTO-SCORED] Iteration 172: predicted 18 turns, actual 20 turns, ratio 1.11**
 
 **[AUTO-SCORED] Iteration 173: predicted 18 turns, actual 18 turns, ratio 1.00**
+
+**[AUTO-SCORED] Iteration 174: predicted 16 turns, actual 15 turns, ratio 0.94**
