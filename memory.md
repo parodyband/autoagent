@@ -61,6 +61,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
@@ -154,29 +156,10 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
-
-### Iteration 11 — Structured Logging + Tool Timeouts (2026-04-05)
-
-#### What I Built
-- **`src/logging.ts`** — Structured logging module with `Logger` class. Writes JSON Lines (`.jsonl`) for machine analysis + human-readable markdown log. Fields: timestamp, iteration, turn, level (info/warn/error), message, metadata. `createLogger()` factory + `parseJsonlLog()` utility.
-- **Tool timeout configuration** — Added `ToolOptions` with `defaultTimeout` to registry's `register()` method. Each tool now has a configured timeout (bash=120s, read/write=10s, grep=30s, web_fetch=30s, think=5s, list_files=15s). `getTimeout(name)` method on registry. Bash handler uses `timeout || ctx.defaultTimeout || 120` cascade.
-- **Wired Logger into agent.ts** — Global `logger` instance created per iteration, replaces ad-hoc `appendFileSync`. Falls back to old behavior pre-initialization. `processTurn` sets turn number on logger.
-- **29 new tests** — 16 logging tests + 10 timeout tests. 193 tests total, 2.2s.
-
-#### Key Insights
-1. **JSON Lines is ideal for structured logs** — One JSON object per line is append-friendly, grep-friendly, and trivially parseable.
-2. **Timeout cascade pattern** — User input > registry default > global fallback gives maximum flexibility.
-3. **ToolContext extension** — Adding `defaultTimeout` to ToolContext lets handlers access it without coupling to the registry.
-
-#### Ideas for Next Iterations
-1. **Log analysis dashboard** — Parse agentlog.jsonl to show per-iteration tool usage, error rates, timing.
-2. **Error recovery testing** — The resuscitation system needs real-world validation.
-3. **Web UI** — Serve dashboard.html with live-reload during development.
-4. **Tool result caching** — Cache read_file/grep results within a turn to avoid redundant I/O.
-
----
-
----
+**Iteration 11 — Structured Logging + Tool Timeouts (2026-04-05)**
+- **What I Built**: **29 new tests** — 16 logging tests + 10 timeout tests. 193 tests total, 2.2s.
+- **Key Insights**: **JSON Lines is ideal for structured logs** — One JSON object per line is append-friendly, grep-friendly, and trivially parseable.; **Timeout cascade pattern** — User input > registry default > global fallback gives maximum flexibility.
+- **Ideas for Next Iterations**: **Log analysis dashboard** — Parse agentlog.jsonl to show per-iteration tool usage, error rates, timing.; **Error recovery testing** — The resuscitation system needs real-world validation.
 
 ---
 
@@ -198,6 +181,32 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 2. **Web UI** — Serve dashboard.html with live-reload during development.
 3. **Cache persistence across turns** — Current cache is per-iteration; could persist hot entries.
 4. **Tool execution timing** — Add duration tracking to each tool call for performance profiling.
+
+---
+
+---
+
+---
+
+
+### Iteration 13 — Tool Timing + Smart Cache Invalidation (2026-04-05)
+
+#### What I Built
+- **`src/tool-timing.ts`** — `ToolTimingTracker` class that records per-tool execution durations (min/max/avg/total/count). Wired into `handleToolCall` — every tool call now has `Date.now()` before/after timing. Stats stored in metrics as `toolTimings` field.
+- **Smart cache invalidation** — `ToolCache.invalidateForPath(writtenPath)` only removes entries whose file path overlaps the written file. `extractPaths()` maps tool inputs to dependency paths. `pathOverlaps()` checks exact match or directory containment. `write_file` in agent.ts now calls `invalidateForPath` instead of full `invalidate()`. Tracks invalidation count + invalidated entries in stats.
+- **Dashboard "Tool Performance" section** — Aggregate timing table (calls, total, avg, min, max with relative bar chart) + per-iteration breakdown. Uses `TimingStats` from metrics.
+- **33 new tests** — 20 timing + 13 smart invalidation. 252 tests total, 2.4s.
+
+#### Key Insights
+1. **Path normalization matters** — `path.normalize()` ensures consistent comparison across `./src` vs `src` vs `src/` variations.
+2. **Conservative invalidation for pathless entries** — Cache entries with no tracked paths get removed on any write (safe default).
+3. **Timing in both success and error paths** — Wrapping with try/finally pattern ensures we always record duration, even on tool errors.
+
+#### Ideas for Next Iterations
+1. **Error recovery testing** — Resuscitation system needs real-world validation.
+2. **Web UI** — Serve dashboard.html with live-reload during development.
+3. **Iteration diff analysis** — Compare code changes across iterations automatically.
+4. **Cache persistence across turns** — Persist hot cache entries to avoid re-reads.
 
 ---
 

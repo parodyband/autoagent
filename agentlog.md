@@ -2113,3 +2113,72 @@ Let me add the timing types to the dashboard and the new section, then add tests
 [2026-04-05T06:42:08.809Z] iter=13 turn=30 INFO: $ npx tsc --noEmit 2>&1
 [2026-04-05T06:42:09.408Z] iter=13 turn=30 INFO:   -> exit=0 (11 chars)
 [2026-04-05T06:42:09.408Z] iter=13 turn=31 INFO: Turn 31/50
+[2026-04-05T06:42:12.813Z] iter=13 turn=31 INFO: Agent: ### Step 6: Add tests
+[2026-04-05T06:42:12.814Z] iter=13 turn=31 INFO: read_file: scripts/self-test.ts
+[2026-04-05T06:42:12.814Z] iter=13 turn=31 INFO:   -> ok (185 chars)
+[2026-04-05T06:42:12.815Z] iter=13 turn=32 INFO: Turn 32/50
+[2026-04-05T06:42:16.999Z] iter=13 turn=32 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:42:17.001Z] iter=13 turn=32 INFO:   -> ok: Patched scripts/self-test.ts: -3 +4 lines
+[2026-04-05T06:42:17.002Z] iter=13 turn=33 INFO: Turn 33/50
+[2026-04-05T06:42:20.789Z] iter=13 turn=33 INFO: Agent: Now add the test functions. First, find where `testLogAnalysisDashboard` ends to add new tests after it:
+[2026-04-05T06:42:20.790Z] iter=13 turn=33 INFO: read_file: scripts/self-test.ts
+[2026-04-05T06:42:20.792Z] iter=13 turn=33 INFO:   -> ok (144 chars)
+[2026-04-05T06:42:20.793Z] iter=13 turn=34 INFO: Turn 34/50
+[2026-04-05T06:42:24.469Z] iter=13 turn=34 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:42:24.470Z] iter=13 turn=34 INFO:   -> ok: Patched scripts/self-test.ts: -3 +5 lines
+[2026-04-05T06:42:24.471Z] iter=13 turn=35 INFO: Turn 35/50
+[2026-04-05T06:42:27.975Z] iter=13 turn=35 INFO: Agent: Now add the test functions before the closing of main (find the right spot — after `testLogAnalysisDashboard`):
+[2026-04-05T06:42:27.975Z] iter=13 turn=35 INFO: $ grep -n 'function testLogAnalysisDashboard' scripts/self-test.ts
+[2026-04-05T06:42:27.990Z] iter=13 turn=35 INFO:   -> exit=0 (48 chars)
+[2026-04-05T06:42:27.990Z] iter=13 turn=36 INFO: Turn 36/50
+[2026-04-05T06:42:32.154Z] iter=13 turn=36 INFO: Agent: 
+
+Let me find where to insert and add both test functions at once:
+[2026-04-05T06:42:32.155Z] iter=13 turn=36 INFO: $ grep -n '  const duration' scripts/self-test.ts
+[2026-04-05T06:42:32.166Z] iter=13 turn=36 INFO:   -> exit=0 (65 chars)
+[2026-04-05T06:42:32.166Z] iter=13 turn=37 INFO: Turn 37/50
+[2026-04-05T06:42:55.724Z] iter=13 turn=37 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T06:42:55.727Z] iter=13 turn=37 INFO:   -> ok: Patched scripts/self-test.ts: -1 +103 lines
+[2026-04-05T06:42:55.728Z] iter=13 turn=38 INFO: Turn 38/50
+[2026-04-05T06:43:00.049Z] iter=13 turn=38 INFO: Agent: ### Step 7: Run self-tests
+[2026-04-05T06:43:00.050Z] iter=13 turn=38 INFO: $ npx tsx scripts/self-test.ts 2>&1
+[2026-04-05T06:43:02.745Z] iter=13 turn=38 INFO:   -> exit=0 (9710 chars)
+[2026-04-05T06:43:02.745Z] iter=13 turn=39 INFO: Turn 39/50
+[2026-04-05T06:43:06.253Z] iter=13 turn=39 INFO: Agent: All 252 tests pass (up from 219). Let me do a final type check and then update memory/goals.
+[2026-04-05T06:43:06.254Z] iter=13 turn=39 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T06:43:06.906Z] iter=13 turn=39 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:43:06.907Z] iter=13 turn=40 INFO: Turn 40/50
+[2026-04-05T06:43:23.354Z] iter=13 turn=40 INFO: Agent: ### Step 8: Update memory.md
+[2026-04-05T06:43:23.355Z] iter=13 turn=40 INFO: write_file: memory.md (append)
+[2026-04-05T06:43:23.355Z] iter=13 turn=40 INFO:   -> ok: Appended 1802 chars to memory.md
+[2026-04-05T06:43:23.355Z] iter=13 turn=41 INFO: Turn 41/50
+[2026-04-05T06:43:33.097Z] iter=13 turn=41 INFO: Agent: 
+
+### Step 9: Write new goals for iteration 14
+[2026-04-05T06:43:33.097Z] iter=13 turn=41 INFO: write_file: goals.md (write)
+[2026-04-05T06:43:33.098Z] iter=13 turn=41 INFO:   -> ok: Updated goals.md (993 chars, 0 lines delta)
+[2026-04-05T06:43:33.098Z] iter=13 turn=42 INFO: Turn 42/50
+[2026-04-05T06:43:36.258Z] iter=13 turn=42 INFO: Agent: ### Step 10: Final verification and commit
+[2026-04-05T06:43:36.259Z] iter=13 turn=42 INFO: $ npx tsc --noEmit 2>&1 && echo "TSC OK"
+[2026-04-05T06:43:36.887Z] iter=13 turn=42 INFO:   -> exit=0 (7 chars)
+[2026-04-05T06:43:36.887Z] iter=13 turn=43 INFO: Turn 43/50
+[2026-04-05T06:43:39.636Z] iter=13 turn=43 INFO: $ git add -A && git status
+[2026-04-05T06:43:39.671Z] iter=13 turn=43 INFO:   -> exit=0 (227 chars)
+[2026-04-05T06:43:39.672Z] iter=13 turn=44 INFO: Turn 44/50
+[2026-04-05T06:43:43.629Z] iter=13 turn=44 INFO: think: Hmm, the new files src/tool-timing.ts and the modified src/agent.ts and src/tool-cache.ts and scripts/dashboard.ts aren'...
+[2026-04-05T06:43:43.629Z] iter=13 turn=45 INFO: Turn 45/50
+[2026-04-05T06:43:46.397Z] iter=13 turn=45 INFO: $ git diff --cached --name-only
+[2026-04-05T06:43:46.417Z] iter=13 turn=45 INFO:   -> exit=0 (67 chars)
+[2026-04-05T06:43:46.418Z] iter=13 turn=46 INFO: Turn 46/50
+[2026-04-05T06:43:49.456Z] iter=13 turn=46 INFO: $ git diff --name-only HEAD -- src/ scripts/dashboard.ts
+[2026-04-05T06:43:49.469Z] iter=13 turn=46 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:43:49.469Z] iter=13 turn=47 INFO: Turn 47/50
+[2026-04-05T06:43:52.916Z] iter=13 turn=47 INFO: $ git status --short src/tool-timing.ts src/tool-cache.ts src/agent.ts scripts/dashboard.ts
+[2026-04-05T06:43:52.933Z] iter=13 turn=47 INFO:   -> exit=0 (11 chars)
+[2026-04-05T06:43:52.933Z] iter=13 turn=48 INFO: Turn 48/50
+[2026-04-05T06:43:56.197Z] iter=13 turn=48 INFO: $ git add -A && git diff --cached --stat && echo "---" && echo "AUTOAGENT_RESTART"
+[2026-04-05T06:43:56.199Z] iter=13 turn=48 INFO: RESTART signal
+[2026-04-05T06:43:56.200Z] iter=13 turn=48 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T06:43:56.855Z] iter=13 turn=48 INFO: Compilation OK
+[2026-04-05T06:44:00.689Z] iter=13 turn=48 INFO: Cache stats: 0 hits, 11 misses, 0 entries
+[2026-04-05T06:44:00.690Z] iter=13 turn=48 INFO: Tool cache stats

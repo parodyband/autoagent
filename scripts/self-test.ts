@@ -20,7 +20,8 @@ import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
 import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage } from "../src/messages.js";
 import { Logger, createLogger, parseJsonlLog, type LogEntry } from "../src/logging.js";
-import { ToolCache, CACHEABLE_TOOLS } from "../src/tool-cache.js";
+import { ToolCache, CACHEABLE_TOOLS, extractPaths, pathOverlaps } from "../src/tool-cache.js";
+import { ToolTimingTracker } from "../src/tool-timing.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import path from "path";
 
@@ -667,6 +668,8 @@ async function main(): Promise<void> {
     testToolTimeouts();
     testToolCache();
     testLogAnalysisDashboard();
+    testToolTiming();
+    testSmartCacheInvalidation();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {
@@ -902,6 +905,108 @@ function testLogAnalysisDashboard(): void {
 
   // Cleanup
   if (existsSync(jsonlPath)) unlinkSync(jsonlPath);
+}
+
+function testToolTiming(): void {
+  console.log("\n⏱️ Tool Timing");
+
+  const tracker = new ToolTimingTracker();
+
+  // Empty stats
+  const empty = tracker.stats();
+  assert(empty.totalCalls === 0, "timing: empty tracker has 0 calls");
+  assert(empty.totalMs === 0, "timing: empty tracker has 0 ms");
+
+  // Record single call
+  tracker.record("bash", 150);
+  const bashStats = tracker.getToolStats("bash");
+  assert(bashStats !== undefined, "timing: getToolStats returns entry");
+  assert(bashStats!.calls === 1, "timing: 1 call recorded");
+  assert(bashStats!.totalMs === 150, "timing: totalMs correct");
+  assert(bashStats!.minMs === 150, "timing: minMs correct for single call");
+  assert(bashStats!.maxMs === 150, "timing: maxMs correct for single call");
+  assert(bashStats!.avgMs === 150, "timing: avgMs correct for single call");
+
+  // Record multiple calls
+  tracker.record("bash", 50);
+  tracker.record("bash", 200);
+  const bashStats2 = tracker.getToolStats("bash")!;
+  assert(bashStats2.calls === 3, "timing: 3 calls recorded");
+  assert(bashStats2.totalMs === 400, "timing: totalMs sums correctly");
+  assert(bashStats2.minMs === 50, "timing: minMs tracks minimum");
+  assert(bashStats2.maxMs === 200, "timing: maxMs tracks maximum");
+  assert(bashStats2.avgMs === 133, "timing: avgMs rounds correctly", `got ${bashStats2.avgMs}`);
+
+  // Multiple tools
+  tracker.record("read_file", 5);
+  tracker.record("grep", 30);
+  const stats = tracker.stats();
+  assert(stats.totalCalls === 5, "timing: totalCalls across tools", `got ${stats.totalCalls}`);
+  assert(stats.totalMs === 435, "timing: totalMs across tools", `got ${stats.totalMs}`);
+  assert(Object.keys(stats.tools).length === 3, "timing: 3 tools tracked");
+
+  // getTrackedTools
+  const tools = tracker.getTrackedTools();
+  assert(tools.includes("bash"), "timing: getTrackedTools includes bash");
+  assert(tools.includes("read_file"), "timing: getTrackedTools includes read_file");
+
+  // Unknown tool returns undefined
+  assert(tracker.getToolStats("unknown") === undefined, "timing: unknown tool returns undefined");
+
+  // Clear
+  tracker.clear();
+  assert(tracker.stats().totalCalls === 0, "timing: clear resets everything");
+}
+
+function testSmartCacheInvalidation(): void {
+  console.log("\n🎯 Smart Cache Invalidation");
+
+  const cache = new ToolCache();
+
+  // Setup: cache entries for different files
+  cache.set("read_file", { path: "src/agent.ts" }, "agent content");
+  cache.set("read_file", { path: "src/logging.ts" }, "logging content");
+  cache.set("grep", { path: "src" }, "grep results");
+  cache.set("list_files", { path: "scripts" }, "list results");
+
+  assert(cache.stats().entries === 4, "smart-inv: 4 entries cached");
+
+  // Writing src/agent.ts should invalidate read_file for agent.ts AND grep on src/
+  const removed = cache.invalidateForPath("src/agent.ts");
+  assert(removed >= 2, "smart-inv: invalidateForPath removes affected entries", `removed ${removed}`);
+
+  // read_file for logging.ts should survive (different file)
+  const logging = cache.get("read_file", { path: "src/logging.ts" });
+  assert(logging === "logging content", "smart-inv: unrelated read_file survives");
+
+  // list_files for scripts/ should survive (different directory)
+  const list = cache.get("list_files", { path: "scripts" });
+  assert(list === "list results", "smart-inv: unrelated list_files survives");
+
+  // Invalidation stats tracked
+  const stats = cache.stats();
+  assert(stats.invalidations === 1, "smart-inv: invalidation count tracked", `got ${stats.invalidations}`);
+  assert(stats.invalidatedEntries >= 2, "smart-inv: invalidated entry count tracked", `got ${stats.invalidatedEntries}`);
+
+  // extractPaths helper
+  const rfPaths = extractPaths("read_file", { path: "src/foo.ts" });
+  assert(rfPaths.length === 1 && rfPaths[0].includes("foo.ts"), "smart-inv: extractPaths for read_file");
+
+  const grepPaths = extractPaths("grep", { pattern: "test", path: "src" });
+  assert(grepPaths.length === 1, "smart-inv: extractPaths for grep");
+
+  const noPaths = extractPaths("bash", { command: "echo" });
+  assert(noPaths.length === 0, "smart-inv: extractPaths for non-cacheable tool");
+
+  // pathOverlaps
+  assert(pathOverlaps("src/agent.ts", ["src/agent.ts"]), "smart-inv: exact path overlaps");
+  assert(pathOverlaps("src/agent.ts", ["src"]), "smart-inv: file in dir overlaps");
+  assert(!pathOverlaps("scripts/test.ts", ["src"]), "smart-inv: different dir doesn't overlap");
+
+  // Full invalidate still works
+  cache.set("read_file", { path: "a.ts" }, "content");
+  cache.invalidate();
+  assert(cache.stats().entries === 0, "smart-inv: full invalidate clears all");
 }
 
   const duration = ((Date.now() - start) / 1000).toFixed(1);
