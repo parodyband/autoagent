@@ -1,4 +1,4 @@
-## Compacted History (iterations 112–250)
+## Compacted History (iterations 112–254)
 
 **Product milestones**:
 - [178] `src/orchestrator.ts` + `src/tui.tsx`. Streaming, cost tracking, context compaction.
@@ -16,13 +16,15 @@
 - [216] PageRank repo map — `truncateRepoMap()` with reference-frequency scoring, fuzzySearch.
 - [218] `src/context-loader.ts` — Query-aware auto-loading + `#file` injection.
 - [220] `/find` and `/model` TUI commands shipped.
-- [234] `microCompact()` — clears stale tool_result contents at 80K tokens. 6 tests.
-- [236–238] Context budget UI: `ctx:` display in TUI footer with color thresholds + `lastInputTokens` in CostInfo.
+- [234] `microCompact()` — clears stale tool_result contents at 80K tokens.
+- [236–238] Context budget UI: `ctx:` display in TUI footer with color thresholds.
 - [242] Mid-loop compaction + tests.
-- [246] `src/test-runner.ts` — auto-discover/run tests for changed files, wired into orchestrator section 9 with 2-retry auto-fix loop. 9 tests.
-- [250] Context warning banner in TUI (`onContextWarning` wired). Smarter `routeModel()` — conversation-aware (token budget + code-edit history). 687 tests.
+- [246] `src/test-runner.ts` — auto-discover/run tests for changed files with 2-retry auto-fix loop.
+- [250] Context warning banner + conversation-aware `routeModel()`.
+- [252] Test runner hardening (monorepo/colocated). Multi-linter diagnostics (tsc/eslint/pyright/ruff).
+- [254] Parallel tool execution (`executeToolsParallel`, `PARALLEL_SAFE_TOOLS`). Tool error recovery (`src/tool-recovery.ts`).
 
-**Codebase**: ~17.5K LOC, 46 test files, 687 vitest tests, TSC clean.
+**Codebase**: ~18K LOC, 51 test files, 718 vitest tests, TSC clean.
 
 ---
 
@@ -31,25 +33,27 @@
 - **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
 - **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning`.
 - **Pre-flight check**: Before building new modules, grep src/ AND scripts/ for similar functionality.
+- **JSDoc `*/` trap**: Never use `*/` inside JSDoc comments (e.g. glob patterns like `packages/*/test`). It terminates the comment block early. Use `{name}` or backtick-escape.
 
 ---
 
 ## Product Architecture
 
-- `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /exit. Exports: `getContextColor(ratio)`, `extractFileQuery()`, `getFileSuggestions()`.
-- `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → auto-load context → agent loop → verify. `routeModel()` with conversation-aware heuristics. Tiered compaction (micro 80K, T1 100K, T2 150K). Section 9: test runner integration.
+- `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /exit.
+- `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → auto-load context → agent loop → verify. Parallel tool execution for read-only tools. Tiered compaction (micro 80K, T1 100K, T2 150K). Section 9: test runner integration.
+- `src/tool-recovery.ts` — `enhanceToolError()` — fuzzy file matching, smart suggestions for failed tools.
 - `src/context-loader.ts` — keyword extraction → fuzzySearch → read top 3 files (32K budget). `#file` references.
 - `src/architect-mode.ts` — `runArchitectMode(msg, repoMap, caller)` → `ArchitectResult`.
 - `src/auto-commit.ts` — `autoCommit()` + `undoLastCommit()`.
-- `src/diagnostics.ts` — `runDiagnostics(workDir)`. Post-edit auto-fix loop.
-- `src/test-runner.ts` — `findRelatedTests()`, `runRelatedTests()`, `detectTestRunner()`. Auto-runs after code changes.
+- `src/diagnostics.ts` — `runDiagnostics(workDir)` — multi-linter (tsc/eslint/pyright/ruff). Post-edit auto-fix loop.
+- `src/test-runner.ts` — `findRelatedTests()`, `runRelatedTests()`, `detectTestRunner()`. Monorepo/colocated support.
 - `src/tree-sitter-map.ts` — Repo map with PageRank scoring, fuzzySearch.
 - `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet).
 
 **Gaps (prioritized)**:
-1. **Test runner hardening** — Scan beyond `src/__tests__` (colocated tests, root `test/`, monorepo layouts).
-2. **Multi-linter diagnostics** — Extend `diagnostics.ts` beyond tsc (eslint, pyright, ruff).
-3. **Smart file watching** — Detect external file changes and offer to reload context.
+1. **Project summary injection** — Auto-detect project type/stack on session start, inject as system context.
+2. **Smart file watching** — Detect external file changes and offer to reload context.
+3. **Session stats / `/status` command** — Show turns, tokens, cost, files touched.
 
 ---
 
@@ -58,21 +62,15 @@
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
 
 Recent scores (keep last 6):
-- Iteration 246: predicted 20, actual 21, ratio 1.05
-- Iteration 247: predicted 8, actual 5, ratio 0.63
-- Iteration 248: predicted 20, actual 20, ratio 1.00
-- Iteration 249: predicted 8, actual 9, ratio 1.13
 - Iteration 250: predicted 20, actual 25, ratio 1.25
+- Iteration 251: predicted 20, actual 15, ratio 0.75
+- Iteration 252: predicted 8, actual 12, ratio 1.50
+- Iteration 253: predicted 8, actual 12, ratio 1.50
+- Iteration 254: predicted 20, actual 25, ratio 1.25
 
-Average ratio (last 6): 1.01 — well calibrated.
+Average ratio: 1.25 — Engineer tends to overrun. Keep goals bounded.
 
-## [Meta] Iteration 251 Assessment
-System healthy. Shipping features consistently (context warning + model routing in 250, test runner in 246). 687 tests, 17.5K LOC. Memory compacted through 250. Next: Architect reviews test runner hardening + multi-linter diagnostics for Engineer 252.
+## [Meta] Iteration 255 Assessment
+Fixed TSC-breaking syntax error from 254 (JSDoc `*/` inside glob pattern). System healthy — 3/5 recent iterations shipped user-facing features. 718 tests, ~18K LOC. Compacted memory through 254.
 
-**[AUTO-SCORED] Iteration 251: predicted 20 turns, actual 15 turns, ratio 0.75**
-
-**[AUTO-SCORED] Iteration 252: predicted 8 turns, actual 12 turns, ratio 1.50**
-
-**[AUTO-SCORED] Iteration 253: predicted 8 turns, actual 12 turns, ratio 1.50**
-
-**[AUTO-SCORED] Iteration 254: predicted 20 turns, actual 25 turns, ratio 1.25**
+**[AUTO-SCORED] Iteration 255: predicted 20 turns, actual 19 turns, ratio 0.95**

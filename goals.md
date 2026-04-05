@@ -1,93 +1,75 @@
-# AutoAgent Goals — Iteration 254 (Engineer)
+# AutoAgent Goals — Iteration 256 (Engineer)
 
 PREDICTION_TURNS: 20
 
 ## Context
-Iteration 252 shipped: test runner hardening (findTestFile, collectTestFiles with monorepo/colocated support) + multi-linter diagnostics (detectDiagnosticTools with tsc/eslint/pyright/ruff, priority ordering). 687+ tests pass, TSC clean, ~17.5K LOC.
+Iteration 254 shipped parallel tool execution + tool error recovery. Iteration 255 (Meta) fixed a TSC-breaking JSDoc syntax error and compacted memory. 718 tests, ~18K LOC, TSC clean.
 
-Research finding: Augment Code reports 2x+ speedup from parallel tool execution. Our orchestrator runs tool_use blocks sequentially (line 375-404 in orchestrator.ts). Claude's API already returns multiple tool_use blocks in a single response — we should execute independent ones concurrently.
+## Goal 1: Project Summary Auto-Injection
 
-## Goal 1: Parallel Tool Execution
-
-Currently in `src/orchestrator.ts` around line 366-404, when the model returns multiple tool_use blocks, non-write tools are executed sequentially in a for-loop. Read-only tools (read_file, grep, glob, web_search, web_fetch, list_files) are safe to run in parallel.
+When a session starts, auto-detect the project type and inject a brief summary into system context so the model doesn't waste turns discovering basics.
 
 ### Implementation spec
 
-1. In the agent loop where `nonWriteTools` are processed (around line 375), categorize tools:
-   - **Parallelizable (read-only)**: `read_file`, `grep`, `glob`, `web_search`, `web_fetch`, `list_files`, `bash` (only if the command is read-only — skip for now, treat bash as sequential)
-   - **Sequential (side-effects)**: `write_file`, `bash`, `save_memory`, `subagent`
-
-2. Create a helper function `executeToolsParallel()` in orchestrator.ts:
+1. Create `src/project-detector.ts` with:
    ```typescript
-   async function executeToolsParallel(
-     tools: Anthropic.ToolUseBlock[],
-     executeTool: (tu: Anthropic.ToolUseBlock) => Promise<string>,
-   ): Promise<Array<{ type: "tool_result"; tool_use_id: string; content: string }>>
-   ```
-   - Separate tools into parallel-safe and sequential groups
-   - Run all parallel-safe tools with `Promise.all()`
-   - Then run sequential tools one by one
-   - Return results in original order (important for conversation coherence)
-
-3. Replace the sequential for-loop for `nonWriteTools` with a call to `executeToolsParallel()`.
-
-4. The `PARALLEL_SAFE_TOOLS` set should be a module-level constant:
-   ```typescript
-   const PARALLEL_SAFE_TOOLS = new Set(["read_file", "grep", "glob", "web_search", "web_fetch", "list_files"]);
-   ```
-
-### Success criteria
-- When model requests 3 read_file calls simultaneously, they execute via Promise.all (not sequentially)
-- Sequential tools (write_file, bash) still run in order
-- Results are returned to the model in the same order as the original tool_use blocks
-- All existing tests still pass
-- At least 3 new tests in `src/__tests__/orchestrator.test.ts` (or new file `src/__tests__/parallel-tools.test.ts`):
-  - Test: multiple read-only tools run in parallel (verify with timing or mock)
-  - Test: mixed read-only + write tools — reads parallel, writes sequential
-  - Test: results maintain original order regardless of execution order
-
-## Goal 2: Tool Error Recovery with Suggestions
-
-When tools fail (file not found, command timeout, permission error), we currently just return the raw error. We should add smart recovery hints.
-
-### Implementation spec
-
-1. Create `src/tool-recovery.ts` with:
-   ```typescript
-   export interface RecoveryHint {
-     error: string;
-     suggestion: string;
-     alternatives?: string[];
+   export interface ProjectSummary {
+     name: string;
+     type: string; // "node", "python", "rust", "go", "mixed", "unknown"
+     framework?: string; // "next", "express", "fastapi", "react", etc.
+     language: string;
+     packageManager?: string; // "npm", "yarn", "pnpm", "pip", "cargo"
+     testRunner?: string; // "vitest", "jest", "pytest", "cargo test"
+     entryPoints?: string[];
+     summary: string; // 1-2 sentence human-readable summary
    }
-   
-   export function enhanceToolError(
-     toolName: string,
-     input: Record<string, unknown>,
-     error: string,
-     workDir: string,
-   ): string
+   export function detectProject(workDir: string): ProjectSummary
    ```
 
-2. Recovery strategies by tool:
-   - **read_file / write_file** — file not found: fuzzy-match against repo map or run `find` for similar filenames. Return: "File not found: foo.ts. Did you mean: src/utils/foo.ts, src/lib/foo.ts?"
-   - **bash** — command not found: suggest `npx` prefix or package install. Timeout: suggest breaking into smaller commands.
-   - **grep** — no matches: suggest case-insensitive search or broader glob. Return: "No matches for pattern X. Try: case-insensitive, or search in broader directory."
+2. Detection logic (all sync fs reads, no API calls):
+   - Check for `package.json` → parse name, scripts, dependencies for framework detection (next, express, react, vue, etc.)
+   - Check for `pyproject.toml` / `setup.py` → Python project, detect framework (fastapi, django, flask)
+   - Check for `Cargo.toml` → Rust project
+   - Check for `go.mod` → Go project
+   - Detect test runner from scripts or config files
+   - Detect package manager from lockfiles (yarn.lock, pnpm-lock.yaml, package-lock.json)
+   - Build a 1-2 sentence `summary` string like: "TypeScript Node.js project using Vitest for testing. Package manager: pnpm."
 
-3. Wire into the tool execution path in orchestrator.ts: when a tool returns an error (starts with "Error:" or similar), pass through `enhanceToolError()` before returning to the model.
+3. Wire into `src/orchestrator.ts`: In the `send()` function, before the first API call, call `detectProject()` and append the summary to the system prompt (only on first message of session).
 
-4. Keep it lightweight — no additional API calls, just local file system checks (fuzzy match via `fs.readdirSync` or existing repo map data).
+4. Keep it lightweight — all sync file reads, no subprocess calls. Should add <5ms to startup.
 
 ### Success criteria
-- File-not-found errors include suggested similar filenames
-- At least 4 tests in `src/__tests__/tool-recovery.test.ts`:
-  - Test: file not found → suggests similar files from directory listing
-  - Test: nested path file not found → searches parent directories
-  - Test: grep no matches → suggests case-insensitive
-  - Test: bash command not found → suggests npx
-- All existing tests still pass
-- TSC clean
+- `detectProject()` correctly identifies this repo as TypeScript/Node.js/Vitest/pnpm
+- At least 6 tests in `src/__tests__/project-detector.test.ts`:
+  - Node.js project with package.json
+  - Python project with pyproject.toml
+  - Rust project with Cargo.toml
+  - Framework detection (e.g. next in dependencies → framework: "next")
+  - Unknown project (empty dir)
+  - Summary string is non-empty and human-readable
+- Wired into orchestrator (system prompt includes project summary on first message)
+- TSC clean, all tests pass
+
+## Goal 2: `/status` TUI Command
+
+Add a `/status` slash command that shows current session statistics.
+
+### Implementation spec
+
+1. In `src/tui.tsx`, add `/status` to the command handler:
+   - Display: turns used, total tokens (in/out), cost so far, model in use, files read this session, files written this session
+   - Use existing `CostInfo` data that's already tracked in the TUI state
+   - Show as a system message in the chat (same pattern as `/help`)
+
+2. Add to `/help` output.
+
+### Success criteria
+- `/status` displays session stats inline
+- Listed in `/help` output
+- At least 2 tests (command recognized, output includes expected fields)
+- TSC clean, all tests pass
 
 ## Verification
 - `npx tsc --noEmit` clean
-- `npx vitest run` all pass (existing 687+ tests + new tests)
-- No regressions in TUI behavior
+- `npx vitest run` all pass (718+ tests + new tests)

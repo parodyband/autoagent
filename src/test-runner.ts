@@ -100,7 +100,7 @@ export function findRelatedTests(workDir: string, changedFiles: string[]): strin
  * Collect all test files under workDir:
  * - Conventional dirs: src/__tests__, test, tests, __tests__
  * - Co-located: any *.test.ts / *.spec.ts files anywhere in src/
- * - Monorepo: packages/*/src/__tests__, packages/*/__tests__, packages/*/test
+ * - Monorepo: packages/{name}/src/__tests__, packages/{name}/__tests__, packages/{name}/test
  */
 function collectTestFiles(workDir: string): string[] {
   const files: string[] = [];
