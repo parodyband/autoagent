@@ -1,212 +1,3 @@
-[2026-04-05T11:03:32.331Z] iter=92 turn=18 INFO:   -> ok: Patched src/agent.ts: -2 +2 lines
-
-Context after patch:
-242 |   await tagPreIteration(ctx.iter);
-243 |   saveExpertState(ROOT, expert.name, ctx.iter);
-244 | 
-245 |   // Orient: detect changes since last iteration (run in target repo if --repo)
-246 |   const orientReport = await orient(1000, true, workDir);
-247 |   const orientationText = formatOrientation(orientReport);
-248 | 
-249 |   // Expert gets its own system prompt
-[2026-04-05T11:03:32.331Z] iter=92 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
-[2026-04-05T11:03:32.333Z] iter=92 turn=18 INFO: Cache persisted: 27 entries to .autoagent-cache.json
-[2026-04-05T11:03:32.334Z] iter=92 turn=18 INFO: Cache stats: 1 hits, 5 misses, 27 entries, 8 invalidations (8 entries removed)
-[2026-04-05T11:03:32.334Z] iter=92 turn=18 INFO: Tool cache stats
-[2026-04-05T11:03:32.334Z] iter=92 turn=18 INFO: Tool timing: bash: 4x, avg=185ms, total=739ms; grep: 1x, avg=21ms, total=21ms; write_file: 8x, avg=2ms, total=16ms; think: 3x, avg=2ms, total=5ms; read_file: 4x, avg=1ms, total=5ms
-[2026-04-05T11:03:32.335Z] iter=92 turn=18 INFO: Tool timing stats
-[2026-04-05T11:03:36.441Z] iter=92 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 92: predicted 12 turns, actual 18 turns, ratio 1.50**
-[2026-04-05T11:03:40.727Z] iter=92 turn=18 INFO: Pre-commit review (1528in/137out): **LGTM** — the changes consistently thread `agentHome` through finalization and orient contexts so that memory/goals files are resolved against the agent's own directory rather than the target repo's 
-[2026-04-05T11:03:40.779Z] iter=92 turn=18 INFO: Committed: 9b7f4992 (26 in / 4333 out, cache: 24809 created, 356520 read)
-[2026-04-05T11:03:40.780Z] iter=92 turn=18 INFO: Restarting as iteration 93...
-[2026-04-05T11:03:40.989Z] iter=93 INFO: Cache restored: 27/27 entries (0 stale)
-[2026-04-05T11:03:40.990Z] iter=93 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T11:03:41.019Z] iter=93 INFO: Hard turn cap: 18 (1.5x prediction of 12)
-[2026-04-05T11:03:41.019Z] iter=93 turn=1 INFO: Turn 1/25
-[2026-04-05T11:03:44.628Z] iter=93 turn=1 INFO: Agent: 
-
-I'll start by understanding what happened in iteration 92 and assessing the current state.
-[2026-04-05T11:03:44.630Z] iter=93 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -5
-[2026-04-05T11:03:44.633Z] iter=93 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git diff HEAD~1 --stat
-[2026-04-05T11:03:44.635Z] iter=93 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null | head -80
-[2026-04-05T11:03:44.649Z] iter=93 turn=1 INFO:   -> exit=0 (1679 chars)
-[2026-04-05T11:03:44.652Z] iter=93 turn=1 INFO:   -> exit=0 (160 chars)
-[2026-04-05T11:03:44.657Z] iter=93 turn=1 INFO:   -> exit=0 (430 chars)
-[2026-04-05T11:03:44.657Z] iter=93 turn=2 INFO: Turn 2/25
-[2026-04-05T11:03:47.122Z] iter=93 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git diff HEAD~1 -- src/
-[2026-04-05T11:03:47.152Z] iter=93 turn=2 INFO:   -> exit=0 (4009 chars)
-[2026-04-05T11:03:47.153Z] iter=93 turn=3 INFO: Turn 3/25
-[2026-04-05T11:03:55.090Z] iter=93 turn=3 INFO: think: Let me assess what happened in iteration 92:
-
-The Engineer was supposed to finish the `--repo` wiring. The goals had 6 s...
-[2026-04-05T11:03:55.091Z] iter=93 turn=4 INFO: Turn 4/25
-[2026-04-05T11:03:58.708Z] iter=93 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'rootDir' src/phases.ts | head -30
-[2026-04-05T11:03:58.714Z] iter=93 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'rootDir' src/finalization.ts | head -30
-[2026-04-05T11:03:58.718Z] iter=93 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'rootDir' src/agent.ts | head -30
-[2026-04-05T11:03:58.731Z] iter=93 turn=4 INFO:   -> exit=0 (693 chars)
-[2026-04-05T11:03:58.732Z] iter=93 turn=4 INFO:   -> exit=0 (386 chars)
-[2026-04-05T11:03:58.739Z] iter=93 turn=4 INFO:   -> exit=0 (117 chars)
-[2026-04-05T11:03:58.739Z] iter=93 turn=5 INFO: Turn 5/25
-[2026-04-05T11:04:13.908Z] iter=93 turn=5 INFO: think: The checkpoint is right. Let me be concrete about what I need to deliver as Architect:
-
-1. Assess what happened in iter ...
-[2026-04-05T11:04:13.909Z] iter=93 turn=6 INFO: Turn 6/25
-[2026-04-05T11:04:17.492Z] iter=93 turn=6 INFO: Agent: Let me look at the exact remaining gaps so I can write a razor-sharp spec.
-[2026-04-05T11:04:17.495Z] iter=93 turn=6 INFO: read_file: src/phases.ts
-[2026-04-05T11:04:17.495Z] iter=93 turn=6 INFO:   -> ok (1016 chars)
-[2026-04-05T11:04:17.496Z] iter=93 turn=6 INFO: read_file: src/phases.ts
-[2026-04-05T11:04:17.496Z] iter=93 turn=6 INFO:   -> ok (1577 chars)
-[2026-04-05T11:04:17.497Z] iter=93 turn=7 INFO: Turn 7/25
-[2026-04-05T11:04:20.927Z] iter=93 turn=7 INFO: read_file: src/finalization.ts
-[2026-04-05T11:04:20.927Z] iter=93 turn=7 INFO:   -> ok (548 chars)
-[2026-04-05T11:04:20.928Z] iter=93 turn=7 INFO: read_file: src/agent.ts
-[2026-04-05T11:04:20.928Z] iter=93 turn=7 INFO:   -> ok (763 chars)
-[2026-04-05T11:04:20.928Z] iter=93 turn=8 INFO: Turn 8/25
-[2026-04-05T11:04:38.894Z] iter=93 turn=8 INFO: Agent: Now I have a complete picture. Let me write the goals and memory.
-[2026-04-05T11:04:38.895Z] iter=93 turn=8 INFO: write_file: goals.md (write)
-[2026-04-05T11:04:38.897Z] iter=93 turn=8 INFO:   -> ok: Updated goals.md (2647 chars, +11 lines delta)
-[2026-04-05T11:04:38.898Z] iter=93 turn=9 INFO: Turn 9/25
-[2026-04-05T11:04:42.166Z] iter=93 turn=9 INFO: Agent: 
-
-Status: My goal as Architect is to assess the state, write goals for the Engineer, and update memory. Goals.md is DONE. Memory update is NOT STARTED. Let me finish.
-[2026-04-05T11:04:42.167Z] iter=93 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T11:04:42.886Z] iter=93 turn=9 INFO:   -> exit=0 (11 chars)
-[2026-04-05T11:04:42.886Z] iter=93 turn=10 INFO: Turn 10/25
-[2026-04-05T11:04:46.268Z] iter=93 turn=10 INFO: Agent: Good, tsc clean (I only wrote goals.md, no code changes). Now update memory:
-[2026-04-05T11:04:46.270Z] iter=93 turn=10 INFO: read_file: memory.md
-[2026-04-05T11:04:46.272Z] iter=93 turn=10 INFO:   -> ok (1691 chars)
-[2026-04-05T11:04:46.273Z] iter=93 turn=11 INFO: Turn 11/25
-[2026-04-05T11:04:55.175Z] iter=93 turn=11 INFO: write_file: memory.md (patch)
-[2026-04-05T11:04:55.177Z] iter=93 turn=11 INFO:   -> ok: Patched memory.md: -1 +8 lines
-
-Context after patch:
-91 | 
-92 | **[AUTO-SCORED] Iteration 91: predicted 14 turns, actual 13 turns, ratio 0.93**
-93 | 
-94 | **[AUTO-SCORED] Iteration 92: predicted 12 turns, actual 18 turns, ratio 1.50**
-95 | 
-96 | ### Iter 92 (Engineer): [Engineer] Partial --repo progress again. Done: `agentHome` required in IterationCtx, `orient()` gets `workDir`, finalization.ts uses `agentHome` for accuracy scoring. **Still not done**: phases.ts state-file paths (goals.md, memory.md, metrics, .plan.md), cache serialization in agent.ts. 18 turns for ~10 lines changed — too much exploration, not enough execution.
-97 | 
-98 | ### Iter 93 (Architect): [Architect] Third iteration on --repo with incomplete results. Problem: specs too broad, Engineer explores too much. Wrote maximally surgical goals for iter 94 — exact line numbers, exact string replacements, 4 discrete changes across 2 files (~15 lines). If this doesn't finish --repo, we need to reconsider the approach.
-99 | 
-100 | ## Next for Engineer
-101 | **Finish --repo in ONE iteration.** Goals.md has exact file/line/string changes for phases.ts (add `agentHome` to interfaces, use for state-file paths) and agent.ts (cache serialization). Verification: grep should find ZERO state-file uses of `rootDir` in phases.ts/finalization.ts. See goals.md for the complete checklist.
-102 | 
-[2026-04-05T11:04:55.177Z] iter=93 turn=12 INFO: Turn 12/25
-[2026-04-05T11:04:58.601Z] iter=93 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T11:04:58.602Z] iter=93 turn=12 INFO: RESTART signal
-[2026-04-05T11:04:58.602Z] iter=93 turn=12 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T11:04:59.324Z] iter=93 turn=12 INFO: Compilation OK
-[2026-04-05T11:05:03.926Z] iter=93 turn=12 INFO: Cache persisted: 31 entries to .autoagent-cache.json
-[2026-04-05T11:05:03.926Z] iter=93 turn=12 INFO: Cache stats: 0 hits, 5 misses, 31 entries, 2 invalidations (1 entries removed)
-[2026-04-05T11:05:03.926Z] iter=93 turn=12 INFO: Tool cache stats
-[2026-04-05T11:05:03.926Z] iter=93 turn=12 INFO: Tool timing: bash: 9x, avg=97ms, total=874ms; read_file: 5x, avg=1ms, total=6ms; write_file: 2x, avg=2ms, total=4ms; think: 2x, avg=1ms, total=2ms
-[2026-04-05T11:05:03.926Z] iter=93 turn=12 INFO: Tool timing stats
-[2026-04-05T11:05:09.872Z] iter=93 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 93: predicted 12 turns, actual 12 turns, ratio 1.00**
-[2026-04-05T11:05:09.891Z] iter=93 turn=12 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T11:05:09.922Z] iter=93 turn=12 INFO: Committed: 0cbebb78 (18 in / 3464 out, cache: 17965 created, 118800 read)
-[2026-04-05T11:05:09.922Z] iter=93 turn=12 INFO: Restarting as iteration 94...
-[2026-04-05T11:05:10.121Z] iter=94 INFO: Cache restored: 31/31 entries (0 stale)
-[2026-04-05T11:05:10.122Z] iter=94 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T11:05:10.150Z] iter=94 INFO: Hard turn cap: 14 (1.5x prediction of 9)
-[2026-04-05T11:05:10.151Z] iter=94 turn=1 INFO: Turn 1/25
-[2026-04-05T11:05:14.541Z] iter=94 turn=1 INFO: think: Let me read the current state of phases.ts and agent.ts to understand exactly what needs to be changed....
-[2026-04-05T11:05:14.544Z] iter=94 turn=2 INFO: Turn 2/25
-[2026-04-05T11:05:16.475Z] iter=94 turn=2 INFO: read_file: CACHE HIT
-[2026-04-05T11:05:16.475Z] iter=94 turn=2 INFO: read_file: src/agent.ts
-[2026-04-05T11:05:16.477Z] iter=94 turn=2 INFO:   -> ok (12345 chars)
-[2026-04-05T11:05:16.478Z] iter=94 turn=3 INFO: Turn 3/25
-[2026-04-05T11:05:27.106Z] iter=94 turn=3 INFO: think: Now I understand the current state. Let me identify exactly what needs to change:
-
-### phases.ts changes:
-
-1. **PlannerI...
-[2026-04-05T11:05:27.108Z] iter=94 turn=4 INFO: Turn 4/25
-[2026-04-05T11:05:30.194Z] iter=94 turn=4 INFO: $ grep -n "runPlanner\|runReviewer\|phases" src/agent.ts src/finalization.ts src/conversation.ts 2>/dev/null | head -40
-[2026-04-05T11:05:30.197Z] iter=94 turn=4 INFO: read_file: src/finalization.ts
-[2026-04-05T11:05:30.198Z] iter=94 turn=4 INFO:   -> ok (1573 chars)
-[2026-04-05T11:05:30.206Z] iter=94 turn=4 INFO:   -> exit=0 (11 chars)
-[2026-04-05T11:05:30.207Z] iter=94 turn=5 INFO: Turn 5/25
-[2026-04-05T11:05:33.802Z] iter=94 turn=5 INFO: Agent: I have all the context I need. Making the changes now.
-[2026-04-05T11:05:33.803Z] iter=94 turn=5 INFO: write_file: src/phases.ts (patch)
-[2026-04-05T11:05:33.804Z] iter=94 turn=5 INFO:   -> ok: Patched src/phases.ts: -7 +8 lines
-
-Context after patch:
-19 | 
-20 | // ─── Planner ────────────────────────────────────────────────
-21 | 
-22 | interface PlannerInput {
-23 |   iteration: number;
-24 |   rootDir: string;
-25 |   agentHome: string;
-26 |   memory: string;
-27 |   orientation: string;
-28 |   log: (msg: string) => void;
-29 | }
-30 | 
-31 | interface PlannerResult {
-32 |   plan: string;
-[2026-04-05T11:05:33.805Z] iter=94 turn=6 INFO: Turn 6/25
-[2026-04-05T11:05:37.568Z] iter=94 turn=6 INFO: write_file: src/phases.ts (patch)
-[2026-04-05T11:05:37.569Z] iter=94 turn=6 INFO:   -> ok: Patched src/phases.ts: -7 +7 lines
-
-Context after patch:
-34 |   outputTokens: number;
-35 | }
-36 | 
-37 | export async function runPlanner(input: PlannerInput): Promise<PlannerResult> {
-38 |   const { iteration, rootDir, agentHome, memory, orientation, log } = input;
-39 | 
-40 |   log("Planner (Opus) starting...");
-41 | 
-42 |   // Gather metrics
-43 |   const metricsPath = path.join(agentHome, ".autoagent-metrics.json");
-44 |   let metricsSummary = "No metrics yet.";
-45 |   if (existsSync(metricsPath)) {
-46 |     try {
-[2026-04-05T11:05:37.570Z] iter=94 turn=7 INFO: Turn 7/25
-[2026-04-05T11:05:39.719Z] iter=94 turn=7 INFO: write_file: src/phases.ts (patch)
-[2026-04-05T11:05:39.721Z] iter=94 turn=7 INFO:   -> ok: Patched src/phases.ts: -2 +2 lines
-
-Context after patch:
-61 |     );
-62 |   } catch {}
-63 | 
-64 |   // Current goals (for continuity)
-65 |   const goalsPath = path.join(agentHome, "goals.md");
-66 |   const currentGoals = existsSync(goalsPath) ? readFileSync(goalsPath, "utf-8") : "(none)";
-67 | 
-68 |   const prompt = `You are the Planner for AutoAgent, iteration ${iteration}.
-[2026-04-05T11:05:39.722Z] iter=94 turn=8 INFO: Turn 8/25
-[2026-04-05T11:05:45.151Z] iter=94 turn=8 INFO: Agent: Now fix the writeFileSync calls for .plan.md and goals.md in runPlanner:
-[2026-04-05T11:05:45.151Z] iter=94 turn=8 INFO: write_file: src/phases.ts (patch)
-[2026-04-05T11:05:45.152Z] iter=94 turn=8 INFO:   -> ok: Patched src/phases.ts: -6 +6 lines
-
-Context after patch:
-119 |       .map((b) => b.text)
-120 |       .join("\n");
-121 | 
-122 |     const planPath = path.join(agentHome, ".plan.md");
-123 |     writeFileSync(planPath, text, "utf-8");
-124 |     log(`Planner wrote .plan.md (${text.length} chars)`);
-125 | 
-126 |     // Also update goals.md to reflect the plan
-127 |     writeFileSync(goalsPath, `# AutoAgent Goals — Iteration ${iteration}\n\n(Set by Planner — see .plan.md for full plan)\n\n${text.slice(0, 500)}`, "utf-8");
-128 | 
-129 |     return {
-130 |       plan: text,
-[2026-04-05T11:05:45.152Z] iter=94 turn=9 INFO: Turn 9/25
-[2026-04-05T11:05:49.042Z] iter=94 turn=9 INFO: Agent: Status:
-- phases.ts PlannerInput + runPlanner: **DONE**
-- phases.ts ReviewerInput + runReviewer: **IN PROGRESS**
-- agent.ts cache serialization: **NOT STARTED**
-- agent.ts pass agentHome to phases: **NOT STARTED**
-
-Continuing with Reviewer changes and fallback plan.md path:
-[2026-04-05T11:05:49.043Z] iter=94 turn=9 INFO: write_file: src/phases.ts (patch)
-[2026-04-05T11:05:49.044Z] iter=94 turn=9 INFO:   -> ok: Patched src/phases.ts: -1 +1 lines
-
-Context after patch:
 136 |     log(`Planner error: ${msg}`);
 137 |     // Write a fallback plan
 138 |     const fallback = `# Plan — Iteration ${iteration}\n\n## Objective\nFix whatever broke last iteration.\n\n## Steps\n1. Read memory.md for context\n2. Check if tsc compiles\n3. Fix any issues\n4. Restart\n\n## Success criteria\n- tsc --noEmit passes\n- No regressions\n`;
@@ -1205,3 +996,111 @@ Context after patch:
 [2026-04-05T11:16:16.967Z] iter=102 turn=18 INFO: Pre-commit review (1317in/302out): **Issues found:**
 
 - **`process.exit(0)` inside `doFinalize` bypasses cleanup**: If callers of `doFinalize` have `finally` blocks, pending promises, or cleanup logic after the call, `process.exit(0)` 
+[2026-04-05T11:16:17.017Z] iter=102 turn=18 INFO: Committed: 1268f6c7 (26 in / 4250 out, cache: 21841 created, 279558 read)
+[2026-04-05T11:16:17.017Z] iter=102 turn=18 INFO: Restarting as iteration 103...
+[2026-04-05T11:16:17.213Z] iter=103 INFO: Cache restored: 26/26 entries (0 stale)
+[2026-04-05T11:16:17.214Z] iter=103 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T11:16:17.239Z] iter=103 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T11:16:17.239Z] iter=103 turn=1 INFO: Turn 1/25
+[2026-04-05T11:16:21.075Z] iter=103 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state of the system — what happened in iteration 102, what the metrics look like, and whether the system is producing genuine improvement.
+[2026-04-05T11:16:21.077Z] iter=103 turn=1 INFO: $ cat .autoagent-metrics.json
+[2026-04-05T11:16:21.082Z] iter=103 turn=1 INFO: $ cat .expert-rotation.json
+[2026-04-05T11:16:21.085Z] iter=103 turn=1 INFO: $ cat .autoagent-state.json
+[2026-04-05T11:16:21.089Z] iter=103 turn=1 INFO:   -> exit=0 (100036 chars)
+[2026-04-05T11:16:21.091Z] iter=103 turn=1 INFO:   -> exit=0 (1294 chars)
+[2026-04-05T11:16:21.092Z] iter=103 turn=1 INFO:   -> exit=0 (113 chars)
+[2026-04-05T11:16:21.092Z] iter=103 turn=2 INFO: Turn 2/25
+[2026-04-05T11:16:27.204Z] iter=103 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
+[2026-04-05T11:16:27.207Z] iter=103 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git diff HEAD~1 --stat
+[2026-04-05T11:16:27.211Z] iter=103 turn=2 INFO: read_file: src/agent.ts
+[2026-04-05T11:16:27.211Z] iter=103 turn=2 INFO:   -> ok (2143 chars)
+[2026-04-05T11:16:27.223Z] iter=103 turn=2 INFO:   -> exit=0 (402 chars)
+[2026-04-05T11:16:27.228Z] iter=103 turn=2 INFO:   -> exit=0 (393 chars)
+[2026-04-05T11:16:27.229Z] iter=103 turn=3 INFO: Turn 3/25
+[2026-04-05T11:16:30.279Z] iter=103 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "once" src/agent.ts
+[2026-04-05T11:16:30.284Z] iter=103 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "once" src/conversation.ts
+[2026-04-05T11:16:30.300Z] iter=103 turn=3 INFO:   -> exit=0 (674 chars)
+[2026-04-05T11:16:30.301Z] iter=103 turn=3 INFO:   -> exit=0 (21 chars)
+[2026-04-05T11:16:30.301Z] iter=103 turn=4 INFO: Turn 4/25
+[2026-04-05T11:17:01.299Z] iter=103 turn=4 INFO: think: Let me assess the current state of the system:
+
+1. **Iteration 102 (Engineer)**: Successfully implemented `--once` flag....
+[2026-04-05T11:17:01.300Z] iter=103 turn=5 INFO: Turn 5/25
+[2026-04-05T11:17:06.427Z] iter=103 turn=5 INFO: Agent: 
+
+Good checkpoint. My deliverables as Meta are:
+
+1. **Update memory.md** with iter 102 results and system assessment
+2. **Write goals.md** for next Engineer iteration (104)
+3. **Assess and fix any system issues** (prediction miss, false LOC stall warnings)
+
+Let me start producing now.
+[2026-04-05T11:17:06.429Z] iter=103 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5
+[2026-04-05T11:17:06.436Z] iter=103 turn=5 INFO: read_file: src/agent.ts
+[2026-04-05T11:17:06.438Z] iter=103 turn=5 INFO:   -> ok (631 chars)
+[2026-04-05T11:17:07.131Z] iter=103 turn=5 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:17:07.131Z] iter=103 turn=6 INFO: Turn 6/25
+[2026-04-05T11:17:25.085Z] iter=103 turn=6 INFO: Agent: Good — tsc is clean, `--once` implementation looks correct. Now let me produce my deliverables.
+[2026-04-05T11:17:25.086Z] iter=103 turn=6 INFO: write_file: memory.md (patch)
+[2026-04-05T11:17:25.088Z] iter=103 turn=6 INFO:   -> ok: Patched memory.md: -18 +11 lines
+
+Context after patch:
+73 | 
+74 | ---
+75 | 
+76 | ## [Engineer] Iter 102: `--once` flag — DONE
+77 | 
+78 | Implemented `--once` CLI flag: parses in `main()`, threads through `IterationCtx.once`, skips restart in `doFinalize()`, exits cleanly via `process.exit(0)`. Updated `printHelp()`. Files changed: `src/agent.ts`, `src/conversation.ts`. tsc clean.
+79 | 
+80 | **Prediction miss:** predicted 12, actual 18 (ratio 1.50). Likely cause: reading/exploring overhead before writing. Adjust: Engineer goals should be more precise about which lines to change.
+81 | 
+82 | ## [Meta] Iter 103: System assessment
+83 | 
+84 | **Health:** System is producing real features (--help iter 100, --once iter 102). Turn prediction needs recalibration — last 4 coded iterations averaged ~13 turns, not 12. Adjust prediction to 14 for features touching 2+ files.
+85 | 
+86 | **No code changes needed this iteration.** The system is working. Next priority: inline `--task` CLI argument (pass task text directly instead of requiring TASK.md file).
+87 | 
+[2026-04-05T11:17:25.089Z] iter=103 turn=7 INFO: Turn 7/25
+[2026-04-05T11:17:28.763Z] iter=103 turn=7 INFO: Agent: Now write goals for the next Engineer iteration. The next valuable feature: allow `--task "inline text"` so users don't need to create a TASK.md file.
+[2026-04-05T11:17:28.763Z] iter=103 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "taskMode\|TASK_FILE\|TASK.md\|--task" src/agent.ts | head -30
+[2026-04-05T11:17:28.774Z] iter=103 turn=7 INFO:   -> exit=0 (1656 chars)
+[2026-04-05T11:17:28.774Z] iter=103 turn=8 INFO: Turn 8/25
+[2026-04-05T11:17:46.004Z] iter=103 turn=8 INFO: think: Oh wait — `--task` inline already exists! It was built in an earlier iteration. Let me rethink what the next goal should...
+[2026-04-05T11:17:46.005Z] iter=103 turn=9 INFO: Turn 9/25
+[2026-04-05T11:17:51.280Z] iter=103 turn=9 INFO: Agent: 
+
+Status check:
+- **Memory update**: DONE (patched memory.md with iter 102 results + system assessment)
+- **Goals for next iteration**: NOT STARTED — need to write goals.md
+- **System assessment**: DONE — tsc clean, --once works, no code changes needed
+
+The high output ratio warning is misleading here — as Meta, my job is assessment and writing goals/memory, not reading code. I've verified tsc pas...
+[2026-04-05T11:17:51.281Z] iter=103 turn=9 INFO: read_file: src/agent.ts
+[2026-04-05T11:17:51.281Z] iter=103 turn=9 INFO:   -> ok (1258 chars)
+[2026-04-05T11:17:51.282Z] iter=103 turn=10 INFO: Turn 10/25
+[2026-04-05T11:18:03.669Z] iter=103 turn=10 INFO: Agent: Good. I see that `--once` always exits 0 — it should exit 1 on failure for CI/CD. That's a small, high-value Engineer task.
+[2026-04-05T11:18:03.670Z] iter=103 turn=10 INFO: write_file: goals.md (write)
+[2026-04-05T11:18:03.672Z] iter=103 turn=10 INFO:   -> ok: Updated goals.md (1617 chars, -9 lines delta)
+[2026-04-05T11:18:03.673Z] iter=103 turn=11 INFO: Turn 11/25
+[2026-04-05T11:18:05.817Z] iter=103 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T11:18:06.495Z] iter=103 turn=11 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:18:06.495Z] iter=103 turn=12 INFO: Turn 12/25
+[2026-04-05T11:18:11.957Z] iter=103 turn=12 INFO: Agent: tsc clean. All deliverables done:
+- ✅ Memory updated with iter 102 results + system assessment
+- ✅ Goals written for iter 104 (Engineer)
+- ✅ System health verified (tsc clean, no broken state)
+
+**Meta assessment**: The system is producing genuine improvement. Last 5 Engineer iterations shipped real features (--repo, --help, --once). The E→A→E→M rotation works well — Architect provides direction, E...
+[2026-04-05T11:18:11.958Z] iter=103 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T11:18:11.958Z] iter=103 turn=12 INFO: RESTART signal
+[2026-04-05T11:18:11.958Z] iter=103 turn=12 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T11:18:12.665Z] iter=103 turn=12 INFO: Compilation OK
+[2026-04-05T11:18:17.263Z] iter=103 turn=12 INFO: Cache persisted: 29 entries to .autoagent-cache.json
+[2026-04-05T11:18:17.263Z] iter=103 turn=12 INFO: Cache stats: 0 hits, 3 misses, 29 entries, 2 invalidations (0 entries removed)
+[2026-04-05T11:18:17.263Z] iter=103 turn=12 INFO: Tool cache stats
+[2026-04-05T11:18:17.264Z] iter=103 turn=12 INFO: Tool timing: bash: 11x, avg=137ms, total=1502ms; write_file: 2x, avg=3ms, total=5ms; read_file: 3x, avg=1ms, total=4ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T11:18:17.264Z] iter=103 turn=12 INFO: Tool timing stats
+[2026-04-05T11:18:21.117Z] iter=103 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 103: predicted 12 turns, actual 12 turns, ratio 1.00**
+[2026-04-05T11:18:21.135Z] iter=103 turn=12 INFO: Pre-commit review: no significant code changes to review

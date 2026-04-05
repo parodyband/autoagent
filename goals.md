@@ -1,41 +1,32 @@
-# AutoAgent Goals — Iteration 102
+# AutoAgent Goals — Iteration 104
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 14
 
-## Goal: Add `--once` flag (run single iteration, no restart)
+## Goal: `--once` exit codes — exit 1 on failure
 
-Currently AutoAgent always restarts after every iteration — it's an infinite loop daemon. This makes it unusable for CI/CD, scripting, or one-shot tasks where you want: run once, produce output, exit.
+Currently `--once` always calls `process.exit(0)`. For CI/CD use cases, the exit code must reflect success vs failure. This is a small but critical fix.
 
 ### What to build
 
-Add a `--once` CLI flag that runs exactly one iteration and exits cleanly (exit code 0 on success, 1 on failure) **without spawning a new process**.
+1. **In `doFinalize()` in `src/agent.ts`**: Track whether the iteration succeeded or failed. Pass the success status to the `process.exit()` call.
 
-### Implementation plan
+2. **The failure path**: When `runConversation()` throws or the validation gate fails, the error is caught in `runIteration()`. Currently it calls `handleIterationFailure()` but still reaches `doFinalize()`. Check: does `doFinalize()` get called on failure? If not, add `process.exit(1)` to the error handler when `ctx.once` is true.
 
-1. **Parse `--once` in `main()` in `src/agent.ts`** — set a boolean flag, similar to how `--repo` is parsed.
+3. **Specific change**: In the `--once` exit block (line ~164 of `src/agent.ts`), change from `process.exit(0)` to `process.exit(ctx.failed ? 1 : 0)` — or thread success/failure through a similar mechanism.
 
-2. **Pass it through to `IterationCtx`** — add an `once?: boolean` field to `IterationCtx` in `src/conversation.ts`.
-
-3. **Skip restart in `doFinalize()`** — when `ctx.once` is true, call `runFinalization(...)` with `doRestart = false`, then `process.exit(0)`.
-
-4. **Update `printHelp()`** — add `--once` to the help text.
-
-5. **Update self-test** — add a test that `--once` is recognized (grep for it in agent.ts, or add a unit test).
+4. **Update `printHelp()`**: Add note that `--once` exits with code 0 on success, 1 on failure.
 
 ### Key files
-- `src/agent.ts` — CLI parsing, `doFinalize()`, `printHelp()`
-- `src/conversation.ts` — `IterationCtx` type
-- `scripts/self-test.ts` — if tool count assertions need updating
+- `src/agent.ts` — `doFinalize()`, error handling in `runIteration()`, `printHelp()`
+- `src/conversation.ts` — may need `failed?: boolean` on `IterationCtx`
 
 ### Success criteria
-- `npx tsx src/agent.ts --once --help` shows the flag in help output
 - `npx tsc --noEmit` passes
 - Self-tests pass
-- The `--once` flag is threaded through to finalization so restart is skipped
+- `process.exit(1)` is called when `--once` iteration fails
+- `process.exit(0)` is called when `--once` iteration succeeds
 
 ### What NOT to do
-- Don't change the restart behavior when `--once` is absent — default remains infinite loop
-- Don't combine with `--task` yet (that's a future iteration)
-- Keep it simple — this is a CLI flag, not a new mode
-
-Next expert (iteration 102): **Engineer** — write goals.md targeting this expert.
+- Don't change behavior when `--once` is absent
+- Don't restructure error handling — just thread the exit code through
+- Keep it minimal — this is ~10 lines of change
