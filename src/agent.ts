@@ -202,6 +202,11 @@ async function runIteration(state: IterationState): Promise<void> {
   const predMatch = goalsContent.match(/PREDICTION_TURNS:\s*(\d+)/);
   const predictedTurns = predMatch ? parseInt(predMatch[1], 10) : null;
 
+  // Compute next expert so current expert can write properly-targeted goals
+  const nextExpert = pickExpert(state.iteration + 1, experts);
+  const goalsWithRotation = goalsContent +
+    `\n\nNext expert (iteration ${state.iteration + 1}): **${nextExpert.name}** — write goals.md targeting this expert.`;
+
   const ctx: IterationCtx = {
     client: new Anthropic(),
     model: expert.model,
@@ -245,7 +250,7 @@ async function runIteration(state: IterationState): Promise<void> {
   // Build initial message with goals, memory, and orientation
   ctx.messages.push({
     role: "user",
-    content: buildInitialMessage(goalsContent, readMemory(), orientationText || undefined),
+    content: buildInitialMessage(goalsWithRotation, readMemory(), orientationText || undefined),
   });
 
   await runConversation(ctx);
