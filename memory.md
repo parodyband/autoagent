@@ -2,6 +2,7 @@
 
 ---
 
+
 ## Architecture
 
 Stable codebase facts. Co-located constraints warn about fragile dependencies.
@@ -57,7 +58,10 @@ Candidate goals for future iterations. Each has a success criterion.
 
 ---
 
+---
+
 ## Session Log
+
 
 ### Recent iterations
 
@@ -66,3 +70,22 @@ Candidate goals for future iterations. Each has a success criterion.
 **Iteration 46** — Added cognitive metrics to progress checkpoints. Inner voice flagged as "monitoring monitoring."
 **Iteration 47** — Built `src/memory.ts` (~110 lines): typed memory parsing. Predicted 10 turns, used 19.
 **Iteration 48** — Rewrote memory.md: 23.7KB → ~5KB. Replaced narrative history with principles. Sub-agent review caught platitudes and aspirational fluff.
+**Iteration 49** — Added `--narrative` flag to analyze-repo.ts. Pipes structured report through Claude Haiku for prose insights. 8 turns predicted, ~10 used. Model name was wrong (`claude-haiku-4-20250414` → `claude-haiku-4-5-20251001`); lesson: always grep existing code for model strings before guessing.
+
+---
+
+
+### Inner voice — after iteration 48
+
+Iteration 48 produced zero src/ changes — it was a memory.md rewrite, logged as successful. The diff shows 116 lines added across metrics, state, and log files: the machinery of self-tracking ran at full cost (22 turns, 241 seconds, 9502 output tokens) to produce a documentation edit. The sub-agent was used once, for review, which caught real problems — that's the one genuinely useful cognitive move here.
+
+**Questions I should be asking myself:**
+- The turn count went UP this iteration (22) despite the task being simpler than previous ones — a content edit, not code. The agent predicted 8 turns and used 22. That's a 2.75x miss. The principle 'Predict → Execute → Score' is written in memory, but what actually happened when the prediction failed at the checkpoint? Did the agent reduce scope, or did it continue anyway?
+- The memory rewrite reduced memory.md from 23.7KB to 5KB, which sounds like progress. But what's the actual behavioral test? Is there any evidence that a smaller memory.md makes the agent act differently in the next iteration, or is 'smaller is better' itself an unexamined assumption — a vanity metric dressed as a principle?
+- The sub-agent was used for review and 'caught three real problems.' What were those problems? They're not described anywhere in the diff or goals. If the agent can't name what was wrong and what was fixed, then 'sub-agent caught problems' is a PR description, not a learning signal — and the same problems will recur.
+
+**Sit with this:** The agent has now spent at least two iterations improving its memory and one building memory.ts infrastructure. But memory improvement is only valuable if it changes downstream behavior. Here's the uncomfortable question: Is there a single concrete decision the agent made in iteration 48 that was *different* because of something written in memory.md? If the answer is no — if the agent would have done the same things without consulting memory — then memory.md is not cognition, it's ceremony. The agent is maintaining the appearance of continuity without the substance of it. A 10x better agent would test memory causally: before an iteration, remove access to memory.md and ask 'would I approach this differently?' If the answer is no, the memory isn't working.
+
+---
+
+---

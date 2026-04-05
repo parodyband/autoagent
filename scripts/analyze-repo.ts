@@ -2,7 +2,10 @@
 /**
  * analyze-repo — Generate a structured Markdown overview of any codebase.
  * 
- * Usage: npx tsx scripts/analyze-repo.ts [path] [--output file.md]
+ * Usage: npx tsx scripts/analyze-repo.ts [path] [--output file.md] [--narrative]
+ * 
+ * --narrative (-n): Pipes structured output through Claude Haiku for prose insights.
+ *                   Requires ANTHROPIC_API_KEY environment variable.
  * 
  * Produces a CODEBASE.md-style document with:
  * - Project metadata (name, description, dependencies)
@@ -14,6 +17,7 @@
 
 import { readFileSync, readdirSync, statSync, existsSync, writeFileSync } from "fs";
 import path from "path";
+import Anthropic from "@anthropic-ai/sdk";
 
 // ── Language detection ────────────────────────────────────────
 
@@ -403,16 +407,49 @@ function generateReport(rootDir: string): string {
   return lines.join("\n");
 }
 
+// ── Narrative generation via Claude Haiku ─────────────────────
+
+async function generateNarrative(structuredReport: string): Promise<string> {
+  const client = new Anthropic();
+  
+  const response = await client.messages.create({
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 1024,
+    messages: [
+      {
+        role: "user",
+        content: `You are a senior engineer reviewing a codebase for the first time. Below is a structured analysis report. Write 3-5 concise, insightful observations about this project. Focus on:
+- What kind of project this is and its apparent purpose
+- Notable architectural patterns or choices
+- Potential concerns (large files, missing tests, dependency bloat, etc.)
+- What makes this codebase interesting or unusual
+
+Be specific and concrete. Reference actual file names, numbers, and patterns from the report. No generic advice.
+
+---
+
+${structuredReport}`
+      }
+    ]
+  });
+
+  const textBlock = response.content.find(b => b.type === "text");
+  return textBlock ? textBlock.text : "(No narrative generated)";
+}
+
 // ── CLI ───────────────────────────────────────────────────────
 
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   let targetDir = process.cwd();
   let outputFile: string | null = null;
+  let narrative = false;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--output" || args[i] === "-o") {
       outputFile = args[++i];
+    } else if (args[i] === "--narrative" || args[i] === "-n") {
+      narrative = true;
     } else if (!args[i].startsWith("-")) {
       targetDir = path.resolve(args[i]);
     }
@@ -423,7 +460,13 @@ function main() {
     process.exit(1);
   }
 
-  const report = generateReport(targetDir);
+  let report = generateReport(targetDir);
+
+  if (narrative) {
+    console.error("Generating narrative insights via Claude Haiku...");
+    const insights = await generateNarrative(report);
+    report += "\n\n## Narrative Insights\n\n" + insights + "\n";
+  }
 
   if (outputFile) {
     writeFileSync(outputFile, report, "utf-8");
