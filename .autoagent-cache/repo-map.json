@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775420145543,
+  "generatedAt": 1775420806476,
   "files": [
     {
       "path": "src/context-loader.ts",
@@ -853,271 +853,6 @@
       "lastModified": 1775418649613.4583
     },
     {
-      "path": "src/orchestrator.ts",
-      "exports": [
-        {
-          "name": "PARALLEL_SAFE_TOOLS",
-          "kind": "const",
-          "line": 53,
-          "exported": true
-        },
-        {
-          "name": "MICRO_COMPACT_THRESHOLD",
-          "kind": "const",
-          "line": 68,
-          "exported": true
-        },
-        {
-          "name": "COMPACT_TIER1_THRESHOLD",
-          "kind": "const",
-          "line": 70,
-          "exported": true
-        },
-        {
-          "name": "COMPACT_THRESHOLD",
-          "kind": "const",
-          "line": 72,
-          "exported": true
-        },
-        {
-          "name": "CONTEXT_WARNING_THRESHOLD",
-          "kind": "const",
-          "line": 74,
-          "exported": true
-        },
-        {
-          "name": "PRUNE_THRESHOLD",
-          "kind": "const",
-          "line": 75,
-          "exported": true
-        },
-        {
-          "name": "selectCompactionTier",
-          "kind": "function",
-          "line": 81,
-          "exported": true
-        },
-        {
-          "name": "MODEL_PRICING",
-          "kind": "const",
-          "line": 89,
-          "exported": true
-        },
-        {
-          "name": "ConversationCheckpoint",
-          "kind": "interface",
-          "line": 112,
-          "exported": true
-        },
-        {
-          "name": "MAX_CHECKPOINTS",
-          "kind": "const",
-          "line": 120,
-          "exported": true
-        },
-        {
-          "name": "OrchestratorOptions",
-          "kind": "interface",
-          "line": 122,
-          "exported": true
-        },
-        {
-          "name": "OrchestratorResult",
-          "kind": "interface",
-          "line": 162,
-          "exported": true
-        },
-        {
-          "name": "CostInfo",
-          "kind": "interface",
-          "line": 171,
-          "exported": true
-        },
-        {
-          "name": "routeModel",
-          "kind": "function",
-          "line": 186,
-          "exported": true
-        },
-        {
-          "name": "computeCost",
-          "kind": "function",
-          "line": 214,
-          "exported": true
-        },
-        {
-          "name": "buildSystemPrompt",
-          "kind": "function",
-          "line": 226,
-          "exported": true
-        },
-        {
-          "name": "buildCachedSystem",
-          "kind": "function",
-          "line": 299,
-          "exported": true
-        },
-        {
-          "name": "injectMessageCacheBreakpoints",
-          "kind": "function",
-          "line": 310,
-          "exported": true
-        },
-        {
-          "name": "isToolError",
-          "kind": "function",
-          "line": 406,
-          "exported": true
-        },
-        {
-          "name": "Orchestrator",
-          "kind": "class",
-          "line": 761,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [
-            "Anthropic"
-          ],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [
-            "compressToolOutput"
-          ],
-          "from": "./tool-output-compressor.js"
-        },
-        {
-          "names": [
-            "fingerprintRepo"
-          ],
-          "from": "./repo-context.js"
-        },
-        {
-          "names": [
-            "rankFiles"
-          ],
-          "from": "./file-ranker.js"
-        },
-        {
-          "names": [
-            "buildRepoMap",
-            "formatRepoMap",
-            "rankSymbols",
-            "truncateRepoMap",
-            "saveRepoMapCache",
-            "loadRepoMapCache",
-            "getStaleFiles",
-            "updateRepoMapIncremental",
-            "cacheToRepoMap"
-          ],
-          "from": "./tree-sitter-map.js"
-        },
-        {
-          "names": [
-            "shouldDecompose",
-            "decomposeTasks",
-            "formatSubtasks"
-          ],
-          "from": "./task-decomposer.js"
-        },
-        {
-          "names": [
-            "runVerification",
-            "formatVerificationResults"
-          ],
-          "from": "./verification.js"
-        },
-        {
-          "names": [
-            "createDefaultRegistry"
-          ],
-          "from": "./tool-registry.js"
-        },
-        {
-          "names": [
-            "getProjectMemoryBlock"
-          ],
-          "from": "./project-memory.js"
-        },
-        {
-          "names": [
-            "autoCommit",
-            "type AutoCommitResult"
-          ],
-          "from": "./auto-commit.js"
-        },
-        {
-          "names": [
-            "runDiagnostics"
-          ],
-          "from": "./diagnostics.js"
-        },
-        {
-          "names": [
-            "findRelatedTests",
-            "runRelatedTests"
-          ],
-          "from": "./test-runner.js"
-        },
-        {
-          "names": [
-            "computeUnifiedDiff"
-          ],
-          "from": "./diff-preview.js"
-        },
-        {
-          "names": [
-            "autoLoadContext",
-            "extractFileReferences",
-            "loadFileReferences",
-            "stripFileReferences"
-          ],
-          "from": "./context-loader.js"
-        },
-        {
-          "names": [
-            "enhanceToolError"
-          ],
-          "from": "./tool-recovery.js"
-        },
-        {
-          "names": [
-            "detectProject"
-          ],
-          "from": "./project-detector.js"
-        },
-        {
-          "names": [
-            "detectLoop"
-          ],
-          "from": "./loop-detector.js"
-        },
-        {
-          "names": [
-            "* as fs"
-          ],
-          "from": "fs"
-        },
-        {
-          "names": [
-            "FileWatcher"
-          ],
-          "from": "./file-watcher.js"
-        },
-        {
-          "names": [
-            "scoredPrune"
-          ],
-          "from": "./context-pruner.js"
-        }
-      ],
-      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775418402074.0774
-    },
-    {
       "path": "src/__tests__/loop-detector.test.ts",
       "exports": [],
       "imports": [
@@ -1183,104 +918,6 @@
       "lastModified": 1775419306149.6353
     },
     {
-      "path": "src/task-planner.ts",
-      "exports": [
-        {
-          "name": "Task",
-          "kind": "interface",
-          "line": 12,
-          "exported": true
-        },
-        {
-          "name": "TaskPlan",
-          "kind": "interface",
-          "line": 22,
-          "exported": true
-        },
-        {
-          "name": "TaskExecutor",
-          "kind": "type",
-          "line": 29,
-          "exported": true
-        },
-        {
-          "name": "OnFailureCallback",
-          "kind": "type",
-          "line": 32,
-          "exported": true
-        },
-        {
-          "name": "getNextTasks",
-          "kind": "function",
-          "line": 45,
-          "exported": true
-        },
-        {
-          "name": "formatPlan",
-          "kind": "function",
-          "line": 58,
-          "exported": true
-        },
-        {
-          "name": "buildTaskContext",
-          "kind": "function",
-          "line": 92,
-          "exported": true
-        },
-        {
-          "name": "executePlan",
-          "kind": "function",
-          "line": 129,
-          "exported": true
-        },
-        {
-          "name": "createPlan",
-          "kind": "function",
-          "line": 188,
-          "exported": true
-        },
-        {
-          "name": "replanOnFailure",
-          "kind": "function",
-          "line": 266,
-          "exported": true
-        },
-        {
-          "name": "PLAN_FILENAME",
-          "kind": "const",
-          "line": 298,
-          "exported": true
-        },
-        {
-          "name": "savePlan",
-          "kind": "function",
-          "line": 303,
-          "exported": true
-        },
-        {
-          "name": "loadPlan",
-          "kind": "function",
-          "line": 312,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        }
-      ],
-      "lastModified": 1775419258858.946
-    },
-    {
       "path": "src/__tests__/task-planner.test.ts",
       "exports": [],
       "imports": [
@@ -1313,42 +950,6 @@
         }
       ],
       "lastModified": 1775419372896.4697
-    },
-    {
-      "path": "src/plan-commands.ts",
-      "exports": [
-        {
-          "name": "PlanCommandContext",
-          "kind": "interface",
-          "line": 19,
-          "exported": true
-        },
-        {
-          "name": "handlePlanCommand",
-          "kind": "function",
-          "line": 35,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "./task-planner.js"
-        },
-        {
-          "names": [],
-          "from": "./project-detector.js"
-        }
-      ],
-      "lastModified": 1775420094981.8403
     },
     {
       "path": "src/tui.tsx",
@@ -1501,6 +1102,581 @@
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
       "lastModified": 1775420058267.8577
+    },
+    {
+      "path": "src/hooks.ts",
+      "exports": [
+        {
+          "name": "HookEvent",
+          "kind": "type",
+          "line": 14,
+          "exported": true
+        },
+        {
+          "name": "HookConfig",
+          "kind": "interface",
+          "line": 16,
+          "exported": true
+        },
+        {
+          "name": "HooksConfig",
+          "kind": "interface",
+          "line": 22,
+          "exported": true
+        },
+        {
+          "name": "HookInput",
+          "kind": "interface",
+          "line": 27,
+          "exported": true
+        },
+        {
+          "name": "HookOutput",
+          "kind": "interface",
+          "line": 36,
+          "exported": true
+        },
+        {
+          "name": "loadHooksConfig",
+          "kind": "function",
+          "line": 50,
+          "exported": true
+        },
+        {
+          "name": "matchHooks",
+          "kind": "function",
+          "line": 65,
+          "exported": true
+        },
+        {
+          "name": "executeHook",
+          "kind": "function",
+          "line": 91,
+          "exported": true
+        },
+        {
+          "name": "runHooks",
+          "kind": "function",
+          "line": 168,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        }
+      ],
+      "lastModified": 1775420683690.1445
+    },
+    {
+      "path": "src/orchestrator.ts",
+      "exports": [
+        {
+          "name": "PARALLEL_SAFE_TOOLS",
+          "kind": "const",
+          "line": 54,
+          "exported": true
+        },
+        {
+          "name": "MICRO_COMPACT_THRESHOLD",
+          "kind": "const",
+          "line": 69,
+          "exported": true
+        },
+        {
+          "name": "COMPACT_TIER1_THRESHOLD",
+          "kind": "const",
+          "line": 71,
+          "exported": true
+        },
+        {
+          "name": "COMPACT_THRESHOLD",
+          "kind": "const",
+          "line": 73,
+          "exported": true
+        },
+        {
+          "name": "CONTEXT_WARNING_THRESHOLD",
+          "kind": "const",
+          "line": 75,
+          "exported": true
+        },
+        {
+          "name": "PRUNE_THRESHOLD",
+          "kind": "const",
+          "line": 76,
+          "exported": true
+        },
+        {
+          "name": "selectCompactionTier",
+          "kind": "function",
+          "line": 82,
+          "exported": true
+        },
+        {
+          "name": "MODEL_PRICING",
+          "kind": "const",
+          "line": 90,
+          "exported": true
+        },
+        {
+          "name": "ConversationCheckpoint",
+          "kind": "interface",
+          "line": 113,
+          "exported": true
+        },
+        {
+          "name": "MAX_CHECKPOINTS",
+          "kind": "const",
+          "line": 121,
+          "exported": true
+        },
+        {
+          "name": "OrchestratorOptions",
+          "kind": "interface",
+          "line": 123,
+          "exported": true
+        },
+        {
+          "name": "OrchestratorResult",
+          "kind": "interface",
+          "line": 163,
+          "exported": true
+        },
+        {
+          "name": "CostInfo",
+          "kind": "interface",
+          "line": 172,
+          "exported": true
+        },
+        {
+          "name": "routeModel",
+          "kind": "function",
+          "line": 187,
+          "exported": true
+        },
+        {
+          "name": "computeCost",
+          "kind": "function",
+          "line": 215,
+          "exported": true
+        },
+        {
+          "name": "buildSystemPrompt",
+          "kind": "function",
+          "line": 227,
+          "exported": true
+        },
+        {
+          "name": "buildCachedSystem",
+          "kind": "function",
+          "line": 300,
+          "exported": true
+        },
+        {
+          "name": "injectMessageCacheBreakpoints",
+          "kind": "function",
+          "line": 311,
+          "exported": true
+        },
+        {
+          "name": "isToolError",
+          "kind": "function",
+          "line": 407,
+          "exported": true
+        },
+        {
+          "name": "Orchestrator",
+          "kind": "class",
+          "line": 762,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [
+            "Anthropic"
+          ],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [
+            "compressToolOutput"
+          ],
+          "from": "./tool-output-compressor.js"
+        },
+        {
+          "names": [
+            "fingerprintRepo"
+          ],
+          "from": "./repo-context.js"
+        },
+        {
+          "names": [
+            "rankFiles"
+          ],
+          "from": "./file-ranker.js"
+        },
+        {
+          "names": [
+            "buildRepoMap",
+            "formatRepoMap",
+            "rankSymbols",
+            "truncateRepoMap",
+            "saveRepoMapCache",
+            "loadRepoMapCache",
+            "getStaleFiles",
+            "updateRepoMapIncremental",
+            "cacheToRepoMap"
+          ],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [
+            "shouldDecompose",
+            "decomposeTasks",
+            "formatSubtasks"
+          ],
+          "from": "./task-decomposer.js"
+        },
+        {
+          "names": [
+            "runVerification",
+            "formatVerificationResults"
+          ],
+          "from": "./verification.js"
+        },
+        {
+          "names": [
+            "createDefaultRegistry"
+          ],
+          "from": "./tool-registry.js"
+        },
+        {
+          "names": [
+            "getProjectMemoryBlock"
+          ],
+          "from": "./project-memory.js"
+        },
+        {
+          "names": [
+            "autoCommit",
+            "type AutoCommitResult"
+          ],
+          "from": "./auto-commit.js"
+        },
+        {
+          "names": [
+            "runDiagnostics"
+          ],
+          "from": "./diagnostics.js"
+        },
+        {
+          "names": [
+            "findRelatedTests",
+            "runRelatedTests"
+          ],
+          "from": "./test-runner.js"
+        },
+        {
+          "names": [
+            "computeUnifiedDiff"
+          ],
+          "from": "./diff-preview.js"
+        },
+        {
+          "names": [
+            "autoLoadContext",
+            "extractFileReferences",
+            "loadFileReferences",
+            "stripFileReferences"
+          ],
+          "from": "./context-loader.js"
+        },
+        {
+          "names": [
+            "enhanceToolError"
+          ],
+          "from": "./tool-recovery.js"
+        },
+        {
+          "names": [
+            "detectProject"
+          ],
+          "from": "./project-detector.js"
+        },
+        {
+          "names": [
+            "detectLoop"
+          ],
+          "from": "./loop-detector.js"
+        },
+        {
+          "names": [
+            "loadHooksConfig",
+            "runHooks",
+            "type HooksConfig"
+          ],
+          "from": "./hooks.js"
+        },
+        {
+          "names": [
+            "* as fs"
+          ],
+          "from": "fs"
+        },
+        {
+          "names": [
+            "FileWatcher"
+          ],
+          "from": "./file-watcher.js"
+        },
+        {
+          "names": [
+            "scoredPrune"
+          ],
+          "from": "./context-pruner.js"
+        }
+      ],
+      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
+      "lastModified": 1775420734656.5896
+    },
+    {
+      "path": "src/plan-commands.ts",
+      "exports": [
+        {
+          "name": "PlanCommandContext",
+          "kind": "interface",
+          "line": 21,
+          "exported": true
+        },
+        {
+          "name": "handlePlanCommand",
+          "kind": "function",
+          "line": 37,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "./task-planner.js"
+        },
+        {
+          "names": [],
+          "from": "./plan-executor.js"
+        },
+        {
+          "names": [],
+          "from": "./project-detector.js"
+        },
+        {
+          "names": [],
+          "from": "./plan-summary.js"
+        }
+      ],
+      "lastModified": 1775420500881.7385
+    },
+    {
+      "path": "src/plan-summary.ts",
+      "exports": [
+        {
+          "name": "PlanSummary",
+          "kind": "interface",
+          "line": 13,
+          "exported": true
+        },
+        {
+          "name": "getChangedFiles",
+          "kind": "function",
+          "line": 30,
+          "exported": true
+        },
+        {
+          "name": "parseTestCounts",
+          "kind": "function",
+          "line": 53,
+          "exported": true
+        },
+        {
+          "name": "generatePlanSummary",
+          "kind": "function",
+          "line": 74,
+          "exported": true
+        },
+        {
+          "name": "formatPlanSummary",
+          "kind": "function",
+          "line": 140,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
+          "from": "./diagnostics.js"
+        },
+        {
+          "names": [],
+          "from": "./test-runner.js"
+        },
+        {
+          "names": [],
+          "from": "./task-planner.js"
+        }
+      ],
+      "lastModified": 1775420269666.4895
+    },
+    {
+      "path": "src/task-planner.ts",
+      "exports": [
+        {
+          "name": "Task",
+          "kind": "interface",
+          "line": 12,
+          "exported": true
+        },
+        {
+          "name": "TaskPlan",
+          "kind": "interface",
+          "line": 22,
+          "exported": true
+        },
+        {
+          "name": "TaskExecutor",
+          "kind": "type",
+          "line": 31,
+          "exported": true
+        },
+        {
+          "name": "OnFailureCallback",
+          "kind": "type",
+          "line": 34,
+          "exported": true
+        },
+        {
+          "name": "getNextTasks",
+          "kind": "function",
+          "line": 47,
+          "exported": true
+        },
+        {
+          "name": "formatPlan",
+          "kind": "function",
+          "line": 60,
+          "exported": true
+        },
+        {
+          "name": "buildTaskContext",
+          "kind": "function",
+          "line": 94,
+          "exported": true
+        },
+        {
+          "name": "executePlan",
+          "kind": "function",
+          "line": 131,
+          "exported": true
+        },
+        {
+          "name": "createPlan",
+          "kind": "function",
+          "line": 203,
+          "exported": true
+        },
+        {
+          "name": "replanOnFailure",
+          "kind": "function",
+          "line": 281,
+          "exported": true
+        },
+        {
+          "name": "PLAN_FILENAME",
+          "kind": "const",
+          "line": 313,
+          "exported": true
+        },
+        {
+          "name": "savePlan",
+          "kind": "function",
+          "line": 318,
+          "exported": true
+        },
+        {
+          "name": "loadPlan",
+          "kind": "function",
+          "line": 327,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        }
+      ],
+      "lastModified": 1775420282647.42
+    },
+    {
+      "path": "src/plan-executor.ts",
+      "exports": [
+        {
+          "name": "PlanExecutorOptions",
+          "kind": "interface",
+          "line": 14,
+          "exported": true
+        },
+        {
+          "name": "createPlanExecutor",
+          "kind": "function",
+          "line": 30,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [],
+          "from": "./task-planner.js"
+        },
+        {
+          "names": [],
+          "from": "./task-planner.js"
+        }
+      ],
+      "lastModified": 1775420487000.2812
     }
   ]
 }

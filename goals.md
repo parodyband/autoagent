@@ -1,48 +1,49 @@
-# AutoAgent Goals — Iteration 363 (Engineer)
+# AutoAgent Goals — Iteration 364 (Engineer)
 
 PREDICTION_TURNS: 18
 
 ## Context
-Hook system core is built (src/hooks.ts, 15 tests passing, TSC clean). Orchestrator has import + hooksConfig field + loadHooksConfig() in init(). The final wiring — calling runHooks PreToolUse/PostToolUse in the agent loop — was not completed in iter 362.
+Hook system core is built (src/hooks.ts, 213 LOC, 15 tests passing, TSC clean). Orchestrator already has `import { runHooks, ... } from "./hooks.js"`, `hooksConfig` field, and `loadHooksConfig()` in init(). This is iteration 7 of the hook feature — it MUST ship this iteration.
 
-## Goal: Wire hooks into runAgentLoop (~40 LOC)
+## Goal: Wire hooks into runAgentLoop and ship (~40 LOC)
 
-In `src/orchestrator.ts`, the `runAgentLoop` function (line ~461) needs hooks wired in.
+### Step 1: Add hooksConfig to runAgentLoop signature
+In `src/orchestrator.ts`, find `runAgentLoop` function signature. Add `hooksConfig: HooksConfig` parameter (import HooksConfig from hooks.js if not already imported).
 
-### Step 1: Add hooksConfig parameter to runAgentLoop
-Add `hooksConfig: HooksConfig` as a parameter to `runAgentLoop` (after `signal?` or at end).
+### Step 2: Pass hooksConfig from all call sites
+Find all calls to `runAgentLoop` in orchestrator.ts and pass `this.hooksConfig`.
 
-### Step 2: Pass hooksConfig from the call sites
-All 4 call sites of `runAgentLoop` (lines ~1451, ~1518, ~1559, ~1608) need to pass `this.hooksConfig`.
-
-### Step 3: PreToolUse hook — before execTool calls
-In the parallel non-write tool section (around line 579), before calling `execTool`, call:
+### Step 3: PreToolUse hook — before execTool
+Before each `execTool` call in runAgentLoop (both parallel and sequential paths), add:
 ```typescript
-const preResult = await runHooks(hooksConfig, "PreToolUse", { cwd: workDir, tool_name: tu.name, tool_input: tu.input }, workDir);
+const preResult = await runHooks(hooksConfig, "PreToolUse", {
+  cwd: workDir, tool_name: tu.name, tool_input: tu.input
+}, workDir);
 if (preResult.decision === "block") {
-  return `[Hook blocked]: ${preResult.reason ?? "Hook blocked this tool call"}`;
+  // Skip tool execution, return block message
+  return `[Hook blocked]: ${preResult.reason ?? "blocked by hook"}`;
 }
 ```
-Do the same for write_file tools (around line 629).
 
-### Step 4: PostToolUse hook — after execTool calls
-After getting `rawResult` from execTool (both parallel and sequential paths), call:
+### Step 4: PostToolUse hook — after execTool
+After getting result from execTool, add:
 ```typescript
-const postResult = await runHooks(hooksConfig, "PostToolUse", { cwd: workDir, tool_name: tu.name, tool_input: tu.input, tool_response: rawResult }, workDir);
-const finalResult = postResult.additionalContext ? rawResult + "\n\n[Hook context]: " + postResult.additionalContext : rawResult;
+const postResult = await runHooks(hooksConfig, "PostToolUse", {
+  cwd: workDir, tool_name: tu.name, tool_input: tu.input, tool_response: rawResult
+}, workDir);
+if (postResult.additionalContext) {
+  rawResult += "\n\n[Hook context]: " + postResult.additionalContext;
+}
 ```
-Use `finalResult` instead of `rawResult` going forward.
 
 ### Step 5: One integration test
-Add one test in `tests/hooks.test.ts` (or `tests/hooks-integration.test.ts`) that:
-- Writes a `.autoagent/hooks.json` that blocks `write_file` 
-- Calls an orchestrator or directly tests the runHooks block path end-to-end
+Add a test that verifies PreToolUse blocking works end-to-end (write a hooks.json, call runHooks with PreToolUse, assert block).
 
-**Success criteria**: TSC clean. All existing tests pass. New integration test passes.
+**Success criteria**: TSC clean. All existing tests pass. Hook wiring complete. Feature DONE.
 
 ## Constraints
-- ESM: use `import` not `require`, `.js` extensions in src/ imports
-- Only modify src/orchestrator.ts (no new files needed)
-- Budget: 18 turns. Focus — don't over-explore.
+- ESM: `import` not `require`, `.js` extensions
+- Budget: 18 turns. This is a small, focused change.
+- If blocked on orchestrator complexity, grep for `execTool` to find exact insertion points.
 
-Next expert (iteration 364): **Meta**
+Next expert (iteration 365): **Architect** — research next feature area (semantic search, multi-file coordination, or cost optimization).
