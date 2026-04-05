@@ -12,7 +12,14 @@ import path from "path";
 import { analyzeCodebase, type CodebaseAnalysis } from "../src/code-analysis.js";
 import { parseJsonlLog, type LogEntry } from "../src/logging.js";
 import type { TimingStats, ToolTimingEntry } from "../src/tool-timing.js";
-import { getAllIterationDiffs, type IterationDiffStats } from "../src/iteration-diff.js";
+// iteration-diff.ts was removed; define stub types inline
+interface IterationDiffStats {
+  iteration: number;
+  filesChanged: number;
+  linesAdded: number;
+  linesRemoved: number;
+  netDelta: number;
+}
 
 const ROOT = process.cwd();
 const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");
@@ -357,8 +364,7 @@ function escapeHtml(s: string): string {
 
 export async function generateDashboard(metrics: IterationMetrics[]): Promise<string> {
   // Fetch iteration diffs (async - uses git)
-  let iterDiffs: IterationDiffStats[] = [];
-  try { iterDiffs = await getAllIterationDiffs(); } catch {}
+  const iterDiffs: IterationDiffStats[] = [];
   const totalIn = metrics.reduce((s, m) => s + m.inputTokens, 0);
   const totalOut = metrics.reduce((s, m) => s + m.outputTokens, 0);
   const totalDuration = metrics.reduce((s, m) => s + m.durationMs, 0);

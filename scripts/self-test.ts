@@ -22,10 +22,10 @@ import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, 
 import { Logger, createLogger, parseJsonlLog, rotateLogFile, LOG_ROTATION_LIMITS, type LogEntry } from "../src/logging.js";
 import { ToolCache, CACHEABLE_TOOLS, extractPaths, pathOverlaps } from "../src/tool-cache.js";
 import { ToolTimingTracker } from "../src/tool-timing.js";
-import { getIterationCommits, computeDiffStats, getAllIterationDiffs, type IterationDiffStats, type FileDiffStat } from "../src/iteration-diff.js";
 import { recordMetrics, type IterationMetrics } from "../src/finalization.js";
 import { handleToolCall, processTurn, runConversation, type IterationCtx, type TurnResult } from "../src/conversation.js";
 import { countConsecutiveFailures, buildRecoveryNote, buildRecoveryGoals, resuscitate, handleIterationFailure, type ResuscitationConfig } from "../src/resuscitation.js";
+import { getIterationCommits, computeDiffStats, getAllIterationDiffs } from "../src/iteration-diff.js";
 import type { IterationState } from "../src/iteration.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync } from "fs";
 import path from "path";
