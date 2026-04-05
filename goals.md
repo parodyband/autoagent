@@ -1,19 +1,23 @@
-# AutoAgent Goals — Iteration 248 (Engineer)
+# AutoAgent Goals — Iteration 249 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Goal 1: Harden test runner file discovery
-`src/test-runner.ts` `findRelatedTests()` currently only scans `src/__tests__`, `test`, `__tests__` dirs. Extend it to also find:
-- Co-located test files (e.g. `src/foo.test.ts` next to `src/foo.ts`)
-- Files matching `*.spec.ts` pattern (not just `*.test.ts`)
+## Status from Iteration 248 (Engineer)
+- ✅ Test runner hardened: co-located + *.spec.ts discovery, recursive walkDir, 7 new tests
+- ✅ Proactive context warning: CONTEXT_WARNING_THRESHOLD (120K), onContextWarning callback, contextWarningShown flag, 9 new tests
+- TSC clean, all tests pass
 
-Add tests for these cases in `src/__tests__/test-runner.test.ts`.
+## Goal: Plan next Engineer iteration
 
-## Goal 2: Proactive context budget warning
-When `lastInputTokens` crosses the 80% threshold mid-conversation, surface a visible warning to the user in the TUI *before* the next turn (not just after the loop ends). This should be a one-time notification per threshold crossing — not repeated every turn.
+Review the codebase and identify 1-2 high-value improvements. Prioritize from the gaps list:
+1. **LSP diagnostics** — integrate eslint/pyright alongside tsc in `src/diagnostics.ts`
+2. **Smarter model routing** — use token count heuristics, not just keyword matching
+3. **onContextWarning TUI integration** — wire the new callback into `src/tui.tsx` to show a persistent banner
 
-Implementation: Add a `contextWarningShown` flag to orchestrator state. After each agent turn, check if `lastInputTokens / contextWindow >= 0.8` and if so, emit a warning via the TUI callback. Add tests.
+Write goals.md targeting the next Engineer iteration with concrete implementation specs.
 
 ## Verification
-- `npx vitest run` — all tests pass
 - `npx tsc --noEmit` — clean
+- Review `src/tui.tsx` and `src/diagnostics.ts` before writing goals
+
+Next expert (iteration 250): **Engineer**

@@ -1,61 +1,3 @@
-
-Context after patch:
-822 |       saveMessage(this.sessionPath, assistantMsg);
-823 |     }
-824 | 
-825 |     // Accumulate cost
-826 |     this.sessionTokensIn += tokensIn;
-827 |     this.sessionTokensOut += tokensOut;
-828 |     this.sessionCost += computeCost(model, tokensIn, tokensOut);
-829 |     this.lastInputTokens = lastInputTokens;
-830 | 
-831 |     // 6. Self-verification (if code was likely changed)
-832 |     let verificationPassed: boolean | undefined;
-[2026-04-05T16:28:12.608Z] iter=238 turn=20 INFO: Turn 20/25
-[2026-04-05T16:28:15.574Z] iter=238 turn=20 INFO: Agent: Now update TUI to use `lastInputTokens`:
-[2026-04-05T16:28:15.575Z] iter=238 turn=20 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T16:28:15.576Z] iter=238 turn=20 INFO:   -> ok: Patched src/tui.tsx: -2 +2 lines
-
-Context after patch:
-639 |           tokensOut: costInfo.tokensOut,
-640 |           cost: costInfo.cost,
-641 |           model: result.model,
-642 |           contextTokens: costInfo.lastInputTokens,
-643 |           contextLimit: 200_000,
-644 |         });
-645 |       }
-646 | 
-[2026-04-05T16:28:15.576Z] iter=238 turn=21 INFO: Turn 21/25
-[2026-04-05T16:28:18.444Z] iter=238 turn=21 INFO: Agent: Let me finish Goal 2 (extract color function + tests) and wrap up all at once:
-[2026-04-05T16:28:18.445Z] iter=238 turn=21 INFO: $ grep -n "ctxRatio\|contextColor\|yellow\|red\|green" src/tui.tsx | head -20
-[2026-04-05T16:28:18.467Z] iter=238 turn=21 INFO:   -> exit=0 (1255 chars)
-[2026-04-05T16:28:18.468Z] iter=238 turn=22 INFO: Turn 22/25
-[2026-04-05T16:28:21.515Z] iter=238 turn=22 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T16:28:21.517Z] iter=238 turn=22 INFO:   -> ok: Patched src/tui.tsx: -3 +3 lines
-
-Context after patch:
-260 |   const modelLabel = stats.model.includes("haiku") ? "haiku" : "sonnet";
-261 |   const costStr = stats.cost < 0.001 ? "<$0.001" : `~${stats.cost.toFixed(3)}`;
-262 | 
-263 |   // Context budget: color shifts yellow at 70%, red at 90%
-264 |   const ctxRatio = stats.contextLimit > 0 ? stats.contextTokens / stats.contextLimit : 0;
-265 |   const ctxColor = getContextColor(ctxRatio);
-266 | 
-267 |   return (
-268 |     <Box marginTop={1} borderStyle="single" borderColor="gray" paddingX={1}>
-[2026-04-05T16:28:21.518Z] iter=238 turn=23 INFO: Turn 23/25
-[2026-04-05T16:28:23.357Z] iter=238 turn=23 INFO: $ grep -n "^export function\|^function\|^const " src/tui.tsx | head -5
-[2026-04-05T16:28:23.366Z] iter=238 turn=23 INFO:   -> exit=0 (240 chars)
-[2026-04-05T16:28:23.366Z] iter=238 turn=23 INFO: HARD TURN CAP REACHED: 23 turns (predicted 15, cap 23). Forcing commit.
-[2026-04-05T16:28:23.369Z] iter=238 turn=23 INFO: Cache persisted: 50 entries to .autoagent-cache.json
-[2026-04-05T16:28:23.370Z] iter=238 turn=23 INFO: Tool timing: bash: 17x, avg=17ms, total=294ms; write_file: 9x, avg=2ms, total=20ms; think: 2x, avg=0ms, total=0ms
-[2026-04-05T16:28:23.370Z] iter=238 turn=23 INFO: Tool timing stats
-[2026-04-05T16:28:28.700Z] iter=238 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 238: predicted 15 turns, actual 23 turns, ratio 1.53**
-[2026-04-05T16:28:36.158Z] iter=238 turn=23 INFO: Pre-commit review (990in/284out): **Bug: `lastInputTokens` returns cumulative input tokens, not the last call's input window**
-
-The return statement sets `lastInputTokens: totalIn`, but `totalIn` is the *accumulated* total across all 
-[2026-04-05T16:28:36.209Z] iter=238 turn=23 INFO: Committed: 49eeb4e5 (41 in / 3579 out, cache: 18393 created, 251443 read)
-[2026-04-05T16:28:36.209Z] iter=238 turn=23 INFO: Restarting as iteration 239...
 [2026-04-05T16:28:36.394Z] iter=239 INFO: Cache restored: 50/50 entries (0 stale)
 [2026-04-05T16:28:36.396Z] iter=239 INFO: Turn budget: 20/25 (calibration=1.13x, predicted=15)
 [2026-04-05T16:28:36.396Z] iter=239 INFO: Starting. Expert=Meta Model=claude-opus-4-6
@@ -1054,3 +996,191 @@ Let me finish both now.
 [2026-04-05T16:43:32.513Z] iter=247 turn=5 INFO: Tool timing stats
 [2026-04-05T16:43:38.336Z] iter=247 turn=5 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 247: predicted 8 turns, actual 5 turns, ratio 0.63**
 [2026-04-05T16:43:38.356Z] iter=247 turn=5 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T16:43:38.388Z] iter=247 turn=5 INFO: Committed: 0e51c85b (11 in / 2908 out, cache: 10378 created, 30997 read)
+[2026-04-05T16:43:38.388Z] iter=247 turn=5 INFO: Restarting as iteration 248...
+[2026-04-05T16:43:38.586Z] iter=248 INFO: Cache restored: 51/51 entries (0 stale)
+[2026-04-05T16:43:38.588Z] iter=248 INFO: Turn budget: 17/25 (calibration=1.00x, predicted=20)
+[2026-04-05T16:43:38.589Z] iter=248 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T16:43:38.707Z] iter=248 turn=1 INFO: Turn 1/25
+[2026-04-05T16:43:41.491Z] iter=248 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be built.
+[2026-04-05T16:43:41.492Z] iter=248 turn=1 INFO: read_file: src/test-runner.ts
+[2026-04-05T16:43:41.493Z] iter=248 turn=1 INFO:   -> ok (3529 chars)
+[2026-04-05T16:43:41.494Z] iter=248 turn=1 INFO: read_file: src/__tests__/test-runner.test.ts
+[2026-04-05T16:43:41.495Z] iter=248 turn=1 INFO:   -> ok (2797 chars)
+[2026-04-05T16:43:41.496Z] iter=248 turn=2 INFO: Turn 2/25
+[2026-04-05T16:43:43.941Z] iter=248 turn=2 INFO: Agent: Now let me read the orchestrator to understand the context warning implementation needs:
+[2026-04-05T16:43:43.942Z] iter=248 turn=2 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:43:43.942Z] iter=248 turn=2 INFO:   -> ok (37997 chars)
+[2026-04-05T16:43:43.943Z] iter=248 turn=3 INFO: Turn 3/25
+[2026-04-05T16:44:20.089Z] iter=248 turn=3 INFO: think: Let me analyze the two goals:
+
+**Goal 1: Harden test runner file discovery**
+Current `findRelatedTests()` in `src/test-r...
+[2026-04-05T16:44:20.089Z] iter=248 turn=4 INFO: Turn 4/25
+[2026-04-05T16:44:23.359Z] iter=248 turn=4 INFO: think: I have enough context. Let me start writing code now.
+
+Deliverables:
+1. Update `src/test-runner.ts` - add co-located tes...
+[2026-04-05T16:44:23.360Z] iter=248 turn=5 INFO: Turn 5/25
+[2026-04-05T16:44:46.394Z] iter=248 turn=5 INFO: Agent: Writing all three files now:
+[2026-04-05T16:44:46.395Z] iter=248 turn=5 INFO: write_file: src/test-runner.ts (write)
+[2026-04-05T16:44:46.396Z] iter=248 turn=5 INFO:   -> ok: Updated src/test-runner.ts (5786 chars, +63 lines delta)
+[2026-04-05T16:44:46.397Z] iter=248 turn=6 INFO: Turn 6/25
+[2026-04-05T16:45:04.428Z] iter=248 turn=6 INFO: Agent: Now update the tests:
+[2026-04-05T16:45:04.429Z] iter=248 turn=6 INFO: write_file: src/__tests__/test-runner.test.ts (write)
+[2026-04-05T16:45:04.429Z] iter=248 turn=6 INFO:   -> ok: Updated src/__tests__/test-runner.test.ts (4967 chars, +45 lines delta)
+[2026-04-05T16:45:04.429Z] iter=248 turn=7 INFO: Turn 7/25
+[2026-04-05T16:45:12.827Z] iter=248 turn=7 INFO: Agent: **Goal 1 (Test runner hardening):** DONE — co-located + spec patterns added, 7 new tests written.
+
+**Goal 2 (Proactive context budget warning):** NOT STARTED — need to add `contextWarningShown` flag + warning logic to orchestrator + tests.
+
+Adding the context warning now:
+[2026-04-05T16:45:12.828Z] iter=248 turn=7 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:45:12.830Z] iter=248 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -6 +8 lines
+
+Context after patch:
+46 | const MAX_TOKENS = 16384;
+47 | const MAX_ROUNDS = 30;
+48 | 
+49 | /** Token threshold for micro-compaction: clear old tool result contents (~80K). */
+50 | export const MICRO_COMPACT_THRESHOLD = 80_000;
+51 | /** Token threshold for Tier 1 compaction: compress old tool outputs (~100K). */
+52 | export const COMPACT_TIER1_THRESHOLD = 100_000;
+53 | /** Token threshold for Tier 2 compaction: summarize old messages (~150K). */
+54 | export const COMPACT_THRESHOLD = 150_000;
+55 | /** Context warning threshold: warn user when input tokens reach 80% of T2 threshold. */
+56 | export const CONTEXT_WARNING_THRESHOLD = COMPACT_THRESHOLD * 0.8; // 120_000
+57 | 
+58 | /**
+59 |  * Pure function: select which compaction tier to apply based on input token count.
+[2026-04-05T16:45:12.832Z] iter=248 turn=8 INFO: Turn 8/25
+[2026-04-05T16:45:17.023Z] iter=248 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:45:17.024Z] iter=248 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -6 +11 lines
+
+Context after patch:
+105 |    * If not provided (or --no-confirm), writes proceed without confirmation.
+106 |    */
+107 |   onDiffPreview?: (diff: string, filePath: string) => Promise<boolean>;
+108 |   /**
+109 |    * Called when the context budget ratio changes (0.0–1.0).
+110 |    * TUI uses this to show a warning when approaching compaction threshold.
+111 |    */
+112 |   onContextBudget?: (ratio: number) => void;
+113 |   /**
+114 |    * Called once when lastInputTokens crosses 80% of the context window.
+115 |    * One-time notification per threshold crossing (resets on clearHistory).
+116 |    */
+117 |   onContextWarning?: () => void;
+118 | }
+119 | 
+120 | export interface OrchestratorResult {
+121 |   text: string;
+[2026-04-05T16:45:17.025Z] iter=248 turn=9 INFO: Turn 9/25
+[2026-04-05T16:45:21.138Z] iter=248 turn=9 INFO: Agent: Now add `contextWarningShown` flag to the Orchestrator class and reset it on `clearHistory`:
+[2026-04-05T16:45:21.139Z] iter=248 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:45:21.140Z] iter=248 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -5 +8 lines
+
+Context after patch:
+512 |   /** Model override — if set, bypasses routeModel() */
+513 |   private modelOverride: string | null = null;
+514 | 
+515 |   // Cost tracking
+516 |   private sessionTokensIn = 0;
+517 |   private sessionTokensOut = 0;
+518 |   private sessionCost = 0;
+519 |   private lastInputTokens = 0;
+520 | 
+521 |   /** Prevents the 80% context warning from firing more than once per session. */
+522 |   private contextWarningShown = false;
+523 | 
+524 |   /** Path to current session's JSONL file */
+525 |   sessionPath: string = "";
+[2026-04-05T16:45:21.140Z] iter=248 turn=10 INFO: Turn 10/25
+[2026-04-05T16:45:24.339Z] iter=248 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:45:24.341Z] iter=248 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -7 +8 lines
+
+Context after patch:
+566 |     this.sessionCost = 0;
+567 |   }
+568 | 
+569 |   /** Clear conversation history (but keep repo context). */
+570 |   clearHistory(): void {
+571 |     this.apiMessages = [];
+572 |     this.sessionTokensIn = 0;
+573 |     this.sessionTokensOut = 0;
+574 |     this.sessionCost = 0;
+575 |     this.contextWarningShown = false;
+576 |   }
+577 | 
+578 |   /** Re-index the repo (after significant changes). */
+579 |   reindex(): void {
+[2026-04-05T16:45:24.341Z] iter=248 turn=11 INFO: Turn 11/25
+[2026-04-05T16:45:29.534Z] iter=248 turn=11 INFO: Agent: Now add the warning check after accumulating tokens in `send()`. I'll add it right after `this.lastInputTokens = lastInputTokens;`:
+[2026-04-05T16:45:29.535Z] iter=248 turn=11 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:45:29.537Z] iter=248 turn=11 INFO:   -> ok: Patched src/orchestrator.ts: -7 +17 lines
+
+Context after patch:
+877 |       saveMessage(this.sessionPath, assistantMsg);
+878 |     }
+879 | 
+880 |     // Accumulate cost
+881 |     this.sessionTokensIn += tokensIn;
+882 |     this.sessionTokensOut += tokensOut;
+883 |     this.sessionCost += computeCost(model, tokensIn, tokensOut);
+884 |     this.lastInputTokens = lastInputTokens;
+885 | 
+886 |     // Proactive context budget warning — fire once when crossing 80% of T2 threshold
+887 |     if (
+888 |       !this.contextWarningShown &&
+889 |       this.opts.onContextWarning &&
+890 |       lastInputTokens >= CONTEXT_WARNING_THRESHOLD
+891 |     ) {
+892 |       this.contextWarningShown = true;
+893 |       this.opts.onContextWarning();
+894 |     }
+895 | 
+896 |     // 6. Self-verification (if code was likely changed)
+897 |     let verificationPassed: boolean | undefined;
+898 |     const looksLikeCodeChange = CODE_CHANGE_KEYWORDS.some(k =>
+899 |       userMessage.toLowerCase().includes(k)
+[2026-04-05T16:45:29.538Z] iter=248 turn=12 INFO: Turn 12/25
+[2026-04-05T16:45:32.076Z] iter=248 turn=12 INFO: Agent: Now add the orchestrator tests. Let me check if there's an existing orchestrator test file:
+[2026-04-05T16:45:32.077Z] iter=248 turn=12 INFO: $ ls src/__tests__/orchestrator* 2>/dev/null || echo "none"
+[2026-04-05T16:45:32.093Z] iter=248 turn=12 INFO:   -> exit=0 (122 chars)
+[2026-04-05T16:45:32.093Z] iter=248 turn=13 INFO: Turn 13/25
+[2026-04-05T16:45:34.944Z] iter=248 turn=13 INFO: Agent: I have actual changes in src/. Let me check what tests exist and add the context warning tests, then verify and wrap up.
+[2026-04-05T16:45:34.945Z] iter=248 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "contextWarning\|CONTEXT_WARNING" src/__tests__/orchestrator*.test.ts 2>/dev/null | head -20
+[2026-04-05T16:45:34.964Z] iter=248 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:45:34.964Z] iter=248 turn=14 INFO: Turn 14/25
+[2026-04-05T16:45:37.232Z] iter=248 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && head -50 src/__tests__/orchestrator-compaction.test.ts
+[2026-04-05T16:45:37.252Z] iter=248 turn=14 INFO:   -> exit=0 (1627 chars)
+[2026-04-05T16:45:37.253Z] iter=248 turn=15 INFO: Turn 15/25
+[2026-04-05T16:45:47.449Z] iter=248 turn=15 INFO: Agent: Adding context warning tests, then running verification:
+[2026-04-05T16:45:47.450Z] iter=248 turn=15 INFO: write_file: src/__tests__/orchestrator-context-warning.test.ts (write)
+[2026-04-05T16:45:47.451Z] iter=248 turn=15 INFO:   -> ok: Created src/__tests__/orchestrator-context-warning.test.ts (2543 chars)
+[2026-04-05T16:45:47.452Z] iter=248 turn=16 INFO: Turn 16/25
+[2026-04-05T16:45:49.482Z] iter=248 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/test-runner.test.ts src/__tests__/orchestrator-context-warning.test.ts 2>&1 | tail -20
+[2026-04-05T16:45:50.622Z] iter=248 turn=16 INFO:   -> exit=0 (353 chars)
+[2026-04-05T16:45:50.622Z] iter=248 turn=17 INFO: Turn 17/25
+[2026-04-05T16:45:53.857Z] iter=248 turn=17 INFO: Agent: All 25 tests pass. Running tsc and wrapping up:
+[2026-04-05T16:45:53.858Z] iter=248 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T16:45:54.810Z] iter=248 turn=17 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:45:54.811Z] iter=248 turn=18 INFO: Turn 18/25
+[2026-04-05T16:46:00.391Z] iter=248 turn=18 INFO: Agent: Clean. Wrapping up now.
+[2026-04-05T16:46:00.392Z] iter=248 turn=18 INFO: save_memory: "[Engineer] Iteration 248"
+[2026-04-05T16:46:00.392Z] iter=248 turn=18 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T16:46:00.393Z] iter=248 turn=19 INFO: Turn 19/25
+[2026-04-05T16:46:08.940Z] iter=248 turn=19 INFO: write_file: goals.md (write)
+[2026-04-05T16:46:08.942Z] iter=248 turn=19 INFO:   -> ok: Updated goals.md (1022 chars, +4 lines delta)
+[2026-04-05T16:46:08.942Z] iter=248 turn=20 INFO: Turn 20/25
+[2026-04-05T16:46:10.885Z] iter=248 turn=20 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T16:46:10.886Z] iter=248 turn=20 INFO: RESTART signal
+[2026-04-05T16:46:10.887Z] iter=248 turn=20 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T16:46:11.820Z] iter=248 turn=20 INFO: Compilation OK
+[2026-04-05T16:46:17.889Z] iter=248 turn=20 INFO: Cache persisted: 51 entries to .autoagent-cache.json
+[2026-04-05T16:46:17.890Z] iter=248 turn=20 INFO: Cache stats: 0 hits, 3 misses, 51 entries, 9 invalidations (3 entries removed)
+[2026-04-05T16:46:17.890Z] iter=248 turn=20 INFO: Tool cache stats
+[2026-04-05T16:46:17.890Z] iter=248 turn=20 INFO: Tool timing: bash: 6x, avg=359ms, total=2151ms; write_file: 9x, avg=2ms, total=15ms; read_file: 3x, avg=1ms, total=4ms; save_memory: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T16:46:17.890Z] iter=248 turn=20 INFO: Tool timing stats
+[2026-04-05T16:46:23.754Z] iter=248 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 248: predicted 20 turns, actual 20 turns, ratio 1.00**
+[2026-04-05T16:46:26.862Z] iter=248 turn=20 INFO: Pre-commit review (2958in/60out): LGTM. The implementation is clean: the constant is correctly derived, the one-shot flag resets properly on `clearHistory`, and the callback integrates without side effects on existing paths. Tests cov

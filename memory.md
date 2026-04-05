@@ -70,3 +70,5 @@ Average ratio (last 6): 1.03 — well calibrated.
 System healthy — shipping product features every Engineer iteration. 661 tests, 16K LOC, TSC clean. Test runner shipped in 246. Rotation cadence good. Memory compacted through 247. Next Engineer: harden test runner + proactive context warning.
 
 **[AUTO-SCORED] Iteration 247: predicted 8 turns, actual 5 turns, ratio 0.63**
+
+**[AUTO-SCORED] Iteration 248: predicted 20 turns, actual 20 turns, ratio 1.00**

@@ -52,6 +52,8 @@ export const MICRO_COMPACT_THRESHOLD = 80_000;
 export const COMPACT_TIER1_THRESHOLD = 100_000;
 /** Token threshold for Tier 2 compaction: summarize old messages (~150K). */
 export const COMPACT_THRESHOLD = 150_000;
+/** Context warning threshold: warn user when input tokens reach 80% of T2 threshold. */
+export const CONTEXT_WARNING_THRESHOLD = COMPACT_THRESHOLD * 0.8; // 120_000
 
 /**
  * Pure function: select which compaction tier to apply based on input token count.
@@ -108,6 +110,11 @@ export interface OrchestratorOptions {
    * TUI uses this to show a warning when approaching compaction threshold.
    */
   onContextBudget?: (ratio: number) => void;
+  /**
+   * Called once when lastInputTokens crosses 80% of the context window.
+   * One-time notification per threshold crossing (resets on clearHistory).
+   */
+  onContextWarning?: () => void;
 }
 
 export interface OrchestratorResult {
@@ -511,6 +518,9 @@ export class Orchestrator {
   private sessionCost = 0;
   private lastInputTokens = 0;
 
+  /** Prevents the 80% context warning from firing more than once per session. */
+  private contextWarningShown = false;
+
   /** Path to current session's JSONL file */
   sessionPath: string = "";
 
@@ -562,6 +572,7 @@ export class Orchestrator {
     this.sessionTokensIn = 0;
     this.sessionTokensOut = 0;
     this.sessionCost = 0;
+    this.contextWarningShown = false;
   }
 
   /** Re-index the repo (after significant changes). */
@@ -871,6 +882,16 @@ export class Orchestrator {
     this.sessionTokensOut += tokensOut;
     this.sessionCost += computeCost(model, tokensIn, tokensOut);
     this.lastInputTokens = lastInputTokens;
+
+    // Proactive context budget warning — fire once when crossing 80% of T2 threshold
+    if (
+      !this.contextWarningShown &&
+      this.opts.onContextWarning &&
+      lastInputTokens >= CONTEXT_WARNING_THRESHOLD
+    ) {
+      this.contextWarningShown = true;
+      this.opts.onContextWarning();
+    }
 
     // 6. Self-verification (if code was likely changed)
     let verificationPassed: boolean | undefined;

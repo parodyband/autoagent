@@ -21,7 +21,8 @@ export function detectTestRunner(workDir: string): "vitest" | "jest" | null {
 
 /**
  * Find test files related to the given changed source files.
- * Strategy: direct name match + import-based scan.
+ * Strategy: direct name match (co-located + conventional dirs) + import-based scan.
+ * Supports .test.ts, .test.tsx, .spec.ts, .spec.tsx patterns.
  */
 export function findRelatedTests(workDir: string, changedFiles: string[]): string[] {
   const found = new Set<string>();
@@ -31,16 +32,33 @@ export function findRelatedTests(workDir: string, changedFiles: string[]): strin
     const rel = path.relative(workDir, path.resolve(workDir, file));
     const dir = path.dirname(rel);
 
-    // Direct match candidates
+    // Direct match candidates — co-located + conventional dirs, .test + .spec variants
     const candidates = [
+      // Co-located (same directory as source file)
+      path.join(dir, `${base}.test.ts`),
+      path.join(dir, `${base}.test.tsx`),
+      path.join(dir, `${base}.spec.ts`),
+      path.join(dir, `${base}.spec.tsx`),
+      // __tests__ subdir of same directory
       path.join(dir, "__tests__", `${base}.test.ts`),
       path.join(dir, "__tests__", `${base}.test.tsx`),
+      path.join(dir, "__tests__", `${base}.spec.ts`),
+      path.join(dir, "__tests__", `${base}.spec.tsx`),
+      // src/__tests__ (conventional monorepo location)
       path.join("src", "__tests__", `${base}.test.ts`),
       path.join("src", "__tests__", `${base}.test.tsx`),
+      path.join("src", "__tests__", `${base}.spec.ts`),
+      path.join("src", "__tests__", `${base}.spec.tsx`),
+      // top-level test dir
       path.join("test", `${base}.test.ts`),
       path.join("test", `${base}.test.tsx`),
-      `${base}.test.ts`,
-      `${base}.test.tsx`,
+      path.join("test", `${base}.spec.ts`),
+      path.join("test", `${base}.spec.tsx`),
+      // top-level __tests__ dir
+      path.join("__tests__", `${base}.test.ts`),
+      path.join("__tests__", `${base}.test.tsx`),
+      path.join("__tests__", `${base}.spec.ts`),
+      path.join("__tests__", `${base}.spec.tsx`),
     ];
 
     for (const c of candidates) {
@@ -49,18 +67,9 @@ export function findRelatedTests(workDir: string, changedFiles: string[]): strin
     }
   }
 
-  // Import-based scan: find test files importing any changed module
-  const testDirs = ["src/__tests__", "test", "__tests__"].map(d => path.join(workDir, d));
-  const testFiles: string[] = [];
-  for (const td of testDirs) {
-    if (fs.existsSync(td)) {
-      for (const f of fs.readdirSync(td)) {
-        if (f.endsWith(".test.ts") || f.endsWith(".test.tsx")) {
-          testFiles.push(path.join(td, f));
-        }
-      }
-    }
-  }
+  // Import-based scan: find test files importing any changed module.
+  // Scans conventional dirs AND co-located files by walking src/ recursively.
+  const testFiles = collectTestFiles(workDir);
 
   for (const changed of changedFiles) {
     const modName = path.basename(changed, path.extname(changed));
@@ -75,6 +84,60 @@ export function findRelatedTests(workDir: string, changedFiles: string[]): strin
   }
 
   return [...found];
+}
+
+/**
+ * Collect all test files under workDir:
+ * - Conventional dirs: src/__tests__, test, __tests__
+ * - Co-located: any *.test.ts / *.spec.ts files anywhere in src/
+ */
+function collectTestFiles(workDir: string): string[] {
+  const files: string[] = [];
+  const seen = new Set<string>();
+
+  function addFile(abs: string) {
+    if (!seen.has(abs)) {
+      seen.add(abs);
+      files.push(abs);
+    }
+  }
+
+  // Walk a directory recursively, collecting test files
+  function walkDir(dir: string) {
+    if (!fs.existsSync(dir)) return;
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch { return; }
+    for (const entry of entries) {
+      const abs = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        // Skip node_modules and .git
+        if (entry.name === "node_modules" || entry.name === ".git") continue;
+        walkDir(abs);
+      } else if (entry.isFile()) {
+        if (
+          entry.name.endsWith(".test.ts") || entry.name.endsWith(".test.tsx") ||
+          entry.name.endsWith(".spec.ts") || entry.name.endsWith(".spec.tsx")
+        ) {
+          addFile(abs);
+        }
+      }
+    }
+  }
+
+  // Walk the full src/ tree to catch co-located and nested test files
+  walkDir(path.join(workDir, "src"));
+
+  // Also scan top-level test and __tests__ dirs
+  for (const td of ["test", "__tests__"]) {
+    const dir = path.join(workDir, td);
+    if (fs.existsSync(dir)) {
+      walkDir(dir);
+    }
+  }
+
+  return files;
 }
 
 /** Run the given test files. Returns pass/fail + truncated output. */
