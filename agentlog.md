@@ -1,89 +1,3 @@
-127 |         if (consecutiveCount > maxCount) {
-128 |           maxCount = consecutiveCount;
-129 |           maxKey = normalized;
-130 |         }
-131 |       } else {
-132 |         consecutiveErrorKey = "";
-133 |         consecutiveCount = 0;
-134 |       }
-135 |     }
-136 | 
-137 |     if (maxCount >= 3) {
-138 |       return {
-139 |         loopDetected: true,
-140 |         loopType: "error-loop",
-141 |         description: `Same error repeated ${maxCount} consecutive times: "${maxKey.slice(0, 80)}..."`,
-142 |       };
-143 |     }
-144 |   }
-145 | 
-146 |   // ── 3. Repeated identical tool calls ──────────────────────────────────────
-147 |   // Look at the last 5 assistant messages and count identical tool+args combos
-148 |   const recent = assistantMsgs.slice(-5);
-149 | 
-150 |   const callCounts = new Map<string, number>();
-151 |   for (const msg of recent) {
-152 |     for (const call of getToolCalls(msg)) {
-153 |       const key = `${call.name}:${call.inputKey}`;
-154 |       callCounts.set(key, (callCounts.get(key) ?? 0) + 1);
-155 |     }
-156 |   }
-157 |   for (const [key, count] of callCounts) {
-158 |     if (count >= 3) {
-159 |       const toolName = key.split(":")[0];
-160 |       return {
-161 |         loopDetected: true,
-162 |         loopType: "repeated-tool",
-163 |         description: `Tool "${toolName}" called with identical arguments ${count} times in the last ${recent.length} rounds`,
-164 |       };
-165 |     }
-166 |   }
-167 | 
-168 |   return noLoop;
-169 | }
-[2026-04-05T19:50:49.614Z] iter=344 turn=13 INFO: Turn 13/25
-[2026-04-05T19:50:53.887Z] iter=344 turn=13 INFO: Agent: Let me run the tests now to confirm both goals' status:
-[2026-04-05T19:50:53.888Z] iter=344 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/task-planner.test.ts src/__tests__/loop-detector.test.ts 2>&1 | tail -15
-[2026-04-05T19:50:54.888Z] iter=344 turn=13 INFO:   -> exit=0 (338 chars)
-[2026-04-05T19:50:54.888Z] iter=344 turn=14 INFO: Turn 14/25
-[2026-04-05T19:50:57.697Z] iter=344 turn=14 INFO: Agent: **Goal 1 DONE.** All 19 tests pass. Now Goal 2: `executePlan()` + wire `/plan` to offer execution.
-[2026-04-05T19:50:57.697Z] iter=344 turn=14 INFO: read_file: src/cli.ts
-[2026-04-05T19:50:57.698Z] iter=344 turn=14 INFO:   -> ok (2293 chars)
-[2026-04-05T19:50:57.698Z] iter=344 turn=15 INFO: Turn 15/25
-[2026-04-05T19:51:00.260Z] iter=344 turn=15 INFO: Agent: I need to finish Goal 2 and wrap up. Let me add `executePlan()` to task-planner.ts and wire it into cli.ts:
-[2026-04-05T19:51:00.261Z] iter=344 turn=15 INFO: read_file: src/cli.ts
-[2026-04-05T19:51:00.262Z] iter=344 turn=15 INFO:   -> ok (3016 chars)
-[2026-04-05T19:51:00.262Z] iter=344 turn=16 INFO: Turn 16/25
-[2026-04-05T19:51:02.714Z] iter=344 turn=16 INFO: Agent: I need to wrap up. Let me add `executePlan()` to task-planner.ts and update cli.ts, then finish.
-[2026-04-05T19:51:02.714Z] iter=344 turn=16 INFO: read_file: src/cli.ts
-[2026-04-05T19:51:02.714Z] iter=344 turn=16 INFO:   -> ok (3274 chars)
-[2026-04-05T19:51:02.715Z] iter=344 turn=17 INFO: Turn 17/25
-[2026-04-05T19:51:05.276Z] iter=344 turn=17 INFO: Agent: Let me finish Goal 2 and wrap up in one shot.
-[2026-04-05T19:51:05.277Z] iter=344 turn=17 INFO: read_file: src/cli.ts
-[2026-04-05T19:51:05.278Z] iter=344 turn=17 INFO:   -> ok (946 chars)
-[2026-04-05T19:51:05.279Z] iter=344 turn=18 INFO: Turn 18/25
-[2026-04-05T19:51:08.137Z] iter=344 turn=18 INFO: Agent: Stopping all new work. Running tsc, writing memory, updating goals, restarting.
-[2026-04-05T19:51:08.138Z] iter=344 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T19:51:09.131Z] iter=344 turn=18 INFO:   -> exit=0 (11 chars)
-[2026-04-05T19:51:09.131Z] iter=344 turn=19 INFO: Turn 19/25
-[2026-04-05T19:51:13.267Z] iter=344 turn=19 INFO: save_memory: "[Engineer] Iteration 344"
-[2026-04-05T19:51:13.270Z] iter=344 turn=19 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T19:51:13.270Z] iter=344 turn=20 INFO: Turn 20/25
-[2026-04-05T19:51:22.993Z] iter=344 turn=20 INFO: write_file: goals.md (write)
-[2026-04-05T19:51:22.995Z] iter=344 turn=20 INFO:   -> ok: Updated goals.md (1220 chars, -28 lines delta)
-[2026-04-05T19:51:22.996Z] iter=344 turn=21 INFO: Turn 21/25
-[2026-04-05T19:51:24.487Z] iter=344 turn=21 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T19:51:24.488Z] iter=344 turn=21 INFO: RESTART signal
-[2026-04-05T19:51:24.488Z] iter=344 turn=21 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T19:51:25.559Z] iter=344 turn=21 INFO: Compilation OK
-[2026-04-05T19:51:32.822Z] iter=344 turn=21 INFO: Cache persisted: 60 entries to .autoagent-cache.json
-[2026-04-05T19:51:32.822Z] iter=344 turn=21 INFO: Cache stats: 0 hits, 10 misses, 60 entries, 5 invalidations (3 entries removed)
-[2026-04-05T19:51:32.822Z] iter=344 turn=21 INFO: Tool cache stats
-[2026-04-05T19:51:32.822Z] iter=344 turn=21 INFO: Tool timing: bash: 5x, avg=796ms, total=3979ms; read_file: 10x, avg=1ms, total=11ms; write_file: 5x, avg=2ms, total=9ms; read_scratchpad: 1x, avg=3ms, total=3ms; save_memory: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=1ms
-[2026-04-05T19:51:32.822Z] iter=344 turn=21 INFO: Tool timing stats
-[2026-04-05T19:51:39.347Z] iter=344 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 344: predicted 20 turns, actual 21 turns, ratio 1.05**
-[2026-04-05T19:51:51.320Z] iter=344 turn=21 INFO: Pre-commit review (1970in/471out): ## Issues Found
-
 - **Logic regression in oscillation detection**: The oscillation check now runs before the "no-op tool calls" check (block ── 2 ──, still present at line ~143). More critically, `roun
 [2026-04-05T19:51:51.401Z] iter=344 turn=21 INFO: Committed: 74ce70d0 (37 in / 6430 out, cache: 25494 created, 373545 read)
 [2026-04-05T19:51:51.401Z] iter=344 turn=21 INFO: Restarting as iteration 345...
@@ -1082,3 +996,65 @@ echo "AUTOAGENT_...
 [2026-04-05T20:05:37.590Z] iter=351 turn=13 INFO: Tool timing stats
 [2026-04-05T20:05:44.479Z] iter=351 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 351: predicted 11 turns, actual 13 turns, ratio 1.18**
 [2026-04-05T20:05:44.505Z] iter=351 turn=13 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T20:05:44.546Z] iter=351 turn=13 INFO: Committed: 43328d6e (25 in / 4303 out, cache: 19724 created, 134707 read)
+[2026-04-05T20:05:44.547Z] iter=351 turn=13 INFO: Restarting as iteration 352...
+[2026-04-05T20:05:44.761Z] iter=352 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T20:05:44.763Z] iter=352 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
+[2026-04-05T20:05:44.763Z] iter=352 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T20:05:44.944Z] iter=352 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T20:05:44.944Z] iter=352 turn=1 INFO: Turn 1/25
+[2026-04-05T20:05:47.169Z] iter=352 turn=1 INFO: Agent: I'll start by reading the scratchpad and goals.md to understand what I need to do.
+[2026-04-05T20:05:47.170Z] iter=352 turn=1 INFO: read_scratchpad: 1755 chars
+[2026-04-05T20:05:47.170Z] iter=352 turn=1 INFO: read_file: goals.md
+[2026-04-05T20:05:47.170Z] iter=352 turn=1 INFO:   -> ok (2680 chars)
+[2026-04-05T20:05:47.171Z] iter=352 turn=2 INFO: Turn 2/25
+[2026-04-05T20:05:49.963Z] iter=352 turn=2 INFO: think: I'm the Architect for iteration 352. My goals are:
+1. Research 2-3 feature candidates and pick the next high-value track...
+[2026-04-05T20:05:49.963Z] iter=352 turn=3 INFO: Turn 3/25
+[2026-04-05T20:05:54.389Z] iter=352 turn=3 INFO: Agent: I'm the **Architect** for iteration 352. My deliverables:
+1. Research 2-3 feature candidates
+2. Write Engineer goals for iteration 353 in goals.md
+
+Let me research in parallel:
+[2026-04-05T20:05:54.391Z] iter=352 turn=3 INFO: web_search: "coding agent TUI slash command plan task integration design patterns 2024"
+[2026-04-05T20:05:54.406Z] iter=352 turn=3 INFO: web_search: "coding agent lifecycle hooks PreToolUse PostToolUse implementation Claude Claude.ai"
+[2026-04-05T20:05:54.407Z] iter=352 turn=3 INFO: $ wc -l src/tui.tsx src/cli.ts src/task-planner.ts 2>/dev/null && grep -n "/plan\|plan\|/hook\|hook" src/tui.tsx | head -20
+[2026-04-05T20:05:54.416Z] iter=352 turn=3 INFO:   -> exit=0 (557 chars)
+[2026-04-05T20:05:55.327Z] iter=352 turn=3 INFO:   -> 8 results
+[2026-04-05T20:05:55.329Z] iter=352 turn=3 INFO:   -> 8 results
+[2026-04-05T20:05:55.329Z] iter=352 turn=4 INFO: Turn 4/25
+[2026-04-05T20:06:00.378Z] iter=352 turn=4 INFO: Agent: **Goal 1 (Research)**: IN PROGRESS — got good data on hooks. Need quick scan of TUI for /plan gap.
+**Goal 2 (Write goals.md)**: NOT STARTED
+
+Let me check the TUI quickly and then write goals.md immediately:
+[2026-04-05T20:06:00.378Z] iter=352 turn=4 INFO: $ grep -n "case '/" src/tui.tsx | head -30
+[2026-04-05T20:06:00.381Z] iter=352 turn=4 INFO: web_fetch: https://platform.claude.com/docs/en/agent-sdk/hooks
+[2026-04-05T20:06:00.389Z] iter=352 turn=4 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:06:01.228Z] iter=352 turn=4 INFO:   -> ok (30355 chars)
+[2026-04-05T20:06:01.229Z] iter=352 turn=5 INFO: Turn 5/25
+[2026-04-05T20:06:24.558Z] iter=352 turn=5 INFO: think: Now I have enough information to make my decision:
+
+**Candidate 1: TUI /plan integration**
+- The TUI currently has NO /p...
+[2026-04-05T20:06:24.559Z] iter=352 turn=6 INFO: Turn 6/25
+[2026-04-05T20:06:48.451Z] iter=352 turn=6 INFO: Agent: I'm the **Architect** — my deliverable is goals.md, not src/ changes. Writing it now.
+[2026-04-05T20:06:48.454Z] iter=352 turn=6 INFO: write_file: goals.md (write)
+[2026-04-05T20:06:48.456Z] iter=352 turn=6 INFO:   -> ok: Updated goals.md (3258 chars, +15 lines delta)
+[2026-04-05T20:06:48.458Z] iter=352 turn=7 INFO: Turn 7/25
+[2026-04-05T20:06:50.590Z] iter=352 turn=7 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T20:06:51.691Z] iter=352 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:06:51.691Z] iter=352 turn=8 INFO: Turn 8/25
+[2026-04-05T20:06:55.786Z] iter=352 turn=8 INFO: save_memory: "[Engineer] Iteration 352 — Architect"
+[2026-04-05T20:06:55.789Z] iter=352 turn=8 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:06:55.790Z] iter=352 turn=9 INFO: Turn 9/25
+[2026-04-05T20:06:58.070Z] iter=352 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:06:58.072Z] iter=352 turn=9 INFO: RESTART signal
+[2026-04-05T20:06:58.073Z] iter=352 turn=9 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:06:59.211Z] iter=352 turn=9 INFO: Compilation OK
+[2026-04-05T20:07:07.683Z] iter=352 turn=9 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T20:07:07.684Z] iter=352 turn=9 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 1 invalidations (1 entries removed)
+[2026-04-05T20:07:07.684Z] iter=352 turn=9 INFO: Tool cache stats
+[2026-04-05T20:07:07.684Z] iter=352 turn=9 INFO: Tool timing: web_search: 2x, avg=931ms, total=1861ms; bash: 4x, avg=281ms, total=1124ms; web_fetch: 1x, avg=849ms, total=849ms; write_file: 1x, avg=4ms, total=4ms; save_memory: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=1ms; read_scratchpad: 1x, avg=0ms, total=0ms; read_file: 1x, avg=0ms, total=0ms
+[2026-04-05T20:07:07.684Z] iter=352 turn=9 INFO: Tool timing stats
+[2026-04-05T20:07:15.101Z] iter=352 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 352: predicted 8 turns, actual 9 turns, ratio 1.13**
+[2026-04-05T20:07:15.125Z] iter=352 turn=9 INFO: Pre-commit review: no significant code changes to review
