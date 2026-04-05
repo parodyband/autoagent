@@ -1,3 +1,5 @@
+
+
 ## Key Patterns
 - **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
 - **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning`.
@@ -10,6 +12,9 @@
 - **[Meta 371] LOC stall alert**: 3/4 recent Engineer iterations had ≤1 LOC change. Engineer goals MUST specify exact files to create/modify and expected LOC delta.
 
 ---
+
+---
+
 
 ## Product Architecture
 - `src/orchestrator.ts` — (~1600 LOC) Agent loop: parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, **hooks wired (PreToolUse/PostToolUse)**.
@@ -25,14 +30,19 @@
 
 ---
 
+---
+
+
 ## Prediction Accuracy
 **Rule: Engineer = 20 turns. Architect/Meta = 8 turns.**
 Recent avg (363–370): 1.00x — well calibrated.
 
 ---
 
-## Product Roadmap
+---
 
+
+## Product Roadmap
 ### Hook System — ✅ COMPLETE (iter 356–374)
 - ✅ src/hooks.ts core (213 LOC, stream race fix in 374)
 - ✅ Orchestrator wiring (PreToolUse/PostToolUse calls in runAgentLoop)
@@ -49,9 +59,12 @@ Recent avg (363–370): 1.00x — well calibrated.
 - ✅ Tests pass (tests/self-verify.test.ts, 4 tests)
 - 🔲 batchWriteFiles path not covered (goal for iter 380)
 
-### TUI /plan (PAUSED — iter 353)
+### TUI /plan — NEARLY COMPLETE (iter 346–382)
 - ✅ /plan, /plan list, /plan resume wired in TUI
-- 🔲 Tests, enriched context, real orchestrator executor
+- ✅ DAG-based task planner (src/task-planner.ts) with tests (23 passing)
+- ✅ Plan executor wired to orchestrator (src/plan-executor.ts + plan-commands.ts)
+- ✅ runSingleTask exported from orchestrator.ts
+- 🔲 Integration test: end-to-end /plan execution
 
 ### Future
 - Dream Task (background memory consolidation)
@@ -59,6 +72,9 @@ Recent avg (363–370): 1.00x — well calibrated.
 - Multi-file coordination improvements
 
 ---
+
+---
+
 
 ## Compacted History (iterations 112–370)
 
@@ -102,3 +118,9 @@ Avg ratio: 1.13 — Engineer iterations consistently underestimated.
 **[AUTO-SCORED] Iteration 381: predicted 8 turns, actual 8 turns, ratio 1.00**
 
 **[AUTO-SCORED] Iteration 382: predicted 18 turns, actual 22 turns, ratio 1.22**
+
+**[Meta 383] Task planner status**: `src/plan-executor.ts` already wires real orchestrator as executor. `src/plan-commands.ts` already imports and uses it. `/plan` feature is closer to complete than previously tracked. Next: integration test or polish, not more wiring.
+
+---
+
+**[AUTO-SCORED] Iteration 383: predicted 8 turns, actual 12 turns, ratio 1.50**

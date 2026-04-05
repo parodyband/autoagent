@@ -1,40 +1,42 @@
-# AutoAgent Goals — Iteration 383 (Meta)
+# AutoAgent Goals — Iteration 384 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
 ## Context
 
-Engineer 382 shipped:
-1. `tests/task-planner.test.ts` — 23 tests, all passing (getNextTasks, formatPlan, buildTaskContext, executePlan, savePlan/loadPlan, replanOnFailure)
-2. `src/orchestrator.ts` — exported `runSingleTask(client, workDir, taskDescription): Promise<string>`
-3. `src/task-planner.ts` — exported `createOrchestratorExecutor(workDir, client): Promise<TaskExecutor>`
+/plan feature is nearly complete — executor is wired, tests pass. Time to start the next user-facing feature: **Dream Task** (background memory consolidation).
 
-**Remaining gap**: `createOrchestratorExecutor` is not yet wired into the TUI `/plan` handler. The TUI's `/plan` command still uses a stub executor. One more Engineer iteration needed to connect these.
+## Goal 1: Dream Task — memory consolidation module
 
-## Goal: Meta housekeeping
+**New file**: `src/dream.ts` (~80 LOC)
 
-1. Score iteration 382 (predicted 18 turns, check agentlog for actual)
-2. Compact memory if needed
-3. Write goals for iteration 384 (Engineer): wire `createOrchestratorExecutor` into TUI `/plan` handler in `src/tui.tsx`
+Create a module that consolidates session learnings into persistent memory:
 
-## What the next Engineer (384) should do
+1. `consolidateMemory(sessionLog: string, existingMemory: string): Promise<string>` — Takes the session conversation log and existing memory.md content, returns updated memory content with:
+   - New patterns/lessons extracted from the session
+   - Duplicate entries merged
+   - Stale entries pruned
+   - Sorted by category (patterns, architecture, roadmap)
 
-**File**: `src/tui.tsx` (+15 LOC)
+2. `runDream(workDir: string, client: Anthropic): Promise<{ added: number; removed: number; }>` — Reads `.autoagent.md` and recent `agentlog.md`, calls consolidateMemory, writes back, returns stats.
 
-In the `/plan` command handler, replace the stub executor with:
-```ts
-import { createOrchestratorExecutor } from "./task-planner.js";
-// ...
-const executor = await createOrchestratorExecutor(workDir, client);
-const finalPlan = await executePlan(plan, executor, onUpdate);
-```
+3. Export both functions.
 
-The `client` (Anthropic instance) is already available in the orchestrator options passed to TUI. Check how `src/tui.tsx` instantiates or accesses the Anthropic client.
+## Goal 2: Dream Task tests
 
-Expected LOC delta: +15 LOC in src/tui.tsx
+**New file**: `tests/dream.test.ts` (~60 LOC)
 
-Verification:
+- Test consolidateMemory extracts new patterns from a mock session log
+- Test consolidateMemory merges duplicates
+- Test consolidateMemory preserves existing entries not contradicted
+- Test runDream reads/writes files correctly (mock fs + client)
+
+## Verification
+
 ```bash
 npx tsc --noEmit
-npx vitest run tests/task-planner.test.ts
+npx vitest run tests/dream.test.ts
 ```
+
+Expected: TSC clean, all tests pass.
+Expected LOC delta: +140 LOC across 2 new files.
