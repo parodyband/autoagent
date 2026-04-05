@@ -25,6 +25,7 @@ import { createDefaultRegistry } from "./tool-registry.js";
 import { loadState, tagPreIteration, type IterationState } from "./iteration.js";
 import { buildInitialMessage } from "./messages.js";
 import { orient, formatOrientation } from "./orientation.js";
+import { fingerprintRepo } from "./repo-context.js";
 import { parseMemory, getSection, serializeMemory } from "./memory.js";
 import { ToolCache } from "./tool-cache.js";
 import { ToolTimingTracker } from "./tool-timing.js";
@@ -273,13 +274,19 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
   const orientReport = await orient(1000, true, workDir);
   const orientationText = formatOrientation(orientReport);
 
+  // Fingerprint the working repo (only injected when operating on an external repo)
+  const repoContextText = workDir !== ROOT ? fingerprintRepo(workDir) : undefined;
+  if (repoContextText) {
+    log(state.iteration, `Repo fingerprint generated (${repoContextText.length} chars)`);
+  }
+
   // Expert gets its own system prompt
   ctx.systemPromptBuilder = (s, r) => buildExpertPrompt(expert, s, r);
 
-  // Build initial message with goals, memory, and orientation
+  // Build initial message with goals, memory, orientation, and optional repo context
   ctx.messages.push({
     role: "user",
-    content: buildInitialMessage(goalsWithRotation, readMemory(), orientationText || undefined),
+    content: buildInitialMessage(goalsWithRotation, readMemory(), orientationText || undefined, repoContextText || undefined),
   });
 
   await runConversation(ctx);

@@ -30,7 +30,7 @@ import { executeSubagent } from "../src/tools/subagent.js";
 import { callWithRetry } from "../src/api-retry.js";
 import { getIterationCommits, computeDiffStats, getAllIterationDiffs } from "../src/iteration-diff.js";
 import type { IterationState } from "../src/iteration.js";
-import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync } from "fs";
+import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync, mkdtempSync } from "fs";
 import path from "path";
 
 const ROOT = process.cwd();
@@ -2246,7 +2246,7 @@ function testExpertStateWiring(): void {
 
   // Verify saveExpertState actually writes to the rotation file
   const tmpDir = mkdtempSync(path.join(TEMP_DIR, "expert-state-"));
-  const { saveExpertState, loadExpertState } = require(path.join(ROOT, "dist/experts.js"));
+  const { saveExpertState, loadExpertState } = await import(path.join(ROOT, "src/experts.js"));
 
   saveExpertState(tmpDir, "Engineer", 999);
   const state = loadExpertState(tmpDir);

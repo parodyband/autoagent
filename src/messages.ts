@@ -78,12 +78,18 @@ export function buildBuilderMessage(plan: string, memorySummary: string): string
 /**
  * Build the first user message that kicks off an iteration.
  * Optionally includes an orientation section showing what changed since last iteration.
+ * Optionally includes a repoContext block (from fingerprintRepo) for external repos.
  */
-export function buildInitialMessage(goals: string, memory: string, orientation?: string): string {
+export function buildInitialMessage(goals: string, memory: string, orientation?: string, repoContext?: string): string {
   const parts: string[] = [];
   
   if (orientation) {
     parts.push(orientation);
+    parts.push("---");
+  }
+  
+  if (repoContext) {
+    parts.push(repoContext);
     parts.push("---");
   }
   

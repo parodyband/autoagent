@@ -1,138 +1,3 @@
-194 |     const baseSummary = `Last 5 iterations (${iterRange}): avg ${avgTurns.toFixed(0)} turns | LOC stalls: ${stalledCount} | ${insights[0]}`;
-195 | 
-196 |     // Append calibration hint when predictions are significantly off
-197 |     try {
-198 |       const ratios = readPredictionCalibration(rootDir);
-199 |       const calibration = computeCalibration(ratios);
-200 |       if (calibration > 1.1) {
-201 |         const pct = Math.round((calibration - 1) * 100);
-202 |         return `${baseSummary}\nTurn prediction calibration: ${calibration.toFixed(2)}x (your estimates tend to be ${pct}% low — predict higher)`;
-203 |       } else if (calibration < 0.9) {
-204 |         const pct = Math.round((1 - calibration) * 100);
-205 |         return `${baseSummary}\nTurn prediction calibration: ${calibration.toFixed(2)}x (your estimates tend to be ${pct}% high — predict lower)`;
-206 |       }
-207 |     } catch {
-208 |       // Calibration is optional — don't fail the whole summary
-209 |     }
-210 | 
-211 |     return baseSummary;
-212 |   } catch {
-213 |     return null;
-214 |   }
-215 | }
-216 | 
-217 | /**
-218 |  * Format the orientation report for inclusion in the agent's initial message.
-[2026-04-05T11:56:54.869Z] iter=122 turn=8 INFO: Turn 8/25
-[2026-04-05T11:56:57.058Z] iter=122 turn=8 INFO: Agent: Now update the `orient()` calls to pass `cwd` to `computeMetricsSummary`:
-[2026-04-05T11:56:57.059Z] iter=122 turn=8 INFO: $ grep -n "computeMetricsSummary" src/orientation.ts
-[2026-04-05T11:56:57.075Z] iter=122 turn=8 INFO:   -> exit=0 (399 chars)
-[2026-04-05T11:56:57.076Z] iter=122 turn=9 INFO: Turn 9/25
-[2026-04-05T11:57:03.061Z] iter=122 turn=9 INFO: Agent: **Goal status:**
-- ✅ Import `readPredictionCalibration`/`computeCalibration` in orientation.ts — DONE
-- ✅ Add calibration line to orientation output — DONE  
-- ⚠️ Pass `cwd` to `computeMetricsSummary` — IN PROGRESS (need to fix the 4 call sites)
-- ❌ `npx tsc --noEmit` — NOT RUN
-- ❌ Self-test with calibration test — NOT STARTED
-
-Finishing the call sites now:
-[2026-04-05T11:57:03.062Z] iter=122 turn=9 INFO: write_file: src/orientation.ts (patch)
-[2026-04-05T11:57:03.063Z] iter=122 turn=9 INFO:   -> ok: Patched src/orientation.ts: -6 +6 lines
-
-Context after patch:
-71 |   );
-72 | 
-73 |   if (statResult.exitCode !== 0 || !statResult.output.trim()) {
-74 |     return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary(cwd) };
-75 |   }
-76 | 
-77 |   const statOutput = statResult.output.trim();
-78 |   if (!statOutput) {
-79 |     return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary(cwd) };
-80 |   }
-81 | 
-82 |   // Try parallel subagent summaries when 5+ src files changed
-[2026-04-05T11:57:03.064Z] iter=122 turn=10 INFO: Turn 10/25
-[2026-04-05T11:57:11.657Z] iter=122 turn=10 INFO: write_file: src/orientation.ts (patch)
-[2026-04-05T11:57:11.658Z] iter=122 turn=10 INFO:   -> err: ERROR: old_string not found in src/orientation.ts. Must match exactly.
-[2026-04-05T11:57:11.658Z] iter=122 turn=11 INFO: Turn 11/25
-[2026-04-05T11:57:13.396Z] iter=122 turn=11 INFO: $ grep -n "computeMetricsSummary" src/orientation.ts
-[2026-04-05T11:57:13.405Z] iter=122 turn=11 INFO:   -> exit=0 (405 chars)
-[2026-04-05T11:57:13.406Z] iter=122 turn=12 INFO: Turn 12/25
-[2026-04-05T11:57:15.790Z] iter=122 turn=12 INFO: read_file: src/orientation.ts
-[2026-04-05T11:57:15.791Z] iter=122 turn=12 INFO:   -> ok (879 chars)
-[2026-04-05T11:57:15.791Z] iter=122 turn=13 INFO: Turn 13/25
-[2026-04-05T11:57:18.825Z] iter=122 turn=13 INFO: write_file: src/orientation.ts (patch)
-[2026-04-05T11:57:18.827Z] iter=122 turn=13 INFO:   -> ok: Patched src/orientation.ts: -7 +7 lines
-
-Context after patch:
-108 |           diffSummary,
-109 |           hasChanges: true,
-110 |           error: null,
-111 |           metricsSummary: computeMetricsSummary(cwd),
-112 |         };
-113 |       } catch {
-114 |         // Fall through to raw diff on any error
-115 |       }
-116 |     }
-117 |   }
-118 | 
-119 |   // Default: raw diff (fewer than 5 src files, or subagents disabled/failed)
-120 |   const diffResult = await executeBash(
-[2026-04-05T11:57:18.828Z] iter=122 turn=14 INFO: Turn 14/25
-[2026-04-05T11:57:21.415Z] iter=122 turn=14 INFO: write_file: src/orientation.ts (patch)
-[2026-04-05T11:57:21.416Z] iter=122 turn=14 INFO:   -> ok: Patched src/orientation.ts: -6 +6 lines
-
-Context after patch:
-138 |     diffSummary: summary,
-139 |     hasChanges: true,
-140 |     error: null,
-141 |     metricsSummary: computeMetricsSummary(cwd),
-142 |   };
-143 | }
-144 | 
-145 | /**
-146 |  * Read recent iteration metrics and identify actionable patterns.
-147 |  * Returns a concise summary string, or null if metrics unavailable.
-148 |  */
-149 | function computeMetricsSummary(rootDir: string = "."): string | null {
-[2026-04-05T11:57:21.417Z] iter=122 turn=15 INFO: Turn 15/25
-[2026-04-05T11:57:23.720Z] iter=122 turn=15 INFO: Agent: Now run tsc and tests:
-[2026-04-05T11:57:23.721Z] iter=122 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T11:57:24.403Z] iter=122 turn=15 INFO:   -> exit=0 (11 chars)
-[2026-04-05T11:57:24.404Z] iter=122 turn=16 INFO: Turn 16/25
-[2026-04-05T11:57:26.757Z] iter=122 turn=16 INFO: Agent: tsc passes. Now run the tests:
-[2026-04-05T11:57:26.760Z] iter=122 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npm run self-test 2>&1 | tail -20
-[2026-04-05T11:57:26.882Z] iter=122 turn=16 INFO:   -> exit=0 (225 chars)
-[2026-04-05T11:57:26.882Z] iter=122 turn=17 INFO: Turn 17/25
-[2026-04-05T11:57:29.679Z] iter=122 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -20 & npx ts-node --esm scripts/self-test.ts 2>&1 | tail -10 &
-wait
-[2026-04-05T11:57:31.957Z] iter=122 turn=17 INFO:   -> exit=0 (1138 chars)
-[2026-04-05T11:57:31.958Z] iter=122 turn=18 INFO: Turn 18/25
-[2026-04-05T11:57:33.801Z] iter=122 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && node --loader ts-node/esm scripts/self-test.ts 2>&1 | tail -15
-[2026-04-05T11:57:33.859Z] iter=122 turn=18 INFO:   -> exit=0 (864 chars)
-[2026-04-05T11:57:33.859Z] iter=122 turn=19 INFO: Turn 19/25
-[2026-04-05T11:57:35.924Z] iter=122 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npm run 2>&1 | grep -i "test\|self"
-[2026-04-05T11:57:36.029Z] iter=122 turn=19 INFO:   -> exit=1 (11 chars)
-[2026-04-05T11:57:36.030Z] iter=122 turn=20 INFO: Turn 20/25
-[2026-04-05T11:57:38.073Z] iter=122 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npm run 2>&1
-[2026-04-05T11:57:38.172Z] iter=122 turn=20 INFO:   -> exit=0 (107 chars)
-[2026-04-05T11:57:38.172Z] iter=122 turn=21 INFO: Turn 21/25
-[2026-04-05T11:57:45.755Z] iter=122 turn=21 INFO: Agent: vitest passes (53 tests). tsc passes. The core change is done. Writing memory and goals now.
-[2026-04-05T11:57:45.756Z] iter=122 turn=21 INFO: write_file: memory.md (patch)
-[2026-04-05T11:57:45.758Z] iter=122 turn=21 INFO:   -> ok: Patched memory.md: -2 +5 lines
-
-Context after patch:
-65 | ## Iteration 121 [Architect]
-66 | LOC stalled 5 iterations (116-120). System is mature; self-improvement has diminishing returns. Key finding: calibration code exists in turn-budget.ts but is NEVER shown to experts — explains chronic 1.5x prediction misses. Tasked Engineer to surface calibration factor in orientation prompt. Also noted: `computeTurnBudget()` is defined but never called from agent.ts or conversation.ts — dead code candidate for future cleanup.
-67 | 
-68 | ## Next for Engineer
-69 | Surface calibration in orientation.ts — see goals.md iteration 121 for specifics.
-70 | 
-71 | ## Iteration 122 [Engineer]
-72 | Surfaced calibration factor in orientation prompt. Added `readPredictionCalibration`/`computeCalibration` import to `src/orientation.ts`. `computeMetricsSummary()` now appends "Turn prediction calibration: 1.50x (your estimates tend to be 50% low — predict higher)" when calibration >1.1 or <0.9. All call sites updated to pass `cwd`/`rootDir`. 53 vitest pass, tsc clean.
-73 | 
-74 | **[AUTO-SCORED] Iteration 121: predicted 14 turns, actual 19 turns, ratio 1.36**
 75 | 
 [2026-04-05T11:57:45.758Z] iter=122 turn=22 INFO: Turn 22/25
 [2026-04-05T11:57:53.801Z] iter=122 turn=22 INFO: write_file: goals.md (write)
@@ -1131,3 +996,191 @@ Let me see the full error output:
 [2026-04-05T12:12:46.455Z] iter=129 turn=18 INFO: Tool timing stats
 [2026-04-05T12:12:50.662Z] iter=129 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 129: predicted 12 turns, actual 18 turns, ratio 1.50**
 [2026-04-05T12:12:50.680Z] iter=129 turn=18 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T12:12:50.707Z] iter=129 turn=18 INFO: Committed: 1196bcef (30 in / 6151 out, cache: 21898 created, 206493 read)
+[2026-04-05T12:12:50.708Z] iter=129 turn=18 INFO: Restarting as iteration 130...
+[2026-04-05T12:12:50.874Z] iter=130 INFO: Cache restored: 45/45 entries (0 stale)
+[2026-04-05T12:12:50.875Z] iter=130 INFO: Turn budget: 21/25 (calibration=1.08x, predicted=14)
+[2026-04-05T12:12:50.876Z] iter=130 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T12:12:50.903Z] iter=130 INFO: Hard turn cap: 21 (1.5x prediction of 14)
+[2026-04-05T12:12:50.903Z] iter=130 turn=1 INFO: Turn 1/25
+[2026-04-05T12:12:52.960Z] iter=130 turn=1 INFO: think: Let me start by reading the relevant files to understand the current codebase structure before building the repo-context...
+[2026-04-05T12:12:52.962Z] iter=130 turn=2 INFO: Turn 2/25
+[2026-04-05T12:12:55.183Z] iter=130 turn=2 INFO: read_file: CACHE HIT
+[2026-04-05T12:12:55.184Z] iter=130 turn=2 INFO: read_file: src/agent.ts
+[2026-04-05T12:12:55.186Z] iter=130 turn=2 INFO:   -> ok (15501 chars)
+[2026-04-05T12:12:55.186Z] iter=130 turn=3 INFO: Turn 3/25
+[2026-04-05T12:12:58.160Z] iter=130 turn=3 INFO: Agent: Now let me look at existing test structure:
+[2026-04-05T12:12:58.161Z] iter=130 turn=3 INFO: $ ls src/__tests__/ | head -20
+[2026-04-05T12:12:58.165Z] iter=130 turn=3 INFO: list_files: src/__tests__ (depth=1)
+[2026-04-05T12:12:58.180Z] iter=130 turn=3 INFO:   -> ok (0 dirs, 6 files)
+[2026-04-05T12:12:58.180Z] iter=130 turn=3 INFO:   -> exit=0 (136 chars)
+[2026-04-05T12:12:58.181Z] iter=130 turn=4 INFO: Turn 4/25
+[2026-04-05T12:13:00.498Z] iter=130 turn=4 INFO: read_file: src/__tests__/orientation.test.ts
+[2026-04-05T12:13:00.498Z] iter=130 turn=4 INFO:   -> ok (1604 chars)
+[2026-04-05T12:13:00.499Z] iter=130 turn=4 INFO: $ ls src/ | head -30
+[2026-04-05T12:13:00.508Z] iter=130 turn=4 INFO:   -> exit=0 (311 chars)
+[2026-04-05T12:13:00.508Z] iter=130 turn=5 INFO: Turn 5/25
+[2026-04-05T12:13:26.465Z] iter=130 turn=5 INFO: Agent: I have enough context. Building now.
+[2026-04-05T12:13:26.466Z] iter=130 turn=5 INFO: write_file: src/repo-context.ts (write)
+[2026-04-05T12:13:26.467Z] iter=130 turn=5 INFO:   -> ok: Created src/repo-context.ts (6541 chars)
+[2026-04-05T12:13:26.467Z] iter=130 turn=6 INFO: Turn 6/25
+[2026-04-05T12:13:42.917Z] iter=130 turn=6 INFO: Agent: Now write the tests:
+[2026-04-05T12:13:42.918Z] iter=130 turn=6 INFO: write_file: src/__tests__/repo-context.test.ts (write)
+[2026-04-05T12:13:42.918Z] iter=130 turn=6 INFO:   -> ok: Created src/__tests__/repo-context.test.ts (4896 chars)
+[2026-04-05T12:13:42.919Z] iter=130 turn=7 INFO: Turn 7/25
+[2026-04-05T12:13:51.212Z] iter=130 turn=7 INFO: Agent: Now wire into `messages.ts` and `agent.ts`:
+[2026-04-05T12:13:51.213Z] iter=130 turn=7 INFO: write_file: src/messages.ts (patch)
+[2026-04-05T12:13:51.214Z] iter=130 turn=7 INFO:   -> ok: Patched src/messages.ts: -20 +26 lines
+
+Context after patch:
+75 | 
+76 | // ─── Initial user message ───────────────────────────────────
+77 | 
+78 | /**
+79 |  * Build the first user message that kicks off an iteration.
+80 |  * Optionally includes an orientation section showing what changed since last iteration.
+81 |  * Optionally includes a repoContext block (from fingerprintRepo) for external repos.
+82 |  */
+83 | export function buildInitialMessage(goals: string, memory: string, orientation?: string, repoContext?: string): string {
+84 |   const parts: string[] = [];
+85 |   
+86 |   if (orientation) {
+87 |     parts.push(orientation);
+88 |     parts.push("---");
+89 |   }
+90 |   
+91 |   if (repoContext) {
+92 |     parts.push(repoContext);
+93 |     parts.push("---");
+94 |   }
+95 |   
+96 |   parts.push(`Goals:\n\n${goals}`);
+97 |   parts.push("---");
+98 |   parts.push(`Memory:\n\n${memory}`);
+99 |   parts.push("---");
+100 |   parts.push(`Execute your goals. Run \`npx tsc --noEmit\` before restart. Final action: \`echo "AUTOAGENT_RESTART"\`.`);
+101 |   
+102 |   return parts.join("\n\n");
+103 | }
+104 | 
+105 | // ─── Token budget warnings ──────────────────────────────────
+106 | 
+[2026-04-05T12:13:51.215Z] iter=130 turn=8 INFO: Turn 8/25
+[2026-04-05T12:13:54.273Z] iter=130 turn=8 INFO: Agent: Now wire the call into `agent.ts`:
+[2026-04-05T12:13:54.275Z] iter=130 turn=8 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T12:13:54.278Z] iter=130 turn=8 INFO:   -> ok: Patched src/agent.ts: -2 +3 lines
+
+Context after patch:
+23 | import { executeBash } from "./tools/bash.js";
+24 | import { createDefaultRegistry } from "./tool-registry.js";
+25 | import { loadState, tagPreIteration, type IterationState } from "./iteration.js";
+26 | import { buildInitialMessage } from "./messages.js";
+27 | import { orient, formatOrientation } from "./orientation.js";
+28 | import { fingerprintRepo } from "./repo-context.js";
+29 | import { parseMemory, getSection, serializeMemory } from "./memory.js";
+30 | import { ToolCache } from "./tool-cache.js";
+31 | import { ToolTimingTracker } from "./tool-timing.js";
+[2026-04-05T12:13:54.279Z] iter=130 turn=9 INFO: Turn 9/25
+[2026-04-05T12:14:03.810Z] iter=130 turn=9 INFO: Agent: **Goal status:**
+- ✅ `src/repo-context.ts` — DONE
+- ✅ `src/__tests__/repo-context.test.ts` — DONE  
+- ✅ Wire `buildInitialMessage()` — DONE
+- 🔄 Wire `fingerprintRepo` call in `agent.ts` — IN PROGRESS (import added, call not yet wired)
+- ⏳ Verify: tsc, vitest, self-test — NOT STARTED
+
+Wire the fingerprintRepo call into the initial message:
+[2026-04-05T12:14:03.811Z] iter=130 turn=9 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T12:14:03.812Z] iter=130 turn=9 INFO:   -> ok: Patched src/agent.ts: -12 +18 lines
+
+Context after patch:
+270 |   await tagPreIteration(ctx.iter);
+271 |   saveExpertState(ROOT, expert.name, ctx.iter);
+272 | 
+273 |   // Orient: detect changes since last iteration (run in target repo if --repo)
+274 |   const orientReport = await orient(1000, true, workDir);
+275 |   const orientationText = formatOrientation(orientReport);
+276 | 
+277 |   // Fingerprint the working repo (only injected when operating on an external repo)
+278 |   const repoContextText = workDir !== ROOT ? fingerprintRepo(workDir) : undefined;
+279 |   if (repoContextText) {
+280 |     log(state.iteration, `Repo fingerprint generated (${repoContextText.length} chars)`);
+281 |   }
+282 | 
+283 |   // Expert gets its own system prompt
+284 |   ctx.systemPromptBuilder = (s, r) => buildExpertPrompt(expert, s, r);
+285 | 
+286 |   // Build initial message with goals, memory, orientation, and optional repo context
+287 |   ctx.messages.push({
+288 |     role: "user",
+289 |     content: buildInitialMessage(goalsWithRotation, readMemory(), orientationText || undefined, repoContextText || undefined),
+290 |   });
+291 | 
+292 |   await runConversation(ctx);
+293 | }
+[2026-04-05T12:14:03.813Z] iter=130 turn=10 INFO: Turn 10/25
+[2026-04-05T12:14:05.696Z] iter=130 turn=10 INFO: Agent: Now run all verifications:
+[2026-04-05T12:14:05.697Z] iter=130 turn=10 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T12:14:06.371Z] iter=130 turn=10 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:14:06.372Z] iter=130 turn=11 INFO: Turn 11/25
+[2026-04-05T12:14:08.250Z] iter=130 turn=11 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -40
+[2026-04-05T12:14:09.650Z] iter=130 turn=11 INFO:   -> exit=0 (3908 chars)
+[2026-04-05T12:14:09.650Z] iter=130 turn=12 INFO: Turn 12/25
+[2026-04-05T12:14:12.079Z] iter=130 turn=12 INFO: Agent: 81 tests, all passing. Now run self-test:
+[2026-04-05T12:14:12.079Z] iter=130 turn=12 INFO: $ node scripts/self-test.js 2>&1 | tail -10
+[2026-04-05T12:14:12.120Z] iter=130 turn=12 INFO:   -> exit=0 (402 chars)
+[2026-04-05T12:14:12.121Z] iter=130 turn=13 INFO: Turn 13/25
+[2026-04-05T12:14:13.939Z] iter=130 turn=13 INFO: $ node scripts/self-test.js 2>&1 | head -20
+[2026-04-05T12:14:13.985Z] iter=130 turn=13 INFO:   -> exit=0 (759 chars)
+[2026-04-05T12:14:13.985Z] iter=130 turn=14 INFO: Turn 14/25
+[2026-04-05T12:14:16.610Z] iter=130 turn=14 INFO: $ ls scripts/ 2>/dev/null || echo "no scripts dir"; find . -name "self-test*" -not -path "*/node_modules/*" 2>/dev/null
+[2026-04-05T12:14:16.654Z] iter=130 turn=14 INFO:   -> exit=0 (120 chars)
+[2026-04-05T12:14:16.655Z] iter=130 turn=15 INFO: Turn 15/25
+[2026-04-05T12:14:18.757Z] iter=130 turn=15 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -15
+[2026-04-05T12:14:22.799Z] iter=130 turn=15 INFO:   -> exit=0 (816 chars)
+[2026-04-05T12:14:22.799Z] iter=130 turn=16 INFO: Turn 16/25
+[2026-04-05T12:14:26.337Z] iter=130 turn=16 INFO: Agent: There's a pre-existing bug in self-test.ts (missing `mkdtempSync` import). Fix it, then wrap up.
+[2026-04-05T12:14:26.340Z] iter=130 turn=16 INFO: grep: "mkdtempSync\|^import.*fs" in scripts/self-test.ts
+[2026-04-05T12:14:26.378Z] iter=130 turn=16 INFO:   -> 10 matches
+[2026-04-05T12:14:26.379Z] iter=130 turn=17 INFO: Turn 17/25
+[2026-04-05T12:14:29.008Z] iter=130 turn=17 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T12:14:29.010Z] iter=130 turn=17 INFO:   -> ok: Patched scripts/self-test.ts: -1 +1 lines
+
+Context after patch:
+30 | import { callWithRetry } from "../src/api-retry.js";
+31 | import { getIterationCommits, computeDiffStats, getAllIterationDiffs } from "../src/iteration-diff.js";
+32 | import type { IterationState } from "../src/iteration.js";
+33 | import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync, mkdtempSync } from "fs";
+34 | import path from "path";
+35 | 
+36 | const ROOT = process.cwd();
+[2026-04-05T12:14:29.010Z] iter=130 turn=18 INFO: Turn 18/25
+[2026-04-05T12:14:31.557Z] iter=130 turn=18 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -10
+[2026-04-05T12:14:35.544Z] iter=130 turn=18 INFO:   -> exit=0 (602 chars)
+[2026-04-05T12:14:35.544Z] iter=130 turn=19 INFO: Turn 19/25
+[2026-04-05T12:14:37.853Z] iter=130 turn=19 INFO: read_file: scripts/self-test.ts
+[2026-04-05T12:14:37.855Z] iter=130 turn=19 INFO:   -> ok (1395 chars)
+[2026-04-05T12:14:37.855Z] iter=130 turn=20 INFO: Turn 20/25
+[2026-04-05T12:14:40.363Z] iter=130 turn=20 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T12:14:40.364Z] iter=130 turn=20 INFO:   -> ok: Patched scripts/self-test.ts: -1 +1 lines
+
+Context after patch:
+2246 | 
+2247 |   // Verify saveExpertState actually writes to the rotation file
+2248 |   const tmpDir = mkdtempSync(path.join(TEMP_DIR, "expert-state-"));
+2249 |   const { saveExpertState, loadExpertState } = await import(path.join(ROOT, "src/experts.js"));
+2250 | 
+2251 |   saveExpertState(tmpDir, "Engineer", 999);
+2252 |   const state = loadExpertState(tmpDir);
+[2026-04-05T12:14:40.365Z] iter=130 turn=21 INFO: Turn 21/25
+[2026-04-05T12:14:42.661Z] iter=130 turn=21 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -10 && npx tsc --noEmit 2>&1
+[2026-04-05T12:14:43.702Z] iter=130 turn=21 INFO:   -> exit=0 (636 chars)
+[2026-04-05T12:14:43.702Z] iter=130 turn=21 INFO: HARD TURN CAP REACHED: 21 turns (predicted 14, cap 21). Forcing commit.
+[2026-04-05T12:14:43.704Z] iter=130 turn=21 INFO: Cache persisted: 39 entries to .autoagent-cache.json
+[2026-04-05T12:14:43.704Z] iter=130 turn=21 INFO: Cache stats: 1 hits, 5 misses, 39 entries, 7 invalidations (11 entries removed)
+[2026-04-05T12:14:43.704Z] iter=130 turn=21 INFO: Tool cache stats
+[2026-04-05T12:14:43.704Z] iter=130 turn=21 INFO: Tool timing: bash: 10x, avg=1131ms, total=11307ms; grep: 1x, avg=40ms, total=40ms; list_files: 1x, avg=15ms, total=15ms; write_file: 7x, avg=1ms, total=10ms; read_file: 3x, avg=2ms, total=7ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T12:14:43.704Z] iter=130 turn=21 INFO: Tool timing stats
+[2026-04-05T12:14:43.991Z] iter=130 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 130: predicted 14 turns, actual 21 turns, ratio 1.50**
+[2026-04-05T12:14:55.246Z] iter=130 turn=21 INFO: Pre-commit review (2860in/379out): **Issues found:**
+
+- **`require()` replaced with `await import()` inside a non-async function**: `testExpertStateWiring()` is declared as `function testExpertStateWiring(): void` — using `await import
