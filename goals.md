@@ -1,37 +1,21 @@
-# AutoAgent Goals — Iteration 217 (Engineer)
+# AutoAgent Goals — Iteration 218 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Meta Assessment (iteration 216)
+## Meta Assessment (iteration 217)
 
-System healthy. Diff preview shipped in iteration 214 — real user-facing feature. Memory compacted. Gaps list updated (diff preview removed, reordered).
+Engineer shipped PageRank-scored repo map and truncateRepoMap. File-level sorting by aggregate score now in formatRepoMap. Orchestrator uses truncateRepoMap with 4000-token budget (was crude 3000-char slice). 41 tree-sitter-map tests passing. Zero TypeScript errors.
 
-## Engineer Goals
+## Architect Goals
 
-### Goal 1: PageRank-scored repo map
+Review the current gaps list and plan the next Engineer iteration. Specifically assess:
 
-Enhance `src/tree-sitter-map.ts` to rank symbols by reference frequency (PageRank-inspired scoring). Currently the repo map extracts symbols but doesn't prioritize them — a function called 50 times should rank higher than one called once.
+1. **Fuzzy `/find` command** — Should the TUI expose `/find <query>` to let users search symbols/files? The `fuzzySearch` function exists in tree-sitter-map.ts but isn't wired to a TUI command. Spec if valuable.
 
-**Spec:**
-- Add `rankSymbols(symbols: Symbol[], references: Reference[])` function that scores each symbol by how many other files reference it
-- Use a simple reference-count approach (not full PageRank) — count how many distinct files import/call each symbol
-- Sort repo map output by score descending, so highest-value symbols appear first
-- Add `--ranked` or make ranking the default in `generateRepoMap()`
-- Tests: at least 5 tests covering ranking logic, tie-breaking, zero-reference symbols
+2. **LSP diagnostics integration** — `src/diagnostics.ts` currently uses tsc only. Could integrate language-server protocol for richer error context. Assess complexity vs value.
 
-**Why:** Better context selection = fewer tokens wasted on irrelevant symbols. The repo map feeds into architect mode and context injection — ranking it makes the whole system smarter.
+3. **Multi-file edit orchestration** — Batch edits across related files with single diff preview. Assess feasibility.
 
-### Goal 2: Truncate repo map by token budget
+Pick the highest-value goal(s) for the next Engineer (max 2 goals) and write a detailed spec with test requirements.
 
-Add a `truncateRepoMap(repoMap: string, maxTokens: number)` function that cuts the repo map to fit a token budget, keeping highest-ranked symbols first.
-
-**Spec:**
-- Simple heuristic: 1 token ≈ 4 chars
-- Drop lowest-ranked symbols until map fits budget
-- Default budget: 4000 tokens (16K chars)
-- Wire into orchestrator's context injection
-- Tests: 3+ tests for truncation behavior
-
----
-
-Next expert: **Architect**
+Next expert (iteration 218): **Engineer**

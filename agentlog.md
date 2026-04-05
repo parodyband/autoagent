@@ -1,67 +1,3 @@
-[2026-04-05T15:34:28.460Z] iter=209 turn=16 INFO: Turn 16/25
-[2026-04-05T15:34:42.457Z] iter=209 turn=16 INFO: Agent: 
-
-Writing tests, then wrapping up immediately.
-[2026-04-05T15:34:42.458Z] iter=209 turn=16 INFO: write_file: src/__tests__/tree-sitter-map.test.ts (patch)
-[2026-04-05T15:34:42.461Z] iter=209 turn=16 INFO:   -> ok: Patched src/__tests__/tree-sitter-map.test.ts: -5 +71 lines
-
-Context after patch:
-333 |       ],
-334 |       builtAt: Date.now(),
-335 |     };
-336 |     const output = formatRepoMap(repoMap);
-337 |     expect(output).toContain("fn (function:1)");
-338 |     expect(output).not.toContain("×");
-339 |   });
-340 | });
-341 | 
-342 | // ─── fuzzySearch ──────────────────────────────────────────────
-343 | 
-344 | import { fuzzySearch } from "../tree-sitter-map.js";
-345 | 
-346 | describe("fuzzySearch", () => {
-347 |   const repoMap: import("../tree-sitter-map.js").RepoMap = {
-348 |     files: [
-349 |       {
-350 |         path: "src/orchestrator.ts",
-351 |         exports: [
-352 |           { name: "send", kind: "function", line: 10, exported: true },
-353 |           { name: "OrchestratorConfig", kind: "interface", line: 1, exported: true },
-354 |         ],
-355 |         imports: [{ names: ["buildRepoMap"], from: "./tree-sitter-map.js" }],
-356 |       },
-357 |       {
-358 |         path: "src/tui.tsx",
-359 |         exports: [
-360 |           { name: "App", kind: "function", line: 5, exported: true },
-361 |         ],
-362 |         imports: [{ names: ["send"], from: "./orchestrator.js" }],
-363 |       },
-364 |       {
-365 |         path: "src/utils/helpers.ts",
-366 |         exports: [
-367 |           { name: "formatBytes", kind: "function", line: 3, exported: true },
-368 |           { name: "parseArgs", kind: "function", line: 20, exported: true },
-369 |         ],
-370 |         imports: [],
-371 |       },
-372 |     ],
-373 |     builtAt: Date.now(),
-374 |   };
-375 | 
-376 |   it("returns file matches for partial path query", () => {
-377 |     const results = fuzzySearch(repoMap, "orch");
-378 |     expect(results.length).toBeGreaterThan(0);
-379 |     expect(results.some(r => r.file === "src/orchestrator.ts" && !r.symbol)).toBe(true);
-380 |   });
-381 | 
-382 |   it("returns symbol matches for partial symbol name", () => {
-383 |     const results = fuzzySearch(repoMap, "send");
-384 |     expect(results.some(r => r.symbol === "send" && r.kind === "function")).toBe(true);
-385 |   });
-386 | 
-387 |   it("respects maxResults cap", () => {
-388 |     const results = fuzzySearch(repoMap, "s", 2);
 389 |     expect(results.length).toBeLessThanOrEqual(2);
 390 |   });
 391 | 
@@ -1060,3 +996,415 @@ Correct — Meta expert doesn't change src/. My deliverables are memory + goals,
 [2026-04-05T15:46:37.370Z] iter=215 turn=6 INFO: Tool timing stats
 [2026-04-05T15:46:42.272Z] iter=215 turn=6 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 215: predicted 8 turns, actual 6 turns, ratio 0.75**
 [2026-04-05T15:46:42.292Z] iter=215 turn=6 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T15:46:42.323Z] iter=215 turn=6 INFO: Committed: c78f0cb9 (14 in / 3398 out, cache: 11330 created, 43706 read)
+[2026-04-05T15:46:42.323Z] iter=215 turn=6 INFO: Restarting as iteration 216...
+[2026-04-05T15:46:42.527Z] iter=216 INFO: Cache restored: 47/47 entries (0 stale)
+[2026-04-05T15:46:42.529Z] iter=216 INFO: Turn budget: 18/25 (calibration=1.00x, predicted=20)
+[2026-04-05T15:46:42.530Z] iter=216 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T15:46:42.646Z] iter=216 turn=1 INFO: Turn 1/25
+[2026-04-05T15:46:45.616Z] iter=216 turn=1 INFO: think: Let me review the goals and existing code before building. I need to:
+1. Add `rankSymbols()` to `src/tree-sitter-map.ts`...
+[2026-04-05T15:46:45.618Z] iter=216 turn=2 INFO: Turn 2/25
+[2026-04-05T15:46:47.959Z] iter=216 turn=2 INFO: read_file: src/tree-sitter-map.ts
+[2026-04-05T15:46:47.961Z] iter=216 turn=2 INFO:   -> ok (17042 chars)
+[2026-04-05T15:46:47.961Z] iter=216 turn=2 INFO: $ grep -n "repoMap\|tree-sitter\|generateRepoMap" src/orchestrator.ts | head -40
+[2026-04-05T15:46:47.981Z] iter=216 turn=2 INFO:   -> exit=0 (896 chars)
+[2026-04-05T15:46:47.982Z] iter=216 turn=3 INFO: Turn 3/25
+[2026-04-05T15:47:06.285Z] iter=216 turn=3 INFO: think: The existing code already has `rankSymbols(repoMap: RepoMap)` and it's already being used in orchestrator.ts! Let me che...
+[2026-04-05T15:47:06.286Z] iter=216 turn=4 INFO: Turn 4/25
+[2026-04-05T15:47:09.874Z] iter=216 turn=4 INFO: Agent: My deliverables:
+1. Enhanced `rankSymbols` + file-level sorting in `formatRepoMap` in `src/tree-sitter-map.ts`
+2. New `truncateRepoMap` function in `src/tree-sitter-map.ts`
+3. Wire `truncateRepoMap` into `src/orchestrator.ts`
+4. Tests in `src/tree-sitter-map.test.ts`
+
+Let me check existing tests then write everything:
+[2026-04-05T15:47:09.875Z] iter=216 turn=4 INFO: $ ls src/*.test.ts | grep -i tree; wc -l src/tree-sitter-map.ts
+[2026-04-05T15:47:09.900Z] iter=216 turn=4 INFO:   -> exit=0 (93 chars)
+[2026-04-05T15:47:09.900Z] iter=216 turn=5 INFO: Turn 5/25
+[2026-04-05T15:47:11.510Z] iter=216 turn=5 INFO: $ find . -name "*.test.*" | grep -i tree; find . -name "*.test.*" | head -10
+[2026-04-05T15:47:11.657Z] iter=216 turn=5 INFO:   -> exit=0 (421 chars)
+[2026-04-05T15:47:11.657Z] iter=216 turn=6 INFO: Turn 6/25
+[2026-04-05T15:47:13.044Z] iter=216 turn=6 INFO: $ cat src/__tests__/tree-sitter-map.test.ts
+[2026-04-05T15:47:13.059Z] iter=216 turn=6 INFO:   -> exit=0 (13774 chars)
+[2026-04-05T15:47:13.060Z] iter=216 turn=7 INFO: Turn 7/25
+[2026-04-05T15:47:42.697Z] iter=216 turn=7 INFO: Agent: **Goal 1 (PageRank-scored repo map):** NOT STARTED — need to add file-level sorting by aggregate score + tests
+**Goal 2 (truncateRepoMap):** NOT STARTED — need to add function + wire into orchestrator
+
+The code I need to write is clear. Starting now:
+[2026-04-05T15:47:42.698Z] iter=216 turn=7 INFO: write_file: src/tree-sitter-map.ts (patch)
+[2026-04-05T15:47:42.701Z] iter=216 turn=7 INFO:   -> ok: Patched src/tree-sitter-map.ts: -54 +138 lines
+
+Context after patch:
+385 |   return scores;
+386 | }
+387 | 
+388 | /**
+389 |  * Compute the aggregate rank score for a file (sum of its exported symbol scores).
+390 |  */
+391 | function fileAggregateScore(file: ParsedFile, ranked: Map<string, number>): number {
+392 |   let total = 0;
+393 |   for (const sym of file.exports) {
+394 |     if (sym.exported) total += ranked.get(sym.name) ?? 0;
+395 |   }
+396 |   return total;
+397 | }
+398 | 
+399 | /**
+400 |  * Format a RepoMap as a compact string suitable for LLM context.
+401 |  *
+402 |  * Output format:
+403 |  *   src/foo.ts
+404 |  *     exports: Foo (class:10), bar (function:25), MyType (type:5)
+405 |  *     imports: react, ./utils
+406 |  *
+407 |  * When `ranked` is provided, files are sorted by their aggregate symbol score
+408 |  * (highest first) and symbols within each file are also sorted by score.
+409 |  */
+410 | export function formatRepoMap(
+411 |   repoMap: RepoMap,
+412 |   opts?: { onlyExported?: boolean; maxFiles?: number; ranked?: Map<string, number> }
+413 | ): string {
+414 |   const onlyExported = opts?.onlyExported ?? true;
+415 |   const maxFiles = opts?.maxFiles ?? 200;
+416 |   const ranked = opts?.ranked;
+417 | 
+418 |   const lines: string[] = ["# Repo Map"];
+419 | 
+420 |   let files = repoMap.files.filter((file) => {
+421 |     const relevantExports = onlyExported ? file.exports.filter((s) => s.exported) : file.exports;
+422 |     return relevantExports.length > 0 || file.imports.length > 0;
+423 |   });
+424 | 
+425 |   // Sort files by aggregate rank score (highest first) when ranked map is provided
+426 |   if (ranked) {
+427 |     files = [...files].sort((a, b) => {
+428 |       const sa = fileAggregateScore(a, ranked);
+429 |       const sb = fileAggregateScore(b, ranked);
+430 |       if (sb !== sa) return sb - sa;
+431 |       return a.path.localeCompare(b.path); // stable tie-break
+432 |     });
+433 |   }
+434 | 
+435 |   for (const file of files.slice(0, maxFiles)) {
+436 |     let relevantExports = onlyExported ? file.exports.filter((s) => s.exported) : file.exports;
+437 | 
+438 |     lines.push(file.path);
+439 | 
+440 |     if (relevantExports.length > 0) {
+441 |       // Sort by rank (highest first) if ranked map provided
+442 |       if (ranked) {
+443 |         relevantExports = [...relevantExports].sort((a, b) => {
+444 |           const sa = ranked.get(a.name) ?? 0;
+445 |           const sb = ranked.get(b.name) ?? 0;
+446 |           if (sb !== sa) return sb - sa;
+447 |           return a.name.localeCompare(b.name); // stable tie-break
+448 |         });
+449 |       }
+450 | 
+451 |       const symStr = relevantExports
+452 |         .map((s) => {
+453 |           const score = ranked?.get(s.name) ?? 0;
+454 |           const suffix = ranked && score >= 2 ? ` (×${score})` : "";
+455 |           return `${s.name}${suffix} (${s.kind}:${s.line})`;
+456 |         })
+457 |         .join(", ");
+458 |       lines.push(`  exports: ${symStr}`);
+459 |     }
+460 | 
+461 |     if (file.imports.length > 0) {
+462 |       const fromList = [...new Set(file.imports.map((i) => i.from))].join(", ");
+463 |       lines.push(`  imports: ${fromList}`);
+464 |     }
+465 |   }
+466 | 
+467 |   return lines.join("\n");
+468 | }
+469 | 
+470 | /**
+471 |  * Truncate a formatted repo map string to fit within a token budget.
+472 |  *
+473 |  * Uses the heuristic: 1 token ≈ 4 characters.
+474 |  * Drops complete file sections from the bottom (lowest-ranked appear last
+475 |  * when formatRepoMap is called with `ranked`), so the highest-value symbols
+476 |  * are preserved.
+477 |  *
+478 |  * @param map       - formatted repo map string (output of formatRepoMap)
+479 |  * @param maxTokens - token budget (default 4000 → ~16K chars)
+480 |  * @returns         - truncated map string, with trailing note if cut
+481 |  */
+482 | export function truncateRepoMap(map: string, maxTokens = 4000): string {
+483 |   const maxChars = maxTokens * 4;
+484 |   if (map.length <= maxChars) return map;
+485 | 
+486 |   // Split into header + file sections
+487 |   // Each file section starts with a line that doesn't begin with whitespace or '#'
+488 |   const allLines = map.split("\n");
+489 |   const header: string[] = [];
+490 |   const sections: string[][] = [];
+491 |   let current: string[] | null = null;
+492 | 
+493 |   for (const line of allLines) {
+494 |     if (line.startsWith("#")) {
+495 |       header.push(line);
+496 |     } else if (line.length > 0 && !line.startsWith(" ") && !line.startsWith("\t")) {
+497 |       // New file section
+498 |       current = [line];
+499 |       sections.push(current);
+500 |     } else if (current) {
+501 |       current.push(line);
+502 |     } else {
+503 |       header.push(line);
+504 |     }
+505 |   }
+506 | 
+507 |   // Greedily include sections until we hit the budget
+508 |   const headerStr = header.join("\n");
+509 |   let result = headerStr;
+510 |   let included = 0;
+511 | 
+512 |   for (const section of sections) {
+513 |     const sectionStr = "\n" + section.join("\n");
+514 |     if (result.length + sectionStr.length > maxChars) break;
+515 |     result += sectionStr;
+516 |     included++;
+517 |   }
+518 | 
+519 |   const omitted = sections.length - included;
+520 |   if (omitted > 0) {
+521 |     result += `\n… (${omitted} more file${omitted === 1 ? "" : "s"} omitted — token budget ${maxTokens})`;
+522 |   }
+523 | 
+524 |   return result;
+525 | }
+526 | 
+527 | // ─── Fuzzy Search ─────────────────────────────────────────────
+528 | 
+[2026-04-05T15:47:42.703Z] iter=216 turn=8 INFO: Turn 8/25
+[2026-04-05T15:47:44.656Z] iter=216 turn=8 INFO: Agent: Now wire `truncateRepoMap` into the orchestrator and add it to the import:
+[2026-04-05T15:47:44.656Z] iter=216 turn=8 INFO: $ sed -n '18:22p' src/orchestrator.ts
+[2026-04-05T15:47:44.664Z] iter=216 turn=8 INFO:   -> exit=1 (65 chars)
+[2026-04-05T15:47:44.665Z] iter=216 turn=9 INFO: Turn 9/25
+[2026-04-05T15:47:46.020Z] iter=216 turn=9 INFO: $ sed -n '18,22p' src/orchestrator.ts
+[2026-04-05T15:47:46.036Z] iter=216 turn=9 INFO:   -> exit=0 (348 chars)
+[2026-04-05T15:47:46.037Z] iter=216 turn=10 INFO: Turn 10/25
+[2026-04-05T15:47:48.683Z] iter=216 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:47:48.684Z] iter=216 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+17 | import { compressToolOutput } from "./tool-output-compressor.js";
+18 | import { fingerprintRepo } from "./repo-context.js";
+19 | import { rankFiles } from "./file-ranker.js";
+20 | import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap } from "./tree-sitter-map.js";
+21 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
+22 | import { runVerification, formatVerificationResults } from "./verification.js";
+23 | import { createDefaultRegistry } from "./tool-registry.js";
+[2026-04-05T15:47:48.684Z] iter=216 turn=11 INFO: Turn 11/25
+[2026-04-05T15:47:50.479Z] iter=216 turn=11 INFO: Agent: Now replace the crude truncation in `buildSystemPrompt` with `truncateRepoMap`:
+[2026-04-05T15:47:50.481Z] iter=216 turn=11 INFO: $ sed -n '158,175p' src/orchestrator.ts
+[2026-04-05T15:47:50.503Z] iter=216 turn=11 INFO:   -> exit=0 (685 chars)
+[2026-04-05T15:47:50.504Z] iter=216 turn=12 INFO: Turn 12/25
+[2026-04-05T15:47:55.058Z] iter=216 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:47:55.059Z] iter=216 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -6 +7 lines
+
+Context after patch:
+160 |   if (isSourceDir) {
+161 |     try {
+162 |       const rankedPaths = rankedFiles.map(f => f.path);
+163 |       const repoMap = buildRepoMap(workDir, rankedPaths);
+164 |       const ranked = rankSymbols(repoMap);
+165 |       const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 60, ranked });
+166 |       if (raw.length > 50) {
+167 |         // Truncate to 4000 token budget (~16K chars), keeping highest-ranked files first
+168 |         repoMapBlock = "\n\n" + truncateRepoMap(raw, 4000);
+169 |       }
+170 |     } catch {
+171 |       // Non-fatal
+172 |     }
+[2026-04-05T15:47:55.060Z] iter=216 turn=13 INFO: Turn 13/25
+[2026-04-05T15:47:58.101Z] iter=216 turn=13 INFO: Agent: Good. I've written code. Now I need to add tests, run tsc, and wrap up.
+[2026-04-05T15:47:58.102Z] iter=216 turn=13 INFO: write_file: src/__tests__/tree-sitter-map.test.ts (patch)
+[2026-04-05T15:47:58.104Z] iter=216 turn=13 INFO:   -> ok: Patched src/__tests__/tree-sitter-map.test.ts: -1 +1 lines
+
+Context after patch:
+341 | 
+342 | // ─── fuzzySearch ──────────────────────────────────────────────
+343 | 
+344 | import { fuzzySearch, truncateRepoMap } from "../tree-sitter-map.js";
+345 | 
+346 | describe("fuzzySearch", () => {
+347 |   const repoMap: import("../tree-sitter-map.js").RepoMap = {
+[2026-04-05T15:47:58.105Z] iter=216 turn=14 INFO: Turn 14/25
+[2026-04-05T15:48:23.699Z] iter=216 turn=14 INFO: write_file: src/__tests__/tree-sitter-map.test.ts (patch)
+[2026-04-05T15:48:23.701Z] iter=216 turn=14 INFO:   -> ok: Patched src/__tests__/tree-sitter-map.test.ts: -5 +134 lines
+
+Context after patch:
+399 |     expect(results[formatIdx].score).toBeGreaterThan(0.5);
+400 |   });
+401 | 
+402 |   it("empty query returns empty array", () => {
+403 |     expect(fuzzySearch(repoMap, "")).toEqual([]);
+404 |     expect(fuzzySearch(repoMap, "   ")).toEqual([]);
+405 |   });
+406 | });
+407 | 
+408 | // ─── rankSymbols (file-level sorting) ────────────────────────
+409 | 
+410 | describe("rankSymbols file-level sorting via formatRepoMap", () => {
+411 |   it("sorts files by aggregate score (highest first)", () => {
+412 |     const repoMap: RepoMap = {
+413 |       files: [
+414 |         {
+415 |           path: "src/low.ts",
+416 |           exports: [{ name: "rareFunc", kind: "function", line: 1, exported: true }],
+417 |           imports: [],
+418 |         },
+419 |         {
+420 |           path: "src/high.ts",
+421 |           exports: [{ name: "popularFunc", kind: "function", line: 1, exported: true }],
+422 |           imports: [],
+423 |         },
+424 |       ],
+425 |       builtAt: Date.now(),
+426 |     };
+427 |     const ranked = new Map([["rareFunc", 1], ["popularFunc", 10]]);
+428 |     const output = formatRepoMap(repoMap, { ranked });
+429 |     expect(output.indexOf("src/high.ts")).toBeLessThan(output.indexOf("src/low.ts"));
+430 |   });
+431 | 
+432 |   it("tie-breaks files by path when scores are equal", () => {
+433 |     const repoMap: RepoMap = {
+434 |       files: [
+435 |         { path: "src/z.ts", exports: [{ name: "fn", kind: "function", line: 1, exported: true }], imports: [] },
+436 |         { path: "src/a.ts", exports: [{ name: "fn2", kind: "function", line: 1, exported: true }], imports: [] },
+437 |       ],
+438 |       builtAt: Date.now(),
+439 |     };
+440 |     const ranked = new Map([["fn", 5], ["fn2", 5]]);
+441 |     const output = formatRepoMap(repoMap, { ranked });
+442 |     expect(output.indexOf("src/a.ts")).toBeLessThan(output.indexOf("src/z.ts"));
+443 |   });
+444 | 
+445 |   it("zero-score files appear after high-score files", () => {
+446 |     const repoMap: RepoMap = {
+447 |       files: [
+448 |         { path: "src/zero.ts", exports: [{ name: "unused", kind: "const", line: 1, exported: true }], imports: [] },
+449 |         { path: "src/hot.ts", exports: [{ name: "core", kind: "function", line: 1, exported: true }], imports: [] },
+450 |       ],
+451 |       builtAt: Date.now(),
+452 |     };
+453 |     const ranked = new Map([["unused", 0], ["core", 8]]);
+454 |     const output = formatRepoMap(repoMap, { ranked });
+455 |     expect(output.indexOf("src/hot.ts")).toBeLessThan(output.indexOf("src/zero.ts"));
+456 |   });
+457 | 
+458 |   it("symbols within a file are sorted by score descending", () => {
+459 |     const repoMap: RepoMap = {
+460 |       files: [{
+461 |         path: "src/mixed.ts",
+462 |         exports: [
+463 |           { name: "alpha", kind: "function", line: 1, exported: true },
+464 |           { name: "omega", kind: "function", line: 2, exported: true },
+465 |         ],
+466 |         imports: [],
+467 |       }],
+468 |       builtAt: Date.now(),
+469 |     };
+470 |     const ranked = new Map([["alpha", 1], ["omega", 9]]);
+471 |     const output = formatRepoMap(repoMap, { ranked });
+472 |     expect(output.indexOf("omega")).toBeLessThan(output.indexOf("alpha"));
+473 |   });
+474 | 
+475 |   it("rankSymbols counts distinct-file imports correctly", () => {
+476 |     const repoMap: RepoMap = {
+477 |       files: [
+478 |         { path: "src/util.ts", exports: [{ name: "helper", kind: "function", line: 1, exported: true }], imports: [] },
+479 |         { path: "src/a.ts", exports: [], imports: [{ names: ["helper"], from: "./util.js" }] },
+480 |         { path: "src/b.ts", exports: [], imports: [{ names: ["helper"], from: "./util.js" }] },
+481 |         { path: "src/c.ts", exports: [], imports: [{ names: ["helper"], from: "./util.js" }] },
+482 |       ],
+483 |       builtAt: Date.now(),
+484 |     };
+485 |     const scores = rankSymbols(repoMap);
+486 |     expect(scores.get("helper")).toBe(3);
+487 |   });
+488 | });
+489 | 
+490 | // ─── truncateRepoMap ──────────────────────────────────────────
+491 | 
+492 | describe("truncateRepoMap", () => {
+493 |   it("returns map unchanged when under budget", () => {
+494 |     const map = "# Repo Map\nsrc/a.ts\n  exports: foo (function:1)";
+495 |     expect(truncateRepoMap(map, 4000)).toBe(map);
+496 |   });
+497 | 
+498 |   it("truncates at file boundaries, not mid-file", () => {
+499 |     // Build a map with sections that each consume ~2000 chars
+500 |     const bigSection = "x".repeat(2000);
+501 |     const map = `# Repo Map\nsrc/a.ts\n  exports: ${bigSection}\nsrc/b.ts\n  exports: ${bigSection}\nsrc/c.ts\n  exports: ${bigSection}`;
+502 |     // Budget of 1 token (4 chars) — should keep header + 0 file sections
+503 |     const result = truncateRepoMap(map, 1);
+504 |     expect(result).toContain("# Repo Map");
+505 |     expect(result).not.toContain("src/a.ts");
+506 |     expect(result).toContain("omitted");
+507 |   });
+508 | 
+509 |   it("includes omitted count in truncation message", () => {
+510 |     const bigSection = "x".repeat(5000);
+511 |     const map = `# Repo Map\nsrc/a.ts\n  exports: ${bigSection}\nsrc/b.ts\n  exports: small\nsrc/c.ts\n  exports: small`;
+512 |     const result = truncateRepoMap(map, 1);
+513 |     expect(result).toMatch(/\d+ more file/);
+514 |   });
+515 | 
+516 |   it("keeps highest-ranked files (first in string) when truncating", () => {
+517 |     // When formatRepoMap is called with ranked, highest files come first
+518 |     // truncateRepoMap preserves this order by dropping from the bottom
+519 |     const header = "# Repo Map\n";
+520 |     const highFile = "src/important.ts\n  exports: core (function:1)\n";
+521 |     const lowFile = "src/minor.ts\n  exports: " + "x".repeat(20000) + " (function:1)\n";
+522 |     const map = header + highFile + lowFile;
+523 |     const result = truncateRepoMap(map, 100); // small budget
+524 |     expect(result).toContain("src/important.ts");
+525 |     expect(result).not.toContain("src/minor.ts");
+526 |   });
+527 | 
+528 |   it("singular 'file' vs plural 'files' in omission message", () => {
+529 |     const bigSection = "x".repeat(8000);
+530 |     const map = `# Repo Map\nsrc/a.ts\n  exports: ${bigSection}`;
+531 |     const result = truncateRepoMap(map, 1);
+532 |     expect(result).toContain("1 more file omitted");
+533 |     expect(result).not.toContain("1 more files");
+534 |   });
+535 | });
+536 | 
+[2026-04-05T15:48:23.703Z] iter=216 turn=15 INFO: Turn 15/25
+[2026-04-05T15:48:26.359Z] iter=216 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T15:48:27.291Z] iter=216 turn=15 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:48:27.291Z] iter=216 turn=16 INFO: Turn 16/25
+[2026-04-05T15:48:30.357Z] iter=216 turn=16 INFO: Agent: TypeScript clean. Run tests, then wrap up:
+[2026-04-05T15:48:30.358Z] iter=216 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tree-sitter-map.test.ts 2>&1 | tail -25
+[2026-04-05T15:48:31.462Z] iter=216 turn=16 INFO:   -> exit=0 (288 chars)
+[2026-04-05T15:48:31.463Z] iter=216 turn=17 INFO: Turn 17/25
+[2026-04-05T15:48:37.908Z] iter=216 turn=17 INFO: Agent: 41 tests passing. Wrapping up now.
+[2026-04-05T15:48:37.910Z] iter=216 turn=17 INFO: save_memory: "[Engineer] Iteration 217"
+[2026-04-05T15:48:37.911Z] iter=216 turn=17 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T15:48:37.912Z] iter=216 turn=18 INFO: Turn 18/25
+[2026-04-05T15:48:46.842Z] iter=216 turn=18 INFO: write_file: goals.md (write)
+[2026-04-05T15:48:46.844Z] iter=216 turn=18 INFO:   -> ok: Updated goals.md (1152 chars, -16 lines delta)
+[2026-04-05T15:48:46.845Z] iter=216 turn=19 INFO: Turn 19/25
+[2026-04-05T15:48:48.722Z] iter=216 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "TSC_OK"
+[2026-04-05T15:48:49.647Z] iter=216 turn=19 INFO:   -> exit=0 (7 chars)
+[2026-04-05T15:48:49.647Z] iter=216 turn=20 INFO: Turn 20/25
+[2026-04-05T15:48:50.835Z] iter=216 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && echo "AUTOAGENT_RESTART"
+[2026-04-05T15:48:50.836Z] iter=216 turn=20 INFO: RESTART signal
+[2026-04-05T15:48:50.836Z] iter=216 turn=20 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T15:48:51.778Z] iter=216 turn=20 INFO: Compilation OK
+[2026-04-05T15:48:57.379Z] iter=216 turn=20 INFO: Cache persisted: 46 entries to .autoagent-cache.json
+[2026-04-05T15:48:57.379Z] iter=216 turn=20 INFO: Cache stats: 0 hits, 1 misses, 46 entries, 6 invalidations (2 entries removed)
+[2026-04-05T15:48:57.379Z] iter=216 turn=20 INFO: Tool cache stats
+[2026-04-05T15:48:57.379Z] iter=216 turn=20 INFO: Tool timing: bash: 11x, avg=293ms, total=3219ms; write_file: 6x, avg=2ms, total=13ms; read_file: 1x, avg=8ms, total=8ms; save_memory: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T15:48:57.379Z] iter=216 turn=20 INFO: Tool timing stats
+[2026-04-05T15:49:02.508Z] iter=216 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 216: predicted 20 turns, actual 20 turns, ratio 1.00**
+[2026-04-05T15:49:15.001Z] iter=216 turn=20 INFO: Pre-commit review (3045in/522out): **Issues found:**
+
+- **Test file imports `rankSymbols` and `formatRepoMap` without adding them to the import statement.** The diff shows `rankSymbols` and `formatRepoMap` used in the new `describe("ra

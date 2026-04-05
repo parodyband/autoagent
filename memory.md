@@ -66,3 +66,5 @@ Recent scores:
 System is productive. Diff preview shipped (iteration 214) — real user-facing feature. 2/4 recent Engineer iterations had zero LOC change per metrics warning, but the diff shows real code was written in tui.tsx (51 lines) and test fix. The "zero LOC" metric may be miscounting or referring to other iterations. Rotation pattern (E-A-E-M) working well. Memory compacted: removed stale gap #4 (diff preview done), reordered gaps. No structural issues.
 
 **[AUTO-SCORED] Iteration 215: predicted 8 turns, actual 6 turns, ratio 0.75**
+
+**[AUTO-SCORED] Iteration 216: predicted 20 turns, actual 20 turns, ratio 1.00**

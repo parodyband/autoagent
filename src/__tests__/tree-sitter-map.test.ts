@@ -341,7 +341,7 @@ describe("formatRepoMap with ranked", () => {
 
 // ─── fuzzySearch ──────────────────────────────────────────────
 
-import { fuzzySearch } from "../tree-sitter-map.js";
+import { fuzzySearch, truncateRepoMap } from "../tree-sitter-map.js";
 
 describe("fuzzySearch", () => {
   const repoMap: import("../tree-sitter-map.js").RepoMap = {
@@ -402,5 +402,134 @@ describe("fuzzySearch", () => {
   it("empty query returns empty array", () => {
     expect(fuzzySearch(repoMap, "")).toEqual([]);
     expect(fuzzySearch(repoMap, "   ")).toEqual([]);
+  });
+});
+
+// ─── rankSymbols (file-level sorting) ────────────────────────
+
+describe("rankSymbols file-level sorting via formatRepoMap", () => {
+  it("sorts files by aggregate score (highest first)", () => {
+    const repoMap: RepoMap = {
+      files: [
+        {
+          path: "src/low.ts",
+          exports: [{ name: "rareFunc", kind: "function", line: 1, exported: true }],
+          imports: [],
+        },
+        {
+          path: "src/high.ts",
+          exports: [{ name: "popularFunc", kind: "function", line: 1, exported: true }],
+          imports: [],
+        },
+      ],
+      builtAt: Date.now(),
+    };
+    const ranked = new Map([["rareFunc", 1], ["popularFunc", 10]]);
+    const output = formatRepoMap(repoMap, { ranked });
+    expect(output.indexOf("src/high.ts")).toBeLessThan(output.indexOf("src/low.ts"));
+  });
+
+  it("tie-breaks files by path when scores are equal", () => {
+    const repoMap: RepoMap = {
+      files: [
+        { path: "src/z.ts", exports: [{ name: "fn", kind: "function", line: 1, exported: true }], imports: [] },
+        { path: "src/a.ts", exports: [{ name: "fn2", kind: "function", line: 1, exported: true }], imports: [] },
+      ],
+      builtAt: Date.now(),
+    };
+    const ranked = new Map([["fn", 5], ["fn2", 5]]);
+    const output = formatRepoMap(repoMap, { ranked });
+    expect(output.indexOf("src/a.ts")).toBeLessThan(output.indexOf("src/z.ts"));
+  });
+
+  it("zero-score files appear after high-score files", () => {
+    const repoMap: RepoMap = {
+      files: [
+        { path: "src/zero.ts", exports: [{ name: "unused", kind: "const", line: 1, exported: true }], imports: [] },
+        { path: "src/hot.ts", exports: [{ name: "core", kind: "function", line: 1, exported: true }], imports: [] },
+      ],
+      builtAt: Date.now(),
+    };
+    const ranked = new Map([["unused", 0], ["core", 8]]);
+    const output = formatRepoMap(repoMap, { ranked });
+    expect(output.indexOf("src/hot.ts")).toBeLessThan(output.indexOf("src/zero.ts"));
+  });
+
+  it("symbols within a file are sorted by score descending", () => {
+    const repoMap: RepoMap = {
+      files: [{
+        path: "src/mixed.ts",
+        exports: [
+          { name: "alpha", kind: "function", line: 1, exported: true },
+          { name: "omega", kind: "function", line: 2, exported: true },
+        ],
+        imports: [],
+      }],
+      builtAt: Date.now(),
+    };
+    const ranked = new Map([["alpha", 1], ["omega", 9]]);
+    const output = formatRepoMap(repoMap, { ranked });
+    expect(output.indexOf("omega")).toBeLessThan(output.indexOf("alpha"));
+  });
+
+  it("rankSymbols counts distinct-file imports correctly", () => {
+    const repoMap: RepoMap = {
+      files: [
+        { path: "src/util.ts", exports: [{ name: "helper", kind: "function", line: 1, exported: true }], imports: [] },
+        { path: "src/a.ts", exports: [], imports: [{ names: ["helper"], from: "./util.js" }] },
+        { path: "src/b.ts", exports: [], imports: [{ names: ["helper"], from: "./util.js" }] },
+        { path: "src/c.ts", exports: [], imports: [{ names: ["helper"], from: "./util.js" }] },
+      ],
+      builtAt: Date.now(),
+    };
+    const scores = rankSymbols(repoMap);
+    expect(scores.get("helper")).toBe(3);
+  });
+});
+
+// ─── truncateRepoMap ──────────────────────────────────────────
+
+describe("truncateRepoMap", () => {
+  it("returns map unchanged when under budget", () => {
+    const map = "# Repo Map\nsrc/a.ts\n  exports: foo (function:1)";
+    expect(truncateRepoMap(map, 4000)).toBe(map);
+  });
+
+  it("truncates at file boundaries, not mid-file", () => {
+    // Build a map with sections that each consume ~2000 chars
+    const bigSection = "x".repeat(2000);
+    const map = `# Repo Map\nsrc/a.ts\n  exports: ${bigSection}\nsrc/b.ts\n  exports: ${bigSection}\nsrc/c.ts\n  exports: ${bigSection}`;
+    // Budget of 1 token (4 chars) — should keep header + 0 file sections
+    const result = truncateRepoMap(map, 1);
+    expect(result).toContain("# Repo Map");
+    expect(result).not.toContain("src/a.ts");
+    expect(result).toContain("omitted");
+  });
+
+  it("includes omitted count in truncation message", () => {
+    const bigSection = "x".repeat(5000);
+    const map = `# Repo Map\nsrc/a.ts\n  exports: ${bigSection}\nsrc/b.ts\n  exports: small\nsrc/c.ts\n  exports: small`;
+    const result = truncateRepoMap(map, 1);
+    expect(result).toMatch(/\d+ more file/);
+  });
+
+  it("keeps highest-ranked files (first in string) when truncating", () => {
+    // When formatRepoMap is called with ranked, highest files come first
+    // truncateRepoMap preserves this order by dropping from the bottom
+    const header = "# Repo Map\n";
+    const highFile = "src/important.ts\n  exports: core (function:1)\n";
+    const lowFile = "src/minor.ts\n  exports: " + "x".repeat(20000) + " (function:1)\n";
+    const map = header + highFile + lowFile;
+    const result = truncateRepoMap(map, 100); // small budget
+    expect(result).toContain("src/important.ts");
+    expect(result).not.toContain("src/minor.ts");
+  });
+
+  it("singular 'file' vs plural 'files' in omission message", () => {
+    const bigSection = "x".repeat(8000);
+    const map = `# Repo Map\nsrc/a.ts\n  exports: ${bigSection}`;
+    const result = truncateRepoMap(map, 1);
+    expect(result).toContain("1 more file omitted");
+    expect(result).not.toContain("1 more files");
   });
 });

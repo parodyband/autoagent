@@ -386,12 +386,26 @@ export function rankSymbols(repoMap: RepoMap): Map<string, number> {
 }
 
 /**
+ * Compute the aggregate rank score for a file (sum of its exported symbol scores).
+ */
+function fileAggregateScore(file: ParsedFile, ranked: Map<string, number>): number {
+  let total = 0;
+  for (const sym of file.exports) {
+    if (sym.exported) total += ranked.get(sym.name) ?? 0;
+  }
+  return total;
+}
+
+/**
  * Format a RepoMap as a compact string suitable for LLM context.
  *
  * Output format:
  *   src/foo.ts
  *     exports: Foo (class:10), bar (function:25), MyType (type:5)
  *     imports: react, ./utils
+ *
+ * When `ranked` is provided, files are sorted by their aggregate symbol score
+ * (highest first) and symbols within each file are also sorted by score.
  */
 export function formatRepoMap(
   repoMap: RepoMap,
@@ -403,11 +417,23 @@ export function formatRepoMap(
 
   const lines: string[] = ["# Repo Map"];
 
-  const files = repoMap.files.slice(0, maxFiles);
-  for (const file of files) {
+  let files = repoMap.files.filter((file) => {
+    const relevantExports = onlyExported ? file.exports.filter((s) => s.exported) : file.exports;
+    return relevantExports.length > 0 || file.imports.length > 0;
+  });
+
+  // Sort files by aggregate rank score (highest first) when ranked map is provided
+  if (ranked) {
+    files = [...files].sort((a, b) => {
+      const sa = fileAggregateScore(a, ranked);
+      const sb = fileAggregateScore(b, ranked);
+      if (sb !== sa) return sb - sa;
+      return a.path.localeCompare(b.path); // stable tie-break
+    });
+  }
+
+  for (const file of files.slice(0, maxFiles)) {
     let relevantExports = onlyExported ? file.exports.filter((s) => s.exported) : file.exports;
-    // Skip files with no exports and no imports (probably empty or non-source)
-    if (relevantExports.length === 0 && file.imports.length === 0) continue;
 
     lines.push(file.path);
 
@@ -417,7 +443,8 @@ export function formatRepoMap(
         relevantExports = [...relevantExports].sort((a, b) => {
           const sa = ranked.get(a.name) ?? 0;
           const sb = ranked.get(b.name) ?? 0;
-          return sb - sa;
+          if (sb !== sa) return sb - sa;
+          return a.name.localeCompare(b.name); // stable tie-break
         });
       }
 
@@ -438,6 +465,63 @@ export function formatRepoMap(
   }
 
   return lines.join("\n");
+}
+
+/**
+ * Truncate a formatted repo map string to fit within a token budget.
+ *
+ * Uses the heuristic: 1 token ≈ 4 characters.
+ * Drops complete file sections from the bottom (lowest-ranked appear last
+ * when formatRepoMap is called with `ranked`), so the highest-value symbols
+ * are preserved.
+ *
+ * @param map       - formatted repo map string (output of formatRepoMap)
+ * @param maxTokens - token budget (default 4000 → ~16K chars)
+ * @returns         - truncated map string, with trailing note if cut
+ */
+export function truncateRepoMap(map: string, maxTokens = 4000): string {
+  const maxChars = maxTokens * 4;
+  if (map.length <= maxChars) return map;
+
+  // Split into header + file sections
+  // Each file section starts with a line that doesn't begin with whitespace or '#'
+  const allLines = map.split("\n");
+  const header: string[] = [];
+  const sections: string[][] = [];
+  let current: string[] | null = null;
+
+  for (const line of allLines) {
+    if (line.startsWith("#")) {
+      header.push(line);
+    } else if (line.length > 0 && !line.startsWith(" ") && !line.startsWith("\t")) {
+      // New file section
+      current = [line];
+      sections.push(current);
+    } else if (current) {
+      current.push(line);
+    } else {
+      header.push(line);
+    }
+  }
+
+  // Greedily include sections until we hit the budget
+  const headerStr = header.join("\n");
+  let result = headerStr;
+  let included = 0;
+
+  for (const section of sections) {
+    const sectionStr = "\n" + section.join("\n");
+    if (result.length + sectionStr.length > maxChars) break;
+    result += sectionStr;
+    included++;
+  }
+
+  const omitted = sections.length - included;
+  if (omitted > 0) {
+    result += `\n… (${omitted} more file${omitted === 1 ? "" : "s"} omitted — token budget ${maxTokens})`;
+  }
+
+  return result;
 }
 
 // ─── Fuzzy Search ─────────────────────────────────────────────
