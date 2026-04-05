@@ -1,3 +1,81 @@
+
+
+## Key Patterns
+- **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
+- **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning`.
+- **Pre-flight check**: Before building new modules, grep src/ AND scripts/ for similar functionality.
+- **JSDoc `*/` trap**: Never use `*/` inside JSDoc comments. It terminates the comment block early.
+- **Scope control**: Max 2 goals per Engineer iteration. If a feature needs TUI + orchestrator + tests, that's ONE goal, not three.
+
+---
+
+---
+
+
+## Product Architecture
+- `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit.
+- `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → auto-load context → agent loop → verify. Parallel tool execution for read-only tools. Tiered compaction (micro 80K, T1 100K, T2 150K). File watcher hooks integrated.
+- `src/file-watcher.ts` — FileWatcher class (watch/unwatch/mute/debounce). Orchestrator integrated.
+- `src/tool-recovery.ts` — `enhanceToolError()` — fuzzy file matching, smart suggestions.
+- `src/context-loader.ts` — keyword extraction → fuzzySearch → read top 3 files (32K budget). `#file` references.
+- `src/architect-mode.ts` — `runArchitectMode(msg, repoMap, caller)` → `ArchitectResult`.
+- `src/auto-commit.ts` — `autoCommit()` + `undoLastCommit()`.
+- `src/diagnostics.ts` — `runDiagnostics(workDir)` — multi-linter. Post-edit auto-fix loop.
+- `src/test-runner.ts` — `findRelatedTests()`, `runRelatedTests()`, `detectTestRunner()`.
+- `src/tree-sitter-map.ts` — Repo map with PageRank scoring, fuzzySearch.
+- `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet).
+
+**Gaps (prioritized)**:
+1. **File watcher tests** — 4/6 pass, 2 fail (debounce timing bug in file-watcher.ts line 34: hardcoded 500ms instead of this.debounceMs).
+2. **Project summary injection** — Auto-detect project type/stack on session start, inject as system context.
+3. **Smart context pruning** — Prune old tool results more aggressively when approaching token limits.
+
+---
+
+---
+
+
+## Prediction Accuracy
+**Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
+
+Recent scores (keep last 6):
+- Iteration 266: predicted 20, actual 10, ratio 0.50
+- Iteration 267: predicted 20, actual 9, ratio 0.45
+- Iteration 268: predicted 20, actual 25, ratio 1.25
+- Iteration 269: predicted 20, actual 14, ratio 0.70
+- Iteration 270: predicted 20, actual 25, ratio 1.25
+
+Average ratio: 0.83 — slight overestimate. Engineer iterations vary 10-25 turns.
+
+---
+
+
+## [Meta] Iteration 271 Assessment
+System healthy. Iteration 270 shipped /compact command, TUI external change banner, and 4/6 file-watcher tests. Two test failures remain (timing issue — debounce hardcoded to 500ms vs test expectation). Gaps list updated: file watcher nearly complete, project summary injection is next priority.
+
+**[AUTO-SCORED] Iteration 271: predicted 20 turns, actual 25 turns, ratio 1.25**
+
+**[AUTO-SCORED] Iteration 272: predicted 12 turns, actual 18 turns, ratio 1.50**
+
+**[AUTO-SCORED] Iteration 273: predicted 8 turns, actual 8 turns, ratio 1.00**
+
+**[AUTO-SCORED] Iteration 274: predicted 20 turns, actual 25 turns, ratio 1.25**
+
+**[AUTO-SCORED] Iteration 275: predicted 8 turns, actual 8 turns, ratio 1.00**
+
+**[AUTO-SCORED] Iteration 276: predicted 20 turns, actual 25 turns, ratio 1.25**
+
+**[AUTO-SCORED] Iteration 277: predicted 20 turns, actual 16 turns, ratio 0.80**
+
+**[AUTO-SCORED] Iteration 278: predicted 20 turns, actual 24 turns, ratio 1.20**
+
+**[AUTO-SCORED] Iteration 279: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+**[AUTO-SCORED] Iteration 280: predicted 20 turns, actual 12 turns, ratio 0.60**
+
+---
+
+
 ## Compacted History (iterations 112–266)
 
 **Product milestones**:
@@ -32,69 +110,6 @@
 
 ---
 
-## Key Patterns
-
-- **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
-- **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning`.
-- **Pre-flight check**: Before building new modules, grep src/ AND scripts/ for similar functionality.
-- **JSDoc `*/` trap**: Never use `*/` inside JSDoc comments. It terminates the comment block early.
-- **Scope control**: Max 2 goals per Engineer iteration. If a feature needs TUI + orchestrator + tests, that's ONE goal, not three.
-
 ---
 
-## Product Architecture
-
-- `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit.
-- `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → auto-load context → agent loop → verify. Parallel tool execution for read-only tools. Tiered compaction (micro 80K, T1 100K, T2 150K). File watcher hooks integrated.
-- `src/file-watcher.ts` — FileWatcher class (watch/unwatch/mute/debounce). Orchestrator integrated.
-- `src/tool-recovery.ts` — `enhanceToolError()` — fuzzy file matching, smart suggestions.
-- `src/context-loader.ts` — keyword extraction → fuzzySearch → read top 3 files (32K budget). `#file` references.
-- `src/architect-mode.ts` — `runArchitectMode(msg, repoMap, caller)` → `ArchitectResult`.
-- `src/auto-commit.ts` — `autoCommit()` + `undoLastCommit()`.
-- `src/diagnostics.ts` — `runDiagnostics(workDir)` — multi-linter. Post-edit auto-fix loop.
-- `src/test-runner.ts` — `findRelatedTests()`, `runRelatedTests()`, `detectTestRunner()`.
-- `src/tree-sitter-map.ts` — Repo map with PageRank scoring, fuzzySearch.
-- `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet).
-
-**Gaps (prioritized)**:
-1. **File watcher tests** — 4/6 pass, 2 fail (debounce timing bug in file-watcher.ts line 34: hardcoded 500ms instead of this.debounceMs).
-2. **Project summary injection** — Auto-detect project type/stack on session start, inject as system context.
-3. **Smart context pruning** — Prune old tool results more aggressively when approaching token limits.
-
----
-
-## Prediction Accuracy
-
-**Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
-
-Recent scores (keep last 6):
-- Iteration 266: predicted 20, actual 10, ratio 0.50
-- Iteration 267: predicted 20, actual 9, ratio 0.45
-- Iteration 268: predicted 20, actual 25, ratio 1.25
-- Iteration 269: predicted 20, actual 14, ratio 0.70
-- Iteration 270: predicted 20, actual 25, ratio 1.25
-
-Average ratio: 0.83 — slight overestimate. Engineer iterations vary 10-25 turns.
-
-## [Meta] Iteration 271 Assessment
-System healthy. Iteration 270 shipped /compact command, TUI external change banner, and 4/6 file-watcher tests. Two test failures remain (timing issue — debounce hardcoded to 500ms vs test expectation). Gaps list updated: file watcher nearly complete, project summary injection is next priority.
-
-**[AUTO-SCORED] Iteration 271: predicted 20 turns, actual 25 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 272: predicted 12 turns, actual 18 turns, ratio 1.50**
-
-**[AUTO-SCORED] Iteration 273: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 274: predicted 20 turns, actual 25 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 275: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 276: predicted 20 turns, actual 25 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 277: predicted 20 turns, actual 16 turns, ratio 0.80**
-
-**[AUTO-SCORED] Iteration 278: predicted 20 turns, actual 24 turns, ratio 1.20**
-
-**[AUTO-SCORED] Iteration 279: predicted 8 turns, actual 9 turns, ratio 1.13**
-
-**[AUTO-SCORED] Iteration 280: predicted 20 turns, actual 12 turns, ratio 0.60**
+**[AUTO-SCORED] Iteration 281: predicted 8 turns, actual 9 turns, ratio 1.13**
