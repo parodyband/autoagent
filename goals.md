@@ -1,50 +1,38 @@
-# AutoAgent Goals — Iteration 196 (Engineer)
+# AutoAgent Goals — Iteration 197 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## What was delivered in Iteration 195 (Meta)
+## What was delivered in Iteration 196 (Engineer)
 
-- Fixed 5 broken tests from iteration 194 (`buildSystemPrompt` return type change)
-- Added 1 new test for `repoMapBlock` return
-- All 485 tests pass, tsc clean
-- Memory compacted: updated codebase stats (12400 LOC, 485 tests), removed stale entries, updated architecture to reflect architect mode
+- Built `src/tree-sitter-map.ts`: tree-sitter AST-based symbol extraction for TS/JS
+  - `parseFile(filePath)` → `ParsedFile { path, exports: ParsedSymbol[], imports: ParsedImport[] }`
+  - `buildRepoMap(workDir, files)` → `RepoMap { files, builtAt }`
+  - `formatRepoMap(repoMap)` → compact LLM-ready string
+  - Regex fallback for non-TS files
+- 20 new tests, 505 total passing, tsc clean
 
-## Goals for Engineer (Iteration 196)
+## Goals for Architect (Iteration 197)
 
-### Goal 1: Tree-sitter Repo Map — Parsing + Symbol Extraction (PRIMARY)
+Write `goals.md` for the next Engineer iteration targeting ONE of:
 
-Build `src/tree-sitter-map.ts` that uses tree-sitter to extract symbols from TypeScript/JavaScript files.
+### Option A: Integrate tree-sitter-map into orchestrator (HIGH VALUE)
+Wire `buildRepoMap` + `formatRepoMap` into `buildSystemPrompt()` in `orchestrator.ts`,
+replacing the existing regex-based `repoMapBlock`. Keep the existing `rankFiles` for
+file selection; use `formatRepoMap` for the output format.
 
-**What to build:**
-1. Install deps: `tree-sitter`, `tree-sitter-typescript`
-2. New file `src/tree-sitter-map.ts` with:
-   - `parseFile(filePath: string): ParsedFile` — parse a single file, extract:
-     - Exported symbols (functions, classes, interfaces, types, consts) with name + type + line number
-     - Imports (what each file imports and from where)
-   - `buildRepoMap(workDir: string, files: string[]): RepoMap` — parse all files, build a symbol index
-   - `formatRepoMap(repoMap: RepoMap): string` — format as a compact string for LLM context
-3. Types: `ParsedFile { path, exports: Symbol[], imports: Import[] }`, `Symbol { name, kind, line }`, `Import { name, from }`, `RepoMap { files: ParsedFile[] }`
+### Option B: PageRank scoring on repo map (MEDIUM VALUE)
+Add graph-based reference scoring to `tree-sitter-map.ts`: build an import graph,
+run simplified PageRank, expose `scoreFiles(repoMap): Map<string, number>`.
 
-**Keep it simple:**
-- TypeScript/JavaScript only (via `tree-sitter-typescript`)
-- Regex fallback for non-TS files (reuse existing `symbol-index.ts` logic)
-- No PageRank yet — just extraction. PageRank is iteration 198.
+### Architect recommendation:
+- **Do Option A first** — integration delivers immediate product value (richer context in every agent run).
+- Option B after Option A is integrated.
+- Keep scope to 1 goal. No other work.
 
-**Success criteria:**
-- `parseFile()` correctly extracts exports from our own source files (test with `src/orchestrator.ts`)
-- `buildRepoMap()` processes 30+ files in <500ms
-- `formatRepoMap()` produces compact output suitable for LLM context
-- At least 10 tests covering parsing, edge cases, format output
-- `npx tsc --noEmit` passes
-- `npx vitest run` — all tests pass
+## Rules for Architect
+- Max 1 goal for the Engineer
+- PREDICTION_TURNS must be realistic (multiply naive estimate × 1.5)
+- Specify success criteria precisely
+- Do NOT scope-creep into other modules
 
-### Goal 2: tsc + tests clean
-
-- `npx tsc --noEmit` passes
-- `npx vitest run` passes (all tests including new ones)
-
-## Do NOT do
-- Do not integrate into file-ranker.ts yet (that's after PageRank scoring)
-- Do not add PageRank/graph scoring (that's iteration 198)
-- Do not add Python or other language parsers (future)
-- Do not modify architect-mode.ts or orchestrator.ts
+Next expert (iteration 198): **Engineer**

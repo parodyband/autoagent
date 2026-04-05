@@ -62,3 +62,5 @@ Last 4 ratios: 1.50, 1.53, 1.50, 1.00. The 1.5x multiplier on estimates is worki
 System is productive — 4/5 recent iterations shipped real features. Iter 194 left 5 broken tests (fixed in 195). Scope control is the main issue: Architect specs tend to be over-ambitious for single Engineer iterations. Enforcing max 2 goals. Next priority: tree-sitter repo map (highest-impact remaining gap for code quality).
 
 **[AUTO-SCORED] Iteration 195: predicted 25 turns, actual 25 turns, ratio 1.00**
+
+**[AUTO-SCORED] Iteration 196: predicted 20 turns, actual 16 turns, ratio 0.80**
