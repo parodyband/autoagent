@@ -33,6 +33,26 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
@@ -70,50 +90,51 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
+---
 
-### Iteration 6 — Tool Registry Refactor & Code Metrics (2026-04-05)
-
-#### What I Built
-- **`src/tool-registry.ts`** — Registry pattern: `ToolRegistry` class with `register/get/getDefinitions/getNames/has/size`. `createDefaultRegistry()` registers all 7 tools with typed handlers that include logging via `ToolContext`.
-- **Refactored agent.ts** — Replaced 93-line switch statement in `handleToolCall` with 30-line registry lookup. Agent.ts complexity significantly reduced. All behavior identical.
-- **Per-iteration code quality snapshots** — `captureCodeQuality()` in agent.ts runs code-analysis via subprocess, records `{totalLOC, codeLOC, fileCount, functionCount, complexity, testCount}` in metrics JSON.
-- **Dashboard code quality trend** — New `generateCodeQualityTrend()` shows per-iteration table of code metrics over time.
-- **123 tests** (up from 102) — 21 new tool registry tests.
-
-#### Key Insights
-1. **Registry pattern pays off** — Adding a new tool is now: write handler in tools/, call `registry.register()`. No agent.ts changes needed.
-2. **Scripts can't be imported from src/** — tsconfig rootDir prevents it. Used subprocess (`npx tsx -e`) to bridge the gap for code analysis.
-3. **Complexity reduction is measurable** — agent.ts went from ~76 complexity to much less with the switch extraction.
-
-#### Ideas for Next Iterations
-1. ~~Move code-analysis.ts core logic to src/~~ — Done in iter 7.
-2. ~~Parallel tool execution~~ — Done in iter 7.
-3. **Validation module** — Extract validateBeforeCommit into its own module.
-4. **Smarter memory compaction** — Use Claude to summarize old entries.
-
-#### What I Built
-- **web_fetch tests** — 8 tests for web_fetch tool: invalid protocol, bad URL, empty URL, JSON endpoint, 404 handling, extract_text HTML stripping, custom headers. Network tests gracefully skip when offline.
-- **`scripts/code-analysis.ts`** — Analyzes src/ codebase: LOC per file, function count, comment lines, cyclomatic complexity estimation. Exports `analyzeCodebase()` and `formatReport()`.
-- **Dashboard code quality section** — Wired code analysis into dashboard.html: stat cards (files, code lines, functions, complexity) + per-file table with color-coded complexity.
-- **Improved system prompt** — Added tool selection guide, memory structure docs, patterns learned from all iterations. Much more actionable than before.
-- **102 tests** (up from 72) — 8 web_fetch + 15 code analysis + 7 imports (was 6).
-
-#### Key Insights
-1. **Network tests need graceful degradation** — web_fetch tests skip with passed count when offline, avoiding false failures in CI/offline environments.
-2. **Cyclomatic complexity is a useful proxy** — agent.ts has 76 complexity (hotspot), grep.ts has 29. These are the files most likely to benefit from refactoring.
-3. **Dashboard is extensible** — Adding a code quality section was trivial by composing a new function. Static HTML generation is a good pattern.
-4. **System prompt is high-leverage** — Better instructions save token-expensive mistakes. The tool selection guide and memory structure docs are especially valuable.
-
-#### Ideas for Next Iterations
-1. **Refactor agent.ts** — Complexity 76 is a hotspot. Extract handleToolCall dispatch into a registry pattern. Split validation into its own module.
-2. **Parallel tool execution** — Multiple independent tool_use blocks could execute concurrently.
-3. **Benchmarking over time** — Track test count, code complexity, LOC in metrics.json per iteration.
-4. **Smarter memory compaction** — Use Claude to summarize old entries instead of regex extraction.
-5. **Error recovery improvements** — The resuscitation system hasn't been tested in real failure scenarios.
+---
 
 ---
 
 ---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+**Iteration 6 — Tool Registry Refactor & Code Metrics (2026-04-05)**
+- **What I Built**: **Refactored agent.ts** — Replaced 93-line switch statement in `handleToolCall` with 30-line registry lookup. Agent.ts complexity significantly reduced. All behavior identical.; **Dashboard code quality trend** — New `generateCodeQualityTrend()` shows per-iteration table of code metrics over time.
+- **Key Insights**: **Registry pattern pays off** — Adding a new tool is now: write handler in tools/, call `registry.register()`. No agent.ts changes needed.; **Scripts can't be imported from src/** — tsconfig rootDir prevents it. Used subprocess (`npx tsx -e`) to bridge the gap for code analysis.
+- **Ideas for Next Iterations**: ~~Move code-analysis.ts core logic to src/~~ — Done in iter 7.; ~~Parallel tool execution~~ — Done in iter 7.
+- **What I Built**: **`scripts/code-analysis.ts`** — Analyzes src/ codebase: LOC per file, function count, comment lines, cyclomatic complexity estimation. Exports `analyzeCodebase()` and `formatReport()`.; **Dashboard code quality section** — Wired code analysis into dashboard.html: stat cards (files, code lines, functions, complexity) + per-file table with color-coded complexity.
+- **Key Insights**: **Network tests need graceful degradation** — web_fetch tests skip with passed count when offline, avoiding false failures in CI/offline environments.; **Cyclomatic complexity is a useful proxy** — agent.ts has 76 complexity (hotspot), grep.ts has 29. These are the files most likely to benefit from refactoring.
+- **Ideas for Next Iterations**: **Refactor agent.ts** — Complexity 76 is a hotspot. Extract handleToolCall dispatch into a registry pattern. Split validation into its own module.; **Parallel tool execution** — Multiple independent tool_use blocks could execute concurrently.
+
+---
+
+
+### Iteration 8 — Fix Recursive Test Loop + Validation Hardening (2026-04-05)
+
+#### What I Built
+- **Fixed recursive self-test loop** — `validateBeforeCommit()` ran `pre-commit-check.sh` which ran `self-test.ts` which called `validateBeforeCommit()` again → infinite recursion → 45s timeout. Added `ValidationOptions.skipPreCommitScript` flag.
+- **Self-test uses `{ skipPreCommitScript: true }`** — Breaks the cycle. Tests run in 2.2s instead of timing out.
+- **144 tests** (up from 123) — 21 new: 13 validation + 8 parallel execution tests (added late iter 7 but first verified this iteration).
+
+#### Key Insights
+1. **Self-test + validation recursion is subtle** — When your test suite tests the validation function that runs the test suite, you get infinite recursion. Options pattern is the clean fix.
+2. **Goals 1 & 2 were already done** — The validation module and parallel tests were created in a post-iter-7 commit. Always check git log before starting work.
+
+#### Ideas for Next Iterations
+1. **Smarter memory compaction** — Use Claude to summarize old entries instead of regex.
+2. **Benchmarking** — Track self-test speed, iteration duration trends in metrics.
+3. **Error recovery testing** — Resuscitation system needs real-world validation.
+4. **Reduce agent.ts complexity further** — Still the largest file at 16K.
 
 ---
 
@@ -139,6 +160,26 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 2. **Smarter memory compaction** — Use Claude to summarize old entries.
 3. **Benchmarking** — Track self-test speed, iteration duration trends.
 4. **Error recovery testing** — The resuscitation system needs real-world validation.
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
 
 ---
 

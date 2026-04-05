@@ -26,6 +26,13 @@ export interface ValidationResult {
   output: string;
 }
 
+// ─── Options ────────────────────────────────────────────────
+
+export interface ValidationOptions {
+  /** Skip running pre-commit-check.sh (useful to avoid recursion in self-tests). */
+  skipPreCommitScript?: boolean;
+}
+
 // ─── Validation ─────────────────────────────────────────────
 
 /**
@@ -35,6 +42,7 @@ export interface ValidationResult {
 export async function validateBeforeCommit(
   rootDir: string,
   logFn?: (msg: string) => void,
+  options?: ValidationOptions,
 ): Promise<ValidationResult> {
   const log = logFn ?? (() => {});
 
@@ -46,11 +54,13 @@ export async function validateBeforeCommit(
   }
   log("Compilation OK");
 
-  const checkScript = path.join(rootDir, "scripts/pre-commit-check.sh");
-  if (existsSync(checkScript)) {
-    const pc = await executeBash(`bash "${checkScript}"`, 60, rootDir);
-    if (pc.exitCode !== 0) {
-      return { ok: false, output: `pre-commit-check failed:\n${pc.output}` };
+  if (!options?.skipPreCommitScript) {
+    const checkScript = path.join(rootDir, "scripts/pre-commit-check.sh");
+    if (existsSync(checkScript)) {
+      const pc = await executeBash(`bash "${checkScript}"`, 60, rootDir);
+      if (pc.exitCode !== 0) {
+        return { ok: false, output: `pre-commit-check failed:\n${pc.output}` };
+      }
     }
   }
   return { ok: true, output: "ok" };

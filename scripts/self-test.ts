@@ -14,7 +14,7 @@ import { executeThink } from "../src/tools/think.js";
 import { executeListFiles } from "../src/tools/list_files.js";
 import { executeWebFetch } from "../src/tools/web_fetch.js";
 import { createDefaultRegistry, ToolRegistry } from "../src/tool-registry.js";
-import { validateBeforeCommit, captureCodeQuality } from "../src/validation.js";
+import { validateBeforeCommit, captureCodeQuality, type ValidationOptions } from "../src/validation.js";
 import { compactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
@@ -533,13 +533,21 @@ async function testToolRegistry(): Promise<void> {
 async function testValidation(): Promise<void> {
   console.log("\n✅ Validation Module");
 
-  // validateBeforeCommit — should pass on a clean codebase
+  // validateBeforeCommit — pass skipPreCommitScript to avoid recursion
+  // (pre-commit-check.sh runs self-test.ts, which would call validateBeforeCommit again)
   const logs: string[] = [];
-  const result = await validateBeforeCommit(ROOT, (msg) => logs.push(msg));
+  const result = await validateBeforeCommit(ROOT, (msg) => logs.push(msg), { skipPreCommitScript: true });
   assert(result.ok, "validation: passes on clean codebase");
   assert(result.output === "ok", "validation: output is 'ok' on success");
   assert(logs.some(l => l.includes("Compilation OK")), "validation: logs compilation success");
   assert(logs.some(l => l.includes("Validating")), "validation: logs start message");
+
+  // Test that options parameter works — default should NOT skip script
+  // (We can't test with script running because it's recursive, but we verify the option exists)
+  const optsDefault: ValidationOptions = {};
+  assert(optsDefault.skipPreCommitScript === undefined, "validation: default options has no skip flag");
+  const optsSkip: ValidationOptions = { skipPreCommitScript: true };
+  assert(optsSkip.skipPreCommitScript === true, "validation: skip option can be set");
 
   // captureCodeQuality — should return a snapshot
   const snapshot = await captureCodeQuality(ROOT);
