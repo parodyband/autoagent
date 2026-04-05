@@ -1,108 +1,3 @@
-239 | 
-240 |   // Compute next expert so current expert can write properly-targeted goals
-241 |   const nextExpert = pickExpert(state.iteration + 1, experts);
-[2026-04-05T12:24:35.136Z] iter=135 turn=12 INFO: Turn 12/25
-[2026-04-05T12:24:52.615Z] iter=135 turn=12 INFO: Agent: Now compact memory and update goals:
-[2026-04-05T12:24:52.615Z] iter=135 turn=12 INFO: write_file: memory.md (write)
-[2026-04-05T12:24:52.616Z] iter=135 turn=12 INFO:   -> ok: Updated memory.md (2268 chars, -23 lines delta)
-[2026-04-05T12:24:52.617Z] iter=135 turn=13 INFO: Turn 13/25
-[2026-04-05T12:25:11.379Z] iter=135 turn=13 INFO: write_file: goals.md (write)
-[2026-04-05T12:25:11.380Z] iter=135 turn=13 INFO:   -> ok: Updated goals.md (2874 chars, 0 lines delta)
-[2026-04-05T12:25:11.381Z] iter=135 turn=14 INFO: Turn 14/25
-[2026-04-05T12:25:13.518Z] iter=135 turn=14 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T12:25:14.232Z] iter=135 turn=14 INFO:   -> exit=0 (11 chars)
-[2026-04-05T12:25:14.232Z] iter=135 turn=15 INFO: Turn 15/25
-[2026-04-05T12:25:16.192Z] iter=135 turn=15 INFO: $ npx vitest run 2>&1 | tail -10
-[2026-04-05T12:25:18.191Z] iter=135 turn=15 INFO:   -> exit=0 (402 chars)
-[2026-04-05T12:25:18.191Z] iter=135 turn=16 INFO: Turn 16/25
-[2026-04-05T12:25:21.633Z] iter=135 turn=16 INFO: Agent: 
-
-All done. I changed `src/agent.ts` (fixed double-calibration bug), updated memory.md and goals.md, tsc clean, 91 tests pass. Wrapping up.
-[2026-04-05T12:25:21.634Z] iter=135 turn=16 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T12:25:21.634Z] iter=135 turn=16 INFO: RESTART signal
-[2026-04-05T12:25:21.635Z] iter=135 turn=16 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T12:25:22.341Z] iter=135 turn=16 INFO: Compilation OK
-[2026-04-05T12:25:27.308Z] iter=135 turn=16 INFO: Cache persisted: 43 entries to .autoagent-cache.json
-[2026-04-05T12:25:27.309Z] iter=135 turn=16 INFO: Cache stats: 0 hits, 3 misses, 43 entries, 3 invalidations (1 entries removed)
-[2026-04-05T12:25:27.309Z] iter=135 turn=16 INFO: Tool cache stats
-[2026-04-05T12:25:27.309Z] iter=135 turn=16 INFO: Tool timing: bash: 13x, avg=429ms, total=5581ms; read_file: 3x, avg=2ms, total=7ms; write_file: 3x, avg=2ms, total=7ms; think: 3x, avg=1ms, total=2ms
-[2026-04-05T12:25:27.309Z] iter=135 turn=16 INFO: Tool timing stats
-[2026-04-05T12:25:31.290Z] iter=135 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 135: predicted 24 turns, actual 16 turns, ratio 0.67**
-[2026-04-05T12:25:34.623Z] iter=135 turn=16 INFO: Pre-commit review (718in/83out): LGTM. The change correctly removes a double-calibration bug where `rawPrediction * calibration` was applied both here and inside `computeTurnBudget`, which would have caused the oscillating over/under
-[2026-04-05T12:25:34.675Z] iter=135 turn=16 INFO: Committed: 5b6d4669 (24 in / 4912 out, cache: 21099 created, 190188 read)
-[2026-04-05T12:25:34.676Z] iter=135 turn=16 INFO: Restarting as iteration 136...
-[2026-04-05T12:25:34.882Z] iter=136 INFO: Cache restored: 43/43 entries (0 stale)
-[2026-04-05T12:25:34.884Z] iter=136 INFO: Turn budget: 21/25 (calibration=1.00x, predicted=18)
-[2026-04-05T12:25:34.884Z] iter=136 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T12:25:34.914Z] iter=136 turn=1 INFO: Turn 1/25
-[2026-04-05T12:25:38.212Z] iter=136 turn=1 INFO: think: Let me read the current state of the codebase to understand what I need to build. The task is to:
-
-1. Build `src/task-de...
-[2026-04-05T12:25:38.213Z] iter=136 turn=2 INFO: Turn 2/25
-[2026-04-05T12:25:40.363Z] iter=136 turn=2 INFO: read_file: src/agent.ts
-[2026-04-05T12:25:40.364Z] iter=136 turn=2 INFO:   -> ok (16719 chars)
-[2026-04-05T12:25:40.365Z] iter=136 turn=2 INFO: read_file: src/messages.ts
-[2026-04-05T12:25:40.366Z] iter=136 turn=2 INFO:   -> ok (10296 chars)
-[2026-04-05T12:25:40.366Z] iter=136 turn=3 INFO: Turn 3/25
-[2026-04-05T12:25:43.590Z] iter=136 turn=3 INFO: Agent: Now let me look at the existing test patterns and the Anthropic client usage:
-[2026-04-05T12:25:43.591Z] iter=136 turn=3 INFO: $ ls src/__tests__/ | head -20
-[2026-04-05T12:25:43.596Z] iter=136 turn=3 INFO: $ head -60 src/__tests__/file-ranker.test.ts
-[2026-04-05T12:25:43.610Z] iter=136 turn=3 INFO:   -> exit=0 (177 chars)
-[2026-04-05T12:25:43.614Z] iter=136 turn=3 INFO:   -> exit=0 (1981 chars)
-[2026-04-05T12:25:43.614Z] iter=136 turn=4 INFO: Turn 4/25
-[2026-04-05T12:25:47.065Z] iter=136 turn=4 INFO: $ head -30 src/repo-context.ts
-[2026-04-05T12:25:47.073Z] iter=136 turn=4 INFO:   -> exit=0 (840 chars)
-[2026-04-05T12:25:47.074Z] iter=136 turn=5 INFO: Turn 5/25
-[2026-04-05T12:25:50.803Z] iter=136 turn=5 INFO: think: I have enough context. Let me write the files now:
-
-1. `src/task-decomposer.ts` - the main module
-2. `src/__tests__/task...
-[2026-04-05T12:25:50.803Z] iter=136 turn=6 INFO: Turn 6/25
-[2026-04-05T12:26:09.716Z] iter=136 turn=6 INFO: Agent: Writing all three files now:
-[2026-04-05T12:26:09.716Z] iter=136 turn=6 INFO: write_file: src/task-decomposer.ts (write)
-[2026-04-05T12:26:09.717Z] iter=136 turn=6 INFO:   -> ok: Created src/task-decomposer.ts (4288 chars)
-[2026-04-05T12:26:09.718Z] iter=136 turn=7 INFO: Turn 7/25
-[2026-04-05T12:26:26.420Z] iter=136 turn=7 INFO: write_file: src/__tests__/task-decomposer.test.ts (write)
-[2026-04-05T12:26:26.421Z] iter=136 turn=7 INFO:   -> ok: Created src/__tests__/task-decomposer.test.ts (4848 chars)
-[2026-04-05T12:26:26.421Z] iter=136 turn=8 INFO: Turn 8/25
-[2026-04-05T12:26:30.380Z] iter=136 turn=8 INFO: Agent: Now wire into `agent.ts` — inject decomposition after reading TASK.md content, before building the initial message:
-[2026-04-05T12:26:30.381Z] iter=136 turn=8 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T12:26:30.383Z] iter=136 turn=8 INFO:   -> ok: Patched src/agent.ts: -1 +2 lines
-
-Context after patch:
-39 |   handleIterationFailure,
-40 |   type ResuscitationConfig,
-41 | } from "./resuscitation.js";
-42 | import { computeTurnBudget } from "./turn-budget.js";
-43 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
-44 | 
-45 | const ROOT = process.cwd();
-46 | const GOALS_FILE = path.join(ROOT, "goals.md");
-[2026-04-05T12:26:30.384Z] iter=136 turn=9 INFO: Turn 9/25
-[2026-04-05T12:26:33.713Z] iter=136 turn=9 INFO: Agent: Status: task-decomposer.ts DONE, tests DONE, import wired DONE. Still need: wire the decomposition call into runIteration + verify/test.
-[2026-04-05T12:26:33.714Z] iter=136 turn=9 INFO: read_file: src/agent.ts
-[2026-04-05T12:26:33.715Z] iter=136 turn=9 INFO:   -> ok (1772 chars)
-[2026-04-05T12:26:33.716Z] iter=136 turn=10 INFO: Turn 10/25
-[2026-04-05T12:26:40.564Z] iter=136 turn=10 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T12:26:40.565Z] iter=136 turn=10 INFO:   -> ok: Patched src/agent.ts: -8 +33 lines
-
-Context after patch:
-295 |     log(state.iteration, `Key files ranked (${keyFilesText.length} chars)`);
-296 |   }
-297 | 
-298 |   // Expert gets its own system prompt
-299 |   ctx.systemPromptBuilder = (s, r) => buildExpertPrompt(expert, s, r);
-300 | 
-301 |   // Task decomposition: if TASK.md is complex, break it into subtasks and inject
-302 |   let subtasksText: string | undefined;
-303 |   if (taskMode) {
-304 |     const rawTask = existsSync(TASK_FILE) ? readFileSync(TASK_FILE, "utf-8").trim() : "";
-305 |     if (rawTask && shouldDecompose(rawTask)) {
-306 |       const callClaude = async (prompt: string): Promise<string> => {
-307 |         const resp = await ctx.client.messages.create({
-308 |           model: expert.model,
-309 |           max_tokens: 1024,
-310 |           messages: [{ role: "user", content: prompt }],
 311 |         });
 312 |         const block = resp.content[0];
 313 |         return block.type === "text" ? block.text : "";
@@ -1101,3 +996,93 @@ AUTOAGENT_RESTART
 [2026-04-05T12:38:42.446Z] iter=142 turn=12 INFO: Tool timing stats
 [2026-04-05T12:38:47.065Z] iter=142 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 142: predicted 16 turns, actual 12 turns, ratio 0.75**
 [2026-04-05T12:38:47.085Z] iter=142 turn=12 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T12:38:47.119Z] iter=142 turn=12 INFO: Committed: 9d93f137 (18 in / 3811 out, cache: 12071 created, 122519 read)
+[2026-04-05T12:38:47.119Z] iter=142 turn=12 INFO: Restarting as iteration 143...
+[2026-04-05T12:38:47.318Z] iter=143 INFO: Cache restored: 50/50 entries (0 stale)
+[2026-04-05T12:38:47.320Z] iter=143 INFO: Turn budget: 18/25 (calibration=1.25x, predicted=14)
+[2026-04-05T12:38:47.320Z] iter=143 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T12:38:47.350Z] iter=143 INFO: Hard turn cap: 21 (1.5x prediction of 14)
+[2026-04-05T12:38:47.350Z] iter=143 turn=1 INFO: Turn 1/25
+[2026-04-05T12:38:51.834Z] iter=143 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state of the system — what's been happening, what's working, and where the opportunities are.
+[2026-04-05T12:38:51.835Z] iter=143 turn=1 INFO: $ cat .autoagent-metrics.json | head -100
+[2026-04-05T12:38:51.839Z] iter=143 turn=1 INFO: $ cat .expert-rotation.json
+[2026-04-05T12:38:51.843Z] iter=143 turn=1 INFO: $ cat .autoagent-state.json
+[2026-04-05T12:38:51.849Z] iter=143 turn=1 INFO:   -> exit=0 (1310 chars)
+[2026-04-05T12:38:51.850Z] iter=143 turn=1 INFO:   -> exit=0 (2117 chars)
+[2026-04-05T12:38:51.852Z] iter=143 turn=1 INFO:   -> exit=0 (113 chars)
+[2026-04-05T12:38:51.853Z] iter=143 turn=2 INFO: Turn 2/25
+[2026-04-05T12:38:57.175Z] iter=143 turn=2 INFO: $ cat .autoagent-metrics.json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+# Get last 20 iterations
+recent = data[-20:]
+for m in recent:
+    it = m.get('iteration', '?')
+    turns = m.get...
+[2026-04-05T12:38:57.179Z] iter=143 turn=2 INFO: $ wc -l memory.md
+[2026-04-05T12:38:57.183Z] iter=143 turn=2 INFO: read_file: memory.md
+[2026-04-05T12:38:57.184Z] iter=143 turn=2 INFO:   -> ok (4103 chars)
+[2026-04-05T12:38:57.189Z] iter=143 turn=2 INFO:   -> exit=0 (19 chars)
+[2026-04-05T12:38:57.223Z] iter=143 turn=2 INFO:   -> exit=0 (1300 chars)
+[2026-04-05T12:38:57.223Z] iter=143 turn=3 INFO: Turn 3/25
+[2026-04-05T12:39:09.405Z] iter=143 turn=3 INFO: think: Let me assess the system's health:
+
+1. **Rotation pattern**: E-A-E-M repeating cycle, 4-iteration cadence. Looks solid a...
+[2026-04-05T12:39:09.406Z] iter=143 turn=4 INFO: Turn 4/25
+[2026-04-05T12:39:12.637Z] iter=143 turn=4 INFO: list_files: src (depth=2)
+[2026-04-05T12:39:12.659Z] iter=143 turn=4 INFO:   -> ok (2 dirs, 44 files)
+[2026-04-05T12:39:12.659Z] iter=143 turn=4 INFO: read_file: CACHE HIT
+[2026-04-05T12:39:12.659Z] iter=143 turn=4 INFO: $ ls .experts/ 2>/dev/null || echo "No .experts directory"
+[2026-04-05T12:39:12.669Z] iter=143 turn=4 INFO:   -> exit=0 (22 chars)
+[2026-04-05T12:39:12.669Z] iter=143 turn=5 INFO: Turn 5/25
+[2026-04-05T12:39:29.099Z] iter=143 turn=5 INFO: Agent: 
+
+You're right. Let me focus. My deliverables are:
+
+1. **Compact memory.md** — fold iterations 140-142 into history, update prediction table
+2. **Set clear goals for iteration 144** (Engineer)
+3. **Assess if anything needs changing** — and if not, say so and move on
+
+Let me start producing.
+[2026-04-05T12:39:29.099Z] iter=143 turn=5 INFO: think: The system is working well. The E-A-E-M cycle is producing real value: Engineer builds, Architect reviews and catches bu...
+[2026-04-05T12:39:29.100Z] iter=143 turn=6 INFO: Turn 6/25
+[2026-04-05T12:39:55.004Z] iter=143 turn=6 INFO: Agent: Now compact memory and write goals:
+[2026-04-05T12:39:55.005Z] iter=143 turn=6 INFO: write_file: memory.md (write)
+[2026-04-05T12:39:55.006Z] iter=143 turn=6 INFO:   -> ok: Updated memory.md (3718 chars, -17 lines delta)
+[2026-04-05T12:39:55.007Z] iter=143 turn=7 INFO: Turn 7/25
+[2026-04-05T12:39:57.255Z] iter=143 turn=7 INFO: $ head -30 src/finalization.ts
+[2026-04-05T12:39:57.268Z] iter=143 turn=7 INFO:   -> exit=0 (1019 chars)
+[2026-04-05T12:39:57.269Z] iter=143 turn=8 INFO: Turn 8/25
+[2026-04-05T12:39:59.816Z] iter=143 turn=8 INFO: $ grep -n 'export function\|export async function' src/finalization.ts
+[2026-04-05T12:39:59.824Z] iter=143 turn=8 INFO:   -> exit=0 (255 chars)
+[2026-04-05T12:39:59.825Z] iter=143 turn=9 INFO: Turn 9/25
+[2026-04-05T12:40:03.413Z] iter=143 turn=9 INFO: Agent: 
+
+Status: Memory is DONE. Goals still need writing. Let me check finalization.ts quickly to write good Engineer goals, then wrap up.
+[2026-04-05T12:40:03.414Z] iter=143 turn=9 INFO: $ grep -n 'export function\|export async function\|function ' src/finalization.ts | head -20
+[2026-04-05T12:40:03.432Z] iter=143 turn=9 INFO:   -> exit=0 (567 chars)
+[2026-04-05T12:40:03.433Z] iter=143 turn=10 INFO: Turn 10/25
+[2026-04-05T12:40:13.697Z] iter=143 turn=10 INFO: Agent: Good. `recordMetrics` and `parsePredictedTurns` are pure/testable functions. Now write goals:
+[2026-04-05T12:40:13.698Z] iter=143 turn=10 INFO: write_file: goals.md (write)
+[2026-04-05T12:40:13.699Z] iter=143 turn=10 INFO:   -> ok: Updated goals.md (1334 chars, +12 lines delta)
+[2026-04-05T12:40:13.699Z] iter=143 turn=11 INFO: Turn 11/25
+[2026-04-05T12:40:16.406Z] iter=143 turn=11 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T12:40:17.120Z] iter=143 turn=11 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:40:17.120Z] iter=143 turn=12 INFO: Turn 12/25
+[2026-04-05T12:40:19.888Z] iter=143 turn=12 INFO: Agent: tsc clean. Now commit and restart:
+[2026-04-05T12:40:19.889Z] iter=143 turn=12 INFO: $ git add -A && git status
+[2026-04-05T12:40:19.945Z] iter=143 turn=12 INFO:   -> exit=0 (263 chars)
+[2026-04-05T12:40:19.945Z] iter=143 turn=13 INFO: Turn 13/25
+[2026-04-05T12:40:22.039Z] iter=143 turn=13 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T12:40:22.041Z] iter=143 turn=13 INFO: RESTART signal
+[2026-04-05T12:40:22.042Z] iter=143 turn=13 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:40:22.764Z] iter=143 turn=13 INFO: Compilation OK
+[2026-04-05T12:40:27.605Z] iter=143 turn=13 INFO: Cache persisted: 51 entries to .autoagent-cache.json
+[2026-04-05T12:40:27.605Z] iter=143 turn=13 INFO: Cache stats: 1 hits, 2 misses, 51 entries, 2 invalidations (1 entries removed)
+[2026-04-05T12:40:27.605Z] iter=143 turn=13 INFO: Tool cache stats
+[2026-04-05T12:40:27.605Z] iter=143 turn=13 INFO: Tool timing: bash: 12x, avg=76ms, total=915ms; list_files: 1x, avg=25ms, total=25ms; think: 2x, avg=1ms, total=2ms; write_file: 2x, avg=1ms, total=2ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-05T12:40:27.605Z] iter=143 turn=13 INFO: Tool timing stats
+[2026-04-05T12:40:31.951Z] iter=143 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 143: predicted 14 turns, actual 13 turns, ratio 0.93**
+[2026-04-05T12:40:31.969Z] iter=143 turn=13 INFO: Pre-commit review: no significant code changes to review

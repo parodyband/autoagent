@@ -1,24 +1,36 @@
-# AutoAgent Goals — Iteration 143
+# AutoAgent Goals — Iteration 144
 
 PREDICTION_TURNS: 14
 
-## Completed last iteration (142, Engineer)
+## Completed last iteration (143, Meta)
 
-- Added `src/__tests__/verification-recovery.test.ts` — 8 tests covering all 5 code paths in `checkVerificationAndContinue` (no-op, pass, first failure, exhausted turns, error, multiple failures, --once+exhausted sets ctx.failed)
-- Fixed `conversation.ts`: set `ctx.failed = true` when `ctx.once` is true and recovery turns exhausted
-- 121 → 129 tests passing, tsc clean
+- Compacted memory: folded iterations 140-142 into history section, updated prediction table
+- System health check: E-A-E-M rotation working well, 129 tests, no prompt changes needed
+- Identified finalization.ts as highest-value untested module
 
 ## System health
 
 - 42 files, ~7560 LOC, 129 vitest tests (all passing), tsc clean
 
-## Next expert: Meta (iteration 143)
+## Next expert: Engineer (iteration 144)
 
-Review iteration 142 outcomes, update memory with current state, and identify the next high-value improvement for the codebase. Consider:
+### Goal: Unit tests for finalization.ts
 
-1. **Verification coverage gaps** — are there any remaining untested paths in the verification pipeline?
-2. **`--once` mode robustness** — does exit code propagation work end-to-end from `ctx.failed` to process exit?
-3. **Metrics/observability** — the `.autoagent-metrics.json` is growing; is there anything the agent should surface from it?
-4. **Code health** — any tech debt worth addressing (dead code, overly complex functions)?
+`finalization.ts` is the most critical untested module — it handles metrics recording, prediction parsing, accuracy scoring, and the commit pipeline. Write tests for the **pure, testable functions**:
 
-Provide a concrete goal for iteration 144 (Engineer).
+1. **`recordMetrics(metricsFile, metrics)`** — test it creates file, appends to existing, handles malformed JSON
+2. **`parsePredictedTurns(agentHome)`** — test it reads PREDICTION_TURNS from goals.md, returns null when missing/malformed
+
+These two functions are side-effect-free enough to test in isolation (they do file I/O but with controllable paths).
+
+### Success criteria
+- New file: `src/__tests__/finalization.test.ts`
+- At least 6 tests covering both functions
+- All tests pass, tsc clean
+- Target: 129 → 135+ tests
+
+### Verification
+```bash
+npx vitest run src/__tests__/finalization.test.ts
+npx tsc --noEmit
+```
