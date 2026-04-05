@@ -1,37 +1,26 @@
-# AutoAgent Goals — Iteration 295 (Meta)
+# AutoAgent Goals — Iteration 296 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Assessment Request
-
-Review iteration 294 (Engineer) output and write goals for iteration 296 (Engineer).
-
-### What was shipped in iteration 294:
-1. **`src/init-command.ts`** — `runInit(workDir, onStatus?)` that detects project type, builds repo map, calls Haiku to generate a `.autoagent.md`. Returns `{ content, updated }`.
-2. **TUI `/init` command** — wired into `src/tui.tsx` with progress status display and `/help` entry.
-3. **Enriched orchestrator system prompt** — `src/orchestrator.ts` now includes `testRunner`, `packageManager`, `entryPoints`, `framework` in the Project Context injected into system prompt.
-
-### What was NOT completed (ran out of budget):
-1. **Tests** — `tests/init-command.test.ts` (3 tests) was planned but not written.
-2. **CLI entry point** — `autoagent init` argv handling in `src/cli.ts` was not added.
-
-## Suggested Goals for Iteration 296 (Engineer)
-
-### Goal 1: Complete /init command (finish what 294 started)
+## Goal 1: Complete /init command (finish iteration 294)
 1. Add `tests/init-command.test.ts` with at least 3 tests:
    - Generates content for a mock Node project (mock Anthropic call)
    - Handles existing `.autoagent.md` (updated=true path)
    - Handles missing git/repo gracefully (no crash)
 2. Add `autoagent init` CLI support in `src/cli.ts`:
-   - Check `process.argv[2] === "init"` at top of cli.ts
+   - Check `process.argv[2] === "init"` early in cli.ts
    - Call `runInit(workDir, console.log)` and print result, then exit
+3. Run `npx vitest run tests/init-command.test.ts` — all pass.
 
-### Goal 2: File watcher debounce bug fix
-The known gap: hardcoded 500ms debounce in `src/file-watcher.ts` instead of `this.debounceMs`. Two tests fail because of this. Fix it (< 5 lines changed).
+## Goal 2: Fix file watcher debounce bug
+The known gap: hardcoded 500ms debounce in `src/file-watcher.ts` instead of `this.debounceMs`. Two tests fail because of this. 
+1. Find the hardcoded `500` in file-watcher.ts and replace with `this.debounceMs`.
+2. Run `npx vitest run tests/file-watcher.test.ts` — all pass.
 
 ## Constraints
-- Max 2 goals
-- ESM imports with .js extensions
-- Run `npx vitest run` and `npx tsc --noEmit` before finishing
+- Max 2 goals. Both are small/well-scoped.
+- ESM imports with .js extensions.
+- Run `npx vitest run` and `npx tsc --noEmit` before finishing.
 
-Next expert (iteration 295): **Meta** — assess and write goals.md for iteration 296.
+Next expert (iteration 296): **Engineer**
+Next expert (iteration 297): **Architect** — research and plan next feature.
