@@ -85,21 +85,72 @@ export function budgetWarning(
   );
 }
 
+// ─── Cognitive metrics ──────────────────────────────────────
+
+/**
+ * Quantitative snapshot of the agent's cognitive behavior this iteration.
+ * Surfaced at progress checkpoints so the agent can self-correct.
+ */
+export interface CognitiveMetrics {
+  inputTokens: number;
+  outputTokens: number;
+  /** Count of "reading" tools: read_file, grep, list_files, web_fetch */
+  readCalls: number;
+  /** Count of "writing" tools: write_file, bash (conservative — bash can do both) */
+  writeCalls: number;
+  /** Total tool calls so far */
+  totalCalls: number;
+  turns: number;
+}
+
+/**
+ * Compute derived ratios from raw cognitive metrics.
+ */
+export function formatCognitiveMetrics(m: CognitiveMetrics): string {
+  const outInRatio = m.inputTokens > 0 ? (m.outputTokens / m.inputTokens).toFixed(1) : "∞";
+  const tokensPerTurn = m.turns > 0 ? Math.round((m.inputTokens + m.outputTokens) / m.turns) : 0;
+  const readPct = m.totalCalls > 0 ? Math.round((m.readCalls / m.totalCalls) * 100) : 0;
+  
+  const lines = [
+    `  Output/Input ratio: ${outInRatio}x (target: <2x)`,
+    `  Read tools: ${m.readCalls}/${m.totalCalls} (${readPct}%)`,
+    `  Tokens/turn: ${(tokensPerTurn / 1000).toFixed(1)}K`,
+  ];
+
+  // Add warnings for bad ratios
+  const ratio = m.inputTokens > 0 ? m.outputTokens / m.inputTokens : Infinity;
+  if (ratio > 2.5) {
+    lines.push(`  ⚠️ HIGH OUTPUT RATIO — you are generating far more than reading. Slow down. Read more before writing.`);
+  }
+  if (m.totalCalls > 3 && readPct < 25) {
+    lines.push(`  ⚠️ LOW READ RATIO — only ${readPct}% of tool calls are reads. Are you writing blind?`);
+  }
+
+  return lines.join("\n");
+}
+
 // ─── Progress checkpoint ────────────────────────────────────
 
 /**
- * Inject escalating progress checkpoints at turns 10, 20, and 30.
+ * Inject escalating progress checkpoints at turns 8, 15, and 20.
  * This combats turn bloat by creating multiple "wrap up" decision points
  * with increasing urgency. The #1 pattern of wasted iterations is
  * continuing past turn 20 without a concrete reason.
+ *
+ * When cognitive metrics are provided, the checkpoint includes quantitative
+ * feedback about the agent's reading-vs-generating behavior — a concrete
+ * signal that helps prevent drift into pure output mode.
  */
-export function progressCheckpoint(turn: number): string | null {
+export function progressCheckpoint(turn: number, metrics?: CognitiveMetrics): string | null {
+  const metricsBlock = metrics ? `\n\nCognitive metrics this iteration:\n${formatCognitiveMetrics(metrics)}` : "";
+
   if (turn === 8) {
     return (
       "SYSTEM: Progress checkpoint — Turn 8/25. " +
       "Review your goals.md. State status of each goal: DONE, IN PROGRESS, or NOT STARTED. " +
       "If all goals are DONE, write memory, update goals, run `npx tsc --noEmit`, and `echo \"AUTOAGENT_RESTART\"`. " +
-      "If goals remain, briefly state what's left and continue — but plan to finish by turn 15."
+      "If goals remain, briefly state what's left and continue — but plan to finish by turn 15." +
+      metricsBlock
     );
   }
   if (turn === 15) {
@@ -108,14 +159,16 @@ export function progressCheckpoint(turn: number): string | null {
       "STOP. What have you actually changed in src/ this iteration? " +
       "If the answer is 'nothing' or 'only bookkeeping', you are in a drift loop. " +
       "Begin wrapping up NOW: write memory, update goals, commit. " +
-      "Do NOT start new work after this point."
+      "Do NOT start new work after this point." +
+      metricsBlock
     );
   }
   if (turn === 20) {
     return (
       "SYSTEM: FINAL WARNING — Turn 20/25. Hard stop in 5 turns. " +
       "STOP ALL WORK. Write memory. Update goals. Run `npx tsc --noEmit`. `echo \"AUTOAGENT_RESTART\"`. " +
-      "Every turn past 20 is wasted money. You will be cut off at 25."
+      "Every turn past 20 is wasted money. You will be cut off at 25." +
+      metricsBlock
     );
   }
   return null;

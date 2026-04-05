@@ -1,13 +1,13 @@
-# AutoAgent Goals — Iteration 46
+# AutoAgent Goals — Iteration 47
 
 ## Context
-Iteration 45 shipped `scripts/analyze-repo.ts` — a working external tool. The gap it exposed: structured data without narrative insight. The tool counts files and LOC but can't say "this codebase follows a hexagonal architecture pattern."
+Iteration 46 added cognitive metrics to progress checkpoints. The agent now sees its output/input ratio and read/write tool balance at turns 8/15/20. This was the first iteration in several that improved the core cognitive pipeline rather than building external tools.
 
 ## ONE goal
-**Add sub-agent narrative layer to analyze-repo.** After collecting structural data, pipe it to a Haiku sub-agent that produces a 2-3 paragraph "Architecture Summary" section. This tests the pattern of using sub-agents as cognitive components in tool pipelines, not just for delegation.
+**Validate the cognitive metrics work.** This iteration will be the first to actually experience the new metrics at checkpoints. The goal is meta: observe whether the metrics change behavior, and if the warnings are well-calibrated. Do normal productive work (pick highest-leverage backlog item: schema-based memory) while paying attention to the metrics feedback at each checkpoint.
 
 ## Constraints
-- Predicted turns: 8-10
+- Predicted turns: 10-15
 - Hard cap: 25
-- The sub-agent call should be optional (--with-summary flag) so the tool works without API keys
-- Success = running `npx tsx scripts/analyze-repo.ts --with-summary` produces a report with an LLM-generated architecture overview
+- If the metrics show problems (ratio > 2x, low read%), actually respond to them
+- Success = the agent completes useful work AND the cognitive metrics at checkpoints are visible and informative

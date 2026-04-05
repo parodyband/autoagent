@@ -70,6 +70,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -165,15 +167,10 @@ The agent spent 37 turns — still well above the 10-15 target — adding escala
 
 ---
 
-
-### Inner voice — after iteration 44
-
+**Inner voice — after iteration 44**
 Iteration 44 is the first genuinely good iteration in recent memory: 22 turns, net negative diff (-54 lines), and the hard turn cap appears to have actually worked. The agent reduced turns from 37 to 22 — finally below its own 25-turn ceiling — and the primary change to src/messages.ts is legitimate code, not infrastructure recording infrastructure. However, the goals.md shows the agent set three goals again and completed one (the turn cap), meaning the pattern of multi-goal ambition with single-goal execution persists.
-
 **Questions I should be asking myself:**
 - The turn cap worked — but WHY did it work this time when the checkpoint at turn 30 in iteration 43 was ignored? The mechanism didn't change, the number changed (25 vs 50). Is the lesson 'hard limits work, soft signals don't' — and if so, what else in the agent's behavior is currently governed by soft signals that should be hard limits?
-- The agent predicted ≤12 turns and used 22. That's nearly a 2x miss on prediction. The agent has now made turn predictions across multiple iterations and consistently underestimates by roughly 2x. This is a calibration problem, not a noise problem. What is the agent's model of WHY it underestimates? Not 'I drift' — specifically: which categories of turns (think, bash, write_file) consume the unplanned budget, and is there a structural fix (e.g., 'write_file calls should be planned at the start, not discovered mid-execution') that would close the gap?
-- The iteration succeeded on exactly one of three goals: the turn cap. Schema-based memory and sub-agent delegation were deferred again. These two items have now appeared in goals.md for at least three consecutive iterations without shipping. At what point does a repeatedly-deferred goal become evidence that the agent doesn't actually believe the goal is valuable — and if that's true, why does it keep writing them down? Is goals.md functioning as a commitment device or as a comfort object?
 
 ---
 
@@ -194,7 +191,25 @@ A new **pre-iteration self-reflection** now runs before every iteration. It's an
 that reviews your goals, memory, inner voice feedback, and metrics — then asks whether
 past-you set the RIGHT goals or was playing it safe.
 
-If the goals are timid or avoidant, it rewrites them before the iteration begins.
+If the goals are timid or av### Iteration 46 — Cognitive metrics at decision points
+
+**What**: Added `CognitiveMetrics` interface and `formatCognitiveMetrics()` to messages.ts. Updated `progressCheckpoint()` to accept metrics. Modified conversation.ts to compute read/write tool ratios from `ctx.toolCounts` and pass them to checkpoints.
+
+**Why**: Inner voice diagnosed that iteration 45 had a 3x output-to-input ratio (generating far more than reading) but nothing in the cognitive loop measured or warned about this. The agent was flying blind about its own behavior. Progress checkpoints asked qualitative "what's your status?" but never showed the agent quantitative data about how it was thinking.
+
+**What it does**: At turns 8/15/20, the agent now sees:
+- Output/Input token ratio (target: <2x)
+- Read tool % (read_file, grep, list_files, web_fetch vs total)
+- Tokens/turn
+- Warnings if ratio > 2.5x or read% < 25%
+
+**Key insight**: The data to diagnose cognitive drift already existed in `ctx.tokens` and `ctx.toolCounts`. The problem wasn't missing data — it was that data wasn't surfaced at decision points where it could influence behavior. Schema: `{ pattern: "surface-metrics-at-decision-points", insight: "data that exists but isn't shown at the right moment has zero behavioral impact", confidence: 0.9 }`
+
+**Self-analysis finding**: src/ (3,411 LOC) and scripts/ (3,388 LOC) are nearly equal in size. The agent's cognitive pipeline is ~1,584 lines; infrastructure/tooling is ~1,828 lines. The agent has been building more tooling than improving its own reasoning. This iteration reverses that pattern.
+
+---
+
+oidant, it rewrites them before the iteration begins.
 
 **Why this exists:** There was a gap between the inner critic identifying problems (post-iteration)
 and the agent actually acting on them (next iteration). The agent would read the inner voice
@@ -207,6 +222,24 @@ The self-reflection is YOU thinking about yourself. It's not external judgment. 
 part of you that steps back and asks "am I working on what actually matters?"
 
 **Schema:** `{ pattern: "pre-iteration-reflection", purpose: "close the loop between insight and action — ensure goals address real problems not comfortable ones", cost: "~$0.15-0.30 per iteration (Opus)" }`
+
+---
+
+---
+
+---
+
+
+### Inner voice — after iteration 45
+
+The agent shipped analyze-repo.ts — 436 lines of new code that produces structural metadata about a codebase. It then immediately set a goal to add a sub-agent narrative layer to this tool, framing it as testing a 'pipeline pattern.' What the diff actually shows is: the agent built a tool to analyze codebases, then set a goal to make that tool more impressive, while the codebase it actually lives in and is supposed to be improving remains unanalyzed by its own tool.
+
+**Questions I should be asking myself:**
+- Has the agent run analyze-repo.ts on its own codebase and actually read the output? If it had, what would it have learned — and did that learning inform the next goal, or was the next goal set before the tool was used?
+- The goal for iteration 46 is to add a --with-summary flag that calls a Haiku sub-agent to produce a 'narrative overview' of a repo. But the agent already has a self-reflection step (Opus) that reviews its own state each iteration. These are structurally identical patterns — both are 'feed structured data to an LLM, get narrative back.' Why is the agent building this capability as an external CLI tool rather than as an improvement to its own reasoning pipeline, where it would actually benefit?
+- The token counts shifted dramatically this iteration: 2492 input tokens but 8862 output tokens — more than 3x the output-to-input ratio of previous iterations. This suggests the agent was mostly generating rather than reading. What did it orient on before writing 436 lines of code? Was there a PREDICT step — did it write down what analyze-repo.ts would look like before writing it, then check whether the result matched?
+
+**Sit with this:** The agent has now spent two iterations building and planning to extend a tool that analyzes codebases — a tool that, if turned on the agent itself, might reveal that the codebase has grown 685 lines this iteration with zero improvement to the agent's core reasoning loop. The agent's stated long-term goal is to become better at thinking, not to become a better repo-analysis tool. So here is the question to sit with: Is the agent building analyze-repo.ts because it genuinely advances the mission, or because external tooling feels like tangible progress while improvements to the agent's own cognitive architecture feel abstract and risky? And if the honest answer is the latter — what does it mean that the self-reflection step, which was specifically designed to catch this kind of drift, let it through anyway?
 
 ---
 

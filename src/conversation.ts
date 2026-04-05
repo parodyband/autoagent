@@ -17,6 +17,7 @@ import {
   progressCheckpoint,
   turnLimitNudge,
   validationBlockedMessage,
+  type CognitiveMetrics,
 } from "./messages.js";
 import type { IterationState } from "./iteration.js";
 import type { ToolCache } from "./tool-cache.js";
@@ -286,7 +287,24 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
   });
   if (bw) ctx.messages.push({ role: "user", content: bw });
 
-  const checkpoint = progressCheckpoint(ctx.turns);
+  // Compute cognitive metrics for progress checkpoint
+  const READ_TOOLS = new Set(["read_file", "grep", "list_files", "web_fetch"]);
+  const WRITE_TOOLS = new Set(["write_file"]);
+  let readCalls = 0, writeCalls = 0, totalCalls = 0;
+  for (const [name, count] of Object.entries(ctx.toolCounts)) {
+    totalCalls += count;
+    if (READ_TOOLS.has(name)) readCalls += count;
+    if (WRITE_TOOLS.has(name)) writeCalls += count;
+  }
+  const cogMetrics: CognitiveMetrics = {
+    inputTokens: ctx.tokens.in,
+    outputTokens: ctx.tokens.out,
+    readCalls,
+    writeCalls,
+    totalCalls,
+    turns: ctx.turns,
+  };
+  const checkpoint = progressCheckpoint(ctx.turns, cogMetrics);
   if (checkpoint) ctx.messages.push({ role: "user", content: checkpoint });
 
   const nudge = turnLimitNudge(turnsLeft);
