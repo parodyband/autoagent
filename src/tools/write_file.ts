@@ -83,7 +83,33 @@ export function executeWriteFile(
       }
       const patched = oldContent.replace(oldString, newString ?? "");
       writeFileSync(resolved, patched, "utf-8");
-      return { message: `Patched ${filePath}: -${countLines(oldString)} +${countLines(newString ?? "")} lines`, success: true };
+
+      // Show surrounding context so the agent doesn't need to re-read the file
+      const replacement = newString ?? "";
+      const patchStart = patched.indexOf(replacement);
+      const contextLines = 3;
+      const patchedLines = patched.split("\n");
+      let startLine = 0;
+      let charCount = 0;
+      for (let i = 0; i < patchedLines.length; i++) {
+        if (charCount + patchedLines[i].length + 1 > patchStart) {
+          startLine = i;
+          break;
+        }
+        charCount += patchedLines[i].length + 1;
+      }
+      const replacementLineCount = replacement.split("\n").length;
+      const contextStart = Math.max(0, startLine - contextLines);
+      const contextEnd = Math.min(patchedLines.length, startLine + replacementLineCount + contextLines);
+      const contextSlice = patchedLines.slice(contextStart, contextEnd);
+      const contextPreview = contextSlice
+        .map((line, i) => `${contextStart + i + 1} | ${line}`)
+        .join("\n");
+
+      return {
+        message: `Patched ${filePath}: -${countLines(oldString)} +${countLines(replacement)} lines\n\nContext after patch:\n${contextPreview}`,
+        success: true,
+      };
     }
 
     if (mode === "append") {
