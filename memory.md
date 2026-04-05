@@ -11,6 +11,8 @@
 
 ---
 
+---
+
 
 ## Product Architecture
 - `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit.
@@ -34,6 +36,8 @@
 
 ---
 
+---
+
 
 ## Prediction Accuracy
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
@@ -46,6 +50,8 @@ Recent scores (keep last 6):
 - Iteration 270: predicted 20, actual 25, ratio 1.25
 
 Average ratio: 0.83 — slight overestimate. Engineer iterations vary 10-25 turns.
+
+---
 
 ---
 
@@ -72,6 +78,8 @@ System healthy. Iteration 270 shipped /compact command, TUI external change bann
 **[AUTO-SCORED] Iteration 279: predicted 8 turns, actual 9 turns, ratio 1.13**
 
 **[AUTO-SCORED] Iteration 280: predicted 20 turns, actual 12 turns, ratio 0.60**
+
+---
 
 ---
 
@@ -113,3 +121,7 @@ System healthy. Iteration 270 shipped /compact command, TUI external change bann
 ---
 
 **[AUTO-SCORED] Iteration 281: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+---
+
+**[AUTO-SCORED] Iteration 282: predicted 20 turns, actual 24 turns, ratio 1.20**

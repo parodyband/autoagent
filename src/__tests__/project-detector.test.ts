@@ -92,4 +92,26 @@ version = "0.1.0"
     const result = detectProject(tmpDir);
     expect(result.type).toBe("mixed");
   });
+
+  it("detects monorepo when package.json has workspaces field", () => {
+    const pkg = { name: "my-monorepo", workspaces: ["packages/app", "packages/lib", "packages/utils"] };
+    fs.writeFileSync(path.join(tmpDir, "package.json"), JSON.stringify(pkg));
+    const result = detectProject(tmpDir);
+    expect(result.type).toBe("monorepo");
+    expect(result.workspaces).toBeDefined();
+    expect(result.workspaces).toContain("packages/app");
+    expect(result.summary).toContain("monorepo");
+    expect(result.summary).toContain("packages/app");
+  });
+
+  it("detects entry points when src/index.ts exists", () => {
+    fs.writeFileSync(path.join(tmpDir, "package.json"), JSON.stringify({ name: "my-app" }));
+    const srcDir = path.join(tmpDir, "src");
+    fs.mkdirSync(srcDir, { recursive: true });
+    fs.writeFileSync(path.join(srcDir, "index.ts"), "export {}");
+    const result = detectProject(tmpDir);
+    expect(result.entryPoints).toBeDefined();
+    expect(result.entryPoints).toContain("src/index.ts");
+    expect(result.summary).toContain("src/index.ts");
+  });
 });

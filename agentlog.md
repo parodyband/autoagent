@@ -1,66 +1,3 @@
-[2026-04-05T17:34:49.431Z] iter=273 turn=3 INFO: Turn 3/25
-[2026-04-05T17:34:52.393Z] iter=273 turn=3 INFO: web_fetch: https://platform.claude.com/cookbook/tool-use-context-engineering-context-engineering-tools
-[2026-04-05T17:34:52.397Z] iter=273 turn=3 INFO: web_fetch: https://www.atlassian.com/blog/developer/rovo-dev-keeps-long-sessions-useful
-[2026-04-05T17:34:52.634Z] iter=273 turn=3 INFO:   -> ok (68632 chars)
-[2026-04-05T17:34:52.681Z] iter=273 turn=3 INFO:   -> ok (13622 chars)
-[2026-04-05T17:34:52.681Z] iter=273 turn=4 INFO: Turn 4/25
-[2026-04-05T17:35:12.055Z] iter=273 turn=4 INFO: Agent: 
-
-**Goal status:**
-- Goal 1 (Smart context pruning spec): NOT STARTED
-- Goal 2 (Identify next high-value product gap): NOT STARTED
-
-Research is done. I have excellent material from Anthropic's cookbook and Rovo Dev's blog post. Let me write goals.md now.
-[2026-04-05T17:35:12.056Z] iter=273 turn=4 INFO: think: From my research, the key insights for smart context pruning are:
-
-1. **Rovo Dev's cascade approach**: Prune in stages f...
-[2026-04-05T17:35:12.056Z] iter=273 turn=5 INFO: Turn 5/25
-[2026-04-05T17:35:43.260Z] iter=273 turn=5 INFO: write_file: goals.md (write)
-[2026-04-05T17:35:43.263Z] iter=273 turn=5 INFO:   -> ok: Updated goals.md (5070 chars, +73 lines delta)
-[2026-04-05T17:35:43.264Z] iter=273 turn=6 INFO: Turn 6/25
-[2026-04-05T17:35:46.493Z] iter=273 turn=6 INFO: Agent: 
-
-This is an Architect iteration — no src/ changes expected. Goals.md is written. Let me wrap up now.
-[2026-04-05T17:35:46.493Z] iter=273 turn=6 INFO: $ npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T17:35:47.411Z] iter=273 turn=6 INFO:   -> exit=0 (11 chars)
-[2026-04-05T17:35:47.411Z] iter=273 turn=7 INFO: Turn 7/25
-[2026-04-05T17:35:57.006Z] iter=273 turn=7 INFO: Agent: 
-
-TSC is clean. Let me save memory and restart.
-[2026-04-05T17:35:57.007Z] iter=273 turn=7 INFO: save_memory: "[Architect] Iteration 273 — Smart context pruning + file cache"
-[2026-04-05T17:35:57.009Z] iter=273 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T17:35:57.009Z] iter=273 turn=8 INFO: Turn 8/25
-[2026-04-05T17:35:58.931Z] iter=273 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T17:35:58.932Z] iter=273 turn=8 INFO: RESTART signal
-[2026-04-05T17:35:58.932Z] iter=273 turn=8 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T17:35:59.917Z] iter=273 turn=8 INFO: Compilation OK
-[2026-04-05T17:36:06.723Z] iter=273 turn=8 INFO: Cache persisted: 57 entries to .autoagent-cache.json
-[2026-04-05T17:36:06.723Z] iter=273 turn=8 INFO: Tool timing: web_search: 1x, avg=1036ms, total=1036ms; bash: 6x, avg=163ms, total=977ms; web_fetch: 2x, avg=263ms, total=526ms; write_file: 1x, avg=4ms, total=4ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T17:36:06.723Z] iter=273 turn=8 INFO: Tool timing stats
-[2026-04-05T17:36:12.743Z] iter=273 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 273: predicted 8 turns, actual 8 turns, ratio 1.00**
-[2026-04-05T17:36:12.764Z] iter=273 turn=8 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T17:36:12.797Z] iter=273 turn=8 INFO: Committed: 957e9088 (18 in / 3446 out, cache: 42404 created, 198796 read)
-[2026-04-05T17:36:12.797Z] iter=273 turn=8 INFO: Restarting as iteration 274...
-[2026-04-05T17:36:12.990Z] iter=274 INFO: Cache restored: 57/57 entries (0 stale)
-[2026-04-05T17:36:12.992Z] iter=274 INFO: Turn budget: 22/25 (calibration=1.25x, predicted=20)
-[2026-04-05T17:36:12.992Z] iter=274 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T17:36:13.123Z] iter=274 turn=1 INFO: Turn 1/25
-[2026-04-05T17:36:15.554Z] iter=274 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what needs to be built.
-[2026-04-05T17:36:15.555Z] iter=274 turn=1 INFO: $ cat goals.md
-[2026-04-05T17:36:15.558Z] iter=274 turn=1 INFO: $ ls src/ | head -50
-[2026-04-05T17:36:15.564Z] iter=274 turn=1 INFO:   -> exit=0 (5070 chars)
-[2026-04-05T17:36:15.568Z] iter=274 turn=1 INFO:   -> exit=0 (683 chars)
-[2026-04-05T17:36:15.568Z] iter=274 turn=2 INFO: Turn 2/25
-[2026-04-05T17:36:18.617Z] iter=274 turn=2 INFO: $ grep -n "microCompact\|tool_result\|80[Kk]\|contextTokens" src/orchestrator.ts | head -40
-[2026-04-05T17:36:18.623Z] iter=274 turn=2 INFO: $ cat src/tools/ | head -5; ls src/tools/
-[2026-04-05T17:36:18.641Z] iter=274 turn=2 INFO:   -> exit=0 (1853 chars)
-[2026-04-05T17:36:18.645Z] iter=274 turn=2 INFO:   -> exit=0 (153 chars)
-[2026-04-05T17:36:18.645Z] iter=274 turn=3 INFO: Turn 3/25
-[2026-04-05T17:36:20.608Z] iter=274 turn=3 INFO: $ sed -n '760,840p' src/orchestrator.ts
-[2026-04-05T17:36:20.613Z] iter=274 turn=3 INFO: $ sed -n '960,980p' src/orchestrator.ts
-[2026-04-05T17:36:20.627Z] iter=274 turn=3 INFO:   -> exit=0 (2968 chars)
-[2026-04-05T17:36:20.628Z] iter=274 turn=3 INFO:   -> exit=0 (1039 chars)
-[2026-04-05T17:36:20.629Z] iter=274 turn=4 INFO: Turn 4/25
 [2026-04-05T17:36:24.552Z] iter=274 turn=4 INFO: think: I have enough context. Let me build both deliverables now:
 
 1. `src/context-pruner.ts` - scoredPrune() function
@@ -1059,3 +996,400 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T17:51:37.804Z] iter=281 turn=9 INFO: Tool timing stats
 [2026-04-05T17:51:43.404Z] iter=281 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 281: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-05T17:51:43.425Z] iter=281 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T17:51:43.456Z] iter=281 turn=9 INFO: Committed: edad4187 (19 in / 2159 out, cache: 15005 created, 90880 read)
+[2026-04-05T17:51:43.456Z] iter=281 turn=9 INFO: Restarting as iteration 282...
+[2026-04-05T17:51:43.627Z] iter=282 INFO: Cache restored: 52/52 entries (0 stale)
+[2026-04-05T17:51:43.629Z] iter=282 INFO: Turn budget: 19/25 (calibration=1.13x, predicted=20)
+[2026-04-05T17:51:43.629Z] iter=282 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T17:51:43.747Z] iter=282 turn=1 INFO: Turn 1/25
+[2026-04-05T17:51:46.680Z] iter=282 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T17:51:46.681Z] iter=282 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-05T17:51:46.690Z] iter=282 turn=1 INFO:   -> exit=0 (3420 chars)
+[2026-04-05T17:51:46.691Z] iter=282 turn=2 INFO: Turn 2/25
+[2026-04-05T17:51:50.405Z] iter=282 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "COMPACT_THRESHOLD\|TIER1_THRESHOLD\|compactTier1\|microCompact\|shouldCompact\|sessionTokensIn" src/orchestrator.ts | head -40
+[2026-04-05T17:51:50.407Z] iter=282 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "detectProject\|buildSummary\|ProjectInfo\|entryPoints\|monorepo" src/project-detector.ts | head -40
+[2026-04-05T17:51:50.418Z] iter=282 turn=2 INFO:   -> exit=0 (246 chars)
+[2026-04-05T17:51:50.419Z] iter=282 turn=2 INFO:   -> exit=0 (1763 chars)
+[2026-04-05T17:51:50.419Z] iter=282 turn=3 INFO: Turn 3/25
+[2026-04-05T17:51:55.039Z] iter=282 turn=3 INFO: read_file: src/orchestrator.ts
+[2026-04-05T17:51:55.040Z] iter=282 turn=3 INFO:   -> ok (4020 chars)
+[2026-04-05T17:51:55.040Z] iter=282 turn=3 INFO: read_file: CACHE HIT
+[2026-04-05T17:51:55.041Z] iter=282 turn=4 INFO: Turn 4/25
+[2026-04-05T17:51:58.530Z] iter=282 turn=4 INFO: think: I have enough context. Let me start building both deliverables now:
+
+1. Goal 1: Add `pruneStaleToolResults()` and `shoul...
+[2026-04-05T17:51:58.532Z] iter=282 turn=5 INFO: Turn 5/25
+[2026-04-05T17:52:02.730Z] iter=282 turn=5 INFO: Agent: Let me start writing both deliverables simultaneously.
+[2026-04-05T17:52:02.732Z] iter=282 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-05T17:52:02.733Z] iter=282 turn=5 INFO:   -> ok (3986 chars)
+[2026-04-05T17:52:02.734Z] iter=282 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "projectInfo\|detectProject\|buildSummary\|project summary\|projectSummary" src/orchestrator.ts | head -20
+[2026-04-05T17:52:02.760Z] iter=282 turn=5 INFO:   -> exit=0 (482 chars)
+[2026-04-05T17:52:02.760Z] iter=282 turn=6 INFO: Turn 6/25
+[2026-04-05T17:52:16.867Z] iter=282 turn=6 INFO: Agent: Now I have everything I need. Let me implement both goals:
+[2026-04-05T17:52:16.868Z] iter=282 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T17:52:16.869Z] iter=282 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -4 +56 lines
+
+Context after patch:
+770 |     return this.sessionTokensIn >= COMPACT_TIER1_THRESHOLD && this.sessionTokensIn < COMPACT_THRESHOLD;
+771 |   }
+772 | 
+773 |   /** Check if Tier 2 compaction is needed (summarize old messages). */
+774 |   private shouldCompact(): boolean {
+775 |     return this.sessionTokensIn >= COMPACT_THRESHOLD;
+776 |   }
+777 | 
+778 |   /** Check if stale tool result pruning is needed (between Tier 1 and Tier 2). */
+779 |   private shouldPruneStaleTool(): boolean {
+780 |     return this.sessionTokensIn >= PRUNE_THRESHOLD && this.sessionTokensIn < COMPACT_THRESHOLD;
+781 |   }
+782 | 
+783 |   /**
+784 |    * Prune stale tool results: replace the content of old tool_result blocks
+785 |    * (older than the last 8 assistant turns) with a one-line stub.
+786 |    * Fires when sessionTokensIn is between PRUNE_THRESHOLD (120K) and Tier 2 (150K).
+787 |    */
+788 |   private pruneStaleToolResults(): void {
+789 |     // Find the index of the 8th most recent assistant message
+790 |     const assistantIndices: number[] = [];
+791 |     for (let i = this.apiMessages.length - 1; i >= 0; i--) {
+792 |       if (this.apiMessages[i].role === "assistant") {
+793 |         assistantIndices.push(i);
+794 |       }
+795 |     }
+796 | 
+797 |     // Keep last 8 assistant turns fresh — prune everything older
+798 |     const cutoffAssistantIdx = assistantIndices[7] ?? 0; // 8th most recent assistant turn
+799 | 
+800 |     let turnN = 0;
+801 |     for (let i = 0; i < cutoffAssistantIdx; i++) {
+802 |       const msg = this.apiMessages[i];
+803 |       if (msg.role === "assistant") turnN++;
+804 |       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
+805 | 
+806 |       for (const block of msg.content) {
+807 |         if (
+808 |           typeof block === "object" &&
+809 |           "type" in block &&
+810 |           block.type === "tool_result" &&
+811 |           Array.isArray((block as { content?: unknown[] }).content)
+812 |         ) {
+813 |           const toolBlock = block as {
+814 |             type: string;
+815 |             tool_use_id: string;
+816 |             content: Array<{ type: string; text?: string }>;
+817 |           };
+818 |           for (const cb of toolBlock.content) {
+819 |             if (cb.type === "text" && typeof cb.text === "string") {
+820 |               // Skip already-compact results
+821 |               if (cb.text.length < 100) continue;
+822 |               cb.text = `[pruned — old result from turn ${turnN}]`;
+823 |             }
+824 |           }
+825 |         }
+826 |       }
+827 |     }
+828 |   }
+829 | 
+830 |   /**
+831 |    * Tier 1 compaction: walk apiMessages backwards, compress tool_result blocks
+[2026-04-05T17:52:16.870Z] iter=282 turn=7 INFO: Turn 7/25
+[2026-04-05T17:52:20.862Z] iter=282 turn=7 INFO: Agent: **Goal 1 (smart context pruning): IN PROGRESS** — methods added, need to wire into runAgentLoop + add PRUNE_THRESHOLD constant + add test.
+**Goal 2 (project detector enrichment): NOT STARTED**
+
+Let me continue efficiently:
+[2026-04-05T17:52:20.863Z] iter=282 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "COMPACT_THRESHOLD\|PRUNE_THRESHOLD" src/orchestrator.ts | head -10
+[2026-04-05T17:52:20.874Z] iter=282 turn=7 INFO:   -> exit=0 (744 chars)
+[2026-04-05T17:52:20.874Z] iter=282 turn=8 INFO: Turn 8/25
+[2026-04-05T17:52:25.373Z] iter=282 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T17:52:25.374Z] iter=282 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
+
+Context after patch:
+70 | /** Token threshold for Tier 2 compaction: summarize old messages (~150K). */
+71 | export const COMPACT_THRESHOLD = 150_000;
+72 | /** Context warning threshold: warn user when input tokens reach 80% of T2 threshold. */
+73 | export const CONTEXT_WARNING_THRESHOLD = COMPACT_THRESHOLD * 0.8; // 120_000
+74 | export const PRUNE_THRESHOLD = 120_000; // Between Tier 1 (100K) and Tier 2 (150K)
+75 | 
+76 | /**
+77 |  * Pure function: select which compaction tier to apply based on input token count.
+[2026-04-05T17:52:25.375Z] iter=282 turn=9 INFO: Turn 9/25
+[2026-04-05T17:52:30.391Z] iter=282 turn=9 INFO: Agent: Now wire `pruneStaleToolResults` into runAgentLoop and update project-detector.ts simultaneously:
+[2026-04-05T17:52:30.392Z] iter=282 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T17:52:30.394Z] iter=282 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -3 +6 lines
+
+Context after patch:
+974 |       await this.compact(); // Tier 2: summarize
+975 |       // After compaction, notify TUI that budget is now low
+976 |       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
+977 |     } else if (this.shouldCompactTier1()) {
+978 |       this.compactTier1(); // Tier 1: compress old tool outputs
+979 |       if (this.shouldPruneStaleTool()) {
+980 |         this.pruneStaleToolResults(); // Aggressive eviction between T1 and T2
+981 |       }
+982 |     } else if (this.shouldMicroCompact()) {
+983 |       scoredPrune(this.apiMessages, this.apiMessages.length, 10_000); // Scored prune: target 10K token savings
+984 |     }
+985 | 
+[2026-04-05T17:52:30.395Z] iter=282 turn=10 INFO: Turn 10/25
+[2026-04-05T17:52:39.401Z] iter=282 turn=10 INFO: Agent: Now enrich project-detector.ts (Goal 2):
+[2026-04-05T17:52:39.402Z] iter=282 turn=10 INFO: write_file: src/project-detector.ts (patch)
+[2026-04-05T17:52:39.402Z] iter=282 turn=10 INFO:   -> ok: Patched src/project-detector.ts: -10 +11 lines
+
+Context after patch:
+1 | import * as fs from "fs";
+2 | import * as path from "path";
+3 | 
+4 | export interface ProjectSummary {
+5 |   name: string;
+6 |   type: string; // "node", "python", "rust", "go", "mixed", "monorepo", "unknown"
+7 |   framework?: string; // "next", "express", "fastapi", "react", "vue", etc.
+8 |   language: string;
+9 |   packageManager?: string; // "npm", "yarn", "pnpm", "pip", "cargo"
+10 |   testRunner?: string; // "vitest", "jest", "pytest", "cargo test"
+11 |   entryPoints?: string[];
+12 |   workspaces?: string[]; // for monorepo: list of workspace names
+13 |   summary: string; // 1-2 sentence human-readable summary
+14 | }
+15 | 
+16 | function readFileSafe(filePath: string): string | null {
+17 |   try {
+[2026-04-05T17:52:39.403Z] iter=282 turn=11 INFO: Turn 11/25
+[2026-04-05T17:52:54.974Z] iter=282 turn=11 INFO: write_file: src/project-detector.ts (patch)
+[2026-04-05T17:52:54.975Z] iter=282 turn=11 INFO:   -> ok: Patched src/project-detector.ts: -34 +89 lines
+
+Context after patch:
+66 |   return undefined;
+67 | }
+68 | 
+69 | /** Candidate entry point files to check, in priority order. */
+70 | const ENTRY_POINT_CANDIDATES = [
+71 |   "src/index.ts",
+72 |   "src/main.ts",
+73 |   "src/app.ts",
+74 |   "index.ts",
+75 |   "main.py",
+76 |   "src/lib.rs",
+77 |   "cmd/main.go",
+78 | ];
+79 | 
+80 | /** Detect entry points that exist in workDir (up to 3). */
+81 | function detectEntryPoints(workDir: string): string[] {
+82 |   const found: string[] = [];
+83 |   for (const candidate of ENTRY_POINT_CANDIDATES) {
+84 |     if (found.length >= 3) break;
+85 |     if (fileExists(path.join(workDir, candidate))) {
+86 |       found.push(candidate);
+87 |     }
+88 |   }
+89 |   return found;
+90 | }
+91 | 
+92 | /** Detect monorepo workspaces from package.json `workspaces` or pnpm-workspace.yaml. */
+93 | function detectWorkspaces(workDir: string, pkg: Record<string, unknown>): string[] | undefined {
+94 |   // Check package.json workspaces field
+95 |   const ws = pkg.workspaces;
+96 |   if (Array.isArray(ws) && ws.length > 0) {
+97 |     return (ws as string[]).slice(0, 5);
+98 |   }
+99 |   if (ws && typeof ws === "object" && "packages" in ws) {
+100 |     const pkgs = (ws as { packages?: string[] }).packages;
+101 |     if (Array.isArray(pkgs) && pkgs.length > 0) {
+102 |       return pkgs.slice(0, 5);
+103 |     }
+104 |   }
+105 | 
+106 |   // Check pnpm-workspace.yaml
+107 |   const pnpmWs = readFileSafe(path.join(workDir, "pnpm-workspace.yaml"));
+108 |   if (pnpmWs) {
+109 |     const matches = pnpmWs.match(/^\s*-\s+['"]?([^'"#\n]+?)['"]?\s*$/gm);
+110 |     if (matches && matches.length > 0) {
+111 |       return matches.slice(0, 5).map(m => m.replace(/^\s*-\s+['"]?/, "").replace(/['"]?\s*$/, "").trim());
+112 |     }
+113 |   }
+114 | 
+115 |   return undefined;
+116 | }
+117 | 
+118 | function detectNodeProject(workDir: string): Partial<ProjectSummary> | null {
+119 |   const pkgPath = path.join(workDir, "package.json");
+120 |   const content = readFileSafe(pkgPath);
+121 |   if (!content) return null;
+122 | 
+123 |   let pkg: Record<string, unknown>;
+124 |   try {
+125 |     pkg = JSON.parse(content) as Record<string, unknown>;
+126 |   } catch {
+127 |     return null;
+128 |   }
+129 | 
+130 |   const name = (pkg.name as string) || path.basename(workDir);
+131 |   const deps: Record<string, string> = {
+132 |     ...((pkg.dependencies as Record<string, string>) || {}),
+133 |     ...((pkg.devDependencies as Record<string, string>) || {}),
+134 |   };
+135 |   const scripts = (pkg.scripts as Record<string, string>) || {};
+136 | 
+137 |   const framework = detectFrameworkFromDeps(deps);
+138 |   const testRunner = detectTestRunnerFromScripts(scripts, deps);
+139 |   const packageManager = detectPackageManager(workDir);
+140 | 
+141 |   // Detect language: TypeScript if tsconfig or ts deps present
+142 |   const hasTypeScript =
+143 |     "typescript" in deps ||
+144 |     fileExists(path.join(workDir, "tsconfig.json")) ||
+145 |     fileExists(path.join(workDir, "tsconfig.base.json"));
+146 | 
+147 |   const language = hasTypeScript ? "TypeScript" : "JavaScript";
+148 | 
+149 |   // Monorepo detection
+150 |   const workspaces = detectWorkspaces(workDir, pkg);
+151 |   const type = workspaces ? "monorepo" : "node";
+152 | 
+153 |   // Entry points
+154 |   const entryPoints = detectEntryPoints(workDir);
+155 | 
+156 |   return { name, type, framework, language, packageManager, testRunner, entryPoints: entryPoints.length > 0 ? entryPoints : undefined, workspaces };
+157 | }
+158 | 
+159 | function detectPythonProject(workDir: string): Partial<ProjectSummary> | null {
+160 |   const hasPyproject = fileExists(path.join(workDir, "pyproject.toml"));
+[2026-04-05T17:52:54.976Z] iter=282 turn=12 INFO: Turn 12/25
+[2026-04-05T17:53:03.366Z] iter=282 turn=12 INFO: Agent: Now update `buildSummary()` to include entry points and monorepo info, and update the `detectProject` return to include `workspaces`:
+[2026-04-05T17:53:03.367Z] iter=282 turn=12 INFO: write_file: src/project-detector.ts (patch)
+[2026-04-05T17:53:03.368Z] iter=282 turn=12 INFO:   -> ok: Patched src/project-detector.ts: -15 +24 lines
+
+Context after patch:
+236 |   };
+237 | }
+238 | 
+239 | function buildSummary(info: Partial<ProjectSummary>): string {
+240 |   const parts: string[] = [];
+241 | 
+242 |   // Opening: language + type + framework
+243 |   const typeLabel = info.type === "node" ? "Node.js" : info.type === "monorepo" ? "monorepo" : info.type;
+244 |   let opening = `${info.language} ${typeLabel} project`;
+245 |   if (info.framework) opening += ` using ${info.framework}`;
+246 |   parts.push(opening + ".");
+247 | 
+248 |   const details: string[] = [];
+249 |   if (info.testRunner) details.push(`Test runner: ${info.testRunner}`);
+250 |   if (info.packageManager) details.push(`Package manager: ${info.packageManager}`);
+251 |   if (details.length > 0) parts.push(details.join(". ") + ".");
+252 | 
+253 |   if (info.entryPoints && info.entryPoints.length > 0) {
+254 |     parts.push(`Entry points: ${info.entryPoints.join(", ")}.`);
+255 |   }
+256 | 
+257 |   if (info.workspaces && info.workspaces.length > 0) {
+258 |     parts.push(`Workspaces: ${info.workspaces.join(", ")}.`);
+259 |   }
+260 | 
+261 |   return parts.join(" ");
+262 | }
+263 | 
+264 | /**
+265 |  * Detect the project type, framework, language, and test runner for a working directory.
+[2026-04-05T17:53:03.374Z] iter=282 turn=13 INFO: Turn 13/25
+[2026-04-05T17:53:08.995Z] iter=282 turn=13 INFO: Agent: I've changed orchestrator.ts and project-detector.ts. Now I need to update `detectProject` return to include `workspaces`, update the orchestrator summary injection, and write tests. Let me finish quickly.
+[2026-04-05T17:53:08.996Z] iter=282 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "workspaces\|entryPoints" src/project-detector.ts | grep -A2 "return {"
+[2026-04-05T17:53:09.010Z] iter=282 turn=13 INFO:   -> exit=0 (283 chars)
+[2026-04-05T17:53:09.010Z] iter=282 turn=14 INFO: Turn 14/25
+[2026-04-05T17:53:11.351Z] iter=282 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "return {" src/project-detector.ts | tail -5
+[2026-04-05T17:53:11.361Z] iter=282 turn=14 INFO:   -> exit=0 (213 chars)
+[2026-04-05T17:53:11.361Z] iter=282 turn=15 INFO: Turn 15/25
+[2026-04-05T17:53:13.666Z] iter=282 turn=15 INFO: read_file: src/project-detector.ts
+[2026-04-05T17:53:13.667Z] iter=282 turn=15 INFO:   -> ok (554 chars)
+[2026-04-05T17:53:13.667Z] iter=282 turn=16 INFO: Turn 16/25
+[2026-04-05T17:53:18.441Z] iter=282 turn=16 INFO: Agent: I need to add `workspaces` to the return, fix orchestrator injection, write both tests, then finish.
+[2026-04-05T17:53:18.442Z] iter=282 turn=16 INFO: write_file: src/project-detector.ts (patch)
+[2026-04-05T17:53:18.443Z] iter=282 turn=16 INFO:   -> ok: Patched src/project-detector.ts: -11 +12 lines
+
+Context after patch:
+292 | 
+293 |   const summary = buildSummary(info);
+294 | 
+295 |   return {
+296 |     name: info.name || path.basename(workDir),
+297 |     type: info.type || "unknown",
+298 |     framework: info.framework,
+299 |     language: info.language || "Unknown",
+300 |     packageManager: info.packageManager,
+301 |     testRunner: info.testRunner,
+302 |     entryPoints: info.entryPoints,
+303 |     workspaces: info.workspaces,
+304 |     summary,
+305 |   };
+306 | }
+307 | 
+[2026-04-05T17:53:18.443Z] iter=282 turn=17 INFO: Turn 17/25
+[2026-04-05T17:53:42.175Z] iter=282 turn=17 INFO: Agent: Writing tests and finishing now.
+[2026-04-05T17:53:42.176Z] iter=282 turn=17 INFO: write_file: src/__tests__/context-pruning.test.ts (write)
+[2026-04-05T17:53:42.177Z] iter=282 turn=17 INFO:   -> ok: Created src/__tests__/context-pruning.test.ts (5669 chars)
+[2026-04-05T17:53:42.178Z] iter=282 turn=18 INFO: Turn 18/25
+[2026-04-05T17:53:45.442Z] iter=282 turn=18 INFO: Agent: Now add project-detector tests:
+[2026-04-05T17:53:45.443Z] iter=282 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "monorepo\|entryPoints\|workspaces" src/__tests__/project-detector.test.ts 2>/dev/null | head -5; echo "---"; tail -20 src/__tests__/project-detector.te...
+[2026-04-05T17:53:45.455Z] iter=282 turn=18 INFO:   -> exit=0 (867 chars)
+[2026-04-05T17:53:45.456Z] iter=282 turn=19 INFO: Turn 19/25
+[2026-04-05T17:53:52.413Z] iter=282 turn=19 INFO: write_file: src/__tests__/project-detector.test.ts (patch)
+[2026-04-05T17:53:52.414Z] iter=282 turn=19 INFO:   -> ok: Patched src/__tests__/project-detector.test.ts: -7 +29 lines
+
+Context after patch:
+86 |     expect(result.language).toBe("TypeScript");
+87 |   });
+88 | 
+89 |   it("detects mixed project when multiple config files exist", () => {
+90 |     fs.writeFileSync(path.join(tmpDir, "package.json"), JSON.stringify({ name: "polyglot" }));
+91 |     fs.writeFileSync(path.join(tmpDir, "pyproject.toml"), '[project]\nname = "pypart"');
+92 |     const result = detectProject(tmpDir);
+93 |     expect(result.type).toBe("mixed");
+94 |   });
+95 | 
+96 |   it("detects monorepo when package.json has workspaces field", () => {
+97 |     const pkg = { name: "my-monorepo", workspaces: ["packages/app", "packages/lib", "packages/utils"] };
+98 |     fs.writeFileSync(path.join(tmpDir, "package.json"), JSON.stringify(pkg));
+99 |     const result = detectProject(tmpDir);
+100 |     expect(result.type).toBe("monorepo");
+101 |     expect(result.workspaces).toBeDefined();
+102 |     expect(result.workspaces).toContain("packages/app");
+103 |     expect(result.summary).toContain("monorepo");
+104 |     expect(result.summary).toContain("packages/app");
+105 |   });
+106 | 
+107 |   it("detects entry points when src/index.ts exists", () => {
+108 |     fs.writeFileSync(path.join(tmpDir, "package.json"), JSON.stringify({ name: "my-app" }));
+109 |     const srcDir = path.join(tmpDir, "src");
+110 |     fs.mkdirSync(srcDir, { recursive: true });
+111 |     fs.writeFileSync(path.join(srcDir, "index.ts"), "export {}");
+112 |     const result = detectProject(tmpDir);
+113 |     expect(result.entryPoints).toBeDefined();
+114 |     expect(result.entryPoints).toContain("src/index.ts");
+115 |     expect(result.summary).toContain("src/index.ts");
+116 |   });
+117 | });
+118 | 
+[2026-04-05T17:53:52.415Z] iter=282 turn=20 INFO: Turn 20/25
+[2026-04-05T17:53:54.569Z] iter=282 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T17:53:55.480Z] iter=282 turn=20 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:53:55.480Z] iter=282 turn=21 INFO: Turn 21/25
+[2026-04-05T17:54:00.607Z] iter=282 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/context-pruning.test.ts src/__tests__/project-detector.test.ts 2>&1 | tail -20
+[2026-04-05T17:54:01.612Z] iter=282 turn=21 INFO:   -> exit=0 (343 chars)
+[2026-04-05T17:54:01.612Z] iter=282 turn=22 INFO: Turn 22/25
+[2026-04-05T17:54:08.259Z] iter=282 turn=22 INFO: Agent: All pass. Write memory, update goals, restart.
+[2026-04-05T17:54:08.260Z] iter=282 turn=22 INFO: save_memory: "[Engineer] Iteration 282"
+[2026-04-05T17:54:08.261Z] iter=282 turn=22 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T17:54:08.261Z] iter=282 turn=23 INFO: Turn 23/25
+[2026-04-05T17:54:16.785Z] iter=282 turn=23 INFO: write_file: goals.md (write)
+[2026-04-05T17:54:16.785Z] iter=282 turn=23 INFO:   -> ok: Updated goals.md (1029 chars, -38 lines delta)
+[2026-04-05T17:54:16.786Z] iter=282 turn=24 INFO: Turn 24/25
+[2026-04-05T17:54:20.101Z] iter=282 turn=24 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T17:54:20.101Z] iter=282 turn=24 INFO: RESTART signal
+[2026-04-05T17:54:20.101Z] iter=282 turn=24 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T17:54:21.100Z] iter=282 turn=24 INFO: Compilation OK
+[2026-04-05T17:54:27.436Z] iter=282 turn=24 INFO: Cache persisted: 51 entries to .autoagent-cache.json
+[2026-04-05T17:54:27.436Z] iter=282 turn=24 INFO: Cache stats: 1 hits, 3 misses, 51 entries, 10 invalidations (4 entries removed)
+[2026-04-05T17:54:27.436Z] iter=282 turn=24 INFO: Tool cache stats
+[2026-04-05T17:54:27.437Z] iter=282 turn=24 INFO: Tool timing: bash: 11x, avg=184ms, total=2027ms; write_file: 10x, avg=2ms, total=22ms; read_file: 3x, avg=4ms, total=11ms; read_scratchpad: 1x, avg=4ms, total=4ms; think: 1x, avg=2ms, total=2ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T17:54:27.437Z] iter=282 turn=24 INFO: Tool timing stats
+[2026-04-05T17:54:33.082Z] iter=282 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 282: predicted 20 turns, actual 24 turns, ratio 1.20**
+[2026-04-05T17:54:45.152Z] iter=282 turn=24 INFO: Pre-commit review (2974in/530out): **Logic bug in `pruneStaleToolResults` copy — `turnN` tracking is off:**
+The standalone test copy increments `turnN` only for `assistant` messages *before* the cutoff, but the pruned stub message refe

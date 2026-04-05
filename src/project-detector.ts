@@ -3,12 +3,13 @@ import * as path from "path";
 
 export interface ProjectSummary {
   name: string;
-  type: string; // "node", "python", "rust", "go", "mixed", "unknown"
+  type: string; // "node", "python", "rust", "go", "mixed", "monorepo", "unknown"
   framework?: string; // "next", "express", "fastapi", "react", "vue", etc.
   language: string;
   packageManager?: string; // "npm", "yarn", "pnpm", "pip", "cargo"
   testRunner?: string; // "vitest", "jest", "pytest", "cargo test"
   entryPoints?: string[];
+  workspaces?: string[]; // for monorepo: list of workspace names
   summary: string; // 1-2 sentence human-readable summary
 }
 
@@ -65,6 +66,55 @@ function detectPackageManager(workDir: string): string | undefined {
   return undefined;
 }
 
+/** Candidate entry point files to check, in priority order. */
+const ENTRY_POINT_CANDIDATES = [
+  "src/index.ts",
+  "src/main.ts",
+  "src/app.ts",
+  "index.ts",
+  "main.py",
+  "src/lib.rs",
+  "cmd/main.go",
+];
+
+/** Detect entry points that exist in workDir (up to 3). */
+function detectEntryPoints(workDir: string): string[] {
+  const found: string[] = [];
+  for (const candidate of ENTRY_POINT_CANDIDATES) {
+    if (found.length >= 3) break;
+    if (fileExists(path.join(workDir, candidate))) {
+      found.push(candidate);
+    }
+  }
+  return found;
+}
+
+/** Detect monorepo workspaces from package.json `workspaces` or pnpm-workspace.yaml. */
+function detectWorkspaces(workDir: string, pkg: Record<string, unknown>): string[] | undefined {
+  // Check package.json workspaces field
+  const ws = pkg.workspaces;
+  if (Array.isArray(ws) && ws.length > 0) {
+    return (ws as string[]).slice(0, 5);
+  }
+  if (ws && typeof ws === "object" && "packages" in ws) {
+    const pkgs = (ws as { packages?: string[] }).packages;
+    if (Array.isArray(pkgs) && pkgs.length > 0) {
+      return pkgs.slice(0, 5);
+    }
+  }
+
+  // Check pnpm-workspace.yaml
+  const pnpmWs = readFileSafe(path.join(workDir, "pnpm-workspace.yaml"));
+  if (pnpmWs) {
+    const matches = pnpmWs.match(/^\s*-\s+['"]?([^'"#\n]+?)['"]?\s*$/gm);
+    if (matches && matches.length > 0) {
+      return matches.slice(0, 5).map(m => m.replace(/^\s*-\s+['"]?/, "").replace(/['"]?\s*$/, "").trim());
+    }
+  }
+
+  return undefined;
+}
+
 function detectNodeProject(workDir: string): Partial<ProjectSummary> | null {
   const pkgPath = path.join(workDir, "package.json");
   const content = readFileSafe(pkgPath);
@@ -95,9 +145,15 @@ function detectNodeProject(workDir: string): Partial<ProjectSummary> | null {
     fileExists(path.join(workDir, "tsconfig.base.json"));
 
   const language = hasTypeScript ? "TypeScript" : "JavaScript";
-  const type = "node";
 
-  return { name, type, framework, language, packageManager, testRunner };
+  // Monorepo detection
+  const workspaces = detectWorkspaces(workDir, pkg);
+  const type = workspaces ? "monorepo" : "node";
+
+  // Entry points
+  const entryPoints = detectEntryPoints(workDir);
+
+  return { name, type, framework, language, packageManager, testRunner, entryPoints: entryPoints.length > 0 ? entryPoints : undefined, workspaces };
 }
 
 function detectPythonProject(workDir: string): Partial<ProjectSummary> | null {
@@ -184,7 +240,8 @@ function buildSummary(info: Partial<ProjectSummary>): string {
   const parts: string[] = [];
 
   // Opening: language + type + framework
-  let opening = `${info.language} ${info.type === "node" ? "Node.js" : info.type} project`;
+  const typeLabel = info.type === "node" ? "Node.js" : info.type === "monorepo" ? "monorepo" : info.type;
+  let opening = `${info.language} ${typeLabel} project`;
   if (info.framework) opening += ` using ${info.framework}`;
   parts.push(opening + ".");
 
@@ -192,6 +249,14 @@ function buildSummary(info: Partial<ProjectSummary>): string {
   if (info.testRunner) details.push(`Test runner: ${info.testRunner}`);
   if (info.packageManager) details.push(`Package manager: ${info.packageManager}`);
   if (details.length > 0) parts.push(details.join(". ") + ".");
+
+  if (info.entryPoints && info.entryPoints.length > 0) {
+    parts.push(`Entry points: ${info.entryPoints.join(", ")}.`);
+  }
+
+  if (info.workspaces && info.workspaces.length > 0) {
+    parts.push(`Workspaces: ${info.workspaces.join(", ")}.`);
+  }
 
   return parts.join(" ");
 }
@@ -235,6 +300,7 @@ export function detectProject(workDir: string): ProjectSummary {
     packageManager: info.packageManager,
     testRunner: info.testRunner,
     entryPoints: info.entryPoints,
+    workspaces: info.workspaces,
     summary,
   };
 }

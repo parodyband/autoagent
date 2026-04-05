@@ -71,6 +71,7 @@ export const COMPACT_TIER1_THRESHOLD = 100_000;
 export const COMPACT_THRESHOLD = 150_000;
 /** Context warning threshold: warn user when input tokens reach 80% of T2 threshold. */
 export const CONTEXT_WARNING_THRESHOLD = COMPACT_THRESHOLD * 0.8; // 120_000
+export const PRUNE_THRESHOLD = 120_000; // Between Tier 1 (100K) and Tier 2 (150K)
 
 /**
  * Pure function: select which compaction tier to apply based on input token count.
@@ -775,6 +776,58 @@ export class Orchestrator {
     return this.sessionTokensIn >= COMPACT_THRESHOLD;
   }
 
+  /** Check if stale tool result pruning is needed (between Tier 1 and Tier 2). */
+  private shouldPruneStaleTool(): boolean {
+    return this.sessionTokensIn >= PRUNE_THRESHOLD && this.sessionTokensIn < COMPACT_THRESHOLD;
+  }
+
+  /**
+   * Prune stale tool results: replace the content of old tool_result blocks
+   * (older than the last 8 assistant turns) with a one-line stub.
+   * Fires when sessionTokensIn is between PRUNE_THRESHOLD (120K) and Tier 2 (150K).
+   */
+  private pruneStaleToolResults(): void {
+    // Find the index of the 8th most recent assistant message
+    const assistantIndices: number[] = [];
+    for (let i = this.apiMessages.length - 1; i >= 0; i--) {
+      if (this.apiMessages[i].role === "assistant") {
+        assistantIndices.push(i);
+      }
+    }
+
+    // Keep last 8 assistant turns fresh — prune everything older
+    const cutoffAssistantIdx = assistantIndices[7] ?? 0; // 8th most recent assistant turn
+
+    let turnN = 0;
+    for (let i = 0; i < cutoffAssistantIdx; i++) {
+      const msg = this.apiMessages[i];
+      if (msg.role === "assistant") turnN++;
+      if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
+
+      for (const block of msg.content) {
+        if (
+          typeof block === "object" &&
+          "type" in block &&
+          block.type === "tool_result" &&
+          Array.isArray((block as { content?: unknown[] }).content)
+        ) {
+          const toolBlock = block as {
+            type: string;
+            tool_use_id: string;
+            content: Array<{ type: string; text?: string }>;
+          };
+          for (const cb of toolBlock.content) {
+            if (cb.type === "text" && typeof cb.text === "string") {
+              // Skip already-compact results
+              if (cb.text.length < 100) continue;
+              cb.text = `[pruned — old result from turn ${turnN}]`;
+            }
+          }
+        }
+      }
+    }
+  }
+
   /**
    * Tier 1 compaction: walk apiMessages backwards, compress tool_result blocks
    * older than the last 5 assistant turns to reduce context without losing structure.
@@ -923,6 +976,9 @@ export class Orchestrator {
       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
     } else if (this.shouldCompactTier1()) {
       this.compactTier1(); // Tier 1: compress old tool outputs
+      if (this.shouldPruneStaleTool()) {
+        this.pruneStaleToolResults(); // Aggressive eviction between T1 and T2
+      }
     } else if (this.shouldMicroCompact()) {
       scoredPrune(this.apiMessages, this.apiMessages.length, 10_000); // Scored prune: target 10K token savings
     }
