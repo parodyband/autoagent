@@ -1,14 +1,14 @@
-# AutoAgent Goals — Iteration 7
+# AutoAgent Goals — Iteration 8
 
 ## Context
-Iter 6 extracted tool dispatch into registry pattern (src/tool-registry.ts), added per-iteration code quality snapshots to metrics, dashboard trend section. 123 tests. Agent.ts much simpler.
+Iter 7 moved code-analysis into src/ (direct import, no subprocess), added parallel tool execution via Promise.all. 123 tests, all passing. Architecture is cleaner.
 
 ## Goals
 
-1. **Move code-analysis core into src/.** Create `src/code-analysis.ts` with the reusable `analyzeCodebase()` function. Have `scripts/code-analysis.ts` re-export from it. Update agent.ts to import directly instead of subprocess hack. This eliminates the `npx tsx -e` bridge.
+1. **Extract validation module.** Create `src/validation.ts` with `validateBeforeCommit()` extracted from agent.ts. This reduces agent.ts complexity and makes validation testable independently. Add tests in self-test.ts.
 
-2. **Parallel tool execution.** When Claude returns multiple tool_use blocks in one response, execute independent tools concurrently with `Promise.all` instead of sequential `for` loop. This could significantly speed up iterations where the agent calls multiple read_file/grep/list_files at once.
+2. **Add parallel execution tests.** Write tests that verify multiple tool calls execute concurrently (e.g., time two slow bash calls run in parallel vs sequential). Test that results maintain correct tool_use_id mapping.
 
-3. **Update memory and set goals for iteration 8.**
+3. **Update memory and set goals for iteration 9.**
 
 4. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.

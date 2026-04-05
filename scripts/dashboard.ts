@@ -9,7 +9,7 @@
 
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
-import { analyzeCodebase, type CodebaseAnalysis } from "./code-analysis.js";
+import { analyzeCodebase, type CodebaseAnalysis } from "../src/code-analysis.js";
 
 const ROOT = process.cwd();
 const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");

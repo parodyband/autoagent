@@ -14,6 +14,7 @@ import path from "path";
 import "dotenv/config";
 import { executeBash } from "./tools/bash.js";
 import { createDefaultRegistry } from "./tool-registry.js";
+import { analyzeCodebase } from "./code-analysis.js";
 import {
   loadState,
   saveState,
@@ -68,28 +69,23 @@ interface IterationMetrics {
 
 async function captureCodeQuality(): Promise<CodeQualitySnapshot | undefined> {
   try {
-    // Run code-analysis.ts to get JSON output
-    const r = await executeBash(
-      `npx tsx -e "import{analyzeCodebase}from'./scripts/code-analysis.js';const a=analyzeCodebase();console.log(JSON.stringify(a.totals))"`,
-      30, ROOT
+    // Direct import — no subprocess needed
+    const analysis = analyzeCodebase();
+    const totals = analysis.totals;
+    // Count tests
+    const testR = await executeBash(
+      `grep -c "^  assert(" scripts/self-test.ts || echo 0`,
+      10, ROOT
     );
-    if (r.exitCode === 0 && r.output.trim().startsWith("{")) {
-      const totals = JSON.parse(r.output.trim());
-      // Count tests by running self-test in dry-count mode
-      const testR = await executeBash(
-        `grep -c "^  assert(" scripts/self-test.ts || echo 0`,
-        10, ROOT
-      );
-      const testCount = parseInt(testR.output.trim(), 10) || 0;
-      return {
-        totalLOC: totals.totalLines,
-        codeLOC: totals.codeLines,
-        fileCount: totals.fileCount,
-        functionCount: totals.functionCount,
-        complexity: totals.complexity,
-        testCount,
-      };
-    }
+    const testCount = parseInt(testR.output.trim(), 10) || 0;
+    return {
+      totalLOC: totals.totalLines,
+      codeLOC: totals.codeLines,
+      fileCount: totals.fileCount,
+      functionCount: totals.functionCount,
+      complexity: totals.complexity,
+      testCount,
+    };
   } catch {}
   return undefined;
 }
@@ -259,10 +255,16 @@ async function runIteration(state: IterationState): Promise<void> {
     const results: Anthropic.ToolResultBlockParam[] = [];
     let shouldRestart = false;
 
-    for (const tu of toolUses) {
-      const { result, isRestart } = await handleToolCall(iter, tu, toolCounts);
-      results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
-      if (isRestart) shouldRestart = true;
+    // Execute independent tools concurrently for speed
+    const toolResults = await Promise.all(
+      toolUses.map(async (tu) => {
+        const { result, isRestart } = await handleToolCall(iter, tu, toolCounts);
+        return { id: tu.id, result, isRestart };
+      })
+    );
+    for (const tr of toolResults) {
+      results.push({ type: "tool_result", tool_use_id: tr.id, content: tr.result });
+      if (tr.isRestart) shouldRestart = true;
     }
 
     messages.push({ role: "user", content: results });

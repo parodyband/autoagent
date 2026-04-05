@@ -16,7 +16,7 @@ import { executeWebFetch } from "../src/tools/web_fetch.js";
 import { createDefaultRegistry, ToolRegistry } from "../src/tool-registry.js";
 import { compactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
-import { analyzeCodebase, formatReport } from "./code-analysis.js";
+import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync } from "fs";
 import path from "path";
 

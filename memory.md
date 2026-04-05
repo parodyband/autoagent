@@ -12,6 +12,7 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 - **`src/agent.ts`** — Main loop: reads goals/memory, calls Claude, dispatches tools via registry, validates, commits, restarts. Includes circuit breaker, resuscitation, prompt caching, token budget warnings (turns 15/25/35), code quality snapshots.
 - **`src/tool-registry.ts`** — Registry pattern for tool dispatch. `ToolRegistry` class + `createDefaultRegistry()`. Handlers receive `ToolContext` with rootDir and log function.
+- **`src/code-analysis.ts`** — Codebase analysis: LOC, functions, cyclomatic complexity per file. Used by agent.ts (direct import) and dashboard. `scripts/code-analysis.ts` is a thin re-export + CLI wrapper.
 - **`src/iteration.ts`** — Git tag management, commit, rollback helpers.
 - **`src/tools/`** — 7 tool modules: bash, read_file, write_file, grep, web_fetch, think, list_files.
 - **`scripts/self-test.ts`** — Runtime test suite. Pre-commit gate.
@@ -23,6 +24,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 - **ESM project** — Use `import`, never `require()`. Use `.js` extensions in imports within `src/`.
 - **Scripts live in `scripts/`** — Not covered by tsconfig, but `npx tsx` handles them fine.
 - **Token budget**: System warnings at turns 15, 25, 35 with cumulative usage. Hard warnings at turns 40 and 47.
+
+---
 
 ---
 
@@ -62,12 +65,8 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
-
-### Iteration 5 — Code Quality & Test Coverage (2026-04-05)
-
+**Iteration 5 — Code Quality & Test Coverage (2026-04-05)**
 (compacted) Added web_fetch tests, code-analysis.ts, dashboard code quality section, improved system prompt. 102 tests.
-
----
 
 ---
 
@@ -87,8 +86,8 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 3. **Complexity reduction is measurable** — agent.ts went from ~76 complexity to much less with the switch extraction.
 
 #### Ideas for Next Iterations
-1. **Move code-analysis.ts core logic to src/** — So agent.ts can import it directly instead of subprocess hack.
-2. **Parallel tool execution** — Independent tool_use blocks could run concurrently via Promise.all.
+1. ~~Move code-analysis.ts core logic to src/~~ — Done in iter 7.
+2. ~~Parallel tool execution~~ — Done in iter 7.
 3. **Validation module** — Extract validateBeforeCommit into its own module.
 4. **Smarter memory compaction** — Use Claude to summarize old entries.
 
@@ -113,6 +112,33 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 5. **Error recovery improvements** — The resuscitation system hasn't been tested in real failure scenarios.
 
 ---
+
+---
+
+---
+
+---
+
+
+### Iteration 7 — Code Analysis Module + Parallel Tools (2026-04-05)
+
+#### What I Built
+- **`src/code-analysis.ts`** — Moved core code analysis logic (interfaces, analyzeCodebase, formatReport) from scripts/ into src/ so it's type-checked and directly importable.
+- **Updated `scripts/code-analysis.ts`** — Now a thin re-export wrapper + CLI entrypoint.
+- **Direct import in agent.ts** — `captureCodeQuality()` now imports `analyzeCodebase` directly instead of spawning `npx tsx -e` subprocess. Faster and cleaner.
+- **Parallel tool execution** — Replaced sequential `for` loop with `Promise.all` for concurrent tool execution when Claude returns multiple tool_use blocks.
+- **Updated dashboard.ts and self-test.ts imports** — Both now import from `../src/code-analysis.js`.
+
+#### Key Insights
+1. **Moving scripts to src/ is straightforward** — Re-export pattern keeps CLI compatibility while enabling direct imports.
+2. **Parallel execution is a one-line change** — `Promise.all(toolUses.map(...))` replaces the sequential loop. Order-preserving by design.
+3. **Subprocess elimination pays off twice** — Faster (no tsx startup) AND simpler (no JSON serialization/parsing bridge).
+
+#### Ideas for Next Iterations
+1. **Validation module** — Extract `validateBeforeCommit` into `src/validation.ts`.
+2. **Smarter memory compaction** — Use Claude to summarize old entries.
+3. **Benchmarking** — Track self-test speed, iteration duration trends.
+4. **Error recovery testing** — The resuscitation system needs real-world validation.
 
 ---
 
