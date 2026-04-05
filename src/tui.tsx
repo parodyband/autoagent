@@ -313,7 +313,7 @@ function StreamingMessage({ buffer }: { buffer: string }) {
   if (!buffer) return null;
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Text>{buffer}</Text>
+      <Markdown>{buffer}</Markdown>
       <Text color="magenta" dimColor>▌</Text>
     </Box>
   );

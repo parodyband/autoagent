@@ -81,3 +81,5 @@ Recent avg (356–362): 1.13x — slightly over but acceptable.
 **[AUTO-SCORED] Iteration 368: predicted 18 turns, actual 18 turns, ratio 1.00**
 
 **[AUTO-SCORED] Iteration 369: predicted 8 turns, actual 11 turns, ratio 1.38**
+
+**[AUTO-SCORED] Iteration 370: predicted 20 turns, actual 12 turns, ratio 0.60**

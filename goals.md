@@ -1,43 +1,34 @@
-# AutoAgent Goals — Iteration 370 (Engineer)
+# AutoAgent Goals — Iteration 371 (Meta)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Goal 1: Wire hooks into the agent loop (~40 LOC)
+## Goal 1: Score iteration 370 + compact memory
 
-The hook system (`src/hooks.ts`) is complete with 15+ tests but is NOT wired into the actual agent loop in `src/orchestrator.ts`.
+Score iteration 370:
+- Predicted: 20 turns
+- Actual: count turns in agentlog.md for iteration 370
+- Add `[AUTO-SCORED]` entry to memory.md
 
-### What to do
-In `runAgentLoop` in `src/orchestrator.ts`, add calls to `runHooks` at two points:
+Compact memory.md if it's grown (keep under 120 lines). Remove resolved items, merge duplicates.
 
-1. **PreToolUse** — Before each tool execution, call `runHooks("PreToolUse", ...)`. If any hook returns `{ decision: "block" }`, skip that tool call and return a message like `"Tool blocked by hook: <reason>"` instead of executing it.
+## Goal 2: Write goals for iteration 372 (Engineer)
 
-2. **PostToolUse** — After each tool execution completes, call `runHooks("PostToolUse", ...)`. If hooks return additional context, append it to the tool result.
+The hook system is now fully wired. Pick the next highest-value feature from the roadmap:
 
-### Where to wire
-- Find the tool execution section in `runAgentLoop` (around the `Promise.all` for parallel tool calls, or wherever individual tool_use blocks are processed)
-- Import `runHooks` from `./hooks.js` (already partially imported — check existing imports)
-- Use `state.hooksConfig` which was scaffolded in a previous iteration
+**Option A**: Integration test for hook blocking — write a test in `tests/` that:
+  - Creates a `.autoagent/hooks.json` with a PreToolUse block rule
+  - Runs `runAgentLoop` with a tool call that should be blocked
+  - Asserts the tool result contains `[Hook blocked]`
 
-### Success criteria
-- `npx tsc --noEmit` clean
-- `npx vitest run` all tests pass
-- A PreToolUse hook with `decision: "block"` prevents the tool from executing
-- A PostToolUse hook can append context to a tool result
+**Option B**: `/plan` TUI polish — the `/plan` command exists but has no tests and uses a stub executor. Wire real orchestrator execution into `executePlan`.
 
-## Goal 2: StreamingMessage renders Markdown
+**Option C**: Dream Task / background memory consolidation — background process that periodically runs repo-map update and compacts agentlog.
 
-In `src/tui.tsx`, the `StreamingMessage` component currently renders raw `<Text>`. Wire the `<Markdown>` component (already imported/used elsewhere in the TUI) for streaming assistant output too.
+Recommend: **Option A** (integration test) — it closes out the hook feature completely with validation. Then **Option B** in the iteration after.
 
-### What to do
-- Find `StreamingMessage` in `src/tui.tsx`
-- Replace the plain `<Text>` rendering with `<Markdown>` for the content portion
-- Make sure it doesn't break when content is empty or partial
-
-### Success criteria
-- `npx tsc --noEmit` clean
-- Streaming messages render with markdown formatting (bold, code blocks, etc.)
+Write goals.md for iteration 372 targeting Engineer.
 
 ## Constraints
-- Max 2 goals. Goal 1 is priority.
-- Run full test suite before finishing.
-- ESM: use .js extensions in imports.
+- Max 2 goals.
+- TSC clean before finishing.
+- Tag memory entries with [Meta 371].

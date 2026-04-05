@@ -1,89 +1,3 @@
-[2026-04-05T20:22:16.663Z] iter=360 turn=25 INFO: RESTART signal
-[2026-04-05T20:22:16.664Z] iter=360 turn=25 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T20:22:17.741Z] iter=360 turn=25 INFO: Compilation OK
-[2026-04-05T20:22:25.971Z] iter=360 turn=25 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-05T20:22:25.971Z] iter=360 turn=25 INFO: Cache stats: 0 hits, 2 misses, 55 entries, 6 invalidations (2 entries removed)
-[2026-04-05T20:22:25.971Z] iter=360 turn=25 INFO: Tool cache stats
-[2026-04-05T20:22:25.971Z] iter=360 turn=25 INFO: Tool timing: bash: 21x, avg=174ms, total=3659ms; write_file: 6x, avg=2ms, total=12ms; read_scratchpad: 1x, avg=4ms, total=4ms; read_file: 2x, avg=2ms, total=4ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T20:22:25.971Z] iter=360 turn=25 INFO: Tool timing stats
-[2026-04-05T20:22:33.166Z] iter=360 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 360: predicted 20 turns, actual 25 turns, ratio 1.25**
-[2026-04-05T20:22:44.642Z] iter=360 turn=25 INFO: Pre-commit review (1384in/508out): ## Issues
-
-- **Missing `orch.cleanup()` / resource leak**: Each task spawns a `new Orchestrator` and calls `orch.init()`, but there's no `finally` block to call any teardown method. If `orch.send()` t
-[2026-04-05T20:22:44.699Z] iter=360 turn=25 INFO: Committed: af8aa86c (41 in / 5737 out, cache: 21603 created, 330821 read)
-[2026-04-05T20:22:44.700Z] iter=360 turn=25 INFO: Restarting as iteration 361...
-[2026-04-05T20:22:44.903Z] iter=361 INFO: Cache restored: 55/55 entries (0 stale)
-[2026-04-05T20:22:44.906Z] iter=361 INFO: Turn budget: 13/25 (calibration=1.25x, predicted=8)
-[2026-04-05T20:22:44.906Z] iter=361 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T20:22:45.087Z] iter=361 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T20:22:45.087Z] iter=361 turn=1 INFO: Turn 1/25
-[2026-04-05T20:22:49.096Z] iter=361 turn=1 INFO: Agent: 
-
-I'll start by reviewing what was built in iteration 360, then research to identify the highest-leverage next feature.
-[2026-04-05T20:22:49.098Z] iter=361 turn=1 INFO: read_file: src/plan-executor.ts
-[2026-04-05T20:22:49.099Z] iter=361 turn=1 INFO:   -> ok (1823 chars)
-[2026-04-05T20:22:49.100Z] iter=361 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
-[2026-04-05T20:22:49.104Z] iter=361 turn=1 INFO: read_file: goals.md
-[2026-04-05T20:22:49.105Z] iter=361 turn=1 INFO:   -> ok (928 chars)
-[2026-04-05T20:22:49.119Z] iter=361 turn=1 INFO:   -> exit=0 (330 chars)
-[2026-04-05T20:22:49.120Z] iter=361 turn=2 INFO: Turn 2/25
-[2026-04-05T20:22:53.354Z] iter=361 turn=2 INFO: Agent: 
-
-You're right. My deliverable is **goals.md for iteration 362 (Engineer)**. Let me do focused research on the highest-leverage feature, then write it.
-[2026-04-05T20:22:53.354Z] iter=361 turn=2 INFO: web_search: "Claude Code hooks PreToolUse PostToolUse lifecycle architecture 2025"
-[2026-04-05T20:22:53.375Z] iter=361 turn=2 INFO: web_search: "coding agent hook system tool lifecycle extensibility architecture"
-[2026-04-05T20:22:54.369Z] iter=361 turn=2 INFO:   -> 8 results
-[2026-04-05T20:22:54.700Z] iter=361 turn=2 INFO:   -> 8 results
-[2026-04-05T20:22:54.701Z] iter=361 turn=3 INFO: Turn 3/25
-[2026-04-05T20:22:57.755Z] iter=361 turn=3 INFO: web_fetch: https://code.claude.com/docs/en/hooks
-[2026-04-05T20:22:57.759Z] iter=361 turn=3 INFO: web_fetch: https://maxpool.dev/research-papers/coding_agents_extensions.html
-[2026-04-05T20:22:58.097Z] iter=361 turn=3 INFO:   -> ok (54860 chars)
-[2026-04-05T20:22:58.271Z] iter=361 turn=3 INFO:   -> ok (29885 chars)
-[2026-04-05T20:22:58.271Z] iter=361 turn=4 INFO: Turn 4/25
-[2026-04-05T20:23:09.484Z] iter=361 turn=4 INFO: Agent: 
-
-**Goal status:** "Review and plan next feature track" — IN PROGRESS.
-
-I've completed research. Now I need to synthesize findings and write goals.md. Let me finish by this turn.
-[2026-04-05T20:23:09.486Z] iter=361 turn=4 INFO: think: Based on my research, the hook system is clearly the highest-leverage next feature. Claude Code's hook system is describ...
-[2026-04-05T20:23:09.487Z] iter=361 turn=5 INFO: Turn 5/25
-[2026-04-05T20:23:11.760Z] iter=361 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T20:23:12.882Z] iter=361 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-05T20:23:12.882Z] iter=361 turn=6 INFO: Turn 6/25
-[2026-04-05T20:23:38.311Z] iter=361 turn=6 INFO: Agent: 
-
-Right — Architect iterations produce goals.md + memory, not src/ changes. Let me write the deliverables now.
-[2026-04-05T20:23:38.313Z] iter=361 turn=6 INFO: write_file: goals.md (write)
-[2026-04-05T20:23:38.317Z] iter=361 turn=6 INFO:   -> ok: Updated goals.md (3874 chars, +58 lines delta)
-[2026-04-05T20:23:38.319Z] iter=361 turn=7 INFO: Turn 7/25
-[2026-04-05T20:23:46.896Z] iter=361 turn=7 INFO: save_memory: "[Architect] Hook system design (iter 361)"
-[2026-04-05T20:23:46.899Z] iter=361 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T20:23:46.900Z] iter=361 turn=7 INFO: save_memory: "[Research] Coding agent extensibility landscape (Jan 2026)"
-[2026-04-05T20:23:46.901Z] iter=361 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T20:23:46.902Z] iter=361 turn=8 INFO: Turn 8/25
-[2026-04-05T20:23:50.069Z] iter=361 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "TSC CLEAN"
-[2026-04-05T20:23:51.081Z] iter=361 turn=8 INFO:   -> exit=0 (10 chars)
-[2026-04-05T20:23:51.081Z] iter=361 turn=9 INFO: Turn 9/25
-[2026-04-05T20:23:53.091Z] iter=361 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T20:23:53.093Z] iter=361 turn=9 INFO: RESTART signal
-[2026-04-05T20:23:53.094Z] iter=361 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T20:23:54.173Z] iter=361 turn=9 INFO: Compilation OK
-[2026-04-05T20:24:01.844Z] iter=361 turn=9 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-05T20:24:01.844Z] iter=361 turn=9 INFO: Cache stats: 0 hits, 2 misses, 56 entries, 1 invalidations (1 entries removed)
-[2026-04-05T20:24:01.844Z] iter=361 turn=9 INFO: Tool cache stats
-[2026-04-05T20:24:01.844Z] iter=361 turn=9 INFO: Tool timing: web_search: 2x, avg=1172ms, total=2343ms; bash: 4x, avg=539ms, total=2155ms; web_fetch: 2x, avg=427ms, total=854ms; read_file: 2x, avg=4ms, total=8ms; save_memory: 2x, avg=3ms, total=6ms; write_file: 1x, avg=5ms, total=5ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T20:24:01.844Z] iter=361 turn=9 INFO: Tool timing stats
-[2026-04-05T20:24:08.660Z] iter=361 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 361: predicted 8 turns, actual 9 turns, ratio 1.13**
-[2026-04-05T20:24:08.685Z] iter=361 turn=9 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T20:24:08.721Z] iter=361 turn=9 INFO: Committed: 59e5e48c (19 in / 2695 out, cache: 32627 created, 177246 read)
-[2026-04-05T20:24:08.721Z] iter=361 turn=9 INFO: Restarting as iteration 362...
-[2026-04-05T20:24:08.918Z] iter=362 INFO: Cache restored: 56/56 entries (0 stale)
-[2026-04-05T20:24:08.921Z] iter=362 INFO: Turn budget: 18/25 (calibration=1.13x, predicted=20)
-[2026-04-05T20:24:08.921Z] iter=362 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T20:24:09.098Z] iter=362 turn=1 INFO: Turn 1/25
-[2026-04-05T20:24:11.521Z] iter=362 turn=1 INFO: Agent: I'll start by reading the current state of the codebase and then implement the hook system.
-[2026-04-05T20:24:11.523Z] iter=362 turn=1 INFO: read_scratchpad: 1755 chars
-[2026-04-05T20:24:11.524Z] iter=362 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md | head -20
 [2026-04-05T20:24:11.536Z] iter=362 turn=1 INFO:   -> exit=0 (932 chars)
 [2026-04-05T20:24:11.537Z] iter=362 turn=2 INFO: Turn 2/25
 [2026-04-05T20:24:13.840Z] iter=362 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "tool" src/orchestrator.ts | grep -i "execut\|dispatch\|call\|invoke" | head -30
@@ -1082,3 +996,77 @@ Context after patch:
 [2026-04-05T20:40:18.145Z] iter=369 turn=11 INFO: Tool timing stats
 [2026-04-05T20:40:25.093Z] iter=369 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 369: predicted 8 turns, actual 11 turns, ratio 1.38**
 [2026-04-05T20:40:25.116Z] iter=369 turn=11 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T20:40:25.152Z] iter=369 turn=11 INFO: Committed: 4b973613 (23 in / 2477 out, cache: 11045 created, 83235 read)
+[2026-04-05T20:40:25.152Z] iter=369 turn=11 INFO: Restarting as iteration 370...
+[2026-04-05T20:40:25.362Z] iter=370 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T20:40:25.365Z] iter=370 INFO: Turn budget: 19/25 (calibration=1.11x, predicted=20)
+[2026-04-05T20:40:25.365Z] iter=370 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T20:40:25.552Z] iter=370 turn=1 INFO: Turn 1/25
+[2026-04-05T20:40:27.644Z] iter=370 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T20:40:27.645Z] iter=370 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-05T20:40:27.656Z] iter=370 turn=1 INFO:   -> exit=0 (2007 chars)
+[2026-04-05T20:40:27.657Z] iter=370 turn=2 INFO: Turn 2/25
+[2026-04-05T20:40:30.260Z] iter=370 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "runHooks\|hooksConfig\|hooks" src/orchestrator.ts | head -40
+[2026-04-05T20:40:30.270Z] iter=370 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "StreamingMessage" src/tui.tsx | head -20
+[2026-04-05T20:40:30.293Z] iter=370 turn=2 INFO:   -> exit=0 (705 chars)
+[2026-04-05T20:40:30.295Z] iter=370 turn=2 INFO:   -> exit=0 (151 chars)
+[2026-04-05T20:40:30.295Z] iter=370 turn=3 INFO: Turn 3/25
+[2026-04-05T20:40:33.505Z] iter=370 turn=3 INFO: think: It seems hooks are already wired in from a previous iteration! Let me look more carefully at the orchestrator to underst...
+[2026-04-05T20:40:33.506Z] iter=370 turn=4 INFO: Turn 4/25
+[2026-04-05T20:40:36.288Z] iter=370 turn=4 INFO: Agent: Let me check what's actually been done vs what's needed, then ship immediately.
+[2026-04-05T20:40:36.289Z] iter=370 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '640,740p' src/orchestrator.ts
+[2026-04-05T20:40:36.294Z] iter=370 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '308,330p' src/tui.tsx
+[2026-04-05T20:40:36.310Z] iter=370 turn=4 INFO:   -> exit=0 (5142 chars)
+[2026-04-05T20:40:36.314Z] iter=370 turn=4 INFO:   -> exit=0 (742 chars)
+[2026-04-05T20:40:36.315Z] iter=370 turn=5 INFO: Turn 5/25
+[2026-04-05T20:40:40.064Z] iter=370 turn=5 INFO: think: Goal 1 (hooks wiring) is ALREADY DONE. The orchestrator already has runHooks wired in at PreToolUse and PostToolUse for ...
+[2026-04-05T20:40:40.064Z] iter=370 turn=6 INFO: Turn 6/25
+[2026-04-05T20:40:42.549Z] iter=370 turn=6 INFO: Agent: Goal 1 is already done. Goal 2 needs the fix. Let me check the Markdown import and wire it in:
+[2026-04-05T20:40:42.550Z] iter=370 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "Markdown\|markdown" src/tui.tsx | head -20
+[2026-04-05T20:40:42.567Z] iter=370 turn=6 INFO:   -> exit=0 (312 chars)
+[2026-04-05T20:40:42.568Z] iter=370 turn=7 INFO: Turn 7/25
+[2026-04-05T20:40:47.484Z] iter=370 turn=7 INFO: Agent: **Goal 1 (Hook wiring): DONE** — Already wired in orchestrator.  
+**Goal 2 (StreamingMessage Markdown): NOT STARTED** — Fixing now.
+[2026-04-05T20:40:47.485Z] iter=370 turn=7 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T20:40:47.486Z] iter=370 turn=7 INFO:   -> ok: Patched src/tui.tsx: -10 +10 lines
+
+Context after patch:
+308 |   );
+309 | }
+310 | 
+311 | /** Live streaming message — shown while the assistant is generating text. */
+312 | function StreamingMessage({ buffer }: { buffer: string }) {
+313 |   if (!buffer) return null;
+314 |   return (
+315 |     <Box flexDirection="column" marginTop={1}>
+316 |       <Markdown>{buffer}</Markdown>
+317 |       <Text color="magenta" dimColor>▌</Text>
+318 |     </Box>
+319 |   );
+320 | }
+321 | 
+322 | /** Footer bar showing cumulative token usage and cost. */
+323 | function Footer({ stats }: { stats: FooterStats }) {
+[2026-04-05T20:40:47.487Z] iter=370 turn=8 INFO: Turn 8/25
+[2026-04-05T20:40:49.090Z] iter=370 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC CLEAN"
+[2026-04-05T20:40:50.173Z] iter=370 turn=8 INFO:   -> exit=0 (10 chars)
+[2026-04-05T20:40:50.174Z] iter=370 turn=9 INFO: Turn 9/25
+[2026-04-05T20:40:51.448Z] iter=370 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -20
+[2026-04-05T20:41:05.841Z] iter=370 turn=9 INFO:   -> exit=0 (996 chars)
+[2026-04-05T20:41:05.841Z] iter=370 turn=10 INFO: Turn 10/25
+[2026-04-05T20:41:09.917Z] iter=370 turn=10 INFO: Agent: All 88 test files, 1052 tests pass. TSC clean.
+[2026-04-05T20:41:09.917Z] iter=370 turn=10 INFO: save_memory: "[Engineer 370] Hook wiring + StreamingMessage Markdown"
+[2026-04-05T20:41:09.918Z] iter=370 turn=10 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:41:09.918Z] iter=370 turn=11 INFO: Turn 11/25
+[2026-04-05T20:41:24.501Z] iter=370 turn=11 INFO: write_file: goals.md (write)
+[2026-04-05T20:41:24.502Z] iter=370 turn=11 INFO:   -> ok: Updated goals.md (1363 chars, -9 lines delta)
+[2026-04-05T20:41:24.502Z] iter=370 turn=12 INFO: Turn 12/25
+[2026-04-05T20:41:27.957Z] iter=370 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:41:27.958Z] iter=370 turn=12 INFO: RESTART signal
+[2026-04-05T20:41:27.958Z] iter=370 turn=12 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:41:29.049Z] iter=370 turn=12 INFO: Compilation OK
+[2026-04-05T20:41:37.043Z] iter=370 turn=12 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T20:41:37.044Z] iter=370 turn=12 INFO: Tool timing: bash: 9x, avg=1734ms, total=15608ms; read_scratchpad: 1x, avg=5ms, total=5ms; write_file: 2x, avg=2ms, total=3ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T20:41:37.044Z] iter=370 turn=12 INFO: Tool timing stats
+[2026-04-05T20:41:44.094Z] iter=370 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 370: predicted 20 turns, actual 12 turns, ratio 0.60**
+[2026-04-05T20:41:44.119Z] iter=370 turn=12 INFO: Pre-commit review: no significant code changes to review

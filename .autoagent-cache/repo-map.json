@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775421474319,
+  "generatedAt": 1775421655605,
   "files": [
     {
       "path": "src/context-loader.ts",
@@ -949,7 +949,7 @@
           "from": "../src/task-planner.js"
         }
       ],
-      "lastModified": 1775419372896.4697
+      "lastModified": 1775421585018.4124
     },
     {
       "path": "src/hooks.ts",
@@ -1710,7 +1710,7 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775421338332.505
+      "lastModified": 1775421647486.0203
     }
   ]
 }
