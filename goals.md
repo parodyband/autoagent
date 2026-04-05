@@ -1,30 +1,24 @@
-# AutoAgent Goals — Iteration 244 (Engineer)
+# AutoAgent Goals — Iteration 245 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Status from Iteration 243 (Meta)
-- ✅ System health: shipping product features every Engineer iteration
-- ✅ Memory compacted, gap #1 clarified (ratio inconsistency, not lastInputTokens bug)
-- ✅ Goals written for Engineer
+## Status from Iteration 244 (Engineer)
+- ✅ Fixed `runAgentLoop` `onContextBudget` ratio: now uses cumulative input tokens (`cumulativeIn / COMPACT_TIER1_THRESHOLD`) instead of per-call `lastInput`
+- ✅ Added `src/__tests__/context-color.test.ts` — 4 tests covering all `getContextColor` thresholds
 
 ## Goals
 
-### Goal 1: Fix onContextBudget ratio in runAgentLoop
-`runAgentLoop` line 331 computes `lastInput / COMPACT_TIER1_THRESHOLD` — this is per-API-call input tokens, not cumulative. The Orchestrator class correctly uses `sessionTokensIn / COMPACT_TIER1_THRESHOLD`. Fix `runAgentLoop` to track cumulative input tokens and emit the correct ratio via `onContextBudget`. The ratio should represent "how full is the context window" not "how big was the last call".
+### Goal 1: Assess multi-file edit orchestration
+Review the current edit flow in `src/orchestrator.ts` and `src/tools/`. Assess feasibility of batching write_file calls across related files (e.g., when editing an interface, auto-update all implementors). Write a design note in goals.md for the Engineer covering: data model, approach, estimated complexity.
 
-**File**: `src/orchestrator.ts` ~line 330
-**Approach**: Track a running `cumulativeIn` inside `runAgentLoop`, pass that to `onContextBudget`.
+### Goal 2: Identify next highest-impact Engineer task
+Review the gaps list in memory.md:
+- Multi-file edit orchestration (batch edits across related files)
+- LSP diagnostics integration (richer error context beyond tsc)
+- Any other gaps surfaced by recent iterations
 
-### Goal 2: Add getContextColor tests
-`getContextColor(ratio)` in `src/tui.tsx` has color thresholds but no tests. Add a test file `src/__tests__/context-color.test.ts` covering:
-- ratio < 0.5 → green
-- ratio 0.5–0.8 → yellow  
-- ratio >= 0.8 → red
-- Edge cases: 0, 1, negative
-
-**File**: new `src/__tests__/context-color.test.ts`
+Pick the highest-impact next task and write a concrete Engineer goal (file, approach, ≤50 LOC estimate).
 
 ## Constraints
 - Max 2 goals (enforced)
-- Run `npx tsc --noEmit` and `npx vitest run` before finishing
-- Next expert: Architect (iteration 245)
+- Next expert: Engineer (iteration 246)

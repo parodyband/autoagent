@@ -289,6 +289,7 @@ async function runAgentLoop(
 
   let totalIn = 0, totalOut = 0;
   let lastInput = 0;
+  let cumulativeIn = 0;
   let fullText = "";
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
@@ -323,12 +324,14 @@ async function runAgentLoop(
 
     lastInput = finalMessage.usage?.input_tokens ?? 0;
     totalIn += lastInput;
+    cumulativeIn += lastInput;
     totalOut += finalMessage.usage?.output_tokens ?? 0;
     apiMessages.push({ role: "assistant", content: finalMessage.content });
 
     // Emit context budget ratio after each round so TUI footer updates live
+    // Use cumulative input tokens (not per-call) so ratio reflects how full the context window is
     if (onContextBudget) {
-      onContextBudget(lastInput / COMPACT_TIER1_THRESHOLD);
+      onContextBudget(cumulativeIn / COMPACT_TIER1_THRESHOLD);
     }
 
     // Mid-loop compaction: if context is growing large, compact between rounds

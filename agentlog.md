@@ -1,104 +1,3 @@
-[2026-04-05T16:23:14.087Z] iter=235 turn=4 INFO:   -> exit=0 (95 chars)
-[2026-04-05T16:23:14.088Z] iter=235 turn=5 INFO: Turn 5/25
-[2026-04-05T16:23:16.980Z] iter=235 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tree-sitter-map.test.ts 2>&1 | tail -20
-[2026-04-05T16:23:18.005Z] iter=235 turn=5 INFO:   -> exit=0 (618 chars)
-[2026-04-05T16:23:18.005Z] iter=235 turn=6 INFO: Turn 6/25
-[2026-04-05T16:23:43.396Z] iter=235 turn=6 INFO: Agent: 
-
-Right — I'm Meta expert, my deliverables are memory compaction and goals.md, not src/ changes. The failing test is a pre-existing tree-sitter issue (not from iteration 234). Let me ship my deliverables now.
-[2026-04-05T16:23:43.397Z] iter=235 turn=6 INFO: write_file: memory.md (write)
-[2026-04-05T16:23:43.398Z] iter=235 turn=6 INFO:   -> ok: Updated memory.md (4935 chars, -21 lines delta)
-[2026-04-05T16:23:43.399Z] iter=235 turn=7 INFO: Turn 7/25
-[2026-04-05T16:23:56.506Z] iter=235 turn=7 INFO: Agent: 
-
-Memory is already written. Writing goals.md now, then wrapping up.
-[2026-04-05T16:23:56.508Z] iter=235 turn=7 INFO: write_file: goals.md (write)
-[2026-04-05T16:23:56.509Z] iter=235 turn=7 INFO:   -> ok: Updated goals.md (1637 chars, +9 lines delta)
-[2026-04-05T16:23:56.510Z] iter=235 turn=8 INFO: Turn 8/25
-[2026-04-05T16:23:59.373Z] iter=235 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T16:24:00.249Z] iter=235 turn=8 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:24:00.250Z] iter=235 turn=9 INFO: Turn 9/25
-[2026-04-05T16:24:03.160Z] iter=235 turn=9 INFO: Agent: TSC clean. Memory written, goals written, tsc passes.
-
-```
-echo "AUTOAGENT_RESTART"
-```
-[2026-04-05T16:24:03.161Z] iter=235 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T16:24:03.161Z] iter=235 turn=9 INFO: RESTART signal
-[2026-04-05T16:24:03.161Z] iter=235 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T16:24:04.101Z] iter=235 turn=9 INFO: Compilation OK
-[2026-04-05T16:24:09.959Z] iter=235 turn=9 INFO: Cache persisted: 57 entries to .autoagent-cache.json
-[2026-04-05T16:24:09.960Z] iter=235 turn=9 INFO: Tool timing: bash: 10x, avg=1858ms, total=18582ms; write_file: 2x, avg=2ms, total=3ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T16:24:09.960Z] iter=235 turn=9 INFO: Tool timing stats
-[2026-04-05T16:24:15.192Z] iter=235 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 235: predicted 8 turns, actual 9 turns, ratio 1.13**
-[2026-04-05T16:24:15.214Z] iter=235 turn=9 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T16:24:15.248Z] iter=235 turn=9 INFO: Committed: 56c77b8c (19 in / 3798 out, cache: 54168 created, 362421 read)
-[2026-04-05T16:24:15.248Z] iter=235 turn=9 INFO: Restarting as iteration 236...
-[2026-04-05T16:24:15.447Z] iter=236 INFO: Cache restored: 57/57 entries (0 stale)
-[2026-04-05T16:24:15.449Z] iter=236 INFO: Turn budget: 20/25 (calibration=1.00x, predicted=20)
-[2026-04-05T16:24:15.450Z] iter=236 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T16:24:15.570Z] iter=236 turn=1 INFO: Turn 1/25
-[2026-04-05T16:24:18.745Z] iter=236 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what needs to be built.
-[2026-04-05T16:24:18.746Z] iter=236 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat src/tui.tsx | head -100
-[2026-04-05T16:24:18.748Z] iter=236 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "tokens\|inputTokens\|cost\|footer\|Footer" src/tui.tsx | head -50
-[2026-04-05T16:24:18.755Z] iter=236 turn=1 INFO:   -> exit=0 (3192 chars)
-[2026-04-05T16:24:18.759Z] iter=236 turn=1 INFO:   -> exit=0 (1341 chars)
-[2026-04-05T16:24:18.759Z] iter=236 turn=2 INFO: Turn 2/25
-[2026-04-05T16:24:21.591Z] iter=236 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getCost\|getMetrics\|contextSize\|estimateTokens\|conversationTokens\|totalTokens\|inputTokens" src/orchestrator.ts | head -40
-[2026-04-05T16:24:21.594Z] iter=236 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '250,310p' src/tui.tsx
-[2026-04-05T16:24:21.602Z] iter=236 turn=2 INFO:   -> exit=0 (2359 chars)
-[2026-04-05T16:24:21.604Z] iter=236 turn=2 INFO:   -> exit=0 (70 chars)
-[2026-04-05T16:24:21.604Z] iter=236 turn=3 INFO: Turn 3/25
-[2026-04-05T16:24:24.381Z] iter=236 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getCost\|CostInfo\|contextTokens\|getContextSize\|conversationLength" src/orchestrator.ts | head -30
-[2026-04-05T16:24:24.386Z] iter=236 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "contextBudgetRatio\|budgetRatio\|contextSize" src/tui.tsx | head -20
-[2026-04-05T16:24:24.402Z] iter=236 turn=3 INFO:   -> exit=0 (102 chars)
-[2026-04-05T16:24:24.403Z] iter=236 turn=3 INFO:   -> exit=0 (241 chars)
-[2026-04-05T16:24:24.404Z] iter=236 turn=4 INFO: Turn 4/25
-[2026-04-05T16:24:32.219Z] iter=236 turn=4 INFO: think: I have enough context. Let me plan what to do:
-
-1. **Goal 1**: Add token context budget UI to TUI footer - show `[tokens...
-[2026-04-05T16:24:32.220Z] iter=236 turn=5 INFO: Turn 5/25
-[2026-04-05T16:24:35.521Z] iter=236 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '100,120p' src/orchestrator.ts && grep -n "contextBudgetRatio\|CONTEXT_LIMIT\|200000\|180000\|getContext" src/orchestrator.ts | head -20
-[2026-04-05T16:24:35.527Z] iter=236 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && cat src/__tests__/tree-sitter-map.test.ts | grep -A 20 "parses exports from orchestrator"
-[2026-04-05T16:24:35.544Z] iter=236 turn=5 INFO:   -> exit=0 (929 chars)
-[2026-04-05T16:24:35.551Z] iter=236 turn=5 INFO:   -> exit=0 (439 chars)
-[2026-04-05T16:24:35.551Z] iter=236 turn=6 INFO: Turn 6/25
-[2026-04-05T16:24:38.079Z] iter=236 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "contextBudgetRatio\|CONTEXT_LIMIT\|200_000\|contextTokens\|onContextBudget\|setContextBudget" src/orchestrator.ts | head -20
-[2026-04-05T16:24:38.101Z] iter=236 turn=6 INFO:   -> exit=0 (185 chars)
-[2026-04-05T16:24:38.102Z] iter=236 turn=7 INFO: Turn 7/25
-[2026-04-05T16:24:41.886Z] iter=236 turn=7 INFO: Agent: **Goal 1 (Context budget UI)**: NOT STARTED - still reading  
-**Goal 2 (Fix tree-sitter test)**: NOT STARTED
-
-Let me look at one more thing then write both fixes immediately.
-[2026-04-05T16:24:41.887Z] iter=236 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "COMPACT_TIER1\|CONTEXT_LIMIT\|sessionTokensIn\|onContextBudget" src/orchestrator.ts | head -10
-[2026-04-05T16:24:41.898Z] iter=236 turn=7 INFO:   -> exit=0 (595 chars)
-[2026-04-05T16:24:41.898Z] iter=236 turn=8 INFO: Turn 8/25
-[2026-04-05T16:24:44.837Z] iter=236 turn=8 INFO: Agent: Now I have everything I need. Let me write both fixes:
-[2026-04-05T16:24:44.838Z] iter=236 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '618,640p' src/tui.tsx
-[2026-04-05T16:24:44.853Z] iter=236 turn=8 INFO:   -> exit=0 (649 chars)
-[2026-04-05T16:24:44.853Z] iter=236 turn=9 INFO: Turn 9/25
-[2026-04-05T16:24:47.709Z] iter=236 turn=9 INFO: Agent: Now I'll make both changes at once:
-[2026-04-05T16:24:47.711Z] iter=236 turn=9 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T16:24:47.714Z] iter=236 turn=9 INFO:   -> ok: Patched src/tui.tsx: -6 +8 lines
-
-Context after patch:
-60 |   resolve: (accepted: boolean) => void;
-61 | }
-62 | 
-63 | interface FooterStats {
-64 |   tokensIn: number;
-65 |   tokensOut: number;
-66 |   cost: number;
-67 |   model: string;
-68 |   contextTokens: number;
-69 |   contextLimit: number;
-70 | }
-71 | 
-72 | // ─── #file hint pure helpers ────────────────────────────────
-73 | 
-[2026-04-05T16:24:47.716Z] iter=236 turn=10 INFO: Turn 10/25
-[2026-04-05T16:24:56.102Z] iter=236 turn=10 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T16:24:56.104Z] iter=236 turn=10 INFO:   -> ok: Patched src/tui.tsx: -18 +26 lines
 
 Context after patch:
 1 | /**
@@ -1097,3 +996,103 @@ Context after patch:
 [2026-04-05T16:37:35.482Z] iter=243 turn=10 INFO: Tool timing stats
 [2026-04-05T16:37:44.849Z] iter=243 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 243: predicted 8 turns, actual 10 turns, ratio 1.25**
 [2026-04-05T16:37:44.870Z] iter=243 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T16:37:44.902Z] iter=243 turn=10 INFO: Committed: 82d6bfe5 (20 in / 2771 out, cache: 12531 created, 83121 read)
+[2026-04-05T16:37:44.902Z] iter=243 turn=10 INFO: Restarting as iteration 244...
+[2026-04-05T16:37:45.100Z] iter=244 INFO: Cache restored: 51/51 entries (0 stale)
+[2026-04-05T16:37:45.102Z] iter=244 INFO: Turn budget: 19/25 (calibration=1.05x, predicted=15)
+[2026-04-05T16:37:45.103Z] iter=244 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T16:37:45.218Z] iter=244 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-05T16:37:45.219Z] iter=244 turn=1 INFO: Turn 1/25
+[2026-04-05T16:37:48.005Z] iter=244 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be changed.
+[2026-04-05T16:37:48.006Z] iter=244 turn=1 INFO: $ sed -n '315,350p' src/orchestrator.ts
+[2026-04-05T16:37:48.015Z] iter=244 turn=1 INFO: $ grep -n "getContextColor" src/tui.tsx | head -20
+[2026-04-05T16:37:48.025Z] iter=244 turn=1 INFO:   -> exit=0 (1292 chars)
+[2026-04-05T16:37:48.028Z] iter=244 turn=1 INFO:   -> exit=0 (110 chars)
+[2026-04-05T16:37:48.029Z] iter=244 turn=2 INFO: Turn 2/25
+[2026-04-05T16:37:50.189Z] iter=244 turn=2 INFO: $ sed -n '75,90p' src/tui.tsx
+[2026-04-05T16:37:50.193Z] iter=244 turn=2 INFO: $ grep -n "cumulativeIn\|sessionTokensIn\|COMPACT_TIER1" src/orchestrator.ts | head -20
+[2026-04-05T16:37:50.205Z] iter=244 turn=2 INFO:   -> exit=0 (522 chars)
+[2026-04-05T16:37:50.211Z] iter=244 turn=2 INFO:   -> exit=0 (1024 chars)
+[2026-04-05T16:37:50.211Z] iter=244 turn=3 INFO: Turn 3/25
+[2026-04-05T16:37:55.370Z] iter=244 turn=3 INFO: think: I have enough context. Let me execute both goals:
+
+1. Fix runAgentLoop to track cumulative input tokens - change `lastIn...
+[2026-04-05T16:37:55.371Z] iter=244 turn=4 INFO: Turn 4/25
+[2026-04-05T16:37:58.032Z] iter=244 turn=4 INFO: Agent: Both goals are clear. Executing now.
+
+**Goal 1**: Fix `onContextBudget` ratio in `runAgentLoop` — track cumulative input tokens.
+[2026-04-05T16:37:58.033Z] iter=244 turn=4 INFO: $ sed -n '280,340p' src/orchestrator.ts
+[2026-04-05T16:37:58.043Z] iter=244 turn=4 INFO:   -> exit=0 (2246 chars)
+[2026-04-05T16:37:58.043Z] iter=244 turn=5 INFO: Turn 5/25
+[2026-04-05T16:38:00.804Z] iter=244 turn=5 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:38:00.808Z] iter=244 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -3 +4 lines
+
+Context after patch:
+287 |   });
+288 |   const tools = registry.getDefinitions();
+289 | 
+290 |   let totalIn = 0, totalOut = 0;
+291 |   let lastInput = 0;
+292 |   let cumulativeIn = 0;
+293 |   let fullText = "";
+294 | 
+295 |   for (let round = 0; round < MAX_ROUNDS; round++) {
+296 |     // Use streaming API
+[2026-04-05T16:38:00.809Z] iter=244 turn=6 INFO: Turn 6/25
+[2026-04-05T16:38:05.917Z] iter=244 turn=6 INFO: Agent: **Goal 1**: IN PROGRESS (need to also update the cumulative tracking line)
+**Goal 2**: NOT STARTED
+
+Let me complete both now:
+[2026-04-05T16:38:05.919Z] iter=244 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:38:05.922Z] iter=244 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -9 +11 lines
+
+Context after patch:
+322 | 
+323 |     const finalMessage = await stream.finalMessage();
+324 | 
+325 |     lastInput = finalMessage.usage?.input_tokens ?? 0;
+326 |     totalIn += lastInput;
+327 |     cumulativeIn += lastInput;
+328 |     totalOut += finalMessage.usage?.output_tokens ?? 0;
+329 |     apiMessages.push({ role: "assistant", content: finalMessage.content });
+330 | 
+331 |     // Emit context budget ratio after each round so TUI footer updates live
+332 |     // Use cumulative input tokens (not per-call) so ratio reflects how full the context window is
+333 |     if (onContextBudget) {
+334 |       onContextBudget(cumulativeIn / COMPACT_TIER1_THRESHOLD);
+335 |     }
+336 | 
+337 |     // Mid-loop compaction: if context is growing large, compact between rounds
+338 |     if (onCompact && lastInput >= MICRO_COMPACT_THRESHOLD) {
+[2026-04-05T16:38:05.923Z] iter=244 turn=7 INFO: Turn 7/25
+[2026-04-05T16:38:11.546Z] iter=244 turn=7 INFO: Agent: Goal 1 DONE. Now Goal 2 — write the `getContextColor` tests:
+[2026-04-05T16:38:11.547Z] iter=244 turn=7 INFO: write_file: src/__tests__/context-color.test.ts (write)
+[2026-04-05T16:38:11.547Z] iter=244 turn=7 INFO:   -> ok: Created src/__tests__/context-color.test.ts (1031 chars)
+[2026-04-05T16:38:11.548Z] iter=244 turn=8 INFO: Turn 8/25
+[2026-04-05T16:38:13.699Z] iter=244 turn=8 INFO: $ npx tsc --noEmit 2>&1 && echo "TSC OK"
+[2026-04-05T16:38:13.705Z] iter=244 turn=8 INFO: $ npx vitest run src/__tests__/context-color.test.ts 2>&1
+[2026-04-05T16:38:14.707Z] iter=244 turn=8 INFO:   -> exit=0 (7 chars)
+[2026-04-05T16:38:15.485Z] iter=244 turn=8 INFO:   -> exit=0 (3170 chars)
+[2026-04-05T16:38:15.485Z] iter=244 turn=9 INFO: Turn 9/25
+[2026-04-05T16:38:19.739Z] iter=244 turn=9 INFO: Agent: Both goals done. TSC clean, 4 tests passing.
+[2026-04-05T16:38:19.739Z] iter=244 turn=9 INFO: save_memory: "[Engineer] Iteration 244"
+[2026-04-05T16:38:19.740Z] iter=244 turn=9 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T16:38:19.741Z] iter=244 turn=10 INFO: Turn 10/25
+[2026-04-05T16:38:29.159Z] iter=244 turn=10 INFO: Agent: Both goals are complete. Wrapping up now.
+[2026-04-05T16:38:29.160Z] iter=244 turn=10 INFO: write_file: goals.md (write)
+[2026-04-05T16:38:29.160Z] iter=244 turn=10 INFO:   -> ok: Updated goals.md (1191 chars, -6 lines delta)
+[2026-04-05T16:38:29.160Z] iter=244 turn=11 INFO: Turn 11/25
+[2026-04-05T16:38:30.838Z] iter=244 turn=11 INFO: $ npx tsc --noEmit 2>&1 && echo "TSC OK"
+[2026-04-05T16:38:31.775Z] iter=244 turn=11 INFO:   -> exit=0 (7 chars)
+[2026-04-05T16:38:31.775Z] iter=244 turn=12 INFO: Turn 12/25
+[2026-04-05T16:38:35.207Z] iter=244 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T16:38:35.209Z] iter=244 turn=12 INFO: RESTART signal
+[2026-04-05T16:38:35.209Z] iter=244 turn=12 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T16:38:36.123Z] iter=244 turn=12 INFO: Compilation OK
+[2026-04-05T16:38:41.984Z] iter=244 turn=12 INFO: Cache persisted: 51 entries to .autoagent-cache.json
+[2026-04-05T16:38:41.985Z] iter=244 turn=12 INFO: Tool timing: bash: 9x, avg=423ms, total=3805ms; write_file: 4x, avg=2ms, total=9ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T16:38:41.985Z] iter=244 turn=12 INFO: Tool timing stats
+[2026-04-05T16:38:47.180Z] iter=244 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 244: predicted 15 turns, actual 12 turns, ratio 0.80**
+[2026-04-05T16:38:54.586Z] iter=244 turn=12 INFO: Pre-commit review (985in/308out): ## Issues Found
+
+- **Logic bug in `cumulativeIn` context ratio**: Using cumulative input tokens across all rounds as a proxy for context window usage is semantically wrong. Each API call already inclu
