@@ -28,6 +28,9 @@ export interface TaskPlan {
 /** Called with each task and updated plan after every status change */
 export type TaskExecutor = (task: Task) => Promise<string>;
 
+/** Optional callback invoked when a task fails. Return a new plan to switch to it, or null to stop. */
+export type OnFailureCallback = (plan: TaskPlan, failedTask: Task) => Promise<TaskPlan | null>;
+
 const STATUS_ICON: Record<Task["status"], string> = {
   pending: "○",
   "in-progress": "◑",
@@ -76,23 +79,68 @@ export function formatPlan(plan: TaskPlan): string {
   return lines.join("\n");
 }
 
+const RESULT_MAX_CHARS = 500;
+
+/**
+ * Builds rich context for a task by including the overall plan goal
+ * and the results of all completed dependency tasks.
+ *
+ * @param plan    The full task plan
+ * @param task    The task about to be executed
+ * @returns       A formatted context string to send to the executor
+ */
+export function buildTaskContext(plan: TaskPlan, task: Task): string {
+  const lines: string[] = [`Overall goal: ${plan.goal}`];
+
+  // Collect results from dependency tasks that are done
+  const completedDeps = task.dependsOn
+    .map((depId) => plan.tasks.find((t) => t.id === depId))
+    .filter((t): t is Task => t !== undefined && t.status === "done" && t.result !== undefined);
+
+  if (completedDeps.length > 0) {
+    lines.push("");
+    lines.push("Completed prerequisite tasks:");
+    for (const dep of completedDeps) {
+      const rawResult = dep.result ?? "";
+      const summary =
+        rawResult.length > RESULT_MAX_CHARS
+          ? rawResult.slice(0, RESULT_MAX_CHARS) + "..."
+          : rawResult;
+      lines.push(`- [${dep.id}] ${dep.title}: ${summary}`);
+    }
+  }
+
+  lines.push("");
+  lines.push(`Your task: ${task.description}`);
+
+  return lines.join("\n");
+}
+
 /**
  * Executes a TaskPlan in dependency order using the provided executor.
- * Runs tasks sequentially. Stops on first failure.
+ * Runs tasks sequentially. Stops on first failure (or calls onFailure if provided).
  * Mutates task statuses and stores result/error on each task.
+ *
+ * @param plan       The plan to execute
+ * @param executor   Async function that runs a single task and returns a result string
+ * @param onUpdate   Optional callback after each status change
+ * @param onFailure  Optional callback when a task fails — return a new plan to switch to it
  */
 export async function executePlan(
   plan: TaskPlan,
   executor: TaskExecutor,
-  onUpdate?: (task: Task, plan: TaskPlan) => void
+  onUpdate?: (task: Task, plan: TaskPlan) => void,
+  onFailure?: OnFailureCallback
 ): Promise<TaskPlan> {
+  let currentPlan = plan;
+
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    const ready = getNextTasks(plan);
+    const ready = getNextTasks(currentPlan);
 
     if (ready.length === 0) {
       // Check if we're done or stuck
-      const allDone = plan.tasks.every(
+      const allDone = currentPlan.tasks.every(
         (t) => t.status === "done" || t.status === "failed"
       );
       if (!allDone) {
@@ -105,24 +153,33 @@ export async function executePlan(
     for (const task of ready) {
       // Mark in-progress
       task.status = "in-progress";
-      onUpdate?.(task, plan);
+      onUpdate?.(task, currentPlan);
 
       try {
         const result = await executor(task);
         task.status = "done";
         task.result = result;
-        onUpdate?.(task, plan);
+        onUpdate?.(task, currentPlan);
       } catch (err) {
         task.status = "failed";
         task.error = err instanceof Error ? err.message : String(err);
-        onUpdate?.(task, plan);
-        // Stop execution — dependent tasks can't run
-        return plan;
+        onUpdate?.(task, currentPlan);
+
+        if (onFailure) {
+          const newPlan = await onFailure(currentPlan, task);
+          if (newPlan) {
+            // Switch to new plan and continue execution
+            currentPlan = newPlan;
+            break; // Restart the while loop with the new plan
+          }
+        }
+        // No callback or returned null — stop execution
+        return currentPlan;
       }
     }
   }
 
-  return plan;
+  return currentPlan;
 }
 
 /**
@@ -195,6 +252,46 @@ Rules:
     tasks,
     createdAt: Date.now(),
   };
+}
+
+/**
+ * Creates a recovery plan when a task fails by calling createPlan with
+ * context about what succeeded and what failed.
+ *
+ * @param originalPlan    The original (partially-executed) plan
+ * @param failedTask      The task that failed
+ * @param projectContext  Project context string for the planner
+ * @returns               A new TaskPlan with fresh tasks
+ */
+export async function replanOnFailure(
+  originalPlan: TaskPlan,
+  failedTask: Task,
+  projectContext: string
+): Promise<TaskPlan> {
+  const completedTasks = originalPlan.tasks.filter((t) => t.status === "done");
+
+  const completedSummary =
+    completedTasks.length > 0
+      ? completedTasks
+          .map((t) => {
+            const resultSnippet = t.result
+              ? t.result.slice(0, RESULT_MAX_CHARS) + (t.result.length > RESULT_MAX_CHARS ? "..." : "")
+              : "(no output)";
+            return `- [${t.id}] ${t.title}: ${resultSnippet}`;
+          })
+          .join("\n")
+      : "(none)";
+
+  const recoveryRequest =
+    `RECOVERY PLAN REQUEST\n\n` +
+    `Original goal: ${originalPlan.goal}\n\n` +
+    `Tasks completed successfully:\n${completedSummary}\n\n` +
+    `Task that failed:\n- [${failedTask.id}] ${failedTask.title}: ${failedTask.description}\n` +
+    `  Error: ${failedTask.error ?? "unknown error"}\n\n` +
+    `Create a recovery plan to achieve the original goal given what has already been done. ` +
+    `Do not repeat tasks that already succeeded. Focus on recovering from the failure and completing the remaining work.`;
+
+  return createPlan(recoveryRequest, projectContext);
 }
 
 /** Default filename for persisted plans. */

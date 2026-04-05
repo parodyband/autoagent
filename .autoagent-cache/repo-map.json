@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775419073235,
+  "generatedAt": 1775419381789,
   "files": [
     {
       "path": "src/context-loader.ts",
@@ -1319,7 +1319,7 @@
           "from": "./init-command.js"
         }
       ],
-      "lastModified": 1775419062882.0312
+      "lastModified": 1775419306149.6353
     },
     {
       "path": "src/task-planner.ts",
@@ -1343,45 +1343,63 @@
           "exported": true
         },
         {
+          "name": "OnFailureCallback",
+          "kind": "type",
+          "line": 32,
+          "exported": true
+        },
+        {
           "name": "getNextTasks",
           "kind": "function",
-          "line": 42,
+          "line": 45,
           "exported": true
         },
         {
           "name": "formatPlan",
           "kind": "function",
-          "line": 55,
+          "line": 58,
+          "exported": true
+        },
+        {
+          "name": "buildTaskContext",
+          "kind": "function",
+          "line": 92,
           "exported": true
         },
         {
           "name": "executePlan",
           "kind": "function",
-          "line": 84,
+          "line": 129,
           "exported": true
         },
         {
           "name": "createPlan",
           "kind": "function",
-          "line": 131,
+          "line": 188,
+          "exported": true
+        },
+        {
+          "name": "replanOnFailure",
+          "kind": "function",
+          "line": 266,
           "exported": true
         },
         {
           "name": "PLAN_FILENAME",
           "kind": "const",
-          "line": 201,
+          "line": 298,
           "exported": true
         },
         {
           "name": "savePlan",
           "kind": "function",
-          "line": 206,
+          "line": 303,
           "exported": true
         },
         {
           "name": "loadPlan",
           "kind": "function",
-          "line": 215,
+          "line": 312,
           "exported": true
         }
       ],
@@ -1399,7 +1417,7 @@
           "from": "path"
         }
       ],
-      "lastModified": 1775419041729.5645
+      "lastModified": 1775419258858.946
     }
   ]
 }
