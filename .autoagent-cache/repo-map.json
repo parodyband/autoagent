@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775419427913,
+  "generatedAt": 1775420145543,
   "files": [
     {
       "path": "src/context-loader.ts",
@@ -774,145 +774,6 @@
       "lastModified": 1775396355226.5557
     },
     {
-      "path": "src/tui.tsx",
-      "exports": [
-        {
-          "name": "Message",
-          "kind": "interface",
-          "line": 67,
-          "exported": true
-        },
-        {
-          "name": "getContextColor",
-          "kind": "function",
-          "line": 94,
-          "exported": true
-        },
-        {
-          "name": "extractFileQuery",
-          "kind": "function",
-          "line": 108,
-          "exported": true
-        },
-        {
-          "name": "getFileSuggestions",
-          "kind": "function",
-          "line": 121,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [
-            "React",
-            "useState",
-            "useCallback",
-            "useEffect",
-            "useRef"
-          ],
-          "from": "react"
-        },
-        {
-          "names": [
-            "render",
-            "Box",
-            "Text",
-            "useInput",
-            "useApp"
-          ],
-          "from": "ink"
-        },
-        {
-          "names": [
-            "Spinner"
-          ],
-          "from": "ink-spinner"
-        },
-        {
-          "names": [
-            "TextInput"
-          ],
-          "from": "ink-text-input"
-        },
-        {
-          "names": [
-            "path"
-          ],
-          "from": "path"
-        },
-        {
-          "names": [
-            "fs"
-          ],
-          "from": "fs"
-        },
-        {
-          "names": [
-            "Orchestrator"
-          ],
-          "from": "./orchestrator.js"
-        },
-        {
-          "names": [
-            "listSessions",
-            "type SessionInfo"
-          ],
-          "from": "./session-store.js"
-        },
-        {
-          "names": [
-            "EditPlan"
-          ],
-          "from": "./architect-mode.js"
-        },
-        {
-          "names": [
-            "VirtualMessageList"
-          ],
-          "from": "./virtual-message-list.js"
-        },
-        {
-          "names": [
-            "undoLastCommit"
-          ],
-          "from": "./auto-commit.js"
-        },
-        {
-          "names": [
-            "buildRepoMap",
-            "fuzzySearch"
-          ],
-          "from": "./tree-sitter-map.js"
-        },
-        {
-          "names": [
-            "execSync"
-          ],
-          "from": "child_process"
-        },
-        {
-          "names": [
-            "runInit"
-          ],
-          "from": "./init-command.js"
-        },
-        {
-          "names": [
-            "buildExportContent"
-          ],
-          "from": "./export-helper.js"
-        },
-        {
-          "names": [
-            "shouldShowWelcome"
-          ],
-          "from": "./welcome.js"
-        }
-      ],
-      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775417242873.1667
-    },
-    {
       "path": "src/architect-mode.ts",
       "exports": [
         {
@@ -1452,6 +1313,194 @@
         }
       ],
       "lastModified": 1775419372896.4697
+    },
+    {
+      "path": "src/plan-commands.ts",
+      "exports": [
+        {
+          "name": "PlanCommandContext",
+          "kind": "interface",
+          "line": 19,
+          "exported": true
+        },
+        {
+          "name": "handlePlanCommand",
+          "kind": "function",
+          "line": 35,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "./task-planner.js"
+        },
+        {
+          "names": [],
+          "from": "./project-detector.js"
+        }
+      ],
+      "lastModified": 1775420094981.8403
+    },
+    {
+      "path": "src/tui.tsx",
+      "exports": [
+        {
+          "name": "Message",
+          "kind": "interface",
+          "line": 69,
+          "exported": true
+        },
+        {
+          "name": "getContextColor",
+          "kind": "function",
+          "line": 96,
+          "exported": true
+        },
+        {
+          "name": "extractFileQuery",
+          "kind": "function",
+          "line": 110,
+          "exported": true
+        },
+        {
+          "name": "getFileSuggestions",
+          "kind": "function",
+          "line": 123,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [
+            "React",
+            "useState",
+            "useCallback",
+            "useEffect",
+            "useRef"
+          ],
+          "from": "react"
+        },
+        {
+          "names": [
+            "render",
+            "Box",
+            "Text",
+            "useInput",
+            "useApp"
+          ],
+          "from": "ink"
+        },
+        {
+          "names": [
+            "Spinner"
+          ],
+          "from": "ink-spinner"
+        },
+        {
+          "names": [
+            "TextInput"
+          ],
+          "from": "ink-text-input"
+        },
+        {
+          "names": [
+            "path"
+          ],
+          "from": "path"
+        },
+        {
+          "names": [
+            "fs"
+          ],
+          "from": "fs"
+        },
+        {
+          "names": [
+            "Orchestrator"
+          ],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [
+            "listSessions",
+            "type SessionInfo"
+          ],
+          "from": "./session-store.js"
+        },
+        {
+          "names": [
+            "EditPlan"
+          ],
+          "from": "./architect-mode.js"
+        },
+        {
+          "names": [
+            "VirtualMessageList"
+          ],
+          "from": "./virtual-message-list.js"
+        },
+        {
+          "names": [
+            "undoLastCommit"
+          ],
+          "from": "./auto-commit.js"
+        },
+        {
+          "names": [
+            "buildRepoMap",
+            "fuzzySearch"
+          ],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [
+            "execSync"
+          ],
+          "from": "child_process"
+        },
+        {
+          "names": [
+            "runInit"
+          ],
+          "from": "./init-command.js"
+        },
+        {
+          "names": [
+            "buildExportContent"
+          ],
+          "from": "./export-helper.js"
+        },
+        {
+          "names": [
+            "shouldShowWelcome"
+          ],
+          "from": "./welcome.js"
+        },
+        {
+          "names": [
+            "Task",
+            "TaskPlan"
+          ],
+          "from": "./task-planner.js"
+        },
+        {
+          "names": [
+            "handlePlanCommand"
+          ],
+          "from": "./plan-commands.js"
+        }
+      ],
+      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
+      "lastModified": 1775420058267.8577
     }
   ]
 }
