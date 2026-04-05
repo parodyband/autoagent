@@ -1,66 +1,3 @@
-Context after patch:
-17 | import { compressToolOutput } from "./tool-output-compressor.js";
-18 | import { fingerprintRepo } from "./repo-context.js";
-19 | import { rankFiles } from "./file-ranker.js";
-20 | import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap } from "./tree-sitter-map.js";
-21 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
-22 | import { runVerification, formatVerificationResults } from "./verification.js";
-23 | import { createDefaultRegistry } from "./tool-registry.js";
-[2026-04-05T15:47:48.684Z] iter=216 turn=11 INFO: Turn 11/25
-[2026-04-05T15:47:50.479Z] iter=216 turn=11 INFO: Agent: Now replace the crude truncation in `buildSystemPrompt` with `truncateRepoMap`:
-[2026-04-05T15:47:50.481Z] iter=216 turn=11 INFO: $ sed -n '158,175p' src/orchestrator.ts
-[2026-04-05T15:47:50.503Z] iter=216 turn=11 INFO:   -> exit=0 (685 chars)
-[2026-04-05T15:47:50.504Z] iter=216 turn=12 INFO: Turn 12/25
-[2026-04-05T15:47:55.058Z] iter=216 turn=12 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:47:55.059Z] iter=216 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -6 +7 lines
-
-Context after patch:
-160 |   if (isSourceDir) {
-161 |     try {
-162 |       const rankedPaths = rankedFiles.map(f => f.path);
-163 |       const repoMap = buildRepoMap(workDir, rankedPaths);
-164 |       const ranked = rankSymbols(repoMap);
-165 |       const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 60, ranked });
-166 |       if (raw.length > 50) {
-167 |         // Truncate to 4000 token budget (~16K chars), keeping highest-ranked files first
-168 |         repoMapBlock = "\n\n" + truncateRepoMap(raw, 4000);
-169 |       }
-170 |     } catch {
-171 |       // Non-fatal
-172 |     }
-[2026-04-05T15:47:55.060Z] iter=216 turn=13 INFO: Turn 13/25
-[2026-04-05T15:47:58.101Z] iter=216 turn=13 INFO: Agent: Good. I've written code. Now I need to add tests, run tsc, and wrap up.
-[2026-04-05T15:47:58.102Z] iter=216 turn=13 INFO: write_file: src/__tests__/tree-sitter-map.test.ts (patch)
-[2026-04-05T15:47:58.104Z] iter=216 turn=13 INFO:   -> ok: Patched src/__tests__/tree-sitter-map.test.ts: -1 +1 lines
-
-Context after patch:
-341 | 
-342 | // ─── fuzzySearch ──────────────────────────────────────────────
-343 | 
-344 | import { fuzzySearch, truncateRepoMap } from "../tree-sitter-map.js";
-345 | 
-346 | describe("fuzzySearch", () => {
-347 |   const repoMap: import("../tree-sitter-map.js").RepoMap = {
-[2026-04-05T15:47:58.105Z] iter=216 turn=14 INFO: Turn 14/25
-[2026-04-05T15:48:23.699Z] iter=216 turn=14 INFO: write_file: src/__tests__/tree-sitter-map.test.ts (patch)
-[2026-04-05T15:48:23.701Z] iter=216 turn=14 INFO:   -> ok: Patched src/__tests__/tree-sitter-map.test.ts: -5 +134 lines
-
-Context after patch:
-399 |     expect(results[formatIdx].score).toBeGreaterThan(0.5);
-400 |   });
-401 | 
-402 |   it("empty query returns empty array", () => {
-403 |     expect(fuzzySearch(repoMap, "")).toEqual([]);
-404 |     expect(fuzzySearch(repoMap, "   ")).toEqual([]);
-405 |   });
-406 | });
-407 | 
-408 | // ─── rankSymbols (file-level sorting) ────────────────────────
-409 | 
-410 | describe("rankSymbols file-level sorting via formatRepoMap", () => {
-411 |   it("sorts files by aggregate score (highest first)", () => {
-412 |     const repoMap: RepoMap = {
-413 |       files: [
 414 |         {
 415 |           path: "src/low.ts",
 416 |           exports: [{ name: "rareFunc", kind: "function", line: 1, exported: true }],
@@ -1059,3 +996,213 @@ tsc clean. Memory and goals already written. Done.
 [2026-04-05T16:01:23.881Z] iter=223 turn=7 INFO: Tool timing stats
 [2026-04-05T16:01:28.868Z] iter=223 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 223: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T16:01:28.888Z] iter=223 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T16:01:28.920Z] iter=223 turn=7 INFO: Committed: 4c77f6cf (17 in / 3190 out, cache: 52625 created, 254669 read)
+[2026-04-05T16:01:28.920Z] iter=223 turn=7 INFO: Restarting as iteration 224...
+[2026-04-05T16:01:29.116Z] iter=224 INFO: Cache restored: 45/45 entries (0 stale)
+[2026-04-05T16:01:29.117Z] iter=224 INFO: Turn budget: 18/25 (calibration=1.00x, predicted=20)
+[2026-04-05T16:01:29.118Z] iter=224 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T16:01:29.220Z] iter=224 turn=1 INFO: Turn 1/25
+[2026-04-05T16:01:31.678Z] iter=224 turn=1 INFO: Agent: I'll start by reading the relevant files to understand the current implementation before making changes.
+[2026-04-05T16:01:31.679Z] iter=224 turn=1 INFO: $ cat src/tools/subagent.ts
+[2026-04-05T16:01:31.684Z] iter=224 turn=1 INFO: $ grep -n "totalIn\|totalOut\|cost\|token" src/orchestrator.ts | head -60
+[2026-04-05T16:01:31.693Z] iter=224 turn=1 INFO:   -> exit=0 (3729 chars)
+[2026-04-05T16:01:31.698Z] iter=224 turn=1 INFO:   -> exit=0 (1819 chars)
+[2026-04-05T16:01:31.699Z] iter=224 turn=2 INFO: Turn 2/25
+[2026-04-05T16:01:34.141Z] iter=224 turn=2 INFO: $ grep -n "subagent\|SubagentResult\|executeSubagent" src/orchestrator.ts | head -30
+[2026-04-05T16:01:34.146Z] iter=224 turn=2 INFO: $ grep -n "subagent\|SubagentResult\|executeSubagent\|ctx\.log\|tool_use\|tool_result" src/tools/tool-registry.ts | head -50
+[2026-04-05T16:01:34.161Z] iter=224 turn=2 INFO:   -> exit=0 (60 chars)
+[2026-04-05T16:01:34.161Z] iter=224 turn=2 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:01:34.162Z] iter=224 turn=3 INFO: Turn 3/25
+[2026-04-05T16:01:36.705Z] iter=224 turn=3 INFO: $ ls src/tools/
+[2026-04-05T16:01:36.714Z] iter=224 turn=3 INFO: $ grep -rn "subagent\|executeSubagent" src/ | grep -v "test\|spec" | head -30
+[2026-04-05T16:01:36.720Z] iter=224 turn=3 INFO:   -> exit=0 (105 chars)
+[2026-04-05T16:01:36.742Z] iter=224 turn=3 INFO:   -> exit=0 (1431 chars)
+[2026-04-05T16:01:36.743Z] iter=224 turn=4 INFO: Turn 4/25
+[2026-04-05T16:01:42.113Z] iter=224 turn=4 INFO: think: I have enough context. Let me identify exactly what I need to do:
+
+1. Sub-agent token cost tracking: In `src/tool-regist...
+[2026-04-05T16:01:42.115Z] iter=224 turn=5 INFO: Turn 5/25
+[2026-04-05T16:01:44.264Z] iter=224 turn=5 INFO: $ sed -n '180,215p' src/tool-registry.ts
+[2026-04-05T16:01:44.268Z] iter=224 turn=5 INFO: $ grep -n "model\|manualModel\|modelOverride" src/tui.tsx | head -40
+[2026-04-05T16:01:44.275Z] iter=224 turn=5 INFO:   -> exit=0 (1715 chars)
+[2026-04-05T16:01:44.279Z] iter=224 turn=5 INFO:   -> exit=0 (978 chars)
+[2026-04-05T16:01:44.279Z] iter=224 turn=6 INFO: Turn 6/25
+[2026-04-05T16:01:46.823Z] iter=224 turn=6 INFO: $ sed -n '417,445p' src/tui.tsx
+[2026-04-05T16:01:46.827Z] iter=224 turn=6 INFO: $ grep -n "ctx\.\|ToolContext\|addTokens\|onTokens" src/tool-registry.ts | head -30
+[2026-04-05T16:01:46.840Z] iter=224 turn=6 INFO:   -> exit=0 (1214 chars)
+[2026-04-05T16:01:46.845Z] iter=224 turn=6 INFO:   -> exit=0 (1869 chars)
+[2026-04-05T16:01:46.846Z] iter=224 turn=7 INFO: Turn 7/25
+[2026-04-05T16:01:51.023Z] iter=224 turn=7 INFO: Agent: **Goal 1 (Sub-agent token tracking)**: NOT STARTED  
+**Goal 2 (/model reset)**: NOT STARTED
+
+I have enough context. Let me now check the `ToolContext` interface and `setModel`/`getModel` to understand what's available, then implement both goals.
+[2026-04-05T16:01:51.024Z] iter=224 turn=7 INFO: $ sed -n '23,45p' src/tool-registry.ts && grep -n "setModel\|getModel\|modelOverride\|_model" src/orchestrator.ts | head -20
+[2026-04-05T16:01:51.049Z] iter=224 turn=7 INFO:   -> exit=0 (820 chars)
+[2026-04-05T16:01:51.050Z] iter=224 turn=8 INFO: Turn 8/25
+[2026-04-05T16:01:57.167Z] iter=224 turn=8 INFO: think: Now I have everything I need:
+
+1. **Sub-agent token tracking**: The `ToolContext` doesn't have a token accumulation call...
+[2026-04-05T16:01:57.167Z] iter=224 turn=9 INFO: Turn 9/25
+[2026-04-05T16:01:59.435Z] iter=224 turn=9 INFO: $ grep -n "ToolContext\|rootDir.*log\|createCtx\|ctx.*rootDir" src/orchestrator.ts | head -20
+[2026-04-05T16:01:59.446Z] iter=224 turn=9 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:01:59.446Z] iter=224 turn=10 INFO: Turn 10/25
+[2026-04-05T16:02:00.956Z] iter=224 turn=10 INFO: $ grep -n "ToolContext\|rootDir\|\.log\b" src/orchestrator.ts | head -20
+[2026-04-05T16:02:00.969Z] iter=224 turn=10 INFO:   -> exit=0 (28 chars)
+[2026-04-05T16:02:00.970Z] iter=224 turn=11 INFO: Turn 11/25
+[2026-04-05T16:02:03.105Z] iter=224 turn=11 INFO: $ sed -n '220,240p' src/orchestrator.ts
+[2026-04-05T16:02:03.116Z] iter=224 turn=11 INFO:   -> exit=0 (655 chars)
+[2026-04-05T16:02:03.116Z] iter=224 turn=12 INFO: Turn 12/25
+[2026-04-05T16:02:07.097Z] iter=224 turn=12 INFO: Agent: Now I have everything. Let me implement both goals:
+[2026-04-05T16:02:07.098Z] iter=224 turn=12 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-05T16:02:07.099Z] iter=224 turn=12 INFO:   -> ok: Patched src/tool-registry.ts: -6 +8 lines
+
+Context after patch:
+20 | 
+21 | // ─── Types ──────────────────────────────────────────────────
+22 | 
+23 | export interface ToolContext {
+24 |   rootDir: string;
+25 |   log: (msg: string) => void;
+26 |   /** Default timeout for this tool (from registry), in seconds */
+27 |   defaultTimeout?: number;
+28 |   /** Callback to accumulate sub-agent token usage into session totals */
+29 |   addTokens?: (tokensIn: number, tokensOut: number) => void;
+30 | }
+31 | 
+32 | export interface ToolResult {
+33 |   result: string;
+[2026-04-05T16:02:07.100Z] iter=224 turn=13 INFO: Turn 13/25
+[2026-04-05T16:02:12.645Z] iter=224 turn=13 INFO: Agent: I've only patched `ToolContext` so far. I need to finish both goals NOW.
+[2026-04-05T16:02:12.645Z] iter=224 turn=13 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-05T16:02:12.646Z] iter=224 turn=13 INFO:   -> ok: Patched src/tool-registry.ts: -5 +6 lines
+
+Context after patch:
+195 |     // If no model specified, use autoSelectModel to pick based on task description
+196 |     const selectedModel = model ?? autoSelectModel(task);
+197 |     ctx.log(`subagent [${selectedModel}${!model ? ' (auto)' : ''}]: ${task.slice(0, 100)}...`);
+198 |     const r = await executeSubagent(task, selectedModel, max_tokens);
+199 |     ctx.log(`  -> ${r.model} (${r.inputTokens}in/${r.outputTokens}out)`);
+200 |     ctx.addTokens?.(r.inputTokens, r.outputTokens);
+201 |     return {
+202 |       result: `[Sub-agent: ${selectedModel}${!model ? ' (auto-selected)' : ''} | ${r.inputTokens}+${r.outputTokens} tokens]\n\n${r.response}`,
+203 |     };
+204 |   }, { defaultTimeout: 60 });
+205 | 
+206 |   // ── web_search ───────────────────────────────────────
+[2026-04-05T16:02:12.647Z] iter=224 turn=14 INFO: Turn 14/25
+[2026-04-05T16:02:15.652Z] iter=224 turn=14 INFO: Agent: Now wire `addTokens` into the orchestrator's tool context:
+[2026-04-05T16:02:15.653Z] iter=224 turn=14 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:02:15.655Z] iter=224 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -5 +6 lines
+
+Context after patch:
+222 |     const tool = registry.get(name);
+223 |     if (!tool) return `Unknown tool: ${name}`;
+224 | 
+225 |     const ctx = {
+226 |       rootDir: workDir,
+227 |       log: () => {},
+228 |       defaultTimeout: tool.defaultTimeout,
+229 |       addTokens: onAddTokens,
+230 |     };
+231 | 
+232 |     onStatus?.(`Running ${name}...`);
+233 | 
+[2026-04-05T16:02:15.656Z] iter=224 turn=15 INFO: Turn 15/25
+[2026-04-05T16:02:17.866Z] iter=224 turn=15 INFO: Agent: Now find the function signature to add the `onAddTokens` parameter:
+[2026-04-05T16:02:17.866Z] iter=224 turn=15 INFO: $ sed -n '210,225p' src/orchestrator.ts
+[2026-04-05T16:02:17.874Z] iter=224 turn=15 INFO:   -> exit=0 (458 chars)
+[2026-04-05T16:02:17.874Z] iter=224 turn=16 INFO: Turn 16/25
+[2026-04-05T16:02:22.308Z] iter=224 turn=16 INFO: Agent: I need to finish this properly. Let me add `onAddTokens` parameter to `makeExecTool` and wire it in, then do `/model reset`, then tests + tsc.
+[2026-04-05T16:02:22.308Z] iter=224 turn=16 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:02:22.309Z] iter=224 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -6 +7 lines
+
+Context after patch:
+212 | 
+213 | // ─── Tool execution ───────────────────────────────────────────
+214 | 
+215 | function makeExecTool(
+216 |   registry: ReturnType<typeof createDefaultRegistry>,
+217 |   workDir: string,
+218 |   onToolCall?: OrchestratorOptions["onToolCall"],
+219 |   onStatus?: OrchestratorOptions["onStatus"],
+220 |   onAddTokens?: (tokensIn: number, tokensOut: number) => void,
+221 | ) {
+222 |   return async (name: string, input: Record<string, unknown>): Promise<string> => {
+223 |     const tool = registry.get(name);
+224 |     if (!tool) return `Unknown tool: ${name}`;
+[2026-04-05T16:02:22.309Z] iter=224 turn=17 INFO: Turn 17/25
+[2026-04-05T16:02:24.084Z] iter=224 turn=17 INFO: Agent: Let me finish the wiring and `/model reset`, then wrap up.
+[2026-04-05T16:02:24.084Z] iter=224 turn=17 INFO: $ grep -n "makeExecTool" src/orchestrator.ts
+[2026-04-05T16:02:24.093Z] iter=224 turn=17 INFO:   -> exit=0 (105 chars)
+[2026-04-05T16:02:24.093Z] iter=224 turn=18 INFO: Turn 18/25
+[2026-04-05T16:02:26.856Z] iter=224 turn=18 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:02:26.857Z] iter=224 turn=18 INFO:   -> ok: Patched src/orchestrator.ts: -1 +4 lines
+
+Context after patch:
+259 |   onText?: OrchestratorOptions["onText"],
+260 |   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
+261 | ): Promise<{ text: string; tokensIn: number; tokensOut: number }> {
+262 |   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
+263 |     totalIn += tIn;
+264 |     totalOut += tOut;
+265 |   });
+266 |   const tools = registry.getDefinitions();
+267 | 
+268 |   let totalIn = 0, totalOut = 0;
+[2026-04-05T16:02:26.858Z] iter=224 turn=19 INFO: Turn 19/25
+[2026-04-05T16:02:29.440Z] iter=224 turn=19 INFO: think: The `totalIn`/`totalOut` variables are declared after the `makeExecTool` call. That's a problem - they won't be in scope...
+[2026-04-05T16:02:29.441Z] iter=224 turn=20 INFO: Turn 20/25
+[2026-04-05T16:02:36.822Z] iter=224 turn=20 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:02:36.824Z] iter=224 turn=20 INFO:   -> ok: Patched src/tui.tsx: -16 +20 lines
+
+Context after patch:
+421 |         sonnet: "claude-sonnet-4-6",
+422 |         opus: "claude-opus-4-5",
+423 |       };
+424 |       if (!arg) {
+425 |         const current = orchestratorRef.current?.getModel() ?? "auto";
+426 |         setMessages(prev => [...prev, { role: "assistant", content: `Current model: ${current}` }]);
+427 |       } else if (arg === "reset" || arg === "auto") {
+428 |         orchestratorRef.current?.setModel(null);
+429 |         setCurrentModel("auto");
+430 |         setMessages(prev => [...prev, { role: "assistant", content: "Model reset to auto-routing (keyword-based)." }]);
+431 |       } else {
+432 |         const resolved = MODEL_ALIASES[arg] ?? (arg.startsWith("claude-") ? arg : null);
+433 |         if (!resolved) {
+434 |           setMessages(prev => [...prev, {
+435 |             role: "assistant",
+436 |             content: `Unknown model "${arg}". Use: haiku, sonnet, opus, reset, or a full model ID.`,
+437 |           }]);
+438 |         } else {
+439 |           orchestratorRef.current?.setModel(resolved);
+440 |           setCurrentModel(resolved);
+441 |           setMessages(prev => [...prev, { role: "assistant", content: `Switched to ${resolved}` }]);
+442 |         }
+443 |       }
+444 |       return;
+445 |     }
+446 |     if (trimmed === "/resume") {
+[2026-04-05T16:02:36.825Z] iter=224 turn=21 INFO: Turn 21/25
+[2026-04-05T16:02:38.739Z] iter=224 turn=21 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T16:02:39.679Z] iter=224 turn=21 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:02:39.679Z] iter=224 turn=22 INFO: Turn 22/25
+[2026-04-05T16:02:41.197Z] iter=224 turn=22 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -20
+[2026-04-05T16:02:49.010Z] iter=224 turn=22 INFO:   -> exit=0 (1597 chars)
+[2026-04-05T16:02:49.010Z] iter=224 turn=23 INFO: Turn 23/25
+[2026-04-05T16:02:55.170Z] iter=224 turn=23 INFO: save_memory: "[Engineer] Iteration 224"
+[2026-04-05T16:02:55.172Z] iter=224 turn=23 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T16:02:55.173Z] iter=224 turn=24 INFO: Turn 24/25
+[2026-04-05T16:03:03.318Z] iter=224 turn=24 INFO: write_file: goals.md (write)
+[2026-04-05T16:03:03.319Z] iter=224 turn=24 INFO:   -> ok: Updated goals.md (1161 chars, -4 lines delta)
+[2026-04-05T16:03:03.320Z] iter=224 turn=25 INFO: Turn 25/25
+[2026-04-05T16:03:05.224Z] iter=224 turn=25 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T16:03:05.225Z] iter=224 turn=25 INFO: RESTART signal
+[2026-04-05T16:03:05.226Z] iter=224 turn=25 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T16:03:06.180Z] iter=224 turn=25 INFO: Compilation OK
+[2026-04-05T16:03:11.935Z] iter=224 turn=25 INFO: Cache persisted: 44 entries to .autoagent-cache.json
+[2026-04-05T16:03:11.935Z] iter=224 turn=25 INFO: Tool timing: bash: 19x, avg=474ms, total=9001ms; write_file: 7x, avg=2ms, total=11ms; save_memory: 1x, avg=3ms, total=3ms; think: 3x, avg=1ms, total=2ms
+[2026-04-05T16:03:11.935Z] iter=224 turn=25 INFO: Tool timing stats
+[2026-04-05T16:03:17.532Z] iter=224 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 224: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T16:03:23.405Z] iter=224 turn=25 INFO: Pre-commit review (972in/262out): **Logic bug: `totalIn`/`totalOut` used before declaration**
+
+In `runAgentLoop`, the closure `(tIn, tOut) => { totalIn += tIn; totalOut += tOut; }` is passed to `makeExecTool` *before* `let totalIn = 0

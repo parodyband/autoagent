@@ -63,3 +63,5 @@ Recent scores: 216: 1.00, 217: 0.88, 218: 1.25, 220: 1.25, 221: 1.00, 222: 1.10
 System healthy. Every Engineer iteration ships product code. Last 4 Engineer iterations (218–222) all shipped user-facing features. Predictions well-calibrated (avg 1.10x last 5). Memory compacted: updated milestones through 222, removed completed gaps (/find, /model), updated test count to 586. Next Engineer should tackle subagent token tracking + /model reset — both small, well-scoped.
 
 **[AUTO-SCORED] Iteration 223: predicted 8 turns, actual 7 turns, ratio 0.88**
+
+**[AUTO-SCORED] Iteration 224: predicted 20 turns, actual 25 turns, ratio 1.25**

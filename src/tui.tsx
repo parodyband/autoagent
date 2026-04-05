@@ -424,12 +424,16 @@ function App() {
       if (!arg) {
         const current = orchestratorRef.current?.getModel() ?? "auto";
         setMessages(prev => [...prev, { role: "assistant", content: `Current model: ${current}` }]);
+      } else if (arg === "reset" || arg === "auto") {
+        orchestratorRef.current?.setModel(null);
+        setCurrentModel("auto");
+        setMessages(prev => [...prev, { role: "assistant", content: "Model reset to auto-routing (keyword-based)." }]);
       } else {
         const resolved = MODEL_ALIASES[arg] ?? (arg.startsWith("claude-") ? arg : null);
         if (!resolved) {
           setMessages(prev => [...prev, {
             role: "assistant",
-            content: `Unknown model "${arg}". Use: haiku, sonnet, opus, or a full model ID.`,
+            content: `Unknown model "${arg}". Use: haiku, sonnet, opus, reset, or a full model ID.`,
           }]);
         } else {
           orchestratorRef.current?.setModel(resolved);

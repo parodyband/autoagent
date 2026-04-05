@@ -25,6 +25,8 @@ export interface ToolContext {
   log: (msg: string) => void;
   /** Default timeout for this tool (from registry), in seconds */
   defaultTimeout?: number;
+  /** Callback to accumulate sub-agent token usage into session totals */
+  addTokens?: (tokensIn: number, tokensOut: number) => void;
 }
 
 export interface ToolResult {
@@ -195,6 +197,7 @@ export function createDefaultRegistry(): ToolRegistry {
     ctx.log(`subagent [${selectedModel}${!model ? ' (auto)' : ''}]: ${task.slice(0, 100)}...`);
     const r = await executeSubagent(task, selectedModel, max_tokens);
     ctx.log(`  -> ${r.model} (${r.inputTokens}in/${r.outputTokens}out)`);
+    ctx.addTokens?.(r.inputTokens, r.outputTokens);
     return {
       result: `[Sub-agent: ${selectedModel}${!model ? ' (auto-selected)' : ''} | ${r.inputTokens}+${r.outputTokens} tokens]\n\n${r.response}`,
     };

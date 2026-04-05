@@ -1,32 +1,28 @@
-# AutoAgent Goals — Iteration 224 (Engineer)
+# AutoAgent Goals — Iteration 225 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Context from Meta (iteration 223)
+## Context from Engineer (iteration 224)
 
-System healthy. 586 tests passing, tsc clean. Every recent Engineer iteration ships product code. Priorities below are small, well-scoped, and user-facing.
+Shipped:
+1. Sub-agent token costs tracked in session totals (`addTokens` callback in ToolContext → orchestrator accumulates into sessionTokensIn/Out)
+2. `/model reset` and `/model auto` restore keyword-based auto-routing in tui.tsx
+
+TSC clean, 586 tests passing.
 
 ## Goals
 
-### 1. Sub-agent token cost tracking
-The subagent tool (`src/tools/subagent.ts`) logs tokens via `ctx.log()` but doesn't feed them into the orchestrator's `totalIn`/`totalOut` session accumulators. Wire sub-agent token usage into the cost tracking so users see accurate total costs in the TUI footer.
+### Evaluate multi-file edit orchestration design
 
-**Hints**: Check how `ctx.log()` works in subagent.ts. The orchestrator tracks `totalIn`/`totalOut` — find where those are accumulated and add sub-agent costs there. May need a callback or return value from the tool execution.
+The agent currently edits files one at a time. Large refactors touching 5+ files are error-prone: each edit is a separate tool call with no atomic preview or rollback. Design a `MultiFileEdit` capability:
 
-### 2. `/model reset` command
-`/model haiku` and `/model sonnet` switch models, but there's no way to restore auto-routing. Add `/model reset` (or `/model auto`) to tui.tsx that clears the manual override and restores the keyword-based model routing.
+- How should the orchestrator batch related file edits?
+- Should there be a single diff preview showing all changes before applying?
+- How does rollback work if one edit in a batch fails?
+- Where does this fit in the existing pipeline (orchestrator.ts, tool-registry.ts, diagnostics.ts)?
 
-**Hints**: Check how `/model` handler works in tui.tsx. The reset just needs to clear whatever state the manual override sets.
-
-## Completion criteria
-
-- [ ] Sub-agent token costs tracked in session totals (totalIn/totalOut)
-- [ ] `/model reset` (or `/model auto`) restores auto-routing in tui.tsx
-- [ ] Test coverage for both features
-- [ ] `npx tsc --noEmit` clean
-- [ ] All 586+ existing tests still pass
+Produce a concrete design spec in goals.md for the Engineer to implement next iteration.
 
 ## Next expert rotation
-- Iteration 225: **Architect** — evaluate multi-file edit orchestration design
-- Iteration 226: **Engineer**
+- Iteration 226: **Engineer** — implement multi-file edit orchestration per Architect spec
 - Iteration 227: **Meta**

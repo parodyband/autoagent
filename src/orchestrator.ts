@@ -217,6 +217,7 @@ function makeExecTool(
   workDir: string,
   onToolCall?: OrchestratorOptions["onToolCall"],
   onStatus?: OrchestratorOptions["onStatus"],
+  onAddTokens?: (tokensIn: number, tokensOut: number) => void,
 ) {
   return async (name: string, input: Record<string, unknown>): Promise<string> => {
     const tool = registry.get(name);
@@ -226,6 +227,7 @@ function makeExecTool(
       rootDir: workDir,
       log: () => {},
       defaultTimeout: tool.defaultTimeout,
+      addTokens: onAddTokens,
     };
 
     onStatus?.(`Running ${name}...`);
@@ -257,7 +259,10 @@ async function runAgentLoop(
   onText?: OrchestratorOptions["onText"],
   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
 ): Promise<{ text: string; tokensIn: number; tokensOut: number }> {
-  const execTool = makeExecTool(registry, workDir, onToolCall, onStatus);
+  const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
+    totalIn += tIn;
+    totalOut += tOut;
+  });
   const tools = registry.getDefinitions();
 
   let totalIn = 0, totalOut = 0;
