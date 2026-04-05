@@ -32,6 +32,13 @@ interface Message {
   verificationPassed?: boolean;
 }
 
+interface FooterStats {
+  tokensIn: number;
+  tokensOut: number;
+  cost: number;
+  model: string;
+}
+
 // ─── Components ─────────────────────────────────────────────
 
 function Header({ model }: { model: string }) {
@@ -106,12 +113,49 @@ function MessageDisplay({ msg }: { msg: Message }) {
   );
 }
 
+/** Live streaming message — shown while the assistant is generating text. */
+function StreamingMessage({ buffer }: { buffer: string }) {
+  if (!buffer) return null;
+  return (
+    <Box flexDirection="column" marginTop={1}>
+      <Text>{buffer}</Text>
+      <Text color="magenta" dimColor>▌</Text>
+    </Box>
+  );
+}
+
+/** Footer bar showing cumulative token usage and cost. */
+function Footer({ stats }: { stats: FooterStats }) {
+  const formatK = (n: number) =>
+    n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
+
+  const modelLabel = stats.model.includes("haiku") ? "haiku" : "sonnet";
+  const costStr = stats.cost < 0.001 ? "<$0.001" : `~$${stats.cost.toFixed(3)}`;
+
+  return (
+    <Box marginTop={1} borderStyle="single" borderColor="gray" paddingX={1}>
+      <Text color="gray" dimColor>
+        Tokens: {formatK(stats.tokensIn)} in / {formatK(stats.tokensOut)} out
+        {"  |  "}Cost: {costStr}
+        {"  |  "}Model: {modelLabel}
+      </Text>
+    </Box>
+  );
+}
+
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("Initializing...");
   const [currentModel, setCurrentModel] = useState("sonnet");
+  const [streamBuffer, setStreamBuffer] = useState("");
+  const [footerStats, setFooterStats] = useState<FooterStats>({
+    tokensIn: 0,
+    tokensOut: 0,
+    cost: 0,
+    model: "sonnet",
+  });
   const orchestratorRef = useRef<Orchestrator | null>(null);
   const { exit } = useApp();
 
@@ -124,7 +168,10 @@ function App() {
         setMessages(prev => [...prev, tm]);
       },
       onStatus: (s) => setStatus(s),
-      onText: (_text) => setStatus("Responding..."),
+      onText: (delta) => {
+        // Append delta to streaming buffer for real-time display
+        setStreamBuffer(prev => prev + delta);
+      },
     });
     orchestratorRef.current = orch;
     orch.init().then(() => setStatus("")).catch(() => setStatus("Init failed"));
@@ -143,6 +190,7 @@ function App() {
     if (trimmed === "/clear") {
       orchestratorRef.current?.clearHistory();
       setMessages([]);
+      setFooterStats({ tokensIn: 0, tokensOut: 0, cost: 0, model: currentModel });
       setStatus("Cleared");
       setTimeout(() => setStatus(""), 1000);
       return;
@@ -165,11 +213,15 @@ function App() {
 
     setLoading(true);
     setStatus("Thinking...");
+    setStreamBuffer(""); // clear any leftover
 
     try {
       const result = await orchestratorRef.current!.send(trimmed);
 
       setCurrentModel(result.model);
+
+      // Flush streaming buffer → final message
+      setStreamBuffer("");
 
       if (result.text) {
         const assistantMsg: Message = {
@@ -181,15 +233,28 @@ function App() {
         };
         setMessages(prev => [...prev, assistantMsg]);
       }
+
+      // Update footer stats from orchestrator
+      const costInfo = orchestratorRef.current?.getCost();
+      if (costInfo) {
+        setFooterStats({
+          tokensIn: costInfo.tokensIn,
+          tokensOut: costInfo.tokensOut,
+          cost: costInfo.cost,
+          model: result.model,
+        });
+      }
+
       setStatus("");
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);
+      setStreamBuffer("");
       setMessages(prev => [...prev, { role: "assistant", content: `Error: ${errMsg}` }]);
       setStatus("");
     }
 
     setLoading(false);
-  }, [exit]);
+  }, [exit, currentModel]);
 
   return (
     <Box flexDirection="column" padding={1}>
@@ -202,6 +267,9 @@ function App() {
         ))}
       </Box>
 
+      {/* Live streaming text */}
+      {streamBuffer && <StreamingMessage buffer={streamBuffer} />}
+
       {/* Status / spinner */}
       {(loading || status) && (
         <Box marginTop={1}>
@@ -213,6 +281,9 @@ function App() {
           <Text color="gray"> {status}</Text>
         </Box>
       )}
+
+      {/* Footer: token + cost stats */}
+      <Footer stats={footerStats} />
 
       {/* Input */}
       {!loading && (

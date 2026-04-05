@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { routeModel, buildSystemPrompt } from "../orchestrator.js";
+import { routeModel, buildSystemPrompt, computeCost, MODEL_PRICING } from "../orchestrator.js";
 
 const MODEL_COMPLEX = "claude-sonnet-4-6";
 const MODEL_SIMPLE = "claude-haiku-4-5";
@@ -68,5 +68,62 @@ describe("buildSystemPrompt", () => {
     const prompt = buildSystemPrompt("/nonexistent/path", "");
     expect(typeof prompt).toBe("string");
     expect(prompt.length).toBeGreaterThan(0);
+  });
+});
+
+describe("computeCost", () => {
+  it("computes zero cost for zero tokens", () => {
+    expect(computeCost(MODEL_COMPLEX, 0, 0)).toBe(0);
+    expect(computeCost(MODEL_SIMPLE, 0, 0)).toBe(0);
+  });
+
+  it("computes correct cost for sonnet (1M in + 1M out)", () => {
+    // Sonnet: $3/MTok in, $15/MTok out
+    const cost = computeCost(MODEL_COMPLEX, 1_000_000, 1_000_000);
+    expect(cost).toBeCloseTo(18.0, 6);
+  });
+
+  it("computes correct cost for haiku (1M in + 1M out)", () => {
+    // Haiku: $0.80/MTok in, $4/MTok out
+    const cost = computeCost(MODEL_SIMPLE, 1_000_000, 1_000_000);
+    expect(cost).toBeCloseTo(4.8, 6);
+  });
+
+  it("scales linearly with token count", () => {
+    const cost1 = computeCost(MODEL_COMPLEX, 100_000, 10_000);
+    const cost2 = computeCost(MODEL_COMPLEX, 200_000, 20_000);
+    expect(cost2).toBeCloseTo(cost1 * 2, 9);
+  });
+
+  it("input tokens cost less than output tokens for all models", () => {
+    for (const model of [MODEL_COMPLEX, MODEL_SIMPLE]) {
+      const inCost = computeCost(model, 1_000_000, 0);
+      const outCost = computeCost(model, 0, 1_000_000);
+      expect(outCost).toBeGreaterThan(inCost);
+    }
+  });
+
+  it("uses fallback pricing for unknown models", () => {
+    // Should not throw; falls back to sonnet pricing
+    const cost = computeCost("unknown-model", 1_000_000, 0);
+    expect(cost).toBeGreaterThan(0);
+  });
+
+  it("MODEL_PRICING has entries for both models", () => {
+    expect(MODEL_PRICING[MODEL_COMPLEX]).toBeDefined();
+    expect(MODEL_PRICING[MODEL_SIMPLE]).toBeDefined();
+    const [sonnetIn, sonnetOut] = MODEL_PRICING[MODEL_COMPLEX];
+    const [haikuIn, haikuOut] = MODEL_PRICING[MODEL_SIMPLE];
+    expect(sonnetIn).toBe(3.0);
+    expect(sonnetOut).toBe(15.0);
+    expect(haikuIn).toBe(0.8);
+    expect(haikuOut).toBe(4.0);
+  });
+
+  it("typical session cost is in expected range", () => {
+    // 10K in + 2K out with sonnet
+    const cost = computeCost(MODEL_COMPLEX, 10_000, 2_000);
+    // $3 * 0.01 + $15 * 0.002 = $0.03 + $0.03 = $0.06
+    expect(cost).toBeCloseTo(0.06, 4);
   });
 });

@@ -7,6 +7,9 @@
  *   - Task decomposition for complex requests (shouldDecompose / decomposeTasks)
  *   - Model routing (haiku for simple, sonnet for complex)
  *   - Self-verification after code changes (runVerification)
+ *   - Streaming responses (onText called with deltas)
+ *   - Token cost tracking (getCost())
+ *   - Context compaction (summarize old messages at ~150K tokens)
  *   - Structured status callbacks for the UI
  */
 
@@ -23,6 +26,15 @@ const MODEL_COMPLEX = "claude-sonnet-4-6";
 const MODEL_SIMPLE = "claude-haiku-4-5";
 const MAX_TOKENS = 16384;
 const MAX_ROUNDS = 30;
+
+/** Token threshold at which we trigger context compaction (~150K). */
+const COMPACT_THRESHOLD = 150_000;
+
+/** Pricing per million tokens: [input, output] */
+export const MODEL_PRICING: Record<string, [number, number]> = {
+  [MODEL_COMPLEX]: [3.0, 15.0],
+  [MODEL_SIMPLE]: [0.8, 4.0],
+};
 
 // Keywords that indicate code-changing intent (use sonnet)
 const CODE_CHANGE_KEYWORDS = [
@@ -45,8 +57,8 @@ export interface OrchestratorOptions {
   onToolCall?: (name: string, input: string, result: string) => void;
   /** Called with status updates (e.g. "Indexing repo...") */
   onStatus?: (status: string) => void;
-  /** Called when the model produces text chunks */
-  onText?: (text: string) => void;
+  /** Called with streaming text deltas */
+  onText?: (delta: string) => void;
 }
 
 export interface OrchestratorResult {
@@ -55,6 +67,12 @@ export interface OrchestratorResult {
   tokensOut: number;
   model: string;
   verificationPassed?: boolean;
+}
+
+export interface CostInfo {
+  cost: number;
+  tokensIn: number;
+  tokensOut: number;
 }
 
 // ─── Model routing ────────────────────────────────────────────
@@ -76,6 +94,16 @@ export function routeModel(userMessage: string): string {
   if (codeScore > 0 || isLong) return MODEL_COMPLEX;
   if (readScore > 0 && codeScore === 0) return MODEL_SIMPLE;
   return MODEL_COMPLEX; // default to capable model
+}
+
+// ─── Cost calculator ──────────────────────────────────────────
+
+/**
+ * Compute USD cost for a given model and token counts.
+ */
+export function computeCost(model: string, tokensIn: number, tokensOut: number): number {
+  const [priceIn, priceOut] = MODEL_PRICING[model] ?? [3.0, 15.0];
+  return (tokensIn / 1_000_000) * priceIn + (tokensOut / 1_000_000) * priceOut;
 }
 
 // ─── Context builder ──────────────────────────────────────────
@@ -107,7 +135,7 @@ Rules:
 ${repoFingerprint}${fileList}`;
 }
 
-// ─── Simple Claude caller (for task decomposition) ────────────
+// ─── Simple Claude caller (for task decomposition / compaction) ─
 
 function makeSimpleCaller(client: Anthropic): (prompt: string) => Promise<string> {
   return async (prompt: string) => {
@@ -154,7 +182,7 @@ function makeExecTool(
   };
 }
 
-// ─── Agent loop ───────────────────────────────────────────────
+// ─── Streaming agent loop ─────────────────────────────────────
 
 async function runAgentLoop(
   client: Anthropic,
@@ -174,7 +202,8 @@ async function runAgentLoop(
   let fullText = "";
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
-    const response = await client.messages.create({
+    // Use streaming API
+    const stream = client.messages.stream({
       model,
       max_tokens: MAX_TOKENS,
       system: systemPrompt,
@@ -182,32 +211,44 @@ async function runAgentLoop(
       messages: apiMessages,
     });
 
-    totalIn += response.usage?.input_tokens ?? 0;
-    totalOut += response.usage?.output_tokens ?? 0;
-    apiMessages.push({ role: "assistant", content: response.content });
+    // Accumulate tool_use inputs (arrive as JSON deltas)
+    const toolInputBuffers: Record<string, string> = {};
 
-    for (const block of response.content) {
-      if (block.type === "text" && block.text.trim()) {
-        fullText += (fullText ? "\n" : "") + block.text;
-        onText?.(block.text);
+    for await (const event of stream) {
+      if (event.type === "content_block_start") {
+        if (event.content_block.type === "tool_use") {
+          toolInputBuffers[event.index] = "";
+        }
+      } else if (event.type === "content_block_delta") {
+        if (event.delta.type === "text_delta") {
+          onText?.(event.delta.text);
+          fullText += event.delta.text;
+        } else if (event.delta.type === "input_json_delta") {
+          toolInputBuffers[event.index] = (toolInputBuffers[event.index] ?? "") + event.delta.partial_json;
+        }
       }
     }
 
-    const toolUses = response.content.filter(
-      (b): b is Anthropic.ContentBlockParam & { type: "tool_use"; id: string; name: string; input: Record<string, unknown> } =>
-        b.type === "tool_use"
+    const finalMessage = await stream.finalMessage();
+
+    totalIn += finalMessage.usage?.input_tokens ?? 0;
+    totalOut += finalMessage.usage?.output_tokens ?? 0;
+    apiMessages.push({ role: "assistant", content: finalMessage.content });
+
+    const toolUses = finalMessage.content.filter(
+      (b): b is Anthropic.ToolUseBlock => b.type === "tool_use"
     );
 
     if (toolUses.length === 0) break;
 
     const results: Anthropic.ToolResultBlockParam[] = [];
     for (const tu of toolUses) {
-      const result = await execTool(tu.name, tu.input);
+      const result = await execTool(tu.name, tu.input as Record<string, unknown>);
       results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
     }
     apiMessages.push({ role: "user", content: results });
 
-    if (response.stop_reason === "end_turn") break;
+    if (finalMessage.stop_reason === "end_turn") break;
   }
 
   return { text: fullText, tokensIn: totalIn, tokensOut: totalOut };
@@ -223,6 +264,11 @@ export class Orchestrator {
   private apiMessages: Anthropic.MessageParam[] = [];
   private opts: OrchestratorOptions;
   private initialized = false;
+
+  // Cost tracking
+  private sessionTokensIn = 0;
+  private sessionTokensOut = 0;
+  private sessionCost = 0;
 
   constructor(opts: OrchestratorOptions) {
     this.opts = opts;
@@ -243,6 +289,9 @@ export class Orchestrator {
   /** Clear conversation history (but keep repo context). */
   clearHistory(): void {
     this.apiMessages = [];
+    this.sessionTokensIn = 0;
+    this.sessionTokensOut = 0;
+    this.sessionCost = 0;
   }
 
   /** Re-index the repo (after significant changes). */
@@ -251,12 +300,69 @@ export class Orchestrator {
     this.systemPrompt = buildSystemPrompt(this.opts.workDir, this.repoFingerprint);
   }
 
+  /** Get current session cost info. */
+  getCost(): CostInfo {
+    return {
+      cost: this.sessionCost,
+      tokensIn: this.sessionTokensIn,
+      tokensOut: this.sessionTokensOut,
+    };
+  }
+
+  /** Check if context compaction is needed. */
+  private shouldCompact(): boolean {
+    return this.sessionTokensIn >= COMPACT_THRESHOLD;
+  }
+
+  /**
+   * Compact conversation: summarize old messages, replace with summary.
+   * Keeps the last 2 exchanges (4 messages) intact.
+   */
+  private async compact(): Promise<void> {
+    this.opts.onStatus?.("Compacting context...");
+    const caller = makeSimpleCaller(this.client);
+
+    // Keep last 4 messages (2 exchanges) fresh
+    const keepCount = 4;
+    if (this.apiMessages.length <= keepCount) return;
+
+    const toSummarize = this.apiMessages.slice(0, -keepCount);
+    const toKeep = this.apiMessages.slice(-keepCount);
+
+    // Build a text representation for summarization
+    const convText = toSummarize.map(m => {
+      const role = m.role.toUpperCase();
+      const content = Array.isArray(m.content)
+        ? m.content
+            .map(b => (typeof b === "object" && "text" in b ? b.text : ""))
+            .filter(Boolean)
+            .join(" ")
+        : String(m.content);
+      return `${role}: ${content}`;
+    }).join("\n\n");
+
+    const summary = await caller(
+      `Summarize this conversation concisely, preserving key decisions, file paths, and results:\n\n${convText}`
+    );
+
+    this.apiMessages = [
+      { role: "user", content: `[Conversation summary]\n${summary}` },
+      { role: "assistant", content: "I have the context from the earlier conversation." },
+      ...toKeep,
+    ];
+
+    // Reset token counter after compaction (context is now much smaller)
+    this.sessionTokensIn = Math.min(this.sessionTokensIn, 20_000);
+    this.opts.onStatus?.("");
+  }
+
   /**
    * Process a user message through the full orchestration pipeline:
    * 1. Route to appropriate model
-   * 2. Optionally decompose complex tasks
-   * 3. Run agent loop
-   * 4. Verify if code was changed
+   * 2. Optionally compact context
+   * 3. Optionally decompose complex tasks
+   * 4. Run streaming agent loop
+   * 5. Verify if code was changed
    */
   async send(userMessage: string): Promise<OrchestratorResult> {
     if (!this.initialized) await this.init();
@@ -265,7 +371,12 @@ export class Orchestrator {
     const model = routeModel(userMessage);
     this.opts.onStatus?.(`Using ${model === MODEL_COMPLEX ? "Sonnet" : "Haiku"}...`);
 
-    // 2. Task decomposition for complex tasks
+    // 2. Context compaction if needed
+    if (this.shouldCompact()) {
+      await this.compact();
+    }
+
+    // 3. Task decomposition for complex tasks
     let effectiveMessage = userMessage;
     if (shouldDecompose(userMessage)) {
       this.opts.onStatus?.("Decomposing task...");
@@ -277,12 +388,12 @@ export class Orchestrator {
       }
     }
 
-    // 3. Add user message to history
+    // 4. Add user message to history
     this.apiMessages.push({ role: "user", content: effectiveMessage });
 
     this.opts.onStatus?.("Thinking...");
 
-    // 4. Run agent loop
+    // 5. Run streaming agent loop
     const { text, tokensIn, tokensOut } = await runAgentLoop(
       this.client,
       model,
@@ -295,7 +406,12 @@ export class Orchestrator {
       this.opts.onText,
     );
 
-    // 5. Self-verification (if code was likely changed)
+    // Accumulate cost
+    this.sessionTokensIn += tokensIn;
+    this.sessionTokensOut += tokensOut;
+    this.sessionCost += computeCost(model, tokensIn, tokensOut);
+
+    // 6. Self-verification (if code was likely changed)
     let verificationPassed: boolean | undefined;
     const looksLikeCodeChange = CODE_CHANGE_KEYWORDS.some(k =>
       userMessage.toLowerCase().includes(k)

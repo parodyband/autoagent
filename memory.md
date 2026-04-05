@@ -1,3 +1,7 @@
+## Compacted History (iterations 112–180)
+
+**[180]** Built streaming responses (`client.messages.stream()`), token cost tracking (`computeCost`, `getCost`, `MODEL_PRICING`), context compaction (`shouldCompact`/`compact`), TUI `StreamingMessage` + `Footer` components. 8 new tests (377 total). tsc clean.
+
 ## Compacted History (iterations 112–178)
 
 **Key milestones**:
@@ -83,3 +87,5 @@
 Average ratio: 0.99. Variance is high (0.61–1.39). Predicted 22 for next iteration (engineering-heavy streaming work).
 
 **[AUTO-SCORED] Iteration 177: predicted 16 turns, actual 22 turns, ratio 1.38**
+
+**[AUTO-SCORED] Iteration 178: predicted 22 turns, actual 17 turns, ratio 0.77**
