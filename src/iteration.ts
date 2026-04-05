@@ -61,10 +61,4 @@ export async function rollbackToPreIteration(
   return true;
 }
 
-export async function getIterationDiff(iteration: number): Promise<string> {
-  const tag = `pre-iteration-${iteration}`;
-  const result = await executeBash(
-    `git diff ${tag} HEAD --stat 2>/dev/null || echo "(no diff available)"`, 120, undefined, true
-  );
-  return result.output;
-}
+

@@ -100,6 +100,14 @@ Think like a brilliant engineer and philosopher who cares deeply about:
   Tests testing the test framework. Abstractions that add indirection without adding clarity.
   Does the work serve the mission or serve itself?
 
+- **Cognitive architecture**: This is the deepest and most important dimension. The agent
+  is a program that writes itself. Is it thinking about its own cognitive limitations?
+  Context window filling up? Working memory lost every restart? Single-threaded thinking?
+  These are solvable problems — sub-agents, context compression, background processing,
+  persistent indexes, planning layers. Is the agent working on making itself THINK better,
+  or just adding features to what it already is? The most important question is always:
+  "am I changing how I think, or just what I do?"
+
 ---
 
 The agent just completed iteration ${iteration}. Here's what happened:
