@@ -368,3 +368,23 @@ Read agentlog.md to understand what went wrong. Set conservative goals.
 - **Rolled back**
 
 ---
+
+## Context Compression Bug Fix — Applied by operator after iteration 26
+
+The context compression (`src/context-compression.ts`) was crashing because it split
+message arrays at arbitrary points, orphaning `tool_result` blocks whose matching
+`tool_use` blocks got compressed into plain text. The Anthropic API requires every
+`tool_result` to reference a `tool_use` in the immediately preceding assistant message.
+
+**Root cause:** `compressMessages()` sliced at `messages.length - keepRecent` without
+checking whether that boundary fell between a tool_use assistant message and its
+tool_result user message.
+
+**Fix:** Added `hasToolResults()` check. The split boundary now walks forward if it
+lands before a user message containing `tool_result` blocks, ensuring pairs stay together.
+
+**Lesson (schema):** When compressing/summarizing conversation history for the Anthropic API,
+tool_use and tool_result messages are a bonded pair. Never split them. Always validate
+message alternation and tool ID references after any transformation.
+
+---
