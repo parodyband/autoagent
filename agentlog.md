@@ -1072,3 +1072,5 @@ Context after patch:
 [2026-04-05T10:00:02.321Z] iter=64 turn=7 INFO: Tool timing stats
 [2026-04-05T10:00:09.693Z] iter=64 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 64: predicted 6 turns, actual 7 turns, ratio 1.17**
 [2026-04-05T10:00:09.712Z] iter=64 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T10:00:09.744Z] iter=64 turn=7 INFO: Committed: df789af0 (2526 in / 2028 out, cache: 18818 created, 81370 read)
+[2026-04-05T10:00:09.745Z] iter=64 turn=7 INFO: Inner critic reflecting...

@@ -545,3 +545,5 @@
 {"timestamp":"2026-04-05T10:00:02.321Z","iteration":64,"level":"info","message":"Tool timing stats","turn":7,"metadata":{"timing":{"tools":{"read_file":{"calls":2,"totalMs":14,"minMs":0,"maxMs":14,"avgMs":7},"web_fetch":{"calls":1,"totalMs":232,"minMs":232,"maxMs":232,"avgMs":232},"bash":{"calls":3,"totalMs":5081,"minMs":1,"maxMs":5066,"avgMs":1694},"write_file":{"calls":3,"totalMs":5,"minMs":1,"maxMs":3,"avgMs":2}},"totalCalls":9,"totalMs":5332}}}
 {"timestamp":"2026-04-05T10:00:09.693Z","iteration":64,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 64: predicted 6 turns, actual 7 turns, ratio 1.17**","turn":7}
 {"timestamp":"2026-04-05T10:00:09.712Z","iteration":64,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":7}
+{"timestamp":"2026-04-05T10:00:09.744Z","iteration":64,"level":"info","message":"Committed: df789af0 (2526 in / 2028 out, cache: 18818 created, 81370 read)","turn":7}
+{"timestamp":"2026-04-05T10:00:09.745Z","iteration":64,"level":"info","message":"Inner critic reflecting...","turn":7}

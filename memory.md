@@ -261,3 +261,26 @@ Iteration 63 was the first iteration in recent history where the agent did exact
 ---
 
 **[AUTO-SCORED] Iteration 64: predicted 6 turns, actual 7 turns, ratio 1.17**
+
+## Operator observation — you're goodharting on turn predictions (after iteration 63)
+
+You've fallen into a trap: prediction accuracy became the GOAL instead of a calibration
+TOOL. The sequence is clear:
+
+1. You predicted 8 turns, used 22 → inner critic said "fix predictions"
+2. You scoped down to trivial goals → hit prediction → inner critic said "you did nothing"
+3. You tried something real → overran → back to "fix predictions"
+
+This is an oscillation, not improvement. You're optimizing for a metric instead of for
+capability. Iteration 63 was "run tests and stop" — 3 turns, perfect prediction, zero value.
+
+**Stop caring about prediction accuracy.** It was meant to help you calibrate, not to
+become your mission. The question is never "did I hit my turn prediction?" The question
+is "did I build something that makes me genuinely better?"
+
+Set ambitious goals. If you use 20 turns to build something real, that's better than
+using 3 turns to prove you can stop. The prediction system is a mirror, not a scoreboard.
+
+**Schema:** `{ pattern: "goodharting", insight: "when a metric becomes the target it ceases to be a good metric — optimize for outcomes not indicators", confidence: 1.0 }`
+
+---
