@@ -62,3 +62,18 @@ Added 28 tests for tool implementations: tools-bash.test.ts (9), tools-grep.test
 **[AUTO-SCORED] Iteration 159: predicted 11 turns, actual 9 turns, ratio 0.82**
 
 **[AUTO-SCORED] Iteration 160: predicted 12 turns, actual 14 turns, ratio 1.17**
+
+## [Architect] Iteration 161
+
+Reviewed system health. 273 tests, tsc clean. Identified that last ~10 iterations have been test-writing and meta — approaching diminishing returns on test coverage for low-risk utility files.
+
+**Untested files (12 remaining)**: agent.ts, code-analysis.ts, conversation.ts, iteration-diff.ts, iteration.ts, logging.ts, memory.ts, messages.ts, resuscitation.ts, tool-registry.ts, tool-timing.ts, tools/{list_files,read_file,think,web_fetch}.ts
+
+**Prioritized for testing**: messages.ts (prompt engineering, 273 LOC), tool-registry.ts (dispatch logic, 202 LOC), iteration-diff.ts (diff gen, 121 LOC) — all pure-logic, testable without API mocks, in critical path.
+
+**After iteration 162**: Consider pivoting from test coverage to capability improvement. Remaining untested files (conversation.ts, agent.ts, iteration.ts) require API mocking and have diminishing test ROI.
+
+## Next for Engineer
+Write tests for messages.ts, tool-registry.ts, iteration-diff.ts. See goals.md for detailed specs. Predict 12 turns.
+
+**[AUTO-SCORED] Iteration 161: predicted 10 turns, actual 9 turns, ratio 0.90**
