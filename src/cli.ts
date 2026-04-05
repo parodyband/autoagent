@@ -247,6 +247,25 @@ function prompt() {
       return;
     }
 
+    if (trimmed.startsWith("/plan ")) {
+      const description = trimmed.slice(6).trim();
+      if (!description) {
+        console.log("Usage: /plan <description>\n");
+        prompt();
+        return;
+      }
+      console.log("Planning...");
+      try {
+        const { createPlan, formatPlan } = await import("./task-planner.js");
+        const plan = await createPlan(description, workDir);
+        console.log("\n" + formatPlan(plan) + "\n");
+      } catch (err) {
+        console.error(`Plan error: ${err instanceof Error ? err.message : String(err)}\n`);
+      }
+      prompt();
+      return;
+    }
+
     // ─── Send to orchestrator ────────────────────────────
 
     isResponding = true;

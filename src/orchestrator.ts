@@ -39,6 +39,7 @@ import { computeUnifiedDiff } from "./diff-preview.js";
 import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences } from "./context-loader.js";
 import { enhanceToolError } from "./tool-recovery.js";
 import { detectProject } from "./project-detector.js";
+import { detectLoop } from "./loop-detector.js";
 import * as fs from "fs";
 import { FileWatcher } from "./file-watcher.js";
 import { scoredPrune } from "./context-pruner.js";
@@ -151,6 +152,11 @@ export interface OrchestratorOptions {
    * Receives the count of changed files since last send().
    */
   onExternalFileChange?: (paths: string[]) => void;
+  /**
+   * Maximum consecutive loop detections before stopping the agent loop.
+   * Default: 2
+   */
+  maxConsecutiveLoops?: number;
 }
 
 export interface OrchestratorResult {
@@ -466,6 +472,7 @@ async function runAgentLoop(
   onContextBudget?: OrchestratorOptions["onContextBudget"],
   onFileWatch?: (event: "read" | "write", filePath: string) => void,
   signal?: AbortSignal,
+  maxConsecutiveLoops = 2,
 ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number; aborted?: boolean }> {
   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
     totalIn += tIn;
@@ -477,6 +484,7 @@ async function runAgentLoop(
   let lastInput = 0;
   let cumulativeIn = 0;
   let fullText = "";
+  let consecutiveLoopCount = 0;
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
     // Check abort signal before starting a new round
@@ -628,6 +636,23 @@ async function runAgentLoop(
     }
 
     apiMessages.push({ role: "user", content: results });
+
+    // Loop detection: check after each round
+    const loopCheck = detectLoop(apiMessages);
+    if (loopCheck.loopDetected) {
+      consecutiveLoopCount++;
+      const warning = `⚠️ Loop detected: ${loopCheck.description}. Try a different approach or ask the user for clarification.`;
+      onText?.(warning);
+      fullText += warning;
+      if (consecutiveLoopCount >= maxConsecutiveLoops) {
+        // Stop the agent loop after too many consecutive detections
+        break;
+      }
+      // Inject warning as a user message so the model sees it
+      apiMessages.push({ role: "user", content: warning });
+    } else {
+      consecutiveLoopCount = 0;
+    }
 
     if (finalMessage.stop_reason === "end_turn") break;
   }
@@ -1433,6 +1458,7 @@ export class Orchestrator {
       this.opts.onContextBudget,
       fileWatchCallback,
       this._abortController?.signal,
+      this.opts.maxConsecutiveLoops ?? 2,
     );
     const { text, tokensIn, tokensOut, lastInputTokens, aborted } = loopResult;
 
