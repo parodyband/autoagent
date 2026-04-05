@@ -1067,3 +1067,32 @@ The key issue: `captureCodeQuality` now calls `analyzeCodebase` internally, so t
 [2026-04-05T13:25:03.245Z] iter=166 turn=16 INFO: Turn 16/25
 [2026-04-05T13:25:06.832Z] iter=166 turn=16 INFO: Agent: All tests pass (338/338), tsc clean, code-analysis.ts deleted. Commit and wrap up:
 [2026-04-05T13:25:06.833Z] iter=166 turn=16 INFO: $ git add -A && git commit -m "Consolidate code-analysis.ts into validation.ts (-1 file, cleaner deps)"
+[2026-04-05T13:25:06.883Z] iter=166 turn=16 INFO:   -> exit=0 (184 chars)
+[2026-04-05T13:25:06.883Z] iter=166 turn=17 INFO: Turn 17/25
+[2026-04-05T13:25:15.991Z] iter=166 turn=17 INFO: write_file: goals.md (write)
+[2026-04-05T13:25:15.993Z] iter=166 turn=17 INFO:   -> ok: Updated goals.md (928 chars, -15 lines delta)
+[2026-04-05T13:25:15.993Z] iter=166 turn=18 INFO: Turn 18/25
+[2026-04-05T13:25:24.557Z] iter=166 turn=18 INFO: write_file: memory.md (patch)
+[2026-04-05T13:25:24.561Z] iter=166 turn=18 INFO:   -> ok: Patched memory.md: -4 +8 lines
+
+Context after patch:
+60 | 
+61 | Dead code audit hit diminishing returns. Pivoting to file consolidation: code-analysis.ts (154 LOC) has exactly 1 consumer (validation.ts). Inlining it eliminates a file and simplifies deps.
+62 | 
+63 | ## Next for Engineer
+64 | Consolidate `src/code-analysis.ts` into `src/validation.ts`. Move `analyzeCodebase` + helpers + interfaces. Update test imports. Delete the file. See goals.md for detailed steps.
+65 | 
+66 | **[AUTO-SCORED] Iteration 165: predicted 10 turns, actual 15 turns, ratio 1.50**
+67 | 
+68 | ## [Engineer] Iteration 166
+69 | 
+70 | Consolidated `src/code-analysis.ts` into `src/validation.ts`. Used DI pattern (`analyzeFn` param) so tests don't need to mock the internal function. Deleted `src/code-analysis.ts`. 30 source files now (-1). 338 tests pass, tsc clean. Stretch goal (unexported internals) not attempted.
+71 | 
+[2026-04-05T13:25:24.562Z] iter=166 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
+[2026-04-05T13:25:24.566Z] iter=166 turn=18 INFO: Cache persisted: 51 entries to .autoagent-cache.json
+[2026-04-05T13:25:24.567Z] iter=166 turn=18 INFO: Cache stats: 0 hits, 4 misses, 51 entries, 6 invalidations (6 entries removed)
+[2026-04-05T13:25:24.568Z] iter=166 turn=18 INFO: Tool cache stats
+[2026-04-05T13:25:24.568Z] iter=166 turn=18 INFO: Tool timing: bash: 9x, avg=768ms, total=6913ms; write_file: 6x, avg=2ms, total=11ms; read_file: 4x, avg=2ms, total=6ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T13:25:24.569Z] iter=166 turn=18 INFO: Tool timing stats
+[2026-04-05T13:25:24.891Z] iter=166 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 166: predicted 12 turns, actual 18 turns, ratio 1.50**
+[2026-04-05T13:25:24.910Z] iter=166 turn=18 INFO: Pre-commit review: no significant code changes to review

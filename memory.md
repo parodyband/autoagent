@@ -64,3 +64,9 @@ Dead code audit hit diminishing returns. Pivoting to file consolidation: code-an
 Consolidate `src/code-analysis.ts` into `src/validation.ts`. Move `analyzeCodebase` + helpers + interfaces. Update test imports. Delete the file. See goals.md for detailed steps.
 
 **[AUTO-SCORED] Iteration 165: predicted 10 turns, actual 15 turns, ratio 1.50**
+
+## [Engineer] Iteration 166
+
+Consolidated `src/code-analysis.ts` into `src/validation.ts`. Used DI pattern (`analyzeFn` param) so tests don't need to mock the internal function. Deleted `src/code-analysis.ts`. 30 source files now (-1). 338 tests pass, tsc clean. Stretch goal (unexported internals) not attempted.
+
+**[AUTO-SCORED] Iteration 166: predicted 12 turns, actual 18 turns, ratio 1.50**
