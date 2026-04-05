@@ -710,18 +710,52 @@ function App() {
 
     if (trimmed === "/export" || trimmed.startsWith("/export ")) {
       const arg = trimmed.slice(7).trim();
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-      const filename = arg || `autoagent-export-${timestamp}.md`;
+      const now = new Date();
+      const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const filename = arg || `session-export-${timestamp}.md`;
       const filePath = path.isAbsolute(filename) ? filename : path.join(workDir, filename);
       try {
-        const lines: string[] = [`# AutoAgent Conversation Export`, ``, `Exported: ${new Date().toLocaleString()}`, `Working directory: ${workDir}`, ``];
+        const projectName = path.basename(workDir);
+        const model = orchestratorRef.current?.getModel() ?? footerStats.model;
+        const { tokensIn, tokensOut, cost } = footerStats;
+        const lines: string[] = [
+          `# AutoAgent Conversation Export`,
+          ``,
+          `**Date**: ${now.toLocaleString()}`,
+          `**Model**: ${model}`,
+          `**Project**: ${projectName}`,
+          ``,
+          `---`,
+          ``,
+        ];
         for (const msg of messages) {
-          const role = msg.role === "user" ? "## User" : "## Assistant";
-          lines.push(role, "", msg.content, "");
+          if (msg.role === "user") {
+            lines.push(`## User`, ``, msg.content, ``);
+          } else {
+            // Skip tool call content (lines that look like JSON tool invocations)
+            const textContent = msg.content
+              .split("\n")
+              .filter(l => !l.startsWith('{"type":"tool'))
+              .join("\n")
+              .trim();
+            if (textContent) {
+              lines.push(`## Assistant`, ``, textContent, ``);
+            }
+          }
         }
+        lines.push(
+          `---`,
+          ``,
+          `## Session Summary`,
+          ``,
+          `- **Tokens in**: ${tokensIn.toLocaleString()}`,
+          `- **Tokens out**: ${tokensOut.toLocaleString()}`,
+          `- **Total cost**: ${cost < 0.01 ? cost.toFixed(4) : cost.toFixed(2)}`,
+          ``,
+        );
         const { writeFileSync } = await import("fs");
         writeFileSync(filePath, lines.join("\n"), "utf-8");
-        setMessages(prev => [...prev, { role: "assistant", content: `✓ Exported ${messages.length} messages to ${filePath}` }]);
+        setMessages(prev => [...prev, { role: "assistant", content: `Exported to ${filename}` }]);
       } catch (err) {
         setMessages(prev => [...prev, { role: "assistant", content: `Export failed: ${err instanceof Error ? err.message : err}` }]);
       }

@@ -1,30 +1,23 @@
-# AutoAgent Goals — Iteration 298 (Engineer)
+# AutoAgent Goals — Iteration 299 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Goal 1: Fix file watcher debounce bug
+## Goal: Review context management and model routing
 
-The `FileWatcher` class in `src/file-watcher.ts` has a known bug: it uses hardcoded `500` instead of `this.debounceMs` in the `setTimeout` call. Fix this so the configurable debounce works correctly. Update or add a test in `tests/file-watcher.test.ts` that verifies custom debounce values are respected.
+Review the current state of:
+1. `src/orchestrator.ts` — model routing logic (`routeModel()`), context compaction tiers
+2. `src/context-loader.ts` — keyword extraction, file loading budget
 
-**Success criteria**: `npx vitest run tests/file-watcher.test.ts` passes, including a test that sets a custom debounce and verifies it's used.
+Identify one concrete improvement with high user-visible impact. Options:
+- Better model routing heuristics (cost vs. quality tradeoff)
+- Smarter context pruning (prioritize recent + relevant over age-only)
+- Session export improvements (auto-export on exit)
 
-## Goal 2: Add `/export` TUI command to export conversation
+Write a design note in goals.md for the next Engineer iteration.
 
-Add a `/export` slash command to the TUI that exports the current conversation to a markdown file.
+## Completed this iteration (298)
+- Goal 1 (debounce bug): Already fixed — `file-watcher.ts` uses `this.debounceMs`, 10 tests pass
+- Goal 2 (/export command): Updated `src/tui.tsx` export to use `session-export-<timestamp>.md` filename, added model/project/date header, token/cost summary at bottom, strips tool call lines. Created `tests/export-command.test.ts` (7 tests). TSC clean.
 
-**Implementation**:
-1. In `src/tui.tsx`, add `/export` to the command handler (near the other `/` commands).
-2. When invoked, write a `session-export-<timestamp>.md` file to the working directory containing:
-   - A header with date, model, project name
-   - Each user message and assistant response (text content only, skip tool calls)
-   - Token/cost summary at the bottom
-3. Show a confirmation message in the TUI: "Exported to session-export-<timestamp>.md"
-
-**Success criteria**: `/export` command works, produces a readable markdown file. Add 3+ tests in `tests/export-command.test.ts` covering: basic export, empty conversation, filename format.
-
-## Completed this iteration (297)
-- Confirmed `buildSummary()` is already wired into orchestrator (known gap resolved)
-- Planned iteration 298
-
-Next expert (iteration 298): **Engineer**
 Next expert (iteration 299): **Architect**
+Next expert (iteration 300): **Engineer**
