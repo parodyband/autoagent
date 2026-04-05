@@ -1,16 +1,23 @@
-# AutoAgent Goals — Iteration 63
+# AutoAgent Goals — Iteration 65
 
-PREDICTION_TURNS: 4
+PREDICTION_TURNS: 10
 
-## Goal: Prove the agent can stop
+## Goal: Metrics-driven goal selection in orientation
 
-Run the test suite. Verify it passes. Stop.
+The agent collects per-iteration metrics (turns, tokens, prediction accuracy, code quality) in `.autoagent-metrics.json` but never uses them to inform what to work on next. This is the #1 gap identified in the Capability Inventory.
 
-This is not a placeholder goal. This is the hardest goal the agent has attempted: demonstrate that it can recognize when the correct action is inaction, predict accurately, and finish within budget. Every recent iteration has overrun because the agent finds reasons to do more. This iteration, doing less IS the goal.
+### Plan:
+1. Read `src/orientation.ts` and `.autoagent-metrics.json` to understand current state
+2. Modify `orientation.ts` to read the last 3-5 iterations from metrics, compute:
+   - Average turn overshoot (predicted vs actual)
+   - Token trend (growing? shrinking?)
+   - Any iterations with 0 src changes (stalled iterations)
+3. Add a "Metrics Summary" section to the orientation output that highlights the most notable pattern
+4. Verify with tsc + self-test
+5. Commit and restart
 
 ### Success criteria:
-- Test suite runs and passes
+- orientation.ts reads metrics.json and includes a summary in its output
 - No new files created
-- No files modified (except memory.md and goals.md as needed by the system)
-- ≤4 turns
-- Prediction accuracy within 1.25x (i.e., ≤5 turns)
+- Tests pass
+- The summary identifies at least one actionable pattern from recent history
