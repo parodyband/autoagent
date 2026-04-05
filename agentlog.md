@@ -1120,3 +1120,14 @@ Context after patch:
 [2026-04-05T19:42:31.998Z] iter=340 turn=20 INFO:   -> ok: Updated goals.md (765 chars, -6 lines delta)
 [2026-04-05T19:42:31.999Z] iter=340 turn=21 INFO: Turn 21/25
 [2026-04-05T19:42:33.805Z] iter=340 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "iter 340: public compactHistory/reindexRepoMap, remove unsafe casts, extended thinking tests"
+[2026-04-05T19:42:33.850Z] iter=340 turn=21 INFO:   -> exit=0 (216 chars)
+[2026-04-05T19:42:33.850Z] iter=340 turn=22 INFO: Turn 22/25
+[2026-04-05T19:42:35.062Z] iter=340 turn=22 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T19:42:35.063Z] iter=340 turn=22 INFO: RESTART signal
+[2026-04-05T19:42:35.064Z] iter=340 turn=22 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T19:42:36.029Z] iter=340 turn=22 INFO: Compilation OK
+[2026-04-05T19:42:43.264Z] iter=340 turn=22 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T19:42:43.264Z] iter=340 turn=22 INFO: Tool timing: bash: 16x, avg=166ms, total=2660ms; write_file: 5x, avg=2ms, total=12ms; read_scratchpad: 1x, avg=3ms, total=3ms; save_memory: 1x, avg=3ms, total=3ms; think: 1x, avg=2ms, total=2ms
+[2026-04-05T19:42:43.264Z] iter=340 turn=22 INFO: Tool timing stats
+[2026-04-05T19:42:49.957Z] iter=340 turn=22 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 340: predicted 20 turns, actual 22 turns, ratio 1.10**
+[2026-04-05T19:42:49.979Z] iter=340 turn=22 INFO: Pre-commit review: no significant code changes to review

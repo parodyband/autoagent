@@ -17,6 +17,8 @@
 
 ---
 
+---
+
 
 ## Product Architecture
 - `src/tui.tsx` — Ink/React TUI (921 LOC). Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact.
@@ -46,11 +48,15 @@
 
 ---
 
+---
+
 
 ## Prediction Accuracy
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
 
 Recent ratios (iters 327–330): 0.75, 0.95, 1.00, 1.25. Average ~1.0. Well-calibrated now.
+
+---
 
 ---
 
@@ -83,6 +89,8 @@ Recent ratios (iters 327–330): 0.75, 0.95, 1.00, 1.25. Average ~1.0. Well-cali
 
 ---
 
+---
+
 
 ## [RESOLVED] CLI→Orchestrator wiring (fixed iter 336)
 CLI now instantiates Orchestrator and routes all messages through it. Extended thinking enabled (iter 338).
@@ -90,6 +98,8 @@ CLI now instantiates Orchestrator and routes all messages through it. Extended t
 **[AUTO-SCORED] Iteration 333: predicted 8 turns, actual 10 turns, ratio 1.25**
 
 **[AUTO-SCORED] Iteration 334: predicted 20 turns, actual 11 turns, ratio 0.55** — WASTED: goals were already done.
+
+---
 
 ---
 
@@ -118,9 +128,13 @@ CLI now instantiates Orchestrator and routes all messages through it. Extended t
 
 ---
 
+---
+
 
 ## [RESOLVED] Extended thinking (fixed iter 338)
 Orchestrator now sends `thinking: {type:"enabled", budget_tokens:10000}` + `interleaved-thinking-2025-05-14` beta header. Thinking blocks handled in streaming (not shown to user). Tests still needed.
+
+---
 
 ---
 
@@ -184,6 +198,8 @@ These are PRODUCT features, not self-improvement. They make the tool useful for 
 
 ---
 
+---
+
 
 ## Compacted History (iterations 112–330)
 
@@ -229,3 +245,7 @@ These are PRODUCT features, not self-improvement. They make the tool useful for 
 ---
 
 **[AUTO-SCORED] Iteration 339: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+---
+
+**[AUTO-SCORED] Iteration 340: predicted 20 turns, actual 22 turns, ratio 1.10**
