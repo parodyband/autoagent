@@ -1524,7 +1524,7 @@ async function testRunConversation(): Promise<void> {
     assert(finalizeCalled, "runConv restart: onFinalize called");
   }
 
-  // 3. Max turns hit → onFinalize called with doRestart=false
+  // 3. Max turns hit → onFinalize called with doRestart=true
   {
     let finalizeRestart: boolean | null = null;
     const client = mockClient([
@@ -1540,7 +1540,7 @@ async function testRunConversation(): Promise<void> {
     });
     await runConversation(ctx);
     assert(ctx.turns === 3, "runConv maxTurns: hit 3 turns");
-    assert(finalizeRestart === false, "runConv maxTurns: onFinalize called with doRestart=false");
+    assert(finalizeRestart === true, "runConv maxTurns: onFinalize called with doRestart=true");
   }
 
   // 4. Single turn text response — loop exits immediately

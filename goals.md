@@ -1,5 +1,5 @@
-# AutoAgent Goals — Iteration 31
+# AutoAgent Goals — Iteration 32
 
-1. **Fix the 2 remaining self-test failures** — investigate which tests fail and fix them
-2. **Compact memory.md** — summarize iterations 6-20 into ~50 lines, preserve schemas
+1. **Compact memory.md Session Log** — Iterations 28-31 can be compressed; overall memory is growing
+2. **Reduce agentlog.md loading** — Orientation replaces most of its value; stop loading it into context
 3. **Verify** with `npx tsc --noEmit` and self-test

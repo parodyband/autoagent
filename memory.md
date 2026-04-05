@@ -5,6 +5,7 @@ Read this carefully at the start of every iteration. Write here thoughtfully at 
 
 ---
 
+
 ## Architecture
 
 Stable facts about this codebase. Rarely changes. Do NOT compact this section.
@@ -51,9 +52,12 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
-### Compacted History (Iterations 0–27)
+
+### Compacted History
 
 **Iteration 0** — Bootstrap. Verified all tools. Git initialized.
 
@@ -101,30 +105,22 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 **Iteration 27** — Test assertion fix post-boundary repair. Very lean (~5 turns).
 
-### Iteration 28 — Orientation Module (2026-04-05)
-
+**Iteration 28 — Orientation Module (2026-04-05)**
 Created `src/orientation.ts` — diffs HEAD~1 at iteration start to show what changed. `orient()` + `formatOrientation()`. Truncates long diffs to avoid context bloat. 6 new tests.
 
-### Iteration 29 — Orientation Integration Verified (2026-04-05)
-
+**Iteration 29 — Orientation Integration Verified (2026-04-05)**
 Confirmed orientation was integrated into agent.ts by operator. `orient()` runs at iteration start, feeds into `buildInitialMessage()` as first section. All tests pass.
 
----
-
-### Iteration 30 — Memory Compaction + Dashboard Fix (2026-04-05)
-
+**Iteration 30 — Memory Compaction + Dashboard Fix (2026-04-05)**
 Compacted memory.md from ~400→120 lines via Haiku sub-agent ($0.001). Fixed dashboard.ts broken import — `scripts/iteration-diff.ts` was deleted; replaced with inline stub types and removed the function call. All tests pass.
-
 **Schema:** After deleting a module, grep for all imports of it across the codebase. Dashboard/scripts outside `src/` are easy to miss since they're not in tsconfig.
 
+**Iteration 30 — iteration-diff module (2026-04-05)**
+Created `src/iteration-diff.ts` with `getIterationCommits()`, `computeDiffStats()`, `getAllIterationDiffs()`. Added import to self-test.ts. tsc clean, vitest 23/23 pass. Self-test has 2 failures (pre-existing, not from this change — need to investigate next iter). Memory compaction goal deferred.
+**Next:** Compact memory.md, reduce agentlog.md loading.
+
 ---
 
-
-### Iteration 30 — iteration-diff module (2026-04-05)
-
-Created `src/iteration-diff.ts` with `getIterationCommits()`, `computeDiffStats()`, `getAllIterationDiffs()`. Added import to self-test.ts. tsc clean, vitest 23/23 pass. Self-test has 2 failures (pre-existing, not from this change — need to investigate next iter). Memory compaction goal deferred.
-
-**Next:** Fix the 2 remaining self-test failures, then compact memory.md.
 
 ## Iteration 28 — post-mortem (operator fix)
 
@@ -135,5 +131,16 @@ update the test. TSC passed fine — the pre-commit self-test blocked the restar
 **Schema:** `{ pattern: "hardcoded-counts-in-tests", approach: "NEVER hardcode tool/test counts — use >= or check dynamically. When adding to a registry, grep for hardcoded counts in tests.", confidence: 1.0 }`
 
 **Fix applied:** Changed 7→8 in self-test.ts. All 461 tests pass.
+
+---
+
+---
+
+
+### Iteration 31 — Test fix for operator's conversation.ts change (2026-04-05)
+
+Operator changed `runConversation` so both max-turns and "break" paths call `onFinalize(ctx, true)` (was `false` for max-turns). Updated self-test assertion to match: `doRestart === true`. All 461 tests pass.
+
+**Schema:** When operator changes behavior in a diff, grep self-test for the old expected values. Test assertions must track production behavior.
 
 ---
