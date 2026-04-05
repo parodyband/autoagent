@@ -20,6 +20,12 @@ import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decompos
 import { runVerification, formatVerificationResults } from "./verification.js";
 import { createDefaultRegistry } from "./tool-registry.js";
 import { getProjectMemoryBlock } from "./project-memory.js";
+import {
+  initSession,
+  saveMessage,
+  loadSession,
+  cleanOldSessions,
+} from "./session-store.js";
 
 // ─── Constants ────────────────────────────────────────────────
 
@@ -60,6 +66,8 @@ export interface OrchestratorOptions {
   onStatus?: (status: string) => void;
   /** Called with streaming text deltas */
   onText?: (delta: string) => void;
+  /** If provided, resume an existing session instead of creating a new one */
+  resumeSessionPath?: string;
 }
 
 export interface OrchestratorResult {
@@ -274,6 +282,9 @@ export class Orchestrator {
   private sessionTokensOut = 0;
   private sessionCost = 0;
 
+  /** Path to current session's JSONL file */
+  sessionPath: string = "";
+
   constructor(opts: OrchestratorOptions) {
     this.opts = opts;
     this.client = new Anthropic();
@@ -286,8 +297,33 @@ export class Orchestrator {
     this.opts.onStatus?.("Indexing repo...");
     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
     this.systemPrompt = buildSystemPrompt(this.opts.workDir, this.repoFingerprint);
+
+    // Session persistence: resume or create new
+    if (this.opts.resumeSessionPath) {
+      this.sessionPath = this.opts.resumeSessionPath;
+      this.apiMessages = loadSession(this.sessionPath);
+    } else {
+      this.sessionPath = initSession(this.opts.workDir);
+    }
+
+    // Clean up old sessions non-blocking
+    setImmediate(() => cleanOldSessions(this.opts.workDir));
+
     this.initialized = true;
     this.opts.onStatus?.("");
+  }
+
+  /**
+   * Resume an existing session by loading its history.
+   * Can be called after init() to switch sessions.
+   */
+  resumeSession(sessionPath: string): void {
+    this.sessionPath = sessionPath;
+    this.apiMessages = loadSession(sessionPath);
+    // Reset cost tracking to reflect reloaded context
+    this.sessionTokensIn = 0;
+    this.sessionTokensOut = 0;
+    this.sessionCost = 0;
   }
 
   /** Clear conversation history (but keep repo context). */
@@ -392,8 +428,10 @@ export class Orchestrator {
       }
     }
 
-    // 4. Add user message to history
-    this.apiMessages.push({ role: "user", content: effectiveMessage });
+    // 4. Add user message to history and persist
+    const userMsg: Anthropic.MessageParam = { role: "user", content: effectiveMessage };
+    this.apiMessages.push(userMsg);
+    if (this.sessionPath) saveMessage(this.sessionPath, userMsg);
 
     this.opts.onStatus?.("Thinking...");
 
@@ -409,6 +447,12 @@ export class Orchestrator {
       this.opts.onStatus,
       this.opts.onText,
     );
+
+    // Persist assistant reply (last assistant message in history)
+    if (this.sessionPath && text) {
+      const assistantMsg: Anthropic.MessageParam = { role: "assistant", content: text };
+      saveMessage(this.sessionPath, assistantMsg);
+    }
 
     // Accumulate cost
     this.sessionTokensIn += tokensIn;

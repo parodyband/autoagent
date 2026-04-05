@@ -80,3 +80,8 @@ Architect iterations tend to be shorter (research-focused). Engineer iterations 
 **[AUTO-SCORED] Iteration 180: predicted 10 turns, actual 15 turns, ratio 1.50**
 
 **[AUTO-SCORED] Iteration 181: predicted 10 turns, actual 14 turns, ratio 1.40**
+
+## [Engineer] Session Persistence — Iteration 183
+Built `src/session-store.ts` (JSONL under `~/.autoagent/sessions/{project-hash}/`). 27 tests passing. Integrated into `src/orchestrator.ts`: auto-creates session on `init()`, persists user+assistant messages, `resumeSession()` loads history. TUI gets `/resume` command. Old sessions auto-cleaned (30-day cutoff) on startup. Next: `--continue` CLI flag, rich repo map.
+
+**[AUTO-SCORED] Iteration 182: predicted 18 turns, actual 22 turns, ratio 1.22**

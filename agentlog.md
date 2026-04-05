@@ -1,152 +1,3 @@
-220 |     t1 = Math.max(1, Math.round(predictedBudget * 0.15));
-221 |     t2 = Math.max(t1 + 1, Math.round(predictedBudget * 0.32));
-222 |     t3 = Math.max(t2 + 1, Math.round(predictedBudget * 0.60));
-223 |     t4 = Math.max(t3 + 1, Math.round(predictedBudget * 0.80));
-224 |   } else {
-225 |     // Hardcoded fallback schedule (backward compat)
-226 |     t1 = 4;
-227 |     t2 = 8;
-228 |     t3 = 15;
-229 |     t4 = 20;
-230 |   }
-231 | 
-232 |   if (turn === t1) {
-233 |     return (
-234 |       `SYSTEM: Early checkpoint — Turn ${turn}/${cap}. ` +
-235 |       `You've used ${turn} turn${turn === 1 ? "" : "s"}. Have you started producing a deliverable yet (writing/patching a file that's in your goals)? ` +
-236 |       "If you've only been reading, exploring, or thinking — STOP exploring and start writing. " +
-237 |       "The #1 source of waste is unfocused upfront exploration: reading files you won't use, " +
-238 |       "running probes that fail, gathering context beyond what your deliverables require. " +
-239 |       "State your deliverables and start producing them NOW."
-240 |     );
-241 |   }
-242 |   if (turn === t2) {
-243 |     return (
-244 |       `SYSTEM: Progress checkpoint — Turn ${turn}/${cap}. ` +
-245 |       "Review your goals.md. State status of each goal: DONE, IN PROGRESS, or NOT STARTED. " +
-246 |       "If all goals are DONE, write memory, update goals, run `npx tsc --noEmit`, and `echo \"AUTOAGENT_RESTART\"`. " +
-247 |       `If goals remain, briefly state what's left and continue — but plan to finish by turn ${t3}.` +
-248 |       metricsBlock
-249 |     );
-250 |   }
-251 |   if (turn === t3) {
-252 |     return (
-253 |       `SYSTEM: Progress checkpoint — Turn ${turn}/${cap}. Past halfway. ` +
-254 |       "STOP. What have you actually changed in src/ this iteration? " +
-255 |       "If the answer is 'nothing' or 'only bookkeeping', you are in a drift loop. " +
-256 |       "Begin wrapping up NOW: write memory, update goals, commit. " +
-257 |       "Do NOT start new work after this point." +
-258 |       metricsBlock
-259 |     );
-260 |   }
-261 |   if (turn === t4) {
-262 |     return (
-263 |       `SYSTEM: FINAL WARNING — Turn ${turn}/${cap}. Hard stop in ${cap - turn} turns. ` +
-264 |       "STOP ALL WORK. Write memory. Update goals. Run `npx tsc --noEmit`. `echo \"AUTOAGENT_RESTART\"`. " +
-265 |       `Every turn past ${turn} is wasted money. You will be cut off at ${cap}.` +
-266 |       metricsBlock
-267 |     );
-268 |   }
-269 |   return null;
-270 | }
-271 | 
-272 | // ─── Turn limit nudges ──────────────────────────────────────
-273 | 
-[2026-04-05T13:43:15.049Z] iter=174 turn=8 INFO: Turn 8/25
-[2026-04-05T13:43:18.939Z] iter=174 turn=8 INFO: Agent: Now update `conversation.ts` to pass the budget info:
-[2026-04-05T13:43:18.939Z] iter=174 turn=8 INFO: write_file: src/conversation.ts (patch)
-[2026-04-05T13:43:18.940Z] iter=174 turn=8 INFO:   -> ok: Patched src/conversation.ts: -1 +1 lines
-
-Context after patch:
-375 |     totalCalls,
-376 |     turns: ctx.turns,
-377 |   };
-378 |   const checkpoint = progressCheckpoint(ctx.turns, ctx.predictedTurns, ctx.maxTurns, cogMetrics);
-379 |   if (checkpoint) ctx.messages.push({ role: "user", content: checkpoint });
-380 | 
-381 |   const nudge = turnLimitNudge(turnsLeft);
-[2026-04-05T13:43:18.941Z] iter=174 turn=9 INFO: Turn 9/25
-[2026-04-05T13:43:43.429Z] iter=174 turn=9 INFO: Agent: Goal status:
-- messages.ts updated: DONE
-- conversation.ts updated: DONE  
-- messages.test.ts updated: IN PROGRESS
-
-Now update the tests:
-[2026-04-05T13:43:43.430Z] iter=174 turn=9 INFO: write_file: src/__tests__/messages.test.ts (patch)
-[2026-04-05T13:43:43.431Z] iter=174 turn=9 INFO:   -> ok: Patched src/__tests__/messages.test.ts: -53 +144 lines
-
-Context after patch:
-164 |   });
-165 | });
-166 | 
-167 | // ─── progressCheckpoint ──────────────────────────────────────
-168 | 
-169 | describe("progressCheckpoint", () => {
-170 |   // ── Fallback (no budget) ──────────────────────────────────
-171 |   it("returns null for non-checkpoint turns (no budget)", () => {
-172 |     expect(progressCheckpoint(1)).toBeNull();
-173 |     expect(progressCheckpoint(5)).toBeNull();
-174 |     expect(progressCheckpoint(10)).toBeNull();
-175 |     expect(progressCheckpoint(12)).toBeNull();
-176 |   });
-177 | 
-178 |   it("returns early checkpoint at turn 4 (no budget)", () => {
-179 |     const result = progressCheckpoint(4);
-180 |     expect(result).not.toBeNull();
-181 |     expect(result).toContain("4");
-182 |   });
-183 | 
-184 |   it("returns checkpoint at turn 8 (no budget)", () => {
-185 |     const result = progressCheckpoint(8);
-186 |     expect(result).not.toBeNull();
-187 |     expect(result).toContain("8");
-188 |   });
-189 | 
-190 |   it("returns checkpoint at turn 15 (no budget)", () => {
-191 |     const result = progressCheckpoint(15);
-192 |     expect(result).not.toBeNull();
-193 |     expect(result).toContain("15");
-194 |   });
-195 | 
-196 |   it("returns FINAL WARNING at turn 20 (no budget)", () => {
-197 |     const result = progressCheckpoint(20);
-198 |     expect(result).not.toBeNull();
-199 |     expect(result).toContain("20");
-200 |     expect(result).toContain("FINAL");
-201 |   });
-202 | 
-203 |   it("includes cognitive metrics block when provided (no budget)", () => {
-204 |     const metrics = {
-205 |       inputTokens: 8000,
-206 |       outputTokens: 4000,
-207 |       readCalls: 5,
-208 |       writeCalls: 2,
-209 |       totalCalls: 7,
-210 |       turns: 8,
-211 |     };
-212 |     const result = progressCheckpoint(8, null, undefined, metrics);
-213 |     expect(result).toContain("Cognitive metrics");
-214 |   });
-215 | 
-216 |   it("omits metrics block when not provided (no budget)", () => {
-217 |     const result = progressCheckpoint(8);
-218 |     expect(result).not.toContain("Cognitive metrics");
-219 |   });
-220 | 
-221 |   // ── Budget 14 ─────────────────────────────────────────────
-222 |   // t1=round(14*0.15)=2, t2=max(3,round(14*0.32))=max(3,4)=4
-223 |   // t3=max(5,round(14*0.60))=max(5,8)=8, t4=max(9,round(14*0.80))=max(9,11)=11
-224 |   it("budget 14: early checkpoint at turn 2", () => {
-225 |     const result = progressCheckpoint(2, 14, 25);
-226 |     expect(result).not.toBeNull();
-227 |     expect(result).toContain("Early checkpoint");
-228 |     expect(result).toContain("Turn 2/25");
-229 |   });
-230 | 
-231 |   it("budget 14: progress checkpoint at turn 4", () => {
-232 |     const result = progressCheckpoint(4, 14, 25);
-233 |     expect(result).not.toBeNull();
-234 |     expect(result).toContain("Progress checkpoint");
 235 |     expect(result).toContain("Turn 4/25");
 236 |   });
 237 | 
@@ -1145,3 +996,311 @@ Context after patch:
 [2026-04-05T14:34:25.685Z] iter=181 turn=14 INFO: Tool timing stats
 [2026-04-05T14:34:30.726Z] iter=181 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 181: predicted 10 turns, actual 14 turns, ratio 1.40**
 [2026-04-05T14:34:30.744Z] iter=181 turn=14 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T14:34:30.771Z] iter=181 turn=14 INFO: Committed: 61877469 (24 in / 6276 out, cache: 36236 created, 329411 read)
+[2026-04-05T14:34:30.772Z] iter=181 turn=14 INFO: Restarting as iteration 182...
+[2026-04-05T14:34:30.961Z] iter=182 INFO: Cache restored: 44/44 entries (0 stale)
+[2026-04-05T14:34:30.963Z] iter=182 INFO: Turn budget: 20/25 (calibration=1.40x, predicted=18)
+[2026-04-05T14:34:30.963Z] iter=182 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T14:34:31.013Z] iter=182 turn=1 INFO: Turn 1/25
+[2026-04-05T14:34:35.006Z] iter=182 turn=1 INFO: think: Let me start by reading the current state of the codebase, particularly the orchestrator and TUI files, to understand wh...
+[2026-04-05T14:34:35.007Z] iter=182 turn=2 INFO: Turn 2/25
+[2026-04-05T14:34:40.137Z] iter=182 turn=2 INFO: $ cat src/orchestrator.ts
+[2026-04-05T14:34:40.143Z] iter=182 turn=2 INFO: $ ls src/ tests/
+[2026-04-05T14:34:40.156Z] iter=182 turn=2 INFO:   -> exit=0 (15256 chars)
+[2026-04-05T14:34:40.159Z] iter=182 turn=2 INFO:   -> exit=0 (481 chars)
+[2026-04-05T14:34:40.159Z] iter=182 turn=3 INFO: Turn 3/25
+[2026-04-05T14:34:42.354Z] iter=182 turn=3 INFO: $ cat src/tui.tsx
+[2026-04-05T14:34:42.359Z] iter=182 turn=3 INFO: $ cat src/agent.ts | head -100
+[2026-04-05T14:34:42.371Z] iter=182 turn=3 INFO:   -> exit=0 (8573 chars)
+[2026-04-05T14:34:42.374Z] iter=182 turn=3 INFO:   -> exit=0 (3978 chars)
+[2026-04-05T14:34:42.375Z] iter=182 turn=4 INFO: Turn 4/25
+[2026-04-05T14:34:51.078Z] iter=182 turn=4 INFO: think: I have enough context. Let me build the session persistence system now:
+
+1. CREATE `src/session-store.ts` 
+2. CREATE `te...
+[2026-04-05T14:34:51.079Z] iter=182 turn=5 INFO: Turn 5/25
+[2026-04-05T14:35:11.663Z] iter=182 turn=5 INFO: Agent: Writing all files now.
+[2026-04-05T14:35:11.664Z] iter=182 turn=5 INFO: write_file: src/session-store.ts (write)
+[2026-04-05T14:35:11.665Z] iter=182 turn=5 INFO:   -> ok: Created src/session-store.ts (5396 chars)
+[2026-04-05T14:35:11.666Z] iter=182 turn=6 INFO: Turn 6/25
+[2026-04-05T14:35:46.680Z] iter=182 turn=6 INFO: write_file: tests/session-store.test.ts (write)
+[2026-04-05T14:35:46.681Z] iter=182 turn=6 INFO:   -> ok: Created tests/session-store.test.ts (10895 chars)
+[2026-04-05T14:35:46.681Z] iter=182 turn=7 INFO: Turn 7/25
+[2026-04-05T14:35:53.175Z] iter=182 turn=7 INFO: Agent: **Goal status:**
+- ✅ `src/session-store.ts` — DONE
+- ✅ `tests/session-store.test.ts` — DONE  
+- 🔄 `src/orchestrator.ts` — IN PROGRESS (need to add sessionPath, saveMessage calls, resumeSession)
+- 🔄 `src/tui.tsx` — IN PROGRESS (need /resume command)
+
+Continuing now — modifying orchestrator and TUI.
+[2026-04-05T14:35:53.177Z] iter=182 turn=7 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T14:35:53.178Z] iter=182 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -1 +7 lines
+
+Context after patch:
+19 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
+20 | import { runVerification, formatVerificationResults } from "./verification.js";
+21 | import { createDefaultRegistry } from "./tool-registry.js";
+22 | import { getProjectMemoryBlock } from "./project-memory.js";
+23 | import {
+24 |   initSession,
+25 |   saveMessage,
+26 |   loadSession,
+27 |   cleanOldSessions,
+28 | } from "./session-store.js";
+29 | 
+30 | // ─── Constants ────────────────────────────────────────────────
+31 | 
+[2026-04-05T14:35:53.180Z] iter=182 turn=8 INFO: Turn 8/25
+[2026-04-05T14:35:58.064Z] iter=182 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T14:35:58.066Z] iter=182 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -9 +11 lines
+
+Context after patch:
+58 | 
+59 | // ─── Types ───────────────────────────────────────────────────
+60 | 
+61 | export interface OrchestratorOptions {
+62 |   workDir: string;
+63 |   /** Called when a tool is invoked */
+64 |   onToolCall?: (name: string, input: string, result: string) => void;
+65 |   /** Called with status updates (e.g. "Indexing repo...") */
+66 |   onStatus?: (status: string) => void;
+67 |   /** Called with streaming text deltas */
+68 |   onText?: (delta: string) => void;
+69 |   /** If provided, resume an existing session instead of creating a new one */
+70 |   resumeSessionPath?: string;
+71 | }
+72 | 
+73 | export interface OrchestratorResult {
+74 |   text: string;
+[2026-04-05T14:35:58.067Z] iter=182 turn=9 INFO: Turn 9/25
+[2026-04-05T14:36:12.079Z] iter=182 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T14:36:12.081Z] iter=182 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -29 +57 lines
+
+Context after patch:
+268 | 
+269 | // ─── Orchestrator class ───────────────────────────────────────
+270 | 
+271 | export class Orchestrator {
+272 |   private client: Anthropic;
+273 |   private registry: ReturnType<typeof createDefaultRegistry>;
+274 |   private repoFingerprint: string = "";
+275 |   private systemPrompt: string = "";
+276 |   private apiMessages: Anthropic.MessageParam[] = [];
+277 |   private opts: OrchestratorOptions;
+278 |   private initialized = false;
+279 | 
+280 |   // Cost tracking
+281 |   private sessionTokensIn = 0;
+282 |   private sessionTokensOut = 0;
+283 |   private sessionCost = 0;
+284 | 
+285 |   /** Path to current session's JSONL file */
+286 |   sessionPath: string = "";
+287 | 
+288 |   constructor(opts: OrchestratorOptions) {
+289 |     this.opts = opts;
+290 |     this.client = new Anthropic();
+291 |     this.registry = createDefaultRegistry();
+292 |   }
+293 | 
+294 |   /** Initialize repo context (call once before first message). */
+295 |   async init(): Promise<void> {
+296 |     if (this.initialized) return;
+297 |     this.opts.onStatus?.("Indexing repo...");
+298 |     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
+299 |     this.systemPrompt = buildSystemPrompt(this.opts.workDir, this.repoFingerprint);
+300 | 
+301 |     // Session persistence: resume or create new
+302 |     if (this.opts.resumeSessionPath) {
+303 |       this.sessionPath = this.opts.resumeSessionPath;
+304 |       this.apiMessages = loadSession(this.sessionPath);
+305 |     } else {
+306 |       this.sessionPath = initSession(this.opts.workDir);
+307 |     }
+308 | 
+309 |     // Clean up old sessions non-blocking
+310 |     setImmediate(() => cleanOldSessions(this.opts.workDir));
+311 | 
+312 |     this.initialized = true;
+313 |     this.opts.onStatus?.("");
+314 |   }
+315 | 
+316 |   /**
+317 |    * Resume an existing session by loading its history.
+318 |    * Can be called after init() to switch sessions.
+319 |    */
+320 |   resumeSession(sessionPath: string): void {
+321 |     this.sessionPath = sessionPath;
+322 |     this.apiMessages = loadSession(sessionPath);
+323 |     // Reset cost tracking to reflect reloaded context
+324 |     this.sessionTokensIn = 0;
+325 |     this.sessionTokensOut = 0;
+326 |     this.sessionCost = 0;
+327 |   }
+328 | 
+329 |   /** Clear conversation history (but keep repo context). */
+330 |   clearHistory(): void {
+[2026-04-05T14:36:12.082Z] iter=182 turn=10 INFO: Turn 10/25
+[2026-04-05T14:36:19.146Z] iter=182 turn=10 INFO: Agent: Now persist messages after each exchange in `send()`:
+[2026-04-05T14:36:19.147Z] iter=182 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T14:36:19.148Z] iter=182 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -4 +6 lines
+
+Context after patch:
+428 |       }
+429 |     }
+430 | 
+431 |     // 4. Add user message to history and persist
+432 |     const userMsg: Anthropic.MessageParam = { role: "user", content: effectiveMessage };
+433 |     this.apiMessages.push(userMsg);
+434 |     if (this.sessionPath) saveMessage(this.sessionPath, userMsg);
+435 | 
+436 |     this.opts.onStatus?.("Thinking...");
+437 | 
+438 |     // 5. Run streaming agent loop
+439 |     const { text, tokensIn, tokensOut } = await runAgentLoop(
+[2026-04-05T14:36:19.149Z] iter=182 turn=11 INFO: Turn 11/25
+[2026-04-05T14:36:25.978Z] iter=182 turn=11 INFO: Agent: Now persist the assistant response after the loop. I need to find where the assistant message gets added in `runAgentLoop` — looking at the loop, it pushes to `apiMessages` directly. I'll save the final assistant message after `runAgentLoop` returns by checking what was appended:
+[2026-04-05T14:36:25.979Z] iter=182 turn=11 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T14:36:25.981Z] iter=182 turn=11 INFO:   -> ok: Patched src/orchestrator.ts: -4 +10 lines
+
+Context after patch:
+448 |       this.opts.onText,
+449 |     );
+450 | 
+451 |     // Persist assistant reply (last assistant message in history)
+452 |     if (this.sessionPath && text) {
+453 |       const assistantMsg: Anthropic.MessageParam = { role: "assistant", content: text };
+454 |       saveMessage(this.sessionPath, assistantMsg);
+455 |     }
+456 | 
+457 |     // Accumulate cost
+458 |     this.sessionTokensIn += tokensIn;
+459 |     this.sessionTokensOut += tokensOut;
+460 |     this.sessionCost += computeCost(model, tokensIn, tokensOut);
+461 | 
+462 |     // 6. Self-verification (if code was likely changed)
+463 |     let verificationPassed: boolean | undefined;
+[2026-04-05T14:36:25.981Z] iter=182 turn=12 INFO: Turn 12/25
+[2026-04-05T14:36:29.987Z] iter=182 turn=12 INFO: Agent: Good - I've made real changes. Let me finish the TUI `/resume` command, then run verification and wrap up.
+[2026-04-05T14:36:29.987Z] iter=182 turn=12 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T14:36:29.988Z] iter=182 turn=12 INFO:   -> ok: Patched src/tui.tsx: -3 +4 lines
+
+Context after patch:
+10 | import { render, Box, Text, useInput, useApp } from "ink";
+11 | import Spinner from "ink-spinner";
+12 | import TextInput from "ink-text-input";
+13 | import path from "path";
+14 | import "dotenv/config";
+15 | import { Orchestrator } from "./orchestrator.js";
+16 | import { listSessions, type SessionInfo } from "./session-store.js";
+17 | 
+18 | // Parse args
+19 | let workDir = process.cwd();
+[2026-04-05T14:36:29.988Z] iter=182 turn=13 INFO: Turn 13/25
+[2026-04-05T14:36:34.197Z] iter=182 turn=13 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T14:36:34.200Z] iter=182 turn=13 INFO:   -> ok: Patched src/tui.tsx: -2 +4 lines
+
+Context after patch:
+150 |   const [loading, setLoading] = useState(false);
+151 |   const [status, setStatus] = useState("Initializing...");
+152 |   const [currentModel, setCurrentModel] = useState("sonnet");
+153 |   const [streamBuffer, setStreamBuffer] = useState("");
+154 |   const [sessionList, setSessionList] = useState<SessionInfo[]>([]);
+155 |   const [showResume, setShowResume] = useState(false);
+156 |   const [footerStats, setFooterStats] = useState<FooterStats>({
+157 |     tokensIn: 0,
+158 |     tokensOut: 0,
+159 |     cost: 0,
+[2026-04-05T14:36:34.200Z] iter=182 turn=14 INFO: Turn 14/25
+[2026-04-05T14:36:41.771Z] iter=182 turn=14 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T14:36:41.773Z] iter=182 turn=14 INFO:   -> ok: Patched src/tui.tsx: -4 +38 lines
+
+Context after patch:
+205 |       setTimeout(() => setStatus(""), 1000);
+206 |       return;
+207 |     }
+208 |     if (trimmed === "/exit") {
+209 |       exit();
+210 |       return;
+211 |     }
+212 |     if (trimmed === "/resume") {
+213 |       const sessions = listSessions(workDir);
+214 |       if (sessions.length === 0) {
+215 |         setMessages(prev => [...prev, { role: "assistant", content: "No saved sessions found." }]);
+216 |       } else {
+217 |         setSessionList(sessions);
+218 |         setShowResume(true);
+219 |         const listing = sessions
+220 |           .slice(0, 10)
+221 |           .map((s, i) => `  [${i + 1}] ${s.summary} (${s.messageCount} msgs, ${s.updatedAt.toLocaleDateString()})`)
+222 |           .join("\n");
+223 |         setMessages(prev => [...prev, {
+224 |           role: "assistant",
+225 |           content: `Recent sessions:\n${listing}\n\nType /resume <number> to load a session.`,
+226 |         }]);
+227 |       }
+228 |       return;
+229 |     }
+230 |     const resumeMatch = trimmed.match(/^\/resume\s+(\d+)$/);
+231 |     if (resumeMatch) {
+232 |       const idx = parseInt(resumeMatch[1], 10) - 1;
+233 |       if (idx >= 0 && idx < sessionList.length) {
+234 |         const session = sessionList[idx];
+235 |         orchestratorRef.current?.resumeSession(session.path);
+236 |         setShowResume(false);
+237 |         setMessages(prev => [...prev, {
+238 |           role: "assistant",
+239 |           content: `✓ Resumed session: "${session.summary}" (${session.messageCount} messages loaded)`,
+240 |         }]);
+241 |       } else {
+242 |         setMessages(prev => [...prev, { role: "assistant", content: "Invalid session number." }]);
+243 |       }
+244 |       return;
+245 |     }
+246 | 
+247 |     // Add user message
+248 |     const userMsg: Message = { role: "user", content: trimmed };
+[2026-04-05T14:36:41.773Z] iter=182 turn=15 INFO: Turn 15/25
+[2026-04-05T14:36:44.064Z] iter=182 turn=15 INFO: Agent: Running verification now.
+[2026-04-05T14:36:44.065Z] iter=182 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -40
+[2026-04-05T14:36:44.872Z] iter=182 turn=15 INFO:   -> exit=0 (11 chars)
+[2026-04-05T14:36:44.872Z] iter=182 turn=16 INFO: Turn 16/25
+[2026-04-05T14:36:48.020Z] iter=182 turn=16 INFO: Agent: TypeScript is clean. Running tests then wrapping up.
+[2026-04-05T14:36:48.022Z] iter=182 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/session-store.test.ts 2>&1 | tail -20
+[2026-04-05T14:36:49.022Z] iter=182 turn=16 INFO:   -> exit=0 (278 chars)
+[2026-04-05T14:36:49.023Z] iter=182 turn=17 INFO: Turn 17/25
+[2026-04-05T14:36:56.722Z] iter=182 turn=17 INFO: Agent: 27 tests passing. Writing memory and goals now.
+[2026-04-05T14:36:56.723Z] iter=182 turn=17 INFO: write_file: memory.md (patch)
+[2026-04-05T14:36:56.724Z] iter=182 turn=17 INFO:   -> err: ERROR: old_string not found in memory.md. Must match exactly.
+[2026-04-05T14:36:56.724Z] iter=182 turn=18 INFO: Turn 18/25
+[2026-04-05T14:37:01.151Z] iter=182 turn=18 INFO: $ grep -n "Iteration 181" /Users/austin/Documents/autoagent/memory.md | tail -3
+[2026-04-05T14:37:01.170Z] iter=182 turn=18 INFO:   -> exit=0 (84 chars)
+[2026-04-05T14:37:01.170Z] iter=182 turn=19 INFO: Turn 19/25
+[2026-04-05T14:37:06.535Z] iter=182 turn=19 INFO: write_file: memory.md (patch)
+[2026-04-05T14:37:06.537Z] iter=182 turn=19 INFO:   -> ok: Patched memory.md: -1 +4 lines
+
+Context after patch:
+79 | 
+80 | **[AUTO-SCORED] Iteration 180: predicted 10 turns, actual 15 turns, ratio 1.50**
+81 | 
+82 | **[AUTO-SCORED] Iteration 181: predicted 10 turns, actual 14 turns, ratio 1.40**
+83 | 
+84 | ## [Engineer] Session Persistence — Iteration 183
+85 | Built `src/session-store.ts` (JSONL under `~/.autoagent/sessions/{project-hash}/`). 27 tests passing. Integrated into `src/orchestrator.ts`: auto-creates session on `init()`, persists user+assistant messages, `resumeSession()` loads history. TUI gets `/resume` command. Old sessions auto-cleaned (30-day cutoff) on startup. Next: `--continue` CLI flag, rich repo map.
+86 | 
+[2026-04-05T14:37:06.537Z] iter=182 turn=20 INFO: Turn 20/25
+[2026-04-05T14:37:19.839Z] iter=182 turn=20 INFO: write_file: goals.md (write)
+[2026-04-05T14:37:19.841Z] iter=182 turn=20 INFO:   -> ok: Updated goals.md (1789 chars, -61 lines delta)
+[2026-04-05T14:37:19.842Z] iter=182 turn=21 INFO: Turn 21/25
+[2026-04-05T14:37:24.677Z] iter=182 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "TSC_OK"
+[2026-04-05T14:37:25.496Z] iter=182 turn=21 INFO:   -> exit=0 (7 chars)
+[2026-04-05T14:37:25.496Z] iter=182 turn=22 INFO: Turn 22/25
+[2026-04-05T14:37:27.824Z] iter=182 turn=22 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T14:37:27.825Z] iter=182 turn=22 INFO: RESTART signal
+[2026-04-05T14:37:27.826Z] iter=182 turn=22 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T14:37:28.744Z] iter=182 turn=22 INFO: Compilation OK
+[2026-04-05T14:37:34.298Z] iter=182 turn=22 INFO: Cache persisted: 43 entries to .autoagent-cache.json
+[2026-04-05T14:37:34.298Z] iter=182 turn=22 INFO: Tool timing: bash: 9x, avg=302ms, total=2719ms; write_file: 13x, avg=2ms, total=28ms; think: 2x, avg=0ms, total=0ms
+[2026-04-05T14:37:34.298Z] iter=182 turn=22 INFO: Tool timing stats
+[2026-04-05T14:37:38.876Z] iter=182 turn=22 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 182: predicted 18 turns, actual 22 turns, ratio 1.22**
+[2026-04-05T14:37:49.916Z] iter=182 turn=22 INFO: Pre-commit review (2827in/347out): - **Double-persisting assistant messages**: The assistant reply is saved via `saveMessage` after `callAI`, but if the agent runs tool-use loops (multi-turn within a single `chat()` call), intermediate

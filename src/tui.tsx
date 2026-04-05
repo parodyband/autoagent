@@ -13,6 +13,7 @@ import TextInput from "ink-text-input";
 import path from "path";
 import "dotenv/config";
 import { Orchestrator } from "./orchestrator.js";
+import { listSessions, type SessionInfo } from "./session-store.js";
 
 // Parse args
 let workDir = process.cwd();
@@ -150,6 +151,8 @@ function App() {
   const [status, setStatus] = useState("Initializing...");
   const [currentModel, setCurrentModel] = useState("sonnet");
   const [streamBuffer, setStreamBuffer] = useState("");
+  const [sessionList, setSessionList] = useState<SessionInfo[]>([]);
+  const [showResume, setShowResume] = useState(false);
   const [footerStats, setFooterStats] = useState<FooterStats>({
     tokensIn: 0,
     tokensOut: 0,
@@ -204,6 +207,40 @@ function App() {
     }
     if (trimmed === "/exit") {
       exit();
+      return;
+    }
+    if (trimmed === "/resume") {
+      const sessions = listSessions(workDir);
+      if (sessions.length === 0) {
+        setMessages(prev => [...prev, { role: "assistant", content: "No saved sessions found." }]);
+      } else {
+        setSessionList(sessions);
+        setShowResume(true);
+        const listing = sessions
+          .slice(0, 10)
+          .map((s, i) => `  [${i + 1}] ${s.summary} (${s.messageCount} msgs, ${s.updatedAt.toLocaleDateString()})`)
+          .join("\n");
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          content: `Recent sessions:\n${listing}\n\nType /resume <number> to load a session.`,
+        }]);
+      }
+      return;
+    }
+    const resumeMatch = trimmed.match(/^\/resume\s+(\d+)$/);
+    if (resumeMatch) {
+      const idx = parseInt(resumeMatch[1], 10) - 1;
+      if (idx >= 0 && idx < sessionList.length) {
+        const session = sessionList[idx];
+        orchestratorRef.current?.resumeSession(session.path);
+        setShowResume(false);
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          content: `✓ Resumed session: "${session.summary}" (${session.messageCount} messages loaded)`,
+        }]);
+      } else {
+        setMessages(prev => [...prev, { role: "assistant", content: "Invalid session number." }]);
+      }
       return;
     }
 
