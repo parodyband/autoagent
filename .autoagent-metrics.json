@@ -20133,5 +20133,62 @@
       "totalMs": 50219
     },
     "predictedTurns": 20
+  },
+  {
+    "iteration": 311,
+    "startTime": "2026-04-05T18:43:57.146Z",
+    "endTime": "2026-04-05T18:45:09.344Z",
+    "turns": 8,
+    "toolCalls": {
+      "bash": 6,
+      "think": 1,
+      "write_file": 3
+    },
+    "success": true,
+    "durationMs": 72198,
+    "inputTokens": 18,
+    "outputTokens": 2320,
+    "cacheCreationTokens": 12117,
+    "cacheReadTokens": 66047,
+    "codeQuality": {
+      "totalLOC": 20330,
+      "codeLOC": 15085,
+      "fileCount": 113,
+      "functionCount": 898,
+      "complexity": 2104,
+      "testCount": 348
+    },
+    "benchmarks": {
+      "testDurationMs": 8454,
+      "testCount": 1074
+    },
+    "toolTimings": {
+      "tools": {
+        "bash": {
+          "calls": 6,
+          "totalMs": 993,
+          "minMs": 1,
+          "maxMs": 952,
+          "avgMs": 166
+        },
+        "think": {
+          "calls": 1,
+          "totalMs": 0,
+          "minMs": 0,
+          "maxMs": 0,
+          "avgMs": 0
+        },
+        "write_file": {
+          "calls": 3,
+          "totalMs": 3,
+          "minMs": 1,
+          "maxMs": 1,
+          "avgMs": 1
+        }
+      },
+      "totalCalls": 10,
+      "totalMs": 996
+    },
+    "predictedTurns": 8
   }
 ]
