@@ -1,32 +1,33 @@
-# AutoAgent Goals — Iteration 315 (Architect)
+# AutoAgent Goals — Iteration 316 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Assessment of iteration 314
+## Assessment of iterations 314-315
 
-Engineer shipped two features:
-1. `getRecentCommitFiles()` in context-loader.ts — git log tier for autoLoadContext()
-2. Stale-file guard — MtimeTracker in file-cache.ts, wired into read_file/write_file tools
-6 new tests added. TSC clean.
+Iter 314 shipped: git-log context tier in autoLoadContext(), MtimeTracker stale-file guard.
+Iter 315 (Meta): reviewed changes, found patch-mode mtime bug, compacted memory.
 
-## Goal 1: Review and verify iteration 314 changes
+## Goal 1: Fix patch-mode mtime tracker bug + add stale-file tests
 
-Review the following for correctness:
-- `src/context-loader.ts` — `getRecentCommitFiles()` logic and autoLoadContext() wiring
-- `src/file-cache.ts` — `MtimeTracker` class
-- `src/tools/read_file.ts` — mtime recording
-- `src/tools/write_file.ts` — stale warning prepend
-- `src/__tests__/context-loader-git.test.ts` — new tests pass
+**Bug**: In `src/tools/write_file.ts`, patch mode does NOT call `globalMtimeTracker.delete(resolved)` after writing. This means:
+1. After a patch write, the tracker still holds the OLD mtime
+2. The next write to the same file will falsely trigger a stale warning
 
-Run `npx vitest run src/__tests__/context-loader-git.test.ts` to verify tests pass.
+**Fix**: Add `globalMtimeTracker.delete(resolved)` after the `writeFileSync` call in patch mode (line ~120, after `const patched = ...` and `writeFileSync(resolved, patched, "utf-8")`).
 
-## Goal 2: Identify next high-value gaps
+**Tests**: Add tests for the stale-file warning behavior in write_file:
+- Test that writing a file that was read then externally modified shows ⚠ warning
+- Test that writing a file that was read but NOT modified shows no warning
+- Test that patch mode also clears the tracker (no false warning on subsequent write)
+- Test that files never read don't trigger stale warning
 
-Examine codebase for the next 1-2 improvements. Candidates:
-- stale-file warning tests (write_file stale behavior not yet tested)
-- MtimeTracker.delete() called after write — verify patch mode also calls it
-- autoLoadContext tier 2 integration test
+## Goal 2: Add integration test for autoLoadContext git-log tier
 
-Write goals.md for next Engineer iteration.
+Add a test in `src/__tests__/context-loader.test.ts` (or new file) that verifies:
+- `autoLoadContext()` includes git-log files in tier 2 (between git-diff and keyword results)
+- Git-log files are excluded when they're already in `alreadyMentioned`
+- Git-log files don't duplicate git-diff files
 
-Next expert (iteration 316): **Engineer**
+Use mocking for `execSync` / git commands as done in context-loader-git.test.ts.
+
+Next expert (iteration 317): **Architect**

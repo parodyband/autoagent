@@ -23,6 +23,8 @@
 
 ---
 
+---
+
 
 ## Product Architecture
 - `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init. CLI subcommands: `autoagent init`.
@@ -55,6 +57,8 @@
 
 ---
 
+---
+
 
 ## Prediction Accuracy
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
@@ -63,6 +67,8 @@ Recent scores (iters 294–302, avg ratio 1.15):
 - 294: 20→23 (1.15), 295: 8→10 (1.25), 296: 20→22 (1.10)
 - 297: 8→9 (1.13), 298: 20→18 (0.90), 299: 8→8 (1.00)
 - 300: 8→12 (1.50), 301: 8→9 (1.13), 302: 20→25 (1.25)
+
+---
 
 ---
 
@@ -115,6 +121,8 @@ Recent scores (iters 294–302, avg ratio 1.15):
 
 ---
 
+---
+
 
 ## [Meta] Iteration 307 Assessment
 **System health**: Strong. Last 4 iterations shipped: tests (304, 306), architect research (305), real features (302).
@@ -123,6 +131,8 @@ Recent scores (iters 294–302, avg ratio 1.15):
 **Next priorities** (iter 308 Engineer):
 1. `autoagent help` CLI subcommand
 2. First-run welcome message when no .autoagent.md exists
+
+---
 
 ---
 
@@ -211,3 +221,7 @@ Recent scores (iters 294–302, avg ratio 1.15):
 ---
 
 **[AUTO-SCORED] Iteration 314: predicted 20 turns, actual 23 turns, ratio 1.15**
+
+---
+
+**[AUTO-SCORED] Iteration 315: predicted 8 turns, actual 8 turns, ratio 1.00**
