@@ -1,157 +1,3 @@
-83 | 
-84 | ## Next for Engineer
-85 | - Add `--once` to CLI parsing in `src/agent.ts` (like `--repo`)
-86 | - Add `once?: boolean` to `IterationCtx` in `src/conversation.ts`
-87 | - In `doFinalize()`: if `ctx.once`, pass `doRestart=false` then `process.exit(0)`
-88 | - Update `printHelp()` with the new flag
-89 | - Files: `src/agent.ts`, `src/conversation.ts`
-90 | 
-[2026-04-05T11:14:26.884Z] iter=101 turn=7 INFO: Turn 7/25
-[2026-04-05T11:14:29.031Z] iter=101 turn=7 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T11:14:29.703Z] iter=101 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-05T11:14:29.703Z] iter=101 turn=8 INFO: Turn 8/25
-[2026-04-05T11:14:31.906Z] iter=101 turn=8 INFO: Agent: Clean. Now restart:
-[2026-04-05T11:14:31.908Z] iter=101 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T11:14:31.909Z] iter=101 turn=8 INFO: RESTART signal
-[2026-04-05T11:14:31.910Z] iter=101 turn=8 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T11:14:32.600Z] iter=101 turn=8 INFO: Compilation OK
-[2026-04-05T11:14:36.880Z] iter=101 turn=8 INFO: Cache persisted: 29 entries to .autoagent-cache.json
-[2026-04-05T11:14:36.880Z] iter=101 turn=8 INFO: Cache stats: 0 hits, 5 misses, 29 entries, 2 invalidations (1 entries removed)
-[2026-04-05T11:14:36.880Z] iter=101 turn=8 INFO: Tool cache stats
-[2026-04-05T11:14:36.880Z] iter=101 turn=8 INFO: Tool timing: bash: 5x, avg=149ms, total=744ms; grep: 2x, avg=25ms, total=49ms; list_files: 1x, avg=34ms, total=34ms; read_file: 2x, avg=2ms, total=3ms; write_file: 2x, avg=2ms, total=3ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T11:14:36.880Z] iter=101 turn=8 INFO: Tool timing stats
-[2026-04-05T11:14:40.834Z] iter=101 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 101: predicted 12 turns, actual 8 turns, ratio 0.67**
-[2026-04-05T11:14:40.853Z] iter=101 turn=8 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T11:14:40.884Z] iter=101 turn=8 INFO: Committed: 8a2abc90 (12 in / 2444 out, cache: 18187 created, 87000 read)
-[2026-04-05T11:14:40.884Z] iter=101 turn=8 INFO: Restarting as iteration 102...
-[2026-04-05T11:14:41.087Z] iter=102 INFO: Cache restored: 28/29 entries (1 stale)
-[2026-04-05T11:14:41.088Z] iter=102 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T11:14:41.113Z] iter=102 INFO: Hard turn cap: 18 (1.5x prediction of 12)
-[2026-04-05T11:14:41.114Z] iter=102 turn=1 INFO: Turn 1/25
-[2026-04-05T11:14:43.476Z] iter=102 turn=1 INFO: think: Let me read the key files first to understand the current state before making changes....
-[2026-04-05T11:14:43.478Z] iter=102 turn=2 INFO: Turn 2/25
-[2026-04-05T11:14:45.623Z] iter=102 turn=2 INFO: read_file: CACHE HIT
-[2026-04-05T11:14:45.624Z] iter=102 turn=2 INFO: read_file: src/conversation.ts
-[2026-04-05T11:14:45.625Z] iter=102 turn=2 INFO:   -> ok (13064 chars)
-[2026-04-05T11:14:45.626Z] iter=102 turn=3 INFO: Turn 3/25
-[2026-04-05T11:15:03.386Z] iter=102 turn=3 INFO: think: Now I understand the codebase. Let me plan the changes:
-
-1. **`src/conversation.ts`**: Add `once?: boolean` to `Iteratio...
-[2026-04-05T11:15:03.387Z] iter=102 turn=4 INFO: Turn 4/25
-[2026-04-05T11:15:06.003Z] iter=102 turn=4 INFO: $ grep -n "once\|--once\|tool count\|toolCount\|tools.length\|\.length.*7\|7.*tools" scripts/self-test.ts | head -30
-[2026-04-05T11:15:06.022Z] iter=102 turn=4 INFO:   -> exit=0 (312 chars)
-[2026-04-05T11:15:06.023Z] iter=102 turn=5 INFO: Turn 5/25
-[2026-04-05T11:15:09.789Z] iter=102 turn=5 INFO: Agent: I have all the context I need. Making the changes now.
-[2026-04-05T11:15:09.790Z] iter=102 turn=5 INFO: write_file: src/conversation.ts (patch)
-[2026-04-05T11:15:09.792Z] iter=102 turn=5 INFO:   -> ok: Patched src/conversation.ts: -3 +5 lines
-
-Context after patch:
-59 |   compressionConfig?: CompressionConfig | null;
-60 |   /** Optional custom system prompt builder. Defaults to buildSystemPrompt from messages.ts. */
-61 |   systemPromptBuilder?: (state: IterationState, rootDir: string) => string;
-62 |   /** True when running a user task from TASK.md */
-63 |   taskMode?: boolean;
-64 |   /** When true, run exactly one iteration and exit cleanly (no restart) */
-65 |   once?: boolean;
-66 | }
-67 | 
-68 | export type TurnResult = "continue" | "break" | "restarted";
-69 | 
-[2026-04-05T11:15:09.793Z] iter=102 turn=6 INFO: Turn 6/25
-[2026-04-05T11:15:24.175Z] iter=102 turn=6 INFO: Agent: Now patch `src/agent.ts` — `doFinalize`, `printHelp`, `main`, and `IterationCtx` construction:
-[2026-04-05T11:15:24.175Z] iter=102 turn=6 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:15:24.176Z] iter=102 turn=6 INFO:   -> ok: Patched src/agent.ts: -32 +41 lines
-
-Context after patch:
-125 | 
-126 | const toolRegistry = createDefaultRegistry();
-127 | 
-128 | async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> {
-129 |   try {
-130 |     const count = ctx.cache.serialize(CACHE_FILE, ctx.agentHome);
-131 |     ctx.log(`Cache persisted: ${count} entries to ${path.basename(CACHE_FILE)}`);
-132 |   } catch (err) {
-133 |     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
-134 |   }
-135 | 
-136 |   // --once mode: never restart regardless of what callers request
-137 |   const effectiveRestart = ctx.once ? false : doRestart;
-138 | 
-139 |   await runFinalization({
-140 |     iter: ctx.iter,
-141 |     state: ctx.state,
-142 |     startTime: ctx.startTime,
-143 |     turns: ctx.turns,
-144 |     toolCounts: ctx.toolCounts,
-145 |     tokens: ctx.tokens,
-146 |     cache: ctx.cache,
-147 |     timing: ctx.timing,
-148 |     rootDir: ROOT,
-149 |     agentHome: ROOT,
-150 |     metricsFile: METRICS_FILE,
-151 |     log: (msg: string) => log(ctx.iter, msg),
-152 |     logger,
-153 |     restart,
-154 |     predictedTurns: ctx.predictedTurns,
-155 |   }, effectiveRestart);
-156 | 
-157 |   // Task mode: delete TASK.md after successful iteration
-158 |   if (ctx.taskMode && existsSync(TASK_FILE)) {
-159 |     unlinkSync(TASK_FILE);
-160 |     ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
-161 |   }
-162 | 
-163 |   // --once mode: exit cleanly after finalization (no restart)
-164 |   if (ctx.once) {
-165 |     ctx.log("--once mode: exiting after single iteration");
-166 |     process.exit(0);
-167 |   }
-168 | }
-169 | 
-170 | // ─── Restart ────────────────────────────────────────────────
-171 | 
-[2026-04-05T11:15:24.177Z] iter=102 turn=7 INFO: Turn 7/25
-[2026-04-05T11:15:29.859Z] iter=102 turn=7 INFO: Agent: Now update `printHelp()` and parse `--once` in `main()`:
-[2026-04-05T11:15:29.859Z] iter=102 turn=7 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:15:29.860Z] iter=102 turn=7 INFO:   -> ok: Patched src/agent.ts: -6 +8 lines
-
-Context after patch:
-288 | USAGE
-289 |   npx tsx src/agent.ts [OPTIONS]
-290 | 
-291 | OPTIONS
-292 |   -h, --help              Print this help message and exit
-293 |   --once                  Run exactly one iteration and exit (no restart)
-294 |                           Exits 0 on success, 1 on failure. Useful for CI/CD.
-295 |   --repo <path>           Operate on an external repository at <path>
-296 |                           (agent state stays in the current directory)
-297 |   --task "<description>"  Run a one-shot task described inline
-298 |                           (writes a temporary TASK.md and starts the agent)
-299 | 
-300 | TASK.MD MODE
-301 |   Create a file named TASK.md in the project root with a plain-text
-[2026-04-05T11:15:29.860Z] iter=102 turn=8 INFO: Turn 8/25
-[2026-04-05T11:15:33.877Z] iter=102 turn=8 INFO: Agent: Now parse `--once` in `main()` and thread it into `IterationCtx`:
-[2026-04-05T11:15:33.878Z] iter=102 turn=8 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T11:15:33.880Z] iter=102 turn=8 INFO:   -> ok: Patched src/agent.ts: -2 +5 lines
-
-Context after patch:
-316 |     process.exit(0);
-317 |   }
-318 | 
-319 |   // Parse --once flag (run single iteration, no restart)
-320 |   const onceMode = process.argv.includes("--once");
-321 | 
-322 |   // Parse --repo /path flag (external repo to operate on)
-323 |   let WORK_DIR = ROOT; // defaults to AGENT_HOME
-324 |   const repoFlagIdx = process.argv.indexOf("--repo");
-325 |   if (repoFlagIdx !== -1) {
-326 |     const repoPath = process.argv[repoFlagIdx + 1];
-[2026-04-05T11:15:33.881Z] iter=102 turn=9 INFO: Turn 9/25
-[2026-04-05T11:15:38.976Z] iter=102 turn=9 INFO: Agent: Status:
-- `once?: boolean` in `IterationCtx` — DONE
-- `doFinalize()` respects `--once` — DONE  
-- `printHelp()` updated — DONE
 - `--once` parsed in `main()` — DONE
 - Thread `once` into `IterationCtx` construction — **IN PROGRESS** (need to add `once: onceMode` to the ctx object)
 
@@ -1150,3 +996,99 @@ Context after patch:
 [2026-04-05T11:27:17.933Z] iter=108 turn=14 INFO: Tool timing stats
 [2026-04-05T11:27:21.774Z] iter=108 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 108: predicted 14 turns, actual 14 turns, ratio 1.00**
 [2026-04-05T11:27:21.794Z] iter=108 turn=14 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T11:27:21.826Z] iter=108 turn=14 INFO: Committed: 015dbcda (20 in / 3732 out, cache: 18427 created, 224899 read)
+[2026-04-05T11:27:21.826Z] iter=108 turn=14 INFO: Restarting as iteration 109...
+[2026-04-05T11:27:22.035Z] iter=109 INFO: Cache restored: 27/27 entries (0 stale)
+[2026-04-05T11:27:22.037Z] iter=109 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T11:27:22.066Z] iter=109 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T11:27:22.066Z] iter=109 turn=1 INFO: Turn 1/25
+[2026-04-05T11:27:26.148Z] iter=109 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state of the system, then make an informed decision about what's next.
+[2026-04-05T11:27:26.149Z] iter=109 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -80
+[2026-04-05T11:27:26.152Z] iter=109 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/**/*.ts src/*.ts 2>/dev/null | tail -5
+[2026-04-05T11:27:26.154Z] iter=109 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-05T11:27:26.163Z] iter=109 turn=1 INFO:   -> exit=0 (1679 chars)
+[2026-04-05T11:27:26.165Z] iter=109 turn=1 INFO:   -> exit=0 (526 chars)
+[2026-04-05T11:27:26.166Z] iter=109 turn=1 INFO:   -> exit=0 (128 chars)
+[2026-04-05T11:27:26.167Z] iter=109 turn=2 INFO: Turn 2/25
+[2026-04-05T11:27:29.625Z] iter=109 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat src/finalization.ts
+[2026-04-05T11:27:29.641Z] iter=109 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx src/agent.ts --help 2>&1
+[2026-04-05T11:27:29.646Z] iter=109 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat src/agent.ts | head -80
+[2026-04-05T11:27:29.655Z] iter=109 turn=2 INFO:   -> exit=0 (12952 chars)
+[2026-04-05T11:27:29.660Z] iter=109 turn=2 INFO:   -> exit=0 (3166 chars)
+[2026-04-05T11:27:29.989Z] iter=109 turn=2 INFO:   -> exit=0 (925 chars)
+[2026-04-05T11:27:29.989Z] iter=109 turn=3 INFO: Turn 3/25
+[2026-04-05T11:27:33.729Z] iter=109 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat src/agent.ts | wc -l
+[2026-04-05T11:27:33.732Z] iter=109 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "once\|--once\|--task\|--repo" src/agent.ts | head -30
+[2026-04-05T11:27:33.736Z] iter=109 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -20
+[2026-04-05T11:27:33.749Z] iter=109 turn=3 INFO:   -> exit=0 (9 chars)
+[2026-04-05T11:27:33.751Z] iter=109 turn=3 INFO:   -> exit=0 (1865 chars)
+[2026-04-05T11:27:38.708Z] iter=109 turn=3 INFO:   -> exit=0 (612 chars)
+[2026-04-05T11:27:38.708Z] iter=109 turn=4 INFO: Turn 4/25
+[2026-04-05T11:27:41.894Z] iter=109 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -20
+[2026-04-05T11:27:41.896Z] iter=109 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && jq '.[length-5:]' .autoagent-metrics.json | jq '.[] | {iteration, turns, success, durationMs, inputTokens, outputTokens}'
+[2026-04-05T11:27:41.913Z] iter=109 turn=4 INFO:   -> exit=0 (809 chars)
+[2026-04-05T11:27:41.917Z] iter=109 turn=4 INFO:   -> exit=0 (627 chars)
+[2026-04-05T11:27:41.918Z] iter=109 turn=5 INFO: Turn 5/25
+[2026-04-05T11:28:20.303Z] iter=109 turn=5 INFO: Agent: 
+
+You're right. My deliverable is clear: **write goals.md for iteration 110 (Engineer)**. Let me do the assessment quickly and write it.
+[2026-04-05T11:28:20.303Z] iter=109 turn=5 INFO: think: Let me assess what I've learned and decide the next high-value feature:
+
+**Current state:**
+- 6458 LOC, 648 tests, all p...
+[2026-04-05T11:28:20.304Z] iter=109 turn=6 INFO: Turn 6/25
+[2026-04-05T11:28:23.998Z] iter=109 turn=6 INFO: grep: "retry|backoff|overloaded|429|529|rate.limit">
+<parameter name="path">src"
+[2026-04-05T11:28:24.048Z] iter=109 turn=6 INFO:   -> 2 matches
+[2026-04-05T11:28:24.048Z] iter=109 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && ls README* 2>/dev/null; echo "---"; cat package.json | jq '{name, description, main, scripts}'
+[2026-04-05T11:28:24.056Z] iter=109 turn=6 INFO:   -> exit=0 (156 chars)
+[2026-04-05T11:28:24.056Z] iter=109 turn=7 INFO: Turn 7/25
+[2026-04-05T11:28:26.443Z] iter=109 turn=7 INFO: grep: CACHE HIT
+[2026-04-05T11:28:26.443Z] iter=109 turn=8 INFO: Turn 8/25
+[2026-04-05T11:28:29.118Z] iter=109 turn=8 INFO: grep: "retry|backoff|overloaded|rate.limit" in src
+[2026-04-05T11:28:29.145Z] iter=109 turn=8 INFO:   -> 0 matches
+[2026-04-05T11:28:29.146Z] iter=109 turn=9 INFO: Turn 9/25
+[2026-04-05T11:28:36.083Z] iter=109 turn=9 INFO: Agent: 
+
+**Goal status: IN PROGRESS** — I need to write goals.md for iteration 110 (Engineer). Let me finalize my assessment and write it now.
+
+Key findings:
+- No retry/backoff logic exists for API failures — agent crashes on transient errors
+- No README exists — features are undiscoverable
+- 648 tests pass, 6458 LOC, system healthy
+- CI/CD story complete (--once, --task, --repo, JSON output)
+
+**Decision...
+[2026-04-05T11:28:36.083Z] iter=109 turn=9 INFO: read_file: src/conversation.ts
+[2026-04-05T11:28:36.084Z] iter=109 turn=9 INFO:   -> ok (1773 chars)
+[2026-04-05T11:28:36.084Z] iter=109 turn=10 INFO: Turn 10/25
+[2026-04-05T11:28:42.331Z] iter=109 turn=10 INFO: grep: "client\.messages\.create|\.create\("" in src/conversation.ts
+[2026-04-05T11:28:42.364Z] iter=109 turn=10 INFO:   -> 0 matches
+[2026-04-05T11:28:42.365Z] iter=109 turn=11 INFO: Turn 11/25
+[2026-04-05T11:28:45.109Z] iter=109 turn=11 INFO: grep: "messages\.create" in src/conversation.ts
+[2026-04-05T11:28:45.126Z] iter=109 turn=11 INFO:   -> 11 matches
+[2026-04-05T11:28:45.126Z] iter=109 turn=12 INFO: Turn 12/25
+[2026-04-05T11:28:56.604Z] iter=109 turn=12 INFO: Agent: Good. The API call is at line 202 in conversation.ts. Now let me write the goals and memory.
+[2026-04-05T11:28:56.605Z] iter=109 turn=12 INFO: write_file: goals.md (write)
+[2026-04-05T11:28:56.606Z] iter=109 turn=12 INFO:   -> ok: Updated goals.md (1541 chars, +38 lines delta)
+[2026-04-05T11:28:56.607Z] iter=109 turn=13 INFO: Turn 13/25
+[2026-04-05T11:29:07.411Z] iter=109 turn=13 INFO: write_file: memory.md (append)
+[2026-04-05T11:29:07.412Z] iter=109 turn=13 INFO:   -> ok: Appended 1211 chars to memory.md
+[2026-04-05T11:29:07.412Z] iter=109 turn=14 INFO: Turn 14/25
+[2026-04-05T11:29:09.955Z] iter=109 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T11:29:10.641Z] iter=109 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:29:10.642Z] iter=109 turn=15 INFO: Turn 15/25
+[2026-04-05T11:29:13.458Z] iter=109 turn=15 INFO: Agent: Clean. Now restart.
+[2026-04-05T11:29:13.458Z] iter=109 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T11:29:13.458Z] iter=109 turn=15 INFO: RESTART signal
+[2026-04-05T11:29:13.458Z] iter=109 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T11:29:14.192Z] iter=109 turn=15 INFO: Compilation OK
+[2026-04-05T11:29:18.677Z] iter=109 turn=15 INFO: Cache persisted: 31 entries to .autoagent-cache.json
+[2026-04-05T11:29:18.677Z] iter=109 turn=15 INFO: Cache stats: 1 hits, 5 misses, 31 entries, 2 invalidations (1 entries removed)
+[2026-04-05T11:29:18.677Z] iter=109 turn=15 INFO: Tool cache stats
+[2026-04-05T11:29:18.678Z] iter=109 turn=15 INFO: Tool timing: bash: 14x, avg=442ms, total=6181ms; grep: 4x, avg=32ms, total=128ms; write_file: 2x, avg=1ms, total=2ms; read_file: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T11:29:18.678Z] iter=109 turn=15 INFO: Tool timing stats
+[2026-04-05T11:29:22.458Z] iter=109 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 109: predicted 12 turns, actual 15 turns, ratio 1.25**
+[2026-04-05T11:29:22.478Z] iter=109 turn=15 INFO: Pre-commit review: no significant code changes to review

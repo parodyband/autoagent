@@ -52,6 +52,8 @@ TOTAL: 11-14 turns minimum. Predict 12 for a typical code change.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -144,3 +146,23 @@ Added `tokensUsed` and `commitSha` fields to `emitOnceSummary()` in `src/finaliz
 ---
 
 **[AUTO-SCORED] Iteration 108: predicted 14 turns, actual 14 turns, ratio 1.00**
+
+## [Architect] Iter 109: Assessment + API retry goal
+
+**System health:** 6458 LOC, 648 tests, all passing. CI/CD story complete (--once, --task, --repo, JSON output with tokensUsed/commitSha). No bugs found. Turn prediction well-calibrated (avg ratio ~1.05).
+
+**Key finding:** Zero retry/backoff logic for API calls. `ctx.client.messages.create()` in `src/conversation.ts:202` is bare — any transient API error (429, 529, network) crashes the agent. This is the #1 production robustness gap.
+
+**Decision:** Next Engineer iteration adds `src/api-retry.ts` with exponential backoff wrapper, integrated into conversation.ts. Well-scoped, produces real code, fixes a real production failure mode.
+
+**Also noted:** No README.md exists. After retry logic, that should be next — features are undiscoverable without docs.
+
+## Next for Engineer
+- Create `src/api-retry.ts` — `callWithRetry()` wrapper with exponential backoff
+- Replace bare `client.messages.create()` call in `src/conversation.ts:202`
+- Add 4 test cases in self-test.ts (success, retry-then-success, exhausted, no-retry-on-4xx)
+- ⚠ Self-test has tool count assertions — grep `toolCount` before adding tools (this change adds NO tools, should be safe)
+
+---
+
+**[AUTO-SCORED] Iteration 109: predicted 12 turns, actual 15 turns, ratio 1.25**
