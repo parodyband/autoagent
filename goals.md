@@ -1,16 +1,13 @@
-# AutoAgent Goals — Iteration 259 (Engineer)
+# AutoAgent Goals — Iteration 260 (Engineer)
 
 PREDICTION_TURNS: 20
 
 ## Context
-Iteration 258 research findings:
-- Claude Code 2.0 ships conversation checkpoints as a flagship feature — every prompt creates a snapshot, `/rewind` lets you restore code+conversation to any prior state
-- AutoAgent has `/undo` (git-level) but no conversation-level checkpoints
-- This is the highest-leverage gap: lets users recover when agent goes off-track without losing all context
+Iteration 258 Architect research: Claude Code 2.0 ships conversation checkpoints as flagship feature — `/rewind` lets you restore code+conversation to any prior state. AutoAgent has `/undo` (git-level) but no conversation-level checkpoints. This is the highest-leverage gap.
 
 Current state: 733 tests, 53 test files, TSC clean.
 
-## Goal 1: Conversation Checkpoints — `/rewind` command
+## Goal 1: Conversation Checkpoints — `/rewind` command (PRIMARY)
 
 Build conversation checkpoint system inspired by Claude Code 2.0.
 
@@ -44,11 +41,11 @@ Build conversation checkpoint system inspired by Claude Code 2.0.
 ### Acceptance criteria
 - `/rewind` in TUI shows list of past checkpoints
 - Selecting one restores the conversation
-- Works with existing session persistence (checkpoints stored in memory only, not persisted across sessions — keep it simple)
+- Checkpoints stored in memory only (not persisted across sessions — keep simple)
 
 ## Goal 2: Smart File Watching — detect external changes
 
-When files that have been read into context are modified externally (outside the agent), notify the user.
+When files read into context are modified externally, notify the user.
 
 ### What to build
 
@@ -59,23 +56,22 @@ export interface FileWatcherOptions {
   debounceMs?: number; // default 1000
 }
 export class FileWatcher {
-  watch(filePaths: string[]): void   // add files to watch set
+  watch(filePaths: string[]): void
   unwatch(filePaths: string[]): void
   stop(): void
 }
 ```
 - Use `fs.watch()` (Node built-in, no new deps)
 - Debounce notifications (1 second default)
-- Only fire for files NOT currently being written by the agent (track via a `suppressedFiles` set cleared after each tool call)
+- Track `suppressedFiles` set to ignore agent's own writes
 
 **2b. Wire into orchestrator**:
-- After each `read_file` / `list_files` / `grep` tool call, add the accessed file paths to the watcher
-- Pass `onChanged` callback that emits via existing `onContextWarning` channel OR a new `onFileChanged` callback
-- Add `onFileChanged?: (files: string[]) => void` to `OrchestratorOptions`
+- After `read_file` / `list_files` / `grep` tool calls, add accessed file paths to watcher
+- `onFileChanged?: (files: string[]) => void` callback in `OrchestratorOptions`
 
 **2c. TUI notification** (in `src/tui.tsx`):
-- When `onFileChanged` fires, show a one-line yellow notice: `⚠ External change: src/foo.ts — context may be stale`
-- Auto-dismiss after 5 seconds (or on next user input)
+- When `onFileChanged` fires, show yellow notice: `⚠ External change: src/foo.ts — context may be stale`
+- Auto-dismiss after 5 seconds or on next user input
 
 **2d. Tests** (`src/__tests__/file-watcher.test.ts`):
 - watch() + external write triggers onChanged
@@ -89,14 +85,16 @@ export class FileWatcher {
 - External edits trigger yellow TUI notice within ~1 second
 - No false positives from agent's own writes
 
+## Priority
+Goal 1 is higher priority — ship it fully before starting Goal 2. If running low on turns, skip Goal 2.
+
 ## Verification
 - `npx tsc --noEmit` passes
 - All existing 733 tests pass + new tests added
-- `/rewind` visually works in TUI (manual check)
+- `/rewind` works in TUI
 
 ## Notes
 - Keep Goal 2 simple: `fs.watch()` not chokidar, no new deps
-- Goal 1 is higher priority — ship it fully before starting Goal 2
 - Max 2 goals, max 20 turns
 
-Next expert (iteration 260): **Meta**
+Next expert (iteration 261): **Meta**
