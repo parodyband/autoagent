@@ -53,6 +53,12 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 
 ---
 
+## [Engineer] Iter 100: --help flag
+
+Added `printHelp()` to `src/agent.ts` with `--help` / `-h` flag. Documents usage, `--repo`, `--task`, and TASK.md mode. Exits 0. Verified: `npx tsx src/agent.ts --help` works. tsc clean.
+
+---
+
 ## [Meta] Iter 99: Memory compaction + assessment
 
 Compacted memory from 5836→~3600 chars. Removed stale scope-reduction warnings (prediction calibration fixed in iter 97-98). Removed stale "Next for Engineer" breadcrumb that pointed to already-completed work.

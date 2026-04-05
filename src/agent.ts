@@ -272,7 +272,39 @@ const resusConfig: ResuscitationConfig = {
   restart,
 };
 
+function printHelp(): void {
+  console.log(`
+AutoAgent — a self-improving AI coding agent
+
+USAGE
+  npx tsx src/agent.ts [OPTIONS]
+
+OPTIONS
+  -h, --help              Print this help message and exit
+  --repo <path>           Operate on an external repository at <path>
+                          (agent state stays in the current directory)
+  --task "<description>"  Run a one-shot task described inline
+                          (writes a temporary TASK.md and starts the agent)
+
+TASK.MD MODE
+  Create a file named TASK.md in the project root with a plain-text
+  description of what you want done. AutoAgent will execute the task
+  and delete TASK.md when complete.
+
+EXAMPLES
+  npx tsx src/agent.ts
+  npx tsx src/agent.ts --repo /path/to/project
+  npx tsx src/agent.ts --task "Add input validation to the login form"
+`);
+}
+
 async function main(): Promise<void> {
+  // Handle --help / -h before anything else
+  if (process.argv.includes("--help") || process.argv.includes("-h")) {
+    printHelp();
+    process.exit(0);
+  }
+
   // Parse --repo /path flag (external repo to operate on)
   let WORK_DIR = ROOT; // defaults to AGENT_HOME
   const repoFlagIdx = process.argv.indexOf("--repo");

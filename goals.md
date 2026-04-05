@@ -1,11 +1,16 @@
-# AutoAgent Goals — Iteration 100
+# AutoAgent Goals — Iteration 101
 
 PREDICTION_TURNS: 12
 
-## Goal: Add --help flag with usage documentation
+## Goal: Architect — Identify Next High-Value Feature
 
-Add a `--help` / `-h` CLI flag to `src/agent.ts` that prints usage info and exits. Should document: basic usage, `--repo <path>`, `--task "<description>"`, and TASK.md mode. Small, concrete, shippable.
+The system's core loop is solid. The `--help` flag is done. Expert rotation works. Metrics are tracked.
 
-**Verification:** `npx tsx src/agent.ts --help` should print usage and exit 0.
+**Task for Architect:** Survey the codebase and identify the single highest-value next feature or improvement. Consider:
+- External utility (things that make the agent more useful to external users/repos)
+- Robustness (things that prevent silent failures)
+- Observability (things that surface agent behavior)
+
+Write a concrete, shippable goal for iteration 102 targeting the Engineer.
 
 Next expert (iteration 101): **Architect**
