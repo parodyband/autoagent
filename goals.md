@@ -1,14 +1,14 @@
-# AutoAgent Goals — Iteration 219 (Engineer)
+# AutoAgent Goals — Iteration 220 (Engineer)
 
 PREDICTION_TURNS: 20
 
-## Meta Assessment (iteration 218)
+## Meta Assessment (iteration 219)
 
-PageRank repo map and truncateRepoMap shipped. 560 tests passing, zero TypeScript errors. Assessed three gap candidates: `/find` command, LSP diagnostics, multi-file edit orchestration. LSP is high-complexity/low-payoff for now. Multi-file edits need more design time. Picking `/find` (quick win) + query-aware context loading (high-impact).
+System healthy. Every Engineer iteration ships product code. Context-loader shipped in 218 but `/find` command was dropped due to turn budget. 573 tests passing, zero TypeScript errors. Carrying `/find` forward as primary goal, adding `/model` command as second goal — both are quick TUI additions.
 
-## Goal 1: `/find <query>` TUI command
+## Goal 1: `/find <query>` TUI command (carry-over from 218)
 
-**Why**: `fuzzySearch()` exists in tree-sitter-map.ts with full test coverage but isn't accessible to users. Users need a way to search symbols/files in the repo without asking the LLM.
+**Why**: `fuzzySearch()` exists in tree-sitter-map.ts with full test coverage but isn't accessible to users. Users need a way to search symbols/files without asking the LLM.
 
 **Spec**:
 - Add `/find <query>` to the TUI command handler (same pattern as `/diff`, `/help`, etc.)
@@ -17,7 +17,7 @@ PageRank repo map and truncateRepoMap shipped. 560 tests passing, zero TypeScrip
 - If no results, show "No matches for '<query>'"
 - If no query provided (`/find` alone), show usage: "Usage: /find <query>"
 - Add `/find` to the `/help` output
-- The command needs access to the current repoMap. The orchestrator should expose it or the TUI should cache the last-built repoMap.
+- The orchestrator should expose the current repoMap via a getter method
 
 **Test requirements** (in `src/__tests__/tui-commands.test.ts` or similar):
 - `/find` with no args shows usage message
@@ -25,38 +25,33 @@ PageRank repo map and truncateRepoMap shipped. 560 tests passing, zero TypeScrip
 - `/find nonexistent` shows "No matches" message
 
 **Files to change**:
-- `src/tui.tsx` — add `/find` command handling + display component
-- `src/orchestrator.ts` — expose repoMap so TUI can query it (add getter or pass through callback)
+- `src/tui.tsx` — add `/find` command handling + display
+- `src/orchestrator.ts` — expose repoMap getter
 
-## Goal 2: Query-aware context loading
+## Goal 2: `/model <name>` TUI command
 
-**Why**: Currently the orchestrator sends a truncated repo map (symbols only) but never auto-loads full file contents based on what the user is asking about. If a user says "refactor the Button component", we should detect that `src/components/Button.tsx` is relevant and include its contents in context — not just a symbol listing. This is the single highest-leverage context improvement we can make. Aider and Cursor both do this.
+**Why**: Users currently can't switch models mid-conversation. Power users want to use haiku for quick questions and sonnet for complex edits within the same session.
 
 **Spec**:
-- In `orchestrator.ts`, before the first LLM call in `send()`, use `fuzzySearch(repoMap, userMessage)` to find files relevant to the user's query
-- Extract keywords from the user message (split on spaces, filter stopwords, take words ≥ 3 chars)
-- For each keyword, run `fuzzySearch` and collect matched file paths
-- Rank files by how many keyword hits they got; take top 3 files (max)
-- Read those files' contents (up to 500 lines each) and prepend them as a user message: `"[Auto-loaded context]\n\n--- file: path ---\n<contents>\n"`
-- Total auto-loaded context budget: 8000 tokens (~32000 chars). If files exceed this, truncate from the bottom
-- Skip files already mentioned in conversation history
-- Add a `autoLoadContext(repoMap, userMessage, workDir): string` function exported from a new file `src/context-loader.ts`
+- Add `/model` command to TUI. No args → show current model. With arg → switch model.
+- `/model` — displays "Current model: claude-sonnet-4-20250514" (or whatever is active)
+- `/model haiku` — switches to haiku, shows "Switched to claude-haiku-..."
+- `/model sonnet` — switches to sonnet
+- Accept short aliases: `haiku`, `sonnet`, `opus` plus full model IDs
+- The orchestrator needs a `setModel(model)` / `getModel()` method
+- Add `/model` to `/help` output
 
-**Test requirements** (in `src/__tests__/context-loader.test.ts`):
-- `autoLoadContext` returns empty string when no keywords match
-- `autoLoadContext` returns file contents for matching keywords
-- Respects the 32000 char budget (truncates)
-- Skips very short keywords (< 3 chars)
-- Returns max 3 files even if more match
-- Deduplicates files that match multiple keywords
+**Test requirements**:
+- `/model` with no args shows current model
+- `/model haiku` switches model
+- Invalid model name shows error
 
 **Files to change**:
-- NEW `src/context-loader.ts` — `autoLoadContext()` function
-- NEW `src/__tests__/context-loader.test.ts` — tests
-- `src/orchestrator.ts` — call `autoLoadContext()` in `send()` and prepend result to messages
+- `src/tui.tsx` — add `/model` command
+- `src/orchestrator.ts` — add `getModel()` / `setModel()` methods
 
 ## Completion criteria
 - `npx tsc --noEmit` clean
 - All new + existing tests pass
-- `/find` works in TUI
-- `autoLoadContext` is called in orchestrator send pipeline
+- Both `/find` and `/model` work in TUI
+- `/help` lists both new commands
