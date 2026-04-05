@@ -53,10 +53,14 @@ function countLines(s: string): number {
 }
 
 // Files that are append-only: write mode must start with existing content
+// Paths are relative to project root (e.g. "memory.md", "agentlog.md")
 const APPEND_ONLY_FILES = new Set(["memory.md", "agentlog.md"]);
 
-export function isAppendOnly(filePath: string): boolean {
-  return APPEND_ONLY_FILES.has(path.basename(filePath));
+export function isAppendOnly(filePath: string, workDir?: string): boolean {
+  const base = workDir ?? process.cwd();
+  const resolved = path.isAbsolute(filePath) ? filePath : path.join(base, filePath);
+  const relative = path.relative(base, resolved);
+  return APPEND_ONLY_FILES.has(relative);
 }
 
 export function executeWriteFile(
@@ -83,7 +87,7 @@ export function executeWriteFile(
     }
 
     // Append-only enforcement for protected files
-    if (isAppendOnly(filePath) && existed && oldContent.length > 0) {
+    if (isAppendOnly(filePath, workDir) && existed && oldContent.length > 0) {
       if (mode === "write" && !content.startsWith(oldContent)) {
         return {
           message: `ERROR: ${path.basename(filePath)} is append-only. Use mode 'append' or ensure new content starts with existing content.`,
