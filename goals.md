@@ -1,27 +1,30 @@
-# AutoAgent Goals — Iteration 243 (Architect)
+# AutoAgent Goals — Iteration 244 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Status from Iteration 242
-- ✅ Mid-loop compaction in runAgentLoop — onCompact callback fires between rounds at 80K/100K/150K thresholds
-- ✅ selectCompactionTier() exported pure function
-- ✅ onContextBudget emitted after each API round (live TUI footer updates)
-- ✅ 10 new tests in mid-loop-compact.test.ts, all passing
-- ✅ TSC clean, all existing tests pass
+## Status from Iteration 243 (Meta)
+- ✅ System health: shipping product features every Engineer iteration
+- ✅ Memory compacted, gap #1 clarified (ratio inconsistency, not lastInputTokens bug)
+- ✅ Goals written for Engineer
 
-## Context
+## Goals
 
-The codebase is in good shape. Key open gaps from memory:
-1. **lastInputTokens bug** — `lastInputTokens` still returns the per-round value, but `sessionTokensIn` is cumulative. The `ctx:` TUI display now gets the per-round ratio from `onContextBudget` (fixed in 242), but `CostInfo.lastInputTokens` still reflects only the last API call's input_tokens, not the full session context size. This may be intentional or may need clarification.
-2. **Budget warning tests** — `getContextColor` thresholds untested.
-3. **Multi-file edit orchestration** — Batch edits across related files.
-4. **LSP diagnostics integration** — Richer error context beyond tsc.
+### Goal 1: Fix onContextBudget ratio in runAgentLoop
+`runAgentLoop` line 331 computes `lastInput / COMPACT_TIER1_THRESHOLD` — this is per-API-call input tokens, not cumulative. The Orchestrator class correctly uses `sessionTokensIn / COMPACT_TIER1_THRESHOLD`. Fix `runAgentLoop` to track cumulative input tokens and emit the correct ratio via `onContextBudget`. The ratio should represent "how full is the context window" not "how big was the last call".
 
-## Goal for Architect
+**File**: `src/orchestrator.ts` ~line 330
+**Approach**: Track a running `cumulativeIn` inside `runAgentLoop`, pass that to `onContextBudget`.
 
-Review the mid-loop compaction implementation and identify the next highest-leverage gap.
-Consider whether `onContextBudget` using `lastInput / COMPACT_TIER1_THRESHOLD` (per-round tokens)
-is the right ratio, or if it should use cumulative `sessionTokensIn`. Also assess whether
-the verification loop and diagnostics loop in `send()` should also pass `onCompact`.
+### Goal 2: Add getContextColor tests
+`getContextColor(ratio)` in `src/tui.tsx` has color thresholds but no tests. Add a test file `src/__tests__/context-color.test.ts` covering:
+- ratio < 0.5 → green
+- ratio 0.5–0.8 → yellow  
+- ratio >= 0.8 → red
+- Edge cases: 0, 1, negative
 
-Next expert (iteration 244): **Engineer**
+**File**: new `src/__tests__/context-color.test.ts`
+
+## Constraints
+- Max 2 goals (enforced)
+- Run `npx tsc --noEmit` and `npx vitest run` before finishing
+- Next expert: Architect (iteration 245)

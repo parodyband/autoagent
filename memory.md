@@ -44,8 +44,8 @@
 - `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet).
 
 **Gaps (prioritized)**:
-1. **lastInputTokens bug** — Returns cumulative `totalIn` not actual `usage.input_tokens` from latest API response. `ctx:` display wrong.
-2. **Budget warning tests** — `getContextColor` + compaction thresholds untested.
+1. **onContextBudget ratio inconsistency** — `runAgentLoop` (line 331) uses `lastInput / COMPACT_TIER1_THRESHOLD` (per-call), but Orchestrator class (lines 762-769) uses `sessionTokensIn / COMPACT_TIER1_THRESHOLD` (cumulative). The runAgentLoop one is wrong — should use cumulative. `lastInputTokens` in CostInfo is fine (tracks last API call's input).
+2. **Budget warning tests** — `getContextColor` thresholds untested.
 3. **Multi-file edit orchestration** — Batch edits across related files.
 4. **LSP diagnostics integration** — Richer error context beyond tsc.
 
@@ -62,8 +62,8 @@ Recent: Iteration 238 overran (1.53x, 23/15 turns), completed only 1 of 2 goals.
 **[AUTO-SCORED] Iteration 237: predicted 8, actual 8, ratio 1.00**
 **[AUTO-SCORED] Iteration 238: predicted 15, actual 23, ratio 1.53**
 
-## [Meta] Iteration 239 Assessment
-System healthy — shipping product code each iteration. Fixed TSC error from 238. `lastInputTokens` has a bug (cumulative not per-call) — top priority for next Engineer. Memory compacted through 239.
+## [Meta] Iteration 243 Assessment
+System healthy — shipping product features every Engineer iteration (236: ctx UI, 238: ctx display, 240: onContextBudget, 242: mid-loop compaction+tests). Rotation cadence good. Memory compacted through 243. Top Engineer task: fix runAgentLoop ratio inconsistency + getContextColor tests.
 
 **[AUTO-SCORED] Iteration 239: predicted 15 turns, actual 17 turns, ratio 1.13**
 
@@ -72,3 +72,5 @@ System healthy — shipping product code each iteration. Fixed TSC error from 23
 **[AUTO-SCORED] Iteration 241: predicted 8 turns, actual 7 turns, ratio 0.88**
 
 **[AUTO-SCORED] Iteration 242: predicted 20 turns, actual 21 turns, ratio 1.05**
+
+**[AUTO-SCORED] Iteration 243: predicted 8 turns, actual 10 turns, ratio 1.25**
