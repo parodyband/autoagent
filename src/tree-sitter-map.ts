@@ -439,3 +439,113 @@ export function formatRepoMap(
 
   return lines.join("\n");
 }
+
+// ─── Fuzzy Search ─────────────────────────────────────────────
+
+export interface SearchResult {
+  file: string;        // relative path
+  symbol?: string;     // undefined = file match only
+  kind?: string;       // 'function' | 'class' | 'interface' etc.
+  line?: number;
+  score: number;       // match quality 0–1
+}
+
+/**
+ * Subsequence match score: how well `query` matches `target` as a subsequence.
+ * Returns 0 if not a subsequence match. Returns 0–1 for quality.
+ *
+ * Scoring heuristics (fzf-like):
+ * - Base: proportion of query chars matched (always 1.0 if subsequence)
+ * - Bonus for consecutive chars matched
+ * - Bonus for prefix match (query starts at target start)
+ * - Bonus for shorter targets (tighter match)
+ */
+function subsequenceScore(query: string, target: string): number {
+  const q = query.toLowerCase();
+  const t = target.toLowerCase();
+  if (q.length === 0) return 0;
+  if (q.length > t.length) return 0;
+
+  // Check if q is a subsequence of t, tracking positions
+  const positions: number[] = [];
+  let qi = 0;
+  for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+    if (t[ti] === q[qi]) {
+      positions.push(ti);
+      qi++;
+    }
+  }
+  if (qi < q.length) return 0; // not a subsequence
+
+  // Base score
+  let score = 0.4;
+
+  // Consecutive bonus: fraction of consecutive pairs
+  let consecutiveCount = 0;
+  for (let i = 1; i < positions.length; i++) {
+    if (positions[i] === positions[i - 1] + 1) consecutiveCount++;
+  }
+  if (positions.length > 1) {
+    score += 0.3 * (consecutiveCount / (positions.length - 1));
+  } else {
+    score += 0.3; // single char — treat as fully consecutive
+  }
+
+  // Prefix bonus
+  if (positions[0] === 0) {
+    score += 0.15;
+  }
+
+  // Tight match bonus (query covers most of target)
+  score += 0.15 * (q.length / t.length);
+
+  return Math.min(score, 1.0);
+}
+
+/**
+ * Fuzzy search across files and symbols in a repo map.
+ *
+ * @param repoMap - the repo map to search
+ * @param query - search string (matched as subsequence)
+ * @param maxResults - max results to return (default 20)
+ */
+export function fuzzySearch(repoMap: RepoMap, query: string, maxResults = 20): SearchResult[] {
+  if (!query || query.trim().length === 0) return [];
+
+  const q = query.trim();
+  const results: SearchResult[] = [];
+
+  for (const file of repoMap.files) {
+    // Score file path (use basename for primary match, full path as tiebreaker)
+    const basename = file.path.split("/").pop() ?? file.path;
+    const fileScore = Math.max(
+      subsequenceScore(q, basename),
+      subsequenceScore(q, file.path) * 0.8 // slight penalty for full-path match
+    );
+    if (fileScore > 0) {
+      results.push({ file: file.path, score: fileScore });
+    }
+
+    // Score each exported symbol
+    for (const sym of file.exports) {
+      const symScore = subsequenceScore(q, sym.name);
+      if (symScore > 0) {
+        results.push({
+          file: file.path,
+          symbol: sym.name,
+          kind: sym.kind,
+          line: sym.line,
+          score: symScore,
+        });
+      }
+    }
+  }
+
+  // Sort by score descending, then by file path for stability
+  results.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.file.localeCompare(b.file);
+  });
+
+  return results.slice(0, maxResults);
+}

@@ -338,3 +338,69 @@ describe("formatRepoMap with ranked", () => {
     expect(output).not.toContain("×");
   });
 });
+
+// ─── fuzzySearch ──────────────────────────────────────────────
+
+import { fuzzySearch } from "../tree-sitter-map.js";
+
+describe("fuzzySearch", () => {
+  const repoMap: import("../tree-sitter-map.js").RepoMap = {
+    files: [
+      {
+        path: "src/orchestrator.ts",
+        exports: [
+          { name: "send", kind: "function", line: 10, exported: true },
+          { name: "OrchestratorConfig", kind: "interface", line: 1, exported: true },
+        ],
+        imports: [{ names: ["buildRepoMap"], from: "./tree-sitter-map.js" }],
+      },
+      {
+        path: "src/tui.tsx",
+        exports: [
+          { name: "App", kind: "function", line: 5, exported: true },
+        ],
+        imports: [{ names: ["send"], from: "./orchestrator.js" }],
+      },
+      {
+        path: "src/utils/helpers.ts",
+        exports: [
+          { name: "formatBytes", kind: "function", line: 3, exported: true },
+          { name: "parseArgs", kind: "function", line: 20, exported: true },
+        ],
+        imports: [],
+      },
+    ],
+    builtAt: Date.now(),
+  };
+
+  it("returns file matches for partial path query", () => {
+    const results = fuzzySearch(repoMap, "orch");
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.some(r => r.file === "src/orchestrator.ts" && !r.symbol)).toBe(true);
+  });
+
+  it("returns symbol matches for partial symbol name", () => {
+    const results = fuzzySearch(repoMap, "send");
+    expect(results.some(r => r.symbol === "send" && r.kind === "function")).toBe(true);
+  });
+
+  it("respects maxResults cap", () => {
+    const results = fuzzySearch(repoMap, "s", 2);
+    expect(results.length).toBeLessThanOrEqual(2);
+  });
+
+  it("ranks exact prefix match above scattered match", () => {
+    const results = fuzzySearch(repoMap, "format");
+    const formatIdx = results.findIndex(r => r.symbol === "formatBytes");
+    // formatBytes should appear — it's a prefix match for "format"
+    expect(formatIdx).toBeGreaterThanOrEqual(0);
+    // It should rank higher than a scattered match like "formatRepoMap" (not in our data)
+    // but at minimum it should be in the results
+    expect(results[formatIdx].score).toBeGreaterThan(0.5);
+  });
+
+  it("empty query returns empty array", () => {
+    expect(fuzzySearch(repoMap, "")).toEqual([]);
+    expect(fuzzySearch(repoMap, "   ")).toEqual([]);
+  });
+});

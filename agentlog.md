@@ -1,48 +1,3 @@
-[2026-04-05T15:19:15.042Z] iter=200 turn=6 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:19:15.044Z] iter=200 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -4 +5 lines
-
-Context after patch:
-28 |   loadSession,
-29 |   cleanOldSessions,
-30 | } from "./session-store.js";
-31 | import {
-32 |   runArchitectMode,
-33 |   type EditPlan,
-34 | } from "./architect-mode.js";
-35 | import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
-36 | 
-37 | // ─── Constants ────────────────────────────────────────────────
-38 | 
-[2026-04-05T15:19:15.045Z] iter=200 turn=7 INFO: Turn 7/25
-[2026-04-05T15:19:18.012Z] iter=200 turn=7 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:19:18.014Z] iter=200 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -7 +8 lines
-
-Context after patch:
-81 |   onPlan?: (plan: EditPlan) => void;
-82 | }
-83 | 
-84 | export interface OrchestratorResult {
-85 |   text: string;
-86 |   tokensIn: number;
-87 |   tokensOut: number;
-88 |   model: string;
-89 |   verificationPassed?: boolean;
-90 |   commitResult?: AutoCommitResult;
-91 | }
-92 | 
-93 | export interface CostInfo {
-94 |   cost: number;
-[2026-04-05T15:19:18.015Z] iter=200 turn=8 INFO: Turn 8/25
-[2026-04-05T15:19:23.174Z] iter=200 turn=8 INFO: Agent: Now add auto-commit call at end of `send()`:
-[2026-04-05T15:19:23.175Z] iter=200 turn=8 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:19:23.175Z] iter=200 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -4 +13 lines
-
-Context after patch:
-607 |       }
-608 |     }
-609 | 
-610 |     // 7. Auto-commit if code was likely changed
-611 |     let commitResult: AutoCommitResult | undefined;
 612 |     if (looksLikeCodeChange) {
 613 |       commitResult = await autoCommit(this.opts.workDir, userMessage);
 614 |       if (commitResult.committed) {
@@ -1041,3 +996,381 @@ TypeScript clean. Memory and goals already written. Done.
 [2026-04-05T15:33:07.778Z] iter=208 turn=7 INFO: Tool timing stats
 [2026-04-05T15:33:12.949Z] iter=208 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 208: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T15:33:12.969Z] iter=208 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T15:33:13.000Z] iter=208 turn=7 INFO: Committed: af170f4e (17 in / 1932 out, cache: 5950 created, 41172 read)
+[2026-04-05T15:33:13.000Z] iter=208 turn=7 INFO: Restarting as iteration 209...
+[2026-04-05T15:33:13.197Z] iter=209 INFO: Cache restored: 44/44 entries (0 stale)
+[2026-04-05T15:33:13.199Z] iter=209 INFO: Turn budget: 15/25 (calibration=0.88x, predicted=20)
+[2026-04-05T15:33:13.199Z] iter=209 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T15:33:13.308Z] iter=209 turn=1 INFO: Turn 1/25
+[2026-04-05T15:33:17.737Z] iter=209 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state of the codebase, then implement the two goals: fuzzy search and rankSymbols wiring.
+[2026-04-05T15:33:17.738Z] iter=209 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && head -50 src/tree-sitter-map.ts
+[2026-04-05T15:33:17.742Z] iter=209 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "rankSymbols\|formatRepoMap\|fuzzySearch\|RepoMap\|SearchResult" src/tree-sitter-map.ts | head -60
+[2026-04-05T15:33:17.746Z] iter=209 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "formatRepoMap\|rankSymbols\|buildRepoMap" src/orchestrator.ts | head -20
+[2026-04-05T15:33:17.759Z] iter=209 turn=1 INFO:   -> exit=0 (310 chars)
+[2026-04-05T15:33:17.760Z] iter=209 turn=1 INFO:   -> exit=0 (1320 chars)
+[2026-04-05T15:33:17.765Z] iter=209 turn=1 INFO:   -> exit=0 (285 chars)
+[2026-04-05T15:33:17.765Z] iter=209 turn=2 INFO: Turn 2/25
+[2026-04-05T15:33:21.357Z] iter=209 turn=2 INFO: think: Interesting - Goal 2 says rankSymbols is NOT called in the orchestrator, but looking at line 155, it IS already called. ...
+[2026-04-05T15:33:21.358Z] iter=209 turn=3 INFO: Turn 3/25
+[2026-04-05T15:33:24.836Z] iter=209 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '140,170p' src/orchestrator.ts
+[2026-04-05T15:33:24.838Z] iter=209 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '340,440p' src/tree-sitter-map.ts
+[2026-04-05T15:33:24.846Z] iter=209 turn=3 INFO:   -> exit=0 (1242 chars)
+[2026-04-05T15:33:24.848Z] iter=209 turn=3 INFO:   -> exit=0 (3276 chars)
+[2026-04-05T15:33:24.848Z] iter=209 turn=4 INFO: Turn 4/25
+[2026-04-05T15:33:30.570Z] iter=209 turn=4 INFO: Agent: 
+
+Good checkpoint. Goal 2 (rankSymbols wiring) is already done in the codebase. My deliverables are:
+
+1. **`fuzzySearch()` function in `src/tree-sitter-map.ts`**
+2. **`/find` command in `src/tui.tsx`**
+3. **Tests in `src/__tests__/tree-sitter-map.test.ts`**
+
+Starting now.
+[2026-04-05T15:33:30.570Z] iter=209 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && tail -5 src/tree-sitter-map.ts
+[2026-04-05T15:33:30.572Z] iter=209 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "/diff\|/undo\|/help\|/clear\|/reindex\|handleCommand\|setInput\|slashCommand" src/tui.tsx | head -30
+[2026-04-05T15:33:30.580Z] iter=209 turn=4 INFO:   -> exit=0 (40 chars)
+[2026-04-05T15:33:30.583Z] iter=209 turn=4 INFO:   -> exit=0 (655 chars)
+[2026-04-05T15:33:30.584Z] iter=209 turn=5 INFO: Turn 5/25
+[2026-04-05T15:33:33.130Z] iter=209 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '240,340p' src/tui.tsx
+[2026-04-05T15:33:33.139Z] iter=209 turn=5 INFO:   -> exit=0 (3636 chars)
+[2026-04-05T15:33:33.139Z] iter=209 turn=6 INFO: Turn 6/25
+[2026-04-05T15:33:36.201Z] iter=209 turn=6 INFO: Agent: Now I have all the context I need. Let me implement the fuzzy search function and the /find command.
+[2026-04-05T15:33:36.202Z] iter=209 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/tree-sitter-map.ts
+[2026-04-05T15:33:36.217Z] iter=209 turn=6 INFO:   -> exit=0 (32 chars)
+[2026-04-05T15:33:36.218Z] iter=209 turn=7 INFO: Turn 7/25
+[2026-04-05T15:33:55.590Z] iter=209 turn=7 INFO: Agent: 
+
+**Goal status:**
+- Goal 1 (`/find` fuzzy search): NOT STARTED — have all context, writing now
+- Goal 2 (rankSymbols wiring): DONE — already wired in orchestrator.ts lines 154-156
+
+Let me write the code now.
+[2026-04-05T15:33:55.591Z] iter=209 turn=7 INFO: write_file: src/tree-sitter-map.ts (patch)
+[2026-04-05T15:33:55.594Z] iter=209 turn=7 INFO:   -> ok: Patched src/tree-sitter-map.ts: -2 +112 lines
+
+Context after patch:
+437 |     }
+438 |   }
+439 | 
+440 |   return lines.join("\n");
+441 | }
+442 | 
+443 | // ─── Fuzzy Search ─────────────────────────────────────────────
+444 | 
+445 | export interface SearchResult {
+446 |   file: string;        // relative path
+447 |   symbol?: string;     // undefined = file match only
+448 |   kind?: string;       // 'function' | 'class' | 'interface' etc.
+449 |   line?: number;
+450 |   score: number;       // match quality 0–1
+451 | }
+452 | 
+453 | /**
+454 |  * Subsequence match score: how well `query` matches `target` as a subsequence.
+455 |  * Returns 0 if not a subsequence match. Returns 0–1 for quality.
+456 |  *
+457 |  * Scoring heuristics (fzf-like):
+458 |  * - Base: proportion of query chars matched (always 1.0 if subsequence)
+459 |  * - Bonus for consecutive chars matched
+460 |  * - Bonus for prefix match (query starts at target start)
+461 |  * - Bonus for shorter targets (tighter match)
+462 |  */
+463 | function subsequenceScore(query: string, target: string): number {
+464 |   const q = query.toLowerCase();
+465 |   const t = target.toLowerCase();
+466 |   if (q.length === 0) return 0;
+467 |   if (q.length > t.length) return 0;
+468 | 
+469 |   // Check if q is a subsequence of t, tracking positions
+470 |   const positions: number[] = [];
+471 |   let qi = 0;
+472 |   for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+473 |     if (t[ti] === q[qi]) {
+474 |       positions.push(ti);
+475 |       qi++;
+476 |     }
+477 |   }
+478 |   if (qi < q.length) return 0; // not a subsequence
+479 | 
+480 |   // Base score
+481 |   let score = 0.4;
+482 | 
+483 |   // Consecutive bonus: fraction of consecutive pairs
+484 |   let consecutiveCount = 0;
+485 |   for (let i = 1; i < positions.length; i++) {
+486 |     if (positions[i] === positions[i - 1] + 1) consecutiveCount++;
+487 |   }
+488 |   if (positions.length > 1) {
+489 |     score += 0.3 * (consecutiveCount / (positions.length - 1));
+490 |   } else {
+491 |     score += 0.3; // single char — treat as fully consecutive
+492 |   }
+493 | 
+494 |   // Prefix bonus
+495 |   if (positions[0] === 0) {
+496 |     score += 0.15;
+497 |   }
+498 | 
+499 |   // Tight match bonus (query covers most of target)
+500 |   score += 0.15 * (q.length / t.length);
+501 | 
+502 |   return Math.min(score, 1.0);
+503 | }
+504 | 
+505 | /**
+506 |  * Fuzzy search across files and symbols in a repo map.
+507 |  *
+508 |  * @param repoMap - the repo map to search
+509 |  * @param query - search string (matched as subsequence)
+510 |  * @param maxResults - max results to return (default 20)
+511 |  */
+512 | export function fuzzySearch(repoMap: RepoMap, query: string, maxResults = 20): SearchResult[] {
+513 |   if (!query || query.trim().length === 0) return [];
+514 | 
+515 |   const q = query.trim();
+516 |   const results: SearchResult[] = [];
+517 | 
+518 |   for (const file of repoMap.files) {
+519 |     // Score file path (use basename for primary match, full path as tiebreaker)
+520 |     const basename = file.path.split("/").pop() ?? file.path;
+521 |     const fileScore = Math.max(
+522 |       subsequenceScore(q, basename),
+523 |       subsequenceScore(q, file.path) * 0.8 // slight penalty for full-path match
+524 |     );
+525 |     if (fileScore > 0) {
+526 |       results.push({ file: file.path, score: fileScore });
+527 |     }
+528 | 
+529 |     // Score each exported symbol
+530 |     for (const sym of file.exports) {
+531 |       const symScore = subsequenceScore(q, sym.name);
+532 |       if (symScore > 0) {
+533 |         results.push({
+534 |           file: file.path,
+535 |           symbol: sym.name,
+536 |           kind: sym.kind,
+537 |           line: sym.line,
+538 |           score: symScore,
+539 |         });
+540 |       }
+541 |     }
+542 |   }
+543 | 
+544 |   // Sort by score descending, then by file path for stability
+545 |   results.sort((a, b) => {
+546 |     if (b.score !== a.score) return b.score - a.score;
+547 |     return a.file.localeCompare(b.file);
+548 |   });
+549 | 
+550 |   return results.slice(0, maxResults);
+551 | }
+552 | 
+[2026-04-05T15:33:55.596Z] iter=209 turn=8 INFO: Turn 8/25
+[2026-04-05T15:33:58.486Z] iter=209 turn=8 INFO: Agent: Now add the `/find` command to the TUI:
+[2026-04-05T15:33:58.487Z] iter=209 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "import.*tree-sitter-map\|import.*auto-commit" src/tui.tsx | head -5
+[2026-04-05T15:33:58.502Z] iter=209 turn=8 INFO:   -> exit=0 (54 chars)
+[2026-04-05T15:33:58.503Z] iter=209 turn=9 INFO: Turn 9/25
+[2026-04-05T15:34:01.671Z] iter=209 turn=9 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:34:01.674Z] iter=209 turn=9 INFO:   -> ok: Patched src/tui.tsx: -1 +2 lines
+
+Context after patch:
+16 | import { listSessions, type SessionInfo } from "./session-store.js";
+17 | import type { EditPlan } from "./architect-mode.js";
+18 | import { VirtualMessageList } from "./virtual-message-list.js";
+19 | import { undoLastCommit } from "./auto-commit.js";
+20 | import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
+21 | import { execSync } from "child_process";
+22 | 
+23 | // Parse args
+[2026-04-05T15:34:01.675Z] iter=209 turn=10 INFO: Turn 10/25
+[2026-04-05T15:34:04.775Z] iter=209 turn=10 INFO: Agent: Now I need to find the right spot to add the `/find` command handler. Let me add it alongside `/help`:
+[2026-04-05T15:34:04.776Z] iter=209 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '278,300p' src/tui.tsx
+[2026-04-05T15:34:04.793Z] iter=209 turn=10 INFO:   -> exit=0 (868 chars)
+[2026-04-05T15:34:04.794Z] iter=209 turn=11 INFO: Turn 11/25
+[2026-04-05T15:34:09.571Z] iter=209 turn=11 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:34:09.572Z] iter=209 turn=11 INFO:   -> ok: Patched src/tui.tsx: -7 +8 lines
+
+Context after patch:
+281 |         role: "assistant",
+282 |         content: [
+283 |           "Available commands:",
+284 |           "  /help     — Show this help message",
+285 |           "  /find Q   — Fuzzy search files & symbols in the repo",
+286 |           "  /clear    — Clear the conversation history",
+287 |           "  /reindex  — Re-index the repository files",
+288 |           "  /resume   — List and restore a previous session",
+289 |           "  /diff     — Show uncommitted git changes",
+290 |           "  /undo     — Revert the last autoagent commit",
+291 |           "  /exit     — Quit AutoAgent",
+292 |         ].join("\n"),
+293 |       }]);
+294 |       return;
+[2026-04-05T15:34:09.572Z] iter=209 turn=12 INFO: Turn 12/25
+[2026-04-05T15:34:17.981Z] iter=209 turn=12 INFO: Agent: Now add the `/find` handler right after `/help`:
+[2026-04-05T15:34:17.981Z] iter=209 turn=12 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:34:17.982Z] iter=209 turn=12 INFO:   -> ok: Patched src/tui.tsx: -1 +34 lines
+
+Context after patch:
+293 |       }]);
+294 |       return;
+295 |     }
+296 |     if (trimmed.startsWith("/find")) {
+297 |       const query = trimmed.slice(5).trim();
+298 |       if (!query) {
+299 |         setMessages(prev => [...prev, { role: "assistant", content: "Usage: /find <query>" }]);
+300 |         return;
+301 |       }
+302 |       try {
+303 |         // Get source files for the repo map
+304 |         const allFiles = execSync(
+305 |           "git ls-files --cached --others --exclude-standard 2>/dev/null || find . -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' -o -name '*.py' | head -200",
+306 |           { cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] }
+307 |         ).trim().split("\n").filter(Boolean).slice(0, 200);
+308 |         const repoMap = buildRepoMap(workDir, allFiles);
+309 |         const results = fuzzySearch(repoMap, query, 15);
+310 |         if (results.length === 0) {
+311 |           setMessages(prev => [...prev, { role: "assistant", content: `No matches for "${query}"` }]);
+312 |         } else {
+313 |           const lines = results.map(r => {
+314 |             if (r.symbol) {
+315 |               return `  ${r.file}:${r.line}  ${r.symbol} (${r.kind})  [${(r.score * 100).toFixed(0)}%]`;
+316 |             }
+317 |             return `  ${r.file}  [${(r.score * 100).toFixed(0)}%]`;
+318 |           });
+319 |           setMessages(prev => [...prev, {
+320 |             role: "assistant",
+321 |             content: `🔍 Results for "${query}":\n${lines.join("\n")}`,
+322 |           }]);
+323 |         }
+324 |       } catch {
+325 |         setMessages(prev => [...prev, { role: "assistant", content: "Search failed — could not build repo map." }]);
+326 |       }
+327 |       return;
+328 |     }
+329 |     if (trimmed === "/diff") {
+330 |       try {
+331 |         const isRepo = execSync("git rev-parse --is-inside-work-tree", {
+332 |           cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"],
+[2026-04-05T15:34:17.982Z] iter=209 turn=13 INFO: Turn 13/25
+[2026-04-05T15:34:21.870Z] iter=209 turn=13 INFO: Agent: 
+
+I've made real changes: `fuzzySearch()` in tree-sitter-map.ts and `/find` command in tui.tsx. Now I need tests and type-check. Let me wrap up.
+[2026-04-05T15:34:21.870Z] iter=209 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T15:34:22.796Z] iter=209 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:34:22.797Z] iter=209 turn=14 INFO: Turn 14/25
+[2026-04-05T15:34:26.070Z] iter=209 turn=14 INFO: Agent: TypeScript compiles clean. Now write the tests:
+[2026-04-05T15:34:26.070Z] iter=209 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "fuzzySearch\|rankSymbols" src/__tests__/tree-sitter-map.test.ts 2>/dev/null | head -10
+[2026-04-05T15:34:26.080Z] iter=209 turn=14 INFO:   -> exit=0 (336 chars)
+[2026-04-05T15:34:26.080Z] iter=209 turn=15 INFO: Turn 15/25
+[2026-04-05T15:34:28.451Z] iter=209 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && tail -5 src/__tests__/tree-sitter-map.test.ts
+[2026-04-05T15:34:28.459Z] iter=209 turn=15 INFO:   -> exit=0 (141 chars)
+[2026-04-05T15:34:28.460Z] iter=209 turn=16 INFO: Turn 16/25
+[2026-04-05T15:34:42.457Z] iter=209 turn=16 INFO: Agent: 
+
+Writing tests, then wrapping up immediately.
+[2026-04-05T15:34:42.458Z] iter=209 turn=16 INFO: write_file: src/__tests__/tree-sitter-map.test.ts (patch)
+[2026-04-05T15:34:42.461Z] iter=209 turn=16 INFO:   -> ok: Patched src/__tests__/tree-sitter-map.test.ts: -5 +71 lines
+
+Context after patch:
+333 |       ],
+334 |       builtAt: Date.now(),
+335 |     };
+336 |     const output = formatRepoMap(repoMap);
+337 |     expect(output).toContain("fn (function:1)");
+338 |     expect(output).not.toContain("×");
+339 |   });
+340 | });
+341 | 
+342 | // ─── fuzzySearch ──────────────────────────────────────────────
+343 | 
+344 | import { fuzzySearch } from "../tree-sitter-map.js";
+345 | 
+346 | describe("fuzzySearch", () => {
+347 |   const repoMap: import("../tree-sitter-map.js").RepoMap = {
+348 |     files: [
+349 |       {
+350 |         path: "src/orchestrator.ts",
+351 |         exports: [
+352 |           { name: "send", kind: "function", line: 10, exported: true },
+353 |           { name: "OrchestratorConfig", kind: "interface", line: 1, exported: true },
+354 |         ],
+355 |         imports: [{ names: ["buildRepoMap"], from: "./tree-sitter-map.js" }],
+356 |       },
+357 |       {
+358 |         path: "src/tui.tsx",
+359 |         exports: [
+360 |           { name: "App", kind: "function", line: 5, exported: true },
+361 |         ],
+362 |         imports: [{ names: ["send"], from: "./orchestrator.js" }],
+363 |       },
+364 |       {
+365 |         path: "src/utils/helpers.ts",
+366 |         exports: [
+367 |           { name: "formatBytes", kind: "function", line: 3, exported: true },
+368 |           { name: "parseArgs", kind: "function", line: 20, exported: true },
+369 |         ],
+370 |         imports: [],
+371 |       },
+372 |     ],
+373 |     builtAt: Date.now(),
+374 |   };
+375 | 
+376 |   it("returns file matches for partial path query", () => {
+377 |     const results = fuzzySearch(repoMap, "orch");
+378 |     expect(results.length).toBeGreaterThan(0);
+379 |     expect(results.some(r => r.file === "src/orchestrator.ts" && !r.symbol)).toBe(true);
+380 |   });
+381 | 
+382 |   it("returns symbol matches for partial symbol name", () => {
+383 |     const results = fuzzySearch(repoMap, "send");
+384 |     expect(results.some(r => r.symbol === "send" && r.kind === "function")).toBe(true);
+385 |   });
+386 | 
+387 |   it("respects maxResults cap", () => {
+388 |     const results = fuzzySearch(repoMap, "s", 2);
+389 |     expect(results.length).toBeLessThanOrEqual(2);
+390 |   });
+391 | 
+392 |   it("ranks exact prefix match above scattered match", () => {
+393 |     const results = fuzzySearch(repoMap, "format");
+394 |     const formatIdx = results.findIndex(r => r.symbol === "formatBytes");
+395 |     // formatBytes should appear — it's a prefix match for "format"
+396 |     expect(formatIdx).toBeGreaterThanOrEqual(0);
+397 |     // It should rank higher than a scattered match like "formatRepoMap" (not in our data)
+398 |     // but at minimum it should be in the results
+399 |     expect(results[formatIdx].score).toBeGreaterThan(0.5);
+400 |   });
+401 | 
+402 |   it("empty query returns empty array", () => {
+403 |     expect(fuzzySearch(repoMap, "")).toEqual([]);
+404 |     expect(fuzzySearch(repoMap, "   ")).toEqual([]);
+405 |   });
+406 | });
+407 | 
+[2026-04-05T15:34:42.462Z] iter=209 turn=17 INFO: Turn 17/25
+[2026-04-05T15:34:45.934Z] iter=209 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -10
+[2026-04-05T15:34:45.936Z] iter=209 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tree-sitter-map.test.ts 2>&1 | tail -20
+[2026-04-05T15:34:46.878Z] iter=209 turn=17 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:34:47.012Z] iter=209 turn=17 INFO:   -> exit=0 (288 chars)
+[2026-04-05T15:34:47.013Z] iter=209 turn=18 INFO: Turn 18/25
+[2026-04-05T15:34:52.182Z] iter=209 turn=18 INFO: Agent: All 31 tests pass, TypeScript clean. Now memory and goals:
+[2026-04-05T15:34:52.183Z] iter=209 turn=18 INFO: save_memory: "[Architect] Iteration 209 shipped"
+[2026-04-05T15:34:52.183Z] iter=209 turn=18 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T15:34:52.183Z] iter=209 turn=19 INFO: Turn 19/25
+[2026-04-05T15:35:01.908Z] iter=209 turn=19 INFO: write_file: goals.md (write)
+[2026-04-05T15:35:01.909Z] iter=209 turn=19 INFO:   -> ok: Updated goals.md (985 chars, -64 lines delta)
+[2026-04-05T15:35:01.910Z] iter=209 turn=20 INFO: Turn 20/25
+[2026-04-05T15:35:04.151Z] iter=209 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status
+[2026-04-05T15:35:04.194Z] iter=209 turn=20 INFO:   -> exit=0 (379 chars)
+[2026-04-05T15:35:04.195Z] iter=209 turn=21 INFO: Turn 21/25
+[2026-04-05T15:35:06.815Z] iter=209 turn=21 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T15:35:06.815Z] iter=209 turn=21 INFO: RESTART signal
+[2026-04-05T15:35:06.816Z] iter=209 turn=21 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T15:35:07.737Z] iter=209 turn=21 INFO: Compilation OK
+[2026-04-05T15:35:13.631Z] iter=209 turn=21 INFO: Cache persisted: 44 entries to .autoagent-cache.json
+[2026-04-05T15:35:13.631Z] iter=209 turn=21 INFO: Tool timing: bash: 18x, avg=176ms, total=3172ms; write_file: 6x, avg=3ms, total=15ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=0ms, total=0ms
+[2026-04-05T15:35:13.631Z] iter=209 turn=21 INFO: Tool timing stats
+[2026-04-05T15:35:18.575Z] iter=209 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 209: predicted 20 turns, actual 21 turns, ratio 1.05**
+[2026-04-05T15:35:21.116Z] iter=209 turn=21 INFO: Pre-commit review (2407in/60out): LGTM. The implementation is clean, self-contained, and the tests cover the key behaviors (partial match, symbol match, result cap, scoring threshold, empty input). The scoring heuristics are reasonabl

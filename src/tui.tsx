@@ -17,6 +17,7 @@ import { listSessions, type SessionInfo } from "./session-store.js";
 import type { EditPlan } from "./architect-mode.js";
 import { VirtualMessageList } from "./virtual-message-list.js";
 import { undoLastCommit } from "./auto-commit.js";
+import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
 import { execSync } from "child_process";
 
 // Parse args
@@ -281,6 +282,7 @@ function App() {
         content: [
           "Available commands:",
           "  /help     — Show this help message",
+          "  /find Q   — Fuzzy search files & symbols in the repo",
           "  /clear    — Clear the conversation history",
           "  /reindex  — Re-index the repository files",
           "  /resume   — List and restore a previous session",
@@ -289,6 +291,39 @@ function App() {
           "  /exit     — Quit AutoAgent",
         ].join("\n"),
       }]);
+      return;
+    }
+    if (trimmed.startsWith("/find")) {
+      const query = trimmed.slice(5).trim();
+      if (!query) {
+        setMessages(prev => [...prev, { role: "assistant", content: "Usage: /find <query>" }]);
+        return;
+      }
+      try {
+        // Get source files for the repo map
+        const allFiles = execSync(
+          "git ls-files --cached --others --exclude-standard 2>/dev/null || find . -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' -o -name '*.py' | head -200",
+          { cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] }
+        ).trim().split("\n").filter(Boolean).slice(0, 200);
+        const repoMap = buildRepoMap(workDir, allFiles);
+        const results = fuzzySearch(repoMap, query, 15);
+        if (results.length === 0) {
+          setMessages(prev => [...prev, { role: "assistant", content: `No matches for "${query}"` }]);
+        } else {
+          const lines = results.map(r => {
+            if (r.symbol) {
+              return `  ${r.file}:${r.line}  ${r.symbol} (${r.kind})  [${(r.score * 100).toFixed(0)}%]`;
+            }
+            return `  ${r.file}  [${(r.score * 100).toFixed(0)}%]`;
+          });
+          setMessages(prev => [...prev, {
+            role: "assistant",
+            content: `🔍 Results for "${query}":\n${lines.join("\n")}`,
+          }]);
+        }
+      } catch {
+        setMessages(prev => [...prev, { role: "assistant", content: "Search failed — could not build repo map." }]);
+      }
       return;
     }
     if (trimmed === "/diff") {
