@@ -1,84 +1,3 @@
-[2026-04-05T16:39:23.024Z] iter=245 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "autoCommit\|runDiagnostics\|verification\|test" src/orchestrator.ts | head -30
-[2026-04-05T16:39:23.035Z] iter=245 turn=4 INFO:   -> exit=0 (1104 chars)
-[2026-04-05T16:39:23.036Z] iter=245 turn=5 INFO: Turn 5/25
-[2026-04-05T16:39:25.684Z] iter=245 turn=5 INFO: read_file: src/orchestrator.ts
-[2026-04-05T16:39:25.685Z] iter=245 turn=5 INFO:   -> ok (3293 chars)
-[2026-04-05T16:39:25.685Z] iter=245 turn=6 INFO: Turn 6/25
-[2026-04-05T16:39:50.375Z] iter=245 turn=6 INFO: Agent: 
-
-I'm an Architect iteration — my deliverable is goals.md, not src/ changes. Let me write it now.
-[2026-04-05T16:39:50.377Z] iter=245 turn=6 INFO: write_file: goals.md (write)
-[2026-04-05T16:39:50.379Z] iter=245 turn=6 INFO:   -> ok: Updated goals.md (3542 chars, +40 lines delta)
-[2026-04-05T16:39:50.381Z] iter=245 turn=7 INFO: Turn 7/25
-[2026-04-05T16:39:58.558Z] iter=245 turn=7 INFO: Agent: 
-
-Wrapping up now.
-[2026-04-05T16:39:58.560Z] iter=245 turn=7 INFO: save_memory: "[Architect] Iteration 245 — Multi-file edit assessment + test runner design"
-[2026-04-05T16:39:58.562Z] iter=245 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T16:39:58.562Z] iter=245 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T16:39:59.479Z] iter=245 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:39:59.480Z] iter=245 turn=8 INFO: Turn 8/25
-[2026-04-05T16:40:07.293Z] iter=245 turn=8 INFO: Agent: TSC clean. 
-[2026-04-05T16:40:07.294Z] iter=245 turn=8 INFO: write_file: memory.md (patch)
-[2026-04-05T16:40:07.294Z] iter=245 turn=8 INFO:   -> ok: Patched memory.md: -5 +4 lines
-
-Context after patch:
-43 | - `src/tree-sitter-map.ts` — Repo map with PageRank scoring, fuzzySearch.
-44 | - `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet).
-45 | 
-46 | **Gaps (prioritized)**:
-47 | 1. **Smart test runner** — `src/test-runner.ts`: auto-discover and run tests for changed files post-edit, with auto-fix loop. Designed in iteration 245.
-48 | 2. **LSP diagnostics integration** — Richer error context beyond tsc.
-49 | 3. **Multi-file edit orchestration** — Deferred; LLM handles naturally via repo map + context loader.
-50 | 
-51 | ---
-52 | 
-[2026-04-05T16:40:07.295Z] iter=245 turn=9 INFO: Turn 9/25
-[2026-04-05T16:40:10.072Z] iter=245 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T16:40:10.073Z] iter=245 turn=9 INFO: RESTART signal
-[2026-04-05T16:40:10.074Z] iter=245 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T16:40:10.975Z] iter=245 turn=9 INFO: Compilation OK
-[2026-04-05T16:40:16.892Z] iter=245 turn=9 INFO: Cache persisted: 53 entries to .autoagent-cache.json
-[2026-04-05T16:40:16.892Z] iter=245 turn=9 INFO: Cache stats: 0 hits, 2 misses, 53 entries, 2 invalidations (0 entries removed)
-[2026-04-05T16:40:16.892Z] iter=245 turn=9 INFO: Tool cache stats
-[2026-04-05T16:40:16.892Z] iter=245 turn=9 INFO: Tool timing: bash: 7x, avg=143ms, total=1000ms; grep: 1x, avg=17ms, total=17ms; save_memory: 1x, avg=7ms, total=7ms; write_file: 2x, avg=2ms, total=4ms; think: 1x, avg=1ms, total=1ms; read_file: 1x, avg=1ms, total=1ms
-[2026-04-05T16:40:16.892Z] iter=245 turn=9 INFO: Tool timing stats
-[2026-04-05T16:40:22.033Z] iter=245 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 245: predicted 8 turns, actual 9 turns, ratio 1.13**
-[2026-04-05T16:40:22.053Z] iter=245 turn=9 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T16:40:22.088Z] iter=245 turn=9 INFO: Committed: 60c7b076 (19 in / 3052 out, cache: 14458 created, 81976 read)
-[2026-04-05T16:40:22.088Z] iter=245 turn=9 INFO: Restarting as iteration 246...
-[2026-04-05T16:40:22.288Z] iter=246 INFO: Cache restored: 53/53 entries (0 stale)
-[2026-04-05T16:40:22.290Z] iter=246 INFO: Turn budget: 17/25 (calibration=1.05x, predicted=20)
-[2026-04-05T16:40:22.291Z] iter=246 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T16:40:22.404Z] iter=246 turn=1 INFO: Turn 1/25
-[2026-04-05T16:40:24.677Z] iter=246 turn=1 INFO: Agent: I'll start by reading the goals and understanding the current codebase structure.
-[2026-04-05T16:40:24.678Z] iter=246 turn=1 INFO: $ cat goals.md
-[2026-04-05T16:40:24.682Z] iter=246 turn=1 INFO: $ ls src/ | head -50
-[2026-04-05T16:40:24.691Z] iter=246 turn=1 INFO:   -> exit=0 (3542 chars)
-[2026-04-05T16:40:24.695Z] iter=246 turn=1 INFO:   -> exit=0 (594 chars)
-[2026-04-05T16:40:24.696Z] iter=246 turn=2 INFO: Turn 2/25
-[2026-04-05T16:40:27.563Z] iter=246 turn=2 INFO: $ cat src/diagnostics.ts
-[2026-04-05T16:40:27.566Z] iter=246 turn=2 INFO: $ grep -n "diagnostics\|write_file\|writtenFiles\|changedFiles\|runDiag" src/orchestrator.ts | head -40
-[2026-04-05T16:40:27.573Z] iter=246 turn=2 INFO:   -> exit=0 (2460 chars)
-[2026-04-05T16:40:27.577Z] iter=246 turn=2 INFO:   -> exit=0 (1083 chars)
-[2026-04-05T16:40:27.578Z] iter=246 turn=3 INFO: Turn 3/25
-[2026-04-05T16:40:29.860Z] iter=246 turn=3 INFO: $ sed -n '900,970p' src/orchestrator.ts
-[2026-04-05T16:40:29.863Z] iter=246 turn=3 INFO: $ ls src/__tests__/
-[2026-04-05T16:40:29.869Z] iter=246 turn=3 INFO:   -> exit=0 (2133 chars)
-[2026-04-05T16:40:29.870Z] iter=246 turn=3 INFO:   -> exit=0 (945 chars)
-[2026-04-05T16:40:29.871Z] iter=246 turn=4 INFO: Turn 4/25
-[2026-04-05T16:40:34.180Z] iter=246 turn=4 INFO: think: I have enough context. Let me build:
-1. `src/test-runner.ts` - findRelatedTests + runRelatedTests
-2. `src/__tests__/test...
-[2026-04-05T16:40:34.181Z] iter=246 turn=5 INFO: Turn 5/25
-[2026-04-05T16:40:49.040Z] iter=246 turn=5 INFO: Agent: Writing all three files now:
-[2026-04-05T16:40:49.041Z] iter=246 turn=5 INFO: write_file: src/test-runner.ts (write)
-[2026-04-05T16:40:49.042Z] iter=246 turn=5 INFO:   -> ok: Created src/test-runner.ts (3529 chars)
-[2026-04-05T16:40:49.043Z] iter=246 turn=6 INFO: Turn 6/25
-[2026-04-05T16:40:59.280Z] iter=246 turn=6 INFO: write_file: src/__tests__/test-runner.test.ts (write)
-[2026-04-05T16:40:59.282Z] iter=246 turn=6 INFO:   -> ok: Created src/__tests__/test-runner.test.ts (2797 chars)
-[2026-04-05T16:40:59.283Z] iter=246 turn=7 INFO: Turn 7/25
-[2026-04-05T16:41:02.248Z] iter=246 turn=7 INFO: Agent: **Goal 1** (src/test-runner.ts): DONE  
 **Goal 2** (wire into orchestrator.ts): NOT STARTED  
 
 Now wiring the test runner into orchestrator.ts after the diagnostics loop:
@@ -1077,3 +996,218 @@ Writing goals.md and wrapping up immediately.
 [2026-04-05T16:55:33.069Z] iter=253 turn=12 INFO: Tool timing stats
 [2026-04-05T16:55:37.983Z] iter=253 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 253: predicted 8 turns, actual 12 turns, ratio 1.50**
 [2026-04-05T16:55:38.003Z] iter=253 turn=12 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T16:55:38.033Z] iter=253 turn=12 INFO: Committed: c2a14275 (22 in / 3924 out, cache: 17982 created, 151620 read)
+[2026-04-05T16:55:38.033Z] iter=253 turn=12 INFO: Restarting as iteration 254...
+[2026-04-05T16:55:38.205Z] iter=254 INFO: Cache restored: 54/54 entries (0 stale)
+[2026-04-05T16:55:38.206Z] iter=254 INFO: Turn budget: 17/25 (calibration=1.50x, predicted=20)
+[2026-04-05T16:55:38.207Z] iter=254 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T16:55:38.319Z] iter=254 turn=1 INFO: Turn 1/25
+[2026-04-05T16:55:41.268Z] iter=254 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what needs to be built.
+[2026-04-05T16:55:41.269Z] iter=254 turn=1 INFO: read_file: goals.md
+[2026-04-05T16:55:41.270Z] iter=254 turn=1 INFO:   -> ok (4806 chars)
+[2026-04-05T16:55:41.270Z] iter=254 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/orchestrator.ts && head -20 src/orchestrator.ts
+[2026-04-05T16:55:41.287Z] iter=254 turn=1 INFO:   -> exit=0 (927 chars)
+[2026-04-05T16:55:41.287Z] iter=254 turn=2 INFO: Turn 2/25
+[2026-04-05T16:55:44.967Z] iter=254 turn=2 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:55:44.969Z] iter=254 turn=2 INFO:   -> ok (3781 chars)
+[2026-04-05T16:55:44.969Z] iter=254 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && ls src/__tests__/ | head -30
+[2026-04-05T16:55:44.983Z] iter=254 turn=2 INFO:   -> exit=0 (682 chars)
+[2026-04-05T16:55:44.983Z] iter=254 turn=3 INFO: Turn 3/25
+[2026-04-05T16:55:48.107Z] iter=254 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && ls src/__tests__/ | tail -20
+[2026-04-05T16:55:48.121Z] iter=254 turn=3 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:55:48.122Z] iter=254 turn=3 INFO:   -> ok (2090 chars)
+[2026-04-05T16:55:48.137Z] iter=254 turn=3 INFO:   -> exit=0 (453 chars)
+[2026-04-05T16:55:48.138Z] iter=254 turn=4 INFO: Turn 4/25
+[2026-04-05T16:55:52.728Z] iter=254 turn=4 INFO: think: I have enough context. Let me start building:
+
+1. Goal 1: Add `PARALLEL_SAFE_TOOLS` constant and `executeToolsParallel()...
+[2026-04-05T16:55:52.729Z] iter=254 turn=5 INFO: Turn 5/25
+[2026-04-05T16:55:55.960Z] iter=254 turn=5 INFO: Agent: Starting deliverables now. I have enough context. Let me build both goals simultaneously.
+[2026-04-05T16:55:55.961Z] iter=254 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:55:55.961Z] iter=254 turn=5 INFO:   -> ok (2596 chars)
+[2026-04-05T16:55:55.962Z] iter=254 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "execTool\|Error:\|error" src/orchestrator.ts | head -40
+[2026-04-05T16:55:55.972Z] iter=254 turn=5 INFO:   -> exit=0 (1891 chars)
+[2026-04-05T16:55:55.972Z] iter=254 turn=6 INFO: Turn 6/25
+[2026-04-05T16:56:29.294Z] iter=254 turn=6 INFO: Agent: Now I have everything I need. Let me build both deliverables:
+[2026-04-05T16:56:29.294Z] iter=254 turn=6 INFO: write_file: src/tool-recovery.ts (write)
+[2026-04-05T16:56:29.295Z] iter=254 turn=6 INFO:   -> ok: Created src/tool-recovery.ts (8344 chars)
+[2026-04-05T16:56:29.296Z] iter=254 turn=7 INFO: Turn 7/25
+[2026-04-05T16:56:35.212Z] iter=254 turn=7 INFO: Agent: **Goal 1 (Parallel Tool Execution): IN PROGRESS** — need to add `PARALLEL_SAFE_TOOLS` constant + `executeToolsParallel()` to orchestrator.ts and replace the sequential loop.
+
+**Goal 2 (Tool Error Recovery): IN PROGRESS** — `src/tool-recovery.ts` created, need to wire it into orchestrator.ts error path + write tests.
+
+Continuing now — targeting finish by turn 12.
+[2026-04-05T16:56:35.212Z] iter=254 turn=7 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:56:35.213Z] iter=254 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
+
+Context after patch:
+36 | import { runDiagnostics } from "./diagnostics.js";
+37 | import { findRelatedTests, runRelatedTests } from "./test-runner.js";
+38 | import { computeUnifiedDiff } from "./diff-preview.js";
+39 | import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences } from "./context-loader.js";
+40 | import { enhanceToolError } from "./tool-recovery.js";
+41 | import * as fs from "fs";
+42 | 
+43 | // ─── Constants ────────────────────────────────────────────────
+44 | 
+[2026-04-05T16:56:35.214Z] iter=254 turn=8 INFO: Turn 8/25
+[2026-04-05T16:56:38.808Z] iter=254 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:56:38.811Z] iter=254 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -3 +16 lines
+
+Context after patch:
+40 | import { enhanceToolError } from "./tool-recovery.js";
+41 | import * as fs from "fs";
+42 | 
+43 | // ─── Constants ────────────────────────────────────────────────
+44 | 
+45 | /**
+46 |  * Tools that are safe to run in parallel — read-only, no side effects.
+47 |  * bash is excluded because it can have side effects.
+48 |  */
+49 | export const PARALLEL_SAFE_TOOLS = new Set([
+50 |   "read_file",
+51 |   "grep",
+52 |   "glob",
+53 |   "web_search",
+54 |   "web_fetch",
+55 |   "list_files",
+56 | ]);
+57 | 
+58 | const MODEL_COMPLEX = "claude-sonnet-4-6";
+59 | const MODEL_SIMPLE = "claude-haiku-4-5";
+60 | const MAX_TOKENS = 16384;
+61 | const MAX_ROUNDS = 30;
+[2026-04-05T16:56:38.812Z] iter=254 turn=9 INFO: Turn 9/25
+[2026-04-05T16:56:42.087Z] iter=254 turn=9 INFO: Agent: Now add `executeToolsParallel()` function and wire tool error enhancement. First, find a good place to add the helper function:
+[2026-04-05T16:56:42.088Z] iter=254 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^async function\|^function\|^export function\|^export async function" src/orchestrator.ts | head -20
+[2026-04-05T16:56:42.114Z] iter=254 turn=9 INFO:   -> exit=0 (479 chars)
+[2026-04-05T16:56:42.114Z] iter=254 turn=10 INFO: Turn 10/25
+[2026-04-05T16:56:50.363Z] iter=254 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:56:50.365Z] iter=254 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -1 +44 lines
+
+Context after patch:
+298 | 
+299 | // ─── Streaming agent loop ─────────────────────────────────────
+300 | 
+301 | /**
+302 |  * Execute tool_use blocks with parallelism for read-only tools.
+303 |  * - Read-only tools (in PARALLEL_SAFE_TOOLS) run concurrently via Promise.all
+304 |  * - Side-effecting tools run sequentially after parallel reads complete
+305 |  * - Results are returned in the original tool_use order
+306 |  */
+307 | async function executeToolsParallel(
+308 |   tools: Anthropic.ToolUseBlock[],
+309 |   executeTool: (tu: Anthropic.ToolUseBlock) => Promise<string>,
+310 | ): Promise<Array<{ type: "tool_result"; tool_use_id: string; content: string }>> {
+311 |   // Separate into parallel-safe and sequential groups, preserving original index
+312 |   const parallelEntries: Array<{ idx: number; tu: Anthropic.ToolUseBlock }> = [];
+313 |   const sequentialEntries: Array<{ idx: number; tu: Anthropic.ToolUseBlock }> = [];
+314 | 
+315 |   tools.forEach((tu, idx) => {
+316 |     if (PARALLEL_SAFE_TOOLS.has(tu.name)) {
+317 |       parallelEntries.push({ idx, tu });
+318 |     } else {
+319 |       sequentialEntries.push({ idx, tu });
+320 |     }
+321 |   });
+322 | 
+323 |   // Results array pre-allocated by original order
+324 |   const results: Array<{ type: "tool_result"; tool_use_id: string; content: string }> =
+325 |     new Array(tools.length);
+326 | 
+327 |   // Run parallel-safe tools concurrently
+328 |   await Promise.all(
+329 |     parallelEntries.map(async ({ idx, tu }) => {
+330 |       const content = await executeTool(tu);
+331 |       results[idx] = { type: "tool_result", tool_use_id: tu.id, content };
+332 |     }),
+333 |   );
+334 | 
+335 |   // Run sequential tools one by one (after parallel completes)
+336 |   for (const { idx, tu } of sequentialEntries) {
+337 |     const content = await executeTool(tu);
+338 |     results[idx] = { type: "tool_result", tool_use_id: tu.id, content };
+339 |   }
+340 | 
+341 |   return results;
+342 | }
+343 | 
+344 | async function runAgentLoop(
+345 |   client: Anthropic,
+346 |   model: string,
+347 |   systemPrompt: string,
+[2026-04-05T16:56:50.366Z] iter=254 turn=11 INFO: Turn 11/25
+[2026-04-05T16:56:53.041Z] iter=254 turn=11 INFO: Agent: Now replace the sequential loop with `executeToolsParallel()` and wire `enhanceToolError`. First I need to see how `execTool` is called to update the interface:
+[2026-04-05T16:56:53.041Z] iter=254 turn=11 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:56:53.042Z] iter=254 turn=11 INFO:   -> ok (1165 chars)
+[2026-04-05T16:56:53.042Z] iter=254 turn=12 INFO: Turn 12/25
+[2026-04-05T16:56:54.587Z] iter=254 turn=12 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:56:54.589Z] iter=254 turn=12 INFO:   -> ok (883 chars)
+[2026-04-05T16:56:54.590Z] iter=254 turn=13 INFO: Turn 13/25
+[2026-04-05T16:56:59.524Z] iter=254 turn=13 INFO: think: Let me assess what I've actually done:
+1. Created src/tool-recovery.ts ✅
+2. Added import for enhanceToolError in orchest...
+[2026-04-05T16:56:59.525Z] iter=254 turn=14 INFO: Turn 14/25
+[2026-04-05T16:57:06.018Z] iter=254 turn=14 INFO: Agent: I've changed: `src/tool-recovery.ts` (created), `src/orchestrator.ts` (import + PARALLEL_SAFE_TOOLS + executeToolsParallel). Still need: wire the loop + write tests. Doing it now.
+[2026-04-05T16:57:06.018Z] iter=254 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "Execute non-write tools first\|for (const tu of nonWriteTools)" src/orchestrator.ts
+[2026-04-05T16:57:06.034Z] iter=254 turn=14 INFO:   -> exit=0 (106 chars)
+[2026-04-05T16:57:06.035Z] iter=254 turn=15 INFO: Turn 15/25
+[2026-04-05T16:57:08.255Z] iter=254 turn=15 INFO: Agent: Wrapping up fast. Let me wire the loop, write tests, then finish.
+[2026-04-05T16:57:08.255Z] iter=254 turn=15 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:57:08.256Z] iter=254 turn=15 INFO:   -> ok (1545 chars)
+[2026-04-05T16:57:08.256Z] iter=254 turn=16 INFO: Turn 16/25
+[2026-04-05T16:57:12.801Z] iter=254 turn=16 INFO: Agent: Wiring the loop and tests in one shot:
+[2026-04-05T16:57:12.801Z] iter=254 turn=16 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:57:12.803Z] iter=254 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -6 +7 lines
+
+Context after patch:
+425 | 
+426 |     const results: Anthropic.ToolResultBlockParam[] = [];
+427 | 
+428 |     // Execute non-write tools (reads, greps, etc.) — parallel-safe ones run concurrently
+429 |     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
+430 |       const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+431 |       const enhanced = enhanceToolError(tu.name, tu.input as Record<string, unknown>, rawResult, workDir);
+432 |       return compressToolOutput(tu.name, enhanced);
+433 |     });
+434 |     results.push(...parallelResults);
+435 | 
+436 |     // Handle write_file tools — batch if 2+ and onDiffPreview is set
+437 |     if (writeTools.length >= 2 && onDiffPreview) {
+[2026-04-05T16:57:12.803Z] iter=254 turn=17 INFO: Turn 17/25
+[2026-04-05T16:57:27.446Z] iter=254 turn=17 INFO: Agent: Writing tests and finishing now.
+[2026-04-05T16:57:27.446Z] iter=254 turn=17 INFO: write_file: src/__tests__/parallel-tools.test.ts (write)
+[2026-04-05T16:57:27.447Z] iter=254 turn=17 INFO:   -> ok: Created src/__tests__/parallel-tools.test.ts (3416 chars)
+[2026-04-05T16:57:27.447Z] iter=254 turn=18 INFO: Turn 18/25
+[2026-04-05T16:57:39.101Z] iter=254 turn=18 INFO: Agent: Writing tests, running tsc, finishing now.
+[2026-04-05T16:57:39.103Z] iter=254 turn=18 INFO: write_file: src/__tests__/tool-recovery.test.ts (write)
+[2026-04-05T16:57:39.104Z] iter=254 turn=18 INFO:   -> ok: Created src/__tests__/tool-recovery.test.ts (2893 chars)
+[2026-04-05T16:57:39.105Z] iter=254 turn=19 INFO: Turn 19/25
+[2026-04-05T16:57:44.238Z] iter=254 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30 && echo "TSC_DONE"
+[2026-04-05T16:57:44.771Z] iter=254 turn=19 INFO:   -> exit=0 (147 chars)
+[2026-04-05T16:57:44.771Z] iter=254 turn=20 INFO: Turn 20/25
+[2026-04-05T16:57:46.437Z] iter=254 turn=20 INFO: read_file: src/test-runner.ts
+[2026-04-05T16:57:46.437Z] iter=254 turn=20 INFO:   -> ok (431 chars)
+[2026-04-05T16:57:46.437Z] iter=254 turn=21 INFO: Turn 21/25
+[2026-04-05T16:57:48.333Z] iter=254 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '100,110p' src/test-runner.ts | cat -A
+[2026-04-05T16:57:48.342Z] iter=254 turn=21 INFO:   -> exit=1 (59 chars)
+[2026-04-05T16:57:48.342Z] iter=254 turn=22 INFO: Turn 22/25
+[2026-04-05T16:57:49.871Z] iter=254 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '100,112p' src/test-runner.ts | od -c | head -30
+[2026-04-05T16:57:49.902Z] iter=254 turn=22 INFO:   -> exit=0 (2190 chars)
+[2026-04-05T16:57:49.903Z] iter=254 turn=23 INFO: Turn 23/25
+[2026-04-05T16:57:51.816Z] iter=254 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | grep "test-runner" | head -5
+[2026-04-05T16:57:52.342Z] iter=254 turn=23 INFO:   -> exit=0 (138 chars)
+[2026-04-05T16:57:52.342Z] iter=254 turn=24 INFO: Turn 24/25
+[2026-04-05T16:57:53.864Z] iter=254 turn=24 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '101,107p' src/test-runner.ts
+[2026-04-05T16:57:53.886Z] iter=254 turn=24 INFO:   -> exit=0 (330 chars)
+[2026-04-05T16:57:53.887Z] iter=254 turn=25 INFO: Turn 25/25
+[2026-04-05T16:57:55.511Z] iter=254 turn=25 INFO: $ cd /Users/austin/Documents/autoagent && git stash && npx tsc --noEmit 2>&1 | head -5 && git stash pop
+[2026-04-05T16:57:55.511Z] iter=254 turn=25 INFO:   -> exit=-1 (249 chars)
+[2026-04-05T16:57:55.512Z] iter=254 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T16:57:55.515Z] iter=254 turn=25 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-05T16:57:55.515Z] iter=254 turn=25 INFO: Cache stats: 0 hits, 8 misses, 56 entries, 7 invalidations (6 entries removed)
+[2026-04-05T16:57:55.516Z] iter=254 turn=25 INFO: Tool cache stats
+[2026-04-05T16:57:55.516Z] iter=254 turn=25 INFO: Tool timing: bash: 12x, avg=103ms, total=1239ms; read_file: 8x, avg=3ms, total=20ms; write_file: 7x, avg=2ms, total=15ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T16:57:55.516Z] iter=254 turn=25 INFO: Tool timing stats
+[2026-04-05T16:58:00.421Z] iter=254 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 254: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T16:58:03.867Z] iter=254 turn=25 INFO: Pre-commit review (2995in/100out): **LGTM** — the changes are well-structured: the `PARALLEL_SAFE_TOOLS` export is clean, imports use `.js` extensions correctly, and the tests accurately validate both the constant membership and `Promi

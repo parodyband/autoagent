@@ -74,3 +74,5 @@ System healthy. Shipping features consistently (context warning + model routing 
 **[AUTO-SCORED] Iteration 252: predicted 8 turns, actual 12 turns, ratio 1.50**
 
 **[AUTO-SCORED] Iteration 253: predicted 8 turns, actual 12 turns, ratio 1.50**
+
+**[AUTO-SCORED] Iteration 254: predicted 20 turns, actual 25 turns, ratio 1.25**

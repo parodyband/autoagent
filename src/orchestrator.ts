@@ -37,9 +37,23 @@ import { runDiagnostics } from "./diagnostics.js";
 import { findRelatedTests, runRelatedTests } from "./test-runner.js";
 import { computeUnifiedDiff } from "./diff-preview.js";
 import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences } from "./context-loader.js";
+import { enhanceToolError } from "./tool-recovery.js";
 import * as fs from "fs";
 
 // ─── Constants ────────────────────────────────────────────────
+
+/**
+ * Tools that are safe to run in parallel — read-only, no side effects.
+ * bash is excluded because it can have side effects.
+ */
+export const PARALLEL_SAFE_TOOLS = new Set([
+  "read_file",
+  "grep",
+  "glob",
+  "web_search",
+  "web_fetch",
+  "list_files",
+]);
 
 const MODEL_COMPLEX = "claude-sonnet-4-6";
 const MODEL_SIMPLE = "claude-haiku-4-5";
@@ -284,6 +298,49 @@ function makeExecTool(
 
 // ─── Streaming agent loop ─────────────────────────────────────
 
+/**
+ * Execute tool_use blocks with parallelism for read-only tools.
+ * - Read-only tools (in PARALLEL_SAFE_TOOLS) run concurrently via Promise.all
+ * - Side-effecting tools run sequentially after parallel reads complete
+ * - Results are returned in the original tool_use order
+ */
+async function executeToolsParallel(
+  tools: Anthropic.ToolUseBlock[],
+  executeTool: (tu: Anthropic.ToolUseBlock) => Promise<string>,
+): Promise<Array<{ type: "tool_result"; tool_use_id: string; content: string }>> {
+  // Separate into parallel-safe and sequential groups, preserving original index
+  const parallelEntries: Array<{ idx: number; tu: Anthropic.ToolUseBlock }> = [];
+  const sequentialEntries: Array<{ idx: number; tu: Anthropic.ToolUseBlock }> = [];
+
+  tools.forEach((tu, idx) => {
+    if (PARALLEL_SAFE_TOOLS.has(tu.name)) {
+      parallelEntries.push({ idx, tu });
+    } else {
+      sequentialEntries.push({ idx, tu });
+    }
+  });
+
+  // Results array pre-allocated by original order
+  const results: Array<{ type: "tool_result"; tool_use_id: string; content: string }> =
+    new Array(tools.length);
+
+  // Run parallel-safe tools concurrently
+  await Promise.all(
+    parallelEntries.map(async ({ idx, tu }) => {
+      const content = await executeTool(tu);
+      results[idx] = { type: "tool_result", tool_use_id: tu.id, content };
+    }),
+  );
+
+  // Run sequential tools one by one (after parallel completes)
+  for (const { idx, tu } of sequentialEntries) {
+    const content = await executeTool(tu);
+    results[idx] = { type: "tool_result", tool_use_id: tu.id, content };
+  }
+
+  return results;
+}
+
 async function runAgentLoop(
   client: Anthropic,
   model: string,
@@ -368,12 +425,13 @@ async function runAgentLoop(
 
     const results: Anthropic.ToolResultBlockParam[] = [];
 
-    // Execute non-write tools first (reads, greps, thinks)
-    for (const tu of nonWriteTools) {
+    // Execute non-write tools (reads, greps, etc.) — parallel-safe ones run concurrently
+    const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
       const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
-      const result = compressToolOutput(tu.name, rawResult);
-      results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
-    }
+      const enhanced = enhanceToolError(tu.name, tu.input as Record<string, unknown>, rawResult, workDir);
+      return compressToolOutput(tu.name, enhanced);
+    });
+    results.push(...parallelResults);
 
     // Handle write_file tools — batch if 2+ and onDiffPreview is set
     if (writeTools.length >= 2 && onDiffPreview) {
