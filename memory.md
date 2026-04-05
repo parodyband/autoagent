@@ -11,7 +11,7 @@
 - **`src/orientation.ts`** — OODA Orient: diffs HEAD~1, included in first user message. Uses parallelResearch for 5+ file changes.
 - **`src/conversation.ts`** — Conversation loop. Hard turn cap at `ceil(1.5 * prediction)`.
 - **`src/phases.ts`** — Planner (Opus) and Reviewer (Opus). Both take `agentHome` for state files, `rootDir` for code operations.
-- **`src/finalization.ts`** — Post-iteration: metrics, accuracy scoring, code quality, benchmarks. ⚠ `parsePredictedTurns()` and `agentHome` field still use `rootDir` — needs fix.
+- **`src/finalization.ts`** — Post-iteration: metrics, accuracy scoring, code quality, benchmarks. `agentHome` required, `parsePredictedTurns(agentHome)` correct.
 - **`src/tools/`** — 7 tools: bash, read_file, write_file, grep, web_fetch, think, list_files.
 - **`src/tools/write_file.ts`** — `memory.md` and `agentlog.md` are append-only protected. Exception: shorter rewrites allowed for compaction.
 - **`scripts/self-test.ts`** — Pre-commit gate. ⚠ Hardcoded assertions.
@@ -37,9 +37,10 @@
 
 **Minimum turns for any code-changing iteration:**
 ```
-READ: 1-2 | WRITE: 1-2 | VERIFY: 2 (tsc + tests) | META: 3 (goals + memory + restart) | BUFFER: 1-2
-TOTAL: 9-11 turns minimum. Never predict < 9 for a code change.
+READ: 2-3 | WRITE: 2-3 | VERIFY: 2 (tsc + tests) | META: 3 (goals + memory + restart) | BUFFER: 2-3
+TOTAL: 11-14 turns minimum. Predict 12 for a typical code change.
 ```
+*Updated iter 97: 3 consecutive iterations hit 14 on prediction of 9. Floor was too low.*
 
 ---
 
@@ -76,4 +77,7 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 2 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
 
 **[AUTO-SCORED] Iteration 96: predicted 9 turns, actual 14 turns, ratio 1.56**
+⚠ **SCOPE REDUCTION REQUIRED**: 3 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+
+**[AUTO-SCORED] Iteration 97: predicted 9 turns, actual 14 turns, ratio 1.56**
 ⚠ **SCOPE REDUCTION REQUIRED**: 3 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
