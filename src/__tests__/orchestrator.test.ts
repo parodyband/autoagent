@@ -47,36 +47,41 @@ describe("routeModel", () => {
 
 describe("buildSystemPrompt", () => {
   it("includes workDir in system prompt", () => {
-    const prompt = buildSystemPrompt("/some/repo", "");
-    expect(prompt).toContain("/some/repo");
+    const { systemPrompt } = buildSystemPrompt("/some/repo", "");
+    expect(systemPrompt).toContain("/some/repo");
   });
 
   it("includes tool list", () => {
-    const prompt = buildSystemPrompt("/tmp", "");
-    expect(prompt).toContain("bash");
-    expect(prompt).toContain("read_file");
-    expect(prompt).toContain("write_file");
-    expect(prompt).toContain("grep");
+    const { systemPrompt } = buildSystemPrompt("/tmp", "");
+    expect(systemPrompt).toContain("bash");
+    expect(systemPrompt).toContain("read_file");
+    expect(systemPrompt).toContain("write_file");
+    expect(systemPrompt).toContain("grep");
   });
 
   it("includes repo fingerprint when provided", () => {
     const fp = "## Repo Context\n\n**Project type**: Node.js";
-    const prompt = buildSystemPrompt("/tmp", fp);
-    expect(prompt).toContain("## Repo Context");
-    expect(prompt).toContain("Node.js");
+    const { systemPrompt } = buildSystemPrompt("/tmp", fp);
+    expect(systemPrompt).toContain("## Repo Context");
+    expect(systemPrompt).toContain("Node.js");
   });
 
   it("includes key files section when repo has source files", () => {
     // Use our own repo dir to get actual ranked files
-    const prompt = buildSystemPrompt(process.cwd(), "");
+    const { systemPrompt } = buildSystemPrompt(process.cwd(), "");
     // Should have either key files section or at least the base prompt
-    expect(prompt).toContain("Working directory:");
+    expect(systemPrompt).toContain("Working directory:");
   });
 
   it("handles empty fingerprint gracefully", () => {
-    const prompt = buildSystemPrompt("/nonexistent/path", "");
-    expect(typeof prompt).toBe("string");
-    expect(prompt.length).toBeGreaterThan(0);
+    const { systemPrompt } = buildSystemPrompt("/nonexistent/path", "");
+    expect(typeof systemPrompt).toBe("string");
+    expect(systemPrompt.length).toBeGreaterThan(0);
+  });
+
+  it("returns repoMapBlock string", () => {
+    const { repoMapBlock } = buildSystemPrompt(process.cwd(), "");
+    expect(typeof repoMapBlock).toBe("string");
   });
 });
 

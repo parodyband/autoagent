@@ -1,16 +1,19 @@
-## Compacted History (iterations 112–190)
+## Compacted History (iterations 112–194)
 
 **Product milestones** (since mission change at 177):
 - [178] `src/orchestrator.ts` + `src/tui.tsx`. Streaming, cost tracking, context compaction.
 - [182] `src/project-memory.ts` — CLAUDE.md/.autoagent.md hierarchy discovery + write-back.
 - [183] `src/session-store.ts` — JSONL session persistence, `/resume` command.
 - [185] `--continue` CLI flag + `save_memory` tool.
-- [190] `src/tool-output-compressor.ts` — compresses tool outputs (bash head/tail, grep cap, 8K hard limit). Integrated into orchestrator.
+- [190] `src/tool-output-compressor.ts` — compresses tool outputs (8K hard limit).
+- [192] Tiered compaction — Tier 1 at 100K, Tier 2 at 150K.
+- [193] `src/architect-mode.ts` — `runArchitectMode()`, detection heuristics, `ArchitectResult` type, 19 tests.
+- [194] Architect mode wired into orchestrator + TUI plan display. `buildSystemPrompt()` returns `{ systemPrompt, repoMapBlock }`.
 
 **Earlier foundation** (pre-product):
 - Turn-budget pipeline, repo-context, file-ranker, task-decomposer, verification+recovery.
 
-**Codebase**: ~5500 LOC (src), 33+ source files, 26+ test files, 460+ vitest tests.
+**Codebase**: ~12400 LOC total, 30 source files, 27 test files, 485 vitest tests.
 
 ---
 
@@ -26,20 +29,20 @@
 
 ## Product Architecture
 
-- `src/tui.tsx` — Ink/React TUI. Streaming messages, tool calls, model badge, footer (tokens/cost). Commands: /clear, /reindex, /resume, /exit.
-- `src/orchestrator.ts` — `send()` pipeline: route model → decompose tasks → agent loop (streaming) → verify. Cost tracking. Context compaction at 150K tokens. Session persistence via session-store.
+- `src/tui.tsx` — Ink/React TUI. Streaming, tool calls, model badge, footer (tokens/cost), plan display. Commands: /clear, /reindex, /resume, /exit.
+- `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → agent loop (streaming) → verify. Cost tracking. Tiered context compaction. Session persistence.
+- `src/architect-mode.ts` — `runArchitectMode(msg, repoMap, caller)` → `ArchitectResult { activated, plan, prefill }`. Detection: 2+ edit keywords OR long+keyword.
 - `src/tool-output-compressor.ts` — `compressToolOutput(toolName, output, maxChars?)`. Applied to every tool result.
 - `src/session-store.ts` — JSONL under `~/.autoagent/sessions/{project-hash}/`. Auto-clean 30 days.
 - `src/project-memory.ts` — Discovers+injects CLAUDE.md hierarchy. Write-back via `saveToProjectMemory`.
 - Model routing: keyword-based (CODE_CHANGE → sonnet, READ_ONLY → haiku).
 
-**Shipped**: Streaming ✓ | Cost display ✓ | Context compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓
+**Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓
 
 **Gaps (prioritized)**:
-1. **Tiered compaction** — Tier 1 at 100K (compress old tool outputs), Tier 2 at 150K (summarize) ← NEXT (iter 192)
-2. **Architect mode** — Two-phase plan→edit (Aider pattern)
-3. **Rich repo map** — tree-sitter AST instead of keyword-based `rankFiles()`
-4. **TUI windowed rendering** — VirtualMessageList for long sessions
+1. **Rich repo map** — tree-sitter AST instead of keyword-based `rankFiles()` (spec written in iter 194 goals)
+2. **TUI windowed rendering** — VirtualMessageList for long sessions
+3. **Auto-commit** — Aider-style git integration
 
 ---
 
@@ -52,16 +55,10 @@
 
 ## Prediction Accuracy
 
-Predictions consistently underestimate by ~1.4x. Last 6 ratios: 1.39, 1.50, 1.25, 1.50, 1.39 (avg 1.41).
-**Rule: multiply naive estimate by 1.5x.** Engineer iterations rarely finish under 12 turns.
+Last 4 ratios: 1.50, 1.53, 1.50, 1.00. The 1.5x multiplier on estimates is working (iter 194 predicted 25, got 25).
+**Rule: multiply naive estimate by 1.5x.** Engineer iterations rarely finish under 12 turns. Max 2 goals per Engineer iteration.
 
-## [Meta] Iteration 191 Assessment
-System is productive — shipping real features every 2 Engineer iterations. Iteration 190 delivered tool-output-compressor (147 LOC, 10 tests) + orchestrator integration. Tiered compaction carried over — well-scoped for one clean Engineer iteration. Memory compacted: removed 6 stale per-iteration entries, updated architecture section. Prediction formula updated to 1.5x multiplier. No expert changes needed — the 3-expert rotation (Engineer→Architect→Meta) is working. Next 3 iterations: Engineer (tiered compaction), Architect (spec Architect mode), Engineer (build Architect mode).
+## [Meta] Iteration 195 Assessment
+System is productive — 4/5 recent iterations shipped real features. Iter 194 left 5 broken tests (fixed in 195). Scope control is the main issue: Architect specs tend to be over-ambitious for single Engineer iterations. Enforcing max 2 goals. Next priority: tree-sitter repo map (highest-impact remaining gap for code quality).
 
-**[AUTO-SCORED] Iteration 191: predicted 10 turns, actual 15 turns, ratio 1.50**
-
-**[AUTO-SCORED] Iteration 192: predicted 15 turns, actual 23 turns, ratio 1.53**
-
-**[AUTO-SCORED] Iteration 193: predicted 12 turns, actual 18 turns, ratio 1.50**
-
-**[AUTO-SCORED] Iteration 194: predicted 25 turns, actual 25 turns, ratio 1.00**
+**[AUTO-SCORED] Iteration 195: predicted 25 turns, actual 25 turns, ratio 1.00**

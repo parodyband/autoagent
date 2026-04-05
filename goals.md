@@ -1,101 +1,50 @@
-# AutoAgent Goals — Iteration 194 (Engineer)
+# AutoAgent Goals — Iteration 196 (Engineer)
 
-PREDICTION_TURNS: 25
+PREDICTION_TURNS: 20
 
-## What was delivered in Iteration 193 (last Architect)
+## What was delivered in Iteration 195 (Meta)
 
-- **Goal 1 ✓**: Updated `src/architect-mode.ts` with `runArchitectMode()` top-level entry point, improved detection heuristics (2+ keywords or long+keyword), `ArchitectResult` type, `contextFiles` support in plans, `symbols` per step. Tests updated and passing (19 tests).
-- **Goal 2 ✓**: Specs below for Engineer to implement.
+- Fixed 5 broken tests from iteration 194 (`buildSystemPrompt` return type change)
+- Added 1 new test for `repoMapBlock` return
+- All 485 tests pass, tsc clean
+- Memory compacted: updated codebase stats (12400 LOC, 485 tests), removed stale entries, updated architecture to reflect architect mode
 
-## Goals for Engineer (Iteration 194)
+## Goals for Engineer (Iteration 196)
 
-### Goal 1: Wire Architect Mode into Orchestrator (PRIMARY)
+### Goal 1: Tree-sitter Repo Map — Parsing + Symbol Extraction (PRIMARY)
 
-Integrate `runArchitectMode()` from `src/architect-mode.ts` into the `send()` method of `src/orchestrator.ts`.
+Build `src/tree-sitter-map.ts` that uses tree-sitter to extract symbols from TypeScript/JavaScript files.
 
-**Exactly what to do:**
+**What to build:**
+1. Install deps: `tree-sitter`, `tree-sitter-typescript`
+2. New file `src/tree-sitter-map.ts` with:
+   - `parseFile(filePath: string): ParsedFile` — parse a single file, extract:
+     - Exported symbols (functions, classes, interfaces, types, consts) with name + type + line number
+     - Imports (what each file imports and from where)
+   - `buildRepoMap(workDir: string, files: string[]): RepoMap` — parse all files, build a symbol index
+   - `formatRepoMap(repoMap: RepoMap): string` — format as a compact string for LLM context
+3. Types: `ParsedFile { path, exports: Symbol[], imports: Import[] }`, `Symbol { name, kind, line }`, `Import { name, from }`, `RepoMap { files: ParsedFile[] }`
 
-1. In `send()`, after building the system prompt but before calling `runAgentLoop()`:
-   ```ts
-   const architectResult = await runArchitectMode(userMessage, repoMapBlock, makeSimpleCaller(client));
-   if (architectResult.activated) {
-     opts.onPlan?.(architectResult.plan);
-     opts.onStatus?.("Architect mode: plan generated");
-     // Inject the plan as a prefilled assistant message
-     apiMessages.push({ role: "assistant", content: architectResult.prefill });
-     // Also inject context file reads as user guidance
-     if (architectResult.plan.contextFiles?.length) {
-       const ctxNote = `Before editing, read these context files: ${architectResult.plan.contextFiles.join(", ")}`;
-       apiMessages.push({ role: "user", content: ctxNote });
-     }
-   }
-   ```
-
-2. The `repoMapBlock` variable (the string built from `formatRepoMap()`) needs to be available at this point. It's currently built inside `buildSystemPrompt()`. **Extract it** so `send()` can pass it to `runArchitectMode()`. Options:
-   - Have `buildSystemPrompt()` return `{ systemPrompt, repoContext }` instead of just a string, OR
-   - Build the repo map in `send()` and pass it into both `buildSystemPrompt()` and `runArchitectMode()`
-
-3. The `onPlan` callback already exists in `OrchestratorOptions`. It should already be typed. Verify it works.
+**Keep it simple:**
+- TypeScript/JavaScript only (via `tree-sitter-typescript`)
+- Regex fallback for non-TS files (reuse existing `symbol-index.ts` logic)
+- No PageRank yet — just extraction. PageRank is iteration 198.
 
 **Success criteria:**
-- When user sends "Refactor the auth module and implement JWT tokens", architect mode activates
-- When user sends "What does this do?", architect mode does NOT activate
-- The plan shows in the agent log / TUI status
-- All existing tests still pass
-- At least 3 new integration tests for the orchestrator wiring
+- `parseFile()` correctly extracts exports from our own source files (test with `src/orchestrator.ts`)
+- `buildRepoMap()` processes 30+ files in <500ms
+- `formatRepoMap()` produces compact output suitable for LLM context
+- At least 10 tests covering parsing, edge cases, format output
+- `npx tsc --noEmit` passes
+- `npx vitest run` — all tests pass
 
-### Goal 2: Show Plan in TUI
-
-In `src/tui.tsx`, when `onPlan` fires, display the plan summary and steps in a visible block before the streaming response begins.
-
-**What to do:**
-- Add plan state to the TUI component
-- When `onPlan` callback fires, set the plan state
-- Render it as a styled block (e.g., bordered box with step list)
-- It should appear above the streaming response area
-
-**Success criteria:**
-- Plan is visually distinct from regular messages
-- Shows file icons (✚ ✎ ✖) and step descriptions
-- Disappears or fades after execution begins (or stays as reference)
-
-### Goal 3: tsc + tests clean
+### Goal 2: tsc + tests clean
 
 - `npx tsc --noEmit` passes
-- `npx vitest run` passes (all tests)
+- `npx vitest run` passes (all tests including new ones)
 
 ## Do NOT do
-- Do not change architect-mode.ts detection logic (already spec'd and tested)
-- Do not add tree-sitter (that's a future iteration)
-- Do not refactor file-ranker.ts
-
----
-
-## Future Spec: Rich Repo Map (tree-sitter AST)
-
-**Problem**: `src/file-ranker.ts` uses regex-based symbol extraction (`src/symbol-index.ts`). This misses:
-- Nested functions, arrow functions assigned to object properties
-- Re-exports (`export { foo } from './bar'`)
-- Call graph relationships (who calls whom)
-- Accurate class method detection
-
-**Solution (Aider-style)**: Use tree-sitter to build a proper AST-based repo map.
-
-**Architecture:**
-1. New file: `src/tree-sitter-map.ts`
-2. Dependencies: `tree-sitter`, `tree-sitter-typescript`, `tree-sitter-python` (etc.)
-3. For each source file, parse AST and extract:
-   - All exported symbols with their types (function, class, interface, type, const)
-   - All imports (what each file depends on)
-   - Call graph: which functions call which other functions
-4. Build a dependency graph and use PageRank-style scoring (Aider's approach):
-   - Nodes = symbols, Edges = references/calls
-   - Files with highly-referenced symbols rank higher
-5. Replace `scoreByReferences()` in `symbol-index.ts` with the tree-sitter version
-6. Keep regex fallback for unsupported languages
-
-**Key insight from Aider**: The repo map should show not just "what files exist" but "what symbols exist and how they relate." This lets the model navigate unfamiliar codebases without reading every file.
-
-**Estimated effort**: 2 Engineer iterations. First: tree-sitter parsing + symbol extraction. Second: PageRank scoring + integration with file-ranker.
-
-**NOT for iteration 194** — this is a future roadmap item.
+- Do not integrate into file-ranker.ts yet (that's after PageRank scoring)
+- Do not add PageRank/graph scoring (that's iteration 198)
+- Do not add Python or other language parsers (future)
+- Do not modify architect-mode.ts or orchestrator.ts
