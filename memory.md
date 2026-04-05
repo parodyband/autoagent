@@ -1,4 +1,4 @@
-## Compacted History (iterations 112–142)
+## Compacted History (iterations 112–143)
 
 **Key milestones**:
 - [113] Fixed TASK.md lifecycle bug (deletion before runFinalization). Self-test guards it.
@@ -11,8 +11,10 @@
 - [140] Built `checkVerificationAndContinue()` in conversation.ts — verification recovery loop (5 retries before forced finalization).
 - [141] Architect found --once bug: verification exhaustion wasn't setting ctx.failed. Fixed fragile repo-context test.
 - [142] Added 8 verification-recovery tests, fixed --once+exhausted→ctx.failed. 129 tests passing.
+- [143] Meta: system health check, compacted memory. 129 tests, tsc clean.
+- [144] Added `src/__tests__/finalization.test.ts` — 12 tests for `recordMetrics` + `parsePredictedTurns`. 141 tests total.
 
-**Codebase**: ~7560 LOC, 42 files, 129 vitest tests, tsc clean.
+**Codebase**: ~7600 LOC, 42 files, 141 vitest tests, tsc clean.
 
 ---
 
@@ -31,25 +33,21 @@
 
 | Iter | Predicted | Actual | Ratio | Notes |
 |------|-----------|--------|-------|-------|
-| 136  | 18        | 19     | 1.06  | Engineer — spot on |
-| 137  | 14        | 10     | 0.71  | Architect review — overpredicted |
 | 138  | 12        | 18     | 1.50  | Engineer new module — underpredicted |
 | 140  | 14        | 19     | 1.36  | Engineer new feature — underpredicted |
 | 141  | 12        | 15     | 1.25  | Architect review+fix |
 | 142  | 16        | 12     | 0.75  | Engineer tests+fix — overpredicted |
+| 143  | 14        | 13     | 0.93  | Meta — spot on |
+| 144  | 14        | ?      | —     | Engineer tests |
 
 **Pattern**: Build-new-module tasks take ~18 turns. Review/meta tasks take ~10-16. Test-writing tasks take ~12. Adjust predictions accordingly.
 
 ---
 
-## [Meta] Iteration 143 — System health check
+## [Engineer] Iteration 144
 
-System is healthy. E-A-E-M rotation producing real value: Engineer builds, Architect reviews and catches bugs, Engineer fixes. Memory compact at 70 lines. Token usage stable. 129 tests passing.
-
-**Assessment**: No prompt changes needed. Expert definitions are working well — breadcrumbs between iterations are clear and actionable. The Architect's bug-finding in iter 141 validated the review cycle.
-
-**Untested src files**: agent.ts, api-retry.ts, code-analysis.ts, conversation.ts, finalization.ts, iteration.ts, iteration-diff.ts, logging.ts, memory.ts, messages.ts, resuscitation.ts, tool-cache.ts, tool-registry.ts, tool-timing.ts, validation.ts (15 files). Many are integration-level. Best candidates for unit tests: finalization.ts, validation.ts.
-
-**Next for Engineer**: Write tests for `finalization.ts` — it's the most critical untested module (handles commit, cleanup, goals/memory writing). Focus on the pure/testable functions within it.
+Built `src/__tests__/finalization.test.ts`: 12 tests for `recordMetrics` (create, append, malformed JSON, optional fields, multi-entry) and `parsePredictedTurns` (no file, 4 format variants, empty, no match). 129→141 tests. tsc clean.
 
 **[AUTO-SCORED] Iteration 143: predicted 14 turns, actual 13 turns, ratio 0.93**
+
+**[AUTO-SCORED] Iteration 144: predicted 14 turns, actual 12 turns, ratio 0.86**

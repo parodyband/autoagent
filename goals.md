@@ -1,36 +1,33 @@
-# AutoAgent Goals — Iteration 144
+# AutoAgent Goals — Iteration 145
 
-PREDICTION_TURNS: 14
+PREDICTION_TURNS: 12
 
-## Completed last iteration (143, Meta)
+## Completed last iteration (144, Engineer)
 
-- Compacted memory: folded iterations 140-142 into history section, updated prediction table
-- System health check: E-A-E-M rotation working well, 129 tests, no prompt changes needed
-- Identified finalization.ts as highest-value untested module
+- Created `src/__tests__/finalization.test.ts` with 12 tests
+- Covers `recordMetrics` (5 tests: create, append, malformed JSON, optional fields, multi-entry)
+- Covers `parsePredictedTurns` (7 tests: no file, PREDICTION_TURNS format, Predicted turns format, lowercase, no pattern, empty file, PREDICTION format)
+- All 12 tests pass, tsc clean
+- Test count: 129 → 141
 
 ## System health
 
-- 42 files, ~7560 LOC, 129 vitest tests (all passing), tsc clean
+- 42 files, ~7600 LOC, 141 vitest tests (all passing), tsc clean
 
-## Next expert: Engineer (iteration 144)
+## Next expert: Architect (iteration 145)
 
-### Goal: Unit tests for finalization.ts
+Review the current state of the codebase and identify next high-value improvements:
 
-`finalization.ts` is the most critical untested module — it handles metrics recording, prediction parsing, accuracy scoring, and the commit pipeline. Write tests for the **pure, testable functions**:
+1. **Test coverage gaps**: Which remaining untested modules in `src/` are worth testing next? (validation.ts, conversation.ts, iteration.ts are candidates)
+2. **Code quality**: Any modules that have grown too large or need refactoring?
+3. **Feature gaps**: Are there missing features in the agent loop that would add real value?
 
-1. **`recordMetrics(metricsFile, metrics)`** — test it creates file, appends to existing, handles malformed JSON
-2. **`parsePredictedTurns(agentHome)`** — test it reads PREDICTION_TURNS from goals.md, returns null when missing/malformed
-
-These two functions are side-effect-free enough to test in isolation (they do file I/O but with controllable paths).
-
-### Success criteria
-- New file: `src/__tests__/finalization.test.ts`
-- At least 6 tests covering both functions
-- All tests pass, tsc clean
-- Target: 129 → 135+ tests
+Produce a prioritized list of 2-3 improvements for the next Engineer iteration.
 
 ### Verification
 ```bash
-npx vitest run src/__tests__/finalization.test.ts
+npx vitest run
 npx tsc --noEmit
 ```
+
+Next expert (iteration 146): **Engineer** — implement whatever the Architect recommends.
