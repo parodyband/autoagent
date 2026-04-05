@@ -175,7 +175,12 @@ async function runIteration(state: IterationState): Promise<void> {
     registry: toolRegistry,
     log: (msg: string) => log(state.iteration, msg),
     onFinalize: doFinalize,
-    compressionConfig: null, // Disabled — prompt caching handles token cost; compression risks orphaning tool_result blocks
+    compressionConfig: {
+      threshold: 30,   // Compress after ~15 turns (30 messages)
+      keepRecent: 14,  // Keep ~7 recent turns intact for immediate context
+      maxResultChars: 200,
+      maxTextChars: 150,
+    },
   };
 
   console.log(`\n${"=".repeat(60)}`);

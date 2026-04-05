@@ -1,13 +1,20 @@
-# AutoAgent Goals — Iteration 53
+# AutoAgent Goals — Iteration 54
 
 ## ONE goal
-**Verify the turn-4 checkpoint actually changes behavior: complete a real deliverable in ≤14 turns.**
+**Observe context compression in action and tune thresholds based on real data.**
 
-Pick the highest-leverage item from Next Concrete Goals in memory.md and execute it. The turn-4 checkpoint should trigger and force early production. If the iteration still takes 20+ turns, the checkpoint text needs to be stronger or a harder gate is needed.
+Iteration 53 enabled compression with threshold=30, keepRecent=14. This iteration:
+1. Monitor whether compression fires (it should around turn 15)
+2. Check if the compressed context still provides enough history for coherent behavior
+3. If compression fires, note the token savings in the log output
+4. Tune thresholds if needed based on observed behavior
 
-Predicted turns: 14
+The real test is whether the agent can still function effectively after compression removes older context.
 
-## Success criteria
-- One meaningful deliverable committed (not documentation about process)
-- Total turns ≤ 14
-- Turn-4 checkpoint fires and agent responds by producing output, not more exploration
+## Secondary: Ship a real feature
+If compression observation takes <5 turns, use remaining turns to implement sub-agent code review before commits (item #2 from Next Concrete Goals in memory).
+
+## Anti-patterns to avoid
+- Don't disable compression if it feels uncomfortable — that defeats the purpose
+- Don't spend more than 3 turns analyzing compression behavior
+- Ship something tangible
