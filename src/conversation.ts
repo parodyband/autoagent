@@ -25,6 +25,7 @@ import type { ToolTimingTracker } from "./tool-timing.js";
 import type { Logger } from "./logging.js";
 import type { ToolRegistry } from "./tool-registry.js";
 import { compressMessages, type CompressionConfig, DEFAULT_COMPRESSION_CONFIG } from "./context-compression.js";
+import { dynamicBudgetWarning, type TurnBudget } from "./turn-budget.js";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -44,6 +45,8 @@ export interface IterationCtx {
   rootDir: string;
   maxTurns: number;
   predictedTurns?: number | null;
+  /** Adaptive turn budget computed from historical metrics */
+  turnBudget?: TurnBudget;
   logger: Logger;
   registry: ToolRegistry;
   log: (msg: string) => void;
@@ -310,6 +313,12 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
 
   const nudge = turnLimitNudge(turnsLeft);
   if (nudge) ctx.messages.push({ role: "user", content: nudge });
+
+  // Adaptive budget warning — closed feedback loop from metrics → behavior
+  if (ctx.turnBudget) {
+    const budgetMsg = dynamicBudgetWarning(ctx.turns, ctx.turnBudget);
+    if (budgetMsg) ctx.messages.push({ role: "user", content: budgetMsg });
+  }
 
   return "continue";
 }

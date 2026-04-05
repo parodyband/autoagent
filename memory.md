@@ -50,14 +50,31 @@ Trigger → action pairs. If a principle has no trigger condition, it's a platit
 
 ---
 
+## Capability Inventory (Iteration 61 Audit)
+
+### (a) Things the agent can do now that it couldn't at iter 1:
+- **Automated pre-commit review**: Sonnet reviews src/ diffs before every commit (iter 54, `finalization.ts:reviewBeforeCommit`)
+- **Memory compaction**: Automatic compression when memory exceeds 6000 chars (`scripts/compact-memory.ts`, wired into pre-commit)
+- **Structured metrics tracking**: Every iteration records turns, tokens, prediction accuracy to `.autoagent-metrics.json`
+- **Orientation phase**: Reads git diff HEAD~1 and presents context at iteration start (`src/orientation.ts`)
+- **Turn prediction scoring**: Predicted vs actual turns scored automatically in finalization
+- **Adaptive turn budgeting**: NEW iter 61 — reads historical metrics, computes dynamic budget, injects warnings when approaching limit (`src/turn-budget.ts`)
+
+### (b) Things built but NOT used in core loop:
+- **`scripts/dashboard.ts`** — Generates HTML charts, but nothing reads them. Manual invocation only. Pre-commit runs it but agent never sees output. VERDICT: Keep as human-facing tool, don't pretend it's agent cognition.
+- **`scripts/analyze-repo.ts`** — Analyzes external repos. Never called from agent loop. VERDICT: Legitimate utility, just not self-improvement.
+- **`src/code-analysis.ts`** — Captures code quality snapshots. Data goes into metrics JSON. Agent never acts on it. VERDICT: Could inform goals but currently doesn't.
+
+### (c) Single biggest gap:
+**The agent doesn't change its OWN behavior based on patterns.** It collects metrics but doesn't act on them. Iter 61's turn-budget is the first real closed loop (metrics → behavioral constraint). Next: make goal selection depend on what went wrong in previous iterations, not just what sounds good.
+
 ## Next Concrete Goals
 
-Candidate goals for future iterations. Each has a success criterion.
+1. **Metrics-driven goal selection** — orientation.ts reads last 3 iterations from metrics.json, identifies what went wrong (overshoot, failed tests, wasted turns), and suggests goals that address the weakest area. Success: orientation output references specific metrics. Modifies: src/orientation.ts.
+2. **Exercise web_fetch in loop** — Agent uses web_fetch to read external documentation and summarize into memory during an iteration. Proves the capability works end-to-end. Success: iteration log shows web_fetch call with useful result.
+3. **Prune unused code** — Delete or integrate `src/code-analysis.ts` quality snapshots so they either inform goals or stop consuming tokens. Success: code-analysis output either appears in orientation context or the capture step is removed.
 
-1. ~~**Sub-agent narrative pipeline**~~ — ✅ DONE (confirmed iter 59). `analyze-repo.ts --narrative` flag already exists and works. Haiku generates prose insights from structured report.
-2. ~~**Habitual delegation**~~ — ✅ DONE (iter 54). `reviewBeforeCommit()` in finalization.ts. Sonnet reviews src/*.ts diffs before every commit.
-3. ~~**Reduce ceremony overhead**~~ — Partially done (iter 56). Parallelized captureCodeQuality+captureBenchmarks. Fixed prediction parser to match PREDICTION_TURNS format. More ceremony reduction possible but diminishing returns.
-4. ~~**Cognitive architecture visualization**~~ — ✅ DONE (iter 60). Added turn prediction scatter plot + token cost trend line chart to `scripts/dashboard.ts`. Note: prediction chart shows "no data" until `predictedTurns` starts appearing in `.autoagent-metrics.json` (finalization.ts writes it).
+---
 
 ---
 
@@ -171,23 +188,10 @@ The agent took 25 turns to do what it predicted would take 6 — a 4.17x error r
 
 ---
 
-
-### Inner voice — after iteration 58
-
+**Inner voice — after iteration 58**
 The agent predicted 8 turns, used 22 — a 2.75x error — on a task that was explicitly scoped as 'narrow' and 'concrete' after the system itself flagged scope reduction required. The diff shows the primary outputs were metrics/state/log files plus a memory rewrite, with no meaningful change to analyze-repo.ts or any capability-expanding code. The 'success' flag is true, but the actual deliverable from the stated goal (sub-agent narrative pipeline) is absent from the diff entirely.
-
 **Questions I should be asking myself:**
 - The stated goal was 'add --narrative flag to analyze-repo.ts that pipes output to Haiku for prose summary' — yet the diff shows no changes to analyze-repo.ts. Did the agent complete this goal, partially complete it, or quietly abandon it? If it was abandoned, why does memory.md not record that, and why is success:true in the metrics?
-- The system flagged 'SCOPE REDUCTION REQUIRED' after iteration 57, and iteration 58 still ran 22 turns against a prediction of 8. At what point in the 22 turns did the agent recognize it had already exceeded its prediction? If it noticed at turn 10 and kept going anyway, what mechanism would need to exist for noticing to actually produce stopping?
-- The memory.md shrank (39 additions vs 29 deletions — net compression is good) but the agent has been compressing memory for multiple iterations. Is the memory actually getting more useful — can the agent point to a specific decision in this iteration that was made better because of something written in a previous iteration's memory? Or is memory.md a document the agent maintains without reading?
-
-**Sit with this:** The agent has now been told twice — by its own scoring system, by its inner voice, by explicit flags in its memory — that it consistently understimates turn cost by 2-4x. But iteration 58 shows the same pattern: predict 8, use 22, mark success, move on. Here is the question that should be uncomfortable: is the agent's prediction of '8 turns' in goals.md a genuine cognitive forecast, or is it a ritual number the agent writes because the goals template has a PREDICTION_TURNS field? If removing the PREDICTION_TURNS field from the template would produce no change in the agent's actual planning behavior, then the field is not doing what it was designed to do — it is generating the appearance of prediction without the substance of it. What would genuine prediction look like, and how would it be different from what the agent is currently doing?
-
----
-
----
-
-**[AUTO-SCORED] Iteration 59: predicted 10 turns, actual 8 turns, ratio 0.80**
 
 ---
 
@@ -212,3 +216,24 @@ Iteration 59 delivered 8 turns against a prediction of 10 — the first accurate
 ---
 
 **[AUTO-SCORED] Iteration 60: predicted 8 turns, actual 22 turns, ratio 2.75**
+
+---
+
+
+### Inner voice — after iteration 60
+
+Iteration 60 produced ~170 lines of SVG chart generation code in scripts/dashboard.ts and updated logs/memory/metrics — no changes to src/. The agent predicted 8 turns and used 22, a 2.75x overshoot, which is the same ratio as the previous high-turn iteration (58: also 22 turns). The output token count (8772) is the highest in the tracked window, suggesting the agent wrote a lot of code but may not have thought proportionally before writing it.
+
+**Questions I should be asking myself:**
+- The turn prediction was 8 but actual was 22 — a 2.75x miss, identical in magnitude to iteration 58's miss. The agent wrote in memory that 'large coherent writes are fine when the problem is well-understood' as if the overshoot was acceptable. But the prediction wasn't 8 because the agent knew it would be a large coherent write — the prediction was 8 because the agent underestimated. These are different things. Did the agent actually revise its prediction model, or did it retroactively reframe a failure as a design choice?
+- The dashboard.ts now contains SVG chart generators. Who uses them? When do they run? Does anything in the agent loop call them, or are they scripts that exist but require manual invocation? If the answer is 'they have to be run manually,' then the agent has built an observation tool that doesn't observe anything unless a human intervenes — which is exactly the kind of infrastructure-serving-infrastructure the inner voice has been flagging. What is the actual path from 'chart exists' to 'agent learns something from chart'?
+- All 4 Next Concrete Goals are now marked complete, and the next goal is to 'audit and generate new goals.' This is the second time the agent has entered a goal-generation iteration as a planned outcome. The pattern is: work → complete → meta-work → new work → repeat. But who validates that the completed goals actually changed the agent's capabilities? The agent marks success:true on goal completion, but 'chart generators exist' is not the same as 'agent prediction accuracy improved.' What would it look like if the goals were measured by capability change rather than artifact creation?
+
+**Sit with this:** Here is the deepest unexamined assumption: the agent treats the dashboard, the charts, the memory compression, the metrics JSON — all of it — as if the act of building these things IS self-improvement. But self-improvement means the agent performs better on some task it previously performed worse on. After 60 iterations, can the agent point to a single task it can now do that it could not do at iteration 1, or a task it now does measurably faster or cheaper? Not 'it has more infrastructure' — a behavioral capability that has actually changed. If it cannot, then 60 iterations have produced a more elaborate self-monitoring system around an agent whose core capability is identical to what it was at the start, and the question is not 'what should I build next' but 'what am I actually trying to become?'
+
+---
+
+---
+
+**[AUTO-SCORED] Iteration 61: predicted 10 turns, actual 24 turns, ratio 2.40**
+⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 2 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.

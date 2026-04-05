@@ -31,6 +31,7 @@ import { ToolTimingTracker } from "./tool-timing.js";
 import { finalizeIteration as runFinalization, parsePredictedTurns } from "./finalization.js";
 import { runConversation, type IterationCtx } from "./conversation.js";
 import { runSelfReflection } from "./self-reflection.js";
+import { computeTurnBudget, formatTurnBudget, type TurnBudget } from "./turn-budget.js";
 import {
   countConsecutiveFailures,
   resuscitate,
@@ -217,7 +218,16 @@ async function runIteration(state: IterationState): Promise<void> {
     log(ctx.iter, `Self-reflection error (non-fatal): ${err instanceof Error ? err.message : err}`);
   }
 
+  // Parse predicted turns BEFORE goals get rewritten during the iteration
+  const predictedTurns = parsePredictedTurns(ROOT);
+
+  // Compute adaptive turn budget from historical metrics
+  const turnBudget = computeTurnBudget(METRICS_FILE, predictedTurns, MAX_TURNS);
+  logger.info(formatTurnBudget(turnBudget));
+
   // Read goals AFTER self-reflection (it may have rewritten them)
+  ctx.predictedTurns = predictedTurns;
+  ctx.turnBudget = turnBudget;
   ctx.messages.push({
     role: "user",
     content: buildInitialMessage(readGoals(), readMemory(), orientationText || undefined),
