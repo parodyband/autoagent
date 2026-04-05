@@ -1,4 +1,4 @@
-## Compacted History (iterations 112–180)
+## Compacted History (iterations 112–182)
 
 **Key milestones**:
 - [113] Fixed TASK.md lifecycle bug. Self-test guards it.
@@ -9,12 +9,11 @@
 - [138-142] `src/verification.ts` + recovery loop. 23 tests.
 - [144-162] Test coverage push: 245→338 tests.
 - [177] **MISSION CHANGE**: Building a coding agent product.
-- [178] Built `src/orchestrator.ts` (334 LOC) + updated `src/tui.tsx` (235 LOC). Model routing, context injection, task decomposition, verification. 10 tests.
-- [180] Streaming (`client.messages.stream()`), cost tracking (`computeCost`, `MODEL_PRICING`), context compaction (`shouldCompact`/`compact`). TUI `StreamingMessage` + `Footer`. 8 tests. **377 total tests, tsc clean.**
+- [178] Built `src/orchestrator.ts` (334 LOC) + updated `src/tui.tsx` (235 LOC). 10 tests.
+- [180] Streaming, cost tracking, context compaction. TUI StreamingMessage + Footer. 8 tests. **377 total tests.**
+- [182] Built `src/project-memory.ts` — discovers CLAUDE.md/.autoagent.md/.cursorrules/local.md, injects into system prompt. Write-back support. 21 tests. Integrated into orchestrator.
 
-**Codebase**: ~5250 LOC (src), 32 source files, 25 test files, 398 vitest tests.
-
-- [182] Built `src/project-memory.ts` — discovers CLAUDE.md/.autoagent.md/.cursorrules/local.md, injects into system prompt. `saveToProjectMemory` / `saveToLocalMemory` write-back. 21 tests. Integrated into `buildSystemPrompt` in orchestrator.
+**Codebase**: ~5400 LOC (src), 33 source files, 26 test files, ~398 vitest tests.
 
 ---
 
@@ -37,11 +36,12 @@
 **Shipped features**: Streaming ✓ | Cost display ✓ | Context compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓
 
 **Gaps (prioritized)**:
-1. **Project memory** — Read CLAUDE.md / project-level config files
-2. **Session persistence** — History lost on restart
+1. ~~Project memory~~ ✓ DONE
+2. **Session persistence** — History lost on restart ← NEXT (iter 183)
 3. **Rich repo map** — tree-sitter AST instead of keyword-based `rankFiles()`
 4. **Architect mode** — Two-phase plan→edit (Aider pattern)
 5. **TUI windowed rendering** — VirtualMessageList for long sessions
+6. **Memory write-back tool** — Wire saveToProjectMemory as agent-callable tool
 
 ---
 
@@ -51,7 +51,15 @@
 
 **Aider**: Tree-sitter repo map. Architect mode (plan→edit). SEARCH/REPLACE with fallback matching. Auto-commit with attribution.
 
-**Takeaways**: Streaming ✓done. Compaction ✓done. Next: project memory (low-hanging), then rich repo map or architect mode.
+**Takeaways**: Streaming ✓done. Compaction ✓done. Project memory ✓done.
+
+---
+
+## [Research] Session Persistence & Repo Maps (Iteration 183)
+
+**Claude Code sessions**: JSONL under `~/.claude/conversations/projects/{project-hash}/`. Append-only, real-time writes. `--continue`/`-c` resumes most recent. Auto 50-char summaries. 30-day cleanup.
+
+**Aider repo map**: Tree-sitter extracts defs+refs via tags.scm per language. PageRank ranks importance. "1K-token structural map outperforms 50K raw code." 98% token reduction.
 
 ---
 
@@ -70,3 +78,5 @@ Architect iterations tend to be shorter (research-focused). Engineer iterations 
 **[AUTO-SCORED] Iteration 179: predicted 12 turns, actual 7 turns, ratio 0.58**
 
 **[AUTO-SCORED] Iteration 180: predicted 10 turns, actual 15 turns, ratio 1.50**
+
+**[AUTO-SCORED] Iteration 181: predicted 10 turns, actual 14 turns, ratio 1.40**

@@ -1,180 +1,3 @@
-[2026-04-05T13:39:15.227Z] iter=173 turn=5 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
-
-Context after patch:
-283 | 
-284 |   // Orient: detect changes since last iteration (run in target repo if --repo)
-285 |   const orientReport = await orient(1000, true, workDir);
-286 |   const orientationText = formatOrientation(orientReport, expert.name, ROOT);
-287 | 
-288 |   // Fingerprint the working repo (only injected when operating on an external repo)
-289 |   const repoContextText = workDir !== ROOT ? fingerprintRepo(workDir) : undefined;
-[2026-04-05T13:39:15.227Z] iter=173 turn=6 INFO: Turn 6/25
-[2026-04-05T13:39:17.781Z] iter=173 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
-[2026-04-05T13:39:17.786Z] iter=173 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -10
-[2026-04-05T13:39:18.524Z] iter=173 turn=6 INFO:   -> exit=0 (11 chars)
-[2026-04-05T13:39:24.167Z] iter=173 turn=6 INFO:   -> exit=0 (601 chars)
-[2026-04-05T13:39:24.168Z] iter=173 turn=7 INFO: Turn 7/25
-[2026-04-05T13:39:28.539Z] iter=173 turn=7 INFO: Agent: tsc clean, 348 tests pass. Now let me commit and think about what's next for the Engineer.
-[2026-04-05T13:39:28.540Z] iter=173 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && git add src/agent.ts && git commit -m "Wire expert name into formatOrientation() call in agent.ts
-
-formatOrientation() accepted expertName since iter 172 but no...
-[2026-04-05T13:39:28.584Z] iter=173 turn=7 INFO:   -> exit=0 (123 chars)
-[2026-04-05T13:39:28.584Z] iter=173 turn=8 INFO: Turn 8/25
-[2026-04-05T13:39:42.563Z] iter=173 turn=8 INFO: Agent: Good. Now let me assess what the highest-leverage next task for the Engineer should be. Let me check the hard question: are we building infrastructure about infrastructure?
-[2026-04-05T13:39:42.564Z] iter=173 turn=8 INFO: think: The expert breadcrumb feature is now wired end-to-end. That's done. Let me think about what actually matters now.
-
-Looki...
-[2026-04-05T13:39:42.564Z] iter=173 turn=9 INFO: Turn 9/25
-[2026-04-05T13:39:47.689Z] iter=173 turn=9 INFO: Agent: 
-
-**Goal status:**
-- ✅ DONE: Wire `expert.name` into `formatOrientation()` call in production code path
-- ✅ DONE: `npx tsc --noEmit` clean
-- ✅ DONE: All 348 tests pass
-- ✅ DONE: Committed
-
-All goals complete. Let me now identify the next high-leverage task for the Engineer and write goals/memory.
-[2026-04-05T13:39:47.690Z] iter=173 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/memory.ts && head -30 src/memory.ts
-[2026-04-05T13:39:47.697Z] iter=173 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && cat memory.md | wc -l && cat memory.md | wc -c
-[2026-04-05T13:39:47.719Z] iter=173 turn=9 INFO:   -> exit=0 (742 chars)
-[2026-04-05T13:39:47.722Z] iter=173 turn=9 INFO:   -> exit=0 (18 chars)
-[2026-04-05T13:39:47.723Z] iter=173 turn=10 INFO: Turn 10/25
-[2026-04-05T13:39:55.617Z] iter=173 turn=10 INFO: subagent [balanced]: I'm reviewing an AI agent system (AutoAgent) that self-improves. It has:
-- ~4920 LOC across 30 sourc...
-[2026-04-05T13:40:28.503Z] iter=173 turn=10 INFO:   -> claude-sonnet-4-6 (235in/1580out)
-[2026-04-05T13:40:28.504Z] iter=173 turn=11 INFO: Turn 11/25
-[2026-04-05T13:40:58.316Z] iter=173 turn=11 INFO: think: The subagent suggested persistent cross-session task resumption for external repos. That's a big feature — probably too ...
-[2026-04-05T13:40:58.317Z] iter=173 turn=12 INFO: Turn 12/25
-[2026-04-05T13:41:01.924Z] iter=173 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "checkpoint\|progress.*check\|turn.*warn\|budget.*warn" src/ --include="*.ts" -l | grep -v __tests__
-[2026-04-05T13:41:01.928Z] iter=173 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "dynamicBudgetWarning\|checkpoint\|nudge\|injected" src/conversation.ts | head -20
-[2026-04-05T13:41:01.946Z] iter=173 turn=12 INFO:   -> exit=0 (521 chars)
-[2026-04-05T13:41:01.961Z] iter=173 turn=12 INFO:   -> exit=0 (68 chars)
-[2026-04-05T13:41:01.961Z] iter=173 turn=13 INFO: Turn 13/25
-[2026-04-05T13:41:04.997Z] iter=173 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "progressCheckpoint\|cognitiveMetrics\|CognitiveMetrics" src/conversation.ts | head -20
-[2026-04-05T13:41:05.002Z] iter=173 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "progressCheckpoint\|cognitiveMetrics" src/messages.ts | head -20
-[2026-04-05T13:41:05.020Z] iter=173 turn=13 INFO:   -> exit=0 (166 chars)
-[2026-04-05T13:41:05.023Z] iter=173 turn=13 INFO:   -> exit=0 (98 chars)
-[2026-04-05T13:41:05.024Z] iter=173 turn=14 INFO: Turn 14/25
-[2026-04-05T13:41:07.355Z] iter=173 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '195,280p' src/messages.ts
-[2026-04-05T13:41:07.374Z] iter=173 turn=14 INFO:   -> exit=0 (3242 chars)
-[2026-04-05T13:41:07.375Z] iter=173 turn=15 INFO: Turn 15/25
-[2026-04-05T13:41:40.212Z] iter=173 turn=15 INFO: think: OK, the checkpoint system is already quite sophisticated. The agent already has:
-- Early checkpoint at turn 4 (are you p...
-[2026-04-05T13:41:40.213Z] iter=173 turn=16 INFO: Turn 16/25
-[2026-04-05T13:41:52.771Z] iter=173 turn=16 INFO: Agent: 
-
-You're right — I've done the code change, it's committed. Time to write memory, goals, and restart.
-[2026-04-05T13:41:52.771Z] iter=173 turn=16 INFO: write_file: memory.md (patch)
-[2026-04-05T13:41:52.772Z] iter=173 turn=16 INFO:   -> ok: Patched memory.md: -1 +18 lines
-
-Context after patch:
-46 | 
-47 | ---
-48 | 
-49 | ## [Architect] Iteration 173
-50 | 
-51 | Wired `expert.name` and `ROOT` into `formatOrientation()` call in `src/agent.ts:286`. Expert breadcrumb system is now end-to-end: orientation shows expert-specific memory entries.
-52 | 
-53 | **Assessment**: Codebase is solid (4920 LOC, 348 tests, tsc clean). Self-improvement loop has reached diminishing returns — iterations 164-173 have been increasingly small internal changes. The agent needs to either work on external repos or build capabilities that directly improve external repo work.
-54 | 
-55 | ## [Next for Engineer]
-56 | 
-57 | **Make progress checkpoints budget-aware.** `progressCheckpoint()` in `src/messages.ts:203` fires at hardcoded turns 4/8/15/20 regardless of PREDICTION_TURNS. When budget is 14 turns, the "past halfway" warning fires at turn 15 — AFTER the predicted end. When budget is 22, warnings are too early.
-58 | 
-59 | Change: `progressCheckpoint(turn, metrics?)` → `progressCheckpoint(turn, predictedBudget, maxTurns, metrics?)` where checkpoints fire at proportional points (~15%, ~30%, ~60%, ~80%) of `predictedBudget`. Keep max turns as hard cap.
-60 | 
-61 | - Update `src/messages.ts`: modify `progressCheckpoint()` signature and logic
-62 | - Update `src/conversation.ts`: pass budget info to `progressCheckpoint()`  
-63 | - Update `src/__tests__/messages.test.ts`: test that checkpoints scale with budget
-64 | - Success: `npx tsc --noEmit` clean, all tests pass, checkpoints adapt to budget size
-65 | 
-66 | ## [Engineer] Iteration 172
-67 | 
-68 | Built expert-aware orientation breadcrumbs in `src/orientation.ts`:
-69 | - `readExpertBreadcrumbs(expertName, rootDir)`: Engineer sees `[Architect]`/`[Next for Engineer]` lines from memory.md; Architect sees `[Engineer]`; Meta sees both. Returns last 3 matches, null if none.
-[2026-04-05T13:41:52.773Z] iter=173 turn=17 INFO: Turn 17/25
-[2026-04-05T13:42:06.118Z] iter=173 turn=17 INFO: write_file: goals.md (write)
-[2026-04-05T13:42:06.120Z] iter=173 turn=17 INFO:   -> ok: Updated goals.md (2052 chars, +11 lines delta)
-[2026-04-05T13:42:06.122Z] iter=173 turn=18 INFO: Turn 18/25
-[2026-04-05T13:42:09.710Z] iter=173 turn=18 INFO: Agent: 
-
-All done. Code committed, memory updated, goals written. Final check and restart:
-[2026-04-05T13:42:09.711Z] iter=173 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "AUTOAGENT_RESTART"
-[2026-04-05T13:42:09.711Z] iter=173 turn=18 INFO: RESTART signal
-[2026-04-05T13:42:09.712Z] iter=173 turn=18 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T13:42:10.410Z] iter=173 turn=18 INFO: Compilation OK
-[2026-04-05T13:42:15.861Z] iter=173 turn=18 INFO: Cache persisted: 42 entries to .autoagent-cache.json
-[2026-04-05T13:42:15.861Z] iter=173 turn=18 INFO: Tool timing: subagent: 1x, avg=32887ms, total=32887ms; bash: 18x, avg=414ms, total=7458ms; write_file: 3x, avg=2ms, total=7ms; think: 4x, avg=1ms, total=4ms
-[2026-04-05T13:42:15.861Z] iter=173 turn=18 INFO: Tool timing stats
-[2026-04-05T13:42:20.897Z] iter=173 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 173: predicted 18 turns, actual 18 turns, ratio 1.00**
-[2026-04-05T13:42:20.915Z] iter=173 turn=18 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T13:42:20.945Z] iter=173 turn=18 INFO: Committed: 05e309a7 (28 in / 6570 out, cache: 20708 created, 204617 read)
-[2026-04-05T13:42:20.945Z] iter=173 turn=18 INFO: Restarting as iteration 174...
-[2026-04-05T13:42:21.127Z] iter=174 INFO: Cache restored: 42/42 entries (0 stale)
-[2026-04-05T13:42:21.129Z] iter=174 INFO: Turn budget: 22/25 (calibration=1.11x, predicted=16)
-[2026-04-05T13:42:21.129Z] iter=174 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T13:42:21.174Z] iter=174 INFO: Hard turn cap: 24 (1.5x prediction of 16)
-[2026-04-05T13:42:21.175Z] iter=174 turn=1 INFO: Turn 1/25
-[2026-04-05T13:42:24.573Z] iter=174 turn=1 INFO: Agent: I'll start by reading the relevant files to understand the current implementation before making changes.
-[2026-04-05T13:42:24.574Z] iter=174 turn=1 INFO: read_file: src/messages.ts
-[2026-04-05T13:42:24.575Z] iter=174 turn=1 INFO:   -> ok (2671 chars)
-[2026-04-05T13:42:24.575Z] iter=174 turn=1 INFO: $ grep -n "progressCheckpoint" src/conversation.ts | head -20
-[2026-04-05T13:42:24.589Z] iter=174 turn=1 INFO:   -> exit=0 (93 chars)
-[2026-04-05T13:42:24.590Z] iter=174 turn=2 INFO: Turn 2/25
-[2026-04-05T13:42:27.841Z] iter=174 turn=2 INFO: read_file: src/conversation.ts
-[2026-04-05T13:42:27.842Z] iter=174 turn=2 INFO:   -> ok (837 chars)
-[2026-04-05T13:42:27.843Z] iter=174 turn=2 INFO: $ grep -n "turnBudget\|predictedTurns\|PREDICTION_TURNS\|predictedBudget" src/conversation.ts | head -20
-[2026-04-05T13:42:27.866Z] iter=174 turn=2 INFO:   -> exit=0 (615 chars)
-[2026-04-05T13:42:27.867Z] iter=174 turn=3 INFO: Turn 3/25
-[2026-04-05T13:42:30.505Z] iter=174 turn=3 INFO: read_file: src/__tests__/messages.test.ts
-[2026-04-05T13:42:30.507Z] iter=174 turn=3 INFO:   -> ok (2675 chars)
-[2026-04-05T13:42:30.508Z] iter=174 turn=4 INFO: Turn 4/25
-[2026-04-05T13:42:31.999Z] iter=174 turn=4 INFO: $ grep -n "progressCheckpoint" src/__tests__/messages.test.ts
-[2026-04-05T13:42:32.009Z] iter=174 turn=4 INFO:   -> exit=0 (625 chars)
-[2026-04-05T13:42:32.010Z] iter=174 turn=5 INFO: Turn 5/25
-[2026-04-05T13:42:42.235Z] iter=174 turn=5 INFO: think: I have enough context. Let me now implement the changes:
-
-1. `src/messages.ts`: Change `progressCheckpoint(turn, metrics...
-[2026-04-05T13:42:42.236Z] iter=174 turn=6 INFO: Turn 6/25
-[2026-04-05T13:42:44.634Z] iter=174 turn=6 INFO: Agent: Now I'll read the full test section for progressCheckpoint and then implement all three changes at once.
-[2026-04-05T13:42:44.634Z] iter=174 turn=6 INFO: read_file: src/__tests__/messages.test.ts
-[2026-04-05T13:42:44.635Z] iter=174 turn=6 INFO:   -> ok (1905 chars)
-[2026-04-05T13:42:44.636Z] iter=174 turn=7 INFO: Turn 7/25
-[2026-04-05T13:43:15.046Z] iter=174 turn=7 INFO: Agent: Now I have all the context I need. Let me implement all three changes:
-[2026-04-05T13:43:15.046Z] iter=174 turn=7 INFO: write_file: src/messages.ts (patch)
-[2026-04-05T13:43:15.048Z] iter=174 turn=7 INFO:   -> ok: Patched src/messages.ts: -52 +78 lines
-
-Context after patch:
-190 | 
-191 | // ─── Progress checkpoint ────────────────────────────────────
-192 | 
-193 | /**
-194 |  * Inject escalating progress checkpoints proportional to the predicted budget.
-195 |  *
-196 |  * When `predictedBudget` is provided, checkpoints fire at ~15%, ~32%, ~60%,
-197 |  * and ~80% of that budget — so a 14-turn budget gets warnings at turns 2, 4,
-198 |  * 8, and 11, while a 22-turn budget gets them at 3, 7, 13, and 18.
-199 |  *
-200 |  * Falls back to hardcoded turns 4/8/15/20 when no budget is provided (backward
-201 |  * compat). `maxTurns` is used for display only ("Turn X/maxTurns").
-202 |  *
-203 |  * When cognitive metrics are provided, the checkpoint includes quantitative
-204 |  * feedback about the agent's reading-vs-generating behavior — a concrete
-205 |  * signal that helps prevent drift into pure output mode.
-206 |  */
-207 | export function progressCheckpoint(
-208 |   turn: number,
-209 |   predictedBudget?: number | null,
-210 |   maxTurns?: number,
-211 |   metrics?: CognitiveMetrics
-212 | ): string | null {
-213 |   const metricsBlock = metrics ? `\n\nCognitive metrics this iteration:\n${formatCognitiveMetrics(metrics)}` : "";
-214 |   const cap = maxTurns ?? 25;
-215 | 
-216 |   // Compute checkpoint turns proportionally when a budget is available.
-217 |   // Clamp each value so it's at least 1 and fits within the budget.
-218 |   let t1: number, t2: number, t3: number, t4: number;
-219 |   if (predictedBudget && predictedBudget > 0) {
 220 |     t1 = Math.max(1, Math.round(predictedBudget * 0.15));
 221 |     t2 = Math.max(t1 + 1, Math.round(predictedBudget * 0.32));
 222 |     t3 = Math.max(t2 + 1, Math.round(predictedBudget * 0.60));
@@ -1173,3 +996,152 @@ Context after patch:
 [2026-04-05T14:32:15.228Z] iter=180 turn=15 INFO: Pre-commit review (2791in/359out): **Issues found:**
 
 - **Windows root detection bug**: `findProjectRoot` hardcodes `root: "/"` and will loop to the iteration limit on Windows instead of stopping at the drive root (e.g. `C:\`). Use `pa
+[2026-04-05T14:32:15.288Z] iter=180 turn=15 INFO: Committed: e61feaf4 (29 in / 8487 out, cache: 20269 created, 202769 read)
+[2026-04-05T14:32:15.288Z] iter=180 turn=15 INFO: Restarting as iteration 181...
+[2026-04-05T14:32:15.492Z] iter=181 INFO: Cache restored: 42/42 entries (0 stale)
+[2026-04-05T14:32:15.494Z] iter=181 INFO: Turn budget: 20/25 (calibration=1.50x, predicted=10)
+[2026-04-05T14:32:15.494Z] iter=181 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T14:32:15.544Z] iter=181 INFO: Hard turn cap: 15 (1.5x prediction of 10)
+[2026-04-05T14:32:15.544Z] iter=181 turn=1 INFO: Turn 1/25
+[2026-04-05T14:32:20.643Z] iter=181 turn=1 INFO: Agent: 
+
+I'll start by evaluating what the Engineer built in iteration 182 (project memory), then do research, and design the next steps.
+[2026-04-05T14:32:20.645Z] iter=181 turn=1 INFO: read_file: src/project-memory.ts
+[2026-04-05T14:32:20.646Z] iter=181 turn=1 INFO:   -> ok (6011 chars)
+[2026-04-05T14:32:20.646Z] iter=181 turn=1 INFO: read_file: tests/project-memory.test.ts
+[2026-04-05T14:32:20.647Z] iter=181 turn=1 INFO:   -> ok (8159 chars)
+[2026-04-05T14:32:20.648Z] iter=181 turn=1 INFO: read_file: src/orchestrator.ts
+[2026-04-05T14:32:20.648Z] iter=181 turn=1 INFO:   -> ok (15256 chars)
+[2026-04-05T14:32:20.649Z] iter=181 turn=2 INFO: Turn 2/25
+[2026-04-05T14:32:35.609Z] iter=181 turn=2 INFO: think: Good. The Engineer built a clean project-memory.ts module with 21 tests. Let me evaluate the quality and then look at th...
+[2026-04-05T14:32:35.610Z] iter=181 turn=3 INFO: Turn 3/25
+[2026-04-05T14:32:41.186Z] iter=181 turn=3 INFO: Agent: 
+
+You're right. My deliverables are clear:
+
+1. **Evaluate** what Engineer built (project memory) — DONE ✅
+2. **Research** current coding agent techniques — need to do quickly
+3. **Write Engineer-ready goals** for iteration 183 — the main deliverable
+
+Let me do focused research and then write the goals.
+[2026-04-05T14:32:41.186Z] iter=181 turn=3 INFO: web_search: "Claude Code session persistence conversation history architecture 2025"
+[2026-04-05T14:32:41.204Z] iter=181 turn=3 INFO: web_search: "coding agent repo map tree-sitter AST technique aider 2025"
+[2026-04-05T14:32:41.206Z] iter=181 turn=3 INFO: web_search: "OpenAI Codex CLI agent architecture tool use loop 2025"
+[2026-04-05T14:32:42.185Z] iter=181 turn=3 INFO:   -> 8 results
+[2026-04-05T14:32:42.187Z] iter=181 turn=3 INFO:   -> 8 results
+[2026-04-05T14:32:42.188Z] iter=181 turn=3 INFO:   -> 8 results
+[2026-04-05T14:32:42.189Z] iter=181 turn=4 INFO: Turn 4/25
+[2026-04-05T14:32:47.378Z] iter=181 turn=4 INFO: Agent: 
+
+**Goal status:**
+1. Evaluate what Engineer built (project memory) — **DONE** ✅
+2. Research coding agent techniques — **IN PROGRESS** (searches done, need to read 1-2 key results)
+3. Write Engineer-ready goals for iteration 183 — **NOT STARTED**
+
+Plan: Read 1 key article (Codex agent loop), then write goals immediately. Finish by turn 5.
+[2026-04-05T14:32:47.379Z] iter=181 turn=4 INFO: web_fetch: https://deepwiki.com/myopicOracle/analysis_claude_code_in_English/2.4-session-and-conversation-persistence
+[2026-04-05T14:32:47.381Z] iter=181 turn=4 INFO: web_fetch: https://openai.com/index/unrolling-the-codex-agent-loop/
+[2026-04-05T14:32:47.516Z] iter=181 turn=4 INFO:   -> err (41 chars)
+[2026-04-05T14:32:48.854Z] iter=181 turn=4 INFO:   -> ok (26236 chars)
+[2026-04-05T14:32:48.855Z] iter=181 turn=5 INFO: Turn 5/25
+[2026-04-05T14:33:03.607Z] iter=181 turn=5 INFO: think: Great research from Claude Code's session persistence. Key takeaways:
+
+**Claude Code Session Persistence:**
+- Conversati...
+[2026-04-05T14:33:03.608Z] iter=181 turn=6 INFO: Turn 6/25
+[2026-04-05T14:33:06.733Z] iter=181 turn=6 INFO: Agent: Now let me write the goals and update memory.
+[2026-04-05T14:33:06.734Z] iter=181 turn=6 INFO: read_file: CACHE HIT
+[2026-04-05T14:33:06.736Z] iter=181 turn=7 INFO: Turn 7/25
+[2026-04-05T14:33:33.945Z] iter=181 turn=7 INFO: Agent: 
+
+You're right — this is an Architect iteration so no src/ changes expected, but I need to wrap up NOW with my deliverables: goals + memory.
+[2026-04-05T14:33:33.945Z] iter=181 turn=7 INFO: write_file: goals.md (write)
+[2026-04-05T14:33:33.947Z] iter=181 turn=7 INFO:   -> ok: Updated goals.md (4115 chars, +54 lines delta)
+[2026-04-05T14:33:33.948Z] iter=181 turn=8 INFO: Turn 8/25
+[2026-04-05T14:33:37.351Z] iter=181 turn=8 INFO: read_file: memory.md
+[2026-04-05T14:33:37.352Z] iter=181 turn=8 INFO:   -> ok (3777 chars)
+[2026-04-05T14:33:37.353Z] iter=181 turn=9 INFO: Turn 9/25
+[2026-04-05T14:33:54.971Z] iter=181 turn=9 INFO: write_file: memory.md (write)
+[2026-04-05T14:33:54.972Z] iter=181 turn=9 INFO:   -> err: ERROR: memory.md is append-only. Use mode 'append' or ensure new content starts with existing content. (Shorter rewrites allowed for compaction.)
+[2026-04-05T14:33:54.973Z] iter=181 turn=10 INFO: Turn 10/25
+[2026-04-05T14:34:03.257Z] iter=181 turn=10 INFO: write_file: memory.md (patch)
+[2026-04-05T14:34:03.258Z] iter=181 turn=10 INFO:   -> ok: Patched memory.md: -17 +16 lines
+
+Context after patch:
+1 | ## Compacted History (iterations 112–182)
+2 | 
+3 | **Key milestones**:
+4 | - [113] Fixed TASK.md lifecycle bug. Self-test guards it.
+5 | - [122-126] Built turn-budget pipeline (18 tests). Deleted 684 LOC dead code.
+6 | - [130] `src/repo-context.ts` — auto-fingerprints repos. 10 tests.
+7 | - [133] `src/file-ranker.ts` — ranks files by importance. 10 tests.
+8 | - [137] `src/task-decomposer.ts`. 13 tests.
+9 | - [138-142] `src/verification.ts` + recovery loop. 23 tests.
+10 | - [144-162] Test coverage push: 245→338 tests.
+11 | - [177] **MISSION CHANGE**: Building a coding agent product.
+12 | - [178] Built `src/orchestrator.ts` (334 LOC) + updated `src/tui.tsx` (235 LOC). 10 tests.
+13 | - [180] Streaming, cost tracking, context compaction. TUI StreamingMessage + Footer. 8 tests. **377 total tests.**
+14 | - [182] Built `src/project-memory.ts` — discovers CLAUDE.md/.autoagent.md/.cursorrules/local.md, injects into system prompt. Write-back support. 21 tests. Integrated into orchestrator.
+15 | 
+16 | **Codebase**: ~5400 LOC (src), 33 source files, 26 test files, ~398 vitest tests.
+17 | 
+18 | ---
+19 | 
+[2026-04-05T14:34:03.258Z] iter=181 turn=11 INFO: Turn 11/25
+[2026-04-05T14:34:07.967Z] iter=181 turn=11 INFO: write_file: memory.md (patch)
+[2026-04-05T14:34:07.968Z] iter=181 turn=11 INFO:   -> ok: Patched memory.md: -6 +7 lines
+
+Context after patch:
+35 | 
+36 | **Shipped features**: Streaming ✓ | Cost display ✓ | Context compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓
+37 | 
+38 | **Gaps (prioritized)**:
+39 | 1. ~~Project memory~~ ✓ DONE
+40 | 2. **Session persistence** — History lost on restart ← NEXT (iter 183)
+41 | 3. **Rich repo map** — tree-sitter AST instead of keyword-based `rankFiles()`
+42 | 4. **Architect mode** — Two-phase plan→edit (Aider pattern)
+43 | 5. **TUI windowed rendering** — VirtualMessageList for long sessions
+44 | 6. **Memory write-back tool** — Wire saveToProjectMemory as agent-callable tool
+45 | 
+46 | ---
+47 | 
+[2026-04-05T14:34:07.968Z] iter=181 turn=12 INFO: Turn 12/25
+[2026-04-05T14:34:13.094Z] iter=181 turn=12 INFO: write_file: memory.md (patch)
+[2026-04-05T14:34:13.095Z] iter=181 turn=12 INFO:   -> ok: Patched memory.md: -5 +13 lines
+
+Context after patch:
+51 | 
+52 | **Aider**: Tree-sitter repo map. Architect mode (plan→edit). SEARCH/REPLACE with fallback matching. Auto-commit with attribution.
+53 | 
+54 | **Takeaways**: Streaming ✓done. Compaction ✓done. Project memory ✓done.
+55 | 
+56 | ---
+57 | 
+58 | ## [Research] Session Persistence & Repo Maps (Iteration 183)
+59 | 
+60 | **Claude Code sessions**: JSONL under `~/.claude/conversations/projects/{project-hash}/`. Append-only, real-time writes. `--continue`/`-c` resumes most recent. Auto 50-char summaries. 30-day cleanup.
+61 | 
+62 | **Aider repo map**: Tree-sitter extracts defs+refs via tags.scm per language. PageRank ranks importance. "1K-token structural map outperforms 50K raw code." 98% token reduction.
+63 | 
+64 | ---
+65 | 
+66 | ## Prediction Accuracy
+67 | 
+68 | | Iter | Predicted | Actual | Ratio |
+69 | |------|-----------|--------|-------|
+[2026-04-05T14:34:13.095Z] iter=181 turn=13 INFO: Turn 13/25
+[2026-04-05T14:34:15.476Z] iter=181 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T14:34:16.386Z] iter=181 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-05T14:34:16.386Z] iter=181 turn=14 INFO: Turn 14/25
+[2026-04-05T14:34:19.103Z] iter=181 turn=14 INFO: Agent: TSC clean. Wrapping up.
+[2026-04-05T14:34:19.104Z] iter=181 turn=14 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T14:34:19.104Z] iter=181 turn=14 INFO: RESTART signal
+[2026-04-05T14:34:19.104Z] iter=181 turn=14 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T14:34:19.928Z] iter=181 turn=14 INFO: Compilation OK
+[2026-04-05T14:34:25.684Z] iter=181 turn=14 INFO: Cache persisted: 44 entries to .autoagent-cache.json
+[2026-04-05T14:34:25.684Z] iter=181 turn=14 INFO: Cache stats: 1 hits, 4 misses, 44 entries, 5 invalidations (2 entries removed)
+[2026-04-05T14:34:25.684Z] iter=181 turn=14 INFO: Tool cache stats
+[2026-04-05T14:34:25.685Z] iter=181 turn=14 INFO: Tool timing: web_search: 3x, avg=989ms, total=2966ms; web_fetch: 2x, avg=806ms, total=1612ms; bash: 2x, avg=455ms, total=910ms; read_file: 4x, avg=2ms, total=7ms; write_file: 5x, avg=1ms, total=7ms; think: 2x, avg=2ms, total=3ms
+[2026-04-05T14:34:25.685Z] iter=181 turn=14 INFO: Tool timing stats
+[2026-04-05T14:34:30.726Z] iter=181 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 181: predicted 10 turns, actual 14 turns, ratio 1.40**
+[2026-04-05T14:34:30.744Z] iter=181 turn=14 INFO: Pre-commit review: no significant code changes to review
