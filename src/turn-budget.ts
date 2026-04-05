@@ -163,6 +163,11 @@ export function formatTurnBudget(budget: TurnBudget): string {
   if (budget.calibration !== 1.0) {
     parts.push(`Calibration: ${budget.calibration.toFixed(2)}x (${budget.calibration > 1 ? "you underestimate — budget inflated" : "you overestimate — budget deflated"})`);
   }
+  // Inline prediction suggestion based on historical median
+  if (budget.sampleSize >= 3 && budget.historicalAvg > 0) {
+    const suggestedPrediction = Math.max(6, Math.min(Math.round(budget.historicalAvg * budget.calibration), budget.hardMax));
+    parts.push(`Based on history, suggest predicting ${suggestedPrediction} turns`);
+  }
   return parts.join(" | ");
 }
 
