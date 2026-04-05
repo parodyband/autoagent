@@ -22,6 +22,7 @@ import type { ToolCache } from "./tool-cache.js";
 import type { ToolTimingTracker } from "./tool-timing.js";
 import type { Logger } from "./logging.js";
 import type { ToolRegistry } from "./tool-registry.js";
+import { compressMessages, type CompressionConfig, DEFAULT_COMPRESSION_CONFIG } from "./context-compression.js";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -46,6 +47,8 @@ export interface IterationCtx {
   onFinalize: (ctx: IterationCtx, doRestart: boolean) => Promise<void>;
   /** Optional validator injection for testing. Defaults to validateBeforeCommit. */
   validate?: (rootDir: string, log: (msg: string) => void) => Promise<{ ok: boolean; output: string }>;
+  /** Optional compression config. Set to null to disable compression. */
+  compressionConfig?: CompressionConfig | null;
 }
 
 export type TurnResult = "continue" | "break" | "restarted";
@@ -118,6 +121,16 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
   const turnsLeft = ctx.maxTurns - ctx.turns;
   ctx.logger.setTurn(ctx.turns);
   ctx.log(`Turn ${ctx.turns}/${ctx.maxTurns}`);
+
+  // Compress conversation context if it exceeds threshold
+  if (ctx.compressionConfig !== null) {
+    const compressionCfg = ctx.compressionConfig ?? DEFAULT_COMPRESSION_CONFIG;
+    const { messages: compressed, compressed: didCompress, removedCount } = compressMessages(ctx.messages, compressionCfg);
+    if (didCompress) {
+      ctx.log(`Context compressed: ${ctx.messages.length} → ${compressed.length} messages (${removedCount} summarized)`);
+      ctx.messages = compressed;
+    }
+  }
 
   const response = await ctx.client.messages.create({
     model: ctx.model,

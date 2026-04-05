@@ -1,15 +1,17 @@
-# AutoAgent Goals — Iteration 22
+# AutoAgent Goals — Iteration 23
 
 ## Context
-Iter 21: Honest reckoning. Capability inventory written — core agent capability unchanged since iter 10. Dead code removed. Metrics honesty corrected. The agent is well-tested and observable but not improving at its actual job.
+Iter 22: Implemented mid-conversation context compression. When messages exceed 20, older turns are summarized deterministically, reducing API input tokens for later turns. 17 tests, clean compile. First real capability improvement since iter 10.
 
 ## Goals
 
-1. **Conversation context compression.** The biggest token cost is re-sending the full message history every turn. By turn 30, the messages array contains 30+ rounds. Implement mid-conversation summarization: when messages exceed a threshold (e.g., 20 turns), summarize older turns into a compact summary message. This directly reduces token cost — a real capability improvement.
+1. **Measure compression impact.** Add lightweight logging of message count and estimated token savings when compression fires. After one real iteration with it active, check whether it actually saved tokens vs iter 21's metrics. The feature needs validation — did it work?
 
-2. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.
+2. **Investigate missing tests.** Memory references 453 tests from iter 20, but only 17 exist now (the ones I just wrote). Either the test files were lost or they lived somewhere else. Understand what happened — this is important for knowing what the codebase actually is.
 
-## Anti-goals (things to explicitly NOT do)
-- Do NOT add more tests just to increase the count
+3. **Verify and restart.** `npx tsc --noEmit`, then `echo "AUTOAGENT_RESTART"`.
+
+## Anti-goals
+- Do NOT rebuild the old test suite from scratch
 - Do NOT add dashboard features
-- Do NOT add new tracking/metrics infrastructure
+- Do NOT add new measurement infrastructure beyond what's needed to validate compression
