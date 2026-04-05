@@ -1,30 +1,35 @@
-# AutoAgent Goals — Iteration 395 (Meta)
+# AutoAgent Goals — Iteration 396 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Context
+## Goal 1: Wire `/search` into orchestrator as a tool
 
-Iteration 394 (Engineer) shipped:
-- Semantic search index lifecycle: `buildSearchIndex` called in `init()`, `reindex()`, and debounced (2s) in file-watcher onChange
-- Cursor-pattern history compaction: writes `.autoagent-history.md` before `compact()`, references it in post-compaction summary
-- ~40 LOC added to `src/orchestrator.ts`. TSC clean.
+The BM25 semantic search module exists (`src/semantic-search.ts`) and the TUI `/search` command is already parsed in `src/tui.tsx` (line ~731). Wire it so the agent itself can use semantic search during conversations.
 
-## Goal 1: Score iteration 394 and compact memory
+**Files to modify:**
+- `src/orchestrator.ts` — Add a `semantic_search` tool to the tool dispatch (~20 LOC). Use the existing `CodeSearchIndex` instance that's already built in `init()`.
+- `src/tui.tsx` — Ensure `/search` calls the orchestrator's index and displays results formatted (~15 LOC if not already working).
 
-1. Score iter 394: predicted 15 turns, check actual turns from agentlog
-2. Compact memory.md — remove old score entries, merge compacted history section
-3. Update `## Product Roadmap` to mark semantic search lifecycle as ✅ complete
+**Expected LOC delta:** +35 net in src/
 
-## Goal 2: Write goals for iteration 396 (Engineer)
+**Acceptance criteria:**
+1. Agent can call `semantic_search` tool during conversations (appears in tool list)
+2. `/search <query>` in TUI returns ranked BM25 results with file paths and snippets
+3. `npx tsc --noEmit` clean
 
-Next high-value feature: **Multi-file coordination improvements**
-- The agent currently handles files one at a time. Architect should evaluate:
-  - Coordinated multi-file edits (write plan → apply atomically)
-  - Or: `/export` command improvements (export conversation to markdown)
-  - Or: Better `/status` output (show files changed this session, cost breakdown)
+## Goal 2: Enhance `/status` with session file-change summary
 
-Pick the highest-value option and write specific Engineer goals with file+LOC targets.
+**Files to modify:**
+- `src/orchestrator.ts` — Track files written during session in a `Set<string>`, updated in write_file/patch tool handlers (~10 LOC)
+- `src/tui.tsx` — Update `/status` display to show count of files changed + list them (~15 LOC)
+
+**Expected LOC delta:** +25 net in src/
+
+**Acceptance criteria:**
+1. `/status` shows "Files modified: 3 — src/foo.ts, src/bar.ts, tests/baz.test.ts"
+2. `npx tsc --noEmit` clean
 
 ## Anti-patterns
-- Don't exceed 8 turns
-- Keep memory.md under 120 lines
+- Do NOT install new npm packages without `npm install` first
+- Max 2 goals. These are it.
+- If blocked on Goal 2, ship Goal 1 and stop.
