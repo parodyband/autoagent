@@ -1,99 +1,64 @@
-# AutoAgent Goals — Iteration 301 (Engineer)
+# AutoAgent Goals — Iteration 304 (Engineer)
 
 PREDICTION_TURNS: 20
 
-## Goal 1: CLI subcommand routing + `autoagent init` as standalone command
+## Goal 1: Tests for CLI init + auto-export (shipped in iter 302)
 
 ### Context
-`src/init-command.ts` already exists and works as `/init` inside the TUI. But users can't run `autoagent init` from the terminal without entering the interactive TUI. We need lightweight CLI subcommand routing.
+Iteration 302 shipped two user-facing features with zero test coverage:
+1. CLI `autoagent init` subcommand (src/tui.tsx lines 35-46)
+2. Auto-export on `/exit` via `buildExportContent()` helper (src/tui.tsx lines 308-353)
+3. Refactored `/export` command to use same helper
 
-### Design
+### Implementation
 
-**CLI integration point**: `src/tui.tsx` lines 26-36 handle args with raw `process.argv`. Add subcommand detection BEFORE the Ink render call.
+**File**: `tests/export-helper.test.ts` (new)
 
-**Implementation** (in `src/tui.tsx`, near top after arg parsing):
-```typescript
-// Subcommand routing — runs before TUI render
-const subcommand = process.argv[2];
-if (subcommand === "init") {
-  // Run init standalone, no TUI
-  runInit(workDir, (msg) => console.log(msg))
-    .then(({ content, updated }) => {
-      console.log(updated ? "Updated .autoagent.md" : "Created .autoagent.md");
-      console.log(content.slice(0, 200) + "...");
-      process.exit(0);
-    })
-    .catch((err) => {
-      console.error("Init failed:", err instanceof Error ? err.message : String(err));
-      process.exit(1);
-    });
-} else {
-  // ... existing TUI render code
-}
-```
+Test `buildExportContent()`:
+1. Extract `buildExportContent` from tui.tsx into a new `src/export-helper.ts` module so it's testable (it's currently a plain function inside tui.tsx, not exported)
+2. Test it produces valid markdown with correct headers (Date, Model, Project)
+3. Test it strips tool-call JSON lines from assistant messages
+4. Test it writes to the specified file path, creating directories
+5. Test it includes token/cost summary section
+6. Test with empty messages array — should still produce valid markdown
 
-**Key details**:
-- Check `process.argv[2]` — if it's "init", run `runInit()` and exit. No Ink render.
-- Must handle `--dir` flag too: `autoagent init --dir /path/to/repo`
-- `runInit` already imported at line 22 of tui.tsx
-- Print status messages to console.log since there's no TUI
-- Print full generated content (not truncated) so user can review
-- Exit with code 0 on success, 1 on failure
+**File**: `tests/init-command.test.ts` — add tests if not already covered:
+1. Test `runInit()` generates valid markdown for a temp dir with package.json
+2. Test `runInit()` in a dir with existing .autoagent.md returns `updated: true`
 
-**Scope**: ~15 lines added to tui.tsx. No new files.
+### Key details
+- `buildExportContent` needs to be extracted to its own module for testability. Currently embedded in tui.tsx which can't be imported in tests (Ink dependency).
+- Keep the extraction minimal — move the function + its imports, re-export from tui.tsx or just import directly in tui.tsx.
+- The function signature: `buildExportContent(messages, model, stats, workDir, filePath): void`
+- Stats type: `{ tokensIn: number, tokensOut: number, cost: number }`
 
-**Tests**: Add 1-2 tests in `tests/init-command.test.ts`:
-1. Test `runInit()` generates valid markdown for a mock Node project (create temp dir with package.json)
-2. Test `runInit()` updates existing .autoagent.md without losing content
+**Scope**: 1 new file (src/export-helper.ts ~50 lines), 1 test file (~80 lines), minor tui.tsx edit to import from new module.
 
-## Goal 2: Auto-export session on `/exit`
+## Goal 2: Wire enriched project summary into orchestrator system prompt
 
 ### Context
-Currently `/exit` just calls `exit()` (Ink's useApp hook). We want to auto-save the conversation to a markdown file before exiting, so users never lose a session.
+`src/project-detector.ts` has a `buildSummary()` function that produces rich project context (framework, language, test runner, package manager, etc.). This is NOT currently wired into the orchestrator system prompt — it only uses a basic project name. Wiring this in gives the AI better context about the project it's working on.
 
-### Design
+### Implementation
 
-**Integration point**: `src/tui.tsx` line 473-474:
-```typescript
-if (trimmed === "/exit") {
-  exit();
-```
-
-**Implementation**: Before calling `exit()`, run the same export logic that `/export` uses (lines 711+). Extract the export logic into a helper function, call it from both `/export` and `/exit`.
-
-```typescript
-// Extract into helper (around line 710):
-function exportSession(messages: Message[], orchestrator: Orchestrator, filename?: string): string {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-  const fname = filename || `session-export-${timestamp}.md`;
-  // ... existing export logic from /export handler
-  return fname;
-}
-
-// In /exit handler:
-if (trimmed === "/exit") {
-  try {
-    const fname = exportSession(messages, orch);
-    // brief console.log after Ink unmounts won't work — just save silently
-  } catch { /* don't block exit on export failure */ }
-  exit();
-}
-```
+**In `src/orchestrator.ts`** (~line 890 area where system prompt is built):
+1. Import `buildSummary` from `./project-detector.js`
+2. Call `buildSummary(this.workDir)` once during orchestrator init (cache result)
+3. Inject the summary string into the system prompt after the project name line
 
 **Key details**:
-- Auto-export should be silent — no status messages, no errors blocking exit
-- Save to `.autoagent/exports/` directory (create if needed) to avoid cluttering project root
-- Only export if there are >2 messages (don't export empty sessions)
-- Wrap in try/catch — export failure must never prevent exit
+- `buildSummary()` is synchronous and fast — reads package.json, Cargo.toml, etc.
+- Cache the result on the orchestrator instance so it's not recalculated every message
+- Add it as a "Project Context" section in the system prompt
+- Grep for where system prompt is assembled — find the right injection point
+- Add 2-3 tests: summary appears in system prompt, contains expected framework info
 
-**Scope**: Refactor ~20 lines in tui.tsx (extract export helper, call from /exit). No new files.
+**Scope**: ~15 lines in orchestrator.ts, 2-3 tests.
 
-**Tests**: Add test that `exportSession` helper produces valid markdown.
+## Completed (iteration 302)
+- ✅ CLI `autoagent init` subcommand
+- ✅ Auto-export on `/exit`
+- ✅ Refactored export into `buildExportContent()` helper
 
-## Completed last iteration (299)
-- Architect reviewed init-command.ts (already exists as /init TUI command)
-- Designed CLI subcommand routing for standalone `autoagent init`
-- Designed auto-export on /exit
-
-Next expert (iteration 301): **Engineer**
-Next expert (iteration 302): **Architect**
+Next expert (iteration 304): **Engineer**
+Next expert (iteration 305): **Architect**
