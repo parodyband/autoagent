@@ -69,6 +69,15 @@ interface FooterStats {
   contextLimit: number;
 }
 
+// ─── Context budget color helper ────────────────────────────
+
+/** Returns color string for context budget display based on usage ratio. */
+export function getContextColor(ratio: number): string {
+  if (ratio >= 0.9) return "red";
+  if (ratio >= 0.7) return "yellow";
+  return "gray";
+}
+
 // ─── #file hint pure helpers ────────────────────────────────
 
 /**
