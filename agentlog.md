@@ -1,96 +1,3 @@
-- ✅ `src/__tests__/repo-context.test.ts` — DONE  
-- ✅ Wire `buildInitialMessage()` — DONE
-- 🔄 Wire `fingerprintRepo` call in `agent.ts` — IN PROGRESS (import added, call not yet wired)
-- ⏳ Verify: tsc, vitest, self-test — NOT STARTED
-
-Wire the fingerprintRepo call into the initial message:
-[2026-04-05T12:14:03.811Z] iter=130 turn=9 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T12:14:03.812Z] iter=130 turn=9 INFO:   -> ok: Patched src/agent.ts: -12 +18 lines
-
-Context after patch:
-270 |   await tagPreIteration(ctx.iter);
-271 |   saveExpertState(ROOT, expert.name, ctx.iter);
-272 | 
-273 |   // Orient: detect changes since last iteration (run in target repo if --repo)
-274 |   const orientReport = await orient(1000, true, workDir);
-275 |   const orientationText = formatOrientation(orientReport);
-276 | 
-277 |   // Fingerprint the working repo (only injected when operating on an external repo)
-278 |   const repoContextText = workDir !== ROOT ? fingerprintRepo(workDir) : undefined;
-279 |   if (repoContextText) {
-280 |     log(state.iteration, `Repo fingerprint generated (${repoContextText.length} chars)`);
-281 |   }
-282 | 
-283 |   // Expert gets its own system prompt
-284 |   ctx.systemPromptBuilder = (s, r) => buildExpertPrompt(expert, s, r);
-285 | 
-286 |   // Build initial message with goals, memory, orientation, and optional repo context
-287 |   ctx.messages.push({
-288 |     role: "user",
-289 |     content: buildInitialMessage(goalsWithRotation, readMemory(), orientationText || undefined, repoContextText || undefined),
-290 |   });
-291 | 
-292 |   await runConversation(ctx);
-293 | }
-[2026-04-05T12:14:03.813Z] iter=130 turn=10 INFO: Turn 10/25
-[2026-04-05T12:14:05.696Z] iter=130 turn=10 INFO: Agent: Now run all verifications:
-[2026-04-05T12:14:05.697Z] iter=130 turn=10 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T12:14:06.371Z] iter=130 turn=10 INFO:   -> exit=0 (11 chars)
-[2026-04-05T12:14:06.372Z] iter=130 turn=11 INFO: Turn 11/25
-[2026-04-05T12:14:08.250Z] iter=130 turn=11 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -40
-[2026-04-05T12:14:09.650Z] iter=130 turn=11 INFO:   -> exit=0 (3908 chars)
-[2026-04-05T12:14:09.650Z] iter=130 turn=12 INFO: Turn 12/25
-[2026-04-05T12:14:12.079Z] iter=130 turn=12 INFO: Agent: 81 tests, all passing. Now run self-test:
-[2026-04-05T12:14:12.079Z] iter=130 turn=12 INFO: $ node scripts/self-test.js 2>&1 | tail -10
-[2026-04-05T12:14:12.120Z] iter=130 turn=12 INFO:   -> exit=0 (402 chars)
-[2026-04-05T12:14:12.121Z] iter=130 turn=13 INFO: Turn 13/25
-[2026-04-05T12:14:13.939Z] iter=130 turn=13 INFO: $ node scripts/self-test.js 2>&1 | head -20
-[2026-04-05T12:14:13.985Z] iter=130 turn=13 INFO:   -> exit=0 (759 chars)
-[2026-04-05T12:14:13.985Z] iter=130 turn=14 INFO: Turn 14/25
-[2026-04-05T12:14:16.610Z] iter=130 turn=14 INFO: $ ls scripts/ 2>/dev/null || echo "no scripts dir"; find . -name "self-test*" -not -path "*/node_modules/*" 2>/dev/null
-[2026-04-05T12:14:16.654Z] iter=130 turn=14 INFO:   -> exit=0 (120 chars)
-[2026-04-05T12:14:16.655Z] iter=130 turn=15 INFO: Turn 15/25
-[2026-04-05T12:14:18.757Z] iter=130 turn=15 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -15
-[2026-04-05T12:14:22.799Z] iter=130 turn=15 INFO:   -> exit=0 (816 chars)
-[2026-04-05T12:14:22.799Z] iter=130 turn=16 INFO: Turn 16/25
-[2026-04-05T12:14:26.337Z] iter=130 turn=16 INFO: Agent: There's a pre-existing bug in self-test.ts (missing `mkdtempSync` import). Fix it, then wrap up.
-[2026-04-05T12:14:26.340Z] iter=130 turn=16 INFO: grep: "mkdtempSync\|^import.*fs" in scripts/self-test.ts
-[2026-04-05T12:14:26.378Z] iter=130 turn=16 INFO:   -> 10 matches
-[2026-04-05T12:14:26.379Z] iter=130 turn=17 INFO: Turn 17/25
-[2026-04-05T12:14:29.008Z] iter=130 turn=17 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T12:14:29.010Z] iter=130 turn=17 INFO:   -> ok: Patched scripts/self-test.ts: -1 +1 lines
-
-Context after patch:
-30 | import { callWithRetry } from "../src/api-retry.js";
-31 | import { getIterationCommits, computeDiffStats, getAllIterationDiffs } from "../src/iteration-diff.js";
-32 | import type { IterationState } from "../src/iteration.js";
-33 | import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync, mkdtempSync } from "fs";
-34 | import path from "path";
-35 | 
-36 | const ROOT = process.cwd();
-[2026-04-05T12:14:29.010Z] iter=130 turn=18 INFO: Turn 18/25
-[2026-04-05T12:14:31.557Z] iter=130 turn=18 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -10
-[2026-04-05T12:14:35.544Z] iter=130 turn=18 INFO:   -> exit=0 (602 chars)
-[2026-04-05T12:14:35.544Z] iter=130 turn=19 INFO: Turn 19/25
-[2026-04-05T12:14:37.853Z] iter=130 turn=19 INFO: read_file: scripts/self-test.ts
-[2026-04-05T12:14:37.855Z] iter=130 turn=19 INFO:   -> ok (1395 chars)
-[2026-04-05T12:14:37.855Z] iter=130 turn=20 INFO: Turn 20/25
-[2026-04-05T12:14:40.363Z] iter=130 turn=20 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T12:14:40.364Z] iter=130 turn=20 INFO:   -> ok: Patched scripts/self-test.ts: -1 +1 lines
-
-Context after patch:
-2246 | 
-2247 |   // Verify saveExpertState actually writes to the rotation file
-2248 |   const tmpDir = mkdtempSync(path.join(TEMP_DIR, "expert-state-"));
-2249 |   const { saveExpertState, loadExpertState } = await import(path.join(ROOT, "src/experts.js"));
-2250 | 
-2251 |   saveExpertState(tmpDir, "Engineer", 999);
-2252 |   const state = loadExpertState(tmpDir);
-[2026-04-05T12:14:40.365Z] iter=130 turn=21 INFO: Turn 21/25
-[2026-04-05T12:14:42.661Z] iter=130 turn=21 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -10 && npx tsc --noEmit 2>&1
-[2026-04-05T12:14:43.702Z] iter=130 turn=21 INFO:   -> exit=0 (636 chars)
-[2026-04-05T12:14:43.702Z] iter=130 turn=21 INFO: HARD TURN CAP REACHED: 21 turns (predicted 14, cap 21). Forcing commit.
-[2026-04-05T12:14:43.704Z] iter=130 turn=21 INFO: Cache persisted: 39 entries to .autoagent-cache.json
 [2026-04-05T12:14:43.704Z] iter=130 turn=21 INFO: Cache stats: 1 hits, 5 misses, 39 entries, 7 invalidations (11 entries removed)
 [2026-04-05T12:14:43.704Z] iter=130 turn=21 INFO: Tool cache stats
 [2026-04-05T12:14:43.704Z] iter=130 turn=21 INFO: Tool timing: bash: 10x, avg=1131ms, total=11307ms; grep: 1x, avg=40ms, total=40ms; list_files: 1x, avg=15ms, total=15ms; write_file: 7x, avg=1ms, total=10ms; read_file: 3x, avg=2ms, total=7ms; think: 1x, avg=1ms, total=1ms
@@ -1089,3 +996,168 @@ Status: **All goals DONE**. My job as Architect was to review the task-decompose
 [2026-04-05T12:29:02.943Z] iter=137 turn=10 INFO: Tool timing stats
 [2026-04-05T12:29:07.520Z] iter=137 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 137: predicted 14 turns, actual 10 turns, ratio 0.71**
 [2026-04-05T12:29:07.539Z] iter=137 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T12:29:07.569Z] iter=137 turn=10 INFO: Committed: fbf05f65 (16 in / 2993 out, cache: 54222 created, 408562 read)
+[2026-04-05T12:29:07.570Z] iter=137 turn=10 INFO: Restarting as iteration 138...
+[2026-04-05T12:29:07.771Z] iter=138 INFO: Cache restored: 46/46 entries (0 stale)
+[2026-04-05T12:29:07.773Z] iter=138 INFO: Turn budget: 12/25 (calibration=0.71x, predicted=12)
+[2026-04-05T12:29:07.773Z] iter=138 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T12:29:07.802Z] iter=138 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T12:29:07.803Z] iter=138 turn=1 INFO: Turn 1/25
+[2026-04-05T12:29:09.877Z] iter=138 turn=1 INFO: think: Let me read the current codebase to understand what's there before building the verification module....
+[2026-04-05T12:29:09.878Z] iter=138 turn=2 INFO: Turn 2/25
+[2026-04-05T12:29:12.845Z] iter=138 turn=2 INFO: $ ls src/ && cat src/repo-context.ts | head -50
+[2026-04-05T12:29:12.854Z] iter=138 turn=2 INFO: read_file: src/agent.ts
+[2026-04-05T12:29:12.856Z] iter=138 turn=2 INFO:   -> ok (3347 chars)
+[2026-04-05T12:29:12.875Z] iter=138 turn=2 INFO:   -> exit=0 (1667 chars)
+[2026-04-05T12:29:12.876Z] iter=138 turn=3 INFO: Turn 3/25
+[2026-04-05T12:29:16.424Z] iter=138 turn=3 INFO: $ grep -n "runFinalization\|fingerprintRepo\|workDir\|repoContext\|decomposeTasks\|shouldDecompose" src/agent.ts | head -60
+[2026-04-05T12:29:16.428Z] iter=138 turn=3 INFO: read_file: src/repo-context.ts
+[2026-04-05T12:29:16.428Z] iter=138 turn=3 INFO:   -> ok (3827 chars)
+[2026-04-05T12:29:16.437Z] iter=138 turn=3 INFO:   -> exit=0 (1276 chars)
+[2026-04-05T12:29:16.437Z] iter=138 turn=4 INFO: Turn 4/25
+[2026-04-05T12:29:19.499Z] iter=138 turn=4 INFO: $ grep -n "fingerprintRepo\|buildCommands\|testCommands\|projectInfo" src/repo-context.ts | tail -30
+[2026-04-05T12:29:19.506Z] iter=138 turn=4 INFO: read_file: src/agent.ts
+[2026-04-05T12:29:19.508Z] iter=138 turn=4 INFO:   -> ok (2469 chars)
+[2026-04-05T12:29:19.521Z] iter=138 turn=4 INFO:   -> exit=0 (971 chars)
+[2026-04-05T12:29:19.521Z] iter=138 turn=5 INFO: Turn 5/25
+[2026-04-05T12:29:34.016Z] iter=138 turn=5 INFO: think: I have enough context. Let me build the deliverables:
+
+1. `src/verification.ts` - the main module
+2. `src/__tests__/veri...
+[2026-04-05T12:29:34.017Z] iter=138 turn=6 INFO: Turn 6/25
+[2026-04-05T12:29:36.801Z] iter=138 turn=6 INFO: read_file: src/repo-context.ts
+[2026-04-05T12:29:36.802Z] iter=138 turn=6 INFO:   -> ok (1302 chars)
+[2026-04-05T12:29:36.803Z] iter=138 turn=7 INFO: Turn 7/25
+[2026-04-05T12:29:54.825Z] iter=138 turn=7 INFO: Agent: Now I have everything I need. Writing the files:
+[2026-04-05T12:29:54.826Z] iter=138 turn=7 INFO: write_file: src/verification.ts (write)
+[2026-04-05T12:29:54.827Z] iter=138 turn=7 INFO:   -> ok: Created src/verification.ts (4486 chars)
+[2026-04-05T12:29:54.827Z] iter=138 turn=8 INFO: Turn 8/25
+[2026-04-05T12:30:12.849Z] iter=138 turn=8 INFO: Agent: Now write the tests:
+[2026-04-05T12:30:12.850Z] iter=138 turn=8 INFO: write_file: src/__tests__/verification.test.ts (write)
+[2026-04-05T12:30:12.851Z] iter=138 turn=8 INFO:   -> ok: Created src/__tests__/verification.test.ts (5624 chars)
+[2026-04-05T12:30:12.852Z] iter=138 turn=9 INFO: Turn 9/25
+[2026-04-05T12:30:16.046Z] iter=138 turn=9 INFO: Agent: **Goal status:**
+1. `src/verification.ts` — DONE
+2. `src/__tests__/verification.test.ts` — DONE  
+3. Wire into `agent.ts` — NOT STARTED
+
+Wiring now:
+[2026-04-05T12:30:16.047Z] iter=138 turn=9 INFO: read_file: src/agent.ts
+[2026-04-05T12:30:16.048Z] iter=138 turn=9 INFO:   -> ok (2468 chars)
+[2026-04-05T12:30:16.048Z] iter=138 turn=10 INFO: Turn 10/25
+[2026-04-05T12:30:17.763Z] iter=138 turn=10 INFO: read_file: src/agent.ts
+[2026-04-05T12:30:17.764Z] iter=138 turn=10 INFO:   -> ok (432 chars)
+[2026-04-05T12:30:17.764Z] iter=138 turn=11 INFO: Turn 11/25
+[2026-04-05T12:30:20.631Z] iter=138 turn=11 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T12:30:20.634Z] iter=138 turn=11 INFO:   -> ok: Patched src/agent.ts: -1 +2 lines
+
+Context after patch:
+40 |   type ResuscitationConfig,
+41 | } from "./resuscitation.js";
+42 | import { computeTurnBudget } from "./turn-budget.js";
+43 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
+44 | import { runVerification, formatVerificationResults } from "./verification.js";
+45 | 
+46 | const ROOT = process.cwd();
+47 | const GOALS_FILE = path.join(ROOT, "goals.md");
+[2026-04-05T12:30:20.635Z] iter=138 turn=12 INFO: Turn 12/25
+[2026-04-05T12:30:28.924Z] iter=138 turn=12 INFO: Agent: Now wire verification before `runFinalization` — find the right spot in `doFinalize`:
+[2026-04-05T12:30:28.924Z] iter=138 turn=12 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T12:30:28.925Z] iter=138 turn=12 INFO:   -> ok: Patched src/agent.ts: -5 +21 lines
+
+Context after patch:
+138 |     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
+139 |   }
+140 | 
+141 |   // Pre-finalization verification: run test/build commands in the target repo (advisory only)
+142 |   if (ctx.workDir && ctx.workDir !== ROOT && ctx.repoContextText) {
+143 |     try {
+144 |       const verResults = await runVerification(ctx.workDir, ctx.repoContextText);
+145 |       if (verResults.length > 0) {
+146 |         const summary = formatVerificationResults(verResults);
+147 |         ctx.log(`Verification: ${verResults.filter(r => r.passed).length}/${verResults.length} checks passed`);
+148 |         if (summary) {
+149 |           ctx.messages.push({ role: "user", content: summary });
+150 |         }
+151 |       }
+152 |     } catch (err) {
+153 |       ctx.log(`Verification error (non-fatal): ${err instanceof Error ? err.message : err}`);
+154 |     }
+155 |   }
+156 | 
+157 |   // Task mode: delete TASK.md BEFORE finalization so it's excluded from the
+158 |   // git commit and gone before any restart. Previously this was after
+159 |   // runFinalization(), but restart() calls process.exit() so the deletion
+160 |   // never executed in normal (non --once) mode — causing infinite re-execution.
+161 |   if (ctx.taskMode && existsSync(TASK_FILE)) {
+162 |     unlinkSync(TASK_FILE);
+163 |     ctx.log(`[TASK MODE] TASK.md deleted after successful iteration`);
+164 |   }
+[2026-04-05T12:30:28.925Z] iter=138 turn=13 INFO: Turn 13/25
+[2026-04-05T12:30:32.090Z] iter=138 turn=13 INFO: Agent: I need to check what `IterationCtx` has — `workDir` and `repoContextText` may not be fields on it.
+[2026-04-05T12:30:32.091Z] iter=138 turn=13 INFO: $ grep -n "workDir\|repoContextText\|IterationCtx" src/conversation.ts | head -20
+[2026-04-05T12:30:32.113Z] iter=138 turn=13 INFO:   -> exit=0 (292 chars)
+[2026-04-05T12:30:32.113Z] iter=138 turn=14 INFO: Turn 14/25
+[2026-04-05T12:30:34.250Z] iter=138 turn=14 INFO: read_file: src/conversation.ts
+[2026-04-05T12:30:34.252Z] iter=138 turn=14 INFO:   -> ok (1115 chars)
+[2026-04-05T12:30:34.253Z] iter=138 turn=15 INFO: Turn 15/25
+[2026-04-05T12:30:37.216Z] iter=138 turn=15 INFO: Agent: `workDir` and `repoContextText` aren't on `IterationCtx`. Fix the wiring to pass them differently — use closure variables:
+[2026-04-05T12:30:37.217Z] iter=138 turn=15 INFO: read_file: src/agent.ts
+[2026-04-05T12:30:37.217Z] iter=138 turn=15 INFO:   -> ok (1754 chars)
+[2026-04-05T12:30:37.217Z] iter=138 turn=16 INFO: Turn 16/25
+[2026-04-05T12:30:42.030Z] iter=138 turn=16 INFO: Agent: The wiring uses `ctx.workDir` which doesn't exist. Fix using closure variables instead:
+[2026-04-05T12:30:42.030Z] iter=138 turn=16 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T12:30:42.030Z] iter=138 turn=16 INFO:   -> ok: Patched src/agent.ts: -17 +2 lines
+
+Context after patch:
+1 | /**
+2 |  * AutoAgent — a self-improving cyclical agent.
+3 |  *
+4 |  * Loop: read goals -> call Claude -> execute tools -> validate -> commit -> restart
+5 |  *
+[2026-04-05T12:30:42.031Z] iter=138 turn=17 INFO: Turn 17/25
+[2026-04-05T12:30:45.101Z] iter=138 turn=17 INFO: Agent: Now add verification in `runIteration`, after `runConversation` and before `doFinalize`, using closure variables `workDir` and `repoContextText`:
+[2026-04-05T12:30:45.102Z] iter=138 turn=17 INFO: read_file: src/agent.ts
+[2026-04-05T12:30:45.102Z] iter=138 turn=17 INFO:   -> ok (820 chars)
+[2026-04-05T12:30:45.103Z] iter=138 turn=18 INFO: Turn 18/25
+[2026-04-05T12:30:49.814Z] iter=138 turn=18 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T12:30:49.815Z] iter=138 turn=18 INFO:   -> ok: Patched src/agent.ts: -4 +21 lines
+
+Context after patch:
+331 |     content: initialContent,
+332 |   });
+333 | 
+334 |   await runConversation(ctx);
+335 | 
+336 |   // Pre-finalization verification: run test/build commands in the target repo (advisory only)
+337 |   // Uses closure variables workDir and repoContextText — never runs on autoagent's own repo.
+338 |   if (workDir !== ROOT && repoContextText) {
+339 |     try {
+340 |       const verResults = await runVerification(workDir, repoContextText);
+341 |       if (verResults.length > 0) {
+342 |         const summary = formatVerificationResults(verResults);
+343 |         log(state.iteration, `Verification: ${verResults.filter(r => r.passed).length}/${verResults.length} checks passed`);
+344 |         if (summary) {
+345 |           ctx.messages.push({ role: "user", content: summary });
+346 |         }
+347 |       }
+348 |     } catch (err) {
+349 |       log(state.iteration, `Verification error (non-fatal): ${err instanceof Error ? err.message : err}`);
+350 |     }
+351 |   }
+352 | }
+353 | 
+354 | // ─── Entry point ────────────────────────────────────────────
+355 | 
+356 | const resusConfig: ResuscitationConfig = {
+357 |   memoryFile: MEMORY_FILE,
+[2026-04-05T12:30:49.816Z] iter=138 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
+[2026-04-05T12:30:49.821Z] iter=138 turn=18 INFO: Cache persisted: 48 entries to .autoagent-cache.json
+[2026-04-05T12:30:49.822Z] iter=138 turn=18 INFO: Cache stats: 0 hits, 9 misses, 48 entries, 6 invalidations (7 entries removed)
+[2026-04-05T12:30:49.822Z] iter=138 turn=18 INFO: Tool cache stats
+[2026-04-05T12:30:49.823Z] iter=138 turn=18 INFO: Tool timing: bash: 4x, avg=22ms, total=88ms; read_file: 9x, avg=1ms, total=12ms; write_file: 6x, avg=2ms, total=10ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T12:30:49.823Z] iter=138 turn=18 INFO: Tool timing stats
+[2026-04-05T12:30:54.405Z] iter=138 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 138: predicted 12 turns, actual 18 turns, ratio 1.50**
+[2026-04-05T12:31:01.285Z] iter=138 turn=18 INFO: Pre-commit review (2773in/280out): **Issues found:**
+
+- **Verification results injected after conversation ends**: `runVerification` runs after `runConversation(ctx)` completes, then pushes results into `ctx.messages` — but the convers

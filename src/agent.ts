@@ -41,6 +41,7 @@ import {
 } from "./resuscitation.js";
 import { computeTurnBudget } from "./turn-budget.js";
 import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
+import { runVerification, formatVerificationResults } from "./verification.js";
 
 const ROOT = process.cwd();
 const GOALS_FILE = path.join(ROOT, "goals.md");
@@ -136,6 +137,7 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
   } catch (err) {
     ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
   }
+
 
   // Task mode: delete TASK.md BEFORE finalization so it's excluded from the
   // git commit and gone before any restart. Previously this was after
@@ -330,6 +332,23 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
   });
 
   await runConversation(ctx);
+
+  // Pre-finalization verification: run test/build commands in the target repo (advisory only)
+  // Uses closure variables workDir and repoContextText — never runs on autoagent's own repo.
+  if (workDir !== ROOT && repoContextText) {
+    try {
+      const verResults = await runVerification(workDir, repoContextText);
+      if (verResults.length > 0) {
+        const summary = formatVerificationResults(verResults);
+        log(state.iteration, `Verification: ${verResults.filter(r => r.passed).length}/${verResults.length} checks passed`);
+        if (summary) {
+          ctx.messages.push({ role: "user", content: summary });
+        }
+      }
+    } catch (err) {
+      log(state.iteration, `Verification error (non-fatal): ${err instanceof Error ? err.message : err}`);
+    }
+  }
 }
 
 // ─── Entry point ────────────────────────────────────────────

@@ -54,3 +54,5 @@ Post-fix: expect ratios to stabilize. If still >1.3x after 3 iterations, revisit
 Build `src/verification.ts` — pre-finalization verification that runs the target repo's test/build commands before committing. Uses repo fingerprint to find commands. Advisory only (doesn't block finalization). See goals.md for full spec.
 
 **[AUTO-SCORED] Iteration 137: predicted 14 turns, actual 10 turns, ratio 0.71**
+
+**[AUTO-SCORED] Iteration 138: predicted 12 turns, actual 18 turns, ratio 1.50**
