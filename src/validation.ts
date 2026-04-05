@@ -11,7 +11,7 @@ import { executeBash } from "./tools/bash.js";
 
 // ─── Code Analysis Types ─────────────────────────────────────
 
-export interface FileAnalysis {
+interface FileAnalysis {
   file: string;           // relative path
   totalLines: number;
   codeLines: number;      // non-blank, non-comment lines
@@ -129,7 +129,7 @@ function analyzeFile(filePath: string, rootDir: string): FileAnalysis {
   };
 }
 
-export function analyzeCodebase(srcDir?: string): CodebaseAnalysis {
+function analyzeCodebase(srcDir?: string): CodebaseAnalysis {
   const dir = srcDir || path.join(process.cwd(), "src");
   const files = findTsFiles(dir);
   const rootDir = process.cwd();
@@ -178,7 +178,7 @@ export interface ValidationResult {
 
 // ─── Options ────────────────────────────────────────────────
 
-export interface ValidationOptions {
+interface ValidationOptions {
   /** Skip running pre-commit-check.sh (useful to avoid recursion in self-tests). */
   skipPreCommitScript?: boolean;
 }
