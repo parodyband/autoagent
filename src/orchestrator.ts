@@ -741,6 +741,9 @@ export class Orchestrator {
   /** Cost of each completed turn, for trend analysis. */
   private turnCosts: number[] = [];
 
+  /** AbortController for the current send() call. Null when idle. */
+  _abortController: AbortController | null = null;
+
   /** Prevents the 80% context warning from firing more than once per session. */
   private contextWarningShown = false;
 
@@ -923,6 +926,28 @@ export class Orchestrator {
       tokensOut: this.sessionTokensOut,
       lastInputTokens: this.lastInputTokens,
     };
+  }
+
+  /** Abort any in-progress send() call. Safe to call when idle. */
+  abort(): void {
+    if (this._abortController) {
+      this._abortController.abort();
+      this._abortController = null;
+    }
+  }
+
+  /** Session statistics for /status display. */
+  getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: "↑" | "→" | "↓" } {
+    const durationMs = Date.now() - this.sessionStartTime;
+    const turnCount = this.turnCosts.length;
+    const avgCostPerTurn = turnCount > 0 ? this.sessionCost / turnCount : 0;
+    let costTrend: "↑" | "→" | "↓" = "→";
+    if (turnCount >= 3) {
+      const recentAvg = this.turnCosts.slice(-3).reduce((a, b) => a + b, 0) / 3;
+      if (recentAvg > avgCostPerTurn * 1.2) costTrend = "↑";
+      else if (recentAvg < avgCostPerTurn * 0.8) costTrend = "↓";
+    }
+    return { durationMs, turnCount, avgCostPerTurn, costTrend };
   }
 
   /** Get the current model (override if set, otherwise "auto"). */
@@ -1232,6 +1257,8 @@ export class Orchestrator {
    */
   async send(userMessage: string): Promise<OrchestratorResult> {
     if (!this.initialized) await this.init();
+    // Create fresh AbortController for this send() call
+    this._abortController = new AbortController();
 
     // 0. Project summary injection (once per session)
     if (!this.projectSummaryInjected) {
@@ -1366,7 +1393,7 @@ export class Orchestrator {
       }
     };
 
-    const { text, tokensIn, tokensOut, lastInputTokens } = await runAgentLoop(
+    const loopResult = await runAgentLoop(
       this.client,
       model,
       this.systemPrompt,
@@ -1380,7 +1407,9 @@ export class Orchestrator {
       onCompact,
       this.opts.onContextBudget,
       fileWatchCallback,
+      this._abortController?.signal,
     );
+    const { text, tokensIn, tokensOut, lastInputTokens, aborted } = loopResult;
 
     // Persist assistant reply (last assistant message in history)
     if (this.sessionPath && text) {
@@ -1391,8 +1420,16 @@ export class Orchestrator {
     // Accumulate cost
     this.sessionTokensIn += tokensIn;
     this.sessionTokensOut += tokensOut;
-    this.sessionCost += computeCost(model, tokensIn, tokensOut);
+    const turnCost = computeCost(model, tokensIn, tokensOut);
+    this.sessionCost += turnCost;
+    this.turnCosts.push(turnCost);
     this.lastInputTokens = lastInputTokens;
+
+    // If aborted, return early with partial result
+    if (aborted) {
+      this._abortController = null;
+      return { text: text || "⏹ Generation cancelled.", changedFiles: [], verificationPassed: undefined };
+    }
 
     // Proactive context budget warning — fire once when crossing 80% of T2 threshold
     if (

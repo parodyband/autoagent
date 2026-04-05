@@ -1143,3 +1143,144 @@ Context after patch:
 747 |   /** Whether project summary has been injected into the system prompt already. */
 748 |   private projectSummaryInjected = false;
 [2026-04-05T19:23:11.022Z] iter=330 turn=16 INFO: Turn 16/25
+[2026-04-05T19:23:14.728Z] iter=330 turn=16 INFO: Agent: Let me implement everything at once - wiring abort signal in `send()`, adding `getSessionStats()`, updating TUI, and writing tests.
+[2026-04-05T19:23:14.729Z] iter=330 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "async send\|runAgentLoop(" src/orchestrator.ts
+[2026-04-05T19:23:14.735Z] iter=330 turn=16 INFO:   -> exit=0 (328 chars)
+[2026-04-05T19:23:14.735Z] iter=330 turn=17 INFO: Turn 17/25
+[2026-04-05T19:23:20.058Z] iter=330 turn=17 INFO: think: I need to finish the implementation fast. Let me do all the changes in one big batch, then run TSC, write memory, update...
+[2026-04-05T19:23:20.059Z] iter=330 turn=18 INFO: Turn 18/25
+[2026-04-05T19:23:21.375Z] iter=330 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1365,1395p' src/orchestrator.ts
+[2026-04-05T19:23:21.383Z] iter=330 turn=18 INFO:   -> exit=0 (915 chars)
+[2026-04-05T19:23:21.384Z] iter=330 turn=19 INFO: Turn 19/25
+[2026-04-05T19:23:29.271Z] iter=330 turn=19 INFO: Agent: I need to complete all changes now in bulk.
+[2026-04-05T19:23:29.272Z] iter=330 turn=19 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:23:29.273Z] iter=330 turn=19 INFO:   -> ok: Patched src/orchestrator.ts: -27 +37 lines
+
+Context after patch:
+1366 |       }
+1367 |     };
+1368 | 
+1369 |     const loopResult = await runAgentLoop(
+1370 |       this.client,
+1371 |       model,
+1372 |       this.systemPrompt,
+1373 |       this.apiMessages,
+1374 |       this.registry,
+1375 |       this.opts.workDir,
+1376 |       this.opts.onToolCall,
+1377 |       this.opts.onStatus,
+1378 |       this.opts.onText,
+1379 |       this.opts.onDiffPreview,
+1380 |       onCompact,
+1381 |       this.opts.onContextBudget,
+1382 |       fileWatchCallback,
+1383 |       this._abortController?.signal,
+1384 |     );
+1385 |     const { text, tokensIn, tokensOut, lastInputTokens, aborted } = loopResult;
+1386 | 
+1387 |     // Persist assistant reply (last assistant message in history)
+1388 |     if (this.sessionPath && text) {
+1389 |       const assistantMsg: Anthropic.MessageParam = { role: "assistant", content: text };
+1390 |       saveMessage(this.sessionPath, assistantMsg);
+1391 |     }
+1392 | 
+1393 |     // Accumulate cost
+1394 |     this.sessionTokensIn += tokensIn;
+1395 |     this.sessionTokensOut += tokensOut;
+1396 |     const turnCost = computeCost(model, tokensIn, tokensOut);
+1397 |     this.sessionCost += turnCost;
+1398 |     this.turnCosts.push(turnCost);
+1399 |     this.lastInputTokens = lastInputTokens;
+1400 | 
+1401 |     // If aborted, return early with partial result
+1402 |     if (aborted) {
+1403 |       this._abortController = null;
+1404 |       return { text: text || "⏹ Generation cancelled.", changedFiles: [], verificationPassed: undefined };
+1405 |     }
+1406 | 
+1407 |     // Proactive context budget warning — fire once when crossing 80% of T2 threshold
+1408 |     if (
+[2026-04-05T19:23:29.273Z] iter=330 turn=20 INFO: Turn 20/25
+[2026-04-05T19:23:33.779Z] iter=330 turn=20 INFO: Agent: Now add `_abortController` field and `abort()`/`getSessionStats()` methods, plus wire `send()` to create the controller:
+[2026-04-05T19:23:33.780Z] iter=330 turn=20 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:23:33.782Z] iter=330 turn=20 INFO:   -> ok: Patched src/orchestrator.ts: -2 +5 lines
+
+Context after patch:
+741 |   /** Cost of each completed turn, for trend analysis. */
+742 |   private turnCosts: number[] = [];
+743 | 
+744 |   /** AbortController for the current send() call. Null when idle. */
+745 |   _abortController: AbortController | null = null;
+746 | 
+747 |   /** Prevents the 80% context warning from firing more than once per session. */
+748 |   private contextWarningShown = false;
+749 | 
+750 |   /** Whether project summary has been injected into the system prompt already. */
+751 |   private projectSummaryInjected = false;
+[2026-04-05T19:23:33.783Z] iter=330 turn=21 INFO: Turn 21/25
+[2026-04-05T19:23:40.742Z] iter=330 turn=21 INFO: Agent: Now add `abort()` and `getSessionStats()` after `getCost()`:
+[2026-04-05T19:23:40.742Z] iter=330 turn=21 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:23:40.744Z] iter=330 turn=21 INFO:   -> ok: Patched src/orchestrator.ts: -4 +26 lines
+
+Context after patch:
+928 |     };
+929 |   }
+930 | 
+931 |   /** Abort any in-progress send() call. Safe to call when idle. */
+932 |   abort(): void {
+933 |     if (this._abortController) {
+934 |       this._abortController.abort();
+935 |       this._abortController = null;
+936 |     }
+937 |   }
+938 | 
+939 |   /** Session statistics for /status display. */
+940 |   getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: "↑" | "→" | "↓" } {
+941 |     const durationMs = Date.now() - this.sessionStartTime;
+942 |     const turnCount = this.turnCosts.length;
+943 |     const avgCostPerTurn = turnCount > 0 ? this.sessionCost / turnCount : 0;
+944 |     let costTrend: "↑" | "→" | "↓" = "→";
+945 |     if (turnCount >= 3) {
+946 |       const recentAvg = this.turnCosts.slice(-3).reduce((a, b) => a + b, 0) / 3;
+947 |       if (recentAvg > avgCostPerTurn * 1.2) costTrend = "↑";
+948 |       else if (recentAvg < avgCostPerTurn * 0.8) costTrend = "↓";
+949 |     }
+950 |     return { durationMs, turnCount, avgCostPerTurn, costTrend };
+951 |   }
+952 | 
+953 |   /** Get the current model (override if set, otherwise "auto"). */
+954 |   getModel(): string {
+955 |     return this.modelOverride ?? "auto";
+956 |   }
+957 | 
+958 |   /** Override model for all subsequent sends. Pass null to restore auto-routing. */
+959 |   setModel(model: string | null): void {
+[2026-04-05T19:23:40.744Z] iter=330 turn=22 INFO: Turn 22/25
+[2026-04-05T19:23:43.938Z] iter=330 turn=22 INFO: Agent: Now wire `_abortController` creation in `send()`:
+[2026-04-05T19:23:43.939Z] iter=330 turn=22 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:23:43.940Z] iter=330 turn=22 INFO:   -> ok: Patched src/orchestrator.ts: -2 +4 lines
+
+Context after patch:
+1255 |    * 4. Run streaming agent loop
+1256 |    * 5. Verify if code was changed
+1257 |    */
+1258 |   async send(userMessage: string): Promise<OrchestratorResult> {
+1259 |     if (!this.initialized) await this.init();
+1260 |     // Create fresh AbortController for this send() call
+1261 |     this._abortController = new AbortController();
+1262 | 
+1263 |     // 0. Project summary injection (once per session)
+1264 |     if (!this.projectSummaryInjected) {
+[2026-04-05T19:23:43.941Z] iter=330 turn=23 INFO: Turn 23/25
+[2026-04-05T19:23:45.963Z] iter=330 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T19:23:46.987Z] iter=330 turn=23 INFO:   -> exit=0 (158 chars)
+[2026-04-05T19:23:46.987Z] iter=330 turn=24 INFO: Turn 24/25
+[2026-04-05T19:23:48.729Z] iter=330 turn=24 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "OrchestratorResult" src/orchestrator.ts | head -5
+[2026-04-05T19:23:48.737Z] iter=330 turn=24 INFO:   -> exit=0 (112 chars)
+[2026-04-05T19:23:48.738Z] iter=330 turn=25 INFO: Turn 25/25
+[2026-04-05T19:23:50.121Z] iter=330 turn=25 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '156,165p' src/orchestrator.ts
+[2026-04-05T19:23:50.127Z] iter=330 turn=25 INFO:   -> exit=0 (210 chars)
+[2026-04-05T19:23:50.127Z] iter=330 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T19:23:50.128Z] iter=330 turn=25 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T19:23:50.128Z] iter=330 turn=25 INFO: Tool timing: bash: 20x, avg=60ms, total=1202ms; write_file: 8x, avg=2ms, total=13ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T19:23:50.129Z] iter=330 turn=25 INFO: Tool timing stats
