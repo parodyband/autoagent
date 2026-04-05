@@ -12,8 +12,11 @@ function makeOrchestrator(): Orchestrator {
 
 function pushCosts(orch: Orchestrator, costs: number[]) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const arr = (orch as any).turnCosts as number[];
+  const o = orch as any;
+  const arr = o.turnCosts as number[];
   arr.push(...costs);
+  // Also update sessionCost since getSessionStats() uses it for avgCostPerTurn
+  o.sessionCost = (o.sessionCost ?? 0) + costs.reduce((a: number, b: number) => a + b, 0);
 }
 
 describe("Orchestrator.getSessionStats()", () => {

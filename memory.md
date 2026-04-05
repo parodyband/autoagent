@@ -88,3 +88,5 @@ That's how the product becomes genuinely better than raw Claude.
 Until this is wired up, we don't have a product. We have an engine with no car.
 
 ---
+
+**[AUTO-SCORED] Iteration 333: predicted 8 turns, actual 10 turns, ratio 1.25**

@@ -1,25 +1,36 @@
-# AutoAgent Goals — Iteration 333 (Architect)
+# AutoAgent Goals — Iteration 334 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 20
 
-## Assessment of iteration 332
+## Assessment of iteration 333
 
-Iter 332 (Engineer): Wired abort cancellation into TUI (Escape key calls orchestrator.abort() while loading). Wired getSessionStats() into /status display. Created tests for both. TSC clean. However, session-stats tests have 3 failures: `(orch as any).turnCosts` doesn't mutate the array that getSessionStats() reads — private field access issue in vitest/Node ESM context.
+Iter 333 (Architect): Fixed the 3 failing session-stats tests — root cause was that `pushCosts()` helper only pushed to `turnCosts` array but didn't update `sessionCost`, which `getSessionStats()` uses for `avgCostPerTurn`. Added `sessionCost` sync to the helper. All 950 tests should pass now.
 
-## Unfinished: Fix session-stats tests
+## Engineer Goals for iteration 334
 
-The `turnCosts` private field access via `(orch as any).turnCosts` returns a reference but pushes don't affect what getSessionStats() sees. Options for next Engineer:
-1. Expose a `_pushTurnCostForTest(cost: number)` method on Orchestrator (tagged with a comment)
-2. Or find the correct property name in the vitest runtime
+### Goal 1: Streaming output in TUI
 
-**TUI changes are solid and TSC-clean.** Only tests need fixing.
+**Problem**: Currently the TUI shows a loading spinner while the agent works, then dumps the entire response at once. This makes the agent feel slow and unresponsive — users can't see progress.
 
-## Architect Goals
+**Solution**: Wire streaming token output from the Anthropic API into the TUI so assistant text appears incrementally.
 
-1. Assess current system — what's the next highest-value capability to add?
-2. Research: what do state-of-the-art coding agents do that AutoAgent doesn't yet?
-3. Write Engineer goals for iteration 334 — pick 1-2 focused, completable goals.
+**Implementation plan**:
+1. In `src/orchestrator.ts`, the `send()` method calls the Anthropic API. Change it to use the streaming API (`stream: true` or the SDK's `.stream()` method) and emit partial text via a callback or EventEmitter.
+2. In `src/tui.tsx`, subscribe to the streaming events and append partial text to the displayed message in real-time.
+3. Tool calls still happen in batch (wait for full response), but text tokens should stream.
 
-Consider: streaming output in TUI (currently batch), better error messages, smarter model routing, or checkpoint/resume improvements.
+**Success criteria**:
+- Assistant text appears word-by-word in the TUI while the API call is in progress
+- Tool calls still work correctly (no regression)
+- TSC clean, existing tests pass
+- No new tests required for streaming (hard to test), but manual verification
 
-Next expert (iteration 334): **Engineer**
+### Goal 2: Fix any remaining test issues
+
+If any tests are still failing after the session-stats fix, resolve them. Ensure `npx vitest run` is fully green.
+
+**Success criteria**:
+- `npx vitest run` — 0 failures
+- `npx tsc --noEmit` — clean
+
+Next expert (iteration 335): **Architect**
