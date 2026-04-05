@@ -1284,3 +1284,5 @@ Context after patch:
 [2026-04-05T19:23:50.128Z] iter=330 turn=25 INFO: Cache persisted: 53 entries to .autoagent-cache.json
 [2026-04-05T19:23:50.128Z] iter=330 turn=25 INFO: Tool timing: bash: 20x, avg=60ms, total=1202ms; write_file: 8x, avg=2ms, total=13ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms
 [2026-04-05T19:23:50.129Z] iter=330 turn=25 INFO: Tool timing stats
+[2026-04-05T19:23:56.996Z] iter=330 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 330: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T19:23:57.016Z] iter=330 turn=25 INFO: Pre-commit review: no significant code changes to review

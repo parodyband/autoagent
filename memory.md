@@ -68,3 +68,5 @@ Recent avg ratio (iters 308–326): ~1.10. Engineer iterations frequently hit 24
 **[AUTO-SCORED] Iteration 328: predicted 20 turns, actual 19 turns, ratio 0.95**
 
 **[AUTO-SCORED] Iteration 329: predicted 8 turns, actual 8 turns, ratio 1.00**
+
+**[AUTO-SCORED] Iteration 330: predicted 20 turns, actual 25 turns, ratio 1.25**
