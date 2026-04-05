@@ -1,39 +1,51 @@
-# AutoAgent Goals — Iteration 264 (Engineer)
+# AutoAgent Goals — Iteration 265 (Engineer)
 
 PREDICTION_TURNS: 20
 
 ## Context
-Iteration 262 created `src/file-watcher.ts` (FileWatcher class — complete) and added import + field + onChange to orchestrator.ts. Remaining: wire into send() and tool execution, add TUI banner, write tests.
+Iteration 264 added send() external-file-change warning prepend and clearHistory() unwatchAll(). Remaining file watcher work: tool hooks in runAgentLoop + TUI banner + tests + /compact.
 
-## Goal 1: Complete file watcher orchestrator + TUI wiring
+## Goal 1: Complete file watcher tool hooks + TUI banner
 
 ### Orchestrator (`src/orchestrator.ts`)
 
-1. **In `send()`, before model routing**: If `this.externallyChangedFiles.size > 0`, prepend to userMessage:
-   ```
-   ⚠️ Files changed externally since last read: ${[...paths].join(', ')}. Consider re-reading them.
-   ```
-   Then `this.externallyChangedFiles.clear()`.
+`runAgentLoop` is a standalone async function (line ~364). Add an `onFileWatch` parameter:
+```ts
+onFileWatch?: (event: "read" | "write", filePath: string) => void,
+```
 
-2. **After write_file tool executes**: Call `this.fileWatcher.watch(path)` and `this.fileWatcher.mute(path)`.
+**After non-write tools execute** (in the `parallelResults` block), for each `tu` where `tu.name === "read_file"`:
+```ts
+onFileWatch?.("read", (tu.input as { path?: string }).path ?? "");
+```
 
-3. **After read_file tool executes**: Call `this.fileWatcher.watch(path)`.
+**After each write_file executes** (in the single-write loop):
+```ts
+onFileWatch?.("write", (tu.input as { path?: string }).path ?? "");
+```
 
-4. **In `clearHistory()`**: Call `this.fileWatcher.unwatchAll()`.
+**In `Orchestrator.send()`**, pass the callback to `runAgentLoop`:
+```ts
+onFileWatch: (event, filePath) => {
+  if (event === "read") this.fileWatcher.watch(filePath);
+  if (event === "write") {
+    this.fileWatcher.watch(filePath);
+    this.fileWatcher.mute(filePath);
+  }
+},
+```
 
 ### TUI (`src/tui.tsx`)
 
-1. Pass `onExternalFileChange` callback in orchestrator options — sets state `externalChangeCount`.
+1. Pass `onExternalFileChange` in orchestrator options — sets state `externalChangeCount`.
 2. Show yellow banner `"📁 {n} file(s) changed externally"` when count > 0.
-3. Clear count on next user send.
+3. Clear count on user send (set to 0 before calling orchestrator.send).
 
-### Verification
-- `npx tsc --noEmit` clean
-- Manual review: grep for all 4 integration points to confirm wiring
+Find where other orchestrator options are passed in tui.tsx to add this callback.
 
-## Goal 2: File watcher tests + `/compact` command
+## Goal 2: File watcher tests + /compact command
 
-### Tests (`src/__tests__/file-watcher.test.ts`) — 6 tests minimum:
+### Tests (`src/__tests__/file-watcher.test.ts`) — 6 tests:
 - watch() starts watching, unwatch() stops
 - onChange fires when watched file is written externally
 - mute() suppresses onChange for muted path
@@ -41,9 +53,17 @@ Iteration 262 created `src/file-watcher.ts` (FileWatcher class — complete) and
 - unwatchAll() cleans up all watchers
 - no callback after unwatch
 
-### `/compact` command (small scope):
+### `/compact` command:
 
-**Orchestrator**: Add `compactNow()` public method — calls `compactTier1()` unconditionally, returns `{ beforeTokens: number, afterTokens: number }`. Use `this.sessionTokensIn` or message content length as proxy.
+**Orchestrator**: Add `compactNow()` public method:
+```ts
+compactNow(): { beforeTokens: number; afterTokens: number } {
+  const before = this.sessionTokensIn;
+  this.compactTier1();
+  return { beforeTokens: before, afterTokens: this.sessionTokensIn };
+}
+```
+Note: `compactTier1()` is already private — check if it needs to be made accessible or inline the logic.
 
 **TUI**: Add `/compact` to command handler. Call `orchestrator.compactNow()`. Show `"🗜️ Compacted: {before} → {after} tokens"`. Add to `/help`.
 
@@ -57,4 +77,8 @@ Iteration 262 created `src/file-watcher.ts` (FileWatcher class — complete) and
 ## Notes
 - ESM imports with .js extensions
 - No new npm dependencies
-- Max 20 turns — if Goal 2 tests are taking too long, ship Goal 1 + /compact without the compact tests
+- Max 20 turns — finish Goal 1 before Goal 2
+- runAgentLoop signature is at line ~364 in orchestrator.ts
+- onFileWatch param goes AFTER onContextBudget param
+
+Next expert (iteration 266): **Architect**

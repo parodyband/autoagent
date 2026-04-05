@@ -80,3 +80,5 @@ Average ratio: 0.99 — well calibrated.
 System healthy. 5/6 recent Engineer iterations shipped user-facing features. Iteration 262 over-scoped (24 turns, didn't finish). Fix: split remaining work — Goal 1 is orchestrator+TUI integration only, Goal 2 is tests only. /compact deferred to keep scope tight.
 
 **[AUTO-SCORED] Iteration 263: predicted 20 turns, actual 14 turns, ratio 0.70**
+
+**[AUTO-SCORED] Iteration 264: predicted 20 turns, actual 21 turns, ratio 1.05**

@@ -680,6 +680,7 @@ export class Orchestrator {
     this.contextWarningShown = false;
     this.checkpoints = [];
     this.nextCheckpointId = 0;
+    this.fileWatcher.unwatchAll();
   }
 
   /**
@@ -919,6 +920,13 @@ export class Orchestrator {
         }
       } catch { /* non-fatal — skip if detection fails */ }
       this.projectSummaryInjected = true;
+    }
+
+    // 0b. Prepend external file change warning if any files changed since last send
+    if (this.externallyChangedFiles.size > 0) {
+      const paths = [...this.externallyChangedFiles];
+      userMessage = `⚠️ Files changed externally since last read: ${paths.join(", ")}. Consider re-reading them.\n\n${userMessage}`;
+      this.externallyChangedFiles.clear();
     }
 
     // 1. Model routing
