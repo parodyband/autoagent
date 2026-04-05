@@ -10,6 +10,7 @@
 
 import { readFileSync, existsSync } from "fs";
 import { join, resolve } from "path";
+import { execSync } from "child_process";
 import type { RepoMap } from "./tree-sitter-map.js";
 import { fuzzySearch } from "./tree-sitter-map.js";
 
@@ -132,6 +133,54 @@ export function extractKeywords(message: string): string[] {
   return [...new Set(words)];
 }
 
+/** Maximum number of git-changed files to prioritize in context. */
+const MAX_GIT_FILES = 3;
+
+/**
+ * Return recently-changed file paths from `git diff` (unstaged + staged).
+ * Returns an empty array if not in a git repo or no changes are found.
+ * Binary files and missing files are silently filtered out.
+ *
+ * @param workDir - the working directory to run git in
+ */
+export function getRecentlyChangedFiles(workDir: string): string[] {
+  try {
+    const run = (args: string) =>
+      execSync(`git -C ${JSON.stringify(workDir)} ${args}`, {
+        encoding: "utf8",
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+
+    const unstaged = run("diff --name-only").trim();
+    const staged = run("diff --cached --name-only").trim();
+
+    const seen = new Set<string>();
+    const result: string[] = [];
+
+    for (const line of [...unstaged.split("\n"), ...staged.split("\n")]) {
+      const f = line.trim();
+      if (!f || seen.has(f)) continue;
+      seen.add(f);
+
+      // Skip binary-looking files (no extension or known binary exts)
+      const ext = f.split(".").pop() ?? "";
+      const binaryExts = new Set(["png", "jpg", "jpeg", "gif", "ico", "svg", "woff", "woff2", "ttf", "eot", "pdf", "zip", "gz", "tar"]);
+      if (binaryExts.has(ext.toLowerCase())) continue;
+
+      // Only include files that still exist on disk
+      const absPath = join(workDir, f);
+      if (existsSync(absPath)) {
+        result.push(f);
+      }
+    }
+
+    return result;
+  } catch {
+    // Not a git repo, or git not available
+    return [];
+  }
+}
+
 /**
  * Auto-load file contents relevant to the user's query.
  *
@@ -152,6 +201,11 @@ export function autoLoadContext(
   const keywords = extractKeywords(userMessage);
   if (keywords.length === 0) return "";
 
+  // --- Git-changed files get highest priority ---
+  const gitChanged = getRecentlyChangedFiles(workDir)
+    .filter(p => !alreadyMentioned.has(p))
+    .slice(0, MAX_GIT_FILES);
+
   // Count keyword hits per file path
   const hitCounts = new Map<string, number>();
   for (const keyword of keywords) {
@@ -161,14 +215,14 @@ export function autoLoadContext(
     }
   }
 
-  if (hitCounts.size === 0) return "";
-
-  // Sort by hit count descending, then path for stability
-  const ranked = [...hitCounts.entries()]
+  // Sort keyword-matched files by hit count descending
+  const keywordRanked = [...hitCounts.entries()]
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .map(([path]) => path)
-    .filter(p => !alreadyMentioned.has(p))
-    .slice(0, MAX_FILES);
+    .filter(p => !alreadyMentioned.has(p) && !gitChanged.includes(p));
+
+  // Merge: git-changed first, then keyword results, capped at MAX_FILES total
+  const ranked = [...gitChanged, ...keywordRanked].slice(0, MAX_FILES);
 
   if (ranked.length === 0) return "";
 

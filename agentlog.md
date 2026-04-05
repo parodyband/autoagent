@@ -1,65 +1,3 @@
-Context after patch:
-486 |       setTimeout(() => setStatus(""), 1000);
-487 |       return;
-488 |     }
-489 |     if (trimmed === "/exit") {
-490 |       if (messages.length > 2) {
-491 |         try {
-492 |           const now = new Date();
-493 |           const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
-494 |           const exportsDir = path.join(workDir, ".autoagent", "exports");
-495 |           import("fs").then(({ mkdirSync, existsSync }) => {
-496 |             if (!existsSync(exportsDir)) mkdirSync(exportsDir, { recursive: true });
-497 |           }).catch(() => {});
-498 |           const filePath = path.join(workDir, ".autoagent", "exports", `session-${timestamp}.md`);
-499 |           const model = orchestratorRef.current?.getModel() ?? footerStats.model;
-500 |           buildExportContent(messages, model, footerStats, workDir, filePath);
-501 |         } catch { /* never block exit */ }
-502 |       }
-503 |       exit();
-504 |       return;
-505 |     }
-506 |     if (trimmed === "/init") {
-507 |       setStatus("Analyzing project...");
-508 |       try {
-[2026-04-05T18:26:52.682Z] iter=302 turn=15 INFO: Turn 15/25
-[2026-04-05T18:26:59.030Z] iter=302 turn=15 INFO: Agent: Now add the `buildExportContent` helper before the `App` component:
-[2026-04-05T18:26:59.030Z] iter=302 turn=15 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T18:26:59.031Z] iter=302 turn=15 INFO:   -> ok: Patched src/tui.tsx: -1 +52 lines
-
-Context after patch:
-305 |   );
-306 | }
-307 | 
-308 | // ─── Export Helper ───────────────────────────────────────────
-309 | function buildExportContent(
-310 |   messages: Message[],
-311 |   model: string,
-312 |   stats: FooterStats,
-313 |   workDir: string,
-314 |   filePath: string,
-315 | ): void {
-316 |   const { writeFileSync, mkdirSync } = require("fs") as typeof import("fs");
-317 |   const dir = path.dirname(filePath);
-318 |   mkdirSync(dir, { recursive: true });
-319 |   const now = new Date();
-320 |   const projectName = path.basename(workDir);
-321 |   const { tokensIn, tokensOut, cost } = stats;
-322 |   const lines: string[] = [
-323 |     `# AutoAgent Conversation Export`,
-324 |     ``,
-325 |     `**Date**: ${now.toLocaleString()}`,
-326 |     `**Model**: ${model}`,
-327 |     `**Project**: ${projectName}`,
-328 |     ``,
-329 |     `---`,
-330 |     ``,
-331 |   ];
-332 |   for (const msg of messages) {
-333 |     if (msg.role === "user") {
-334 |       lines.push(`## User`, ``, msg.content, ``);
-335 |     } else {
-336 |       const textContent = msg.content
 337 |         .split("\n")
 338 |         .filter(l => !l.startsWith('{"type":"tool'))
 339 |         .join("\n")
@@ -1058,3 +996,249 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T18:40:26.226Z] iter=309 turn=7 INFO: Tool timing stats
 [2026-04-05T18:40:32.621Z] iter=309 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 309: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T18:40:32.643Z] iter=309 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T18:40:32.677Z] iter=309 turn=7 INFO: Committed: 926ae81d (17 in / 2340 out, cache: 10855 created, 52798 read)
+[2026-04-05T18:40:32.678Z] iter=309 turn=7 INFO: Restarting as iteration 310...
+[2026-04-05T18:40:32.881Z] iter=310 INFO: Cache restored: 52/52 entries (0 stale)
+[2026-04-05T18:40:32.883Z] iter=310 INFO: Turn budget: 18/25 (calibration=0.88x, predicted=20)
+[2026-04-05T18:40:32.883Z] iter=310 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T18:40:33.018Z] iter=310 turn=1 INFO: Turn 1/25
+[2026-04-05T18:40:35.793Z] iter=310 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what needs to be built.
+[2026-04-05T18:40:35.794Z] iter=310 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T18:40:35.795Z] iter=310 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-05T18:40:35.806Z] iter=310 turn=1 INFO:   -> exit=0 (2520 chars)
+[2026-04-05T18:40:35.807Z] iter=310 turn=2 INFO: Turn 2/25
+[2026-04-05T18:40:38.228Z] iter=310 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -5
+[2026-04-05T18:40:38.231Z] iter=310 turn=2 INFO: read_file: src/tui.tsx
+[2026-04-05T18:40:38.232Z] iter=310 turn=2 INFO:   -> ok (1926 chars)
+[2026-04-05T18:40:49.927Z] iter=310 turn=2 INFO:   -> exit=0 (191 chars)
+[2026-04-05T18:40:49.928Z] iter=310 turn=3 INFO: Turn 3/25
+[2026-04-05T18:40:52.072Z] iter=310 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat src/__tests__/help-command.test.ts
+[2026-04-05T18:40:52.074Z] iter=310 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat src/context-loader.ts
+[2026-04-05T18:40:52.082Z] iter=310 turn=3 INFO:   -> exit=0 (983 chars)
+[2026-04-05T18:40:52.085Z] iter=310 turn=3 INFO:   -> exit=0 (6785 chars)
+[2026-04-05T18:40:52.085Z] iter=310 turn=4 INFO: Turn 4/25
+[2026-04-05T18:40:57.294Z] iter=310 turn=4 INFO: think: I have enough context. Let me plan my deliverables:
+
+1. Create `src/welcome.ts` with a pure `shouldShowWelcome()` functi...
+[2026-04-05T18:40:57.295Z] iter=310 turn=5 INFO: Turn 5/25
+[2026-04-05T18:41:03.541Z] iter=310 turn=5 INFO: Agent: Starting deliverables now. Let me write all files:
+[2026-04-05T18:41:03.542Z] iter=310 turn=5 INFO: write_file: src/welcome.ts (write)
+[2026-04-05T18:41:03.543Z] iter=310 turn=5 INFO:   -> ok: Created src/welcome.ts (766 chars)
+[2026-04-05T18:41:03.543Z] iter=310 turn=6 INFO: Turn 6/25
+[2026-04-05T18:41:11.016Z] iter=310 turn=6 INFO: write_file: src/__tests__/welcome-banner.test.ts (write)
+[2026-04-05T18:41:11.017Z] iter=310 turn=6 INFO:   -> ok: Created src/__tests__/welcome-banner.test.ts (1670 chars)
+[2026-04-05T18:41:11.017Z] iter=310 turn=7 INFO: Turn 7/25
+[2026-04-05T18:41:15.756Z] iter=310 turn=7 INFO: Agent: **Goal 1 (test coverage)**: IN PROGRESS — welcome banner tests done, need to update tui.tsx to use the extracted function, and add help command coverage for missing slash commands.
+
+**Goal 2 (git-aware context)**: NOT STARTED
+
+Let me continue writing:
+[2026-04-05T18:41:15.756Z] iter=310 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "printHelp\|/clear\|/reindex\|/resume\|/diff\|/undo\|/help\|/find\|/model\|/status\|/rewind\|/exit\|/export\|/compact\|/init" src/cli.ts | head -60
+[2026-04-05T18:41:15.767Z] iter=310 turn=7 INFO:   -> exit=0 (1142 chars)
+[2026-04-05T18:41:15.767Z] iter=310 turn=8 INFO: Turn 8/25
+[2026-04-05T18:41:20.642Z] iter=310 turn=8 INFO: Agent: Now update tui.tsx to use `shouldShowWelcome`, add the help command completeness test, and implement git-aware context loading all at once:
+[2026-04-05T18:41:20.642Z] iter=310 turn=8 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:41:20.644Z] iter=310 turn=8 INFO:   -> ok: Patched src/tui.tsx: -10 +7 lines
+
+Context after patch:
+392 |             content: "⚠ No saved sessions found — starting fresh.",
+393 |           }]);
+394 |         }
+395 |       } else {
+396 |         // First-run welcome: show onboarding banner if .autoagent.md doesn't exist
+397 |         const welcome = shouldShowWelcome(workDir);
+398 |         if (welcome) {
+399 |           setMessages(prev => [...prev, welcome]);
+400 |         }
+401 |       }
+402 |       setStatus("");
+403 |       // Build initial repoMap for #file suggestions
+404 |       try {
+[2026-04-05T18:41:20.644Z] iter=310 turn=9 INFO: Turn 9/25
+[2026-04-05T18:41:22.645Z] iter=310 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && head -20 src/tui.tsx | grep -n "import"
+[2026-04-05T18:41:22.655Z] iter=310 turn=9 INFO:   -> exit=0 (599 chars)
+[2026-04-05T18:41:22.656Z] iter=310 turn=10 INFO: Turn 10/25
+[2026-04-05T18:41:24.536Z] iter=310 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^import" src/tui.tsx | tail -20
+[2026-04-05T18:41:24.551Z] iter=310 turn=10 INFO:   -> exit=0 (849 chars)
+[2026-04-05T18:41:24.551Z] iter=310 turn=11 INFO: Turn 11/25
+[2026-04-05T18:41:27.504Z] iter=310 turn=11 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T18:41:27.505Z] iter=310 turn=11 INFO:   -> ok: Patched src/tui.tsx: -1 +2 lines
+
+Context after patch:
+21 | import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
+22 | import { execSync } from "child_process";
+23 | import { runInit } from "./init-command.js";
+24 | import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
+25 | import { shouldShowWelcome } from "./welcome.js";
+26 | 
+27 | // Parse args
+28 | let workDir = process.cwd();
+[2026-04-05T18:41:27.505Z] iter=310 turn=12 INFO: Turn 12/25
+[2026-04-05T18:41:29.788Z] iter=310 turn=12 INFO: Agent: Now remove the duplicate fs.existsSync usage since it's no longer needed for welcome:
+[2026-04-05T18:41:29.788Z] iter=310 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "fs\.existsSync\|memoryPath" src/tui.tsx
+[2026-04-05T18:41:29.800Z] iter=310 turn=12 INFO:   -> exit=1 (11 chars)
+[2026-04-05T18:41:29.800Z] iter=310 turn=13 INFO: Turn 13/25
+[2026-04-05T18:41:37.184Z] iter=310 turn=13 INFO: Agent: Good - I have actually changed files. Let me complete Goal 2 (git-aware context) and the help test, then wrap up.
+[2026-04-05T18:41:37.185Z] iter=310 turn=13 INFO: write_file: src/__tests__/help-command.test.ts (write)
+[2026-04-05T18:41:37.185Z] iter=310 turn=13 INFO:   -> ok: Updated src/__tests__/help-command.test.ts (1477 chars, +24 lines delta)
+[2026-04-05T18:41:37.186Z] iter=310 turn=14 INFO: Turn 14/25
+[2026-04-05T18:41:41.564Z] iter=310 turn=14 INFO: Agent: Now add `getRecentlyChangedFiles` and wire it into `autoLoadContext`:
+[2026-04-05T18:41:41.564Z] iter=310 turn=14 INFO: write_file: src/context-loader.ts (patch)
+[2026-04-05T18:41:41.565Z] iter=310 turn=14 INFO:   -> ok: Patched src/context-loader.ts: -4 +5 lines
+
+Context after patch:
+8 |  * Also supports explicit #file mentions in user messages.
+9 |  */
+10 | 
+11 | import { readFileSync, existsSync } from "fs";
+12 | import { join, resolve } from "path";
+13 | import { execSync } from "child_process";
+14 | import type { RepoMap } from "./tree-sitter-map.js";
+15 | import { fuzzySearch } from "./tree-sitter-map.js";
+16 | 
+17 | const STOPWORDS = new Set([
+18 |   "the", "and", "for", "are", "but", "not", "you", "all", "can", "has",
+[2026-04-05T18:41:41.565Z] iter=310 turn=15 INFO: Turn 15/25
+[2026-04-05T18:41:59.787Z] iter=310 turn=15 INFO: Agent: Now add `getRecentlyChangedFiles` before `autoLoadContext`, and update `autoLoadContext` to use it:
+[2026-04-05T18:41:59.787Z] iter=310 turn=15 INFO: write_file: src/context-loader.ts (patch)
+[2026-04-05T18:41:59.788Z] iter=310 turn=15 INFO:   -> ok: Patched src/context-loader.ts: -37 +90 lines
+
+Context after patch:
+133 |   return [...new Set(words)];
+134 | }
+135 | 
+136 | /** Maximum number of git-changed files to prioritize in context. */
+137 | const MAX_GIT_FILES = 3;
+138 | 
+139 | /**
+140 |  * Return recently-changed file paths from `git diff` (unstaged + staged).
+141 |  * Returns an empty array if not in a git repo or no changes are found.
+142 |  * Binary files and missing files are silently filtered out.
+143 |  *
+144 |  * @param workDir - the working directory to run git in
+145 |  */
+146 | export function getRecentlyChangedFiles(workDir: string): string[] {
+147 |   try {
+148 |     const run = (args: string) =>
+149 |       execSync(`git -C ${JSON.stringify(workDir)} ${args}`, {
+150 |         encoding: "utf8",
+151 |         stdio: ["pipe", "pipe", "pipe"],
+152 |       });
+153 | 
+154 |     const unstaged = run("diff --name-only").trim();
+155 |     const staged = run("diff --cached --name-only").trim();
+156 | 
+157 |     const seen = new Set<string>();
+158 |     const result: string[] = [];
+159 | 
+160 |     for (const line of [...unstaged.split("\n"), ...staged.split("\n")]) {
+161 |       const f = line.trim();
+162 |       if (!f || seen.has(f)) continue;
+163 |       seen.add(f);
+164 | 
+165 |       // Skip binary-looking files (no extension or known binary exts)
+166 |       const ext = f.split(".").pop() ?? "";
+167 |       const binaryExts = new Set(["png", "jpg", "jpeg", "gif", "ico", "svg", "woff", "woff2", "ttf", "eot", "pdf", "zip", "gz", "tar"]);
+168 |       if (binaryExts.has(ext.toLowerCase())) continue;
+169 | 
+170 |       // Only include files that still exist on disk
+171 |       const absPath = join(workDir, f);
+172 |       if (existsSync(absPath)) {
+173 |         result.push(f);
+174 |       }
+175 |     }
+176 | 
+177 |     return result;
+178 |   } catch {
+179 |     // Not a git repo, or git not available
+180 |     return [];
+181 |   }
+182 | }
+183 | 
+184 | /**
+185 |  * Auto-load file contents relevant to the user's query.
+186 |  *
+187 |  * @param repoMap - current repo map
+188 |  * @param userMessage - the user's message
+189 |  * @param workDir - working directory to resolve file paths
+190 |  * @param alreadyMentioned - set of file paths already in conversation context (skip these)
+191 |  * @returns formatted string with file contents, or empty string if nothing relevant
+192 |  */
+193 | export function autoLoadContext(
+194 |   repoMap: RepoMap,
+195 |   userMessage: string,
+196 |   workDir: string,
+197 |   alreadyMentioned: Set<string> = new Set(),
+198 | ): string {
+199 |   if (!repoMap || repoMap.files.length === 0) return "";
+200 | 
+201 |   const keywords = extractKeywords(userMessage);
+202 |   if (keywords.length === 0) return "";
+203 | 
+204 |   // --- Git-changed files get highest priority ---
+205 |   const gitChanged = getRecentlyChangedFiles(workDir)
+206 |     .filter(p => !alreadyMentioned.has(p))
+207 |     .slice(0, MAX_GIT_FILES);
+208 | 
+209 |   // Count keyword hits per file path
+210 |   const hitCounts = new Map<string, number>();
+211 |   for (const keyword of keywords) {
+212 |     const results = fuzzySearch(repoMap, keyword, 30);
+213 |     for (const r of results) {
+214 |       hitCounts.set(r.file, (hitCounts.get(r.file) ?? 0) + 1);
+215 |     }
+216 |   }
+217 | 
+218 |   // Sort keyword-matched files by hit count descending
+219 |   const keywordRanked = [...hitCounts.entries()]
+220 |     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+221 |     .map(([path]) => path)
+222 |     .filter(p => !alreadyMentioned.has(p) && !gitChanged.includes(p));
+223 | 
+224 |   // Merge: git-changed first, then keyword results, capped at MAX_FILES total
+225 |   const ranked = [...gitChanged, ...keywordRanked].slice(0, MAX_FILES);
+226 | 
+227 |   if (ranked.length === 0) return "";
+228 | 
+[2026-04-05T18:41:59.788Z] iter=310 turn=16 INFO: Turn 16/25
+[2026-04-05T18:42:10.513Z] iter=310 turn=16 INFO: Agent: Now add the git-aware context tests, then run verification:
+[2026-04-05T18:42:10.514Z] iter=310 turn=16 INFO: write_file: src/__tests__/context-loader-git.test.ts (write)
+[2026-04-05T18:42:10.514Z] iter=310 turn=16 INFO:   -> ok: Created src/__tests__/context-loader-git.test.ts (2774 chars)
+[2026-04-05T18:42:10.514Z] iter=310 turn=17 INFO: Turn 17/25
+[2026-04-05T18:42:13.384Z] iter=310 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && npx vitest run 2>&1 | tail -8
+[2026-04-05T18:42:26.185Z] iter=310 turn=17 INFO:   -> exit=0 (247 chars)
+[2026-04-05T18:42:26.185Z] iter=310 turn=18 INFO: Turn 18/25
+[2026-04-05T18:42:28.433Z] iter=310 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | grep "FAIL\|×" | head -20
+[2026-04-05T18:42:40.392Z] iter=310 turn=18 INFO:   -> exit=0 (1821 chars)
+[2026-04-05T18:42:40.392Z] iter=310 turn=19 INFO: Turn 19/25
+[2026-04-05T18:42:43.486Z] iter=310 turn=19 INFO: Agent: Let me quickly check the error messages and fix them:
+[2026-04-05T18:42:43.486Z] iter=310 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/welcome-banner.test.ts 2>&1 | grep "Error\|error\|Cannot\|mock" | head -10
+[2026-04-05T18:42:44.450Z] iter=310 turn=19 INFO:   -> exit=0 (1235 chars)
+[2026-04-05T18:42:44.450Z] iter=310 turn=20 INFO: Turn 20/25
+[2026-04-05T18:42:51.575Z] iter=310 turn=20 INFO: Agent: ESM spy issue. Need to use `vi.mock` instead. Fix both test files:
+[2026-04-05T18:42:51.576Z] iter=310 turn=20 INFO: write_file: src/__tests__/welcome-banner.test.ts (write)
+[2026-04-05T18:42:51.576Z] iter=310 turn=20 INFO:   -> ok: Updated src/__tests__/welcome-banner.test.ts (1709 chars, +5 lines delta)
+[2026-04-05T18:42:51.577Z] iter=310 turn=21 INFO: Turn 21/25
+[2026-04-05T18:43:01.096Z] iter=310 turn=21 INFO: write_file: src/__tests__/context-loader-git.test.ts (write)
+[2026-04-05T18:43:01.097Z] iter=310 turn=21 INFO:   -> ok: Updated src/__tests__/context-loader-git.test.ts (2901 chars, +10 lines delta)
+[2026-04-05T18:43:01.097Z] iter=310 turn=22 INFO: Turn 22/25
+[2026-04-05T18:43:03.450Z] iter=310 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && npx vitest run 2>&1 | tail -6
+[2026-04-05T18:43:16.141Z] iter=310 turn=22 INFO:   -> exit=0 (192 chars)
+[2026-04-05T18:43:16.141Z] iter=310 turn=23 INFO: Turn 23/25
+[2026-04-05T18:43:21.067Z] iter=310 turn=23 INFO: save_memory: "[Engineer] Iteration 310"
+[2026-04-05T18:43:21.068Z] iter=310 turn=23 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T18:43:21.069Z] iter=310 turn=24 INFO: Turn 24/25
+[2026-04-05T18:43:29.600Z] iter=310 turn=24 INFO: write_file: goals.md (write)
+[2026-04-05T18:43:29.601Z] iter=310 turn=24 INFO:   -> ok: Updated goals.md (1061 chars, -16 lines delta)
+[2026-04-05T18:43:29.601Z] iter=310 turn=25 INFO: Turn 25/25
+[2026-04-05T18:43:31.411Z] iter=310 turn=25 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T18:43:31.412Z] iter=310 turn=25 INFO: RESTART signal
+[2026-04-05T18:43:31.412Z] iter=310 turn=25 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T18:43:32.382Z] iter=310 turn=25 INFO: Compilation OK
+[2026-04-05T18:43:39.760Z] iter=310 turn=25 INFO: Cache persisted: 52 entries to .autoagent-cache.json
+[2026-04-05T18:43:39.760Z] iter=310 turn=25 INFO: Cache stats: 0 hits, 1 misses, 52 entries, 11 invalidations (1 entries removed)
+[2026-04-05T18:43:39.760Z] iter=310 turn=25 INFO: Tool cache stats
+[2026-04-05T18:43:39.761Z] iter=310 turn=25 INFO: Tool timing: bash: 13x, avg=3861ms, total=50199ms; write_file: 11x, avg=1ms, total=10ms; read_scratchpad: 1x, avg=6ms, total=6ms; save_memory: 1x, avg=2ms, total=2ms; read_file: 1x, avg=1ms, total=1ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T18:43:39.761Z] iter=310 turn=25 INFO: Tool timing stats
+[2026-04-05T18:43:46.035Z] iter=310 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 310: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T18:43:56.907Z] iter=310 turn=25 INFO: Pre-commit review (2991in/451out): - **Shell injection risk**: `execSync(\`git -C ${JSON.stringify(workDir)} ${args}\`)` — `JSON.stringify` adds quotes suitable for JSON, not shell. A path with spaces or special characters (e.g., `/my 

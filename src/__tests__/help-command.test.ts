@@ -39,4 +39,28 @@ describe("printHelp", () => {
     printHelp();
     expect(output).toContain("autoagent");
   });
+
+  it("mentions all core slash commands", () => {
+    printHelp();
+    // All commands from tui.tsx command list
+    const commands = [
+      "/help",
+      "/clear",
+      "/init",
+      "/diff",
+      "/undo",
+      "/find",
+      "/model",
+      "/status",
+      "/rewind",
+      "/exit",
+      "/export",
+      "/resume",
+      "/reindex",
+      "/compact",
+    ];
+    for (const cmd of commands) {
+      expect(output, `expected printHelp() to mention ${cmd}`).toContain(cmd);
+    }
+  });
 });

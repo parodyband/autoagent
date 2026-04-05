@@ -22,6 +22,7 @@ import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
 import { execSync } from "child_process";
 import { runInit } from "./init-command.js";
 import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
+import { shouldShowWelcome } from "./welcome.js";
 
 // Parse args
 let workDir = process.cwd();
@@ -394,12 +395,9 @@ function App() {
         }
       } else {
         // First-run welcome: show onboarding banner if .autoagent.md doesn't exist
-        const memoryPath = path.join(workDir, ".autoagent.md");
-        if (!fs.existsSync(memoryPath)) {
-          setMessages(prev => [...prev, {
-            role: "assistant",
-            content: "👋 Welcome to AutoAgent! No `.autoagent.md` found in this project.\nRun `/init` to scaffold project config and give the agent context about your codebase.",
-          }]);
+        const welcome = shouldShowWelcome(workDir);
+        if (welcome) {
+          setMessages(prev => [...prev, welcome]);
         }
       }
       setStatus("");
