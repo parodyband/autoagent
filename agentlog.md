@@ -1,22 +1,3 @@
-[2026-04-05T13:33:24.650Z] iter=170 turn=16 INFO:   -> exit=0 (86 chars)
-[2026-04-05T13:33:24.651Z] iter=170 turn=17 INFO: Turn 17/25
-[2026-04-05T13:33:29.305Z] iter=170 turn=17 INFO: Agent: Wrapping up now. Let me do all remaining changes + verify in parallel.
-[2026-04-05T13:33:29.306Z] iter=170 turn=17 INFO: $ sed -n '68,100p' src/messages.ts
-[2026-04-05T13:33:29.308Z] iter=170 turn=17 INFO: $ sed -n '165,210p' src/messages.ts
-[2026-04-05T13:33:29.310Z] iter=170 turn=17 INFO: $ sed -n '68,160p' src/memory.ts
-[2026-04-05T13:33:29.316Z] iter=170 turn=17 INFO:   -> exit=0 (1259 chars)
-[2026-04-05T13:33:29.318Z] iter=170 turn=17 INFO:   -> exit=0 (2127 chars)
-[2026-04-05T13:33:29.320Z] iter=170 turn=17 INFO:   -> exit=0 (2121 chars)
-[2026-04-05T13:33:29.321Z] iter=170 turn=18 INFO: Turn 18/25
-[2026-04-05T13:33:33.842Z] iter=170 turn=18 INFO: Agent: Now make all remaining changes at once:
-[2026-04-05T13:33:33.842Z] iter=170 turn=18 INFO: write_file: src/messages.ts (patch)
-[2026-04-05T13:33:33.843Z] iter=170 turn=18 INFO:   -> ok: Patched src/messages.ts: -6 +6 lines
-
-Context after patch:
-66 | ${state.lastFailureReason ? `- Last failure: ${state.lastFailureReason}` : ""}`;
-67 | }
-68 | 
-69 | /**
 70 |  * Build the initial user message for the Builder from the plan.
 71 |  */
 72 | function buildBuilderMessage(plan: string, memorySummary: string): string {
@@ -1017,3 +998,14 @@ I have enough ...
 [2026-04-05T13:56:46.481Z] iter=176 turn=5 INFO: Turn 5/25
 [2026-04-05T13:56:50.677Z] iter=176 turn=5 INFO: $ ls src/__tests__/ | grep -E "(agent|repo|target|cli)"
 [2026-04-05T13:56:50.680Z] iter=176 turn=5 INFO: $ grep -n "repo\|target\|workDir\|WORK_DIR" src/agent.ts | head -40
+[2026-04-05T14:00:33.792Z] iter=176 INFO: Cache restored: 41/42 entries (1 stale)
+[2026-04-05T14:00:33.794Z] iter=176 INFO: Turn budget: 21/25 (calibration=1.00x, predicted=18)
+[2026-04-05T14:00:33.795Z] iter=176 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T14:00:33.847Z] iter=176 turn=1 INFO: Turn 1/25
+[2026-04-05T14:00:35.970Z] iter=176 turn=1 INFO: think: Let me start by reading the current state of agent.ts to understand the existing structure before making changes....
+[2026-04-05T14:00:35.971Z] iter=176 turn=2 INFO: Turn 2/25
+[2026-04-05T14:00:38.730Z] iter=176 turn=2 INFO: read_file: src/agent.ts
+[2026-04-05T14:00:38.731Z] iter=176 turn=2 INFO:   -> ok (18757 chars)
+[2026-04-05T14:00:38.732Z] iter=176 turn=2 INFO: $ ls src/__tests__/ | head -30
+[2026-04-05T14:00:38.742Z] iter=176 turn=2 INFO:   -> exit=0 (470 chars)
+[2026-04-05T14:00:38.742Z] iter=176 turn=3 INFO: Turn 3/25

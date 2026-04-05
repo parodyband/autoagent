@@ -1,45 +1,31 @@
-## AutoAgent Goals — Iteration 176
+# AutoAgent Goals — Iteration 177 (NEW MISSION)
 
 PREDICTION_TURNS: 18
 
-## Completed last iteration (175, Meta)
+## Mission change
 
-- Compacted memory, diagnosed continued cycling on internal polish
-- Redirected system toward external repo support (highest-value missing capability)
-- Confirmed prediction accuracy is well-calibrated, no structural changes needed
+The agent's mission has changed. You are no longer self-improving for its own sake.
+Your mission is: **build the best possible AI coding agent tool.**
 
-## Task for Engineer (iteration 176)
+The TUI (src/tui.tsx) is the user interface. The orchestration underneath is the product.
+The self-improvement loop exists to make the product better.
 
-**Add `--target <dir>` CLI flag for external repo support.**
+## First task for Architect
 
-The agent already distinguishes `rootDir` (work target) vs `agentHome` (where autoagent lives) in `agent.ts`. The `fingerprintRepo()` call at line 289 already fires when `workDir !== ROOT`. The plumbing is half-done — finish it.
+This is an Architect iteration. Your job:
 
-### Scope
+1. **Research** — Use web_search to study 2-3 coding agent architectures (Aider, SWE-Agent,
+   OpenHands, or others). What do they do that we don't? What's their core loop?
+   Focus on: how they manage context, how they decompose tasks, how they verify work.
 
-1. **CLI parsing** in `agent.ts`: Add `--target <dir>` argument parsing. Resolve to absolute path. Validate directory exists.
-2. **Wire `workDir`**: Pass the target dir as `workDir` to `runIteration()` (currently hardcoded to `ROOT` at the call site).
-3. **Orientation adjustment**: When `workDir !== agentHome`, orientation should include repo fingerprint and skip autoagent-specific sections (expert rotation, prediction calibration).
-4. **Tests**: At least 5 tests covering CLI parsing, path resolution, missing-dir error, and orientation behavior with external workDir.
+2. **Assess our current product** — Read src/tui.tsx. It's a bare REPL right now.
+   What's missing to make it a useful coding tool? Prioritize ruthlessly.
 
-### What NOT to do
-- Don't change the expert rotation system — it still operates from agentHome
-- Don't change memory/goals/metrics paths — those stay in agentHome
-- Don't build a full "project onboarding" flow yet — just get the plumbing right
+3. **Design the orchestrator** — The TUI should talk to an orchestrator, not directly
+   to Claude. The orchestrator decomposes tasks, manages context, routes to models,
+   verifies results. Sketch this architecture.
 
-### Success criteria
-- `npx tsx src/agent.ts --target /tmp/some-repo --once` runs orientation against that repo
-- `npx tsc --noEmit` clean
-- All existing 359+ tests pass, plus new tests
+4. **Leave specific instructions for the Engineer** — What should iteration 178 build first?
+   Be concrete: files to create, interfaces to define, success criteria.
 
-### Verification
-```bash
-npx tsc --noEmit
-npx vitest run --reporter=verbose 2>&1 | tail -5
-```
-
-## System health
-- ~4950 LOC (src), 30 source files, 23 test files, 359 vitest tests, tsc clean
-- Prediction accuracy: well-calibrated (last 2: 1.00, 0.94)
-
-Next expert (iteration 176): **Engineer**
-Next expert (iteration 177): **Architect**
+## Next expert: Architect

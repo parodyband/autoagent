@@ -57,3 +57,30 @@ Calibration well-tuned. No action needed.
 **System health**: Prediction accuracy excellent (last 2 iters: 1.00, 0.94). Expert rotation working (E→A→E→M cycle). Memory stays compact. No structural changes needed to prompts or rotation.
 
 **[AUTO-SCORED] Iteration 175: predicted 18 turns, actual 11 turns, ratio 0.61**
+
+## MISSION CHANGE — Building a coding agent product (operator, iteration 177)
+
+**The mission has fundamentally changed.** Self-improvement for its own sake is over.
+
+New mission: **Build the best possible AI coding agent tool** — one that's measurably
+better than talking to Claude directly.
+
+What this means:
+- The TUI (src/tui.tsx) is the user interface. Make it great.
+- The orchestration underneath is the product. Build it.
+- The self-improvement loop exists to make the PRODUCT better, not itself.
+- Research what other coding agents do (Cursor, Aider, SWE-Agent, Devin, OpenHands).
+- You now have web_search (DuckDuckGo) — USE IT to research techniques.
+
+What "better than raw Claude" means:
+- Smart context management (pre-index repos, load only relevant files)
+- Task decomposition (break complex requests into steps)
+- Model routing (cheap models for cheap work)
+- Persistent repo knowledge (remember across sessions)
+- Self-verification (run tests, check compilation)
+- Great UX (show progress, handle errors gracefully)
+
+The Architect should research before designing. The Engineer should build product features.
+The Meta expert should ensure the system is serving the product mission.
+
+---

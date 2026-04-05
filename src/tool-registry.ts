@@ -14,6 +14,7 @@ import { webFetchToolDefinition, executeWebFetch } from "./tools/web_fetch.js";
 import { thinkToolDefinition, executeThink } from "./tools/think.js";
 import { listFilesToolDefinition, executeListFiles } from "./tools/list_files.js";
 import { subagentToolDefinition, executeSubagent } from "./tools/subagent.js";
+import { webSearchToolDefinition, executeWebSearch } from "./tools/web_search.js";
 import { autoSelectModel } from "./model-selection.js";
 
 // ─── Types ──────────────────────────────────────────────────
@@ -197,6 +198,15 @@ export function createDefaultRegistry(): ToolRegistry {
       result: `[Sub-agent: ${selectedModel}${!model ? ' (auto-selected)' : ''} | ${r.inputTokens}+${r.outputTokens} tokens]\n\n${r.response}`,
     };
   }, { defaultTimeout: 60 });
+
+  // ── web_search ───────────────────────────────────────
+  registry.register(webSearchToolDefinition, async (input, ctx) => {
+    const { query, max_results } = input as { query: string; max_results?: number };
+    ctx.log(`web_search: "${query}"`);
+    const r = await executeWebSearch(query, max_results);
+    ctx.log(`  -> ${r.results.length} results`);
+    return { result: r.content };
+  }, { defaultTimeout: 15 });
 
   return registry;
 }
