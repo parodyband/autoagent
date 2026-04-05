@@ -37,6 +37,7 @@ import {
   handleIterationFailure,
   type ResuscitationConfig,
 } from "./resuscitation.js";
+import { computeTurnBudget } from "./turn-budget.js";
 
 const ROOT = process.cwd();
 const GOALS_FILE = path.join(ROOT, "goals.md");
@@ -223,6 +224,10 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
   const predMatch = goalsContent.match(/PREDICTION_TURNS:\s*(\d+)/);
   const predictedTurns = predMatch ? parseInt(predMatch[1], 10) : null;
 
+  // Compute adaptive turn budget from historical metrics + calibration
+  const turnBudget = computeTurnBudget(METRICS_FILE, predictedTurns, MAX_TURNS, 10, workDir);
+  log(state.iteration, `Turn budget: ${turnBudget.recommended}/${turnBudget.hardMax} (calibration=${turnBudget.calibration.toFixed(2)}x, predicted=${predictedTurns})`);
+
   // Compute next expert so current expert can write properly-targeted goals
   const nextExpert = pickExpert(state.iteration + 1, experts);
   const goalsWithRotation = goalsContent +
@@ -250,6 +255,7 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
     onFinalize: doFinalize,
     compressionConfig: null, // Disabled — prompt caching handles token cost
     predictedTurns,
+    turnBudget,
     taskMode,
     once: onceMode,
   };
