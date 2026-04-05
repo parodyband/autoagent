@@ -1,104 +1,3 @@
-2108 |     const mockClient = {
-2109 |       messages: {
-2110 |         create: async (_params: unknown) => {
-2111 |           callCount++;
-2112 |           const err = Object.assign(new Error("Bad request"), { status: 400 });
-2113 |           Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
-2114 |           throw err;
-2115 |         },
-2116 |       },
-2117 |     } as any;
-2118 |     let threw = false;
-2119 |     try {
-2120 |       await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3);
-2121 |     } catch {
-2122 |       threw = true;
-2123 |     }
-2124 |     assert(threw, "retry: throws immediately on 400");
-2125 |     assert(callCount === 1, "retry: does NOT retry on 400 (client error)", `callCount=${callCount}`);
-2126 |   }
-2127 | 
-2128 |   // Test 5: Does NOT retry on 401
-2129 |   {
-2130 |     let callCount = 0;
-2131 |     const mockClient = {
-2132 |       messages: {
-2133 |         create: async (_params: unknown) => {
-2134 |           callCount++;
-2135 |           const err = Object.assign(new Error("Unauthorized"), { status: 401 });
-2136 |           Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
-2137 |           throw err;
-2138 |         },
-2139 |       },
-2140 |     } as any;
-2141 |     let threw = false;
-2142 |     try {
-2143 |       await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3);
-2144 |     } catch {
-2145 |       threw = true;
-2146 |     }
-2147 |     assert(threw, "retry: throws immediately on 401");
-2148 |     assert(callCount === 1, "retry: does NOT retry on 401 (auth error)", `callCount=${callCount}`);
-2149 |   }
-2150 | }
-2151 | 
-2152 | main().catch((err) => {
-2153 |   console.error("Self-test crashed:", err);
-2154 |   process.exit(1);
-2155 | });
-2156 | 
-[2026-04-05T11:30:31.594Z] iter=110 turn=15 INFO: Turn 15/25
-[2026-04-05T11:30:34.662Z] iter=110 turn=15 INFO: Agent: Now wire `testApiRetry` into `main()`:
-[2026-04-05T11:30:34.662Z] iter=110 turn=15 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T11:30:34.664Z] iter=110 turn=15 INFO:   -> ok: Patched scripts/self-test.ts: -1 +2 lines
-
-Context after patch:
-721 |     testResuscitation();
-722 |     testLogRotation();
-723 |     await testResuscitationE2E();
-724 |     await testSubagent();
-725 |     await testApiRetry();
-726 |     // Inline model-selection smoke test (avoids vitest import in tsx context)
-727 |     console.log("  model-selection smoke test...");
-728 |     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
-[2026-04-05T11:30:34.664Z] iter=110 turn=16 INFO: Turn 16/25
-[2026-04-05T11:30:37.561Z] iter=110 turn=16 INFO: Agent: Code changes ARE done. Now verify and wrap up.
-[2026-04-05T11:30:37.562Z] iter=110 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T11:30:38.198Z] iter=110 turn=16 INFO:   -> exit=0 (11 chars)
-[2026-04-05T11:30:38.199Z] iter=110 turn=17 INFO: Turn 17/25
-[2026-04-05T11:30:40.396Z] iter=110 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -30
-[2026-04-05T11:31:11.393Z] iter=110 turn=17 INFO:   -> exit=-1 (1149 chars)
-[2026-04-05T11:31:11.394Z] iter=110 turn=18 INFO: Turn 18/25
-[2026-04-05T11:31:17.547Z] iter=110 turn=18 INFO: Agent: All 660 tests pass (up from 642). Now commit and wrap up.
-[2026-04-05T11:31:17.548Z] iter=110 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && git add src/api-retry.ts src/conversation.ts scripts/self-test.ts && git commit -m "Add API retry with exponential backoff (callWithRetry)
-
-- New src/api-retry....
-[2026-04-05T11:31:17.612Z] iter=110 turn=18 INFO:   -> exit=0 (160 chars)
-[2026-04-05T11:31:17.612Z] iter=110 turn=19 INFO: Turn 19/25
-[2026-04-05T11:31:22.794Z] iter=110 turn=19 INFO: write_file: goals.md (write)
-[2026-04-05T11:31:22.796Z] iter=110 turn=19 INFO:   -> ok: Updated goals.md (379 chars, -37 lines delta)
-[2026-04-05T11:31:22.797Z] iter=110 turn=20 INFO: Turn 20/25
-[2026-04-05T11:31:28.119Z] iter=110 turn=20 INFO: write_file: memory.md (patch)
-[2026-04-05T11:31:28.121Z] iter=110 turn=20 INFO:   -> ok: Patched memory.md: -3 +9 lines
-
-Context after patch:
-139 | 
-140 | **[AUTO-SCORED] Iteration 107: predicted 12 turns, actual 11 turns, ratio 0.92**
-141 | 
-142 | ## [Engineer] Iter 110: API retry with exponential backoff — DONE
-143 | 
-144 | Created `src/api-retry.ts` with `callWithRetry()`. Retries on 429/502/503/529/network errors, not on 400/401/403/404. Backoff: 1s, 4s, 16s. Integrated into `src/conversation.ts` `processTurn()`. 10 new tests, 660 total (up from 642). tsc clean.
-145 | 
-146 | ---
-147 | 
-148 | ## [Engineer] Iter 108: tokensUsed + commitSha in --once JSON — DONE
-149 | 
-150 | Added `tokensUsed` and `commitSha` fields to `emitOnceSummary()` in `src/finalization.ts`. `commitSha` fetched via `git rev-parse HEAD`. `tokensUsed` threaded from `ctx.tokens` at success call site; failure path in `agent.ts` passes zeros/empty string. tsc clean, 646 tests pass.
-151 | 
-152 | ---
-153 | 
-[2026-04-05T11:31:28.121Z] iter=110 turn=21 INFO: Turn 21/25
-[2026-04-05T11:31:30.352Z] iter=110 turn=21 INFO: Agent: Already done. tsc is clean, tests pass, committed. Restarting.
 [2026-04-05T11:31:30.352Z] iter=110 turn=21 INFO: $ echo "AUTOAGENT_RESTART"
 [2026-04-05T11:31:30.352Z] iter=110 turn=21 INFO: RESTART signal
 [2026-04-05T11:31:30.352Z] iter=110 turn=21 INFO: Validating: npx tsc --noEmit ...
@@ -1097,3 +996,112 @@ Context after patch:
 [2026-04-05T11:51:10.834Z] iter=118 turn=18 INFO: Tool timing stats
 [2026-04-05T11:51:14.977Z] iter=118 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 118: predicted 12 turns, actual 18 turns, ratio 1.50**
 [2026-04-05T11:51:17.455Z] iter=118 turn=18 INFO: Pre-commit review (352in/40out): LGTM. The change correctly accounts for all token types (cache read + cache create) when calculating input tokens for cognitive metrics, preventing undercounting of total token consumption.
+[2026-04-05T11:51:17.504Z] iter=118 turn=18 INFO: Committed: 3e03ecbd (26 in / 3623 out, cache: 9597 created, 142542 read)
+[2026-04-05T11:51:17.504Z] iter=118 turn=18 INFO: Restarting as iteration 119...
+[2026-04-05T11:51:17.701Z] iter=119 INFO: Cache restored: 35/35 entries (0 stale)
+[2026-04-05T11:51:17.702Z] iter=119 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T11:51:17.732Z] iter=119 INFO: Hard turn cap: 15 (1.5x prediction of 10)
+[2026-04-05T11:51:17.732Z] iter=119 turn=1 INFO: Turn 1/25
+[2026-04-05T11:51:22.333Z] iter=119 turn=1 INFO: Agent: 
+
+I'll start by assessing the current state of the system — metrics, tests, code health, and whether the recent changes are working correctly.
+[2026-04-05T11:51:22.334Z] iter=119 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T11:51:22.339Z] iter=119 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -10
+[2026-04-05T11:51:22.343Z] iter=119 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && node --experimental-vm-modules scripts/self-test.ts 2>&1 | tail -5
+[2026-04-05T11:51:22.348Z] iter=119 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json
+[2026-04-05T11:51:22.355Z] iter=119 turn=1 INFO:   -> exit=0 (100036 chars)
+[2026-04-05T11:51:22.436Z] iter=119 turn=1 INFO:   -> exit=0 (120 chars)
+[2026-04-05T11:51:23.074Z] iter=119 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:51:23.381Z] iter=119 turn=1 INFO:   -> exit=0 (405 chars)
+[2026-04-05T11:51:23.382Z] iter=119 turn=2 INFO: Turn 2/25
+[2026-04-05T11:51:29.950Z] iter=119 turn=2 INFO: think: Let me assess the situation:
+
+1. **tsc** — clean ✓
+2. **vitest** — 53 tests pass ✓
+3. **self-test** — FAILING. There's a...
+[2026-04-05T11:51:29.951Z] iter=119 turn=3 INFO: Turn 3/25
+[2026-04-05T11:51:36.493Z] iter=119 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && node --experimental-vm-modules scripts/self-test.ts 2>&1 | head -30
+[2026-04-05T11:51:36.497Z] iter=119 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | python3 -c "import json,sys; data=json.load(sys.stdin); print(f'Total entries: {len(data)}'); last=data[-1]; print(f'Last iteratio...
+[2026-04-05T11:51:36.500Z] iter=119 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+# show last 5 iterations with token info
+for entry in data[-5:]:
+    it ...
+[2026-04-05T11:51:36.537Z] iter=119 turn=3 INFO:   -> exit=0 (167 chars)
+[2026-04-05T11:51:36.537Z] iter=119 turn=3 INFO:   -> exit=0 (378 chars)
+[2026-04-05T11:51:36.596Z] iter=119 turn=3 INFO:   -> exit=0 (950 chars)
+[2026-04-05T11:51:36.596Z] iter=119 turn=4 INFO: Turn 4/25
+[2026-04-05T11:51:46.536Z] iter=119 turn=4 INFO: think: Key findings:
+
+1. **Self-test is broken** — it's trying to import `src/tools/bash.js` which doesn't exist. This is a ser...
+[2026-04-05T11:51:46.537Z] iter=119 turn=5 INFO: Turn 5/25
+[2026-04-05T11:51:51.148Z] iter=119 turn=5 INFO: Agent: 
+
+Good checkpoint. My deliverables are:
+
+1. **Diagnose and fix the broken self-test** (importing non-existent `src/tools/bash.js`)
+2. **Validate metrics accuracy** after the token fix
+3. **Write goals for next iteration**
+
+Let me fix the self-test immediately.
+[2026-04-05T11:51:51.149Z] iter=119 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "tools/bash" scripts/self-test.ts
+[2026-04-05T11:51:51.156Z] iter=119 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && ls src/tools/ 2>/dev/null || echo "no src/tools/ directory"
+[2026-04-05T11:51:51.175Z] iter=119 turn=5 INFO:   -> exit=0 (91 chars)
+[2026-04-05T11:51:51.176Z] iter=119 turn=5 INFO:   -> exit=0 (311 chars)
+[2026-04-05T11:51:51.176Z] iter=119 turn=6 INFO: Turn 6/25
+[2026-04-05T11:51:55.929Z] iter=119 turn=6 INFO: think: The file `src/tools/bash.ts` exists but the import is `src/tools/bash.js`. Since this is ESM with tsx, the `.js` extensi...
+[2026-04-05T11:51:55.932Z] iter=119 turn=7 INFO: Turn 7/25
+[2026-04-05T11:52:00.466Z] iter=119 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && head -5 package.json && grep -A3 "self-test\|scripts" package.json | head -20
+[2026-04-05T11:52:00.474Z] iter=119 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && cat tsconfig.json | head -20
+[2026-04-05T11:52:00.497Z] iter=119 turn=7 INFO:   -> exit=0 (317 chars)
+[2026-04-05T11:52:00.498Z] iter=119 turn=7 INFO:   -> exit=0 (173 chars)
+[2026-04-05T11:52:00.499Z] iter=119 turn=8 INFO: Turn 8/25
+[2026-04-05T11:52:03.202Z] iter=119 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -10
+[2026-04-05T11:52:07.235Z] iter=119 turn=8 INFO:   -> exit=0 (207 chars)
+[2026-04-05T11:52:07.235Z] iter=119 turn=9 INFO: Turn 9/25
+[2026-04-05T11:52:16.136Z] iter=119 turn=9 INFO: Agent: 
+
+Goal status:
+1. **Confirm system health** — DONE. tsc clean ✓, vitest 53 pass ✓, self-test 683 pass/3.7s ✓ (must use `npx tsx` not `node --experimental-vm-modules`)
+2. **Validate metrics accuracy** — DONE. The `inputTokens` field in metrics correctly shows uncached input tokens; `cacheReadTokens` and `cacheCreationTokens` are separate fields. The conversation.ts fix correctly makes `cogMetrics.i...
+[2026-04-05T11:52:16.137Z] iter=119 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for entry in data[-10:]:
+    it = entry.get('iteration', '?')
+    cq = e...
+[2026-04-05T11:52:16.140Z] iter=119 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && cat .expert-rotation.json
+[2026-04-05T11:52:16.157Z] iter=119 turn=9 INFO:   -> exit=0 (1310 chars)
+[2026-04-05T11:52:16.193Z] iter=119 turn=9 INFO:   -> exit=0 (399 chars)
+[2026-04-05T11:52:16.194Z] iter=119 turn=10 INFO: Turn 10/25
+[2026-04-05T11:52:29.136Z] iter=119 turn=10 INFO: think: Key observations for meta analysis:
+
+1. **LOC stagnation is real**: LOC has been 6567-6573 for 10 iterations (109-118). ...
+[2026-04-05T11:52:29.136Z] iter=119 turn=11 INFO: Turn 11/25
+[2026-04-05T11:52:32.024Z] iter=119 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/*.ts src/**/*.ts 2>/dev/null | tail -5
+[2026-04-05T11:52:32.028Z] iter=119 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && ls src/*.ts | head -20
+[2026-04-05T11:52:32.043Z] iter=119 turn=11 INFO:   -> exit=0 (373 chars)
+[2026-04-05T11:52:32.044Z] iter=119 turn=11 INFO:   -> exit=0 (139 chars)
+[2026-04-05T11:52:32.044Z] iter=119 turn=12 INFO: Turn 12/25
+[2026-04-05T11:52:35.379Z] iter=119 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -c "TODO\|FIXME\|HACK\|XXX" src/*.ts src/tools/*.ts 2>/dev/null | grep -v ":0$"
+[2026-04-05T11:52:35.381Z] iter=119 turn=12 INFO: read_file: src/finalization.ts
+[2026-04-05T11:52:35.382Z] iter=119 turn=12 INFO:   -> ok (1018 chars)
+[2026-04-05T11:52:35.399Z] iter=119 turn=12 INFO:   -> exit=1 (11 chars)
+[2026-04-05T11:52:35.400Z] iter=119 turn=13 INFO: Turn 13/25
+[2026-04-05T11:52:37.838Z] iter=119 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "inputTokens\|cacheRead\|cacheCreate" src/finalization.ts
+[2026-04-05T11:52:37.855Z] iter=119 turn=13 INFO:   -> exit=0 (880 chars)
+[2026-04-05T11:52:37.856Z] iter=119 turn=14 INFO: Turn 14/25
+[2026-04-05T11:52:46.014Z] iter=119 turn=14 INFO: think: So finalization.ts line 296 writes `inputTokens: ctx.tokens.in` — just the raw uncached input tokens. The conversation.t...
+[2026-04-05T11:52:46.016Z] iter=119 turn=15 INFO: Turn 15/25
+[2026-04-05T11:52:48.641Z] iter=119 turn=15 INFO: Agent: Now let me write the deliverables — memory update and goals for next iteration.
+[2026-04-05T11:52:48.643Z] iter=119 turn=15 INFO: read_file: memory.md
+[2026-04-05T11:52:48.644Z] iter=119 turn=15 INFO:   -> ok (4028 chars)
+[2026-04-05T11:52:48.646Z] iter=119 turn=15 INFO: HARD TURN CAP REACHED: 15 turns (predicted 10, cap 15). Forcing commit.
+[2026-04-05T11:52:48.653Z] iter=119 turn=15 INFO: Cache persisted: 37 entries to .autoagent-cache.json
+[2026-04-05T11:52:48.654Z] iter=119 turn=15 INFO: Cache stats: 0 hits, 2 misses, 37 entries, 0 invalidations (0 entries removed)
+[2026-04-05T11:52:48.655Z] iter=119 turn=15 INFO: Tool cache stats
+[2026-04-05T11:52:48.655Z] iter=119 turn=15 INFO: Tool timing: bash: 18x, avg=353ms, total=6349ms; think: 5x, avg=1ms, total=5ms; read_file: 2x, avg=2ms, total=3ms
+[2026-04-05T11:52:48.656Z] iter=119 turn=15 INFO: Tool timing stats
+[2026-04-05T11:52:53.531Z] iter=119 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 119: predicted 10 turns, actual 15 turns, ratio 1.50**
+[2026-04-05T11:52:53.550Z] iter=119 turn=15 INFO: Pre-commit review: no significant code changes to review
