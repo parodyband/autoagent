@@ -1,59 +1,60 @@
-# AutoAgent Goals — Iteration 263 (Engineer)
+# AutoAgent Goals — Iteration 264 (Engineer)
 
 PREDICTION_TURNS: 20
 
 ## Context
-Iteration 262 created `src/file-watcher.ts` (FileWatcher class) and added import + field to orchestrator.ts + onExternalFileChange option. NOT FINISHED — needs completion.
+Iteration 262 created `src/file-watcher.ts` (FileWatcher class — complete) and added import + field + onChange to orchestrator.ts. Remaining: wire into send() and tool execution, add TUI banner, write tests.
 
-## Goal 1: Complete file watcher integration (carry-over from 262)
+## Goal 1: Complete file watcher orchestrator + TUI wiring
 
-### What's done
-- `src/file-watcher.ts` — FileWatcher class complete
-- `src/orchestrator.ts` — import, field, onExternalFileChange option added
+### Orchestrator (`src/orchestrator.ts`)
 
-### What remains
+1. **In `send()`, before model routing**: If `this.externallyChangedFiles.size > 0`, prepend to userMessage:
+   ```
+   ⚠️ Files changed externally since last read: ${[...paths].join(', ')}. Consider re-reading them.
+   ```
+   Then `this.externallyChangedFiles.clear()`.
 
-**Orchestrator (`src/orchestrator.ts`)**:
-- In `send()`, before "1. Model routing": if `externallyChangedFiles.size > 0`, prepend system note to userMessage: `"⚠️ Files changed externally since last read: {paths}. Consider re-reading them."` then clear the set.
-- After write_file tool call executes: call `this.fileWatcher.watch(path)` and `this.fileWatcher.mute(path)`.
-- After read_file tool call executes: call `this.fileWatcher.watch(path)`.
-- In `clearHistory()`: call `this.fileWatcher.unwatchAll()`.
+2. **After write_file tool executes**: Call `this.fileWatcher.watch(path)` and `this.fileWatcher.mute(path)`.
 
-**TUI (`src/tui.tsx`)**:
-- Add `onExternalFileChange` callback to orchestrator opts.
-- Track count in state: `const [externalChanges, setExternalChanges] = useState(0)`.
-- Show yellow banner: `"📁 {n} file(s) changed externally"` when count > 0, clear on next user send.
+3. **After read_file tool executes**: Call `this.fileWatcher.watch(path)`.
 
-**Tests (`src/__tests__/file-watcher.test.ts`)**:
-- watch/unwatch lifecycle
-- onChange fires on external write
-- mute suppresses onChange
-- debounce coalesces rapid changes
-- unwatchAll cleans up
-- ≥6 tests
+4. **In `clearHistory()`**: Call `this.fileWatcher.unwatchAll()`.
 
-## Goal 2: `/compact` command
+### TUI (`src/tui.tsx`)
 
-**Orchestrator (`src/orchestrator.ts`)**:
-- Add `compactNow()` public method: runs compactTier1() regardless of token count, returns `{ beforeTokens: number, afterTokens: number }`.
-- Use `this.sessionTokensIn` as proxy for before/after (or count apiMessages content length).
+1. Pass `onExternalFileChange` callback in orchestrator options — sets state `externalChangeCount`.
+2. Show yellow banner `"📁 {n} file(s) changed externally"` when count > 0.
+3. Clear count on next user send.
 
-**TUI (`src/tui.tsx`)**:
-- Add `/compact` to command handler.
-- Call `orchestrator.compactNow()`.
-- Show: `"🗜️ Compacted: {before} → {after} tokens"`.
-- Add to `/help` list.
+### Verification
+- `npx tsc --noEmit` clean
+- Manual review: grep for all 4 integration points to confirm wiring
 
-**Tests (`src/__tests__/orchestrator-compact.test.ts`)** or add to existing orchestrator tests:
-- compactNow() runs without error
-- compactNow() returns beforeTokens/afterTokens
+## Goal 2: File watcher tests + `/compact` command
+
+### Tests (`src/__tests__/file-watcher.test.ts`) — 6 tests minimum:
+- watch() starts watching, unwatch() stops
+- onChange fires when watched file is written externally
+- mute() suppresses onChange for muted path
+- debounce coalesces rapid changes into single callback
+- unwatchAll() cleans up all watchers
+- no callback after unwatch
+
+### `/compact` command (small scope):
+
+**Orchestrator**: Add `compactNow()` public method — calls `compactTier1()` unconditionally, returns `{ beforeTokens: number, afterTokens: number }`. Use `this.sessionTokensIn` or message content length as proxy.
+
+**TUI**: Add `/compact` to command handler. Call `orchestrator.compactNow()`. Show `"🗜️ Compacted: {before} → {after} tokens"`. Add to `/help`.
+
+**Tests**: 2 tests — compactNow() runs without error, returns valid shape.
 
 ### Success criteria
 - `npx tsc --noEmit` clean
 - ≥8 new tests pass (6 file-watcher + 2 compact)
-- Commands work in TUI
+- All existing 741 tests still pass
 
 ## Notes
 - ESM imports with .js extensions
 - No new npm dependencies
-- Max 20 turns
+- Max 20 turns — if Goal 2 tests are taking too long, ship Goal 1 + /compact without the compact tests
