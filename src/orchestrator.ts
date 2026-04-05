@@ -474,6 +474,7 @@ async function runAgentLoop(
   onFileWatch?: (event: "read" | "write", filePath: string) => void,
   signal?: AbortSignal,
   maxConsecutiveLoops = 2,
+  hooksConfig: HooksConfig = {},
 ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number; aborted?: boolean }> {
   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
     totalIn += tIn;
@@ -577,7 +578,21 @@ async function runAgentLoop(
 
     // Execute non-write tools (reads, greps, etc.) — parallel-safe ones run concurrently
     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
-      const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+      // PreToolUse hook — may block execution
+      const preResult = await runHooks(hooksConfig, "PreToolUse", {
+        cwd: workDir, tool_name: tu.name, tool_input: tu.input,
+      }, workDir);
+      if (preResult.decision === "block") {
+        return `[Hook blocked]: ${preResult.reason ?? "blocked by hook"}`;
+      }
+      let rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+      // PostToolUse hook — may append context
+      const postResult = await runHooks(hooksConfig, "PostToolUse", {
+        cwd: workDir, tool_name: tu.name, tool_input: tu.input, tool_response: rawResult,
+      }, workDir);
+      if (postResult.additionalContext) {
+        rawResult += "\n\n[Hook context]: " + postResult.additionalContext;
+      }
       const enhanced = enhanceToolError(tu.name, tu.input as Record<string, unknown>, rawResult, workDir);
       // Auto-retry once if the result looks like an error and enhancement added suggestions
       if (enhanced !== rawResult && isToolError(rawResult)) {
@@ -627,7 +642,22 @@ async function runAgentLoop(
             }
           }
         }
-        const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+        // PreToolUse hook — may block execution
+        const preWriteResult = await runHooks(hooksConfig, "PreToolUse", {
+          cwd: workDir, tool_name: tu.name, tool_input: tu.input,
+        }, workDir);
+        if (preWriteResult.decision === "block") {
+          results.push({ type: "tool_result", tool_use_id: tu.id, content: `[Hook blocked]: ${preWriteResult.reason ?? "blocked by hook"}` });
+          continue;
+        }
+        let rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+        // PostToolUse hook — may append context
+        const postWriteResult = await runHooks(hooksConfig, "PostToolUse", {
+          cwd: workDir, tool_name: tu.name, tool_input: tu.input, tool_response: rawResult,
+        }, workDir);
+        if (postWriteResult.additionalContext) {
+          rawResult += "\n\n[Hook context]: " + postWriteResult.additionalContext;
+        }
         if (onFileWatch) {
           onFileWatch("write", (tu.input as { path?: string }).path ?? "");
         }
@@ -1464,6 +1494,7 @@ export class Orchestrator {
       fileWatchCallback,
       this._abortController?.signal,
       this.opts.maxConsecutiveLoops ?? 2,
+      this.hooksConfig,
     );
     const { text, tokensIn, tokensOut, lastInputTokens, aborted } = loopResult;
 
@@ -1529,6 +1560,9 @@ export class Orchestrator {
             undefined,
             undefined,
             fileWatchCallback,
+            undefined,
+            2,
+            this.hooksConfig,
           );
         }
       }
@@ -1570,6 +1604,9 @@ export class Orchestrator {
           undefined,
           undefined,
           fileWatchCallback,
+          undefined,
+          2,
+          this.hooksConfig,
         );
 
         this.sessionTokensIn += fixResult.tokensIn;
@@ -1610,6 +1647,7 @@ export class Orchestrator {
               this.registry, this.opts.workDir, this.opts.onToolCall,
               this.opts.onStatus, this.opts.onText, this.opts.onDiffPreview,
               undefined, undefined, fileWatchCallback,
+              undefined, 2, this.hooksConfig,
             );
             this.sessionTokensIn += fixResult.tokensIn;
             this.sessionTokensOut += fixResult.tokensOut;

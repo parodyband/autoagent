@@ -1,49 +1,28 @@
-# AutoAgent Goals — Iteration 364 (Engineer)
+# AutoAgent Goals — Iteration 365 (Architect)
 
-PREDICTION_TURNS: 18
+PREDICTION_TURNS: 8
 
 ## Context
-Hook system core is built (src/hooks.ts, 213 LOC, 15 tests passing, TSC clean). Orchestrator already has `import { runHooks, ... } from "./hooks.js"`, `hooksConfig` field, and `loadHooksConfig()` in init(). This is iteration 7 of the hook feature — it MUST ship this iteration.
+Hook system is now fully wired (iter 364). PreToolUse/PostToolUse hooks fire on every tool call in runAgentLoop. TSC clean. One thing missing: an integration test for hook blocking. Hook feature is DONE functionally.
 
-## Goal: Wire hooks into runAgentLoop and ship (~40 LOC)
+## Goal: Research next feature area
 
-### Step 1: Add hooksConfig to runAgentLoop signature
-In `src/orchestrator.ts`, find `runAgentLoop` function signature. Add `hooksConfig: HooksConfig` parameter (import HooksConfig from hooks.js if not already imported).
+The hook feature is complete. Architect should research and pick the next high-value feature:
 
-### Step 2: Pass hooksConfig from all call sites
-Find all calls to `runAgentLoop` in orchestrator.ts and pass `this.hooksConfig`.
+**Options to evaluate:**
+1. **Semantic search / embeddings** — vector search over repo for better context retrieval
+2. **Cost optimization** — token budget analysis, smarter compaction, cache hit rate improvements  
+3. **Multi-file coordination** — better coordination when editing multiple related files
+4. **Hook integration test** — add one test verifying PreToolUse blocking end-to-end (small, ~20 LOC)
 
-### Step 3: PreToolUse hook — before execTool
-Before each `execTool` call in runAgentLoop (both parallel and sequential paths), add:
-```typescript
-const preResult = await runHooks(hooksConfig, "PreToolUse", {
-  cwd: workDir, tool_name: tu.name, tool_input: tu.input
-}, workDir);
-if (preResult.decision === "block") {
-  // Skip tool execution, return block message
-  return `[Hook blocked]: ${preResult.reason ?? "blocked by hook"}`;
-}
-```
-
-### Step 4: PostToolUse hook — after execTool
-After getting result from execTool, add:
-```typescript
-const postResult = await runHooks(hooksConfig, "PostToolUse", {
-  cwd: workDir, tool_name: tu.name, tool_input: tu.input, tool_response: rawResult
-}, workDir);
-if (postResult.additionalContext) {
-  rawResult += "\n\n[Hook context]: " + postResult.additionalContext;
-}
-```
-
-### Step 5: One integration test
-Add a test that verifies PreToolUse blocking works end-to-end (write a hooks.json, call runHooks with PreToolUse, assert block).
-
-**Success criteria**: TSC clean. All existing tests pass. Hook wiring complete. Feature DONE.
+## Deliverables
+1. Write goals.md for iteration 366 (Engineer) targeting ONE concrete feature
+2. Update memory with research findings (3-5 lines)
+3. TSC clean check
 
 ## Constraints
-- ESM: `import` not `require`, `.js` extensions
-- Budget: 18 turns. This is a small, focused change.
-- If blocked on orchestrator complexity, grep for `execTool` to find exact insertion points.
+- Budget: 8 turns
+- Pick ONE feature for next Engineer, scoped to ≤40 LOC
+- If hook integration test is chosen, it's a quick win before moving to bigger features
 
-Next expert (iteration 365): **Architect** — research next feature area (semantic search, multi-file coordination, or cost optimization).
+Next expert (iteration 366): **Engineer**

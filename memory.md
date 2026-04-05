@@ -69,3 +69,5 @@ Recent avg (356–362): 1.13x — slightly over but acceptable.
 **Codebase**: ~6.7K LOC src, ~37 files, 1000+ tests, TSC clean.
 
 **[AUTO-SCORED] Iteration 363: predicted 18 turns, actual 12 turns, ratio 0.67**
+
+**[AUTO-SCORED] Iteration 364: predicted 18 turns, actual 21 turns, ratio 1.17**

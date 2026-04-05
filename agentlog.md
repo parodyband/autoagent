@@ -1,87 +1,3 @@
-[2026-04-05T20:13:10.407Z] iter=356 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=20)
-[2026-04-05T20:13:10.408Z] iter=356 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T20:13:10.577Z] iter=356 turn=1 INFO: Turn 1/25
-[2026-04-05T20:13:12.267Z] iter=356 turn=1 INFO: read_scratchpad: 1755 chars
-[2026-04-05T20:13:12.267Z] iter=356 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
-[2026-04-05T20:13:12.273Z] iter=356 turn=1 INFO:   -> exit=0 (2283 chars)
-[2026-04-05T20:13:12.273Z] iter=356 turn=2 INFO: Turn 2/25
-[2026-04-05T20:13:15.448Z] iter=356 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "plan" src/tui.tsx | head -60
-[2026-04-05T20:13:15.452Z] iter=356 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat src/task-planner.ts | head -50
-[2026-04-05T20:13:15.461Z] iter=356 turn=2 INFO:   -> exit=0 (1434 chars)
-[2026-04-05T20:13:15.462Z] iter=356 turn=2 INFO:   -> exit=0 (3049 chars)
-[2026-04-05T20:13:15.462Z] iter=356 turn=3 INFO: Turn 3/25
-[2026-04-05T20:13:17.779Z] iter=356 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '820,920p' src/tui.tsx
-[2026-04-05T20:13:17.781Z] iter=356 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^export" src/task-planner.ts
-[2026-04-05T20:13:17.787Z] iter=356 turn=3 INFO:   -> exit=0 (5069 chars)
-[2026-04-05T20:13:17.787Z] iter=356 turn=3 INFO:   -> exit=0 (722 chars)
-[2026-04-05T20:13:17.787Z] iter=356 turn=4 INFO: Turn 4/25
-[2026-04-05T20:13:27.149Z] iter=356 turn=4 INFO: think: I have enough context. Let me write the code now:
-
-1. `src/plan-commands.ts` - extract the /plan handler logic
-2. Update...
-[2026-04-05T20:13:27.150Z] iter=356 turn=5 INFO: Turn 5/25
-[2026-04-05T20:13:49.298Z] iter=356 turn=5 INFO: Agent: Writing all three files now:
-[2026-04-05T20:13:49.298Z] iter=356 turn=5 INFO: write_file: src/plan-commands.ts (write)
-[2026-04-05T20:13:49.299Z] iter=356 turn=5 INFO:   -> ok: Created src/plan-commands.ts (5187 chars)
-[2026-04-05T20:13:49.299Z] iter=356 turn=6 INFO: Turn 6/25
-[2026-04-05T20:13:52.052Z] iter=356 turn=6 INFO: Agent: Now update tui.tsx to use the new handler:
-[2026-04-05T20:13:52.053Z] iter=356 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && head -40 src/tui.tsx
-[2026-04-05T20:13:52.063Z] iter=356 turn=6 INFO:   -> exit=0 (1403 chars)
-[2026-04-05T20:13:52.064Z] iter=356 turn=7 INFO: Turn 7/25
-[2026-04-05T20:13:57.170Z] iter=356 turn=7 INFO: Agent: **Goal 1**: IN PROGRESS — `src/plan-commands.ts` created. Still need to update tui.tsx and write tests.
-**Goal 2**: IN PROGRESS — context enrichment already included in `plan-commands.ts` (reads `.autoagent.md` + calls `buildSummary`).
-
-Continuing — update tui.tsx imports and replace inline /plan handler, then write tests.
-[2026-04-05T20:13:57.170Z] iter=356 turn=7 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T20:13:57.171Z] iter=356 turn=7 INFO:   -> ok: Patched src/tui.tsx: -9 +5 lines
-
-Context after patch:
-23 | import { runInit } from "./init-command.js";
-24 | import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
-25 | import { shouldShowWelcome } from "./welcome.js";
-26 | import {
-27 |   type Task,
-28 |   type TaskPlan,
-29 | } from "./task-planner.js";
-30 | import { handlePlanCommand } from "./plan-commands.js";
-31 | 
-32 | // Parse args
-33 | let workDir = process.cwd();
-[2026-04-05T20:13:57.171Z] iter=356 turn=8 INFO: Turn 8/25
-[2026-04-05T20:13:58.767Z] iter=356 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '818,900p' src/tui.tsx
-[2026-04-05T20:13:58.777Z] iter=356 turn=8 INFO:   -> exit=0 (4304 chars)
-[2026-04-05T20:13:58.777Z] iter=356 turn=9 INFO: Turn 9/25
-[2026-04-05T20:14:10.249Z] iter=356 turn=9 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T20:14:10.251Z] iter=356 turn=9 INFO:   -> ok: Patched src/tui.tsx: -77 +14 lines
-
-Context after patch:
-815 |     }
-816 | 
-817 |     // /plan commands
-818 |     if (trimmed === "/plan" || trimmed === "/plan help" || trimmed === "/plan list" || trimmed === "/plan resume" || trimmed.startsWith("/plan ")) {
-819 |       const args = trimmed.slice(5).trim(); // everything after "/plan"
-820 |       await handlePlanCommand(args, {
-821 |         workDir,
-822 |         addMessage: (text) => setMessages(prev => [...prev, { role: "assistant", content: text }]),
-823 |         execute: async (description) => {
-824 |           const res = await orchestratorRef.current!.send(description);
-825 |           return res.text ?? "done";
-826 |         },
-827 |         setLoading,
-828 |         setStatus,
-829 |       });
-830 |       return;
-831 |     }
-832 | 
-833 |     if (trimmed === "/export" || trimmed.startsWith("/export ")) {
-834 |       const arg = trimmed.slice(7).trim();
-[2026-04-05T20:14:10.252Z] iter=356 turn=10 INFO: Turn 10/25
-[2026-04-05T20:14:15.328Z] iter=356 turn=10 INFO: Agent: Now check for unused imports in tui.tsx and write the tests:
-[2026-04-05T20:14:15.329Z] iter=356 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "formatPlan\|createPlan\|executePlan\|loadPlan\|savePlan" src/tui.tsx
-[2026-04-05T20:14:15.343Z] iter=356 turn=10 INFO:   -> exit=1 (11 chars)
-[2026-04-05T20:14:15.344Z] iter=356 turn=11 INFO: Turn 11/25
-[2026-04-05T20:14:18.265Z] iter=356 turn=11 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T20:14:18.268Z] iter=356 turn=11 INFO:   -> ok: Patched src/tui.tsx: -5 +2 lines
 
 Context after patch:
 23 | import { runInit } from "./init-command.js";
@@ -1080,3 +996,294 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T20:28:02.535Z] iter=363 turn=12 INFO: Tool timing stats
 [2026-04-05T20:28:09.497Z] iter=363 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 363: predicted 18 turns, actual 12 turns, ratio 0.67**
 [2026-04-05T20:28:09.521Z] iter=363 turn=12 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T20:28:09.556Z] iter=363 turn=12 INFO: Committed: 3d7bac2e (20 in / 3969 out, cache: 13720 created, 105402 read)
+[2026-04-05T20:28:09.556Z] iter=363 turn=12 INFO: Restarting as iteration 364...
+[2026-04-05T20:28:09.756Z] iter=364 INFO: Cache restored: 56/56 entries (0 stale)
+[2026-04-05T20:28:09.758Z] iter=364 INFO: Turn budget: 18/25 (calibration=1.00x, predicted=18)
+[2026-04-05T20:28:09.759Z] iter=364 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T20:28:09.936Z] iter=364 turn=1 INFO: Turn 1/25
+[2026-04-05T20:28:12.414Z] iter=364 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand exactly what needs to be wired.
+[2026-04-05T20:28:12.416Z] iter=364 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T20:28:12.417Z] iter=364 turn=1 INFO: $ grep -n "runAgentLoop\|execTool\|hooksConfig\|runHooks\|HooksConfig" src/orchestrator.ts | head -60
+[2026-04-05T20:28:12.439Z] iter=364 turn=1 INFO:   -> exit=0 (1109 chars)
+[2026-04-05T20:28:12.439Z] iter=364 turn=2 INFO: Turn 2/25
+[2026-04-05T20:28:14.174Z] iter=364 turn=2 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:28:14.176Z] iter=364 turn=2 INFO:   -> ok (8568 chars)
+[2026-04-05T20:28:14.177Z] iter=364 turn=3 INFO: Turn 3/25
+[2026-04-05T20:28:16.039Z] iter=364 turn=3 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:28:16.041Z] iter=364 turn=3 INFO:   -> ok (7149 chars)
+[2026-04-05T20:28:16.042Z] iter=364 turn=4 INFO: Turn 4/25
+[2026-04-05T20:28:41.521Z] iter=364 turn=4 INFO: think: I have enough context. I need to:
+1. Add `hooksConfig: HooksConfig` parameter to `runAgentLoop` signature
+2. Pass `this....
+[2026-04-05T20:28:41.521Z] iter=364 turn=5 INFO: Turn 5/25
+[2026-04-05T20:28:44.441Z] iter=364 turn=5 INFO: Agent: I have enough context. Let me write the patches now.
+[2026-04-05T20:28:44.442Z] iter=364 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:28:44.443Z] iter=364 turn=5 INFO:   -> ok (912 chars)
+[2026-04-05T20:28:44.443Z] iter=364 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:28:44.444Z] iter=364 turn=5 INFO:   -> ok (3796 chars)
+[2026-04-05T20:28:44.445Z] iter=364 turn=6 INFO: Turn 6/25
+[2026-04-05T20:28:52.822Z] iter=364 turn=6 INFO: Agent: Now I'll make all the changes in one pass:
+[2026-04-05T20:28:52.823Z] iter=364 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:28:52.829Z] iter=364 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -17 +18 lines
+
+Context after patch:
+458 |   return results;
+459 | }
+460 | 
+461 | async function runAgentLoop(
+462 |   client: Anthropic,
+463 |   model: string,
+464 |   systemPrompt: string,
+465 |   apiMessages: Anthropic.MessageParam[],
+466 |   registry: ReturnType<typeof createDefaultRegistry>,
+467 |   workDir: string,
+468 |   onToolCall?: OrchestratorOptions["onToolCall"],
+469 |   onStatus?: OrchestratorOptions["onStatus"],
+470 |   onText?: OrchestratorOptions["onText"],
+471 |   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
+472 |   onCompact?: (inputTokens: number, messages: Anthropic.MessageParam[]) => Promise<void>,
+473 |   onContextBudget?: OrchestratorOptions["onContextBudget"],
+474 |   onFileWatch?: (event: "read" | "write", filePath: string) => void,
+475 |   signal?: AbortSignal,
+476 |   maxConsecutiveLoops = 2,
+477 |   hooksConfig: HooksConfig = {},
+478 | ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number; aborted?: boolean }> {
+479 |   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
+480 |     totalIn += tIn;
+481 |     totalOut += tOut;
+[2026-04-05T20:28:52.831Z] iter=364 turn=7 INFO: Turn 7/25
+[2026-04-05T20:29:07.638Z] iter=364 turn=7 INFO: Agent: **Goal status:**
+- Add `hooksConfig` param to `runAgentLoop`: ✅ DONE
+- PreToolUse/PostToolUse hooks wired: IN PROGRESS (0%)  
+- Pass `hooksConfig` from call sites: NOT STARTED
+- Integration test: NOT STARTED
+
+Continuing — finishing by turn 11.
+[2026-04-05T20:29:07.638Z] iter=364 turn=7 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:29:07.640Z] iter=364 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -26 +40 lines
+
+Context after patch:
+576 | 
+577 |     const results: Anthropic.ToolResultBlockParam[] = [];
+578 | 
+579 |     // Execute non-write tools (reads, greps, etc.) — parallel-safe ones run concurrently
+580 |     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
+581 |       // PreToolUse hook — may block execution
+582 |       const preResult = await runHooks(hooksConfig, "PreToolUse", {
+583 |         cwd: workDir, tool_name: tu.name, tool_input: tu.input,
+584 |       }, workDir);
+585 |       if (preResult.decision === "block") {
+586 |         return `[Hook blocked]: ${preResult.reason ?? "blocked by hook"}`;
+587 |       }
+588 |       let rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+589 |       // PostToolUse hook — may append context
+590 |       const postResult = await runHooks(hooksConfig, "PostToolUse", {
+591 |         cwd: workDir, tool_name: tu.name, tool_input: tu.input, tool_response: rawResult,
+592 |       }, workDir);
+593 |       if (postResult.additionalContext) {
+594 |         rawResult += "\n\n[Hook context]: " + postResult.additionalContext;
+595 |       }
+596 |       const enhanced = enhanceToolError(tu.name, tu.input as Record<string, unknown>, rawResult, workDir);
+597 |       // Auto-retry once if the result looks like an error and enhancement added suggestions
+598 |       if (enhanced !== rawResult && isToolError(rawResult)) {
+599 |         const retryResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+600 |         if (!isToolError(retryResult)) {
+601 |           // Retry succeeded — return clean result transparently
+602 |           if (tu.name === "read_file" && onFileWatch) {
+603 |             onFileWatch("read", (tu.input as { path?: string }).path ?? "");
+604 |           }
+605 |           return compressToolOutput(tu.name, retryResult);
+606 |         }
+607 |         // Both attempts failed — return enhanced error with suggestions
+608 |         const enhancedRetry = enhanceToolError(tu.name, tu.input as Record<string, unknown>, retryResult, workDir);
+609 |         if (tu.name === "read_file" && onFileWatch) {
+610 |           onFileWatch("read", (tu.input as { path?: string }).path ?? "");
+611 |         }
+612 |         return compressToolOutput(tu.name, `${enhanced}\n\n[Retry also failed]: ${enhancedRetry}`);
+613 |       }
+614 |       if (tu.name === "read_file" && onFileWatch) {
+615 |         onFileWatch("read", (tu.input as { path?: string }).path ?? "");
+616 |       }
+617 |       return compressToolOutput(tu.name, enhanced);
+618 |     });
+619 |     results.push(...parallelResults);
+620 | 
+621 |     // Handle write_file tools — batch if 2+ and onDiffPreview is set
+[2026-04-05T20:29:07.640Z] iter=364 turn=8 INFO: Turn 8/25
+[2026-04-05T20:29:13.944Z] iter=364 turn=8 INFO: Agent: Now patch the sequential write path:
+[2026-04-05T20:29:13.945Z] iter=364 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:29:13.946Z] iter=364 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -6 +21 lines
+
+Context after patch:
+642 |             }
+643 |           }
+644 |         }
+645 |         // PreToolUse hook — may block execution
+646 |         const preWriteResult = await runHooks(hooksConfig, "PreToolUse", {
+647 |           cwd: workDir, tool_name: tu.name, tool_input: tu.input,
+648 |         }, workDir);
+649 |         if (preWriteResult.decision === "block") {
+650 |           results.push({ type: "tool_result", tool_use_id: tu.id, content: `[Hook blocked]: ${preWriteResult.reason ?? "blocked by hook"}` });
+651 |           continue;
+652 |         }
+653 |         let rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+654 |         // PostToolUse hook — may append context
+655 |         const postWriteResult = await runHooks(hooksConfig, "PostToolUse", {
+656 |           cwd: workDir, tool_name: tu.name, tool_input: tu.input, tool_response: rawResult,
+657 |         }, workDir);
+658 |         if (postWriteResult.additionalContext) {
+659 |           rawResult += "\n\n[Hook context]: " + postWriteResult.additionalContext;
+660 |         }
+661 |         if (onFileWatch) {
+662 |           onFileWatch("write", (tu.input as { path?: string }).path ?? "");
+663 |         }
+664 |         const result = compressToolOutput(tu.name, rawResult);
+665 |         results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
+666 |       }
+667 |     }
+668 | 
+[2026-04-05T20:29:13.946Z] iter=364 turn=9 INFO: Turn 9/25
+[2026-04-05T20:29:16.590Z] iter=364 turn=9 INFO: Agent: Now update all 4 call sites to pass `hooksConfig` (as the last positional arg after `maxConsecutiveLoops`):
+[2026-04-05T20:29:16.591Z] iter=364 turn=9 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:29:16.592Z] iter=364 turn=9 INFO:   -> ok (776 chars)
+[2026-04-05T20:29:16.593Z] iter=364 turn=10 INFO: Turn 10/25
+[2026-04-05T20:29:18.558Z] iter=364 turn=10 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:29:18.559Z] iter=364 turn=10 INFO:   -> ok (743 chars)
+[2026-04-05T20:29:18.560Z] iter=364 turn=11 INFO: Turn 11/25
+[2026-04-05T20:29:23.013Z] iter=364 turn=11 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:29:23.014Z] iter=364 turn=11 INFO:   -> ok: Patched src/orchestrator.ts: -8 +9 lines
+
+Context after patch:
+1488 |       this.opts.onToolCall,
+1489 |       this.opts.onStatus,
+1490 |       this.opts.onText,
+1491 |       this.opts.onDiffPreview,
+1492 |       onCompact,
+1493 |       this.opts.onContextBudget,
+1494 |       fileWatchCallback,
+1495 |       this._abortController?.signal,
+1496 |       this.opts.maxConsecutiveLoops ?? 2,
+1497 |       this.hooksConfig,
+1498 |     );
+1499 |     const { text, tokensIn, tokensOut, lastInputTokens, aborted } = loopResult;
+1500 | 
+1501 |     // Persist assistant reply (last assistant message in history)
+1502 |     if (this.sessionPath && text) {
+[2026-04-05T20:29:23.015Z] iter=364 turn=12 INFO: Turn 12/25
+[2026-04-05T20:29:25.008Z] iter=364 turn=12 INFO: Agent: I've made real src/ changes. Let me finish the remaining call sites and run verification.
+[2026-04-05T20:29:25.008Z] iter=364 turn=12 INFO: $ grep -n "await runAgentLoop(" src/orchestrator.ts
+[2026-04-05T20:29:25.029Z] iter=364 turn=12 INFO:   -> exit=0 (189 chars)
+[2026-04-05T20:29:25.029Z] iter=364 turn=13 INFO: Turn 13/25
+[2026-04-05T20:29:27.312Z] iter=364 turn=13 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:29:27.314Z] iter=364 turn=13 INFO:   -> ok (779 chars)
+[2026-04-05T20:29:27.314Z] iter=364 turn=13 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:29:27.315Z] iter=364 turn=13 INFO:   -> ok (889 chars)
+[2026-04-05T20:29:27.316Z] iter=364 turn=14 INFO: Turn 14/25
+[2026-04-05T20:29:29.269Z] iter=364 turn=14 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:29:29.270Z] iter=364 turn=14 INFO:   -> ok (974 chars)
+[2026-04-05T20:29:29.270Z] iter=364 turn=15 INFO: Turn 15/25
+[2026-04-05T20:29:33.689Z] iter=364 turn=15 INFO: Agent: Patching the remaining 3 call sites now, then TSC + restart.
+[2026-04-05T20:29:33.691Z] iter=364 turn=15 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:29:33.693Z] iter=364 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -15 +18 lines
+
+Context after patch:
+1546 |             content: `Verification results:\n${formatted}\n\nPlease fix any failures.`,
+1547 |           });
+1548 |           this.opts.onStatus?.("Fixing verification failures...");
+1549 |           await runAgentLoop(
+1550 |             this.client,
+1551 |             model,
+1552 |             this.systemPrompt,
+1553 |             this.apiMessages,
+1554 |             this.registry,
+1555 |             this.opts.workDir,
+1556 |             this.opts.onToolCall,
+1557 |             this.opts.onStatus,
+1558 |             this.opts.onText,
+1559 |             this.opts.onDiffPreview,
+1560 |             undefined,
+1561 |             undefined,
+1562 |             fileWatchCallback,
+1563 |             undefined,
+1564 |             2,
+1565 |             this.hooksConfig,
+1566 |           );
+1567 |         }
+1568 |       }
+1569 |     }
+[2026-04-05T20:29:33.693Z] iter=364 turn=16 INFO: Turn 16/25
+[2026-04-05T20:29:38.412Z] iter=364 turn=16 INFO: Agent: Patching the final 2 call sites simultaneously, then TSC + finish.
+[2026-04-05T20:29:38.413Z] iter=364 turn=16 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:29:38.417Z] iter=364 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -17 +20 lines
+
+Context after patch:
+1590 |           content: `TypeScript errors after edit:\n\`\`\`\n${diagErrors}\n\`\`\`\nPlease fix these errors.`,
+1591 |         });
+1592 | 
+1593 |         const fixResult = await runAgentLoop(
+1594 |           this.client,
+1595 |           model,
+1596 |           this.systemPrompt,
+1597 |           this.apiMessages,
+1598 |           this.registry,
+1599 |           this.opts.workDir,
+1600 |           this.opts.onToolCall,
+1601 |           this.opts.onStatus,
+1602 |           this.opts.onText,
+1603 |           this.opts.onDiffPreview,
+1604 |           undefined,
+1605 |           undefined,
+1606 |           fileWatchCallback,
+1607 |           undefined,
+1608 |           2,
+1609 |           this.hooksConfig,
+1610 |         );
+1611 | 
+1612 |         this.sessionTokensIn += fixResult.tokensIn;
+1613 |         this.sessionTokensOut += fixResult.tokensOut;
+1614 |         this.sessionCost += computeCost(model, fixResult.tokensIn, fixResult.tokensOut);
+1615 | 
+[2026-04-05T20:29:38.418Z] iter=364 turn=17 INFO: Turn 17/25
+[2026-04-05T20:29:41.728Z] iter=364 turn=17 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:29:41.731Z] iter=364 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -6 +7 lines
+
+Context after patch:
+1642 |               role: "user",
+1643 |               content: `${failLabel}:\n\`\`\`\n${output}\n\`\`\`\nPlease fix these test failures.`,
+1644 |             });
+1645 |             const fixResult = await runAgentLoop(
+1646 |               this.client, model, this.systemPrompt, this.apiMessages,
+1647 |               this.registry, this.opts.workDir, this.opts.onToolCall,
+1648 |               this.opts.onStatus, this.opts.onText, this.opts.onDiffPreview,
+1649 |               undefined, undefined, fileWatchCallback,
+1650 |               undefined, 2, this.hooksConfig,
+1651 |             );
+1652 |             this.sessionTokensIn += fixResult.tokensIn;
+1653 |             this.sessionTokensOut += fixResult.tokensOut;
+1654 |             this.sessionCost += computeCost(model, fixResult.tokensIn, fixResult.tokensOut);
+[2026-04-05T20:29:41.731Z] iter=364 turn=18 INFO: Turn 18/25
+[2026-04-05T20:29:44.163Z] iter=364 turn=18 INFO: Agent: Now TSC check, then memory + goals + restart:
+[2026-04-05T20:29:44.163Z] iter=364 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T20:29:45.257Z] iter=364 turn=18 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:29:45.257Z] iter=364 turn=19 INFO: Turn 19/25
+[2026-04-05T20:29:50.271Z] iter=364 turn=19 INFO: Agent: TSC clean. Writing memory and goals now.
+[2026-04-05T20:29:50.272Z] iter=364 turn=19 INFO: save_memory: "[Engineer 364] Hook wiring complete"
+[2026-04-05T20:29:50.273Z] iter=364 turn=19 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:29:50.274Z] iter=364 turn=20 INFO: Turn 20/25
+[2026-04-05T20:29:59.560Z] iter=364 turn=20 INFO: write_file: goals.md (write)
+[2026-04-05T20:29:59.562Z] iter=364 turn=20 INFO:   -> ok: Updated goals.md (1223 chars, -21 lines delta)
+[2026-04-05T20:29:59.564Z] iter=364 turn=21 INFO: Turn 21/25
+[2026-04-05T20:30:01.261Z] iter=364 turn=21 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:30:01.262Z] iter=364 turn=21 INFO: RESTART signal
+[2026-04-05T20:30:01.263Z] iter=364 turn=21 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:30:02.269Z] iter=364 turn=21 INFO: Compilation OK
+[2026-04-05T20:30:10.748Z] iter=364 turn=21 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-05T20:30:10.748Z] iter=364 turn=21 INFO: Cache stats: 0 hits, 9 misses, 56 entries, 8 invalidations (9 entries removed)
+[2026-04-05T20:30:10.748Z] iter=364 turn=21 INFO: Tool cache stats
+[2026-04-05T20:30:10.749Z] iter=364 turn=21 INFO: Tool timing: bash: 4x, avg=285ms, total=1138ms; write_file: 8x, avg=3ms, total=25ms; read_file: 9x, avg=2ms, total=22ms; read_scratchpad: 1x, avg=7ms, total=7ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T20:30:10.749Z] iter=364 turn=21 INFO: Tool timing stats
+[2026-04-05T20:30:18.185Z] iter=364 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 364: predicted 18 turns, actual 21 turns, ratio 1.17**
+[2026-04-05T20:30:27.632Z] iter=364 turn=21 INFO: Pre-commit review (1533in/396out): **Issues found:**
+
+- **New optional parameter breaks call-site stability**: `hooksConfig` is appended after `maxConsecutiveLoops`, but several call sites now explicitly pass `undefined, 2, this.hooksC
