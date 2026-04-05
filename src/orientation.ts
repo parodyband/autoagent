@@ -11,6 +11,7 @@
 
 import { readFileSync } from "fs";
 import { executeBash } from "./tools/bash.js";
+import { parallelResearch } from "./tools/subagent.js";
 
 export interface OrientationReport {
   /** Summary of files changed since last iteration commit */
@@ -34,13 +35,31 @@ interface IterationMetrics {
 }
 
 /**
+ * Extract src filenames from a git diff --stat output.
+ * Returns only lines that look like file paths (contain a pipe character).
+ */
+function extractSrcFiles(statOutput: string): string[] {
+  return statOutput
+    .split("\n")
+    .filter(line => line.includes("|") && line.trim().startsWith("src/"))
+    .map(line => line.trim().split("|")[0].trim());
+}
+
+/**
  * Compute what changed in the codebase since the last iteration.
  * Uses `git diff HEAD~1` to compare against the previous commit.
- * 
+ *
+ * If 5+ src files changed and useSubagentSummaries is true, dispatches
+ * per-file diffs to cheap sub-agents for concise summaries instead of
+ * returning a truncated raw diff.
+ *
  * Returns a concise report suitable for including in the agent's
  * initial context without bloating the token budget.
  */
-export async function orient(maxDiffChars: number = 1000): Promise<OrientationReport> {
+export async function orient(
+  maxDiffChars: number = 1000,
+  useSubagentSummaries: boolean = true,
+): Promise<OrientationReport> {
   // Get the stat summary (which files changed)
   const statResult = await executeBash(
     "git diff HEAD~1 --stat 2>/dev/null",
@@ -58,7 +77,44 @@ export async function orient(maxDiffChars: number = 1000): Promise<OrientationRe
     return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary() };
   }
 
-  // Only diff src/ files — .md and .json are the agent's own output and already known
+  // Try parallel subagent summaries when 5+ src files changed
+  if (useSubagentSummaries) {
+    const srcFiles = extractSrcFiles(statOutput);
+    if (srcFiles.length >= 5) {
+      try {
+        const fileDiffs = await Promise.all(
+          srcFiles.map(file =>
+            executeBash(`git diff HEAD~1 -- ${file} 2>/dev/null`, 10, undefined, true)
+          )
+        );
+
+        const prompts = srcFiles.map((file, i) => {
+          const diff = fileDiffs[i].output.trim() || "(no diff content)";
+          return `Summarize this git diff in 1-2 sentences. Focus on what changed and why it matters:\n\n${diff}`;
+        });
+
+        const summaries = await parallelResearch(prompts, "fast", 256);
+
+        const perFileSummaries = srcFiles
+          .map((file, i) => `- **${file}**: ${summaries[i].response.trim()}`)
+          .join("\n");
+
+        const diffSummary =
+          `Files changed:\n${statOutput}\n\nPer-file summaries (src):\n${perFileSummaries}`;
+
+        return {
+          diffSummary,
+          hasChanges: true,
+          error: null,
+          metricsSummary: computeMetricsSummary(),
+        };
+      } catch {
+        // Fall through to raw diff on any error
+      }
+    }
+  }
+
+  // Default: raw diff (fewer than 5 src files, or subagents disabled/failed)
   const diffResult = await executeBash(
     "git diff HEAD~1 -- 'src/**' ':!agentlog.*' 2>/dev/null",
     10,
@@ -67,7 +123,7 @@ export async function orient(maxDiffChars: number = 1000): Promise<OrientationRe
   );
 
   let diffContent = diffResult.output.trim();
-  
+
   if (diffContent.length > maxDiffChars) {
     diffContent = diffContent.slice(0, maxDiffChars) + "\n... (truncated)";
   }

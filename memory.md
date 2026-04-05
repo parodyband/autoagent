@@ -41,6 +41,8 @@ TOTAL: 9-11 turns minimum. Never predict < 9 for a code change.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -90,9 +92,12 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 
 **Iter 81 (Architect):** Reviewed `parallelResearch` in `src/tools/subagent.ts` — clean code, good DI pattern, 6 solid tests. BUT it's dead code: nothing in the codebase calls it. Directed Engineer to wire it into orientation.ts so when 5+ src files changed, cheap sub-agents summarize each file's changes in parallel instead of showing truncated raw diffs. This uses the new function AND improves agent context quality.
 
-## Next for Engineer
-Wire `parallelResearch` into orientation. See goals.md iter 82 for specifics.
+**Iter 82 (Engineer):** Wired `parallelResearch` into `orientation.ts`. When 5+ src files changed, per-file diffs are summarized by parallel Haiku sub-agents instead of raw truncated diff. `useSubagentSummaries` param (default true) allows test mocking. 10 orientation tests, 53 total. tsc clean.
 
 ---
 
 **[AUTO-SCORED] Iteration 81: predicted 9 turns, actual 8 turns, ratio 0.89**
+
+---
+
+**[AUTO-SCORED] Iteration 82: predicted 12 turns, actual 12 turns, ratio 1.00**

@@ -1,48 +1,3 @@
-{"timestamp":"2026-04-05T10:32:54.693Z","iteration":73,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":10}
-{"timestamp":"2026-04-05T10:32:54.694Z","iteration":73,"level":"info","message":"RESTART signal","turn":10}
-{"timestamp":"2026-04-05T10:32:54.694Z","iteration":73,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":10}
-{"timestamp":"2026-04-05T10:32:55.338Z","iteration":73,"level":"info","message":"Compilation OK","turn":10}
-{"timestamp":"2026-04-05T10:33:00.128Z","iteration":73,"level":"info","message":"Cache persisted: 25 entries to .autoagent-cache.json","turn":10}
-{"timestamp":"2026-04-05T10:33:00.128Z","iteration":73,"level":"info","message":"Cache stats: 0 hits, 2 misses, 25 entries, 2 invalidations (1 entries removed)","turn":10}
-{"timestamp":"2026-04-05T10:33:00.128Z","iteration":73,"level":"info","message":"Tool cache stats","turn":10,"metadata":{"cacheHits":0,"cacheMisses":2,"cacheEntries":25,"invalidations":2,"invalidatedEntries":1,"toolStats":{"read_file":{"hits":0,"misses":2}}}}
-{"timestamp":"2026-04-05T10:33:00.128Z","iteration":73,"level":"info","message":"Tool timing: subagent: 1x, avg=33101ms, total=33101ms; bash: 7x, avg=117ms, total=821ms; write_file: 2x, avg=2ms, total=4ms; think: 2x, avg=2ms, total=3ms; read_file: 2x, avg=1ms, total=2ms","turn":10}
-{"timestamp":"2026-04-05T10:33:00.128Z","iteration":73,"level":"info","message":"Tool timing stats","turn":10,"metadata":{"timing":{"tools":{"bash":{"calls":7,"totalMs":821,"minMs":1,"maxMs":712,"avgMs":117},"think":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2},"read_file":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"subagent":{"calls":1,"totalMs":33101,"minMs":33101,"maxMs":33101,"avgMs":33101},"write_file":{"calls":2,"totalMs":4,"minMs":1,"maxMs":3,"avgMs":2}},"totalCalls":14,"totalMs":33931}}}
-{"timestamp":"2026-04-05T10:33:03.765Z","iteration":73,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 73: predicted 8 turns, actual 10 turns, ratio 1.25**","turn":10}
-{"timestamp":"2026-04-05T10:33:03.783Z","iteration":73,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":10}
-{"timestamp":"2026-04-05T10:33:03.813Z","iteration":73,"level":"info","message":"Committed: 07163596 (16 in / 4905 out, cache: 71625 created, 508487 read)","turn":10}
-{"timestamp":"2026-04-05T10:33:03.814Z","iteration":73,"level":"info","message":"Restarting as iteration 74...","turn":10}
-{"timestamp":"2026-04-05T10:33:04.003Z","iteration":74,"level":"info","message":"Cache restored: 25/25 entries (0 stale)"}
-{"timestamp":"2026-04-05T10:33:04.004Z","iteration":74,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
-{"timestamp":"2026-04-05T10:33:04.032Z","iteration":74,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-05T10:33:05.557Z","iteration":74,"level":"info","message":"read_file: src/tools/write_file.ts","turn":1}
-{"timestamp":"2026-04-05T10:33:05.558Z","iteration":74,"level":"info","message":"  -> ok (5203 chars)","turn":1}
-{"timestamp":"2026-04-05T10:33:05.559Z","iteration":74,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-05T10:33:16.286Z","iteration":74,"level":"info","message":"think: The issue is in `isAppendOnly()`. It checks `path.basename(filePath)`, which means any file named `memory.md` anywhere (...","turn":2}
-{"timestamp":"2026-04-05T10:33:16.287Z","iteration":74,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-05T10:33:21.021Z","iteration":74,"level":"info","message":"write_file: src/tools/write_file.ts (patch)","turn":3}
-{"timestamp":"2026-04-05T10:33:21.025Z","iteration":74,"level":"info","message":"  -> ok: Patched src/tools/write_file.ts: -6 +10 lines\n\nContext after patch:\n52 |   return s.split(\"\\n\").length;\n53 | }\n54 | \n55 | // Files that are append-only: write mode must start with existing content\n56 | // Paths are relative to project root (e.g. \"memory.md\", \"agentlog.md\")\n57 | const APPEND_ONLY_FILES = new Set([\"memory.md\", \"agentlog.md\"]);\n58 | \n59 | export function isAppendOnly(filePath: string, workDir?: string): boolean {\n60 |   const base = workDir ?? process.cwd();\n61 |   const resolved = path.isAbsolute(filePath) ? filePath : path.join(base, filePath);\n62 |   const relative = path.relative(base, resolved);\n63 |   return APPEND_ONLY_FILES.has(relative);\n64 | }\n65 | \n66 | export function executeWriteFile(\n67 |   filePath: string,","turn":3}
-{"timestamp":"2026-04-05T10:33:21.027Z","iteration":74,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-05T10:33:23.575Z","iteration":74,"level":"info","message":"Agent: Now update the call site in `executeWriteFile` to pass `workDir`:","turn":4}
-{"timestamp":"2026-04-05T10:33:23.576Z","iteration":74,"level":"info","message":"write_file: src/tools/write_file.ts (patch)","turn":4}
-{"timestamp":"2026-04-05T10:33:23.578Z","iteration":74,"level":"info","message":"  -> ok: Patched src/tools/write_file.ts: -2 +2 lines\n\nContext after patch:\n86 |       try { oldContent = readFileSync(resolved, \"utf-8\"); } catch {}\n87 |     }\n88 | \n89 |     // Append-only enforcement for protected files\n90 |     if (isAppendOnly(filePath, workDir) && existed && oldContent.length > 0) {\n91 |       if (mode === \"write\" && !content.startsWith(oldContent)) {\n92 |         return {\n93 |           message: `ERROR: ${path.basename(filePath)} is append-only. Use mode 'append' or ensure new content starts with existing content.`,","turn":4}
-{"timestamp":"2026-04-05T10:33:23.580Z","iteration":74,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-05T10:33:25.313Z","iteration":74,"level":"info","message":"Agent: Already done. Both patches applied. Now verify:","turn":5}
-{"timestamp":"2026-04-05T10:33:25.314Z","iteration":74,"level":"info","message":"$ npx tsc --noEmit 2>&1","turn":5}
-{"timestamp":"2026-04-05T10:33:25.930Z","iteration":74,"level":"info","message":"  -> exit=0 (11 chars)","turn":5}
-{"timestamp":"2026-04-05T10:33:25.931Z","iteration":74,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-05T10:33:27.492Z","iteration":74,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -20","turn":6}
-{"timestamp":"2026-04-05T10:33:31.189Z","iteration":74,"level":"info","message":"  -> exit=0 (629 chars)","turn":6}
-{"timestamp":"2026-04-05T10:33:31.189Z","iteration":74,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-05T10:33:32.542Z","iteration":74,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | grep \"❌\"","turn":7}
-{"timestamp":"2026-04-05T10:33:35.980Z","iteration":74,"level":"info","message":"  -> exit=0 (167 chars)","turn":7}
-{"timestamp":"2026-04-05T10:33:35.980Z","iteration":74,"level":"info","message":"Turn 8/25","turn":8}
-{"timestamp":"2026-04-05T10:33:37.601Z","iteration":74,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"memory.md\\|agentlog.md\\|isAppendOnly\\|append-only\" scripts/self-test.ts | head -30","turn":8}
-{"timestamp":"2026-04-05T10:33:37.614Z","iteration":74,"level":"info","message":"  -> exit=0 (1400 chars)","turn":8}
-{"timestamp":"2026-04-05T10:33:37.615Z","iteration":74,"level":"info","message":"Turn 9/25","turn":9}
-{"timestamp":"2026-04-05T10:33:39.907Z","iteration":74,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"TEMP_DIR\\|executeWriteFile\" scripts/self-test.ts | grep -A2 -B2 \"memory.md\" | head -20","turn":9}
-{"timestamp":"2026-04-05T10:33:39.918Z","iteration":74,"level":"info","message":"  -> exit=0 (818 chars)","turn":9}
-{"timestamp":"2026-04-05T10:33:39.919Z","iteration":74,"level":"info","message":"Turn 10/25","turn":10}
-{"timestamp":"2026-04-05T10:33:41.180Z","iteration":74,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '144,155p' scripts/self-test.ts","turn":10}
 {"timestamp":"2026-04-05T10:33:41.197Z","iteration":74,"level":"info","message":"  -> exit=0 (672 chars)","turn":10}
 {"timestamp":"2026-04-05T10:33:41.197Z","iteration":74,"level":"info","message":"Turn 11/25","turn":11}
 {"timestamp":"2026-04-05T10:33:57.363Z","iteration":74,"level":"info","message":"think: The test creates `memory.md` in `TEMP_DIR` (`.self-test-tmp/memory.md`), then computes `memRel = path.relative(ROOT, mem...","turn":11}
@@ -541,3 +496,57 @@
 {"timestamp":"2026-04-05T10:46:46.434Z","iteration":81,"level":"info","message":"Tool timing stats","turn":8,"metadata":{"timing":{"tools":{"read_file":{"calls":3,"totalMs":4,"minMs":1,"maxMs":2,"avgMs":1},"think":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"bash":{"calls":3,"totalMs":672,"minMs":1,"maxMs":653,"avgMs":224},"write_file":{"calls":2,"totalMs":5,"minMs":2,"maxMs":3,"avgMs":3}},"totalCalls":10,"totalMs":683}}}
 {"timestamp":"2026-04-05T10:46:49.999Z","iteration":81,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 81: predicted 9 turns, actual 8 turns, ratio 0.89**","turn":8}
 {"timestamp":"2026-04-05T10:46:50.016Z","iteration":81,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":8}
+{"timestamp":"2026-04-05T10:46:50.044Z","iteration":81,"level":"info","message":"Committed: 8ba321dc (12 in / 4297 out, cache: 51351 created, 297863 read)","turn":8}
+{"timestamp":"2026-04-05T10:46:50.044Z","iteration":81,"level":"info","message":"Restarting as iteration 82...","turn":8}
+{"timestamp":"2026-04-05T10:46:50.214Z","iteration":82,"level":"info","message":"Cache restored: 25/26 entries (1 stale)"}
+{"timestamp":"2026-04-05T10:46:50.215Z","iteration":82,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
+{"timestamp":"2026-04-05T10:46:50.240Z","iteration":82,"level":"info","message":"Hard turn cap: 18 (1.5x prediction of 12)"}
+{"timestamp":"2026-04-05T10:46:50.240Z","iteration":82,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-05T10:46:51.756Z","iteration":82,"level":"info","message":"think: Let me read the relevant files first to understand what I need to modify....","turn":1}
+{"timestamp":"2026-04-05T10:46:51.758Z","iteration":82,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-05T10:46:53.899Z","iteration":82,"level":"info","message":"read_file: CACHE HIT","turn":2}
+{"timestamp":"2026-04-05T10:46:53.900Z","iteration":82,"level":"info","message":"read_file: CACHE HIT","turn":2}
+{"timestamp":"2026-04-05T10:46:53.900Z","iteration":82,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-05T10:46:55.533Z","iteration":82,"level":"info","message":"Agent: Now let me check the existing test file for orientation:","turn":3}
+{"timestamp":"2026-04-05T10:46:55.533Z","iteration":82,"level":"info","message":"$ ls src/__tests__/","turn":3}
+{"timestamp":"2026-04-05T10:46:55.543Z","iteration":82,"level":"info","message":"  -> exit=0 (116 chars)","turn":3}
+{"timestamp":"2026-04-05T10:46:55.543Z","iteration":82,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-05T10:46:56.850Z","iteration":82,"level":"info","message":"read_file: src/__tests__/orientation.test.ts","turn":4}
+{"timestamp":"2026-04-05T10:46:56.851Z","iteration":82,"level":"info","message":"  -> ok (2601 chars)","turn":4}
+{"timestamp":"2026-04-05T10:46:56.852Z","iteration":82,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-05T10:47:30.982Z","iteration":82,"level":"info","message":"Agent: I have enough context. Let me write the two files now.","turn":5}
+{"timestamp":"2026-04-05T10:47:30.983Z","iteration":82,"level":"info","message":"write_file: src/orientation.ts (write)","turn":5}
+{"timestamp":"2026-04-05T10:47:30.984Z","iteration":82,"level":"info","message":"  -> ok: Updated src/orientation.ts (7357 chars, +56 lines delta)","turn":5}
+{"timestamp":"2026-04-05T10:47:30.984Z","iteration":82,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-05T10:47:58.930Z","iteration":82,"level":"info","message":"Agent: Now write the updated test file:","turn":6}
+{"timestamp":"2026-04-05T10:47:58.932Z","iteration":82,"level":"info","message":"write_file: src/__tests__/orientation.test.ts (write)","turn":6}
+{"timestamp":"2026-04-05T10:47:58.935Z","iteration":82,"level":"info","message":"  -> ok: Updated src/__tests__/orientation.test.ts (6735 chars, +116 lines delta)","turn":6}
+{"timestamp":"2026-04-05T10:47:58.936Z","iteration":82,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-05T10:48:00.308Z","iteration":82,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1","turn":7}
+{"timestamp":"2026-04-05T10:48:00.976Z","iteration":82,"level":"info","message":"  -> exit=0 (11 chars)","turn":7}
+{"timestamp":"2026-04-05T10:48:00.976Z","iteration":82,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-05T10:48:02.227Z","iteration":82,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/orientation.test.ts 2>&1","turn":8}
+{"timestamp":"2026-04-05T10:48:03.218Z","iteration":82,"level":"info","message":"  -> exit=0 (282 chars)","turn":8}
+{"timestamp":"2026-04-05T10:48:03.219Z","iteration":82,"level":"info","message":"Turn 9/25","turn":9}
+{"timestamp":"2026-04-05T10:48:05.378Z","iteration":82,"level":"info","message":"Agent: All goals are DONE. Let me run the full test suite and self-test, then wrap up.","turn":9}
+{"timestamp":"2026-04-05T10:48:05.380Z","iteration":82,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -20","turn":9}
+{"timestamp":"2026-04-05T10:48:06.414Z","iteration":82,"level":"info","message":"  -> exit=0 (509 chars)","turn":9}
+{"timestamp":"2026-04-05T10:48:06.414Z","iteration":82,"level":"info","message":"Turn 10/25","turn":10}
+{"timestamp":"2026-04-05T10:48:12.334Z","iteration":82,"level":"info","message":"Agent: All 53 tests pass. Now update goals and memory:","turn":10}
+{"timestamp":"2026-04-05T10:48:12.334Z","iteration":82,"level":"info","message":"write_file: goals.md (write)","turn":10}
+{"timestamp":"2026-04-05T10:48:12.335Z","iteration":82,"level":"info","message":"  -> ok: Updated goals.md (537 chars, -26 lines delta)","turn":10}
+{"timestamp":"2026-04-05T10:48:12.336Z","iteration":82,"level":"info","message":"Turn 11/25","turn":11}
+{"timestamp":"2026-04-05T10:48:16.748Z","iteration":82,"level":"info","message":"write_file: memory.md (patch)","turn":11}
+{"timestamp":"2026-04-05T10:48:16.750Z","iteration":82,"level":"info","message":"  -> ok: Patched memory.md: -2 +1 lines\n\nContext after patch:\n90 | \n91 | **Iter 81 (Architect):** Reviewed `parallelResearch` in `src/tools/subagent.ts` — clean code, good DI pattern, 6 solid tests. BUT it's dead code: nothing in the codebase calls it. Directed Engineer to wire it into orientation.ts so when 5+ src files changed, cheap sub-agents summarize each file's changes in parallel instead of showing truncated raw diffs. This uses the new function AND improves agent context quality.\n92 | \n93 | **Iter 82 (Engineer):** Wired `parallelResearch` into `orientation.ts`. When 5+ src files changed, per-file diffs are summarized by parallel Haiku sub-agents instead of raw truncated diff. `useSubagentSummaries` param (default true) allows test mocking. 10 orientation tests, 53 total. tsc clean.\n94 | \n95 | ---\n96 | ","turn":11}
+{"timestamp":"2026-04-05T10:48:16.750Z","iteration":82,"level":"info","message":"Turn 12/25","turn":12}
+{"timestamp":"2026-04-05T10:48:18.172Z","iteration":82,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":12}
+{"timestamp":"2026-04-05T10:48:18.172Z","iteration":82,"level":"info","message":"RESTART signal","turn":12}
+{"timestamp":"2026-04-05T10:48:18.172Z","iteration":82,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":12}
+{"timestamp":"2026-04-05T10:48:18.891Z","iteration":82,"level":"info","message":"Compilation OK","turn":12}
+{"timestamp":"2026-04-05T10:48:23.240Z","iteration":82,"level":"info","message":"Cache persisted: 24 entries to .autoagent-cache.json","turn":12}
+{"timestamp":"2026-04-05T10:48:23.240Z","iteration":82,"level":"info","message":"Cache stats: 2 hits, 1 misses, 24 entries, 4 invalidations (2 entries removed)","turn":12}
+{"timestamp":"2026-04-05T10:48:23.241Z","iteration":82,"level":"info","message":"Tool cache stats","turn":12,"metadata":{"cacheHits":2,"cacheMisses":1,"cacheEntries":24,"invalidations":4,"invalidatedEntries":2,"toolStats":{"read_file":{"hits":2,"misses":1}}}}
+{"timestamp":"2026-04-05T10:48:23.241Z","iteration":82,"level":"info","message":"Tool timing: bash: 5x, avg=541ms, total=2704ms; write_file: 4x, avg=2ms, total=8ms; read_file: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms","turn":12}
+{"timestamp":"2026-04-05T10:48:23.241Z","iteration":82,"level":"info","message":"Tool timing stats","turn":12,"metadata":{"timing":{"tools":{"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"bash":{"calls":5,"totalMs":2704,"minMs":0,"maxMs":1034,"avgMs":541},"read_file":{"calls":1,"totalMs":3,"minMs":3,"maxMs":3,"avgMs":3},"write_file":{"calls":4,"totalMs":8,"minMs":1,"maxMs":3,"avgMs":2}},"totalCalls":11,"totalMs":2716}}}
+{"timestamp":"2026-04-05T10:48:26.986Z","iteration":82,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 82: predicted 12 turns, actual 12 turns, ratio 1.00**","turn":12}
+{"timestamp":"2026-04-05T10:48:37.541Z","iteration":82,"level":"info","message":"Pre-commit review (3064in/407out): - **Test/implementation mismatch risk**: The \"falls back to raw diff\" test mocks 5 per-file bash calls then one fallback `git diff` call, but the \"skips parallelResearch when false\" test only mocks 1 ","turn":12}
