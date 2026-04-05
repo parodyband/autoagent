@@ -12,13 +12,8 @@ import { readFileSync, writeFileSync, existsSync, appendFileSync } from "fs";
 import { spawn as spawnProcess } from "child_process";
 import path from "path";
 import "dotenv/config";
-import { bashToolDefinition, executeBash } from "./tools/bash.js";
-import { readFileToolDefinition, executeReadFile } from "./tools/read_file.js";
-import { writeFileToolDefinition, executeWriteFile } from "./tools/write_file.js";
-import { grepToolDefinition, executeGrep } from "./tools/grep.js";
-import { webFetchToolDefinition, executeWebFetch } from "./tools/web_fetch.js";
-import { thinkToolDefinition, executeThink } from "./tools/think.js";
-import { listFilesToolDefinition, executeListFiles } from "./tools/list_files.js";
+import { executeBash } from "./tools/bash.js";
+import { createDefaultRegistry } from "./tool-registry.js";
 import {
   loadState,
   saveState,
@@ -47,6 +42,15 @@ function log(iter: number, msg: string): void {
 
 // ─── Metrics ────────────────────────────────────────────────
 
+interface CodeQualitySnapshot {
+  totalLOC: number;
+  codeLOC: number;
+  fileCount: number;
+  functionCount: number;
+  complexity: number;
+  testCount: number;
+}
+
 interface IterationMetrics {
   iteration: number;
   startTime: string;
@@ -59,6 +63,35 @@ interface IterationMetrics {
   outputTokens: number;
   cacheCreationTokens?: number;
   cacheReadTokens?: number;
+  codeQuality?: CodeQualitySnapshot;
+}
+
+async function captureCodeQuality(): Promise<CodeQualitySnapshot | undefined> {
+  try {
+    // Run code-analysis.ts to get JSON output
+    const r = await executeBash(
+      `npx tsx -e "import{analyzeCodebase}from'./scripts/code-analysis.js';const a=analyzeCodebase();console.log(JSON.stringify(a.totals))"`,
+      30, ROOT
+    );
+    if (r.exitCode === 0 && r.output.trim().startsWith("{")) {
+      const totals = JSON.parse(r.output.trim());
+      // Count tests by running self-test in dry-count mode
+      const testR = await executeBash(
+        `grep -c "^  assert(" scripts/self-test.ts || echo 0`,
+        10, ROOT
+      );
+      const testCount = parseInt(testR.output.trim(), 10) || 0;
+      return {
+        totalLOC: totals.totalLines,
+        codeLOC: totals.codeLines,
+        fileCount: totals.fileCount,
+        functionCount: totals.functionCount,
+        complexity: totals.complexity,
+        testCount,
+      };
+    }
+  } catch {}
+  return undefined;
 }
 
 function recordMetrics(m: IterationMetrics): void {
@@ -102,15 +135,7 @@ function buildSystemPrompt(state: IterationState): string {
 
 // ─── Tools ──────────────────────────────────────────────────
 
-const allTools: Anthropic.Tool[] = [
-  bashToolDefinition,
-  readFileToolDefinition,
-  writeFileToolDefinition,
-  grepToolDefinition,
-  webFetchToolDefinition,
-  thinkToolDefinition,
-  listFilesToolDefinition,
-];
+const toolRegistry = createDefaultRegistry();
 
 async function handleToolCall(
   iter: number,
@@ -119,74 +144,19 @@ async function handleToolCall(
 ): Promise<{ result: string; isRestart: boolean }> {
   counts[toolUse.name] = (counts[toolUse.name] || 0) + 1;
 
+  const tool = toolRegistry.get(toolUse.name);
+  if (!tool) {
+    return { result: `Unknown tool: ${toolUse.name}`, isRestart: false };
+  }
+
+  const ctx = {
+    rootDir: ROOT,
+    log: (msg: string) => log(iter, msg),
+  };
+
   try {
-    switch (toolUse.name) {
-      case "bash": {
-        const input = toolUse.input as { command: string; timeout?: number };
-        log(iter, `$ ${input.command.slice(0, 200)}${input.command.length > 200 ? "..." : ""}`);
-        if (input.command.includes("AUTOAGENT_RESTART")) {
-          log(iter, "RESTART signal");
-          return { result: "RESTART acknowledged. Harness will validate, commit, restart.", isRestart: true };
-        }
-        const r = await executeBash(input.command, input.timeout || 120, ROOT);
-        log(iter, `  -> exit=${r.exitCode} (${r.output.length} chars)`);
-        return { result: r.output, isRestart: false };
-      }
-      case "read_file": {
-        const input = toolUse.input as { path: string; start_line?: number; end_line?: number };
-        log(iter, `read_file: ${input.path}`);
-        const r = executeReadFile(input.path, input.start_line, input.end_line, ROOT);
-        log(iter, `  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
-        return { result: r.content, isRestart: false };
-      }
-      case "write_file": {
-        const input = toolUse.input as {
-          path: string; content?: string; mode?: "write" | "append" | "patch";
-          old_string?: string; new_string?: string;
-        };
-        const mode = input.mode || "write";
-        log(iter, `write_file: ${input.path} (${mode})`);
-        const r = executeWriteFile(input.path, input.content || "", mode, ROOT, input.old_string, input.new_string);
-        log(iter, `  -> ${r.success ? "ok" : "err"}: ${r.message}`);
-        return { result: r.message, isRestart: false };
-      }
-      case "grep": {
-        const input = toolUse.input as {
-          pattern: string; path?: string; glob?: string; type?: string;
-          output_mode?: "content" | "files" | "count"; context?: number;
-          case_insensitive?: boolean; max_results?: number; multiline?: boolean;
-        };
-        log(iter, `grep: "${input.pattern}"${input.path ? ` in ${input.path}` : ""}`);
-        const r = executeGrep(
-          input.pattern, input.path, input.glob, input.type,
-          input.output_mode, input.context, input.case_insensitive,
-          input.max_results, input.multiline, ROOT
-        );
-        log(iter, `  -> ${r.matchCount} matches`);
-        return { result: r.content, isRestart: false };
-      }
-      case "web_fetch": {
-        const input = toolUse.input as { url: string; extract_text?: boolean; headers?: Record<string, string> };
-        log(iter, `web_fetch: ${input.url}`);
-        const r = await executeWebFetch(input.url, input.extract_text, input.headers);
-        log(iter, `  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
-        return { result: r.content, isRestart: false };
-      }
-      case "think": {
-        const input = toolUse.input as { thought: string };
-        log(iter, `think: ${input.thought.slice(0, 120)}...`);
-        return { result: `Thought recorded (${input.thought.length} chars). Continue.`, isRestart: false };
-      }
-      case "list_files": {
-        const input = toolUse.input as { path?: string; depth?: number; exclude?: string[] };
-        log(iter, `list_files: ${input.path || "."} (depth=${input.depth || 3})`);
-        const r = executeListFiles(input.path, input.depth, input.exclude, ROOT);
-        log(iter, `  -> ${r.success ? "ok" : "err"} (${r.dirCount} dirs, ${r.fileCount} files)`);
-        return { result: r.content, isRestart: false };
-      }
-      default:
-        return { result: `Unknown tool: ${toolUse.name}`, isRestart: false };
-    }
+    const { result, isRestart } = await tool.handler(toolUse.input, ctx);
+    return { result, isRestart: isRestart || false };
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err);
     log(iter, `TOOL ERROR (${toolUse.name}): ${errMsg}`);
@@ -226,7 +196,7 @@ async function runIteration(state: IterationState): Promise<void> {
 
   console.log(`\n${"=".repeat(60)}`);
   console.log(`  AutoAgent — Iteration ${iter}`);
-  console.log(`  Tools: ${allTools.map(t => t.name).join(", ")}`);
+  console.log(`  Tools: ${toolRegistry.getNames().join(", ")}`);
   console.log(`${"=".repeat(60)}\n`);
 
   log(iter, `Starting. Model=${model} MaxTokens=${maxTokens}`);
@@ -254,7 +224,7 @@ async function runIteration(state: IterationState): Promise<void> {
         text: buildSystemPrompt(state),
         cache_control: { type: "ephemeral" as const },
       }],
-      tools: allTools,
+      tools: toolRegistry.getDefinitions(),
       messages,
     });
 
@@ -308,6 +278,7 @@ async function runIteration(state: IterationState): Promise<void> {
         continue;
       }
 
+      const codeQuality = await captureCodeQuality();
       recordMetrics({
         iteration: iter, startTime: startTime.toISOString(), endTime: new Date().toISOString(),
         turns, toolCalls: toolCounts, success: true,
@@ -315,6 +286,7 @@ async function runIteration(state: IterationState): Promise<void> {
         inputTokens: totalIn, outputTokens: totalOut,
         cacheCreationTokens: totalCacheCreate || undefined,
         cacheReadTokens: totalCacheRead || undefined,
+        codeQuality,
       });
 
       const sha = await commitIteration(iter);
@@ -359,6 +331,7 @@ async function runIteration(state: IterationState): Promise<void> {
 
   if (turns >= MAX_TURNS) log(iter, "Hit max turns — forcing commit");
 
+  const codeQuality2 = await captureCodeQuality();
   recordMetrics({
     iteration: iter, startTime: startTime.toISOString(), endTime: new Date().toISOString(),
     turns, toolCalls: toolCounts, success: true,
@@ -366,6 +339,7 @@ async function runIteration(state: IterationState): Promise<void> {
     inputTokens: totalIn, outputTokens: totalOut,
     cacheCreationTokens: totalCacheCreate || undefined,
     cacheReadTokens: totalCacheRead || undefined,
+    codeQuality: codeQuality2,
   });
 
   const sha = await commitIteration(iter);

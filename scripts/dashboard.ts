@@ -15,6 +15,15 @@ const ROOT = process.cwd();
 const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");
 const OUTPUT_FILE = path.join(ROOT, "dashboard.html");
 
+interface CodeQualitySnapshot {
+  totalLOC: number;
+  codeLOC: number;
+  fileCount: number;
+  functionCount: number;
+  complexity: number;
+  testCount: number;
+}
+
 interface IterationMetrics {
   iteration: number;
   startTime: string;
@@ -27,6 +36,7 @@ interface IterationMetrics {
   outputTokens: number;
   cacheCreationTokens?: number;
   cacheReadTokens?: number;
+  codeQuality?: CodeQualitySnapshot;
 }
 
 function formatNumber(n: number): string {
@@ -93,6 +103,34 @@ ${fileRows}
   } catch {
     return '<p style="color: #8b949e; margin-top: 2rem;">Code quality analysis unavailable.</p>';
   }
+}
+
+function generateCodeQualityTrend(metrics: IterationMetrics[]): string {
+  const withQuality = metrics.filter(m => m.codeQuality);
+  if (withQuality.length === 0) return "";
+
+  const rows = withQuality.map(m => {
+    const q = m.codeQuality!;
+    return `
+      <tr>
+        <td>${m.iteration}</td>
+        <td>${q.fileCount}</td>
+        <td>${q.totalLOC}</td>
+        <td>${q.codeLOC}</td>
+        <td>${q.functionCount}</td>
+        <td style="color: ${q.complexity > 200 ? '#f85149' : q.complexity > 100 ? '#d29922' : '#3fb950'}">${q.complexity}</td>
+        <td>${q.testCount}</td>
+      </tr>`;
+  }).join("\n");
+
+  return `
+<h2 style="color: #58a6ff; margin-top: 2rem;">📈 Code Quality Trend</h2>
+<table style="margin-top: 1rem;">
+<thead><tr><th>Iter</th><th>Files</th><th>Total LOC</th><th>Code LOC</th><th>Functions</th><th>Complexity</th><th>Tests</th></tr></thead>
+<tbody>
+${rows}
+</tbody>
+</table>`;
 }
 
 export function generateDashboard(metrics: IterationMetrics[]): string {
@@ -211,6 +249,8 @@ ${avgRow}
 </table>
 
 ${generateCodeQualitySection()}
+
+${generateCodeQualityTrend(metrics)}
 
 <footer>AutoAgent — Self-improving autonomous agent</footer>
 </body>

@@ -13,6 +13,7 @@ import { executeGrep } from "../src/tools/grep.js";
 import { executeThink } from "../src/tools/think.js";
 import { executeListFiles } from "../src/tools/list_files.js";
 import { executeWebFetch } from "../src/tools/web_fetch.js";
+import { createDefaultRegistry, ToolRegistry } from "../src/tool-registry.js";
 import { compactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "./code-analysis.js";
@@ -470,6 +471,62 @@ function testDashboard(): void {
   assert(emptyHtml.includes("0"), "dashboard: shows zero for empty");
 }
 
+// ─── Tool Registry Tests ────────────────────────────────────
+
+async function testToolRegistry(): Promise<void> {
+  console.log("\n🔌 Tool Registry");
+
+  const registry = createDefaultRegistry();
+
+  // Registry has all 7 tools
+  assert(registry.size() === 7, "registry: has 7 tools", `got ${registry.size()}`);
+
+  // All tool names present
+  const names = registry.getNames();
+  for (const name of ["bash", "read_file", "write_file", "grep", "web_fetch", "think", "list_files"]) {
+    assert(names.includes(name), `registry: has ${name}`);
+  }
+
+  // getDefinitions returns Anthropic.Tool objects
+  const defs = registry.getDefinitions();
+  assert(defs.length === 7, "registry: getDefinitions returns 7");
+  assert(defs.every(d => d.name && d.description && d.input_schema), "registry: definitions have required fields");
+
+  // has() works
+  assert(registry.has("bash"), "registry: has('bash') = true");
+  assert(!registry.has("nonexistent"), "registry: has('nonexistent') = false");
+
+  // get() returns undefined for unknown tools
+  assert(registry.get("nonexistent") === undefined, "registry: get unknown returns undefined");
+
+  // Handler execution works — think tool (no side effects)
+  const thinkTool = registry.get("think");
+  assert(!!thinkTool, "registry: get('think') returns tool");
+  if (thinkTool) {
+    const logs: string[] = [];
+    const ctx = { rootDir: ROOT, log: (msg: string) => logs.push(msg) };
+    const result = await thinkTool.handler({ thought: "test thought" }, ctx);
+    assert(result.result.includes("12"), "registry: think handler returns char count");
+    assert(!result.isRestart, "registry: think handler isRestart = false");
+    assert(logs.length > 0, "registry: handler calls ctx.log");
+  }
+
+  // Handler execution — bash with AUTOAGENT_RESTART returns isRestart
+  const bashTool = registry.get("bash");
+  if (bashTool) {
+    const logs: string[] = [];
+    const ctx = { rootDir: ROOT, log: (msg: string) => logs.push(msg) };
+    const result = await bashTool.handler({ command: 'echo "AUTOAGENT_RESTART"' }, ctx);
+    assert(result.isRestart === true, "registry: bash RESTART detection works");
+  }
+
+  // Empty registry
+  const empty = new ToolRegistry();
+  assert(empty.size() === 0, "registry: empty registry has size 0");
+  assert(empty.getNames().length === 0, "registry: empty getNames returns []");
+  assert(empty.getDefinitions().length === 0, "registry: empty getDefinitions returns []");
+}
+
 // ─── Main ───────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -493,6 +550,7 @@ async function main(): Promise<void> {
     testCodeAnalysis();
     testCompactMemory();
     testDashboard();
+    await testToolRegistry();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {

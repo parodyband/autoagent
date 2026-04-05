@@ -778,3 +778,199 @@ Good, all goals complete. Let me do the final verification and restart.
 [2026-04-05T05:56:25.993Z] iter=5 RESTART signal
 [2026-04-05T05:56:25.993Z] iter=5 Validating: npx tsc --noEmit ...
 [2026-04-05T05:56:26.544Z] iter=5 Compilation OK
+[2026-04-05T05:56:28.246Z] iter=5 Committed: 4003e874 (751431 in / 11817 out, cache: 0 created, 0 read)
+[2026-04-05T05:56:28.246Z] iter=5 Restarting as iteration 6...
+[2026-04-05T05:56:28.408Z] iter=6 Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T05:56:28.416Z] iter=6 Turn 1/50
+[2026-04-05T05:56:31.309Z] iter=6 Agent: 
+
+I'll start by understanding the current codebase structure, then execute the goals sequentially.
+[2026-04-05T05:56:31.309Z] iter=6 list_files: src (depth=3)
+[2026-04-05T05:56:31.322Z] iter=6   -> ok (1 dirs, 10 files)
+[2026-04-05T05:56:31.323Z] iter=6 read_file: goals.md
+[2026-04-05T05:56:31.323Z] iter=6   -> ok (984 chars)
+[2026-04-05T05:56:31.323Z] iter=6 Turn 2/50
+[2026-04-05T05:56:33.497Z] iter=6 read_file: src/agent.ts
+[2026-04-05T05:56:33.497Z] iter=6   -> ok (19845 chars)
+[2026-04-05T05:56:33.498Z] iter=6 Turn 3/50
+[2026-04-05T05:56:58.385Z] iter=6 think: Now I understand the codebase. Let me plan the tool registry refactor:
+
+1. **Create `src/tool-registry.ts`** — A registr...
+[2026-04-05T05:56:58.385Z] iter=6 Turn 4/50
+[2026-04-05T05:57:01.796Z] iter=6 Agent: Now let me look at the existing tools, dashboard, and metrics files to understand the full picture:
+[2026-04-05T05:57:01.796Z] iter=6 read_file: scripts/dashboard.ts
+[2026-04-05T05:57:01.797Z] iter=6   -> ok (9361 chars)
+[2026-04-05T05:57:01.797Z] iter=6 read_file: scripts/code-analysis.ts
+[2026-04-05T05:57:01.797Z] iter=6   -> ok (7351 chars)
+[2026-04-05T05:57:01.798Z] iter=6 read_file: scripts/self-test.ts
+[2026-04-05T05:57:01.798Z] iter=6   -> ok (21889 chars)
+[2026-04-05T05:57:01.799Z] iter=6 Turn 5/50
+[2026-04-05T05:57:10.505Z] iter=6 think: Now I have a clear picture. Let me plan the implementation:
+
+## Goal 1: Extract tool dispatch into a registry pattern
+
+I...
+[2026-04-05T05:57:10.506Z] iter=6 Turn 6/50
+[2026-04-05T05:57:17.224Z] iter=6 $ cat .autoagent-metrics.json | head -100
+[2026-04-05T05:57:17.243Z] iter=6   -> exit=0 (2117 chars)
+[2026-04-05T05:57:17.244Z] iter=6 Turn 7/50
+[2026-04-05T05:57:21.099Z] iter=6 Agent: Now let me check the tool module interfaces more carefully to design the registry:
+[2026-04-05T05:57:21.100Z] iter=6 $ head -30 src/tools/bash.ts
+[2026-04-05T05:57:21.113Z] iter=6   -> exit=0 (1107 chars)
+[2026-04-05T05:57:21.113Z] iter=6 $ head -15 src/tools/read_file.ts
+[2026-04-05T05:57:21.121Z] iter=6   -> exit=0 (577 chars)
+[2026-04-05T05:57:21.121Z] iter=6 $ head -15 src/tools/think.ts
+[2026-04-05T05:57:21.128Z] iter=6   -> exit=0 (563 chars)
+[2026-04-05T05:57:21.128Z] iter=6 Turn 8/50
+[2026-04-05T05:57:43.331Z] iter=6 Agent: Now I have a complete understanding. Let me build the tool registry:
+[2026-04-05T05:57:43.331Z] iter=6 write_file: src/tool-registry.ts (write)
+[2026-04-05T05:57:43.332Z] iter=6   -> ok: Created src/tool-registry.ts (6007 chars)
+[2026-04-05T05:57:43.332Z] iter=6 Turn 9/50
+[2026-04-05T05:57:47.843Z] iter=6 Agent: Now let me refactor `agent.ts` to use the registry:
+[2026-04-05T05:57:47.843Z] iter=6 write_file: src/agent.ts (patch)
+[2026-04-05T05:57:47.844Z] iter=6   -> ok: Patched src/agent.ts: -8 +3 lines
+[2026-04-05T05:57:47.844Z] iter=6 Turn 10/50
+[2026-04-05T05:58:05.009Z] iter=6 Agent: Now replace the `allTools` and `handleToolCall` with registry-based versions:
+[2026-04-05T05:58:05.010Z] iter=6 write_file: src/agent.ts (patch)
+[2026-04-05T05:58:05.011Z] iter=6   -> ok: Patched src/agent.ts: -93 +30 lines
+[2026-04-05T05:58:05.011Z] iter=6 Turn 11/50
+[2026-04-05T05:58:07.659Z] iter=6 Agent: Now update the references to `allTools` in agent.ts:
+[2026-04-05T05:58:07.659Z] iter=6 grep: "allTools" in src/agent.ts
+[2026-04-05T05:58:07.686Z] iter=6   -> 7 matches
+[2026-04-05T05:58:07.686Z] iter=6 Turn 12/50
+[2026-04-05T05:58:12.143Z] iter=6 write_file: src/agent.ts (patch)
+[2026-04-05T05:58:12.144Z] iter=6   -> ok: Patched src/agent.ts: -2 +2 lines
+[2026-04-05T05:58:12.144Z] iter=6 Turn 13/50
+[2026-04-05T05:58:15.062Z] iter=6 write_file: src/agent.ts (patch)
+[2026-04-05T05:58:15.063Z] iter=6   -> ok: Patched src/agent.ts: -1 +1 lines
+[2026-04-05T05:58:15.063Z] iter=6 Turn 14/50
+[2026-04-05T05:58:20.609Z] iter=6 Agent: Now let me check if there are any remaining references to the old imports that are no longer used:
+[2026-04-05T05:58:20.610Z] iter=6 grep: "allTools|executeReadFile|executeWriteFile|executeGrep|executeWebFetch|executeThink|executeListFiles|readFileToolDefinition|writeFileToolDefinition|grepToolDefinition|webFetchToolDefinition|thinkToolDefinition|listFilesToolDefinition|bashToolDefinition" in src/agent.ts
+[2026-04-05T05:58:20.648Z] iter=6   -> 0 matches
+[2026-04-05T05:58:20.649Z] iter=6 Turn 15/50
+[2026-04-05T05:58:24.397Z] iter=6 Agent: Good — all old references are cleaned up. Let me also verify the `executeBash` import is still there (used in `validateBeforeCommit` and `resuscitate`):
+[2026-04-05T05:58:24.397Z] iter=6 grep: "executeBash" in src/agent.ts
+[2026-04-05T05:58:24.412Z] iter=6   -> 8 matches
+[2026-04-05T05:58:24.412Z] iter=6 Turn 16/50
+[2026-04-05T05:58:27.711Z] iter=6 Agent: 
+
+Good — `executeBash` is still needed directly in agent.ts for validation/resuscitation. Now let me compile to check for errors:
+[2026-04-05T05:58:27.712Z] iter=6 $ npx tsc --noEmit 2>&1
+[2026-04-05T05:58:28.295Z] iter=6   -> exit=0 (11 chars)
+[2026-04-05T05:58:28.295Z] iter=6 Turn 17/50
+[2026-04-05T05:58:31.155Z] iter=6 Agent: Compiles clean. Now let me run the self-tests to make sure behavior is identical:
+[2026-04-05T05:58:31.155Z] iter=6 $ npx tsx scripts/self-test.ts 2>&1
+[2026-04-05T05:58:32.156Z] iter=6   -> exit=0 (4071 chars)
+[2026-04-05T05:58:32.157Z] iter=6 Turn 18/50
+[2026-04-05T05:58:35.865Z] iter=6 Agent: All 102 tests pass. Now let me add tests for the new tool registry module and then work on Goal 2 (code metrics per iteration):
+[2026-04-05T05:58:35.865Z] iter=6 read_file: scripts/self-test.ts
+[2026-04-05T05:58:35.866Z] iter=6   -> ok (591 chars)
+[2026-04-05T05:58:35.866Z] iter=6 Turn 19/50
+[2026-04-05T05:58:39.549Z] iter=6 write_file: scripts/self-test.ts (patch)
+[2026-04-05T05:58:39.551Z] iter=6   -> ok: Patched scripts/self-test.ts: -2 +3 lines
+[2026-04-05T05:58:39.551Z] iter=6 Turn 20/50
+[2026-04-05T05:58:42.930Z] iter=6 Agent: Now add tool registry tests. Let me find the right place to insert them — after the dashboard tests and before the main function:
+[2026-04-05T05:58:42.931Z] iter=6 grep: "^// ─── Main"" in scripts/self-test.ts
+[2026-04-05T05:58:42.949Z] iter=6   -> 0 matches
+[2026-04-05T05:58:42.949Z] iter=6 Turn 21/50
+[2026-04-05T05:58:45.592Z] iter=6 grep: "// ─── Main" in scripts/self-test.ts
+[2026-04-05T05:58:45.609Z] iter=6   -> 1 matches
+[2026-04-05T05:58:45.610Z] iter=6 Turn 22/50
+[2026-04-05T05:58:57.820Z] iter=6 write_file: scripts/self-test.ts (patch)
+[2026-04-05T05:58:57.822Z] iter=6   -> ok: Patched scripts/self-test.ts: -1 +57 lines
+[2026-04-05T05:58:57.823Z] iter=6 Turn 23/50
+[2026-04-05T05:59:02.161Z] iter=6 Agent: Now add the test call in the main function:
+[2026-04-05T05:59:02.161Z] iter=6 write_file: scripts/self-test.ts (patch)
+[2026-04-05T05:59:02.162Z] iter=6   -> ok: Patched scripts/self-test.ts: -3 +4 lines
+[2026-04-05T05:59:02.163Z] iter=6 Turn 24/50
+[2026-04-05T05:59:04.824Z] iter=6 $ npx tsx scripts/self-test.ts 2>&1 | tail -30
+[2026-04-05T05:59:05.985Z] iter=6   -> exit=0 (943 chars)
+[2026-04-05T05:59:05.985Z] iter=6 Turn 25/50
+[2026-04-05T05:59:13.242Z] iter=6 Agent: 123 tests all passing. Now for **Goal 2**: Add per-iteration code metrics. I need to:
+
+1. Extend `IterationMetrics` in agent.ts to include code quality snapshot
+2. Run code analysis before recording metrics
+3. Update dashboard to show a code quality trend
+[2026-04-05T05:59:13.242Z] iter=6 write_file: src/agent.ts (patch)
+[2026-04-05T05:59:13.243Z] iter=6   -> ok: Patched src/agent.ts: -13 +23 lines
+[2026-04-05T05:59:13.243Z] iter=6 Turn 26/50
+[2026-04-05T05:59:17.618Z] iter=6 Agent: 
+
+Now I need to add a function to capture code quality snapshots and wire it into the metrics recording. Let me add the import and helper function:
+[2026-04-05T05:59:17.619Z] iter=6 write_file: src/agent.ts (patch)
+[2026-04-05T05:59:17.619Z] iter=6   -> ok: Patched src/agent.ts: -2 +3 lines
+[2026-04-05T05:59:17.620Z] iter=6 Turn 27/50
+[2026-04-05T05:59:20.080Z] iter=6 $ npx tsc --noEmit 2>&1
+[2026-04-05T05:59:20.723Z] iter=6   -> exit=2 (216 chars)
+[2026-04-05T05:59:20.723Z] iter=6 Turn 28/50
+[2026-04-05T05:59:29.675Z] iter=6 think: Scripts aren't under tsconfig's rootDir. I can't import from scripts/ in src/. I need to either:
+1. Move code-analysis.t...
+[2026-04-05T05:59:29.676Z] iter=6 Turn 29/50
+[2026-04-05T05:59:33.475Z] iter=6 Agent: I'll revert the import and instead capture the snapshot directly in agent.ts without importing from scripts:
+[2026-04-05T05:59:33.475Z] iter=6 write_file: src/agent.ts (patch)
+[2026-04-05T05:59:33.476Z] iter=6   -> ok: Patched src/agent.ts: -3 +2 lines
+[2026-04-05T05:59:33.476Z] iter=6 Turn 30/50
+[2026-04-05T05:59:41.330Z] iter=6 Agent: Now add a `captureCodeQuality` function that runs the analysis script via subprocess and parses the result:
+[2026-04-05T05:59:41.330Z] iter=6 write_file: src/agent.ts (patch)
+[2026-04-05T05:59:41.331Z] iter=6   -> ok: Patched src/agent.ts: -1 +29 lines
+[2026-04-05T05:59:41.331Z] iter=6 Turn 31/50
+[2026-04-05T05:59:45.293Z] iter=6 Agent: Now wire it into the two places where `recordMetrics` is called — before each call, capture the snapshot:
+[2026-04-05T05:59:45.294Z] iter=6 grep: "recordMetrics\(\{" in src/agent.ts
+[2026-04-05T05:59:45.317Z] iter=6   -> 0 matches
+[2026-04-05T05:59:45.318Z] iter=6 Turn 32/50
+[2026-04-05T05:59:47.853Z] iter=6 grep: "recordMetrics" in src/agent.ts
+[2026-04-05T05:59:47.880Z] iter=6   -> 11 matches
+[2026-04-05T05:59:47.880Z] iter=6 Turn 33/50
+[2026-04-05T05:59:50.925Z] iter=6 read_file: src/agent.ts
+[2026-04-05T05:59:50.925Z] iter=6   -> ok (741 chars)
+[2026-04-05T05:59:50.926Z] iter=6 Turn 34/50
+[2026-04-05T05:59:55.574Z] iter=6 write_file: src/agent.ts (patch)
+[2026-04-05T05:59:55.575Z] iter=6   -> ok: Patched src/agent.ts: -10 +12 lines
+[2026-04-05T05:59:55.576Z] iter=6 Turn 35/50
+[2026-04-05T05:59:58.382Z] iter=6 Agent: Now do the same for the second recordMetrics call:
+[2026-04-05T05:59:58.382Z] iter=6 read_file: src/agent.ts
+[2026-04-05T05:59:58.383Z] iter=6   -> ok (585 chars)
+[2026-04-05T05:59:58.383Z] iter=6 Turn 36/50
+[2026-04-05T06:00:03.623Z] iter=6 write_file: src/agent.ts (patch)
+[2026-04-05T06:00:03.625Z] iter=6   -> ok: Patched src/agent.ts: -11 +13 lines
+[2026-04-05T06:00:03.626Z] iter=6 Turn 37/50
+[2026-04-05T06:00:09.050Z] iter=6 Agent: Now update the dashboard to show code quality trend. Let me add a trend section:
+[2026-04-05T06:00:09.051Z] iter=6 write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:00:09.052Z] iter=6   -> ok: Patched scripts/dashboard.ts: -13 +23 lines
+[2026-04-05T06:00:09.052Z] iter=6 Turn 38/50
+[2026-04-05T06:00:16.218Z] iter=6 Agent: Now add a code quality trend section generator:
+[2026-04-05T06:00:16.219Z] iter=6 write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:00:16.219Z] iter=6   -> ok: Patched scripts/dashboard.ts: -1 +29 lines
+[2026-04-05T06:00:16.219Z] iter=6 Turn 39/50
+[2026-04-05T06:00:21.134Z] iter=6 Agent: Now insert the trend section into the HTML output:
+[2026-04-05T06:00:21.134Z] iter=6 write_file: scripts/dashboard.ts (patch)
+[2026-04-05T06:00:21.135Z] iter=6   -> ok: Patched scripts/dashboard.ts: -3 +5 lines
+[2026-04-05T06:00:21.135Z] iter=6 Turn 40/50
+[2026-04-05T06:00:24.104Z] iter=6 Agent: Now compile and test everything:
+[2026-04-05T06:00:24.104Z] iter=6 $ npx tsc --noEmit 2>&1 && npx tsx scripts/self-test.ts 2>&1 | tail -15
+[2026-04-05T06:00:26.245Z] iter=6   -> exit=0 (523 chars)
+[2026-04-05T06:00:26.245Z] iter=6 Turn 41/50
+[2026-04-05T06:00:56.977Z] iter=6 Agent: 
+
+All 123 tests pass, compilation clean. Now update memory and goals:
+[2026-04-05T06:00:56.977Z] iter=6 write_file: memory.md (patch)
+[2026-04-05T06:00:56.978Z] iter=6   -> ok: Patched memory.md: -4 +27 lines
+[2026-04-05T06:00:56.978Z] iter=6 Turn 42/50
+[2026-04-05T06:01:05.636Z] iter=6 write_file: goals.md (write)
+[2026-04-05T06:01:05.637Z] iter=6   -> ok: Updated goals.md (964 chars, 0 lines delta)
+[2026-04-05T06:01:05.637Z] iter=6 Turn 43/50
+[2026-04-05T06:01:11.622Z] iter=6 Agent: Update architecture in memory:
+[2026-04-05T06:01:11.622Z] iter=6 write_file: memory.md (patch)
+[2026-04-05T06:01:11.624Z] iter=6   -> ok: Patched memory.md: -1 +2 lines
+[2026-04-05T06:01:11.624Z] iter=6 Turn 44/50
+[2026-04-05T06:01:14.588Z] iter=6 Agent: Final verification:
+[2026-04-05T06:01:14.588Z] iter=6 $ npx tsc --noEmit 2>&1 && echo "TSC OK"
+[2026-04-05T06:01:15.221Z] iter=6   -> exit=0 (7 chars)
+[2026-04-05T06:01:15.221Z] iter=6 Turn 45/50
+[2026-04-05T06:01:18.070Z] iter=6 $ git add -A && git status
+[2026-04-05T06:01:18.113Z] iter=6   -> exit=0 (328 chars)
+[2026-04-05T06:01:18.113Z] iter=6 Turn 46/50
+[2026-04-05T06:01:21.812Z] iter=6 $ echo "AUTOAGENT_RESTART"
+[2026-04-05T06:01:21.812Z] iter=6 RESTART signal
+[2026-04-05T06:01:21.812Z] iter=6 Validating: npx tsc --noEmit ...
+[2026-04-05T06:01:22.445Z] iter=6 Compilation OK

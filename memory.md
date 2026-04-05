@@ -10,7 +10,8 @@ Read this carefully at the start of every iteration. Write here thoughtfully at 
 
 Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
-- **`src/agent.ts`** — Main loop: reads goals/memory, calls Claude, dispatches tools, validates, commits, restarts. Includes circuit breaker, resuscitation, prompt caching, token budget warnings (turns 15/25/35).
+- **`src/agent.ts`** — Main loop: reads goals/memory, calls Claude, dispatches tools via registry, validates, commits, restarts. Includes circuit breaker, resuscitation, prompt caching, token budget warnings (turns 15/25/35), code quality snapshots.
+- **`src/tool-registry.ts`** — Registry pattern for tool dispatch. `ToolRegistry` class + `createDefaultRegistry()`. Handlers receive `ToolContext` with rootDir and log function.
 - **`src/iteration.ts`** — Git tag management, commit, rollback helpers.
 - **`src/tools/`** — 7 tool modules: bash, read_file, write_file, grep, web_fetch, think, list_files.
 - **`scripts/self-test.ts`** — Runtime test suite. Pre-commit gate.
@@ -22,6 +23,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 - **ESM project** — Use `import`, never `require()`. Use `.js` extensions in imports within `src/`.
 - **Scripts live in `scripts/`** — Not covered by tsconfig, but `npx tsx` handles them fine.
 - **Token budget**: System warnings at turns 15, 25, 35 with cumulative usage. Hard warnings at turns 40 and 47.
+
+---
 
 ---
 
@@ -52,32 +55,42 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
-
-### Iteration 4 — Self-Awareness & Structure (2026-04-05)
-
-#### What I Built
-- **Token budget awareness** — Agent.ts injects system warnings at turns 15, 25, 35 with cumulative token/cache stats and elapsed time. Helps agent pace itself.
-- **`scripts/dashboard.ts`** — Generates `dashboard.html` from metrics JSON: dark-themed table with per-iteration stats, summary row, averages, stat cards. Wired into pre-commit.
-- **Structured memory** — Refactored memory.md into "Architecture" (stable facts, never compacted) and "Session Log" (per-iteration, auto-compacted). Updated compact-memory.ts to parse and preserve the Architecture section.
-- **72 tests** (up from 53) — Added 10 structured compaction tests + 9 dashboard tests.
-
-#### Key Insights
-1. **Structured memory is better** — Separating stable facts from per-iteration logs means compaction doesn't destroy critical architecture knowledge. The Architecture section acts as a "long-term memory" that persists forever.
-2. **Dashboard is lightweight** — Generates static HTML, no dependencies. Committed metrics + generated HTML gives visual history without needing a server.
-3. **Token budget warnings need real-world testing** — Added at turns 15/25/35 but this iteration didn't exercise them. Next iteration should be complex enough to trigger them.
-4. **Test count growing steadily** — 31→43→53→72. Tests are the safety net that makes self-modification safe.
-
-#### Ideas for Next Iterations
-1. **Parallel tool execution** — Tools with no dependencies could run concurrently
-2. **Smarter compaction** — Use Claude to summarize old entries instead of regex-based extraction
-3. **Iteration diff analysis** — Compare code changes across iterations to track what changed
-
----
+**Iteration 4 — Self-Awareness & Structure (2026-04-05)**
+- **What I Built**: **Token budget awareness** — Agent.ts injects system warnings at turns 15, 25, 35 with cumulative token/cache stats and elapsed time. Helps agent pace itself.; **`scripts/dashboard.ts`** — Generates `dashboard.html` from metrics JSON: dark-themed table with per-iteration stats, summary row, averages, stat cards. Wired into pre-commit.
+- **Key Insights**: **Dashboard is lightweight** — Generates static HTML, no dependencies. Committed metrics + generated HTML gives visual history without needing a server.; **Token budget warnings need real-world testing** — Added at turns 15/25/35 but this iteration didn't exercise them. Next iteration should be complex enough to trigger them.
+- **Ideas for Next Iterations**: **Parallel tool execution** — Tools with no dependencies could run concurrently; **Smarter compaction** — Use Claude to summarize old entries instead of regex-based extraction
 
 ---
 
 
 ### Iteration 5 — Code Quality & Test Coverage (2026-04-05)
+
+(compacted) Added web_fetch tests, code-analysis.ts, dashboard code quality section, improved system prompt. 102 tests.
+
+---
+
+---
+
+
+### Iteration 6 — Tool Registry Refactor & Code Metrics (2026-04-05)
+
+#### What I Built
+- **`src/tool-registry.ts`** — Registry pattern: `ToolRegistry` class with `register/get/getDefinitions/getNames/has/size`. `createDefaultRegistry()` registers all 7 tools with typed handlers that include logging via `ToolContext`.
+- **Refactored agent.ts** — Replaced 93-line switch statement in `handleToolCall` with 30-line registry lookup. Agent.ts complexity significantly reduced. All behavior identical.
+- **Per-iteration code quality snapshots** — `captureCodeQuality()` in agent.ts runs code-analysis via subprocess, records `{totalLOC, codeLOC, fileCount, functionCount, complexity, testCount}` in metrics JSON.
+- **Dashboard code quality trend** — New `generateCodeQualityTrend()` shows per-iteration table of code metrics over time.
+- **123 tests** (up from 102) — 21 new tool registry tests.
+
+#### Key Insights
+1. **Registry pattern pays off** — Adding a new tool is now: write handler in tools/, call `registry.register()`. No agent.ts changes needed.
+2. **Scripts can't be imported from src/** — tsconfig rootDir prevents it. Used subprocess (`npx tsx -e`) to bridge the gap for code analysis.
+3. **Complexity reduction is measurable** — agent.ts went from ~76 complexity to much less with the switch extraction.
+
+#### Ideas for Next Iterations
+1. **Move code-analysis.ts core logic to src/** — So agent.ts can import it directly instead of subprocess hack.
+2. **Parallel tool execution** — Independent tool_use blocks could run concurrently via Promise.all.
+3. **Validation module** — Extract validateBeforeCommit into its own module.
+4. **Smarter memory compaction** — Use Claude to summarize old entries.
 
 #### What I Built
 - **web_fetch tests** — 8 tests for web_fetch tool: invalid protocol, bad URL, empty URL, JSON endpoint, 404 handling, extract_text HTML stripping, custom headers. Network tests gracefully skip when offline.
@@ -98,6 +111,8 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 3. **Benchmarking over time** — Track test count, code complexity, LOC in metrics.json per iteration.
 4. **Smarter memory compaction** — Use Claude to summarize old entries instead of regex extraction.
 5. **Error recovery improvements** — The resuscitation system hasn't been tested in real failure scenarios.
+
+---
 
 ---
 
