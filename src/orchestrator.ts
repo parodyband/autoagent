@@ -374,6 +374,7 @@ async function runAgentLoop(
   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
   onCompact?: (inputTokens: number, messages: Anthropic.MessageParam[]) => Promise<void>,
   onContextBudget?: OrchestratorOptions["onContextBudget"],
+  onFileWatch?: (event: "read" | "write", filePath: string) => void,
 ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number }> {
   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
     totalIn += tIn;
@@ -449,13 +450,16 @@ async function runAgentLoop(
     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
       const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
       const enhanced = enhanceToolError(tu.name, tu.input as Record<string, unknown>, rawResult, workDir);
+      if (tu.name === "read_file" && onFileWatch) {
+        onFileWatch("read", (tu.input as { path?: string }).path ?? "");
+      }
       return compressToolOutput(tu.name, enhanced);
     });
     results.push(...parallelResults);
 
     // Handle write_file tools — batch if 2+ and onDiffPreview is set
     if (writeTools.length >= 2 && onDiffPreview) {
-      const batchResults = await batchWriteFiles(writeTools, workDir, execTool, onDiffPreview);
+      const batchResults = await batchWriteFiles(writeTools, workDir, execTool, onDiffPreview, onFileWatch);
       results.push(...batchResults);
     } else {
       // Single write_file (or no preview callback) — existing per-file flow
@@ -478,6 +482,9 @@ async function runAgentLoop(
           }
         }
         const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+        if (onFileWatch) {
+          onFileWatch("write", (tu.input as { path?: string }).path ?? "");
+        }
         const result = compressToolOutput(tu.name, rawResult);
         results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
       }
@@ -501,6 +508,7 @@ async function batchWriteFiles(
   workDir: string,
   execTool: (name: string, input: Record<string, unknown>) => Promise<string>,
   onDiffPreview: (diff: string, label: string) => Promise<boolean>,
+  onFileWatch?: (event: "read" | "write", filePath: string) => void,
 ): Promise<Anthropic.ToolResultBlockParam[]> {
   type FileEdit = {
     id: string;
@@ -551,6 +559,7 @@ async function batchWriteFiles(
     snapshots.push({ fullPath: edit.fullPath, oldContent: edit.oldContent, existed });
     try {
       const rawResult = await execTool("write_file", edit.input);
+      onFileWatch?.("write", edit.relPath);
       const result = compressToolOutput("write_file", rawResult);
       results.push({ type: "tool_result", tool_use_id: edit.id, content: result });
     } catch (err) {
@@ -1027,6 +1036,14 @@ export class Orchestrator {
       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
     };
 
+    const fileWatchCallback = (event: "read" | "write", filePath: string) => {
+      if (event === "read") this.fileWatcher.watch(filePath);
+      if (event === "write") {
+        this.fileWatcher.watch(filePath);
+        this.fileWatcher.mute(filePath);
+      }
+    };
+
     const { text, tokensIn, tokensOut, lastInputTokens } = await runAgentLoop(
       this.client,
       model,
@@ -1040,6 +1057,7 @@ export class Orchestrator {
       this.opts.onDiffPreview,
       onCompact,
       this.opts.onContextBudget,
+      fileWatchCallback,
     );
 
     // Persist assistant reply (last assistant message in history)
@@ -1093,6 +1111,9 @@ export class Orchestrator {
             this.opts.onStatus,
             this.opts.onText,
             this.opts.onDiffPreview,
+            undefined,
+            undefined,
+            fileWatchCallback,
           );
         }
       }
@@ -1131,6 +1152,9 @@ export class Orchestrator {
           this.opts.onStatus,
           this.opts.onText,
           this.opts.onDiffPreview,
+          undefined,
+          undefined,
+          fileWatchCallback,
         );
 
         this.sessionTokensIn += fixResult.tokensIn;
@@ -1170,6 +1194,7 @@ export class Orchestrator {
               this.client, model, this.systemPrompt, this.apiMessages,
               this.registry, this.opts.workDir, this.opts.onToolCall,
               this.opts.onStatus, this.opts.onText, this.opts.onDiffPreview,
+              undefined, undefined, fileWatchCallback,
             );
             this.sessionTokensIn += fixResult.tokensIn;
             this.sessionTokensOut += fixResult.tokensOut;
