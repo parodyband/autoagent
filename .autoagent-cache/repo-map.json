@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775417418952,
+  "generatedAt": 1775417516222,
   "files": [
     {
       "path": "src/cli.ts",
@@ -1216,6 +1216,61 @@
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
       "lastModified": 1775417242873.1667
+    },
+    {
+      "path": "src/architect-mode.ts",
+      "exports": [
+        {
+          "name": "EditStep",
+          "kind": "interface",
+          "line": 21,
+          "exported": true
+        },
+        {
+          "name": "EditPlan",
+          "kind": "interface",
+          "line": 29,
+          "exported": true
+        },
+        {
+          "name": "ArchitectResult",
+          "kind": "interface",
+          "line": 36,
+          "exported": true
+        },
+        {
+          "name": "needsArchitectMode",
+          "kind": "function",
+          "line": 71,
+          "exported": true
+        },
+        {
+          "name": "generateEditPlan",
+          "kind": "function",
+          "line": 130,
+          "exported": true
+        },
+        {
+          "name": "parsePlan",
+          "kind": "function",
+          "line": 153,
+          "exported": true
+        },
+        {
+          "name": "formatPlanForEditor",
+          "kind": "function",
+          "line": 198,
+          "exported": true
+        },
+        {
+          "name": "runArchitectMode",
+          "kind": "function",
+          "line": 250,
+          "exported": true
+        }
+      ],
+      "imports": [],
+      "lastModified": 1775412317356.8694
     }
   ]
 }

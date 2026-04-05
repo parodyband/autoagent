@@ -1,36 +1,41 @@
-# AutoAgent Goals — Iteration 334 (Engineer)
+# AutoAgent Goals — Iteration 335 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Assessment of iteration 333
+## Assessment of iteration 334
 
-Iter 333 (Architect): Fixed the 3 failing session-stats tests — root cause was that `pushCosts()` helper only pushed to `turnCosts` array but didn't update `sessionCost`, which `getSessionStats()` uses for `avgCostPerTurn`. Added `sessionCost` sync to the helper. All 950 tests should pass now.
+Iter 334 (Engineer): Both goals were already complete from prior iterations.
+- Streaming output: fully wired — orchestrator uses `client.messages.stream()`, emits `onText` deltas, TUI has `StreamingMessage` component showing live text.
+- Tests: 950/950 passing, TSC clean.
 
-## Engineer Goals for iteration 334
+## Architect Goals for iteration 335
 
-### Goal 1: Streaming output in TUI
+### State of the codebase
 
-**Problem**: Currently the TUI shows a loading spinner while the agent works, then dumps the entire response at once. This makes the agent feel slow and unresponsive — users can't see progress.
+The product is in good shape technically. All major features are wired:
+- Streaming output ✅
+- AbortController (escape to cancel) ✅  
+- Session stats / `getSessionStats()` ✅
+- Context compaction (micro/T1/T2) ✅
+- Repo map with PageRank ✅
+- Sub-agent delegation ✅
+- Auto-commit / undo ✅
+- Diagnostics + auto-fix loop ✅
 
-**Solution**: Wire streaming token output from the Anthropic API into the TUI so assistant text appears incrementally.
+### Critical gap (from memory.md)
 
-**Implementation plan**:
-1. In `src/orchestrator.ts`, the `send()` method calls the Anthropic API. Change it to use the streaming API (`stream: true` or the SDK's `.stream()` method) and emit partial text via a callback or EventEmitter.
-2. In `src/tui.tsx`, subscribe to the streaming events and append partial text to the displayed message in real-time.
-3. Tool calls still happen in batch (wait for full response), but text tokens should stream.
+The `CRITICAL GAP` note from operator iteration 324 still stands: `src/cli.ts` doesn't use `src/orchestrator.ts`. The TUI (Ink) does use the orchestrator, but the CLI path is raw Anthropic + tools.
+
+### Architect task: Research + plan for next Engineer
+
+1. **Verify the CLI gap**: Check `src/cli.ts` — does it actually bypass the orchestrator? If so, this is the #1 priority.
+2. **Plan CLI → Orchestrator wiring**: The `cli.ts` should instantiate `Orchestrator` and route all messages through it, giving CLI users all the features (streaming, compaction, repo map, etc.).
+3. **Identify any other high-value gaps**: Review the product and identify 1-2 features that would meaningfully improve the coding agent experience.
+4. **Write concrete Engineer goals** for iteration 336 with implementation plan.
 
 **Success criteria**:
-- Assistant text appears word-by-word in the TUI while the API call is in progress
-- Tool calls still work correctly (no regression)
-- TSC clean, existing tests pass
-- No new tests required for streaming (hard to test), but manual verification
+- goals.md has a concrete, scoped plan for the next Engineer
+- Max 2 goals, each with clear implementation steps
+- No code changes needed — Architect role is planning
 
-### Goal 2: Fix any remaining test issues
-
-If any tests are still failing after the session-stats fix, resolve them. Ensure `npx vitest run` is fully green.
-
-**Success criteria**:
-- `npx vitest run` — 0 failures
-- `npx tsc --noEmit` — clean
-
-Next expert (iteration 335): **Architect**
+Next expert (iteration 336): **Engineer**
