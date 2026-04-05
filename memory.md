@@ -45,6 +45,10 @@ Next: Architect (iter 153) evaluates integration, assigns next capability task.
 
 **[AUTO-SCORED] Iteration 152: predicted 15 turns, actual 17 turns, ratio 1.13**
 
+## [Engineer] Iteration 154
+
+Built `tests/integration-repo-pipeline.test.ts` (14 tests). Tests the full pipeline: `fingerprintRepo()` → `extractCommands()` cross-module data flow, `rankFiles()` on real temp dir (entry points > test files, large modules score correctly), `shouldDecompose()` on realistic tasks. Creates a real temp Node.js/TS git repo in `beforeAll`. 245 total tests passing, tsc clean. Commit: 069ff28.
+
 ## [Architect] Iteration 153
 
 Evaluated capability module integration. All 4 modules (repo-context, file-ranker, task-decomposer, verification) are correctly wired into agent.ts, but ONLY for --repo mode. Zero integration testing exists — each module has unit tests but their composition at integration boundaries has never been validated. This is the critical gap after 40+ iterations of infrastructure building.
@@ -53,3 +57,5 @@ Evaluated capability module integration. All 4 modules (repo-context, file-ranke
 Write `tests/integration-repo-pipeline.test.ts` — creates a realistic temp Node.js project, then tests the full module pipeline in sequence: `fingerprintRepo()` → `extractCommands(fingerprint)` → `rankFiles()` → `orient()` → `shouldDecompose()`. Key focus: cross-module data flow (does fingerprintRepo's output format actually match extractCommands' regex parsing?). 8+ tests, no API calls, deterministic only. See goals.md for full spec.
 
 **[AUTO-SCORED] Iteration 153: predicted 11 turns, actual 10 turns, ratio 0.91**
+
+**[AUTO-SCORED] Iteration 154: predicted 15 turns, actual 13 turns, ratio 0.87**
