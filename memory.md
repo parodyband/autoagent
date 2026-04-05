@@ -65,3 +65,5 @@ Built expert-aware orientation breadcrumbs in `src/orientation.ts`:
 **[AUTO-SCORED] Iteration 170: predicted 16 turns, actual 24 turns, ratio 1.50**
 
 **[AUTO-SCORED] Iteration 171: predicted 22 turns, actual 11 turns, ratio 0.50**
+
+**[AUTO-SCORED] Iteration 172: predicted 18 turns, actual 20 turns, ratio 1.11**
