@@ -24,7 +24,7 @@ import { ToolCache, CACHEABLE_TOOLS, extractPaths, pathOverlaps } from "../src/t
 import { ToolTimingTracker } from "../src/tool-timing.js";
 import { getIterationCommits, computeDiffStats, getAllIterationDiffs, type IterationDiffStats, type FileDiffStat } from "../src/iteration-diff.js";
 import { recordMetrics, type IterationMetrics } from "../src/finalization.js";
-import { handleToolCall, processTurn, type IterationCtx, type TurnResult } from "../src/conversation.js";
+import { handleToolCall, processTurn, runConversation, type IterationCtx, type TurnResult } from "../src/conversation.js";
 import { countConsecutiveFailures, type ResuscitationConfig } from "../src/resuscitation.js";
 import type { IterationState } from "../src/iteration.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync } from "fs";
@@ -680,6 +680,8 @@ async function main(): Promise<void> {
     testCachePersistence();
     await testConversation();
     await testProcessTurn();
+    await testRunConversation();
+    await testProcessTurnErrors();
     testResuscitation();
   } finally {
     // Cleanup
@@ -1471,6 +1473,165 @@ async function testProcessTurn(): Promise<void> {
     assert(ctx.tokens.out === 80, "turn: output tokens from usage");
     assert(ctx.tokens.cacheCreate === 50, "turn: cache create tokens tracked");
     assert(ctx.tokens.cacheRead === 30, "turn: cache read tokens tracked");
+  }
+}
+
+// ─── runConversation Integration Tests ──────────────────────
+
+async function testRunConversation(): Promise<void> {
+  console.log("\n🔁 runConversation Integration Tests");
+
+  // 1. Multi-turn: tool_use on turn 1, text end_turn on turn 2 → loop terminates with 2 turns
+  {
+    const client = mockClient([
+      // Turn 1: tool_use → think tool executed → continue
+      mockApiResponse([
+        { type: "text", text: "Let me think about this." },
+        { type: "tool_use", id: "rc1", name: "think", input: { thought: "planning" } },
+      ], "tool_use"),
+      // Turn 2: text only → end_turn → break
+      mockApiResponse([{ type: "text", text: "All done!" }], "end_turn"),
+    ]);
+    const ctx = makeMockCtx({ client: client as any });
+    await runConversation(ctx);
+    assert(ctx.turns === 2, "runConv: 2 turns completed");
+    // Messages: turn1 assistant, turn1 tool_result, turn2 assistant = 3
+    assert(ctx.messages.length === 3, "runConv: 3 messages accumulated (2 assistant + 1 tool_result)");
+    assert((ctx.messages[0] as any).role === "assistant", "runConv: msg[0] is assistant");
+    assert((ctx.messages[1] as any).role === "user", "runConv: msg[1] is user (tool_result)");
+    assert((ctx.messages[2] as any).role === "assistant", "runConv: msg[2] is assistant");
+    assert(ctx.tokens.in === 200, "runConv: tokens accumulated across turns (200 in)");
+    assert(ctx.tokens.out === 100, "runConv: tokens accumulated across turns (100 out)");
+  }
+
+  // 2. Restart terminates loop — tool_use with AUTOAGENT_RESTART, validation passes
+  {
+    let finalizeCalled = false;
+    const client = mockClient([
+      mockApiResponse([
+        { type: "tool_use", id: "rc2", name: "bash", input: { command: 'echo "AUTOAGENT_RESTART"' } },
+      ], "tool_use"),
+    ]);
+    const ctx = makeMockCtx({
+      client: client as any,
+      validate: async () => ({ ok: true, output: "" }),
+      onFinalize: async (_ctx, doRestart) => { finalizeCalled = true; },
+    });
+    await runConversation(ctx);
+    assert(ctx.turns === 1, "runConv restart: only 1 turn before restart");
+    assert(finalizeCalled, "runConv restart: onFinalize called");
+  }
+
+  // 3. Max turns hit → onFinalize called with doRestart=false
+  {
+    let finalizeRestart: boolean | null = null;
+    const client = mockClient([
+      // Provide enough responses for 3 turns (maxTurns=3)
+      mockApiResponse([{ type: "tool_use", id: "rc3a", name: "think", input: { thought: "t1" } }], "tool_use"),
+      mockApiResponse([{ type: "tool_use", id: "rc3b", name: "think", input: { thought: "t2" } }], "tool_use"),
+      mockApiResponse([{ type: "tool_use", id: "rc3c", name: "think", input: { thought: "t3" } }], "tool_use"),
+    ]);
+    const ctx = makeMockCtx({
+      client: client as any,
+      maxTurns: 3,
+      onFinalize: async (_ctx, doRestart) => { finalizeRestart = doRestart; },
+    });
+    await runConversation(ctx);
+    assert(ctx.turns === 3, "runConv maxTurns: hit 3 turns");
+    assert(finalizeRestart === false, "runConv maxTurns: onFinalize called with doRestart=false");
+  }
+
+  // 4. Single turn text response — loop exits immediately
+  {
+    const client = mockClient([
+      mockApiResponse([{ type: "text", text: "Nothing to do." }], "end_turn"),
+    ]);
+    const ctx = makeMockCtx({ client: client as any });
+    await runConversation(ctx);
+    assert(ctx.turns === 1, "runConv single: 1 turn");
+    assert(ctx.messages.length === 1, "runConv single: 1 message");
+  }
+}
+
+// ─── processTurn Error Handling Tests ───────────────────────
+
+async function testProcessTurnErrors(): Promise<void> {
+  console.log("\n⚠️ processTurn Error Handling Tests");
+
+  // 1. API call throws network error → propagates (processTurn doesn't catch API errors)
+  {
+    const client = {
+      messages: {
+        create: async () => { throw new Error("network timeout"); },
+      },
+    };
+    const ctx = makeMockCtx({ client: client as any });
+    let threw = false;
+    try {
+      await processTurn(ctx);
+    } catch (e: any) {
+      threw = true;
+      assert(e.message === "network timeout", "error: API error message preserved");
+    }
+    assert(threw, "error: API network error propagates from processTurn");
+    assert(ctx.turns === 1, "error: turns still incremented before API call");
+  }
+
+  // 2. Tool handler throws → error caught, tool_result contains error message
+  {
+    // Use bash with a command that will cause tool handler to throw
+    // Actually, handleToolCall already wraps in try/catch. Let's verify via a custom registry tool.
+    const client = mockClient([
+      mockApiResponse([
+        { type: "tool_use", id: "err1", name: "nonexistent_tool", input: {} },
+      ], "tool_use"),
+    ]);
+    const ctx = makeMockCtx({ client: client as any });
+    const result = await processTurn(ctx);
+    assert(result === "continue", "error: unknown tool → continue (not crash)");
+    // tool_result should contain "Unknown tool"
+    const toolResultMsg = ctx.messages[1] as any;
+    const toolResult = toolResultMsg.content[0];
+    assert(toolResult.content.includes("Unknown tool"), "error: unknown tool error in result");
+  }
+
+  // 3. Multiple tool calls, one fails → all results returned, loop continues
+  {
+    const client = mockClient([
+      mockApiResponse([
+        { type: "tool_use", id: "mix1", name: "think", input: { thought: "valid" } },
+        { type: "tool_use", id: "mix2", name: "nonexistent_tool", input: {} },
+      ], "tool_use"),
+    ]);
+    const ctx = makeMockCtx({ client: client as any });
+    const result = await processTurn(ctx);
+    assert(result === "continue", "error: mixed tools → continue");
+    const toolResultMsg = ctx.messages[1] as any;
+    assert(toolResultMsg.content.length === 2, "error: both tool results returned");
+    assert(toolResultMsg.content[0].tool_use_id === "mix1", "error: first tool result present");
+    assert(toolResultMsg.content[1].tool_use_id === "mix2", "error: second tool result present");
+    assert(toolResultMsg.content[1].content.includes("Unknown tool"), "error: failed tool has error message");
+  }
+
+  // 4. Validation throws during restart → should propagate (not silently swallow)
+  {
+    const client = mockClient([
+      mockApiResponse([
+        { type: "tool_use", id: "ve1", name: "bash", input: { command: 'echo "AUTOAGENT_RESTART"' } },
+      ], "tool_use"),
+    ]);
+    const ctx = makeMockCtx({
+      client: client as any,
+      validate: async () => { throw new Error("validation crashed"); },
+    });
+    let threw = false;
+    try {
+      await processTurn(ctx);
+    } catch (e: any) {
+      threw = true;
+      assert(e.message === "validation crashed", "error: validation crash message preserved");
+    }
+    assert(threw, "error: validation crash propagates from processTurn");
   }
 }
 

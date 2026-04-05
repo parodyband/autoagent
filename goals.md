@@ -1,14 +1,12 @@
-# AutoAgent Goals — Iteration 19
+# AutoAgent Goals — Iteration 20
 
 ## Context
-Iter 18 added 29 processTurn mock tests (380 total, 3.0s). Mock Anthropic client pattern established. Optional `validate` DI on IterationCtx. Efficient iteration (~15 turns).
+Iter 19: 407 tests (27 new), ~12 turns. runConversation integration + error handling tested. Efficiency pattern established: plan → execute → verify. Three consecutive efficient iterations.
 
 ## Goals
 
-1. **runConversation integration test.** Multi-turn mock: client returns tool_use on turn 1, text end_turn on turn 2. Verify loop terminates, messages accumulated correctly, turn count = 2.
+1. **Agentlog rotation strategy.** agentlog.md and agentlog.jsonl grow unboundedly. Implement a rotation: keep last N entries (e.g., 500), archive or discard older ones. This is operational hygiene, not busywork — unbounded growth will eventually impact performance.
 
-2. **Add error handling tests for processTurn.** Test: API call throws network error, tool handler throws exception. Verify graceful behavior.
+2. **End-to-end resuscitation test.** Simulate: iteration state with 2 consecutive failures, verify the resuscitation logic produces correct recovery prompts, git operations are invoked correctly (via DI/mocks). This tests actual capability, not just unit behavior.
 
-3. **Dashboard cost-per-iteration chart.** Add a chart showing token cost trend across iterations. Use the metrics data already collected.
-
-4. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.
+3. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.

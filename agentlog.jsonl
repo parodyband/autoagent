@@ -1111,3 +1111,94 @@
 {"timestamp":"2026-04-05T07:17:14.007Z","iteration":18,"level":"info","message":"Tool cache stats","turn":34,"metadata":{"cacheHits":1,"cacheMisses":9,"cacheEntries":9,"invalidations":7,"invalidatedEntries":8,"toolStats":{"read_file":{"hits":1,"misses":2},"grep":{"hits":0,"misses":7}}}}
 {"timestamp":"2026-04-05T07:17:14.007Z","iteration":18,"level":"info","message":"Tool timing: bash: 12x, avg=623ms, total=7470ms; grep: 7x, avg=16ms, total=110ms; write_file: 7x, avg=2ms, total=14ms; think: 5x, avg=1ms, total=5ms; read_file: 2x, avg=2ms, total=3ms","turn":34}
 {"timestamp":"2026-04-05T07:17:14.007Z","iteration":18,"level":"info","message":"Tool timing stats","turn":34,"metadata":{"timing":{"tools":{"think":{"calls":5,"totalMs":5,"minMs":0,"maxMs":2,"avgMs":1},"bash":{"calls":12,"totalMs":7470,"minMs":1,"maxMs":3387,"avgMs":623},"grep":{"calls":7,"totalMs":110,"minMs":14,"maxMs":18,"avgMs":16},"write_file":{"calls":7,"totalMs":14,"minMs":0,"maxMs":5,"avgMs":2},"read_file":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2}},"totalCalls":33,"totalMs":7602}}}
+{"timestamp":"2026-04-05T07:17:17.478Z","iteration":18,"level":"info","message":"Committed: c97fcba8 (459680 in / 7385 out, cache: 0 created, 0 read)","turn":34}
+{"timestamp":"2026-04-05T07:17:17.478Z","iteration":18,"level":"info","message":"Inner critic reflecting...","turn":34}
+{"timestamp":"2026-04-05T07:17:30.771Z","iteration":18,"level":"info","message":"Inner critic: 3 questions raised","turn":34}
+{"timestamp":"2026-04-05T07:17:30.772Z","iteration":18,"level":"info","message":"Restarting as iteration 19...","turn":34}
+{"timestamp":"2026-04-05T07:17:30.983Z","iteration":19,"level":"info","message":"Cache restored: 9/9 entries (0 stale)"}
+{"timestamp":"2026-04-05T07:17:30.984Z","iteration":19,"level":"info","message":"Starting. Model=claude-opus-4-6 MaxTokens=16384"}
+{"timestamp":"2026-04-05T07:17:30.992Z","iteration":19,"level":"info","message":"Turn 1/50","turn":1}
+{"timestamp":"2026-04-05T07:17:39.220Z","iteration":19,"level":"info","message":"think: Let me read the inner voice feedback carefully. Key points:\n\n1. The dashboard chart might be busywork - infrastructure s...","turn":1}
+{"timestamp":"2026-04-05T07:17:39.222Z","iteration":19,"level":"info","message":"Turn 2/50","turn":2}
+{"timestamp":"2026-04-05T07:17:41.901Z","iteration":19,"level":"info","message":"read_file: src/conversation.ts","turn":2}
+{"timestamp":"2026-04-05T07:17:41.902Z","iteration":19,"level":"info","message":"  -> ok (7363 chars)","turn":2}
+{"timestamp":"2026-04-05T07:17:41.902Z","iteration":19,"level":"info","message":"$ ls tests/","turn":2}
+{"timestamp":"2026-04-05T07:17:41.911Z","iteration":19,"level":"info","message":"  -> exit=1 (38 chars)","turn":2}
+{"timestamp":"2026-04-05T07:17:41.912Z","iteration":19,"level":"info","message":"Turn 3/50","turn":3}
+{"timestamp":"2026-04-05T07:17:44.022Z","iteration":19,"level":"info","message":"$ find . -name '*.test.ts' -not -path '*/node_modules/*' | head -20","turn":3}
+{"timestamp":"2026-04-05T07:17:44.061Z","iteration":19,"level":"info","message":"  -> exit=0 (11 chars)","turn":3}
+{"timestamp":"2026-04-05T07:17:44.062Z","iteration":19,"level":"info","message":"Turn 4/50","turn":4}
+{"timestamp":"2026-04-05T07:17:46.234Z","iteration":19,"level":"info","message":"$ find . -name '*.test.*' -not -path '*/node_modules/*' -not -path '*/.self-test-tmp/*' | head -30","turn":4}
+{"timestamp":"2026-04-05T07:17:46.273Z","iteration":19,"level":"info","message":"  -> exit=0 (11 chars)","turn":4}
+{"timestamp":"2026-04-05T07:17:46.273Z","iteration":19,"level":"info","message":"Turn 5/50","turn":5}
+{"timestamp":"2026-04-05T07:17:48.432Z","iteration":19,"level":"info","message":"$ cat scripts/self-test.ts | head -50","turn":5}
+{"timestamp":"2026-04-05T07:17:48.447Z","iteration":19,"level":"info","message":"  -> exit=0 (2392 chars)","turn":5}
+{"timestamp":"2026-04-05T07:17:48.447Z","iteration":19,"level":"info","message":"Turn 6/50","turn":6}
+{"timestamp":"2026-04-05T07:17:50.737Z","iteration":19,"level":"info","message":"$ grep -n \"processTurn\\|runConversation\\|handleToolCall\" scripts/self-test.ts | head -30","turn":6}
+{"timestamp":"2026-04-05T07:17:50.752Z","iteration":19,"level":"info","message":"  -> exit=0 (1339 chars)","turn":6}
+{"timestamp":"2026-04-05T07:17:50.752Z","iteration":19,"level":"info","message":"Turn 7/50","turn":7}
+{"timestamp":"2026-04-05T07:17:52.779Z","iteration":19,"level":"info","message":"$ wc -l scripts/self-test.ts","turn":7}
+{"timestamp":"2026-04-05T07:17:52.794Z","iteration":19,"level":"info","message":"  -> exit=0 (30 chars)","turn":7}
+{"timestamp":"2026-04-05T07:17:52.795Z","iteration":19,"level":"info","message":"Turn 8/50","turn":8}
+{"timestamp":"2026-04-05T07:17:55.498Z","iteration":19,"level":"info","message":"read_file: scripts/self-test.ts","turn":8}
+{"timestamp":"2026-04-05T07:17:55.500Z","iteration":19,"level":"info","message":"  -> ok (9049 chars)","turn":8}
+{"timestamp":"2026-04-05T07:17:55.501Z","iteration":19,"level":"info","message":"Turn 9/50","turn":9}
+{"timestamp":"2026-04-05T07:17:57.714Z","iteration":19,"level":"info","message":"$ grep -n \"makeMockCtx\" scripts/self-test.ts | head -5","turn":9}
+{"timestamp":"2026-04-05T07:17:57.730Z","iteration":19,"level":"info","message":"  -> exit=0 (217 chars)","turn":9}
+{"timestamp":"2026-04-05T07:17:57.731Z","iteration":19,"level":"info","message":"Turn 10/50","turn":10}
+{"timestamp":"2026-04-05T07:17:59.972Z","iteration":19,"level":"info","message":"read_file: scripts/self-test.ts","turn":10}
+{"timestamp":"2026-04-05T07:17:59.974Z","iteration":19,"level":"info","message":"  -> ok (1098 chars)","turn":10}
+{"timestamp":"2026-04-05T07:17:59.975Z","iteration":19,"level":"info","message":"Turn 11/50","turn":11}
+{"timestamp":"2026-04-05T07:18:03.184Z","iteration":19,"level":"info","message":"Agent: Now let me find where `main()` is and how tests are wired up:","turn":11}
+{"timestamp":"2026-04-05T07:18:03.185Z","iteration":19,"level":"info","message":"$ grep -n \"async function main\\|await test\" scripts/self-test.ts | head -20","turn":11}
+{"timestamp":"2026-04-05T07:18:03.207Z","iteration":19,"level":"info","message":"  -> exit=0 (414 chars)","turn":11}
+{"timestamp":"2026-04-05T07:18:03.207Z","iteration":19,"level":"info","message":"Turn 12/50","turn":12}
+{"timestamp":"2026-04-05T07:18:06.043Z","iteration":19,"level":"info","message":"read_file: scripts/self-test.ts","turn":12}
+{"timestamp":"2026-04-05T07:18:06.045Z","iteration":19,"level":"info","message":"  -> ok (1634 chars)","turn":12}
+{"timestamp":"2026-04-05T07:18:06.046Z","iteration":19,"level":"info","message":"Turn 13/50","turn":13}
+{"timestamp":"2026-04-05T07:18:12.796Z","iteration":19,"level":"info","message":"think: Now I understand the structure. I need to:\n\n1. Add a `testRunConversation()` function - multi-turn mock: client returns ...","turn":13}
+{"timestamp":"2026-04-05T07:18:12.797Z","iteration":19,"level":"info","message":"Turn 14/50","turn":14}
+{"timestamp":"2026-04-05T07:18:16.041Z","iteration":19,"level":"info","message":"Agent: Now let me look at the exact spot where I need to insert the new test functions and the call in main():","turn":14}
+{"timestamp":"2026-04-05T07:18:16.042Z","iteration":19,"level":"info","message":"read_file: scripts/self-test.ts","turn":14}
+{"timestamp":"2026-04-05T07:18:16.043Z","iteration":19,"level":"info","message":"  -> ok (2504 chars)","turn":14}
+{"timestamp":"2026-04-05T07:18:16.044Z","iteration":19,"level":"info","message":"Turn 15/50","turn":15}
+{"timestamp":"2026-04-05T07:18:18.740Z","iteration":19,"level":"info","message":"Agent: I also need to add the `runConversation` import. Let me check the current import:","turn":15}
+{"timestamp":"2026-04-05T07:18:18.741Z","iteration":19,"level":"info","message":"$ grep \"from.*conversation\" scripts/self-test.ts","turn":15}
+{"timestamp":"2026-04-05T07:18:18.756Z","iteration":19,"level":"info","message":"  -> exit=0 (106 chars)","turn":15}
+{"timestamp":"2026-04-05T07:18:18.757Z","iteration":19,"level":"info","message":"Turn 16/50","turn":16}
+{"timestamp":"2026-04-05T07:18:23.553Z","iteration":19,"level":"info","message":"think: Good, I'm at turn 15 with low token usage. Let me be efficient. I need to:\n\n1. Update the import to include `runConversa...","turn":16}
+{"timestamp":"2026-04-05T07:18:23.554Z","iteration":19,"level":"info","message":"Turn 17/50","turn":17}
+{"timestamp":"2026-04-05T07:18:26.625Z","iteration":19,"level":"info","message":"write_file: scripts/self-test.ts (patch)","turn":17}
+{"timestamp":"2026-04-05T07:18:26.629Z","iteration":19,"level":"info","message":"  -> ok: Patched scripts/self-test.ts: -1 +1 lines","turn":17}
+{"timestamp":"2026-04-05T07:18:26.631Z","iteration":19,"level":"info","message":"Turn 18/50","turn":18}
+{"timestamp":"2026-04-05T07:18:55.702Z","iteration":19,"level":"info","message":"Agent: Now add the new test functions before the Resuscitation section:","turn":18}
+{"timestamp":"2026-04-05T07:18:55.703Z","iteration":19,"level":"info","message":"write_file: scripts/self-test.ts (patch)","turn":18}
+{"timestamp":"2026-04-05T07:18:55.703Z","iteration":19,"level":"info","message":"  -> ok: Patched scripts/self-test.ts: -1 +160 lines","turn":18}
+{"timestamp":"2026-04-05T07:18:55.704Z","iteration":19,"level":"info","message":"Turn 19/50","turn":19}
+{"timestamp":"2026-04-05T07:19:00.203Z","iteration":19,"level":"info","message":"Agent: Now wire the new test functions into main():","turn":19}
+{"timestamp":"2026-04-05T07:19:00.204Z","iteration":19,"level":"info","message":"write_file: scripts/self-test.ts (patch)","turn":19}
+{"timestamp":"2026-04-05T07:19:00.205Z","iteration":19,"level":"info","message":"  -> ok: Patched scripts/self-test.ts: -2 +4 lines","turn":19}
+{"timestamp":"2026-04-05T07:19:00.205Z","iteration":19,"level":"info","message":"Turn 20/50","turn":20}
+{"timestamp":"2026-04-05T07:19:02.876Z","iteration":19,"level":"info","message":"Agent: Now verify:","turn":20}
+{"timestamp":"2026-04-05T07:19:02.877Z","iteration":19,"level":"info","message":"$ npx tsc --noEmit 2>&1","turn":20}
+{"timestamp":"2026-04-05T07:19:03.486Z","iteration":19,"level":"info","message":"  -> exit=0 (11 chars)","turn":20}
+{"timestamp":"2026-04-05T07:19:03.486Z","iteration":19,"level":"info","message":"Turn 21/50","turn":21}
+{"timestamp":"2026-04-05T07:19:06.664Z","iteration":19,"level":"info","message":"$ npx tsx scripts/self-test.ts 2>&1 | tail -40","turn":21}
+{"timestamp":"2026-04-05T07:19:10.248Z","iteration":19,"level":"info","message":"  -> exit=0 (1495 chars)","turn":21}
+{"timestamp":"2026-04-05T07:19:10.248Z","iteration":19,"level":"info","message":"Turn 22/50","turn":22}
+{"timestamp":"2026-04-05T07:19:30.320Z","iteration":19,"level":"info","message":"Agent: All 407 tests pass. 27 new tests (380 → 407), clean tsc. Now update memory and goals:","turn":22}
+{"timestamp":"2026-04-05T07:19:30.321Z","iteration":19,"level":"info","message":"write_file: memory.md (append)","turn":22}
+{"timestamp":"2026-04-05T07:19:30.322Z","iteration":19,"level":"info","message":"  -> ok: Appended 2579 chars to memory.md","turn":22}
+{"timestamp":"2026-04-05T07:19:30.323Z","iteration":19,"level":"info","message":"Turn 23/50","turn":23}
+{"timestamp":"2026-04-05T07:19:38.197Z","iteration":19,"level":"info","message":"write_file: goals.md (write)","turn":23}
+{"timestamp":"2026-04-05T07:19:38.198Z","iteration":19,"level":"info","message":"  -> ok: Updated goals.md (872 chars, -2 lines delta)","turn":23}
+{"timestamp":"2026-04-05T07:19:38.198Z","iteration":19,"level":"info","message":"Turn 24/50","turn":24}
+{"timestamp":"2026-04-05T07:19:40.439Z","iteration":19,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":24}
+{"timestamp":"2026-04-05T07:19:40.440Z","iteration":19,"level":"info","message":"RESTART signal","turn":24}
+{"timestamp":"2026-04-05T07:19:40.440Z","iteration":19,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":24}
+{"timestamp":"2026-04-05T07:19:41.107Z","iteration":19,"level":"info","message":"Compilation OK","turn":24}
+{"timestamp":"2026-04-05T07:19:45.801Z","iteration":19,"level":"info","message":"Cache persisted: 10 entries to .autoagent-cache.json","turn":24}
+{"timestamp":"2026-04-05T07:19:45.802Z","iteration":19,"level":"info","message":"Cache stats: 0 hits, 5 misses, 10 entries, 5 invalidations (4 entries removed)","turn":24}
+{"timestamp":"2026-04-05T07:19:45.802Z","iteration":19,"level":"info","message":"Tool cache stats","turn":24,"metadata":{"cacheHits":0,"cacheMisses":5,"cacheEntries":10,"invalidations":5,"invalidatedEntries":4,"toolStats":{"read_file":{"hits":0,"misses":5}}}}
+{"timestamp":"2026-04-05T07:19:45.802Z","iteration":19,"level":"info","message":"Tool timing: bash: 12x, avg=365ms, total=4382ms; read_file: 5x, avg=3ms, total=14ms; write_file: 5x, avg=2ms, total=10ms; think: 3x, avg=1ms, total=3ms","turn":24}
+{"timestamp":"2026-04-05T07:19:45.802Z","iteration":19,"level":"info","message":"Tool timing stats","turn":24,"metadata":{"timing":{"tools":{"think":{"calls":3,"totalMs":3,"minMs":1,"maxMs":1,"avgMs":1},"read_file":{"calls":5,"totalMs":14,"minMs":2,"maxMs":4,"avgMs":3},"bash":{"calls":12,"totalMs":4382,"minMs":1,"maxMs":3584,"avgMs":365},"write_file":{"calls":5,"totalMs":10,"minMs":1,"maxMs":5,"avgMs":2}},"totalCalls":25,"totalMs":4409}}}

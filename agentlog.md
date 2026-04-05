@@ -3038,3 +3038,100 @@ Let me check if there's something else wrong. Let me look at the actual web_fetc
 [2026-04-05T07:17:14.007Z] iter=18 turn=34 INFO: Tool cache stats
 [2026-04-05T07:17:14.007Z] iter=18 turn=34 INFO: Tool timing: bash: 12x, avg=623ms, total=7470ms; grep: 7x, avg=16ms, total=110ms; write_file: 7x, avg=2ms, total=14ms; think: 5x, avg=1ms, total=5ms; read_file: 2x, avg=2ms, total=3ms
 [2026-04-05T07:17:14.007Z] iter=18 turn=34 INFO: Tool timing stats
+[2026-04-05T07:17:17.478Z] iter=18 turn=34 INFO: Committed: c97fcba8 (459680 in / 7385 out, cache: 0 created, 0 read)
+[2026-04-05T07:17:17.478Z] iter=18 turn=34 INFO: Inner critic reflecting...
+[2026-04-05T07:17:30.771Z] iter=18 turn=34 INFO: Inner critic: 3 questions raised
+[2026-04-05T07:17:30.772Z] iter=18 turn=34 INFO: Restarting as iteration 19...
+[2026-04-05T07:17:30.983Z] iter=19 INFO: Cache restored: 9/9 entries (0 stale)
+[2026-04-05T07:17:30.984Z] iter=19 INFO: Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T07:17:30.992Z] iter=19 turn=1 INFO: Turn 1/50
+[2026-04-05T07:17:39.220Z] iter=19 turn=1 INFO: think: Let me read the inner voice feedback carefully. Key points:
+
+1. The dashboard chart might be busywork - infrastructure s...
+[2026-04-05T07:17:39.222Z] iter=19 turn=2 INFO: Turn 2/50
+[2026-04-05T07:17:41.901Z] iter=19 turn=2 INFO: read_file: src/conversation.ts
+[2026-04-05T07:17:41.902Z] iter=19 turn=2 INFO:   -> ok (7363 chars)
+[2026-04-05T07:17:41.902Z] iter=19 turn=2 INFO: $ ls tests/
+[2026-04-05T07:17:41.911Z] iter=19 turn=2 INFO:   -> exit=1 (38 chars)
+[2026-04-05T07:17:41.912Z] iter=19 turn=3 INFO: Turn 3/50
+[2026-04-05T07:17:44.022Z] iter=19 turn=3 INFO: $ find . -name '*.test.ts' -not -path '*/node_modules/*' | head -20
+[2026-04-05T07:17:44.061Z] iter=19 turn=3 INFO:   -> exit=0 (11 chars)
+[2026-04-05T07:17:44.062Z] iter=19 turn=4 INFO: Turn 4/50
+[2026-04-05T07:17:46.234Z] iter=19 turn=4 INFO: $ find . -name '*.test.*' -not -path '*/node_modules/*' -not -path '*/.self-test-tmp/*' | head -30
+[2026-04-05T07:17:46.273Z] iter=19 turn=4 INFO:   -> exit=0 (11 chars)
+[2026-04-05T07:17:46.273Z] iter=19 turn=5 INFO: Turn 5/50
+[2026-04-05T07:17:48.432Z] iter=19 turn=5 INFO: $ cat scripts/self-test.ts | head -50
+[2026-04-05T07:17:48.447Z] iter=19 turn=5 INFO:   -> exit=0 (2392 chars)
+[2026-04-05T07:17:48.447Z] iter=19 turn=6 INFO: Turn 6/50
+[2026-04-05T07:17:50.737Z] iter=19 turn=6 INFO: $ grep -n "processTurn\|runConversation\|handleToolCall" scripts/self-test.ts | head -30
+[2026-04-05T07:17:50.752Z] iter=19 turn=6 INFO:   -> exit=0 (1339 chars)
+[2026-04-05T07:17:50.752Z] iter=19 turn=7 INFO: Turn 7/50
+[2026-04-05T07:17:52.779Z] iter=19 turn=7 INFO: $ wc -l scripts/self-test.ts
+[2026-04-05T07:17:52.794Z] iter=19 turn=7 INFO:   -> exit=0 (30 chars)
+[2026-04-05T07:17:52.795Z] iter=19 turn=8 INFO: Turn 8/50
+[2026-04-05T07:17:55.498Z] iter=19 turn=8 INFO: read_file: scripts/self-test.ts
+[2026-04-05T07:17:55.500Z] iter=19 turn=8 INFO:   -> ok (9049 chars)
+[2026-04-05T07:17:55.501Z] iter=19 turn=9 INFO: Turn 9/50
+[2026-04-05T07:17:57.714Z] iter=19 turn=9 INFO: $ grep -n "makeMockCtx" scripts/self-test.ts | head -5
+[2026-04-05T07:17:57.730Z] iter=19 turn=9 INFO:   -> exit=0 (217 chars)
+[2026-04-05T07:17:57.731Z] iter=19 turn=10 INFO: Turn 10/50
+[2026-04-05T07:17:59.972Z] iter=19 turn=10 INFO: read_file: scripts/self-test.ts
+[2026-04-05T07:17:59.974Z] iter=19 turn=10 INFO:   -> ok (1098 chars)
+[2026-04-05T07:17:59.975Z] iter=19 turn=11 INFO: Turn 11/50
+[2026-04-05T07:18:03.184Z] iter=19 turn=11 INFO: Agent: Now let me find where `main()` is and how tests are wired up:
+[2026-04-05T07:18:03.185Z] iter=19 turn=11 INFO: $ grep -n "async function main\|await test" scripts/self-test.ts | head -20
+[2026-04-05T07:18:03.207Z] iter=19 turn=11 INFO:   -> exit=0 (414 chars)
+[2026-04-05T07:18:03.207Z] iter=19 turn=12 INFO: Turn 12/50
+[2026-04-05T07:18:06.043Z] iter=19 turn=12 INFO: read_file: scripts/self-test.ts
+[2026-04-05T07:18:06.045Z] iter=19 turn=12 INFO:   -> ok (1634 chars)
+[2026-04-05T07:18:06.046Z] iter=19 turn=13 INFO: Turn 13/50
+[2026-04-05T07:18:12.796Z] iter=19 turn=13 INFO: think: Now I understand the structure. I need to:
+
+1. Add a `testRunConversation()` function - multi-turn mock: client returns ...
+[2026-04-05T07:18:12.797Z] iter=19 turn=14 INFO: Turn 14/50
+[2026-04-05T07:18:16.041Z] iter=19 turn=14 INFO: Agent: Now let me look at the exact spot where I need to insert the new test functions and the call in main():
+[2026-04-05T07:18:16.042Z] iter=19 turn=14 INFO: read_file: scripts/self-test.ts
+[2026-04-05T07:18:16.043Z] iter=19 turn=14 INFO:   -> ok (2504 chars)
+[2026-04-05T07:18:16.044Z] iter=19 turn=15 INFO: Turn 15/50
+[2026-04-05T07:18:18.740Z] iter=19 turn=15 INFO: Agent: I also need to add the `runConversation` import. Let me check the current import:
+[2026-04-05T07:18:18.741Z] iter=19 turn=15 INFO: $ grep "from.*conversation" scripts/self-test.ts
+[2026-04-05T07:18:18.756Z] iter=19 turn=15 INFO:   -> exit=0 (106 chars)
+[2026-04-05T07:18:18.757Z] iter=19 turn=16 INFO: Turn 16/50
+[2026-04-05T07:18:23.553Z] iter=19 turn=16 INFO: think: Good, I'm at turn 15 with low token usage. Let me be efficient. I need to:
+
+1. Update the import to include `runConversa...
+[2026-04-05T07:18:23.554Z] iter=19 turn=17 INFO: Turn 17/50
+[2026-04-05T07:18:26.625Z] iter=19 turn=17 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T07:18:26.629Z] iter=19 turn=17 INFO:   -> ok: Patched scripts/self-test.ts: -1 +1 lines
+[2026-04-05T07:18:26.631Z] iter=19 turn=18 INFO: Turn 18/50
+[2026-04-05T07:18:55.702Z] iter=19 turn=18 INFO: Agent: Now add the new test functions before the Resuscitation section:
+[2026-04-05T07:18:55.703Z] iter=19 turn=18 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T07:18:55.703Z] iter=19 turn=18 INFO:   -> ok: Patched scripts/self-test.ts: -1 +160 lines
+[2026-04-05T07:18:55.704Z] iter=19 turn=19 INFO: Turn 19/50
+[2026-04-05T07:19:00.203Z] iter=19 turn=19 INFO: Agent: Now wire the new test functions into main():
+[2026-04-05T07:19:00.204Z] iter=19 turn=19 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T07:19:00.205Z] iter=19 turn=19 INFO:   -> ok: Patched scripts/self-test.ts: -2 +4 lines
+[2026-04-05T07:19:00.205Z] iter=19 turn=20 INFO: Turn 20/50
+[2026-04-05T07:19:02.876Z] iter=19 turn=20 INFO: Agent: Now verify:
+[2026-04-05T07:19:02.877Z] iter=19 turn=20 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T07:19:03.486Z] iter=19 turn=20 INFO:   -> exit=0 (11 chars)
+[2026-04-05T07:19:03.486Z] iter=19 turn=21 INFO: Turn 21/50
+[2026-04-05T07:19:06.664Z] iter=19 turn=21 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -40
+[2026-04-05T07:19:10.248Z] iter=19 turn=21 INFO:   -> exit=0 (1495 chars)
+[2026-04-05T07:19:10.248Z] iter=19 turn=22 INFO: Turn 22/50
+[2026-04-05T07:19:30.320Z] iter=19 turn=22 INFO: Agent: All 407 tests pass. 27 new tests (380 → 407), clean tsc. Now update memory and goals:
+[2026-04-05T07:19:30.321Z] iter=19 turn=22 INFO: write_file: memory.md (append)
+[2026-04-05T07:19:30.322Z] iter=19 turn=22 INFO:   -> ok: Appended 2579 chars to memory.md
+[2026-04-05T07:19:30.323Z] iter=19 turn=23 INFO: Turn 23/50
+[2026-04-05T07:19:38.197Z] iter=19 turn=23 INFO: write_file: goals.md (write)
+[2026-04-05T07:19:38.198Z] iter=19 turn=23 INFO:   -> ok: Updated goals.md (872 chars, -2 lines delta)
+[2026-04-05T07:19:38.198Z] iter=19 turn=24 INFO: Turn 24/50
+[2026-04-05T07:19:40.439Z] iter=19 turn=24 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T07:19:40.440Z] iter=19 turn=24 INFO: RESTART signal
+[2026-04-05T07:19:40.440Z] iter=19 turn=24 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T07:19:41.107Z] iter=19 turn=24 INFO: Compilation OK
+[2026-04-05T07:19:45.801Z] iter=19 turn=24 INFO: Cache persisted: 10 entries to .autoagent-cache.json
+[2026-04-05T07:19:45.802Z] iter=19 turn=24 INFO: Cache stats: 0 hits, 5 misses, 10 entries, 5 invalidations (4 entries removed)
+[2026-04-05T07:19:45.802Z] iter=19 turn=24 INFO: Tool cache stats
+[2026-04-05T07:19:45.802Z] iter=19 turn=24 INFO: Tool timing: bash: 12x, avg=365ms, total=4382ms; read_file: 5x, avg=3ms, total=14ms; write_file: 5x, avg=2ms, total=10ms; think: 3x, avg=1ms, total=3ms
+[2026-04-05T07:19:45.802Z] iter=19 turn=24 INFO: Tool timing stats
