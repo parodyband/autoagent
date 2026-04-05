@@ -489,6 +489,7 @@ function App() {
           "  /compact  — Manually compact conversation context",
           "  /diff     — Show uncommitted git changes",
           "  /undo     — Revert the last autoagent commit",
+          "  /export   — Export conversation to markdown (optional filename arg)",
           "  /exit     — Quit AutoAgent",
         ].join("\n"),
       }]);
@@ -681,6 +682,26 @@ function App() {
         }]);
       } else {
         setMessages(prev => [...prev, { role: "assistant", content: "Invalid session number." }]);
+      }
+      return;
+    }
+
+    if (trimmed === "/export" || trimmed.startsWith("/export ")) {
+      const arg = trimmed.slice(7).trim();
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const filename = arg || `autoagent-export-${timestamp}.md`;
+      const filePath = path.isAbsolute(filename) ? filename : path.join(workDir, filename);
+      try {
+        const lines: string[] = [`# AutoAgent Conversation Export`, ``, `Exported: ${new Date().toLocaleString()}`, `Working directory: ${workDir}`, ``];
+        for (const msg of messages) {
+          const role = msg.role === "user" ? "## User" : "## Assistant";
+          lines.push(role, "", msg.content, "");
+        }
+        const { writeFileSync } = await import("fs");
+        writeFileSync(filePath, lines.join("\n"), "utf-8");
+        setMessages(prev => [...prev, { role: "assistant", content: `✓ Exported ${messages.length} messages to ${filePath}` }]);
+      } catch (err) {
+        setMessages(prev => [...prev, { role: "assistant", content: `Export failed: ${err instanceof Error ? err.message : err}` }]);
       }
       return;
     }

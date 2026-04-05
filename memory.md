@@ -82,3 +82,5 @@ Average ratio: ~1.05 — well calibrated.
 4. **Multi-file edit preview** — show all pending changes before applying.
 
 **[AUTO-SCORED] Iteration 291: predicted 8 turns, actual 10 turns, ratio 1.25**
+
+**[AUTO-SCORED] Iteration 292: predicted 8 turns, actual 12 turns, ratio 1.50**
