@@ -38,11 +38,15 @@ Recent avg (363–370): 1.00x — well calibrated.
 - ✅ Orchestrator wiring (PreToolUse/PostToolUse calls in runAgentLoop)
 - 🔲 3 integration tests fail: WORKDIR `/tmp/test-hooks-workdir` not created in beforeAll (NOT race condition)
 
-### Cost Tracking — IN PROGRESS (iter 374)
+### Cost Tracking — ✅ COMPLETE (iter 374–376)
 - ✅ src/cost-tracker.ts (71 LOC, CostTracker class with pricing table)
-- ✅ Wired into orchestrator (costTracker.record called after each API response)
-- 🔲 Unit tests (tests/cost-tracker.test.ts)
-- 🔲 Wire into /status command and TUI
+- ✅ Wired into orchestrator + /status TUI shows cost
+- ✅ Unit tests pass (tests/cost-tracker.test.ts, 8 tests)
+
+### Self-Verification Loop — IN PROGRESS (iter 378)
+- 🔲 src/self-verify.ts — wraps diagnostics.ts, debounced auto-check after writes
+- 🔲 Wire into orchestrator PostToolUse for write tools
+- 🔲 Tests (tests/self-verify.test.ts)
 
 ### TUI /plan (PAUSED — iter 353)
 - ✅ /plan, /plan list, /plan resume wired in TUI
@@ -83,3 +87,5 @@ Avg ratio: 1.13 — Engineer iterations consistently underestimated.
 **[AUTO-SCORED] Iteration 375: predicted 18 turns, actual 15 turns, ratio 0.83**
 
 **[AUTO-SCORED] Iteration 376: predicted 15 turns, actual 19 turns, ratio 1.27**
+
+**[AUTO-SCORED] Iteration 377: predicted 8 turns, actual 9 turns, ratio 1.13**
