@@ -45,6 +45,8 @@ const MODEL_SIMPLE = "claude-haiku-4-5";
 const MAX_TOKENS = 16384;
 const MAX_ROUNDS = 30;
 
+/** Token threshold for micro-compaction: clear old tool result contents (~80K). */
+export const MICRO_COMPACT_THRESHOLD = 80_000;
 /** Token threshold for Tier 1 compaction: compress old tool outputs (~100K). */
 export const COMPACT_TIER1_THRESHOLD = 100_000;
 /** Token threshold for Tier 2 compaction: summarize old messages (~150K). */
@@ -561,6 +563,11 @@ export class Orchestrator {
     this.modelOverride = null;
   }
 
+  /** Check if micro-compaction is needed (clear old tool result contents ~80K). */
+  private shouldMicroCompact(): boolean {
+    return this.sessionTokensIn >= MICRO_COMPACT_THRESHOLD && this.sessionTokensIn < COMPACT_TIER1_THRESHOLD;
+  }
+
   /** Check if Tier 1 compaction is needed (compress old tool outputs). */
   private shouldCompactTier1(): boolean {
     return this.sessionTokensIn >= COMPACT_TIER1_THRESHOLD && this.sessionTokensIn < COMPACT_THRESHOLD;
@@ -569,6 +576,52 @@ export class Orchestrator {
   /** Check if Tier 2 compaction is needed (summarize old messages). */
   private shouldCompact(): boolean {
     return this.sessionTokensIn >= COMPACT_THRESHOLD;
+  }
+
+  /**
+   * Micro-compaction: replace tool_result contents older than 5 turns with a
+   * short placeholder. Cheaper than Tier 1 — runs at 80K tokens.
+   */
+  microCompact(currentTurn: number = 0): void {
+    this.opts.onStatus?.("Micro-compacting context...");
+
+    // Find assistant turn indices (most recent first)
+    const assistantIndices: number[] = [];
+    for (let i = this.apiMessages.length - 1; i >= 0; i--) {
+      if (this.apiMessages[i].role === "assistant") {
+        assistantIndices.push(i);
+      }
+    }
+
+    // Clear tool_result contents older than the 5th most-recent assistant turn
+    const cutoffIdx = assistantIndices[4] ?? 0;
+
+    for (let i = 0; i < cutoffIdx; i++) {
+      const msg = this.apiMessages[i];
+      if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
+
+      for (const block of msg.content) {
+        if (
+          typeof block === "object" &&
+          "type" in block &&
+          block.type === "tool_result"
+        ) {
+          const toolBlock = block as {
+            type: string;
+            tool_use_id: string;
+            content: Array<{ type: string; text?: string }> | string;
+          };
+          const turn = currentTurn > 0 ? currentTurn : i;
+          if (Array.isArray(toolBlock.content)) {
+            toolBlock.content = [{ type: "text", text: `[Tool output cleared — turn ${turn}]` }];
+          } else if (typeof toolBlock.content === "string") {
+            toolBlock.content = `[Tool output cleared — turn ${turn}]`;
+          }
+        }
+      }
+    }
+
+    this.opts.onStatus?.("");
   }
 
   /**
@@ -687,6 +740,8 @@ export class Orchestrator {
       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
     } else if (this.shouldCompactTier1()) {
       this.compactTier1(); // Tier 1: compress old tool outputs
+    } else if (this.shouldMicroCompact()) {
+      this.microCompact(this.apiMessages.length); // Micro: clear old tool result contents
     }
 
     // 2b. Extract #file references from user message, inject as context

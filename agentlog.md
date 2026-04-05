@@ -1,104 +1,3 @@
-[2026-04-05T16:08:54.157Z] iter=228 turn=3 INFO: $ ls src/__tests__/
-[2026-04-05T16:08:54.166Z] iter=228 turn=3 INFO:   -> exit=0 (6401 chars)
-[2026-04-05T16:08:54.166Z] iter=228 turn=3 INFO:   -> exit=0 (784 chars)
-[2026-04-05T16:08:54.167Z] iter=228 turn=4 INFO: Turn 4/25
-[2026-04-05T16:08:59.776Z] iter=228 turn=4 INFO: think: I have two goals:
-1. Auto-context from `#file` mentions - extract file refs from user messages, inject contents
-2. Token...
-[2026-04-05T16:08:59.777Z] iter=228 turn=5 INFO: Turn 5/25
-[2026-04-05T16:09:06.885Z] iter=228 turn=5 INFO: Agent: Starting production now. Two deliverables: (1) `extractFileReferences` + orchestrator wiring, (2) token budget warnings.
-[2026-04-05T16:09:06.886Z] iter=228 turn=5 INFO: write_file: src/context-loader.ts (patch)
-[2026-04-05T16:09:06.887Z] iter=228 turn=5 INFO:   -> ok: Patched src/context-loader.ts: -12 +14 lines
-
-Context after patch:
-1 | /**
-2 |  * Query-aware context loading.
-3 |  *
-4 |  * Before the first LLM call, extract keywords from the user message,
-5 |  * fuzzy-search the repo map for relevant files, and return their contents
-6 |  * as a formatted string to prepend as context.
-7 |  *
-8 |  * Also supports explicit #file mentions in user messages.
-9 |  */
-10 | 
-11 | import { readFileSync, existsSync } from "fs";
-12 | import { join, resolve } from "path";
-13 | import type { RepoMap } from "./tree-sitter-map.js";
-14 | import { fuzzySearch } from "./tree-sitter-map.js";
-15 | 
-16 | const STOPWORDS = new Set([
-17 |   "the", "and", "for", "are", "but", "not", "you", "all", "can", "has",
-[2026-04-05T16:09:06.887Z] iter=228 turn=6 INFO: Turn 6/25
-[2026-04-05T16:09:08.540Z] iter=228 turn=6 INFO: read_file: src/context-loader.ts
-[2026-04-05T16:09:08.542Z] iter=228 turn=6 INFO:   -> ok (467 chars)
-[2026-04-05T16:09:08.543Z] iter=228 turn=7 INFO: Turn 7/25
-[2026-04-05T16:09:25.588Z] iter=228 turn=7 INFO: Agent: **Goal 1** (auto-context from #file mentions): IN PROGRESS — added imports, need to add `extractFileReferences()` function and wire into orchestrator  
-**Goal 2** (token budget warnings): NOT STARTED
-
-Let me ship both now:
-[2026-04-05T16:09:25.590Z] iter=228 turn=7 INFO: write_file: src/context-loader.ts (patch)
-[2026-04-05T16:09:25.591Z] iter=228 turn=7 INFO:   -> ok: Patched src/context-loader.ts: -5 +96 lines
-
-Context after patch:
-28 | const MAX_FILES = 3;
-29 | const MAX_LINES_PER_FILE = 500;
-30 | 
-31 | /** Budget cap for #file auto-loading (same as query-aware loading). */
-32 | const FILE_REF_BUDGET = 32_000;
-33 | 
-34 | /**
-35 |  * Extract explicit #file references from a user message.
-36 |  * Matches patterns like #src/foo.ts, #package.json, #path/to/file.ext
-37 |  * Only returns paths that exist on disk (relative to workDir).
-38 |  *
-39 |  * @param message - raw user message
-40 |  * @param workDir - working directory to resolve relative paths
-41 |  * @returns array of resolved absolute paths that exist
-42 |  */
-43 | export function extractFileReferences(message: string, workDir: string): string[] {
-44 |   // Match #<path> — path can contain letters, digits, /, ., -, _
-45 |   const regex = /#([\w./\-]+)/g;
-46 |   const seen = new Set<string>();
-47 |   const results: string[] = [];
-48 | 
-49 |   let match: RegExpExecArray | null;
-50 |   while ((match = regex.exec(message)) !== null) {
-51 |     const rawPath = match[1];
-52 |     // Resolve relative to workDir
-53 |     const absPath = rawPath.startsWith("/")
-54 |       ? rawPath
-55 |       : resolve(workDir, rawPath);
-56 | 
-57 |     if (seen.has(absPath)) continue;
-58 |     seen.add(absPath);
-59 | 
-60 |     if (existsSync(absPath)) {
-61 |       results.push(absPath);
-62 |     }
-63 |     // Non-existent paths are silently skipped
-64 |   }
-65 | 
-66 |   return results;
-67 | }
-68 | 
-69 | /**
-70 |  * Strip #file references from a user message, returning clean text.
-71 |  * e.g. "look at #src/foo.ts and fix it" → "look at src/foo.ts and fix it"
-72 |  */
-73 | export function stripFileReferences(message: string): string {
-74 |   return message.replace(/#([\w./\-]+)/g, "$1");
-75 | }
-76 | 
-77 | /**
-78 |  * Load contents of explicitly-referenced files (from #file mentions),
-79 |  * respecting a char budget. Returns formatted context block or empty string.
-80 |  *
-81 |  * @param filePaths - absolute paths to load (pre-filtered to existing files)
-82 |  * @param workDir - working directory (for display paths)
-83 |  */
-84 | export function loadFileReferences(filePaths: string[], workDir: string): string {
-85 |   if (filePaths.length === 0) return "";
-86 | 
 87 |   const sections: string[] = [];
 88 |   let totalChars = 0;
 89 | 
@@ -1097,3 +996,241 @@ TypeScript clean, goals written, memory saved. Done.
 [2026-04-05T16:19:59.224Z] iter=233 turn=16 INFO: Tool timing stats
 [2026-04-05T16:20:04.602Z] iter=233 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 233: predicted 20 turns, actual 16 turns, ratio 0.80**
 [2026-04-05T16:20:04.623Z] iter=233 turn=16 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T16:20:04.655Z] iter=233 turn=16 INFO: Committed: 3c2da833 (26 in / 4319 out, cache: 39795 created, 433793 read)
+[2026-04-05T16:20:04.655Z] iter=233 turn=16 INFO: Restarting as iteration 234...
+[2026-04-05T16:20:04.854Z] iter=234 INFO: Cache restored: 52/52 entries (0 stale)
+[2026-04-05T16:20:04.856Z] iter=234 INFO: Turn budget: 19/25 (calibration=1.00x, predicted=20)
+[2026-04-05T16:20:04.856Z] iter=234 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T16:20:04.963Z] iter=234 turn=1 INFO: Turn 1/25
+[2026-04-05T16:20:08.348Z] iter=234 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be built.
+[2026-04-05T16:20:08.348Z] iter=234 turn=1 INFO: $ cat goals.md | head -5 && echo "---" && wc -l src/tui.tsx src/orchestrator.ts src/context-loader.ts
+[2026-04-05T16:20:08.351Z] iter=234 turn=1 INFO: $ grep -n "extractFileQuery\|handleSubmit\|#file\|#path\|fileRef" src/tui.tsx | head -40
+[2026-04-05T16:20:08.361Z] iter=234 turn=1 INFO:   -> exit=0 (210 chars)
+[2026-04-05T16:20:08.363Z] iter=234 turn=1 INFO:   -> exit=0 (439 chars)
+[2026-04-05T16:20:08.364Z] iter=234 turn=2 INFO: Turn 2/25
+[2026-04-05T16:20:11.176Z] iter=234 turn=2 INFO: read_file: src/tui.tsx
+[2026-04-05T16:20:11.177Z] iter=234 turn=2 INFO:   -> ok (1625 chars)
+[2026-04-05T16:20:11.177Z] iter=234 turn=2 INFO: read_file: src/tui.tsx
+[2026-04-05T16:20:11.178Z] iter=234 turn=2 INFO:   -> ok (2118 chars)
+[2026-04-05T16:20:11.179Z] iter=234 turn=3 INFO: Turn 3/25
+[2026-04-05T16:20:15.085Z] iter=234 turn=3 INFO: read_file: src/tui.tsx
+[2026-04-05T16:20:15.086Z] iter=234 turn=3 INFO:   -> ok (4879 chars)
+[2026-04-05T16:20:15.087Z] iter=234 turn=3 INFO: $ grep -n "microCompact\|compactMessages\|Tier\|tierCompact\|contextCompact\|CONTEXT_LIMIT\|TOKEN_LIMIT\|80K\|100K" src/orchestrator.ts | head -40
+[2026-04-05T16:20:15.108Z] iter=234 turn=3 INFO:   -> exit=0 (656 chars)
+[2026-04-05T16:20:15.109Z] iter=234 turn=4 INFO: Turn 4/25
+[2026-04-05T16:20:20.025Z] iter=234 turn=4 INFO: think: I have enough context. Let me build both deliverables:
+
+1. `extractAllFileRefs()` in tui.tsx + file injection in handleS...
+[2026-04-05T16:20:20.026Z] iter=234 turn=5 INFO: Turn 5/25
+[2026-04-05T16:20:23.358Z] iter=234 turn=5 INFO: Agent: Let me read the exact code sections I need to modify, then immediately write both deliverables.
+[2026-04-05T16:20:23.359Z] iter=234 turn=5 INFO: read_file: src/tui.tsx
+[2026-04-05T16:20:23.359Z] iter=234 turn=5 INFO:   -> ok (478 chars)
+[2026-04-05T16:20:23.359Z] iter=234 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:20:23.360Z] iter=234 turn=5 INFO:   -> ok (613 chars)
+[2026-04-05T16:20:23.360Z] iter=234 turn=6 INFO: Turn 6/25
+[2026-04-05T16:20:26.167Z] iter=234 turn=6 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:20:26.169Z] iter=234 turn=6 INFO:   -> ok (1938 chars)
+[2026-04-05T16:20:26.169Z] iter=234 turn=6 INFO: read_file: src/tui.tsx
+[2026-04-05T16:20:26.170Z] iter=234 turn=6 INFO:   -> ok (1658 chars)
+[2026-04-05T16:20:26.172Z] iter=234 turn=7 INFO: Turn 7/25
+[2026-04-05T16:20:30.106Z] iter=234 turn=7 INFO: Agent: **Goal 1** (`extractAllFileRefs` + file injection): NOT STARTED
+**Goal 2** (microCompact): NOT STARTED
+
+Starting both now simultaneously.
+[2026-04-05T16:20:30.107Z] iter=234 turn=7 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:20:30.107Z] iter=234 turn=7 INFO:   -> ok (1307 chars)
+[2026-04-05T16:20:30.107Z] iter=234 turn=7 INFO: read_file: src/tui.tsx
+[2026-04-05T16:20:30.107Z] iter=234 turn=7 INFO:   -> ok (426 chars)
+[2026-04-05T16:20:30.108Z] iter=234 turn=8 INFO: Turn 8/25
+[2026-04-05T16:20:32.723Z] iter=234 turn=8 INFO: think: Interesting! The orchestrator already has `extractFileReferences`, `loadFileReferences`, and `stripFileReferences` funct...
+[2026-04-05T16:20:32.723Z] iter=234 turn=9 INFO: Turn 9/25
+[2026-04-05T16:20:35.595Z] iter=234 turn=9 INFO: $ grep -n "extractFileReferences\|loadFileReferences\|stripFileReferences\|microCompact\|MICRO_COMPACT" src/orchestrator.ts | head -30
+[2026-04-05T16:20:35.614Z] iter=234 turn=9 INFO:   -> exit=0 (377 chars)
+[2026-04-05T16:20:35.615Z] iter=234 turn=10 INFO: Turn 10/25
+[2026-04-05T16:20:38.849Z] iter=234 turn=10 INFO: $ grep -n "extractFileReferences\|loadFileReferences\|stripFileReferences" src/context-loader.ts
+[2026-04-05T16:20:38.858Z] iter=234 turn=10 INFO:   -> exit=0 (239 chars)
+[2026-04-05T16:20:38.858Z] iter=234 turn=11 INFO: Turn 11/25
+[2026-04-05T16:20:43.170Z] iter=234 turn=11 INFO: Agent: Goal 1 is already implemented in context-loader.ts and wired into orchestrator! Let me check if `extractAllFileRefs` exists in tui.tsx and verify the tests exist:
+[2026-04-05T16:20:43.171Z] iter=234 turn=11 INFO: $ grep -n "extractAllFileRefs\|extractFileReferences\|loadFileReferences" src/tui.tsx src/__tests__/*.test.ts 2>/dev/null | head -30
+[2026-04-05T16:20:43.173Z] iter=234 turn=11 INFO: read_file: src/context-loader.ts
+[2026-04-05T16:20:43.173Z] iter=234 turn=11 INFO:   -> ok (2066 chars)
+[2026-04-05T16:20:43.193Z] iter=234 turn=11 INFO:   -> exit=0 (1173 chars)
+[2026-04-05T16:20:43.193Z] iter=234 turn=12 INFO: Turn 12/25
+[2026-04-05T16:20:46.758Z] iter=234 turn=12 INFO: Agent: Goal 1 is **already fully implemented**! `extractFileReferences`, `loadFileReferences`, `stripFileReferences` in context-loader.ts with tests. Wired into orchestrator. 
+
+Now I need to check Goal 2 (microCompact). Let me check if it exists, then build it if not:
+[2026-04-05T16:20:46.760Z] iter=234 turn=12 INFO: $ grep -n "microCompact\|MICRO_COMPACT\|80_000\|80000" src/orchestrator.ts src/__tests__/*.test.ts 2>/dev/null | head -20
+[2026-04-05T16:20:46.799Z] iter=234 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:20:46.800Z] iter=234 turn=13 INFO: Turn 13/25
+[2026-04-05T16:20:50.033Z] iter=234 turn=13 INFO: Agent: I've been reading, not writing. Goal 1 is already done (from a previous iteration). Goal 2 (microCompact) needs to be built NOW.
+[2026-04-05T16:20:50.034Z] iter=234 turn=13 INFO: read_file: src/orchestrator.ts
+[2026-04-05T16:20:50.035Z] iter=234 turn=13 INFO:   -> ok (2247 chars)
+[2026-04-05T16:20:50.035Z] iter=234 turn=14 INFO: Turn 14/25
+[2026-04-05T16:20:54.845Z] iter=234 turn=14 INFO: Agent: Now I'll add `microCompact` and wire it in:
+[2026-04-05T16:20:54.847Z] iter=234 turn=14 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:20:54.850Z] iter=234 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -4 +6 lines
+
+Context after patch:
+45 | const MAX_TOKENS = 16384;
+46 | const MAX_ROUNDS = 30;
+47 | 
+48 | /** Token threshold for micro-compaction: clear old tool result contents (~80K). */
+49 | export const MICRO_COMPACT_THRESHOLD = 80_000;
+50 | /** Token threshold for Tier 1 compaction: compress old tool outputs (~100K). */
+51 | export const COMPACT_TIER1_THRESHOLD = 100_000;
+52 | /** Token threshold for Tier 2 compaction: summarize old messages (~150K). */
+53 | export const COMPACT_THRESHOLD = 150_000;
+54 | 
+55 | /** Pricing per million tokens: [input, output] */
+56 | export const MODEL_PRICING: Record<string, [number, number]> = {
+[2026-04-05T16:20:54.851Z] iter=234 turn=15 INFO: Turn 15/25
+[2026-04-05T16:20:59.145Z] iter=234 turn=15 INFO: Agent: Now add the `microCompact` method right before `compactTier1`:
+[2026-04-05T16:20:59.146Z] iter=234 turn=15 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:20:59.147Z] iter=234 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -4 +9 lines
+
+Context after patch:
+563 |     this.modelOverride = null;
+564 |   }
+565 | 
+566 |   /** Check if micro-compaction is needed (clear old tool result contents ~80K). */
+567 |   private shouldMicroCompact(): boolean {
+568 |     return this.sessionTokensIn >= MICRO_COMPACT_THRESHOLD && this.sessionTokensIn < COMPACT_TIER1_THRESHOLD;
+569 |   }
+570 | 
+571 |   /** Check if Tier 1 compaction is needed (compress old tool outputs). */
+572 |   private shouldCompactTier1(): boolean {
+573 |     return this.sessionTokensIn >= COMPACT_TIER1_THRESHOLD && this.sessionTokensIn < COMPACT_THRESHOLD;
+574 |   }
+575 | 
+576 |   /** Check if Tier 2 compaction is needed (summarize old messages). */
+577 |   private shouldCompact(): boolean {
+[2026-04-05T16:20:59.147Z] iter=234 turn=16 INFO: Turn 16/25
+[2026-04-05T16:21:07.744Z] iter=234 turn=16 INFO: Agent: Adding the microCompact method and wiring it in:
+[2026-04-05T16:21:07.744Z] iter=234 turn=16 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:21:07.745Z] iter=234 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -5 +51 lines
+
+Context after patch:
+578 |     return this.sessionTokensIn >= COMPACT_THRESHOLD;
+579 |   }
+580 | 
+581 |   /**
+582 |    * Micro-compaction: replace tool_result contents older than 5 turns with a
+583 |    * short placeholder. Cheaper than Tier 1 — runs at 80K tokens.
+584 |    */
+585 |   microCompact(currentTurn: number = 0): void {
+586 |     this.opts.onStatus?.("Micro-compacting context...");
+587 | 
+588 |     // Find assistant turn indices (most recent first)
+589 |     const assistantIndices: number[] = [];
+590 |     for (let i = this.apiMessages.length - 1; i >= 0; i--) {
+591 |       if (this.apiMessages[i].role === "assistant") {
+592 |         assistantIndices.push(i);
+593 |       }
+594 |     }
+595 | 
+596 |     // Clear tool_result contents older than the 5th most-recent assistant turn
+597 |     const cutoffIdx = assistantIndices[4] ?? 0;
+598 | 
+599 |     for (let i = 0; i < cutoffIdx; i++) {
+600 |       const msg = this.apiMessages[i];
+601 |       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
+602 | 
+603 |       for (const block of msg.content) {
+604 |         if (
+605 |           typeof block === "object" &&
+606 |           "type" in block &&
+607 |           block.type === "tool_result"
+608 |         ) {
+609 |           const toolBlock = block as {
+610 |             type: string;
+611 |             tool_use_id: string;
+612 |             content: Array<{ type: string; text?: string }> | string;
+613 |           };
+614 |           const turn = currentTurn > 0 ? currentTurn : i;
+615 |           if (Array.isArray(toolBlock.content)) {
+616 |             toolBlock.content = [{ type: "text", text: `[Tool output cleared — turn ${turn}]` }];
+617 |           } else if (typeof toolBlock.content === "string") {
+618 |             toolBlock.content = `[Tool output cleared — turn ${turn}]`;
+619 |           }
+620 |         }
+621 |       }
+622 |     }
+623 | 
+624 |     this.opts.onStatus?.("");
+625 |   }
+626 | 
+627 |   /**
+628 |    * Tier 1 compaction: walk apiMessages backwards, compress tool_result blocks
+629 |    * older than the last 5 assistant turns to reduce context without losing structure.
+630 |    */
+631 |   private compactTier1(): void {
+632 |     this.opts.onStatus?.("Compressing tool outputs...");
+633 | 
+634 |     // Find the indices of assistant messages (most recent first)
+[2026-04-05T16:21:07.745Z] iter=234 turn=17 INFO: Turn 17/25
+[2026-04-05T16:21:12.662Z] iter=234 turn=17 INFO: Agent: Wire microCompact into the pipeline, write tests, then finish up.
+[2026-04-05T16:21:12.663Z] iter=234 turn=17 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:21:12.664Z] iter=234 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -3 +5 lines
+
+Context after patch:
+738 |       await this.compact(); // Tier 2: summarize
+739 |       // After compaction, notify TUI that budget is now low
+740 |       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
+741 |     } else if (this.shouldCompactTier1()) {
+742 |       this.compactTier1(); // Tier 1: compress old tool outputs
+743 |     } else if (this.shouldMicroCompact()) {
+744 |       this.microCompact(this.apiMessages.length); // Micro: clear old tool result contents
+745 |     }
+746 | 
+747 |     // 2b. Extract #file references from user message, inject as context
+748 |     const fileRefs = extractFileReferences(userMessage, this.opts.workDir);
+[2026-04-05T16:21:12.664Z] iter=234 turn=18 INFO: Turn 18/25
+[2026-04-05T16:21:32.733Z] iter=234 turn=18 INFO: Agent: Now write the tests:
+[2026-04-05T16:21:32.734Z] iter=234 turn=18 INFO: write_file: src/__tests__/micro-compact.test.ts (write)
+[2026-04-05T16:21:32.734Z] iter=234 turn=18 INFO:   -> ok: Created src/__tests__/micro-compact.test.ts (4801 chars)
+[2026-04-05T16:21:32.734Z] iter=234 turn=19 INFO: Turn 19/25
+[2026-04-05T16:21:35.600Z] iter=234 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T16:21:36.534Z] iter=234 turn=19 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:21:36.534Z] iter=234 turn=20 INFO: Turn 20/25
+[2026-04-05T16:21:38.678Z] iter=234 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/micro-compact.test.ts 2>&1 | tail -15
+[2026-04-05T16:21:39.743Z] iter=234 turn=20 INFO:   -> exit=0 (529 chars)
+[2026-04-05T16:21:39.744Z] iter=234 turn=21 INFO: Turn 21/25
+[2026-04-05T16:21:41.839Z] iter=234 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/micro-compact.test.ts 2>&1 | grep "FAIL\|Error\|expect\|received" | head -20
+[2026-04-05T16:21:42.901Z] iter=234 turn=21 INFO:   -> exit=0 (353 chars)
+[2026-04-05T16:21:42.901Z] iter=234 turn=22 INFO: Turn 22/25
+[2026-04-05T16:21:49.219Z] iter=234 turn=22 INFO: Agent: The "preserved" indices are wrong. Let me fix the test's index math:
+[2026-04-05T16:21:49.220Z] iter=234 turn=22 INFO: write_file: src/__tests__/micro-compact.test.ts (patch)
+[2026-04-05T16:21:49.220Z] iter=234 turn=22 INFO:   -> ok: Patched src/__tests__/micro-compact.test.ts: -5 +6 lines
+
+Context after patch:
+41 | 
+42 |     orch.microCompact(99);
+43 | 
+44 |     // 8 pairs → indices: 0(tr),1(a),2(tr),3(a),...,14(tr),15(a)
+45 |     // assistantIndices (most recent first): 15,13,11,9,7 → cutoffIdx = 7
+46 |     // Indices < 7 are cleared: tool_results at 0,2,4,6 → but index 6 is tool_result for t4
+47 |     // Preserved tool_results: 8,10,12,14
+48 |     const cleared = [0, 2, 4, 6];
+49 |     const preserved = [8, 10, 12, 14];
+50 | 
+51 |     for (const idx of cleared) {
+52 |       const block = (msgs[idx] as ReturnType<typeof makeToolResultMsg>).content[0];
+[2026-04-05T16:21:49.221Z] iter=234 turn=23 INFO: Turn 23/25
+[2026-04-05T16:21:51.360Z] iter=234 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/micro-compact.test.ts 2>&1 | tail -5 && npx tsc --noEmit 2>&1 | head -5
+[2026-04-05T16:21:53.299Z] iter=234 turn=23 INFO:   -> exit=0 (179 chars)
+[2026-04-05T16:21:53.299Z] iter=234 turn=24 INFO: Turn 24/25
+[2026-04-05T16:21:58.539Z] iter=234 turn=24 INFO: save_memory: "[Engineer] Iteration 234"
+[2026-04-05T16:21:58.542Z] iter=234 turn=24 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T16:21:58.543Z] iter=234 turn=25 INFO: Turn 25/25
+[2026-04-05T16:22:07.855Z] iter=234 turn=25 INFO: write_file: goals.md (write)
+[2026-04-05T16:22:07.856Z] iter=234 turn=25 INFO:   -> ok: Updated goals.md (1296 chars, -31 lines delta)
+[2026-04-05T16:22:07.856Z] iter=234 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T16:22:07.859Z] iter=234 turn=25 INFO: Cache persisted: 57 entries to .autoagent-cache.json
+[2026-04-05T16:22:07.859Z] iter=234 turn=25 INFO: Cache stats: 0 hits, 11 misses, 57 entries, 7 invalidations (6 entries removed)
+[2026-04-05T16:22:07.859Z] iter=234 turn=25 INFO: Tool cache stats
+[2026-04-05T16:22:07.860Z] iter=234 turn=25 INFO: Tool timing: bash: 11x, avg=467ms, total=5139ms; read_file: 11x, avg=2ms, total=18ms; write_file: 7x, avg=1ms, total=8ms; save_memory: 1x, avg=4ms, total=4ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T16:22:07.860Z] iter=234 turn=25 INFO: Tool timing stats
+[2026-04-05T16:22:13.045Z] iter=234 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 234: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T16:22:23.448Z] iter=234 turn=25 INFO: Pre-commit review (2983in/427out): **Issues found:**
+
+- **`microCompact` is never called in the main loop.** `shouldMicroCompact()` is defined but there's no evidence it's wired into the orchestrator's token-check logic (the diff trunc
