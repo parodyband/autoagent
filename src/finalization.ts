@@ -5,6 +5,7 @@
  * - Cache/timing stats logging
  * - Code quality + benchmark capture
  * - Metrics recording
+ * - Prediction accuracy injection (machine-verified, prevents self-deception)
  * - Git commit + state update
  */
 
@@ -68,6 +69,67 @@ export interface FinalizationCtx {
   restart: () => never;
 }
 
+// ─── Prediction accuracy scoring ────────────────────────────
+// Reads predicted turns from goals.md, compares to actual ctx.turns,
+// and injects a machine-verified accuracy line into memory.md.
+// This runs BEFORE git commit so the truth is always in the record.
+
+function parsePredictedTurns(rootDir: string): number | null {
+  const goalsFile = path.join(rootDir, "goals.md");
+  if (!existsSync(goalsFile)) return null;
+  const content = readFileSync(goalsFile, "utf-8");
+  const match = content.match(/[Pp]redicted\s+turns:\s*(\d+)/);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+function getRecentAccuracyRatios(metricsFile: string, goalsDir: string): number[] {
+  // We can only check the current iteration's ratio since goals.md changes each iteration.
+  // For consecutive-miss detection, we store ratios in the accuracy lines already in memory.
+  // This function reads the last N auto-scored lines from memory.md.
+  const memFile = path.join(goalsDir, "memory.md");
+  if (!existsSync(memFile)) return [];
+  const content = readFileSync(memFile, "utf-8");
+  const ratios: number[] = [];
+  const re = /\[AUTO-SCORED\].*ratio[:\s=]+(\d+\.?\d*)/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(content)) !== null) {
+    ratios.push(parseFloat(m[1]));
+  }
+  return ratios;
+}
+
+function injectAccuracyScore(ctx: FinalizationCtx): void {
+  const predicted = parsePredictedTurns(ctx.rootDir);
+  const actual = ctx.turns;
+  const memFile = path.join(ctx.rootDir, "memory.md");
+  if (!existsSync(memFile)) return;
+
+  let content = readFileSync(memFile, "utf-8");
+
+  // Build the accuracy line
+  let line: string;
+  if (predicted !== null && predicted > 0) {
+    const ratio = (actual / predicted).toFixed(2);
+    line = `**[AUTO-SCORED] Iteration ${ctx.iter}: predicted ${predicted} turns, actual ${actual} turns, ratio ${ratio}**`;
+
+    // Check for consecutive misses (including this one)
+    const pastRatios = getRecentAccuracyRatios(ctx.metricsFile, ctx.rootDir);
+    const allRatios = [...pastRatios, actual / predicted];
+    const recentMisses = allRatios.slice(-3).filter(r => r > 1.5);
+    if (recentMisses.length >= 2) {
+      line += `\n⚠ **SCOPE REDUCTION REQUIRED**: ${recentMisses.length} of last ${Math.min(allRatios.length, 3)} iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.`;
+    }
+  } else {
+    line = `**[AUTO-SCORED] Iteration ${ctx.iter}: no prediction found, actual ${actual} turns**`;
+  }
+
+  // Inject before the last "---" boundary in Session Log, or append at end
+  // Strategy: append to the very end of the file
+  content = content.trimEnd() + "\n\n" + line + "\n";
+  writeFileSync(memFile, content);
+  ctx.log(`Accuracy score injected: ${line.split("\n")[0]}`);
+}
+
 /**
  * Log cache and timing stats, capture quality/benchmarks, record metrics,
  * commit the iteration, and update state.
@@ -116,6 +178,11 @@ export async function finalizeIteration(
     benchmarks,
     toolTimings: timingStats.totalCalls > 0 ? timingStats : undefined,
   });
+
+  // ─── Prediction accuracy injection ────────────────────────
+  // Machine-verified turn count injected into memory.md BEFORE commit.
+  // This prevents self-deception: the agent can't round or misreport.
+  injectAccuracyScore(ctx);
 
   const sha = await commitIteration(ctx.iter);
   const label = doRestart ? "Committed" : "Committed (no restart)";
