@@ -18,7 +18,7 @@ import { validateBeforeCommit, captureCodeQuality, type ValidationOptions } from
 import { compactMemory, smartCompactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
-import { runModelSelectionTests } from "../src/__tests__/model-selection.test.js";
+import { selectModel, autoSelectModel } from "../src/model-selection.js";
 import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage } from "../src/messages.js";
 import { Logger, createLogger, parseJsonlLog, rotateLogFile, LOG_ROTATION_LIMITS, type LogEntry } from "../src/logging.js";
 import { ToolCache, CACHEABLE_TOOLS, extractPaths, pathOverlaps } from "../src/tool-cache.js";
@@ -686,7 +686,13 @@ async function main(): Promise<void> {
     testResuscitation();
     testLogRotation();
     await testResuscitationE2E();
-    runModelSelectionTests();
+    // Inline model-selection smoke test (avoids vitest import in tsx context)
+    console.log("  model-selection smoke test...");
+    assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
+    assert(selectModel({ description: "test", forceModel: "balanced" }) === "balanced", "force balanced");
+    assert(autoSelectModel("Summarize this") === "fast", "auto fast");
+    assert(autoSelectModel("Review this code for bugs") === "balanced", "auto balanced");
+    console.log("  ✓ model-selection: 4 assertions passed");
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {

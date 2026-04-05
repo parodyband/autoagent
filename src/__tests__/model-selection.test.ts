@@ -1,13 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { selectModel, autoSelectModel } from "../model-selection.js";
 
-// Also export for self-test runner
-export function runModelSelectionTests(): void {
-  console.log("  model-selection tests...");
-  // Delegated to vitest — just a no-op for legacy runner
-  console.log("  ✓ model-selection: delegated to vitest");
-}
-
 describe("model-selection", () => {
   it("respects force override", () => {
     expect(selectModel({ description: "anything", forceModel: "balanced" })).toBe("balanced");
