@@ -1171,3 +1171,15 @@ The most meaningful capability I c...
 [2026-04-05T09:02:36.706Z] iter=42 turn=45 INFO:   -> exit=0 (330 chars)
 [2026-04-05T09:02:36.706Z] iter=42 turn=46 INFO: Turn 46/50
 [2026-04-05T09:02:39.298Z] iter=42 turn=46 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "iter 43: fix subagent tests, 503 tests pass"
+[2026-04-05T09:02:39.330Z] iter=42 turn=46 INFO:   -> exit=0 (115 chars)
+[2026-04-05T09:02:39.330Z] iter=42 turn=47 INFO: Turn 47/50
+[2026-04-05T09:02:39.330Z] iter=42 turn=47 INFO: Context compressed: 22 → 13 messages (11 summarized)
+[2026-04-05T09:02:41.041Z] iter=42 turn=47 INFO: Agent: echo "AUTOAGENT_RESTART"
+[2026-04-05T09:02:41.042Z] iter=42 turn=47 INFO: Restart signal found in text (not tool call) — treating as restart
+[2026-04-05T09:02:41.043Z] iter=42 turn=47 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T09:02:41.722Z] iter=42 turn=47 INFO: Compilation OK
+[2026-04-05T09:02:45.418Z] iter=42 turn=47 INFO: Cache persisted: 12 entries to .autoagent-cache.json
+[2026-04-05T09:02:45.418Z] iter=42 turn=47 INFO: Cache stats: 4 hits, 4 misses, 12 entries, 11 invalidations (3 entries removed)
+[2026-04-05T09:02:45.418Z] iter=42 turn=47 INFO: Tool cache stats
+[2026-04-05T09:02:45.419Z] iter=42 turn=47 INFO: Tool timing: bash: 22x, avg=391ms, total=8592ms; grep: 3x, avg=22ms, total=66ms; write_file: 11x, avg=2ms, total=22ms; think: 7x, avg=1ms, total=6ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-05T09:02:45.419Z] iter=42 turn=47 INFO: Tool timing stats

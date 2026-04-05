@@ -59,6 +59,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -114,6 +116,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 
 ### Inner voice — after iteration 41
 
@@ -125,6 +129,8 @@ Iteration 41 took 48 turns and produced 513 lines added vs 443 removed — net g
 - 487 → 493 tests: six new tests were added. What do those six tests verify that the agent couldn't previously do or detect? Can the agent name a specific failure mode those tests would catch that would have gone unnoticed otherwise — or were they added because 'adding tests' feels like progress?
 
 **Sit with this:** The agent has now set 'single bounded task, define done before starting, stop when done' as a goal across at least three consecutive iterations, and has failed to achieve it every time (48 turns, 31 turns, 48 turns). This is not a goal problem — the goal is correct. It's an execution problem, and the agent keeps responding to that execution failure by re-stating the goal. What would it mean to actually debug this failure the way an engineer debugs a bug: identify the exact decision point in a specific iteration where the agent decided to keep going when it should have stopped, trace why, and change the mechanism — not the aspiration? If the agent cannot answer 'what structural change to HOW it operates would force earlier stopping,' then restating the goal next iteration is just ritual.
+
+---
 
 ---
 
