@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "start": "tsx src/agent.ts",
+    "cli": "tsx src/cli.ts",
     "restart": "tsx src/agent.ts"
   },
   "dependencies": {

@@ -1,72 +1,3 @@
-Continuing now:
-[2026-04-05T13:32:59.765Z] iter=170 turn=9 INFO: write_file: src/orientation.ts (patch)
-[2026-04-05T13:32:59.765Z] iter=170 turn=9 INFO:   -> ok: Patched src/orientation.ts: -16 +15 lines
-
-Context after patch:
-232 |     const iterRange = `${recent[0].iteration}–${recent[recent.length - 1].iteration}`;
-233 |     const baseSummary = `Last 5 iterations (${iterRange}): avg ${avgTurns.toFixed(0)} turns | LOC stalls: ${stalledCount} | ${insights[0]}`;
-234 | 
-235 |     // Append calibration advisory using the proper feedback mechanism
-236 |     try {
-237 |       const metricsFile = `${rootDir}/.autoagent-metrics.json`;
-238 |       const budget = computeTurnBudget(metricsFile, null);
-239 |       const advisory = calibrationSuggestion(budget);
-240 |       if (advisory) {
-241 |         // Extract just the body (strip the ## header for inline use)
-242 |         const body = advisory.replace(/^## Calibration Advisory\n\n/, "");
-243 |         return `${baseSummary}\n${body}`;
-244 |       }
-245 |     } catch {
-246 |       // Calibration is optional — don't fail the whole summary
-247 |     }
-248 | 
-249 |     return baseSummary;
-250 |   } catch {
-251 |     return null;
-252 |   }
-[2026-04-05T13:32:59.766Z] iter=170 turn=10 INFO: Turn 10/25
-[2026-04-05T13:33:03.224Z] iter=170 turn=10 INFO: Agent: Now the unused imports `readPredictionCalibration` and `computeCalibration` need to be removed since they're no longer used:
-[2026-04-05T13:33:03.225Z] iter=170 turn=10 INFO: $ grep -n "readPredictionCalibration\|computeCalibration" src/orientation.ts
-[2026-04-05T13:33:03.234Z] iter=170 turn=10 INFO:   -> exit=0 (127 chars)
-[2026-04-05T13:33:03.235Z] iter=170 turn=11 INFO: Turn 11/25
-[2026-04-05T13:33:06.296Z] iter=170 turn=11 INFO: Agent: They're only in the import now (no longer used in the body). Remove them:
-[2026-04-05T13:33:06.297Z] iter=170 turn=11 INFO: write_file: src/orientation.ts (patch)
-[2026-04-05T13:33:06.299Z] iter=170 turn=11 INFO:   -> ok: Patched src/orientation.ts: -1 +1 lines
-
-Context after patch:
-12 | import { readFileSync } from "fs";
-13 | import { executeBash } from "./tools/bash.js";
-14 | import { parallelResearch } from "./tools/subagent.js";
-15 | import { computeTurnBudget, calibrationSuggestion } from "./turn-budget.js";
-16 | import { rankFiles } from "./file-ranker.js";
-17 | 
-18 | export interface OrientationReport {
-[2026-04-05T13:33:06.300Z] iter=170 turn=12 INFO: Turn 12/25
-[2026-04-05T13:33:11.072Z] iter=170 turn=12 INFO: Agent: Now the secondary task — unexport/delete dead symbols. From the grep, none of `formatTurnBudget`, `buildBuilderMessage`, `parseBacklog`, `parseSchemas`, `serializeSchema`, `setSection` are called outside their own files. Let me check if they're called *inside* their own files before deleting:
-[2026-04-05T13:33:11.073Z] iter=170 turn=12 INFO: $ grep -n "formatTurnBudget\|buildBuilderMessage\|parseBacklog\|parseSchemas\|serializeSchema\|setSection" src/turn-budget.ts src/messages.ts src/memory.ts
-[2026-04-05T13:33:11.090Z] iter=170 turn=12 INFO:   -> exit=0 (553 chars)
-[2026-04-05T13:33:11.090Z] iter=170 turn=13 INFO: Turn 13/25
-[2026-04-05T13:33:13.890Z] iter=170 turn=13 INFO: Agent: None called internally (just defined). But must check `__tests__/` before deleting:
-[2026-04-05T13:33:13.891Z] iter=170 turn=13 INFO: $ grep -rn "formatTurnBudget\|buildBuilderMessage\|parseBacklog\|parseSchemas\|serializeSchema\|setSection\|formatCognitiveMetrics" __tests__/ 2>/dev/null | head -20
-[2026-04-05T13:33:13.911Z] iter=170 turn=13 INFO:   -> exit=0 (11 chars)
-[2026-04-05T13:33:13.912Z] iter=170 turn=14 INFO: Turn 14/25
-[2026-04-05T13:33:17.428Z] iter=170 turn=14 INFO: Agent: Not used in tests either. Now make all the changes:
-
-**1. `formatTurnBudget` in turn-budget.ts — delete it:**
-[2026-04-05T13:33:17.428Z] iter=170 turn=14 INFO: $ sed -n '148,178p' src/turn-budget.ts
-[2026-04-05T13:33:17.437Z] iter=170 turn=14 INFO:   -> exit=0 (1273 chars)
-[2026-04-05T13:33:17.437Z] iter=170 turn=15 INFO: Turn 15/25
-[2026-04-05T13:33:22.514Z] iter=170 turn=15 INFO: write_file: src/turn-budget.ts (patch)
-[2026-04-05T13:33:22.515Z] iter=170 turn=15 INFO:   -> ok: Patched src/turn-budget.ts: -26 +1 lines
-
-Context after patch:
-1 | /**
-2 |  * Adaptive turn budgeting — the agent uses its own historical metrics
-3 |  * to set a dynamic turn budget for the current iteration.
-4 |  *
-[2026-04-05T13:33:22.516Z] iter=170 turn=16 INFO: Turn 16/25
-[2026-04-05T13:33:24.636Z] iter=170 turn=16 INFO: Agent: Good progress made. Let me finish the remaining secondary changes, then verify and commit.
-[2026-04-05T13:33:24.637Z] iter=170 turn=16 INFO: $ grep -n "buildBuilderMessage" src/messages.ts | head -5
 [2026-04-05T13:33:24.650Z] iter=170 turn=16 INFO:   -> exit=0 (86 chars)
 [2026-04-05T13:33:24.651Z] iter=170 turn=17 INFO: Turn 17/25
 [2026-04-05T13:33:29.305Z] iter=170 turn=17 INFO: Agent: Wrapping up now. Let me do all remaining changes + verify in parallel.
@@ -1065,3 +996,16 @@ I have enough ...
 [2026-04-05T13:46:22.500Z] iter=175 turn=11 INFO: Tool timing stats
 [2026-04-05T13:46:27.271Z] iter=175 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 175: predicted 18 turns, actual 11 turns, ratio 0.61**
 [2026-04-05T13:46:27.290Z] iter=175 turn=11 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T13:46:27.319Z] iter=175 turn=11 INFO: Committed: 6ce37838 (17 in / 4221 out, cache: 12870 created, 82813 read)
+[2026-04-05T13:46:27.320Z] iter=175 turn=11 INFO: Restarting as iteration 176...
+[2026-04-05T13:46:27.497Z] iter=176 INFO: Cache restored: 42/42 entries (0 stale)
+[2026-04-05T13:46:27.498Z] iter=176 INFO: Turn budget: 21/25 (calibration=1.00x, predicted=18)
+[2026-04-05T13:46:27.499Z] iter=176 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T13:46:27.548Z] iter=176 turn=1 INFO: Turn 1/25
+[2026-04-05T13:46:29.668Z] iter=176 turn=1 INFO: think: Let me start by understanding the current codebase structure, particularly agent.ts and orientation.ts, before building ...
+[2026-04-05T13:46:29.670Z] iter=176 turn=2 INFO: Turn 2/25
+[2026-04-05T13:46:31.457Z] iter=176 turn=2 INFO: $ cat src/agent.ts
+[2026-04-05T13:46:31.462Z] iter=176 turn=2 INFO: $ cat src/orientation.ts | head -100
+[2026-04-05T13:46:31.480Z] iter=176 turn=2 INFO:   -> exit=0 (18757 chars)
+[2026-04-05T13:46:31.485Z] iter=176 turn=2 INFO:   -> exit=0 (3420 chars)
+[2026-04-05T13:46:31.485Z] iter=176 turn=3 INFO: Turn 3/25
