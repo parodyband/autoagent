@@ -470,11 +470,53 @@ function App() {
           "  /clear    — Clear the conversation history",
           "  /reindex  — Re-index the repository files",
           "  /resume   — List and restore a previous session",
+          "  /rewind   — Restore conversation to a prior checkpoint",
           "  /diff     — Show uncommitted git changes",
           "  /undo     — Revert the last autoagent commit",
           "  /exit     — Quit AutoAgent",
         ].join("\n"),
       }]);
+      return;
+    }
+    if (trimmed === "/rewind") {
+      const checkpoints = orchestratorRef.current?.getCheckpoints() ?? [];
+      if (checkpoints.length === 0) {
+        setMessages(prev => [...prev, { role: "assistant", content: "No checkpoints yet. Send a message first." }]);
+        return;
+      }
+      const lines = ["Conversation checkpoints (select with /rewind <number>):"];
+      lines.push("  [0] now (current state)");
+      checkpoints.slice().reverse().forEach((cp, i) => {
+        const t = new Date(cp.timestamp).toLocaleTimeString();
+        lines.push(`  [${i + 1}] "${cp.label}" (${t})`);
+      });
+      lines.push("\nType /rewind <number> to restore that checkpoint.");
+      setMessages(prev => [...prev, { role: "assistant", content: lines.join("\n") }]);
+      return;
+    }
+    const rewindMatch = trimmed.match(/^\/rewind\s+(\d+)$/);
+    if (rewindMatch) {
+      const idx = parseInt(rewindMatch[1], 10);
+      if (idx === 0) {
+        setMessages(prev => [...prev, { role: "assistant", content: "Already at current state." }]);
+        return;
+      }
+      const checkpoints = orchestratorRef.current?.getCheckpoints() ?? [];
+      const reversed = checkpoints.slice().reverse();
+      const cp = reversed[idx - 1];
+      if (!cp) {
+        setMessages(prev => [...prev, { role: "assistant", content: "Invalid checkpoint number." }]);
+        return;
+      }
+      const result = orchestratorRef.current?.rewindTo(cp.id);
+      if (result) {
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          content: `↩ Rewound to: "${result.label}"`,
+        }]);
+      } else {
+        setMessages(prev => [...prev, { role: "assistant", content: "Could not rewind to that checkpoint." }]);
+      }
       return;
     }
     if (trimmed === "/status") {

@@ -76,3 +76,5 @@ Average ratio: 1.07 — well calibrated.
 System healthy. 4/5 recent iterations shipped user-facing features. Predictions well-calibrated (1.07x). /rewind is the clear next high-value feature from Architect research.
 
 **[AUTO-SCORED] Iteration 259: predicted 20 turns, actual 14 turns, ratio 0.70**
+
+**[AUTO-SCORED] Iteration 260: predicted 20 turns, actual 23 turns, ratio 1.15**

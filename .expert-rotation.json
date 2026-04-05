@@ -1,22 +1,77 @@
 {
   "lastExpert": "Engineer",
   "history": [
-    { "iteration": 244, "expert": "Engineer" },
-    { "iteration": 245, "expert": "Architect" },
-    { "iteration": 246, "expert": "Engineer" },
-    { "iteration": 247, "expert": "Meta" },
-    { "iteration": 248, "expert": "Engineer" },
-    { "iteration": 249, "expert": "Architect" },
-    { "iteration": 250, "expert": "Engineer" },
-    { "iteration": 251, "expert": "Meta" },
-    { "iteration": 252, "expert": "Engineer" },
-    { "iteration": 253, "expert": "Architect" },
-    { "iteration": 254, "expert": "Engineer" },
-    { "iteration": 255, "expert": "Meta" },
-    { "iteration": 256, "expert": "Engineer" },
-    { "iteration": 257, "expert": "Architect" },
-    { "iteration": 258, "expert": "Engineer" },
-    { "iteration": 259, "expert": "Meta" },
-    { "iteration": 260, "expert": "Engineer" }
+    {
+      "iteration": 244,
+      "expert": "Engineer"
+    },
+    {
+      "iteration": 245,
+      "expert": "Architect"
+    },
+    {
+      "iteration": 246,
+      "expert": "Engineer"
+    },
+    {
+      "iteration": 247,
+      "expert": "Meta"
+    },
+    {
+      "iteration": 248,
+      "expert": "Engineer"
+    },
+    {
+      "iteration": 249,
+      "expert": "Architect"
+    },
+    {
+      "iteration": 250,
+      "expert": "Engineer"
+    },
+    {
+      "iteration": 251,
+      "expert": "Meta"
+    },
+    {
+      "iteration": 252,
+      "expert": "Engineer"
+    },
+    {
+      "iteration": 253,
+      "expert": "Architect"
+    },
+    {
+      "iteration": 254,
+      "expert": "Engineer"
+    },
+    {
+      "iteration": 255,
+      "expert": "Meta"
+    },
+    {
+      "iteration": 256,
+      "expert": "Engineer"
+    },
+    {
+      "iteration": 257,
+      "expert": "Architect"
+    },
+    {
+      "iteration": 258,
+      "expert": "Engineer"
+    },
+    {
+      "iteration": 259,
+      "expert": "Meta"
+    },
+    {
+      "iteration": 260,
+      "expert": "Engineer"
+    },
+    {
+      "iteration": 260,
+      "expert": "Engineer"
+    }
   ]
 }

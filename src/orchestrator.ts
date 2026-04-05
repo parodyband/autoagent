@@ -102,6 +102,19 @@ const READ_ONLY_KEYWORDS = [
 
 // ─── Types ───────────────────────────────────────────────────
 
+// ─── Checkpoint types ─────────────────────────────────────────
+
+/** A snapshot of the conversation at a point in time. */
+export interface ConversationCheckpoint {
+  id: number;
+  label: string;
+  messages: Anthropic.MessageParam[];
+  timestamp: number;
+}
+
+/** Maximum number of checkpoints to retain in memory. */
+export const MAX_CHECKPOINTS = 20;
+
 export interface OrchestratorOptions {
   workDir: string;
   /** Called when a tool is invoked */
@@ -595,6 +608,10 @@ export class Orchestrator {
   /** Path to current session's JSONL file */
   sessionPath: string = "";
 
+  /** Conversation checkpoints for /rewind command. */
+  private checkpoints: ConversationCheckpoint[] = [];
+  private nextCheckpointId = 0;
+
   constructor(opts: OrchestratorOptions) {
     this.opts = opts;
     this.client = new Anthropic();
@@ -644,6 +661,42 @@ export class Orchestrator {
     this.sessionTokensOut = 0;
     this.sessionCost = 0;
     this.contextWarningShown = false;
+    this.checkpoints = [];
+    this.nextCheckpointId = 0;
+  }
+
+  /**
+   * Save a checkpoint of the current conversation state.
+   * Called before each user message is processed.
+   * Keeps at most MAX_CHECKPOINTS; drops oldest when cap exceeded.
+   */
+  saveCheckpoint(label: string): void {
+    const checkpoint: ConversationCheckpoint = {
+      id: this.nextCheckpointId++,
+      label: label.slice(0, 60),
+      messages: this.apiMessages.map(m => ({ ...m })),
+      timestamp: Date.now(),
+    };
+    this.checkpoints.push(checkpoint);
+    if (this.checkpoints.length > MAX_CHECKPOINTS) {
+      this.checkpoints.shift();
+    }
+  }
+
+  /**
+   * Restore conversation to the state at a given checkpoint id.
+   * Returns the checkpoint label on success, null if not found.
+   */
+  rewindTo(id: number): { label: string } | null {
+    const cp = this.checkpoints.find(c => c.id === id);
+    if (!cp) return null;
+    this.apiMessages = cp.messages.map(m => ({ ...m }));
+    return { label: cp.label };
+  }
+
+  /** Get all current checkpoints (most recent last). */
+  getCheckpoints(): ConversationCheckpoint[] {
+    return [...this.checkpoints];
   }
 
   /** Re-index the repo (after significant changes). */
@@ -910,6 +963,9 @@ export class Orchestrator {
       this.opts.onStatus?.("Architect mode: plan generated");
       this.opts.onPlan?.(architectResult.plan);
     }
+
+    // 4. Save checkpoint BEFORE adding user message (so rewind restores pre-message state)
+    this.saveCheckpoint(userMessage);
 
     // 4. Add user message to history and persist
     // Prepend file reference context if present
