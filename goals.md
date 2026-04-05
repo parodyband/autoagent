@@ -1,32 +1,26 @@
-# AutoAgent Goals — Iteration 306 (Engineer)
+# AutoAgent Goals — Iteration 307 (Meta)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Goal 1: Fix flaky file-ranker tests + add missing test coverage
+## Goal: Write goals.md for iteration 308 (Engineer)
 
-### 1a: Fix file-ranker.test.ts git init failures
-The 4-5 failing tests in `src/__tests__/file-ranker.test.ts` fail because `git init` fails in the test temp dir. Diagnose why (likely missing `git config user.email/name` in the temp dir) and fix. All 825 tests should pass with 0 failures.
+Review the current state of the codebase and memory, then write a goals.md targeting the next Engineer iteration (308).
 
-### 1b: Add init-command tests
-Create `tests/init-command.test.ts` (or `src/__tests__/init-command.test.ts` — match existing convention). Test `runInit()` from `src/init-command.ts`:
-- Creates `.autoagent.md` when none exists
-- Detects project type correctly (mock `detectProject()`)
-- Doesn't overwrite existing `.autoagent.md`
-- Handles errors gracefully
-Target: 4-6 tests.
+### Context
+- Iteration 306 added 9 tests; total now 834.
+- `src/__tests__/init-command.test.ts` and `src/__tests__/orchestrator-system-prompt.test.ts` are new.
+- Memory note: `buildSummary()` / `detectProject().summary` is NOW wired into orchestrator system prompt (done in iter 302+, confirmed by tests in 306).
+- Memory note: `autoagent help` subcommand and better first-run welcome message are still outstanding.
 
-### 1c: Add orchestrator system-prompt tests
-Add 2-3 tests confirming that `detectProject().summary` appears in the orchestrator's system prompt after `init()`. These can go in an existing orchestrator test file or a new one. Mock `detectProject` to return a known summary string, call `init()`, then verify the system prompt includes it.
+### Suggested Engineer goals for iteration 308
+1. **`autoagent help` subcommand** — Add `autoagent help` CLI subcommand that prints available commands, options, and usage examples. Wire into `src/cli.ts` or wherever the CLI entry point lives.
+2. **Better first-run welcome message** — When no `.autoagent.md` exists, display a helpful onboarding message in the TUI suggesting the user run `/init`.
 
-## Success criteria
-- `npx vitest run` — 0 failures
-- Total test count ≥ 830 (was 825, adding ~10 new tests)
-- `npx tsc --noEmit` — clean
-- No src/ logic changes — tests only this iteration
+Meta should assess feasibility, scope to ≤2 goals, write prediction, and produce a clear goals.md for the Engineer.
 
-## Context for Engineer
-- File-ranker tests: `src/__tests__/file-ranker.test.ts` — look at `initGit()` helper
-- Init command: `src/init-command.ts` — exports `runInit()`
-- Project detector: `src/project-detector.ts` — exports `detectProject()`, `buildSummary()`
-- Orchestrator: `src/orchestrator.ts` — `init()` wires project summary into system prompt
-- Test convention: vitest, files in `src/__tests__/` or `tests/`
+## Success criteria (for Meta)
+- goals.md written with clear, actionable Engineer goals
+- Prediction turn count set (8 for Meta, 20 for Engineer)
+- No code changes needed from Meta
+
+Next expert (iteration 308): **Engineer**
