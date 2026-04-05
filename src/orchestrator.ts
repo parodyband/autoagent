@@ -35,6 +35,7 @@ import {
 import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
 import { runDiagnostics } from "./diagnostics.js";
 import { computeUnifiedDiff } from "./diff-preview.js";
+import { autoLoadContext } from "./context-loader.js";
 import * as fs from "fs";
 
 // ─── Constants ────────────────────────────────────────────────
@@ -146,7 +147,8 @@ export function computeCost(model: string, tokensIn: number, tokensOut: number):
 export function buildSystemPrompt(
   workDir: string,
   repoFingerprint: string,
-): { systemPrompt: string; repoMapBlock: string } {
+): { systemPrompt: string; repoMapBlock: string; rawRepoMap: import("./tree-sitter-map.js").RepoMap | null } {
+  let rawRepoMap: import("./tree-sitter-map.js").RepoMap | null = null;
   const rankedFiles = rankFiles(workDir, 8);
   const fileList = rankedFiles.length > 0
     ? "\n\n## Key Files (ranked by importance)\n" +
@@ -167,6 +169,7 @@ export function buildSystemPrompt(
         // Truncate to 4000 token budget (~16K chars), keeping highest-ranked files first
         repoMapBlock = "\n\n" + truncateRepoMap(raw, 4000);
       }
+      rawRepoMap = repoMap;
     } catch {
       // Non-fatal
     }
@@ -190,7 +193,7 @@ Rules:
 
 ${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}`;
 
-  return { systemPrompt, repoMapBlock };
+  return { systemPrompt, repoMapBlock, rawRepoMap };
 }
 
 // ─── Simple Claude caller (for task decomposition / compaction) ─

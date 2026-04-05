@@ -1,59 +1,3 @@
-81 |   /** If provided, resume an existing session instead of creating a new one */
-82 |   resumeSessionPath?: string;
-83 |   /** Called when an architect plan is generated */
-84 |   onPlan?: (plan: EditPlan) => void;
-85 |   /**
-86 |    * Called before write_file executes. Receives the unified diff and file path.
-87 |    * Return true to accept the write, false to reject it.
-88 |    * If not provided (or --no-confirm), writes proceed without confirmation.
-89 |    */
-90 |   onDiffPreview?: (diff: string, filePath: string) => Promise<boolean>;
-91 | }
-92 | 
-93 | export interface OrchestratorResult {
-94 |   text: string;
-[2026-04-05T15:40:33.586Z] iter=212 turn=8 INFO: Turn 8/25
-[2026-04-05T15:40:39.806Z] iter=212 turn=8 INFO: Agent: Now update `runAgentLoop` signature and the tool-execution loop to intercept `write_file`:
-[2026-04-05T15:40:39.807Z] iter=212 turn=8 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:40:39.809Z] iter=212 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -12 +13 lines
-
-Context after patch:
-241 | 
-242 | // ─── Streaming agent loop ─────────────────────────────────────
-243 | 
-244 | async function runAgentLoop(
-245 |   client: Anthropic,
-246 |   model: string,
-247 |   systemPrompt: string,
-248 |   apiMessages: Anthropic.MessageParam[],
-249 |   registry: ReturnType<typeof createDefaultRegistry>,
-250 |   workDir: string,
-251 |   onToolCall?: OrchestratorOptions["onToolCall"],
-252 |   onStatus?: OrchestratorOptions["onStatus"],
-253 |   onText?: OrchestratorOptions["onText"],
-254 |   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
-255 | ): Promise<{ text: string; tokensIn: number; tokensOut: number }> {
-256 |   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus);
-257 |   const tools = registry.getDefinitions();
-258 | 
-259 |   let totalIn = 0, totalOut = 0;
-[2026-04-05T15:40:39.810Z] iter=212 turn=9 INFO: Turn 9/25
-[2026-04-05T15:40:47.429Z] iter=212 turn=9 INFO: Agent: Now intercept `write_file` in the tool execution loop:
-[2026-04-05T15:40:47.430Z] iter=212 turn=9 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:40:47.430Z] iter=212 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -7 +25 lines
-
-Context after patch:
-299 | 
-300 |     if (toolUses.length === 0) break;
-301 | 
-302 |     const results: Anthropic.ToolResultBlockParam[] = [];
-303 |     for (const tu of toolUses) {
-304 |       // Intercept write_file for diff preview confirmation
-305 |       if (tu.name === "write_file" && onDiffPreview) {
-306 |         const inp = tu.input as { path?: string; content?: string; mode?: string };
-307 |         const relPath = inp.path ?? "";
-308 |         const newContent = inp.content ?? "";
-309 |         const fullPath = fs.existsSync(relPath) ? relPath
 310 |           : `${workDir}/${relPath}`;
 311 |         let oldContent = "";
 312 |         try { oldContent = fs.readFileSync(fullPath, "utf-8"); } catch { /* new file */ }
@@ -1052,3 +996,189 @@ TypeScript is clean. Goals are written. Memory is saved. Done.
 [2026-04-05T15:50:30.179Z] iter=217 turn=7 INFO: Tool timing stats
 [2026-04-05T15:50:35.211Z] iter=217 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 217: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T15:50:35.233Z] iter=217 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T15:50:35.266Z] iter=217 turn=7 INFO: Committed: 8ec0c5f2 (17 in / 2504 out, cache: 10590 created, 50068 read)
+[2026-04-05T15:50:35.266Z] iter=217 turn=7 INFO: Restarting as iteration 218...
+[2026-04-05T15:50:35.462Z] iter=218 INFO: Cache restored: 46/46 entries (0 stale)
+[2026-04-05T15:50:35.463Z] iter=218 INFO: Turn budget: 18/25 (calibration=0.88x, predicted=20)
+[2026-04-05T15:50:35.464Z] iter=218 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T15:50:35.575Z] iter=218 turn=1 INFO: Turn 1/25
+[2026-04-05T15:50:38.981Z] iter=218 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what's there before building.
+[2026-04-05T15:50:38.982Z] iter=218 turn=1 INFO: $ cat goals.md
+[2026-04-05T15:50:38.985Z] iter=218 turn=1 INFO: $ ls src/ | head -40
+[2026-04-05T15:50:38.993Z] iter=218 turn=1 INFO:   -> exit=0 (3725 chars)
+[2026-04-05T15:50:38.997Z] iter=218 turn=1 INFO:   -> exit=0 (576 chars)
+[2026-04-05T15:50:38.998Z] iter=218 turn=2 INFO: Turn 2/25
+[2026-04-05T15:50:41.327Z] iter=218 turn=2 INFO: $ grep -n "fuzzySearch\|buildRepoMap\|truncateRepoMap" src/tree-sitter-map.ts | head -40
+[2026-04-05T15:50:41.333Z] iter=218 turn=2 INFO: $ grep -n "repoMap\|fuzzySearch" src/orchestrator.ts | head -40
+[2026-04-05T15:50:41.350Z] iter=218 turn=2 INFO:   -> exit=0 (255 chars)
+[2026-04-05T15:50:41.352Z] iter=218 turn=2 INFO:   -> exit=0 (784 chars)
+[2026-04-05T15:50:41.353Z] iter=218 turn=3 INFO: Turn 3/25
+[2026-04-05T15:50:43.511Z] iter=218 turn=3 INFO: $ grep -n "repoMap\|RepoMap" src/orchestrator.ts | head -60
+[2026-04-05T15:50:43.513Z] iter=218 turn=3 INFO: $ grep -n "export\|interface\|class\|type " src/tree-sitter-map.ts | head -60
+[2026-04-05T15:50:43.522Z] iter=218 turn=3 INFO:   -> exit=0 (885 chars)
+[2026-04-05T15:50:43.523Z] iter=218 turn=3 INFO:   -> exit=0 (3546 chars)
+[2026-04-05T15:50:43.524Z] iter=218 turn=4 INFO: Turn 4/25
+[2026-04-05T15:50:47.780Z] iter=218 turn=4 INFO: think: I have enough context. Let me start building:
+
+1. `src/context-loader.ts` - new file with `autoLoadContext()` 
+2. `src/_...
+[2026-04-05T15:50:47.781Z] iter=218 turn=5 INFO: Turn 5/25
+[2026-04-05T15:50:51.563Z] iter=218 turn=5 INFO: $ grep -n "fuzzySearch" src/tree-sitter-map.ts | head -10
+sed -n '590,640p' src/tree-sitter-map.ts
+[2026-04-05T15:50:51.565Z] iter=218 turn=5 INFO: $ grep -n "\/diff\|\/undo\|\/help\|\/clear\|\/resume\|onFind\|onDiff" src/tui.tsx | head -40
+[2026-04-05T15:50:51.567Z] iter=218 turn=5 INFO: $ grep -n "class Orchestrator\|private repoMap\|getRepoMap\|this\.repoMap\b" src/orchestrator.ts | head -20
+[2026-04-05T15:50:51.578Z] iter=218 turn=5 INFO:   -> exit=0 (791 chars)
+[2026-04-05T15:50:51.578Z] iter=218 turn=5 INFO:   -> exit=0 (1540 chars)
+[2026-04-05T15:50:51.585Z] iter=218 turn=5 INFO:   -> exit=0 (73 chars)
+[2026-04-05T15:50:51.585Z] iter=218 turn=6 INFO: Turn 6/25
+[2026-04-05T15:50:54.229Z] iter=218 turn=6 INFO: $ grep -n "SearchResult\|export.*SearchResult" src/tree-sitter-map.ts | head -10
+[2026-04-05T15:50:54.234Z] iter=218 turn=6 INFO: $ sed -n '330,460p' src/tui.tsx
+[2026-04-05T15:50:54.249Z] iter=218 turn=6 INFO:   -> exit=0 (5385 chars)
+[2026-04-05T15:50:54.251Z] iter=218 turn=6 INFO:   -> exit=0 (178 chars)
+[2026-04-05T15:50:54.252Z] iter=218 turn=7 INFO: Turn 7/25
+[2026-04-05T15:50:59.453Z] iter=218 turn=7 INFO: Agent: Goal 1 `/find`: DONE (already in tui.tsx from a prior iteration!)
+Goal 2 `context-loader.ts`: NOT STARTED
+
+Let me check what exists and build what's missing.
+[2026-04-05T15:50:59.454Z] iter=218 turn=7 INFO: $ ls src/__tests__/ | grep -E "context|find|tui-command"
+cat src/context-loader.ts 2>/dev/null || echo "MISSING"
+[2026-04-05T15:50:59.462Z] iter=218 turn=7 INFO: $ grep -n "autoLoadContext\|context-loader" src/orchestrator.ts | head -10
+[2026-04-05T15:50:59.485Z] iter=218 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:50:59.485Z] iter=218 turn=7 INFO:   -> exit=0 (57 chars)
+[2026-04-05T15:50:59.486Z] iter=218 turn=8 INFO: Turn 8/25
+[2026-04-05T15:51:00.860Z] iter=218 turn=8 INFO: $ sed -n '520,580p' src/orchestrator.ts
+[2026-04-05T15:51:00.879Z] iter=218 turn=8 INFO:   -> exit=0 (2378 chars)
+[2026-04-05T15:51:00.880Z] iter=218 turn=9 INFO: Turn 9/25
+[2026-04-05T15:51:22.592Z] iter=218 turn=9 INFO: Agent: Now I have everything I need. Let me build `context-loader.ts` and its tests, then wire it into the orchestrator.
+[2026-04-05T15:51:22.593Z] iter=218 turn=9 INFO: write_file: src/context-loader.ts (write)
+[2026-04-05T15:51:22.594Z] iter=218 turn=9 INFO:   -> ok: Created src/context-loader.ts (3981 chars)
+[2026-04-05T15:51:22.595Z] iter=218 turn=10 INFO: Turn 10/25
+[2026-04-05T15:51:43.895Z] iter=218 turn=10 INFO: Agent: Now write the tests:
+[2026-04-05T15:51:43.896Z] iter=218 turn=10 INFO: write_file: src/__tests__/context-loader.test.ts (write)
+[2026-04-05T15:51:43.897Z] iter=218 turn=10 INFO:   -> ok: Created src/__tests__/context-loader.test.ts (5909 chars)
+[2026-04-05T15:51:43.898Z] iter=218 turn=11 INFO: Turn 11/25
+[2026-04-05T15:51:46.349Z] iter=218 turn=11 INFO: Agent: Now wire `autoLoadContext` into the orchestrator's `send()` pipeline. I need to see the orchestrator's send() and init() to find where repoMap is available:
+[2026-04-05T15:51:46.350Z] iter=218 turn=11 INFO: $ sed -n '340,420p' src/orchestrator.ts
+[2026-04-05T15:51:46.366Z] iter=218 turn=11 INFO:   -> exit=0 (2487 chars)
+[2026-04-05T15:51:46.367Z] iter=218 turn=12 INFO: Turn 12/25
+[2026-04-05T15:51:48.808Z] iter=218 turn=12 INFO: $ sed -n '1,30p' src/orchestrator.ts
+[2026-04-05T15:51:48.831Z] iter=218 turn=12 INFO:   -> exit=0 (1290 chars)
+[2026-04-05T15:51:48.832Z] iter=218 turn=13 INFO: Turn 13/25
+[2026-04-05T15:51:51.569Z] iter=218 turn=13 INFO: Agent: I've written `src/context-loader.ts` and `src/__tests__/context-loader.test.ts`. Now I need to wire it into orchestrator and verify everything compiles/tests pass.
+[2026-04-05T15:51:51.569Z] iter=218 turn=13 INFO: $ grep -n "^import\|autoLoadContext\|context-loader" src/orchestrator.ts | head -20
+[2026-04-05T15:51:51.579Z] iter=218 turn=13 INFO:   -> exit=0 (861 chars)
+[2026-04-05T15:51:51.580Z] iter=218 turn=14 INFO: Turn 14/25
+[2026-04-05T15:51:54.950Z] iter=218 turn=14 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:51:54.952Z] iter=218 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -4 +5 lines
+
+Context after patch:
+32 |   runArchitectMode,
+33 |   type EditPlan,
+34 | } from "./architect-mode.js";
+35 | import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
+36 | import { runDiagnostics } from "./diagnostics.js";
+37 | import { computeUnifiedDiff } from "./diff-preview.js";
+38 | import { autoLoadContext } from "./context-loader.js";
+39 | import * as fs from "fs";
+40 | 
+41 | // ─── Constants ────────────────────────────────────────────────
+42 | 
+[2026-04-05T15:51:54.953Z] iter=218 turn=15 INFO: Turn 15/25
+[2026-04-05T15:51:58.676Z] iter=218 turn=15 INFO: Agent: Now I need to find where repoMap is built in orchestrator (needed for autoLoadContext) and where to inject the context. Let me look at the send() pipeline and find a good spot - I need the raw RepoMap object, but currently only `repoMapBlock` (string) is stored. I need to also store the RepoMap:
+[2026-04-05T15:51:58.677Z] iter=218 turn=15 INFO: $ sed -n '140,200p' src/orchestrator.ts
+[2026-04-05T15:51:58.685Z] iter=218 turn=15 INFO:   -> exit=0 (2478 chars)
+[2026-04-05T15:51:58.685Z] iter=218 turn=16 INFO: Turn 16/25
+[2026-04-05T15:52:02.525Z] iter=218 turn=16 INFO: think: I need to store the RepoMap object in the orchestrator so autoLoadContext can use it. The buildSystemPrompt function cur...
+[2026-04-05T15:52:02.526Z] iter=218 turn=17 INFO: Turn 17/25
+[2026-04-05T15:52:08.366Z] iter=218 turn=17 INFO: Agent: I need to finish wiring orchestrator and wrap up now.
+[2026-04-05T15:52:08.368Z] iter=218 turn=17 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:52:08.370Z] iter=218 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -15 +16 lines
+
+Context after patch:
+161 |   if (isSourceDir) {
+162 |     try {
+163 |       const rankedPaths = rankedFiles.map(f => f.path);
+164 |       const repoMap = buildRepoMap(workDir, rankedPaths);
+165 |       const ranked = rankSymbols(repoMap);
+166 |       const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 60, ranked });
+167 |       if (raw.length > 50) {
+168 |         // Truncate to 4000 token budget (~16K chars), keeping highest-ranked files first
+169 |         repoMapBlock = "\n\n" + truncateRepoMap(raw, 4000);
+170 |       }
+171 |       rawRepoMap = repoMap;
+172 |     } catch {
+173 |       // Non-fatal
+174 |     }
+175 |   }
+176 | 
+177 |   const projectMemory = getProjectMemoryBlock(workDir);
+178 | 
+179 |   const systemPrompt = `You are an expert coding assistant with direct access to the filesystem and shell.
+180 | 
+181 | Working directory: ${workDir}
+182 | 
+[2026-04-05T15:52:08.371Z] iter=218 turn=18 INFO: Turn 18/25
+[2026-04-05T15:52:09.899Z] iter=218 turn=18 INFO: $ sed -n '148,160p' src/orchestrator.ts
+[2026-04-05T15:52:09.913Z] iter=218 turn=18 INFO:   -> exit=0 (647 chars)
+[2026-04-05T15:52:09.914Z] iter=218 turn=19 INFO: Turn 19/25
+[2026-04-05T15:52:13.482Z] iter=218 turn=19 INFO: Agent: Stopping all new work. Running checks and wrapping up.
+[2026-04-05T15:52:13.482Z] iter=218 turn=19 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T15:52:14.388Z] iter=218 turn=19 INFO:   -> exit=0 (97 chars)
+[2026-04-05T15:52:14.389Z] iter=218 turn=20 INFO: Turn 20/25
+[2026-04-05T15:52:15.837Z] iter=218 turn=20 INFO: $ sed -n '144,155p' src/orchestrator.ts
+[2026-04-05T15:52:15.846Z] iter=218 turn=20 INFO:   -> exit=0 (492 chars)
+[2026-04-05T15:52:15.846Z] iter=218 turn=21 INFO: Turn 21/25
+[2026-04-05T15:52:18.603Z] iter=218 turn=21 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:52:18.605Z] iter=218 turn=21 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
+
+Context after patch:
+147 | export function buildSystemPrompt(
+148 |   workDir: string,
+149 |   repoFingerprint: string,
+150 | ): { systemPrompt: string; repoMapBlock: string } {
+151 |   let rawRepoMap: import("./tree-sitter-map.js").RepoMap | null = null;
+152 |   const rankedFiles = rankFiles(workDir, 8);
+153 |   const fileList = rankedFiles.length > 0
+154 |     ? "\n\n## Key Files (ranked by importance)\n" +
+155 |       rankedFiles.map(f => `- ${f.path} (${f.reason})`).join("\n")
+[2026-04-05T15:52:18.606Z] iter=218 turn=22 INFO: Turn 22/25
+[2026-04-05T15:52:23.664Z] iter=218 turn=22 INFO: Agent: Now update the return type and value:
+[2026-04-05T15:52:23.664Z] iter=218 turn=22 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:52:23.665Z] iter=218 turn=22 INFO:   -> ok: Patched src/orchestrator.ts: -2 +2 lines
+
+Context after patch:
+147 | export function buildSystemPrompt(
+148 |   workDir: string,
+149 |   repoFingerprint: string,
+150 | ): { systemPrompt: string; repoMapBlock: string; rawRepoMap: import("./tree-sitter-map.js").RepoMap | null } {
+151 |   let rawRepoMap: import("./tree-sitter-map.js").RepoMap | null = null;
+152 |   const rankedFiles = rankFiles(workDir, 8);
+153 |   const fileList = rankedFiles.length > 0
+154 |     ? "\n\n## Key Files (ranked by importance)\n" +
+[2026-04-05T15:52:23.665Z] iter=218 turn=23 INFO: Turn 23/25
+[2026-04-05T15:52:26.181Z] iter=218 turn=23 INFO: $ sed -n '190,200p' src/orchestrator.ts
+[2026-04-05T15:52:26.199Z] iter=218 turn=23 INFO:   -> exit=0 (400 chars)
+[2026-04-05T15:52:26.200Z] iter=218 turn=24 INFO: Turn 24/25
+[2026-04-05T15:52:28.527Z] iter=218 turn=24 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T15:52:28.528Z] iter=218 turn=24 INFO:   -> ok: Patched src/orchestrator.ts: -2 +2 lines
+
+Context after patch:
+193 | 
+194 | ${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}`;
+195 | 
+196 |   return { systemPrompt, repoMapBlock, rawRepoMap };
+197 | }
+198 | 
+199 | // ─── Simple Claude caller (for task decomposition / compaction) ─
+200 | 
+[2026-04-05T15:52:28.528Z] iter=218 turn=25 INFO: Turn 25/25
+[2026-04-05T15:52:30.692Z] iter=218 turn=25 INFO: $ grep -n "private repoMapBlock\|private rawRepoMap\|this\.rawRepoMap\|repoMapBlock.*=.*buildSystem\|systemPrompt.*repoMapBlock.*=" src/orchestrator.ts | head -20
+[2026-04-05T15:52:30.704Z] iter=218 turn=25 INFO:   -> exit=0 (201 chars)
+[2026-04-05T15:52:30.704Z] iter=218 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T15:52:30.707Z] iter=218 turn=25 INFO: Cache persisted: 46 entries to .autoagent-cache.json
+[2026-04-05T15:52:30.708Z] iter=218 turn=25 INFO: Tool timing: bash: 23x, avg=55ms, total=1271ms; write_file: 7x, avg=2ms, total=14ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T15:52:30.708Z] iter=218 turn=25 INFO: Tool timing stats
+[2026-04-05T15:52:35.934Z] iter=218 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 218: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T15:52:46.868Z] iter=218 turn=25 INFO: Pre-commit review (2941in/387out): - **"has" is duplicated in STOPWORDS** (`"has"` appears twice on lines 2 and 3 of the set literal). Minor, but wasteful and suggests a copy-paste error.
+
+- **Truncation logic is fragile**: The budget 
