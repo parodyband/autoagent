@@ -51,6 +51,7 @@ interface IterationMetrics {
   outputTokens: number;
   cacheCreationTokens?: number;
   cacheReadTokens?: number;
+  predictedTurns?: number;
   codeQuality?: CodeQualitySnapshot;
   benchmarks?: BenchmarkSnapshot;
   toolTimings?: TimingStats;
@@ -272,6 +273,174 @@ ${rows}
 </table>`;
 }
 
+function generateTurnPredictionChart(metrics: IterationMetrics[]): string {
+  const withPredictions = metrics.filter(m => m.predictedTurns != null && m.predictedTurns > 0);
+  if (withPredictions.length === 0) {
+    return `
+<h2 style="color: #58a6ff; margin-top: 2rem;">🎯 Turn Prediction Accuracy</h2>
+<p style="color: #8b949e; margin-top: 0.5rem;">No prediction data available yet. Predictions will appear once iterations include <code>predictedTurns</code> in metrics.</p>`;
+  }
+
+  const padding = 50;
+  const width = 500;
+  const height = 400;
+  const plotW = width - 2 * padding;
+  const plotH = height - 2 * padding;
+
+  const allValues = withPredictions.flatMap(m => [m.predictedTurns!, m.turns]);
+  const maxVal = Math.max(...allValues, 10);
+  const scale = (v: number) => (v / maxVal);
+
+  // Build scatter points
+  const points = withPredictions.map(m => {
+    const x = padding + scale(m.predictedTurns!) * plotW;
+    const y = height - padding - scale(m.turns) * plotH;
+    const ratio = m.turns / m.predictedTurns!;
+    const color = ratio <= 1.5 ? "#3fb950" : ratio <= 2.0 ? "#d29922" : "#f85149";
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${color}" opacity="0.85"><title>Iter ${m.iteration}: predicted ${m.predictedTurns}, actual ${m.turns} (${ratio.toFixed(2)}x)</title></circle>`;
+  }).join("\n    ");
+
+  // Perfect prediction line (diagonal)
+  const lineX1 = padding;
+  const lineY1 = height - padding;
+  const lineX2 = padding + plotW;
+  const lineY2 = padding;
+
+  // Axis ticks
+  const tickCount = 5;
+  const ticks = Array.from({ length: tickCount + 1 }, (_, i) => Math.round(maxVal * i / tickCount));
+  const xTicks = ticks.map(v => {
+    const x = padding + scale(v) * plotW;
+    return `<line x1="${x}" y1="${height - padding}" x2="${x}" y2="${height - padding + 5}" stroke="#484f58"/>
+    <text x="${x}" y="${height - padding + 18}" text-anchor="middle" fill="#8b949e" font-size="11">${v}</text>`;
+  }).join("\n    ");
+  const yTicks = ticks.map(v => {
+    const y = height - padding - scale(v) * plotH;
+    return `<line x1="${padding - 5}" y1="${y}" x2="${padding}" y2="${y}" stroke="#484f58"/>
+    <text x="${padding - 10}" y="${y + 4}" text-anchor="end" fill="#8b949e" font-size="11">${v}</text>`;
+  }).join("\n    ");
+
+  // Stats
+  const avgRatio = withPredictions.reduce((s, m) => s + m.turns / m.predictedTurns!, 0) / withPredictions.length;
+  const accurate = withPredictions.filter(m => m.turns / m.predictedTurns! <= 1.5).length;
+
+  return `
+<h2 style="color: #58a6ff; margin-top: 2rem;">🎯 Turn Prediction Accuracy</h2>
+<div class="stats" style="margin-top: 1rem;">
+  <div class="stat-card"><div class="stat-value">${withPredictions.length}</div><div class="stat-label">Predictions</div></div>
+  <div class="stat-card"><div class="stat-value">${avgRatio.toFixed(2)}x</div><div class="stat-label">Avg Actual/Predicted</div></div>
+  <div class="stat-card"><div class="stat-value">${accurate}/${withPredictions.length}</div><div class="stat-label">Within 1.5x</div></div>
+</div>
+<svg width="${width}" height="${height}" style="background: #161b22; border-radius: 8px; margin-top: 1rem;">
+  <!-- Grid -->
+  <rect x="${padding}" y="${padding}" width="${plotW}" height="${plotH}" fill="none" stroke="#21262d"/>
+  <!-- Perfect line -->
+  <line x1="${lineX1}" y1="${lineY1}" x2="${lineX2}" y2="${lineY2}" stroke="#58a6ff" stroke-width="1" stroke-dasharray="6,4" opacity="0.5"/>
+  <!-- Axes -->
+  ${xTicks}
+  ${yTicks}
+  <!-- Labels -->
+  <text x="${width / 2}" y="${height - 5}" text-anchor="middle" fill="#8b949e" font-size="12">Predicted Turns</text>
+  <text x="14" y="${height / 2}" text-anchor="middle" fill="#8b949e" font-size="12" transform="rotate(-90, 14, ${height / 2})">Actual Turns</text>
+  <!-- Points -->
+  ${points}
+</svg>
+<p style="color: #484f58; font-size: 0.8rem; margin-top: 0.5rem;">
+  <span style="color: #3fb950;">●</span> ≤1.5x &nbsp;
+  <span style="color: #d29922;">●</span> 1.5–2x &nbsp;
+  <span style="color: #f85149;">●</span> &gt;2x &nbsp;
+  <span style="color: #58a6ff;">- -</span> Perfect prediction
+</p>`;
+}
+
+function generateTokenCostChart(metrics: IterationMetrics[]): string {
+  if (metrics.length === 0) return "";
+
+  const padding = { top: 30, right: 20, bottom: 50, left: 70 };
+  const width = 700;
+  const height = 350;
+  const plotW = width - padding.left - padding.right;
+  const plotH = height - padding.top - padding.bottom;
+
+  // Compute total tokens per iteration
+  const data = metrics.map(m => ({
+    iter: m.iteration,
+    input: m.inputTokens + (m.cacheCreationTokens || 0) + (m.cacheReadTokens || 0),
+    output: m.outputTokens,
+    total: m.inputTokens + m.outputTokens + (m.cacheCreationTokens || 0) + (m.cacheReadTokens || 0),
+  }));
+
+  const maxTotal = Math.max(...data.map(d => d.total), 1);
+  const xScale = (i: number) => padding.left + (i / Math.max(data.length - 1, 1)) * plotW;
+  const yScale = (v: number) => height - padding.bottom - (v / maxTotal) * plotH;
+
+  // Build polylines
+  const inputLine = data.map((d, i) => `${xScale(i).toFixed(1)},${yScale(d.input).toFixed(1)}`).join(" ");
+  const outputLine = data.map((d, i) => `${xScale(i).toFixed(1)},${yScale(d.output).toFixed(1)}`).join(" ");
+  const totalLine = data.map((d, i) => `${xScale(i).toFixed(1)},${yScale(d.total).toFixed(1)}`).join(" ");
+
+  // Fill area under total line
+  const totalArea = `${xScale(0).toFixed(1)},${yScale(0).toFixed(1)} ${totalLine} ${xScale(data.length - 1).toFixed(1)},${yScale(0).toFixed(1)}`;
+
+  // Y-axis ticks
+  const yTickCount = 5;
+  const yTicks = Array.from({ length: yTickCount + 1 }, (_, i) => {
+    const v = (maxTotal * i) / yTickCount;
+    const y = yScale(v);
+    const label = formatNumber(Math.round(v));
+    return `<line x1="${padding.left - 5}" y1="${y}" x2="${padding.left}" y2="${y}" stroke="#484f58"/>
+    <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="#21262d" stroke-dasharray="2,4"/>
+    <text x="${padding.left - 10}" y="${y + 4}" text-anchor="end" fill="#8b949e" font-size="11">${label}</text>`;
+  }).join("\n    ");
+
+  // X-axis ticks (show every Nth iteration to avoid crowding)
+  const step = Math.max(1, Math.floor(data.length / 10));
+  const xTicks = data.filter((_, i) => i % step === 0 || i === data.length - 1).map((d, _, arr) => {
+    const idx = data.indexOf(d);
+    const x = xScale(idx);
+    return `<line x1="${x}" y1="${height - padding.bottom}" x2="${x}" y2="${height - padding.bottom + 5}" stroke="#484f58"/>
+    <text x="${x}" y="${height - padding.bottom + 18}" text-anchor="middle" fill="#8b949e" font-size="11">${d.iter}</text>`;
+  }).join("\n    ");
+
+  // Cost estimates (Opus pricing: $15/M input, $75/M output, $3.75/M cache read, $18.75/M cache create)
+  const totalInputCost = metrics.reduce((s, m) => s + m.inputTokens * 15 / 1_000_000, 0);
+  const totalOutputCost = metrics.reduce((s, m) => s + m.outputTokens * 75 / 1_000_000, 0);
+  const totalCacheReadCost = metrics.reduce((s, m) => s + (m.cacheReadTokens || 0) * 3.75 / 1_000_000, 0);
+  const totalCacheCreateCost = metrics.reduce((s, m) => s + (m.cacheCreationTokens || 0) * 18.75 / 1_000_000, 0);
+  const totalCost = totalInputCost + totalOutputCost + totalCacheReadCost + totalCacheCreateCost;
+
+  return `
+<h2 style="color: #58a6ff; margin-top: 2rem;">💰 Token Cost Trend</h2>
+<div class="stats" style="margin-top: 1rem;">
+  <div class="stat-card"><div class="stat-value">${totalCost.toFixed(2)}</div><div class="stat-label">Est. Total Cost</div></div>
+  <div class="stat-card"><div class="stat-value">${(totalCost / metrics.length).toFixed(2)}</div><div class="stat-label">Avg Cost/Iter</div></div>
+  <div class="stat-card"><div class="stat-value">${totalInputCost.toFixed(2)}</div><div class="stat-label">Input Cost</div></div>
+  <div class="stat-card"><div class="stat-value">${totalOutputCost.toFixed(2)}</div><div class="stat-label">Output Cost</div></div>
+  <div class="stat-card"><div class="stat-value">${totalCacheReadCost.toFixed(2)}</div><div class="stat-label">Cache Read Cost</div></div>
+</div>
+<svg width="${width}" height="${height}" style="background: #161b22; border-radius: 8px; margin-top: 1rem;">
+  <!-- Grid -->
+  <rect x="${padding.left}" y="${padding.top}" width="${plotW}" height="${plotH}" fill="none" stroke="#21262d"/>
+  ${yTicks}
+  ${xTicks}
+  <!-- Area fill -->
+  <polygon points="${totalArea}" fill="#58a6ff" opacity="0.08"/>
+  <!-- Lines -->
+  <polyline points="${totalLine}" fill="none" stroke="#58a6ff" stroke-width="2" opacity="0.4"/>
+  <polyline points="${inputLine}" fill="none" stroke="#d29922" stroke-width="1.5"/>
+  <polyline points="${outputLine}" fill="none" stroke="#3fb950" stroke-width="1.5"/>
+  <!-- Axis labels -->
+  <text x="${width / 2}" y="${height - 5}" text-anchor="middle" fill="#8b949e" font-size="12">Iteration</text>
+  <text x="14" y="${height / 2}" text-anchor="middle" fill="#8b949e" font-size="12" transform="rotate(-90, 14, ${height / 2})">Tokens</text>
+</svg>
+<p style="color: #484f58; font-size: 0.8rem; margin-top: 0.5rem;">
+  <span style="color: #d29922;">━</span> Input tokens &nbsp;
+  <span style="color: #3fb950;">━</span> Output tokens &nbsp;
+  <span style="color: #58a6ff; opacity: 0.4;">━</span> Total (incl. cache)
+</p>
+<p style="color: #484f58; font-size: 0.75rem;">Cost estimates based on Claude Opus pricing: $15/M input, $75/M output, $3.75/M cache read, $18.75/M cache create</p>`;
+}
+
 function generateLogAnalysisSection(jsonlPath: string): string {
   const entries = parseJsonlLog(jsonlPath);
   if (entries.length === 0) return "";
@@ -478,6 +647,10 @@ ${summaryRow}
 ${avgRow}
 </tbody>
 </table>
+
+${generateTurnPredictionChart(metrics)}
+
+${generateTokenCostChart(metrics)}
 
 ${generateCodeQualitySection()}
 
