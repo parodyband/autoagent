@@ -1,79 +1,3 @@
-131 | 
-132 | /**
-133 |  * Build an enriched system prompt for the given workDir.
-134 |  * Includes repo fingerprint and top-ranked files.
-135 |  * Returns both the system prompt string and the raw repoMapBlock (for architect mode).
-136 |  */
-137 | export function buildSystemPrompt(
-138 |   workDir: string,
-139 |   repoFingerprint: string,
-140 | ): { systemPrompt: string; repoMapBlock: string } {
-141 |   const rankedFiles = rankFiles(workDir, 8);
-142 |   const fileList = rankedFiles.length > 0
-143 |     ? "\n\n## Key Files (ranked by importance)\n" +
-144 |       rankedFiles.map(f => `- ${f.path} (${f.reason})`).join("\n")
-145 |     : "";
-146 | 
-147 |   // Repo map: symbol-aware summary of top files (reuse already-ranked files)
-148 |   // Only run on source-like dirs (skip /tmp and similar system paths)
-149 |   let repoMapBlock = "";
-150 |   const isSourceDir = rankedFiles.some(f => f.reason.includes("entry point") || f.reason.includes("large module") || f.reason.includes("recently modified"));
-151 |   if (isSourceDir) {
-152 |     try {
-153 |       const topFiles = rankedFiles.map(f => f.path);
-154 |       const symIndex = buildSymbolIndex(workDir, topFiles);
-155 |       const raw = formatRepoMap(symIndex, 20);
-156 |       if (raw) {
-157 |         // Truncate to ~2K chars
-158 |         repoMapBlock = "\n\n" + (raw.length > 2000 ? raw.slice(0, 2000) + "\n…" : raw);
-159 |       }
-160 |     } catch {
-161 |       // Non-fatal
-162 |     }
-163 |   }
-164 | 
-165 |   const projectMemory = getProjectMemoryBlock(workDir);
-166 | 
-167 |   const systemPrompt = `You are an expert coding assistant with direct access to the filesystem and shell.
-168 | 
-169 | Working directory: ${workDir}
-170 | 
-171 | You have these tools: bash, read_file, write_file, grep, web_search.
-172 | 
-173 | Rules:
-174 | - Be concise and action-oriented. Do the thing, show the result.
-175 | - Use bash for commands, read_file/write_file for files, grep for search.
-176 | - After making code changes, always verify with the appropriate test/build command.
-177 | - If you encounter an error, diagnose and fix it before giving up.
-178 | - Never ask for confirmation — just do it.
-179 | - To persist instructions for future sessions, ask the user to say "remember: ..." or use the save_memory tool.
-180 | 
-181 | ${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}`;
-182 | 
-183 |   return { systemPrompt, repoMapBlock };
-184 | }
-185 | 
-186 | // ─── Simple Claude caller (for task decomposition / compaction) ─
-187 | 
-[2026-04-05T15:07:18.093Z] iter=194 turn=9 INFO: Turn 9/25
-[2026-04-05T15:07:23.956Z] iter=194 turn=9 INFO: Agent: **Goal status:**
-- Goal 1 (Wire Architect Mode): IN PROGRESS — `buildSystemPrompt` refactored, need to fix callers + update `send()` to use `runArchitectMode()`
-- Goal 2 (Show Plan in TUI): NOT STARTED
-- Goal 3 (tsc + tests): NOT STARTED
-
-Finishing all 3 now.
-[2026-04-05T15:07:23.957Z] iter=194 turn=9 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:07:23.958Z] iter=194 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -6 +4 lines
-
-Context after patch:
-28 |   loadSession,
-29 |   cleanOldSessions,
-30 | } from "./session-store.js";
-31 | import {
-32 |   runArchitectMode,
-33 |   type EditPlan,
-34 | } from "./architect-mode.js";
-35 | 
 36 | // ─── Constants ────────────────────────────────────────────────
 37 | 
 [2026-04-05T15:07:23.958Z] iter=194 turn=10 INFO: Turn 10/25
@@ -1072,3 +996,136 @@ Goals.md is already written. Finishing up now.
 [2026-04-05T15:21:40.591Z] iter=201 turn=8 INFO: Tool timing stats
 [2026-04-05T15:21:45.482Z] iter=201 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 201: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-05T15:21:45.501Z] iter=201 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T15:21:45.532Z] iter=201 turn=8 INFO: Committed: 6934df4d (18 in / 2386 out, cache: 11475 created, 58531 read)
+[2026-04-05T15:21:45.532Z] iter=201 turn=8 INFO: Restarting as iteration 202...
+[2026-04-05T15:21:45.727Z] iter=202 INFO: Cache restored: 45/45 entries (0 stale)
+[2026-04-05T15:21:45.729Z] iter=202 INFO: Turn budget: 16/25 (calibration=0.80x, predicted=15)
+[2026-04-05T15:21:45.729Z] iter=202 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T15:21:45.837Z] iter=202 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-05T15:21:45.837Z] iter=202 turn=1 INFO: Turn 1/25
+[2026-04-05T15:21:50.078Z] iter=202 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what's needed.
+[2026-04-05T15:21:50.078Z] iter=202 turn=1 INFO: $ cat goals.md
+[2026-04-05T15:21:50.083Z] iter=202 turn=1 INFO: $ ls src/
+[2026-04-05T15:21:50.090Z] iter=202 turn=1 INFO:   -> exit=0 (2886 chars)
+[2026-04-05T15:21:50.093Z] iter=202 turn=1 INFO:   -> exit=0 (520 chars)
+[2026-04-05T15:21:50.094Z] iter=202 turn=2 INFO: Turn 2/25
+[2026-04-05T15:21:52.632Z] iter=202 turn=2 INFO: $ grep -n "messages.map\|MessageDisplay\|Message\b" src/tui.tsx | head -60
+[2026-04-05T15:21:52.634Z] iter=202 turn=2 INFO: $ npm ls ink-testing-library 2>/dev/null || echo "not installed"
+[2026-04-05T15:21:52.643Z] iter=202 turn=2 INFO:   -> exit=0 (618 chars)
+[2026-04-05T15:21:52.831Z] iter=202 turn=2 INFO:   -> exit=0 (77 chars)
+[2026-04-05T15:21:52.831Z] iter=202 turn=3 INFO: Turn 3/25
+[2026-04-05T15:21:56.062Z] iter=202 turn=3 INFO: think: I need to:
+1. Look at the Message type in tui.tsx quickly to understand it
+2. Create src/virtual-message-list.tsx
+3. Upd...
+[2026-04-05T15:21:56.063Z] iter=202 turn=4 INFO: Turn 4/25
+[2026-04-05T15:21:58.509Z] iter=202 turn=4 INFO: read_file: src/tui.tsx
+[2026-04-05T15:21:58.510Z] iter=202 turn=4 INFO:   -> ok (1223 chars)
+[2026-04-05T15:21:58.511Z] iter=202 turn=5 INFO: Turn 5/25
+[2026-04-05T15:22:01.815Z] iter=202 turn=5 INFO: Agent: Now I have everything I need. Let me write all three files simultaneously.
+[2026-04-05T15:22:01.816Z] iter=202 turn=5 INFO: $ npm i -D ink-testing-library 2>&1 | tail -5
+[2026-04-05T15:22:01.818Z] iter=202 turn=5 INFO: read_file: src/tui.tsx
+[2026-04-05T15:22:01.818Z] iter=202 turn=5 INFO:   -> ok (567 chars)
+[2026-04-05T15:22:02.512Z] iter=202 turn=5 INFO:   -> exit=0 (91 chars)
+[2026-04-05T15:22:02.513Z] iter=202 turn=6 INFO: Turn 6/25
+[2026-04-05T15:22:10.762Z] iter=202 turn=6 INFO: Agent: **Goal 1: VirtualMessageList** — IN PROGRESS (not started writing yet)
+
+Let me write all three deliverables now:
+[2026-04-05T15:22:10.764Z] iter=202 turn=6 INFO: write_file: src/virtual-message-list.tsx (write)
+[2026-04-05T15:22:10.766Z] iter=202 turn=6 INFO:   -> ok: Created src/virtual-message-list.tsx (1620 chars)
+[2026-04-05T15:22:10.768Z] iter=202 turn=7 INFO: Turn 7/25
+[2026-04-05T15:22:14.958Z] iter=202 turn=7 INFO: Agent: Now export the `Message` type from tui.tsx and integrate VirtualMessageList:
+[2026-04-05T15:22:14.959Z] iter=202 turn=7 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:22:14.960Z] iter=202 turn=7 INFO:   -> ok: Patched src/tui.tsx: -8 +8 lines
+
+Context after patch:
+38 | 
+39 | // ─── Types ──────────────────────────────────────────────────
+40 | 
+41 | export interface Message {
+42 |   role: "user" | "assistant" | "tool";
+43 |   content: string;
+44 |   toolName?: string;
+45 |   tokens?: { in: number; out: number };
+46 |   model?: string;
+47 |   verificationPassed?: boolean;
+48 | }
+49 | 
+50 | interface FooterStats {
+51 |   tokensIn: number;
+[2026-04-05T15:22:14.961Z] iter=202 turn=8 INFO: Turn 8/25
+[2026-04-05T15:22:17.383Z] iter=202 turn=8 INFO: Agent: Now add the VirtualMessageList import and replace the messages.map block:
+[2026-04-05T15:22:17.384Z] iter=202 turn=8 INFO: $ head -20 src/tui.tsx
+[2026-04-05T15:22:17.400Z] iter=202 turn=8 INFO:   -> exit=0 (698 chars)
+[2026-04-05T15:22:17.401Z] iter=202 turn=9 INFO: Turn 9/25
+[2026-04-05T15:22:22.126Z] iter=202 turn=9 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:22:22.127Z] iter=202 turn=9 INFO:   -> ok: Patched src/tui.tsx: -3 +4 lines
+
+Context after patch:
+12 | import TextInput from "ink-text-input";
+13 | import path from "path";
+14 | import "dotenv/config";
+15 | import { Orchestrator } from "./orchestrator.js";
+16 | import { listSessions, type SessionInfo } from "./session-store.js";
+17 | import type { EditPlan } from "./architect-mode.js";
+18 | import { VirtualMessageList } from "./virtual-message-list.js";
+19 | 
+20 | // Parse args
+21 | let workDir = process.cwd();
+[2026-04-05T15:22:22.127Z] iter=202 turn=10 INFO: Turn 10/25
+[2026-04-05T15:22:26.428Z] iter=202 turn=10 INFO: Agent: I have written `src/virtual-message-list.tsx` and patched `src/tui.tsx` (export + import). I still need to replace the `messages.map` block and write tests. Doing it now:
+[2026-04-05T15:22:26.429Z] iter=202 turn=10 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T15:22:26.431Z] iter=202 turn=10 INFO:   -> ok: Patched src/tui.tsx: -6 +8 lines
+
+Context after patch:
+370 |     <Box flexDirection="column" padding={1}>
+371 |       <Header model={currentModel} />
+372 | 
+373 |       {/* Message history */}
+374 |       <Box flexDirection="column" flexGrow={1}>
+375 |         <VirtualMessageList
+376 |           messages={messages}
+377 |           windowSize={20}
+378 |           renderMessage={(msg, i) => <MessageDisplay key={`${msg.role}-${i}`} msg={msg} />}
+379 |         />
+380 |       </Box>
+381 | 
+382 |       {/* Live streaming text */}
+383 |       {streamBuffer && <StreamingMessage buffer={streamBuffer} />}
+[2026-04-05T15:22:26.431Z] iter=202 turn=11 INFO: Turn 11/25
+[2026-04-05T15:22:39.296Z] iter=202 turn=11 INFO: Agent: Now write the tests:
+[2026-04-05T15:22:39.297Z] iter=202 turn=11 INFO: write_file: src/__tests__/virtual-message-list.test.tsx (write)
+[2026-04-05T15:22:39.299Z] iter=202 turn=11 INFO:   -> ok: Created src/__tests__/virtual-message-list.test.tsx (3475 chars)
+[2026-04-05T15:22:39.300Z] iter=202 turn=12 INFO: Turn 12/25
+[2026-04-05T15:22:41.173Z] iter=202 turn=12 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T15:22:42.044Z] iter=202 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:22:42.044Z] iter=202 turn=13 INFO: Turn 13/25
+[2026-04-05T15:22:44.257Z] iter=202 turn=13 INFO: Agent: TSC is clean. Let me run tests and wrap up.
+[2026-04-05T15:22:44.257Z] iter=202 turn=13 INFO: $ npx vitest run src/__tests__/virtual-message-list.test.tsx 2>&1 | tail -20
+[2026-04-05T15:22:45.367Z] iter=202 turn=13 INFO:   -> exit=0 (292 chars)
+[2026-04-05T15:22:45.367Z] iter=202 turn=14 INFO: Turn 14/25
+[2026-04-05T15:22:47.572Z] iter=202 turn=14 INFO: Agent: All 6 tests pass. Now run full test suite, write memory, update goals, restart.
+[2026-04-05T15:22:47.573Z] iter=202 turn=14 INFO: $ npx vitest run 2>&1 | tail -10
+[2026-04-05T15:22:54.377Z] iter=202 turn=14 INFO:   -> exit=0 (458 chars)
+[2026-04-05T15:22:54.377Z] iter=202 turn=15 INFO: Turn 15/25
+[2026-04-05T15:22:59.150Z] iter=202 turn=15 INFO: Agent: 518 tests pass. Now write memory and update goals.
+[2026-04-05T15:22:59.151Z] iter=202 turn=15 INFO: save_memory: "[Engineer] Iteration 202"
+[2026-04-05T15:22:59.152Z] iter=202 turn=15 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T15:22:59.152Z] iter=202 turn=16 INFO: Turn 16/25
+[2026-04-05T15:23:09.641Z] iter=202 turn=16 INFO: write_file: goals.md (write)
+[2026-04-05T15:23:09.643Z] iter=202 turn=16 INFO:   -> ok: Updated goals.md (1224 chars, -42 lines delta)
+[2026-04-05T15:23:09.644Z] iter=202 turn=17 INFO: Turn 17/25
+[2026-04-05T15:23:11.689Z] iter=202 turn=17 INFO: $ npx tsc --noEmit && echo "TSC_CLEAN"
+[2026-04-05T15:23:12.556Z] iter=202 turn=17 INFO:   -> exit=0 (10 chars)
+[2026-04-05T15:23:12.556Z] iter=202 turn=18 INFO: Turn 18/25
+[2026-04-05T15:23:14.187Z] iter=202 turn=18 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T15:23:14.187Z] iter=202 turn=18 INFO: RESTART signal
+[2026-04-05T15:23:14.188Z] iter=202 turn=18 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T15:23:15.035Z] iter=202 turn=18 INFO: Compilation OK
+[2026-04-05T15:23:20.382Z] iter=202 turn=18 INFO: Cache persisted: 45 entries to .autoagent-cache.json
+[2026-04-05T15:23:20.382Z] iter=202 turn=18 INFO: Cache stats: 0 hits, 2 misses, 45 entries, 6 invalidations (2 entries removed)
+[2026-04-05T15:23:20.382Z] iter=202 turn=18 INFO: Tool cache stats
+[2026-04-05T15:23:20.382Z] iter=202 turn=18 INFO: Tool timing: bash: 11x, avg=964ms, total=10599ms; write_file: 6x, avg=2ms, total=11ms; read_file: 2x, avg=2ms, total=3ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T15:23:20.382Z] iter=202 turn=18 INFO: Tool timing stats
+[2026-04-05T15:23:25.422Z] iter=202 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 202: predicted 15 turns, actual 18 turns, ratio 1.20**
+[2026-04-05T15:23:25.444Z] iter=202 turn=18 INFO: Pre-commit review: no significant code changes to review

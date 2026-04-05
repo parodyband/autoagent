@@ -15,6 +15,7 @@ import "dotenv/config";
 import { Orchestrator } from "./orchestrator.js";
 import { listSessions, type SessionInfo } from "./session-store.js";
 import type { EditPlan } from "./architect-mode.js";
+import { VirtualMessageList } from "./virtual-message-list.js";
 
 // Parse args
 let workDir = process.cwd();
@@ -38,7 +39,7 @@ if (continueFlag) {
 
 // ─── Types ──────────────────────────────────────────────────
 
-interface Message {
+export interface Message {
   role: "user" | "assistant" | "tool";
   content: string;
   toolName?: string;
@@ -371,9 +372,11 @@ function App() {
 
       {/* Message history */}
       <Box flexDirection="column" flexGrow={1}>
-        {messages.map((msg, i) => (
-          <MessageDisplay key={`${msg.role}-${i}`} msg={msg} />
-        ))}
+        <VirtualMessageList
+          messages={messages}
+          windowSize={20}
+          renderMessage={(msg, i) => <MessageDisplay key={`${msg.role}-${i}`} msg={msg} />}
+        />
       </Box>
 
       {/* Live streaming text */}
