@@ -1,0 +1,773 @@
+{
+  "generatedAt": 1775416018460,
+  "files": [
+    {
+      "path": "src/cli.ts",
+      "exports": [
+        {
+          "name": "printHelp",
+          "kind": "function",
+          "line": 33,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "readline"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "url"
+        },
+        {
+          "names": [],
+          "from": "dotenv/config"
+        },
+        {
+          "names": [],
+          "from": "./tool-registry.js"
+        },
+        {
+          "names": [],
+          "from": "./init-command.js"
+        }
+      ],
+      "lastModified": 1775414268260.3657
+    },
+    {
+      "path": "src/context-loader.ts",
+      "exports": [
+        {
+          "name": "extractFileReferences",
+          "kind": "function",
+          "line": 44,
+          "exported": true
+        },
+        {
+          "name": "stripFileReferences",
+          "kind": "function",
+          "line": 74,
+          "exported": true
+        },
+        {
+          "name": "loadFileReferences",
+          "kind": "function",
+          "line": 85,
+          "exported": true
+        },
+        {
+          "name": "extractKeywords",
+          "kind": "function",
+          "line": 127,
+          "exported": true
+        },
+        {
+          "name": "filterByRepoMap",
+          "kind": "function",
+          "line": 162,
+          "exported": true
+        },
+        {
+          "name": "getRecentCommitFiles",
+          "kind": "function",
+          "line": 180,
+          "exported": true
+        },
+        {
+          "name": "getRecentlyChangedFiles",
+          "kind": "function",
+          "line": 225,
+          "exported": true
+        },
+        {
+          "name": "symbolLookup",
+          "kind": "function",
+          "line": 279,
+          "exported": true
+        },
+        {
+          "name": "autoLoadContext",
+          "kind": "function",
+          "line": 293,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [],
+          "from": "./tree-sitter-map.js"
+        }
+      ],
+      "lastModified": 1775415442185.9863
+    },
+    {
+      "path": "src/file-cache.ts",
+      "exports": [
+        {
+          "name": "FileCache",
+          "kind": "class",
+          "line": 15,
+          "exported": true
+        },
+        {
+          "name": "globalFileCache",
+          "kind": "const",
+          "line": 138,
+          "exported": true
+        },
+        {
+          "name": "MtimeTracker",
+          "kind": "class",
+          "line": 144,
+          "exported": true
+        },
+        {
+          "name": "globalMtimeTracker",
+          "kind": "const",
+          "line": 174,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        }
+      ],
+      "lastModified": 1775414971562.6633
+    },
+    {
+      "path": "src/orchestrator.ts",
+      "exports": [
+        {
+          "name": "PARALLEL_SAFE_TOOLS",
+          "kind": "const",
+          "line": 52,
+          "exported": true
+        },
+        {
+          "name": "MICRO_COMPACT_THRESHOLD",
+          "kind": "const",
+          "line": 67,
+          "exported": true
+        },
+        {
+          "name": "COMPACT_TIER1_THRESHOLD",
+          "kind": "const",
+          "line": 69,
+          "exported": true
+        },
+        {
+          "name": "COMPACT_THRESHOLD",
+          "kind": "const",
+          "line": 71,
+          "exported": true
+        },
+        {
+          "name": "CONTEXT_WARNING_THRESHOLD",
+          "kind": "const",
+          "line": 73,
+          "exported": true
+        },
+        {
+          "name": "PRUNE_THRESHOLD",
+          "kind": "const",
+          "line": 74,
+          "exported": true
+        },
+        {
+          "name": "selectCompactionTier",
+          "kind": "function",
+          "line": 80,
+          "exported": true
+        },
+        {
+          "name": "MODEL_PRICING",
+          "kind": "const",
+          "line": 88,
+          "exported": true
+        },
+        {
+          "name": "ConversationCheckpoint",
+          "kind": "interface",
+          "line": 111,
+          "exported": true
+        },
+        {
+          "name": "MAX_CHECKPOINTS",
+          "kind": "const",
+          "line": 119,
+          "exported": true
+        },
+        {
+          "name": "OrchestratorOptions",
+          "kind": "interface",
+          "line": 121,
+          "exported": true
+        },
+        {
+          "name": "OrchestratorResult",
+          "kind": "interface",
+          "line": 156,
+          "exported": true
+        },
+        {
+          "name": "CostInfo",
+          "kind": "interface",
+          "line": 165,
+          "exported": true
+        },
+        {
+          "name": "routeModel",
+          "kind": "function",
+          "line": 180,
+          "exported": true
+        },
+        {
+          "name": "computeCost",
+          "kind": "function",
+          "line": 208,
+          "exported": true
+        },
+        {
+          "name": "buildSystemPrompt",
+          "kind": "function",
+          "line": 220,
+          "exported": true
+        },
+        {
+          "name": "Orchestrator",
+          "kind": "class",
+          "line": 616,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [
+            "Anthropic"
+          ],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [
+            "compressToolOutput"
+          ],
+          "from": "./tool-output-compressor.js"
+        },
+        {
+          "names": [
+            "fingerprintRepo"
+          ],
+          "from": "./repo-context.js"
+        },
+        {
+          "names": [
+            "rankFiles"
+          ],
+          "from": "./file-ranker.js"
+        },
+        {
+          "names": [
+            "buildRepoMap",
+            "formatRepoMap",
+            "rankSymbols",
+            "truncateRepoMap",
+            "saveRepoMapCache",
+            "loadRepoMapCache",
+            "getStaleFiles",
+            "updateRepoMapIncremental",
+            "cacheToRepoMap"
+          ],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [
+            "shouldDecompose",
+            "decomposeTasks",
+            "formatSubtasks"
+          ],
+          "from": "./task-decomposer.js"
+        },
+        {
+          "names": [
+            "runVerification",
+            "formatVerificationResults"
+          ],
+          "from": "./verification.js"
+        },
+        {
+          "names": [
+            "createDefaultRegistry"
+          ],
+          "from": "./tool-registry.js"
+        },
+        {
+          "names": [
+            "getProjectMemoryBlock"
+          ],
+          "from": "./project-memory.js"
+        },
+        {
+          "names": [
+            "autoCommit",
+            "type AutoCommitResult"
+          ],
+          "from": "./auto-commit.js"
+        },
+        {
+          "names": [
+            "runDiagnostics"
+          ],
+          "from": "./diagnostics.js"
+        },
+        {
+          "names": [
+            "findRelatedTests",
+            "runRelatedTests"
+          ],
+          "from": "./test-runner.js"
+        },
+        {
+          "names": [
+            "computeUnifiedDiff"
+          ],
+          "from": "./diff-preview.js"
+        },
+        {
+          "names": [
+            "autoLoadContext",
+            "extractFileReferences",
+            "loadFileReferences",
+            "stripFileReferences"
+          ],
+          "from": "./context-loader.js"
+        },
+        {
+          "names": [
+            "enhanceToolError"
+          ],
+          "from": "./tool-recovery.js"
+        },
+        {
+          "names": [
+            "detectProject"
+          ],
+          "from": "./project-detector.js"
+        },
+        {
+          "names": [
+            "* as fs"
+          ],
+          "from": "fs"
+        },
+        {
+          "names": [
+            "FileWatcher"
+          ],
+          "from": "./file-watcher.js"
+        },
+        {
+          "names": [
+            "scoredPrune"
+          ],
+          "from": "./context-pruner.js"
+        }
+      ],
+      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
+      "lastModified": 1775415962825.1106
+    },
+    {
+      "path": "src/tools/write_file.ts",
+      "exports": [
+        {
+          "name": "writeFileToolDefinition",
+          "kind": "const",
+          "line": 10,
+          "exported": true
+        },
+        {
+          "name": "WriteFileResult",
+          "kind": "interface",
+          "line": 46,
+          "exported": true
+        },
+        {
+          "name": "isAppendOnly",
+          "kind": "function",
+          "line": 60,
+          "exported": true
+        },
+        {
+          "name": "executeWriteFile",
+          "kind": "function",
+          "line": 67,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "../file-cache.js"
+        }
+      ],
+      "lastModified": 1775415173946.7727
+    },
+    {
+      "path": "src/tree-sitter-map.ts",
+      "exports": [
+        {
+          "name": "SymbolKind",
+          "kind": "type",
+          "line": 19,
+          "exported": true
+        },
+        {
+          "name": "ParsedSymbol",
+          "kind": "interface",
+          "line": 21,
+          "exported": true
+        },
+        {
+          "name": "ParsedImport",
+          "kind": "interface",
+          "line": 28,
+          "exported": true
+        },
+        {
+          "name": "ParsedFile",
+          "kind": "interface",
+          "line": 33,
+          "exported": true
+        },
+        {
+          "name": "RepoMap",
+          "kind": "interface",
+          "line": 40,
+          "exported": true
+        },
+        {
+          "name": "RepoMapCache",
+          "kind": "interface",
+          "line": 45,
+          "exported": true
+        },
+        {
+          "name": "parseFile",
+          "kind": "function",
+          "line": 299,
+          "exported": true
+        },
+        {
+          "name": "buildRepoMap",
+          "kind": "function",
+          "line": 345,
+          "exported": true
+        },
+        {
+          "name": "rankSymbols",
+          "kind": "function",
+          "line": 364,
+          "exported": true
+        },
+        {
+          "name": "formatRepoMap",
+          "kind": "function",
+          "line": 415,
+          "exported": true
+        },
+        {
+          "name": "truncateRepoMap",
+          "kind": "function",
+          "line": 487,
+          "exported": true
+        },
+        {
+          "name": "SearchResult",
+          "kind": "interface",
+          "line": 534,
+          "exported": true
+        },
+        {
+          "name": "fuzzySearch",
+          "kind": "function",
+          "line": 601,
+          "exported": true
+        },
+        {
+          "name": "findFilesBySymbol",
+          "kind": "function",
+          "line": 652,
+          "exported": true
+        },
+        {
+          "name": "saveRepoMapCache",
+          "kind": "function",
+          "line": 692,
+          "exported": true
+        },
+        {
+          "name": "loadRepoMapCache",
+          "kind": "function",
+          "line": 722,
+          "exported": true
+        },
+        {
+          "name": "getStaleFiles",
+          "kind": "function",
+          "line": 739,
+          "exported": true
+        },
+        {
+          "name": "updateRepoMapIncremental",
+          "kind": "function",
+          "line": 772,
+          "exported": true
+        },
+        {
+          "name": "cacheToRepoMap",
+          "kind": "function",
+          "line": 803,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "module"
+        }
+      ],
+      "lastModified": 1775415941491.9272
+    },
+    {
+      "path": "src/tui.tsx",
+      "exports": [
+        {
+          "name": "Message",
+          "kind": "interface",
+          "line": 67,
+          "exported": true
+        },
+        {
+          "name": "getContextColor",
+          "kind": "function",
+          "line": 94,
+          "exported": true
+        },
+        {
+          "name": "extractFileQuery",
+          "kind": "function",
+          "line": 108,
+          "exported": true
+        },
+        {
+          "name": "getFileSuggestions",
+          "kind": "function",
+          "line": 121,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [
+            "React",
+            "useState",
+            "useCallback",
+            "useEffect",
+            "useRef"
+          ],
+          "from": "react"
+        },
+        {
+          "names": [
+            "render",
+            "Box",
+            "Text",
+            "useInput",
+            "useApp"
+          ],
+          "from": "ink"
+        },
+        {
+          "names": [
+            "Spinner"
+          ],
+          "from": "ink-spinner"
+        },
+        {
+          "names": [
+            "TextInput"
+          ],
+          "from": "ink-text-input"
+        },
+        {
+          "names": [
+            "path"
+          ],
+          "from": "path"
+        },
+        {
+          "names": [
+            "fs"
+          ],
+          "from": "fs"
+        },
+        {
+          "names": [
+            "Orchestrator"
+          ],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [
+            "listSessions",
+            "type SessionInfo"
+          ],
+          "from": "./session-store.js"
+        },
+        {
+          "names": [
+            "EditPlan"
+          ],
+          "from": "./architect-mode.js"
+        },
+        {
+          "names": [
+            "VirtualMessageList"
+          ],
+          "from": "./virtual-message-list.js"
+        },
+        {
+          "names": [
+            "undoLastCommit"
+          ],
+          "from": "./auto-commit.js"
+        },
+        {
+          "names": [
+            "buildRepoMap",
+            "fuzzySearch"
+          ],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [
+            "execSync"
+          ],
+          "from": "child_process"
+        },
+        {
+          "names": [
+            "runInit"
+          ],
+          "from": "./init-command.js"
+        },
+        {
+          "names": [
+            "buildExportContent"
+          ],
+          "from": "./export-helper.js"
+        },
+        {
+          "names": [
+            "shouldShowWelcome"
+          ],
+          "from": "./welcome.js"
+        }
+      ],
+      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
+      "lastModified": 1775414731776.646
+    },
+    {
+      "path": "src/tools/read_file.ts",
+      "exports": [
+        {
+          "name": "readFileToolDefinition",
+          "kind": "const",
+          "line": 6,
+          "exported": true
+        },
+        {
+          "name": "ReadFileResult",
+          "kind": "interface",
+          "line": 31,
+          "exported": true
+        },
+        {
+          "name": "executeReadFile",
+          "kind": "function",
+          "line": 36,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "../file-cache.js"
+        }
+      ],
+      "lastModified": 1775414977083.2922
+    }
+  ]
+}

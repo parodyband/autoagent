@@ -1,87 +1,3 @@
-[2026-04-05T18:51:04.175Z] iter=315 turn=1 INFO: read_file: src/file-cache.ts
-[2026-04-05T18:51:04.175Z] iter=315 turn=1 INFO:   -> ok (4568 chars)
-[2026-04-05T18:51:04.175Z] iter=315 turn=1 INFO: read_file: src/tools/write_file.ts
-[2026-04-05T18:51:04.176Z] iter=315 turn=1 INFO:   -> ok (6375 chars)
-[2026-04-05T18:51:04.176Z] iter=315 turn=1 INFO: read_file: src/tools/read_file.ts
-[2026-04-05T18:51:04.176Z] iter=315 turn=1 INFO:   -> ok (3086 chars)
-[2026-04-05T18:51:05.193Z] iter=315 turn=1 INFO:   -> exit=0 (289 chars)
-[2026-04-05T18:51:05.193Z] iter=315 turn=2 INFO: Turn 2/25
-[2026-04-05T18:51:20.043Z] iter=315 turn=2 INFO: Agent: 
-
-Good point. Let me assess what I've found and produce deliverables now.
-[2026-04-05T18:51:20.043Z] iter=315 turn=2 INFO: think: My deliverables as Meta expert:
-1. Review iter 314 changes - DONE (read all files, tests pass). Found two bugs to flag.
-...
-[2026-04-05T18:51:20.043Z] iter=315 turn=3 INFO: Turn 3/25
-[2026-04-05T18:51:24.137Z] iter=315 turn=3 INFO: Agent: Two deliverables: (1) goals.md for Engineer iter 316, (2) memory compaction. Let me also check what the last few iterations actually shipped to assess product vs. self trajectory.
-[2026-04-05T18:51:24.138Z] iter=315 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -12 | head -12
-[2026-04-05T18:51:24.140Z] iter=315 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/**/*.ts src/**/**/*.ts 2>/dev/null | tail -5
-[2026-04-05T18:51:24.153Z] iter=315 turn=3 INFO:   -> exit=0 (141 chars)
-[2026-04-05T18:51:24.156Z] iter=315 turn=3 INFO:   -> exit=0 (396 chars)
-[2026-04-05T18:51:24.156Z] iter=315 turn=4 INFO: Turn 4/25
-[2026-04-05T18:51:37.306Z] iter=315 turn=4 INFO: Agent: 
-
-Status: Goal 1 (review iter 314) — DONE. Goal 2 (write goals.md + assess system) — IN PROGRESS. Let me finish now.
-[2026-04-05T18:51:37.306Z] iter=315 turn=4 INFO: write_file: goals.md (write)
-[2026-04-05T18:51:37.307Z] iter=315 turn=4 INFO:   -> ok: Updated goals.md (1658 chars, +1 lines delta)
-[2026-04-05T18:51:37.308Z] iter=315 turn=5 INFO: Turn 5/25
-[2026-04-05T18:51:39.908Z] iter=315 turn=5 INFO: Agent: Now compact memory — remove stale data, update compacted history through iter 314:
-[2026-04-05T18:51:39.909Z] iter=315 turn=5 INFO: read_file: .autoagent.md
-[2026-04-05T18:51:39.909Z] iter=315 turn=5 INFO:   -> ok (16055 chars)
-[2026-04-05T18:51:39.909Z] iter=315 turn=6 INFO: Turn 6/25
-[2026-04-05T18:52:16.568Z] iter=315 turn=6 INFO: Agent: 
-
-Right — as Meta expert, my deliverables are goals.md (DONE) and memory compaction. No src/ changes expected for Meta. Let me compact memory and wrap up.
-[2026-04-05T18:52:16.569Z] iter=315 turn=6 INFO: write_file: .autoagent.md (write)
-[2026-04-05T18:52:16.570Z] iter=315 turn=6 INFO:   -> ok: Updated .autoagent.md (5640 chars, -86 lines delta)
-[2026-04-05T18:52:16.570Z] iter=315 turn=7 INFO: Turn 7/25
-[2026-04-05T18:52:19.537Z] iter=315 turn=7 INFO: Agent: 
-
-Goals.md is written, memory is compacted. Final steps:
-[2026-04-05T18:52:19.538Z] iter=315 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T18:52:20.533Z] iter=315 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:52:20.533Z] iter=315 turn=8 INFO: Turn 8/25
-[2026-04-05T18:52:22.917Z] iter=315 turn=8 INFO: Agent: TSC clean.
-[2026-04-05T18:52:22.917Z] iter=315 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T18:52:22.917Z] iter=315 turn=8 INFO: RESTART signal
-[2026-04-05T18:52:22.918Z] iter=315 turn=8 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T18:52:23.879Z] iter=315 turn=8 INFO: Compilation OK
-[2026-04-05T18:52:31.089Z] iter=315 turn=8 INFO: Cache persisted: 57 entries to .autoagent-cache.json
-[2026-04-05T18:52:31.089Z] iter=315 turn=8 INFO: Cache stats: 0 hits, 5 misses, 57 entries, 2 invalidations (1 entries removed)
-[2026-04-05T18:52:31.089Z] iter=315 turn=8 INFO: Tool cache stats
-[2026-04-05T18:52:31.089Z] iter=315 turn=8 INFO: Tool timing: bash: 5x, avg=410ms, total=2049ms; read_file: 5x, avg=1ms, total=7ms; write_file: 2x, avg=1ms, total=2ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T18:52:31.089Z] iter=315 turn=8 INFO: Tool timing stats
-[2026-04-05T18:52:37.473Z] iter=315 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 315: predicted 8 turns, actual 8 turns, ratio 1.00**
-[2026-04-05T18:52:37.497Z] iter=315 turn=8 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T18:52:37.531Z] iter=315 turn=8 INFO: Committed: 4a405855 (18 in / 3744 out, cache: 24475 created, 118347 read)
-[2026-04-05T18:52:37.531Z] iter=315 turn=8 INFO: Restarting as iteration 316...
-[2026-04-05T18:52:37.730Z] iter=316 INFO: Cache restored: 57/57 entries (0 stale)
-[2026-04-05T18:52:37.732Z] iter=316 INFO: Turn budget: 18/25 (calibration=1.00x, predicted=20)
-[2026-04-05T18:52:37.732Z] iter=316 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T18:52:37.868Z] iter=316 turn=1 INFO: Turn 1/25
-[2026-04-05T18:52:40.943Z] iter=316 turn=1 INFO: Agent: I'll start by reading the scratchpad and current state of the codebase to understand what needs to be done.
-[2026-04-05T18:52:40.944Z] iter=316 turn=1 INFO: read_scratchpad: 7 chars
-[2026-04-05T18:52:40.944Z] iter=316 turn=1 INFO: $ cat goals.md
-[2026-04-05T18:52:40.953Z] iter=316 turn=1 INFO:   -> exit=0 (1658 chars)
-[2026-04-05T18:52:40.954Z] iter=316 turn=2 INFO: Turn 2/25
-[2026-04-05T18:52:42.679Z] iter=316 turn=2 INFO: $ cat src/tools/write_file.ts
-[2026-04-05T18:52:42.681Z] iter=316 turn=2 INFO: $ ls src/__tests__/ | grep -E "context|write"
-[2026-04-05T18:52:42.687Z] iter=316 turn=2 INFO:   -> exit=0 (6375 chars)
-[2026-04-05T18:52:42.690Z] iter=316 turn=2 INFO:   -> exit=0 (281 chars)
-[2026-04-05T18:52:42.690Z] iter=316 turn=3 INFO: Turn 3/25
-[2026-04-05T18:52:46.369Z] iter=316 turn=3 INFO: think: I can see the bug clearly:
-
-In patch mode (around line 120-160), after `writeFileSync(resolved, patched, "utf-8")` and `...
-[2026-04-05T18:52:46.370Z] iter=316 turn=4 INFO: Turn 4/25
-[2026-04-05T18:52:49.337Z] iter=316 turn=4 INFO: think: I have all the info I need. Let me act:
-
-1. Fix: Add `globalMtimeTracker.delete(resolved)` in patch mode after `globalFi...
-[2026-04-05T18:52:49.337Z] iter=316 turn=5 INFO: Turn 5/25
-[2026-04-05T18:52:53.945Z] iter=316 turn=5 INFO: Agent: **Deliverables:**
-1. Fix patch-mode mtime bug in `src/tools/write_file.ts`
-2. Add stale-file tests in `src/__tests__/tools-write-file.test.ts`
-3. Add git-log tier tests in `src/__tests__/context-loader-git.test.ts`
-
 Starting now:
 [2026-04-05T18:52:53.945Z] iter=316 turn=5 INFO: write_file: src/tools/write_file.ts (patch)
 [2026-04-05T18:52:53.947Z] iter=316 turn=5 INFO:   -> ok: Patched src/tools/write_file.ts: -4 +5 lines
@@ -1080,3 +996,196 @@ The research gave me excellent insights. Let me now quickly check our current st
 [2026-04-05T19:04:44.493Z] iter=321 turn=12 INFO: Tool timing stats
 [2026-04-05T19:04:51.298Z] iter=321 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 321: predicted 20 turns, actual 12 turns, ratio 0.60**
 [2026-04-05T19:04:51.322Z] iter=321 turn=12 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T19:04:51.358Z] iter=321 turn=12 INFO: Committed: db625579 (18 in / 3580 out, cache: 54098 created, 313292 read)
+[2026-04-05T19:04:51.359Z] iter=321 turn=12 INFO: Restarting as iteration 322...
+[2026-04-05T19:04:51.558Z] iter=322 INFO: Cache restored: 53/53 entries (0 stale)
+[2026-04-05T19:04:51.560Z] iter=322 INFO: Turn budget: 20/25 (calibration=1.13x, predicted=20)
+[2026-04-05T19:04:51.560Z] iter=322 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T19:04:51.716Z] iter=322 turn=1 INFO: Turn 1/25
+[2026-04-05T19:04:54.238Z] iter=322 turn=1 INFO: Agent: I'll start by reading the current state of the codebase and goals.
+[2026-04-05T19:04:54.239Z] iter=322 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T19:04:54.239Z] iter=322 turn=1 INFO: read_file: goals.md
+[2026-04-05T19:04:54.240Z] iter=322 turn=1 INFO:   -> ok (3023 chars)
+[2026-04-05T19:04:54.240Z] iter=322 turn=2 INFO: Turn 2/25
+[2026-04-05T19:04:57.305Z] iter=322 turn=2 INFO: read_file: src/tree-sitter-map.ts
+[2026-04-05T19:04:57.306Z] iter=322 turn=2 INFO:   -> ok (20871 chars)
+[2026-04-05T19:04:57.306Z] iter=322 turn=2 INFO: $ grep -n "compact\|compaction\|TIER\|tier2\|T2\|summarize\|summarization" src/orchestrator.ts | head -60
+[2026-04-05T19:04:57.320Z] iter=322 turn=2 INFO:   -> exit=0 (3526 chars)
+[2026-04-05T19:04:57.320Z] iter=322 turn=3 INFO: Turn 3/25
+[2026-04-05T19:05:01.401Z] iter=322 turn=3 INFO: $ grep -n "private async compact\|compact():\|SUMMARIZE\|You are a helpful\|Summarize\|summarize\|compaction prompt\|messages to summarize\|old messages" src/orchestrator.ts | head -40
+[2026-04-05T19:05:01.404Z] iter=322 turn=3 INFO: $ grep -n "loadRepoMapCache\|saveRepoMapCache\|updateRepoMapIncremental\|repo-map.json\|autoagent-cache" src/*.ts 2>/dev/null | head -20
+[2026-04-05T19:05:01.418Z] iter=322 turn=3 INFO:   -> exit=0 (687 chars)
+[2026-04-05T19:05:01.437Z] iter=322 turn=3 INFO:   -> exit=0 (77 chars)
+[2026-04-05T19:05:01.437Z] iter=322 turn=4 INFO: Turn 4/25
+[2026-04-05T19:05:06.215Z] iter=322 turn=4 INFO: think: I have enough context. Let me plan my deliverables:
+
+1. **Goal 1**: Add `saveRepoMapCache`, `loadRepoMapCache`, `updateR...
+[2026-04-05T19:05:06.216Z] iter=322 turn=5 INFO: Turn 5/25
+[2026-04-05T19:05:10.003Z] iter=322 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-05T19:05:10.004Z] iter=322 turn=5 INFO:   -> ok (1794 chars)
+[2026-04-05T19:05:10.005Z] iter=322 turn=5 INFO: $ grep -n "repoMap\|buildRepoMap\|formatRepoMap\|rankSymbols\|fileWatcher\|onFileChange\|reindex" src/orchestrator.ts | head -40
+[2026-04-05T19:05:10.019Z] iter=322 turn=5 INFO:   -> exit=0 (1416 chars)
+[2026-04-05T19:05:10.020Z] iter=322 turn=6 INFO: Turn 6/25
+[2026-04-05T19:05:12.051Z] iter=322 turn=6 INFO: read_file: src/orchestrator.ts
+[2026-04-05T19:05:12.052Z] iter=322 turn=6 INFO:   -> ok (2324 chars)
+[2026-04-05T19:05:12.053Z] iter=322 turn=7 INFO: Turn 7/25
+[2026-04-05T19:05:15.915Z] iter=322 turn=7 INFO: Agent: **Goal 1 (Repo map cache): NOT STARTED**
+**Goal 2 (Structured compaction): NOT STARTED**
+
+I've been reading too much. Starting implementation now.
+[2026-04-05T19:05:15.915Z] iter=322 turn=7 INFO: write_file: src/tree-sitter-map.ts (patch)
+[2026-04-05T19:05:15.916Z] iter=322 turn=7 INFO:   -> ok: Patched src/tree-sitter-map.ts: -2 +2 lines
+
+Context after patch:
+8 |  * Companion to: symbol-index.ts (regex-based, kept for non-TS files)
+9 |  */
+10 | 
+11 | import { readFileSync, writeFileSync, mkdirSync, statSync } from "fs";
+12 | import path from "path";
+13 | import { createRequire } from "module";
+14 | 
+15 | const require = createRequire(import.meta.url);
+[2026-04-05T19:05:15.917Z] iter=322 turn=8 INFO: Turn 8/25
+[2026-04-05T19:05:18.398Z] iter=322 turn=8 INFO: Agent: Now add the cache interface and functions to `tree-sitter-map.ts` (at the end):
+[2026-04-05T19:05:18.399Z] iter=322 turn=8 INFO: read_file: src/tree-sitter-map.ts
+[2026-04-05T19:05:18.399Z] iter=322 turn=8 INFO:   -> ok (154 chars)
+[2026-04-05T19:05:18.400Z] iter=322 turn=9 INFO: Turn 9/25
+[2026-04-05T19:05:22.752Z] iter=322 turn=9 INFO: write_file: src/tree-sitter-map.ts (patch)
+[2026-04-05T19:05:22.754Z] iter=322 turn=9 INFO:   -> ok: Patched src/tree-sitter-map.ts: -4 +9 lines
+
+Context after patch:
+37 |   parseError?: string;
+38 | }
+39 | 
+40 | export interface RepoMap {
+41 |   files: ParsedFile[];
+42 |   builtAt: number; // Date.now()
+43 | }
+44 | 
+45 | export interface RepoMapCache {
+46 |   generatedAt: number;           // Date.now() when cache was written
+47 |   files: Array<ParsedFile & { lastModified: number }>; // mtime per file
+48 | }
+49 | 
+50 | // ─── Tree-sitter setup ───────────────────────────────────────
+51 | 
+[2026-04-05T19:05:22.755Z] iter=322 turn=10 INFO: Turn 10/25
+[2026-04-05T19:05:24.543Z] iter=322 turn=10 INFO: Agent: Now append the cache functions at the end of the file:
+[2026-04-05T19:05:24.543Z] iter=322 turn=10 INFO: $ tail -5 src/tree-sitter-map.ts
+[2026-04-05T19:05:24.550Z] iter=322 turn=10 INFO:   -> exit=0 (125 chars)
+[2026-04-05T19:05:24.551Z] iter=322 turn=11 INFO: Turn 11/25
+[2026-04-05T19:05:41.491Z] iter=322 turn=11 INFO: write_file: src/tree-sitter-map.ts (append)
+[2026-04-05T19:05:41.492Z] iter=322 turn=11 INFO:   -> ok: Appended 3960 chars to src/tree-sitter-map.ts
+[2026-04-05T19:05:41.492Z] iter=322 turn=12 INFO: Turn 12/25
+[2026-04-05T19:05:44.805Z] iter=322 turn=12 INFO: Agent: Now wire the cache into `orchestrator.ts`. First update the import:
+[2026-04-05T19:05:44.805Z] iter=322 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:05:44.806Z] iter=322 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+17 | import { compressToolOutput } from "./tool-output-compressor.js";
+18 | import { fingerprintRepo } from "./repo-context.js";
+19 | import { rankFiles } from "./file-ranker.js";
+20 | import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap, saveRepoMapCache, loadRepoMapCache, getStaleFiles, updateRepoMapIncremental, cacheToRepoMap } from "./tree-sitter-map.js";
+21 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
+22 | import { runVerification, formatVerificationResults } from "./verification.js";
+23 | import { createDefaultRegistry } from "./tool-registry.js";
+[2026-04-05T19:05:44.807Z] iter=322 turn=13 INFO: Turn 13/25
+[2026-04-05T19:05:49.324Z] iter=322 turn=13 INFO: Agent: I've patched `tree-sitter-map.ts` (added cache types + functions) and updated the import in `orchestrator.ts`. Now finishing the wiring quickly.
+[2026-04-05T19:05:49.325Z] iter=322 turn=13 INFO: read_file: src/orchestrator.ts
+[2026-04-05T19:05:49.325Z] iter=322 turn=13 INFO:   -> ok (2447 chars)
+[2026-04-05T19:05:49.325Z] iter=322 turn=14 INFO: Turn 14/25
+[2026-04-05T19:05:56.384Z] iter=322 turn=14 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:05:56.386Z] iter=322 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -15 +29 lines
+
+Context after patch:
+232 |   // Only run on source-like dirs (skip /tmp and similar system paths)
+233 |   let repoMapBlock = "";
+234 |   const isSourceDir = rankedFiles.some(f => f.reason.includes("entry point") || f.reason.includes("large module") || f.reason.includes("recently modified"));
+235 |   if (isSourceDir) {
+236 |     try {
+237 |       const rankedPaths = rankedFiles.map(f => f.path);
+238 |       // Try incremental cache first
+239 |       const cache = loadRepoMapCache(workDir);
+240 |       let repoMap: import("./tree-sitter-map.js").RepoMap;
+241 |       if (cache) {
+242 |         const stale = getStaleFiles(workDir, cache, rankedPaths);
+243 |         if (stale.length === 0) {
+244 |           repoMap = cacheToRepoMap(cache);
+245 |         } else {
+246 |           repoMap = updateRepoMapIncremental(workDir, cacheToRepoMap(cache), stale);
+247 |           saveRepoMapCache(workDir, repoMap);
+248 |         }
+249 |       } else {
+250 |         repoMap = buildRepoMap(workDir, rankedPaths);
+251 |         saveRepoMapCache(workDir, repoMap);
+252 |       }
+253 |       const ranked = rankSymbols(repoMap);
+254 |       const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 60, ranked });
+255 |       if (raw.length > 50) {
+256 |         // Truncate to 4000 token budget (~16K chars), keeping highest-ranked files first
+257 |         repoMapBlock = "\n\n" + truncateRepoMap(raw, 4000);
+258 |       }
+259 |       rawRepoMap = repoMap;
+260 |     } catch {
+261 |       // Non-fatal
+262 |     }
+263 |   }
+264 | 
+265 |   const projectMemory = getProjectMemoryBlock(workDir);
+266 | 
+[2026-04-05T19:05:56.386Z] iter=322 turn=15 INFO: Turn 15/25
+[2026-04-05T19:06:02.824Z] iter=322 turn=15 INFO: Agent: Now update the compaction prompt (Goal 2):
+[2026-04-05T19:06:02.824Z] iter=322 turn=15 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T19:06:02.825Z] iter=322 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -3 +3 lines
+
+Context after patch:
+1048 |       return `${role}: ${content}`;
+1049 |     }).join("\n\n");
+1050 | 
+1051 |     const summary = await caller(
+1052 |       `Summarize this conversation into the following structured format. Use exactly these section headers:\n\n## Current Task\nWhat the user is currently trying to accomplish.\n\n## Plan & Progress\nStep-by-step plan and which steps are done, in-progress, or pending.\n\n## Files Modified\nList of files that were created, edited, or deleted.\n\n## Key Decisions\nImportant choices made (libraries chosen, approaches taken, things ruled out).\n\n## Open Questions\nUnresolved issues, errors, or things that still need attention.\n\nConversation to summarize:\n\n${convText}`
+1053 |     );
+1054 | 
+1055 |     this.apiMessages = [
+1056 |       { role: "user", content: `[Conversation summary]\n${summary}` },
+[2026-04-05T19:06:02.825Z] iter=322 turn=16 INFO: Turn 16/25
+[2026-04-05T19:06:05.199Z] iter=322 turn=16 INFO: Agent: Now write the tests, run TSC, then wrap up.
+[2026-04-05T19:06:05.199Z] iter=322 turn=16 INFO: $ ls tests/ | grep -E "compact|repo-map|tree-sitter" | head -10
+[2026-04-05T19:06:05.209Z] iter=322 turn=16 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:06:05.209Z] iter=322 turn=17 INFO: Turn 17/25
+[2026-04-05T19:06:22.645Z] iter=322 turn=17 INFO: Agent: Writing tests now, then TSC and wrap.
+[2026-04-05T19:06:22.645Z] iter=322 turn=17 INFO: write_file: tests/repo-map-cache.test.ts (write)
+[2026-04-05T19:06:22.646Z] iter=322 turn=17 INFO:   -> ok: Created tests/repo-map-cache.test.ts (4423 chars)
+[2026-04-05T19:06:22.646Z] iter=322 turn=18 INFO: Turn 18/25
+[2026-04-05T19:06:41.955Z] iter=322 turn=18 INFO: write_file: tests/compaction-structured.test.ts (write)
+[2026-04-05T19:06:41.956Z] iter=322 turn=18 INFO:   -> ok: Created tests/compaction-structured.test.ts (3724 chars)
+[2026-04-05T19:06:41.956Z] iter=322 turn=19 INFO: Turn 19/25
+[2026-04-05T19:06:44.300Z] iter=322 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -40
+[2026-04-05T19:06:45.338Z] iter=322 turn=19 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:06:45.338Z] iter=322 turn=20 INFO: Turn 20/25
+[2026-04-05T19:06:47.591Z] iter=322 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/repo-map-cache.test.ts tests/compaction-structured.test.ts 2>&1 | tail -30
+[2026-04-05T19:06:48.664Z] iter=322 turn=20 INFO:   -> exit=0 (333 chars)
+[2026-04-05T19:06:48.664Z] iter=322 turn=21 INFO: Turn 21/25
+[2026-04-05T19:06:55.168Z] iter=322 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -10
+[2026-04-05T19:07:07.477Z] iter=322 turn=21 INFO:   -> exit=0 (460 chars)
+[2026-04-05T19:07:07.477Z] iter=322 turn=22 INFO: Turn 22/25
+[2026-04-05T19:07:12.987Z] iter=322 turn=22 INFO: Agent: All 894 tests pass. Now write memory, update goals, restart.
+[2026-04-05T19:07:12.987Z] iter=322 turn=22 INFO: save_memory: "[Engineer] Iteration 322"
+[2026-04-05T19:07:12.988Z] iter=322 turn=22 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T19:07:12.988Z] iter=322 turn=23 INFO: Turn 23/25
+[2026-04-05T19:07:22.407Z] iter=322 turn=23 INFO: write_file: goals.md (write)
+[2026-04-05T19:07:22.408Z] iter=322 turn=23 INFO:   -> ok: Updated goals.md (1277 chars, -21 lines delta)
+[2026-04-05T19:07:22.408Z] iter=322 turn=24 INFO: Turn 24/25
+[2026-04-05T19:07:24.383Z] iter=322 turn=24 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T19:07:24.383Z] iter=322 turn=24 INFO: RESTART signal
+[2026-04-05T19:07:24.383Z] iter=322 turn=24 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T19:07:25.397Z] iter=322 turn=24 INFO: Compilation OK
+[2026-04-05T19:07:32.406Z] iter=322 turn=24 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T19:07:32.407Z] iter=322 turn=24 INFO: Cache stats: 0 hits, 6 misses, 53 entries, 9 invalidations (6 entries removed)
+[2026-04-05T19:07:32.407Z] iter=322 turn=24 INFO: Tool cache stats
+[2026-04-05T19:07:32.407Z] iter=322 turn=24 INFO: Tool timing: bash: 10x, avg=1452ms, total=14518ms; write_file: 9x, avg=1ms, total=12ms; read_file: 6x, avg=2ms, total=10ms; read_scratchpad: 1x, avg=1ms, total=1ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T19:07:32.407Z] iter=322 turn=24 INFO: Tool timing stats
+[2026-04-05T19:07:38.715Z] iter=322 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 322: predicted 20 turns, actual 24 turns, ratio 1.20**
+[2026-04-05T19:07:49.339Z] iter=322 turn=24 INFO: Pre-commit review (2876in/393out): **Issues:**
+
+- **`getStaleFiles` doesn't detect new files added to the repo**: It only checks `allFiles` (the ranked paths passed in) against the cache, but files that exist on disk and were previousl

@@ -17,7 +17,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { compressToolOutput } from "./tool-output-compressor.js";
 import { fingerprintRepo } from "./repo-context.js";
 import { rankFiles } from "./file-ranker.js";
-import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap } from "./tree-sitter-map.js";
+import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap, saveRepoMapCache, loadRepoMapCache, getStaleFiles, updateRepoMapIncremental, cacheToRepoMap } from "./tree-sitter-map.js";
 import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
 import { runVerification, formatVerificationResults } from "./verification.js";
 import { createDefaultRegistry } from "./tool-registry.js";
@@ -235,7 +235,21 @@ export function buildSystemPrompt(
   if (isSourceDir) {
     try {
       const rankedPaths = rankedFiles.map(f => f.path);
-      const repoMap = buildRepoMap(workDir, rankedPaths);
+      // Try incremental cache first
+      const cache = loadRepoMapCache(workDir);
+      let repoMap: import("./tree-sitter-map.js").RepoMap;
+      if (cache) {
+        const stale = getStaleFiles(workDir, cache, rankedPaths);
+        if (stale.length === 0) {
+          repoMap = cacheToRepoMap(cache);
+        } else {
+          repoMap = updateRepoMapIncremental(workDir, cacheToRepoMap(cache), stale);
+          saveRepoMapCache(workDir, repoMap);
+        }
+      } else {
+        repoMap = buildRepoMap(workDir, rankedPaths);
+        saveRepoMapCache(workDir, repoMap);
+      }
       const ranked = rankSymbols(repoMap);
       const raw = formatRepoMap(repoMap, { onlyExported: true, maxFiles: 60, ranked });
       if (raw.length > 50) {
@@ -1035,7 +1049,7 @@ export class Orchestrator {
     }).join("\n\n");
 
     const summary = await caller(
-      `Summarize this conversation concisely, preserving key decisions, file paths, and results:\n\n${convText}`
+      `Summarize this conversation into the following structured format. Use exactly these section headers:\n\n## Current Task\nWhat the user is currently trying to accomplish.\n\n## Plan & Progress\nStep-by-step plan and which steps are done, in-progress, or pending.\n\n## Files Modified\nList of files that were created, edited, or deleted.\n\n## Key Decisions\nImportant choices made (libraries chosen, approaches taken, things ruled out).\n\n## Open Questions\nUnresolved issues, errors, or things that still need attention.\n\nConversation to summarize:\n\n${convText}`
     );
 
     this.apiMessages = [

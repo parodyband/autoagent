@@ -8,7 +8,7 @@
  * Companion to: symbol-index.ts (regex-based, kept for non-TS files)
  */
 
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, statSync } from "fs";
 import path from "path";
 import { createRequire } from "module";
 
@@ -40,6 +40,11 @@ export interface ParsedFile {
 export interface RepoMap {
   files: ParsedFile[];
   builtAt: number; // Date.now()
+}
+
+export interface RepoMapCache {
+  generatedAt: number;           // Date.now() when cache was written
+  files: Array<ParsedFile & { lastModified: number }>; // mtime per file
 }
 
 // ─── Tree-sitter setup ───────────────────────────────────────
@@ -669,4 +674,135 @@ export function findFilesBySymbol(repoMap: RepoMap, symbolName: string): string[
 
   matches.sort((a, b) => b.priority - a.priority || a.file.localeCompare(b.file));
   return matches.map(m => m.file);
+}
+
+// ─── Persistent Repo Map Cache ────────────────────────────────
+
+const CACHE_DIR = ".autoagent-cache";
+const CACHE_FILE = "repo-map.json";
+
+function cacheFilePath(workDir: string): string {
+  return path.join(workDir, CACHE_DIR, CACHE_FILE);
+}
+
+/**
+ * Save a repo map to the persistent cache.
+ * Each entry gets a `lastModified` timestamp from the file's mtime.
+ */
+export function saveRepoMapCache(workDir: string, repoMap: RepoMap): void {
+  try {
+    const cacheDir = path.join(workDir, CACHE_DIR);
+    mkdirSync(cacheDir, { recursive: true });
+
+    const files: RepoMapCache["files"] = repoMap.files.map((f) => {
+      const absPath = path.join(workDir, f.path);
+      let lastModified = 0;
+      try {
+        lastModified = statSync(absPath).mtimeMs;
+      } catch {
+        // file may have been deleted — store 0
+      }
+      return { ...f, lastModified };
+    });
+
+    const cache: RepoMapCache = { generatedAt: Date.now(), files };
+    writeFileSync(cacheFilePath(workDir), JSON.stringify(cache, null, 2), "utf-8");
+  } catch {
+    // Non-fatal: cache write failure is silently ignored
+  }
+}
+
+/**
+ * Load the cached repo map. Returns null if no cache exists.
+ *
+ * For each cached file, the caller should check whether `lastModified`
+ * matches the file's current mtime. Stale files can be re-parsed with
+ * `updateRepoMapIncremental`.
+ */
+export function loadRepoMapCache(workDir: string): RepoMapCache | null {
+  try {
+    const raw = readFileSync(cacheFilePath(workDir), "utf-8");
+    const cache = JSON.parse(raw) as RepoMapCache;
+    if (typeof cache.generatedAt !== "number" || !Array.isArray(cache.files)) {
+      return null;
+    }
+    return cache;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Check which cached files are stale (mtime changed or file missing from cache).
+ * Returns the set of relative paths that need re-parsing.
+ */
+export function getStaleFiles(workDir: string, cache: RepoMapCache, allFiles: string[]): string[] {
+  const cachedMtimes = new Map<string, number>();
+  for (const f of cache.files) {
+    cachedMtimes.set(f.path, f.lastModified);
+  }
+
+  const stale: string[] = [];
+  for (const f of allFiles) {
+    const rel = path.isAbsolute(f) ? path.relative(workDir, f) : f;
+    const cached = cachedMtimes.get(rel);
+    if (cached === undefined) {
+      // New file not in cache
+      stale.push(f);
+      continue;
+    }
+    try {
+      const mtime = statSync(path.isAbsolute(f) ? f : path.join(workDir, f)).mtimeMs;
+      if (mtime !== cached) stale.push(f);
+    } catch {
+      stale.push(f); // file gone or unreadable — mark stale
+    }
+  }
+  return stale;
+}
+
+/**
+ * Incrementally update a repo map by re-parsing only the changed files.
+ * Merges fresh parsed results into the cached map and returns a new RepoMap.
+ *
+ * @param workDir     - repo root
+ * @param cachedMap   - previously cached repo map (as a RepoMap)
+ * @param changedFiles - relative or absolute paths of files to re-parse
+ */
+export function updateRepoMapIncremental(
+  workDir: string,
+  cachedMap: RepoMap,
+  changedFiles: string[]
+): RepoMap {
+  if (changedFiles.length === 0) return cachedMap;
+
+  const changedRels = new Set(
+    changedFiles.map((f) => (path.isAbsolute(f) ? path.relative(workDir, f) : f))
+  );
+
+  // Keep unchanged files from cache
+  const unchanged = cachedMap.files.filter((f) => !changedRels.has(f.path));
+
+  // Re-parse changed files
+  const fresh: ParsedFile[] = changedFiles.map((f) => {
+    const absPath = path.isAbsolute(f) ? f : path.join(workDir, f);
+    const parsed = parseFile(absPath);
+    parsed.path = path.relative(workDir, absPath);
+    return parsed;
+  });
+
+  return {
+    files: [...unchanged, ...fresh],
+    builtAt: Date.now(),
+  };
+}
+
+/**
+ * Convert a RepoMapCache to a plain RepoMap (strips lastModified).
+ */
+export function cacheToRepoMap(cache: RepoMapCache): RepoMap {
+  return {
+    files: cache.files.map(({ lastModified: _lm, ...rest }) => rest),
+    builtAt: cache.generatedAt,
+  };
 }
