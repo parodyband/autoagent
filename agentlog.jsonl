@@ -544,3 +544,33 @@
 {"timestamp":"2026-04-05T19:19:57.648Z","iteration":328,"level":"info","message":"Turn 12/25","turn":12}
 {"timestamp":"2026-04-05T19:20:02.934Z","iteration":328,"level":"info","message":"think: The failing test \"skips assistant messages that are purely tool calls\" expects no \"## Assistant\" heading when the conten...","turn":12}
 {"timestamp":"2026-04-05T19:20:02.935Z","iteration":328,"level":"info","message":"Turn 13/25","turn":13}
+{"timestamp":"2026-04-05T19:20:09.183Z","iteration":328,"level":"info","message":"Agent: Both src files updated. One failing test to fix (old test expects old behavior), then TSC check and done.","turn":13}
+{"timestamp":"2026-04-05T19:20:09.184Z","iteration":328,"level":"info","message":"write_file: tests/export-helper.test.ts (patch)","turn":13}
+{"timestamp":"2026-04-05T19:20:09.186Z","iteration":328,"level":"info","message":"  -> ok: Patched tests/export-helper.test.ts: -11 +12 lines\n\nContext after patch:\n82 |     expect(content).not.toContain('{\"type\":\"tool_use\"');\n83 |   });\n84 | \n85 |   it(\"renders purely tool-call assistant messages as <details> blocks\", () => {\n86 |     const messages = [\n87 |       {\n88 |         role: \"assistant\" as const,\n89 |         content: '{\"type\":\"tool_use\",\"id\":\"toolu_01\",\"name\":\"bash\",\"input\":{\"command\":\"ls\"}}',\n90 |       },\n91 |     ];\n92 |     buildExportContent(messages, \"claude-3-5-sonnet-20241022\", { tokensIn: 10, tokensOut: 20, cost: 0.001 }, tmpDir, exportPath);\n93 |     const content = readFileSync(exportPath, \"utf-8\");\n94 |     expect(content).toContain(\"<details>\");\n95 |     expect(content).toContain(\"bash\");\n96 |   });\n97 | \n98 |   it(\"handles empty messages array — produces valid markdown\", () => {\n99 |     buildExportContent([], \"claude-3-5-sonnet-20241022\", { tokensIn: 0, tokensOut: 0, cost: 0 }, tmpDir, exportPath);","turn":13}
+{"timestamp":"2026-04-05T19:20:09.186Z","iteration":328,"level":"info","message":"Turn 14/25","turn":14}
+{"timestamp":"2026-04-05T19:20:11.948Z","iteration":328,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tool-recovery.test.ts tests/export-helper.test.ts 2>&1 | tail -15","turn":14}
+{"timestamp":"2026-04-05T19:20:12.903Z","iteration":328,"level":"info","message":"  -> exit=0 (332 chars)","turn":14}
+{"timestamp":"2026-04-05T19:20:12.903Z","iteration":328,"level":"info","message":"Turn 15/25","turn":15}
+{"timestamp":"2026-04-05T19:20:14.548Z","iteration":328,"level":"info","message":"Agent: All 36 tests pass. Now TSC check:","turn":15}
+{"timestamp":"2026-04-05T19:20:14.549Z","iteration":328,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1","turn":15}
+{"timestamp":"2026-04-05T19:20:15.507Z","iteration":328,"level":"info","message":"  -> exit=0 (11 chars)","turn":15}
+{"timestamp":"2026-04-05T19:20:15.507Z","iteration":328,"level":"info","message":"Turn 16/25","turn":16}
+{"timestamp":"2026-04-05T19:20:20.487Z","iteration":328,"level":"info","message":"Agent: Clean. Writing memory, updating goals, restarting.","turn":16}
+{"timestamp":"2026-04-05T19:20:20.487Z","iteration":328,"level":"info","message":"save_memory: \"[Engineer] Iteration 328\"","turn":16}
+{"timestamp":"2026-04-05T19:20:20.488Z","iteration":328,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":16}
+{"timestamp":"2026-04-05T19:20:20.488Z","iteration":328,"level":"info","message":"Turn 17/25","turn":17}
+{"timestamp":"2026-04-05T19:20:28.842Z","iteration":328,"level":"info","message":"write_file: goals.md (write)","turn":17}
+{"timestamp":"2026-04-05T19:20:28.843Z","iteration":328,"level":"info","message":"  -> ok: Updated goals.md (1075 chars, -18 lines delta)","turn":17}
+{"timestamp":"2026-04-05T19:20:28.843Z","iteration":328,"level":"info","message":"Turn 18/25","turn":18}
+{"timestamp":"2026-04-05T19:20:30.890Z","iteration":328,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo \"TSC_CLEAN\"","turn":18}
+{"timestamp":"2026-04-05T19:20:31.941Z","iteration":328,"level":"info","message":"  -> exit=0 (10 chars)","turn":18}
+{"timestamp":"2026-04-05T19:20:31.942Z","iteration":328,"level":"info","message":"Turn 19/25","turn":19}
+{"timestamp":"2026-04-05T19:20:34.108Z","iteration":328,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":19}
+{"timestamp":"2026-04-05T19:20:34.109Z","iteration":328,"level":"info","message":"RESTART signal","turn":19}
+{"timestamp":"2026-04-05T19:20:34.109Z","iteration":328,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":19}
+{"timestamp":"2026-04-05T19:20:35.103Z","iteration":328,"level":"info","message":"Compilation OK","turn":19}
+{"timestamp":"2026-04-05T19:20:42.179Z","iteration":328,"level":"info","message":"Cache persisted: 53 entries to .autoagent-cache.json","turn":19}
+{"timestamp":"2026-04-05T19:20:42.180Z","iteration":328,"level":"info","message":"Tool timing: bash: 12x, avg=349ms, total=4193ms; write_file: 6x, avg=2ms, total=9ms; read_scratchpad: 1x, avg=4ms, total=4ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms","turn":19}
+{"timestamp":"2026-04-05T19:20:42.180Z","iteration":328,"level":"info","message":"Tool timing stats","turn":19,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":4,"minMs":4,"maxMs":4,"avgMs":4},"bash":{"calls":12,"totalMs":4193,"minMs":1,"maxMs":1052,"avgMs":349},"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"write_file":{"calls":6,"totalMs":9,"minMs":1,"maxMs":2,"avgMs":2},"save_memory":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":22,"totalMs":4208}}}
+{"timestamp":"2026-04-05T19:20:48.444Z","iteration":328,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 328: predicted 20 turns, actual 19 turns, ratio 0.95**","turn":19}
+{"timestamp":"2026-04-05T19:20:48.466Z","iteration":328,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":19}

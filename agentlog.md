@@ -1049,3 +1049,53 @@ Writing tests for both now:
 [2026-04-05T19:19:57.648Z] iter=328 turn=12 INFO: Turn 12/25
 [2026-04-05T19:20:02.934Z] iter=328 turn=12 INFO: think: The failing test "skips assistant messages that are purely tool calls" expects no "## Assistant" heading when the conten...
 [2026-04-05T19:20:02.935Z] iter=328 turn=13 INFO: Turn 13/25
+[2026-04-05T19:20:09.183Z] iter=328 turn=13 INFO: Agent: Both src files updated. One failing test to fix (old test expects old behavior), then TSC check and done.
+[2026-04-05T19:20:09.184Z] iter=328 turn=13 INFO: write_file: tests/export-helper.test.ts (patch)
+[2026-04-05T19:20:09.186Z] iter=328 turn=13 INFO:   -> ok: Patched tests/export-helper.test.ts: -11 +12 lines
+
+Context after patch:
+82 |     expect(content).not.toContain('{"type":"tool_use"');
+83 |   });
+84 | 
+85 |   it("renders purely tool-call assistant messages as <details> blocks", () => {
+86 |     const messages = [
+87 |       {
+88 |         role: "assistant" as const,
+89 |         content: '{"type":"tool_use","id":"toolu_01","name":"bash","input":{"command":"ls"}}',
+90 |       },
+91 |     ];
+92 |     buildExportContent(messages, "claude-3-5-sonnet-20241022", { tokensIn: 10, tokensOut: 20, cost: 0.001 }, tmpDir, exportPath);
+93 |     const content = readFileSync(exportPath, "utf-8");
+94 |     expect(content).toContain("<details>");
+95 |     expect(content).toContain("bash");
+96 |   });
+97 | 
+98 |   it("handles empty messages array — produces valid markdown", () => {
+99 |     buildExportContent([], "claude-3-5-sonnet-20241022", { tokensIn: 0, tokensOut: 0, cost: 0 }, tmpDir, exportPath);
+[2026-04-05T19:20:09.186Z] iter=328 turn=14 INFO: Turn 14/25
+[2026-04-05T19:20:11.948Z] iter=328 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tool-recovery.test.ts tests/export-helper.test.ts 2>&1 | tail -15
+[2026-04-05T19:20:12.903Z] iter=328 turn=14 INFO:   -> exit=0 (332 chars)
+[2026-04-05T19:20:12.903Z] iter=328 turn=15 INFO: Turn 15/25
+[2026-04-05T19:20:14.548Z] iter=328 turn=15 INFO: Agent: All 36 tests pass. Now TSC check:
+[2026-04-05T19:20:14.549Z] iter=328 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T19:20:15.507Z] iter=328 turn=15 INFO:   -> exit=0 (11 chars)
+[2026-04-05T19:20:15.507Z] iter=328 turn=16 INFO: Turn 16/25
+[2026-04-05T19:20:20.487Z] iter=328 turn=16 INFO: Agent: Clean. Writing memory, updating goals, restarting.
+[2026-04-05T19:20:20.487Z] iter=328 turn=16 INFO: save_memory: "[Engineer] Iteration 328"
+[2026-04-05T19:20:20.488Z] iter=328 turn=16 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T19:20:20.488Z] iter=328 turn=17 INFO: Turn 17/25
+[2026-04-05T19:20:28.842Z] iter=328 turn=17 INFO: write_file: goals.md (write)
+[2026-04-05T19:20:28.843Z] iter=328 turn=17 INFO:   -> ok: Updated goals.md (1075 chars, -18 lines delta)
+[2026-04-05T19:20:28.843Z] iter=328 turn=18 INFO: Turn 18/25
+[2026-04-05T19:20:30.890Z] iter=328 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC_CLEAN"
+[2026-04-05T19:20:31.941Z] iter=328 turn=18 INFO:   -> exit=0 (10 chars)
+[2026-04-05T19:20:31.942Z] iter=328 turn=19 INFO: Turn 19/25
+[2026-04-05T19:20:34.108Z] iter=328 turn=19 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T19:20:34.109Z] iter=328 turn=19 INFO: RESTART signal
+[2026-04-05T19:20:34.109Z] iter=328 turn=19 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T19:20:35.103Z] iter=328 turn=19 INFO: Compilation OK
+[2026-04-05T19:20:42.179Z] iter=328 turn=19 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T19:20:42.180Z] iter=328 turn=19 INFO: Tool timing: bash: 12x, avg=349ms, total=4193ms; write_file: 6x, avg=2ms, total=9ms; read_scratchpad: 1x, avg=4ms, total=4ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T19:20:42.180Z] iter=328 turn=19 INFO: Tool timing stats
+[2026-04-05T19:20:48.444Z] iter=328 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 328: predicted 20 turns, actual 19 turns, ratio 0.95**
+[2026-04-05T19:20:48.466Z] iter=328 turn=19 INFO: Pre-commit review: no significant code changes to review

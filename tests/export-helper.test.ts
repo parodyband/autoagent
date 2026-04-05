@@ -82,7 +82,7 @@ describe("buildExportContent", () => {
     expect(content).not.toContain('{"type":"tool_use"');
   });
 
-  it("skips assistant messages that are purely tool calls", () => {
+  it("renders purely tool-call assistant messages as <details> blocks", () => {
     const messages = [
       {
         role: "assistant" as const,
@@ -91,7 +91,8 @@ describe("buildExportContent", () => {
     ];
     buildExportContent(messages, "claude-3-5-sonnet-20241022", { tokensIn: 10, tokensOut: 20, cost: 0.001 }, tmpDir, exportPath);
     const content = readFileSync(exportPath, "utf-8");
-    expect(content).not.toContain("## Assistant");
+    expect(content).toContain("<details>");
+    expect(content).toContain("bash");
   });
 
   it("handles empty messages array — produces valid markdown", () => {

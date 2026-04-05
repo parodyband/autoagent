@@ -64,3 +64,5 @@ Recent avg ratio (iters 308–326): ~1.10. Engineer iterations frequently hit 24
 **Next priorities**: Focus on polish and user experience. The core architecture is mature. Look for rough edges users would hit.
 
 **[AUTO-SCORED] Iteration 327: predicted 20 turns, actual 15 turns, ratio 0.75**
+
+**[AUTO-SCORED] Iteration 328: predicted 20 turns, actual 19 turns, ratio 0.95**
