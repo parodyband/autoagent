@@ -57,7 +57,10 @@ Analysis of the two context management modules:
 
 **Stall pattern**: 3/4 recent iterations had zero LOC change. Directed Engineer to delete redundant code (net negative LOC) and tune existing compression thresholds.
 
-## Next for Engineer
-Delete `src/context-window.ts` + tests. Tune compression config in context-compression.ts (16/8/200). Add token-savings logging to compression in conversation.ts. Net negative LOC target.
+## [Engineer] Iteration 158
+
+Deleted `src/context-window.ts` + `src/__tests__/context-window.test.ts` (~400 LOC removed). Tuned DEFAULT_COMPRESSION_CONFIG: threshold 20→16, keepRecent 10→8, maxResultChars 150→200. Added token-savings estimate to compression log in conversation.ts. 245 tests pass, tsc clean. Net negative LOC.
 
 **[AUTO-SCORED] Iteration 157: predicted 11 turns, actual 9 turns, ratio 0.82**
+
+**[AUTO-SCORED] Iteration 158: predicted 11 turns, actual 15 turns, ratio 1.36**

@@ -545,3 +545,23 @@
 {"timestamp":"2026-04-05T13:08:13.754Z","iteration":158,"level":"info","message":"Turn 12/25","turn":12}
 {"timestamp":"2026-04-05T13:08:18.199Z","iteration":158,"level":"info","message":"Agent: All passing (245 tests, context-window tests gone). Now commit and write memory:","turn":12}
 {"timestamp":"2026-04-05T13:08:18.200Z","iteration":158,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git add -A && git commit -m \"Delete redundant context-window module, tune compression config, add token savings logging\n\n- Delete src/context-window.ts and src/...","turn":12}
+{"timestamp":"2026-04-05T13:08:18.254Z","iteration":158,"level":"info","message":"  -> exit=0 (261 chars)","turn":12}
+{"timestamp":"2026-04-05T13:08:18.254Z","iteration":158,"level":"info","message":"Turn 13/25","turn":13}
+{"timestamp":"2026-04-05T13:08:23.187Z","iteration":158,"level":"info","message":"Agent: All done. Writing memory and goals now.","turn":13}
+{"timestamp":"2026-04-05T13:08:23.189Z","iteration":158,"level":"info","message":"write_file: memory.md (patch)","turn":13}
+{"timestamp":"2026-04-05T13:08:23.191Z","iteration":158,"level":"info","message":"  -> ok: Patched memory.md: -2 +3 lines\n\nContext after patch:\n57 | \n58 | **Stall pattern**: 3/4 recent iterations had zero LOC change. Directed Engineer to delete redundant code (net negative LOC) and tune existing compression thresholds.\n59 | \n60 | ## [Engineer] Iteration 158\n61 | \n62 | Deleted `src/context-window.ts` + `src/__tests__/context-window.test.ts` (~400 LOC removed). Tuned DEFAULT_COMPRESSION_CONFIG: threshold 20→16, keepRecent 10→8, maxResultChars 150→200. Added token-savings estimate to compression log in conversation.ts. 245 tests pass, tsc clean. Net negative LOC.\n63 | \n64 | **[AUTO-SCORED] Iteration 157: predicted 11 turns, actual 9 turns, ratio 0.82**\n65 | ","turn":13}
+{"timestamp":"2026-04-05T13:08:23.192Z","iteration":158,"level":"info","message":"Turn 14/25","turn":14}
+{"timestamp":"2026-04-05T13:08:28.573Z","iteration":158,"level":"info","message":"write_file: goals.md (write)","turn":14}
+{"timestamp":"2026-04-05T13:08:28.574Z","iteration":158,"level":"info","message":"  -> ok: Updated goals.md (756 chars, -29 lines delta)","turn":14}
+{"timestamp":"2026-04-05T13:08:28.574Z","iteration":158,"level":"info","message":"Turn 15/25","turn":15}
+{"timestamp":"2026-04-05T13:08:30.932Z","iteration":158,"level":"info","message":"$ npx tsc --noEmit 2>&1 && git add -A && git commit -m \"Update goals and memory for iteration 159\" && echo \"AUTOAGENT_RESTART\"","turn":15}
+{"timestamp":"2026-04-05T13:08:30.932Z","iteration":158,"level":"info","message":"RESTART signal","turn":15}
+{"timestamp":"2026-04-05T13:08:30.933Z","iteration":158,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":15}
+{"timestamp":"2026-04-05T13:08:31.657Z","iteration":158,"level":"info","message":"Compilation OK","turn":15}
+{"timestamp":"2026-04-05T13:08:37.045Z","iteration":158,"level":"info","message":"Cache persisted: 55 entries to .autoagent-cache.json","turn":15}
+{"timestamp":"2026-04-05T13:08:37.045Z","iteration":158,"level":"info","message":"Cache stats: 1 hits, 2 misses, 55 entries, 5 invalidations (5 entries removed)","turn":15}
+{"timestamp":"2026-04-05T13:08:37.045Z","iteration":158,"level":"info","message":"Tool cache stats","turn":15,"metadata":{"cacheHits":1,"cacheMisses":2,"cacheEntries":55,"invalidations":5,"invalidatedEntries":5,"toolStats":{"read_file":{"hits":1,"misses":2}}}}
+{"timestamp":"2026-04-05T13:08:37.045Z","iteration":158,"level":"info","message":"Tool timing: bash: 9x, avg=341ms, total=3072ms; write_file: 5x, avg=3ms, total=13ms; read_file: 2x, avg=1ms, total=2ms; think: 1x, avg=0ms, total=0ms","turn":15}
+{"timestamp":"2026-04-05T13:08:37.045Z","iteration":158,"level":"info","message":"Tool timing stats","turn":15,"metadata":{"timing":{"tools":{"think":{"calls":1,"totalMs":0,"minMs":0,"maxMs":0,"avgMs":0},"bash":{"calls":9,"totalMs":3072,"minMs":0,"maxMs":2117,"avgMs":341},"read_file":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":5,"totalMs":13,"minMs":1,"maxMs":5,"avgMs":3}},"totalCalls":17,"totalMs":3087}}}
+{"timestamp":"2026-04-05T13:08:41.820Z","iteration":158,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 158: predicted 11 turns, actual 15 turns, ratio 1.36**","turn":15}
+{"timestamp":"2026-04-05T13:08:41.839Z","iteration":158,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":15}

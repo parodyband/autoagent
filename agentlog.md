@@ -1097,3 +1097,34 @@ npm test -- --reporter=verbose 2>&1 | tail -20
 [2026-04-05T13:08:18.200Z] iter=158 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "Delete redundant context-window module, tune compression config, add token savings logging
 
 - Delete src/context-window.ts and src/...
+[2026-04-05T13:08:18.254Z] iter=158 turn=12 INFO:   -> exit=0 (261 chars)
+[2026-04-05T13:08:18.254Z] iter=158 turn=13 INFO: Turn 13/25
+[2026-04-05T13:08:23.187Z] iter=158 turn=13 INFO: Agent: All done. Writing memory and goals now.
+[2026-04-05T13:08:23.189Z] iter=158 turn=13 INFO: write_file: memory.md (patch)
+[2026-04-05T13:08:23.191Z] iter=158 turn=13 INFO:   -> ok: Patched memory.md: -2 +3 lines
+
+Context after patch:
+57 | 
+58 | **Stall pattern**: 3/4 recent iterations had zero LOC change. Directed Engineer to delete redundant code (net negative LOC) and tune existing compression thresholds.
+59 | 
+60 | ## [Engineer] Iteration 158
+61 | 
+62 | Deleted `src/context-window.ts` + `src/__tests__/context-window.test.ts` (~400 LOC removed). Tuned DEFAULT_COMPRESSION_CONFIG: threshold 20→16, keepRecent 10→8, maxResultChars 150→200. Added token-savings estimate to compression log in conversation.ts. 245 tests pass, tsc clean. Net negative LOC.
+63 | 
+64 | **[AUTO-SCORED] Iteration 157: predicted 11 turns, actual 9 turns, ratio 0.82**
+65 | 
+[2026-04-05T13:08:23.192Z] iter=158 turn=14 INFO: Turn 14/25
+[2026-04-05T13:08:28.573Z] iter=158 turn=14 INFO: write_file: goals.md (write)
+[2026-04-05T13:08:28.574Z] iter=158 turn=14 INFO:   -> ok: Updated goals.md (756 chars, -29 lines delta)
+[2026-04-05T13:08:28.574Z] iter=158 turn=15 INFO: Turn 15/25
+[2026-04-05T13:08:30.932Z] iter=158 turn=15 INFO: $ npx tsc --noEmit 2>&1 && git add -A && git commit -m "Update goals and memory for iteration 159" && echo "AUTOAGENT_RESTART"
+[2026-04-05T13:08:30.932Z] iter=158 turn=15 INFO: RESTART signal
+[2026-04-05T13:08:30.933Z] iter=158 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T13:08:31.657Z] iter=158 turn=15 INFO: Compilation OK
+[2026-04-05T13:08:37.045Z] iter=158 turn=15 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T13:08:37.045Z] iter=158 turn=15 INFO: Cache stats: 1 hits, 2 misses, 55 entries, 5 invalidations (5 entries removed)
+[2026-04-05T13:08:37.045Z] iter=158 turn=15 INFO: Tool cache stats
+[2026-04-05T13:08:37.045Z] iter=158 turn=15 INFO: Tool timing: bash: 9x, avg=341ms, total=3072ms; write_file: 5x, avg=3ms, total=13ms; read_file: 2x, avg=1ms, total=2ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T13:08:37.045Z] iter=158 turn=15 INFO: Tool timing stats
+[2026-04-05T13:08:41.820Z] iter=158 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 158: predicted 11 turns, actual 15 turns, ratio 1.36**
+[2026-04-05T13:08:41.839Z] iter=158 turn=15 INFO: Pre-commit review: no significant code changes to review
