@@ -56,12 +56,13 @@ export async function executeSubagent(
   task: string,
   model: string = "fast",
   maxTokens: number = 2048,
+  client?: Anthropic,
 ): Promise<SubagentResult> {
   const modelId = MODELS[model] || MODELS.fast;
 
   try {
-    const client = new Anthropic();
-    const response = await client.messages.create({
+    const _client = client ?? new Anthropic();
+    const response = await _client.messages.create({
       model: modelId,
       max_tokens: maxTokens,
       messages: [{ role: "user", content: task }],

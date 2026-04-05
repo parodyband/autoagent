@@ -26,6 +26,7 @@ import { ToolTimingTracker } from "../src/tool-timing.js";
 import { recordMetrics, type IterationMetrics } from "../src/finalization.js";
 import { handleToolCall, processTurn, runConversation, type IterationCtx, type TurnResult } from "../src/conversation.js";
 import { countConsecutiveFailures, buildRecoveryNote, buildRecoveryGoals, resuscitate, handleIterationFailure, type ResuscitationConfig } from "../src/resuscitation.js";
+import { executeSubagent } from "../src/tools/subagent.js";
 import { getIterationCommits, computeDiffStats, getAllIterationDiffs } from "../src/iteration-diff.js";
 import type { IterationState } from "../src/iteration.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync } from "fs";
@@ -686,6 +687,7 @@ async function main(): Promise<void> {
     testResuscitation();
     testLogRotation();
     await testResuscitationE2E();
+    await testSubagent();
     // Inline model-selection smoke test (avoids vitest import in tsx context)
     console.log("  model-selection smoke test...");
     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
@@ -1875,6 +1877,105 @@ async function testResuscitationE2E(): Promise<void> {
     console.log("\n✅ All tests passed!");
     process.exit(0);
   }
+}
+
+// === Sub-agent delegation tests ===
+
+async function testSubagent(): Promise<void> {
+  // Test 1: executeSubagent calls the client with correct parameters
+  let capturedRequest: any = null;
+  const mockClient = {
+    messages: {
+      create: async (req: any) => {
+        capturedRequest = req;
+        return {
+          content: [{ type: "text", text: "Summary: The file contains utility functions." }],
+          usage: { input_tokens: 50, output_tokens: 20 },
+        };
+      },
+    },
+  };
+
+  const result = await executeSubagent(
+    "Summarize this code", "fast", 512, mockClient as any
+  );
+
+  // Verify it called the right model
+  assert(capturedRequest !== null, "subagent: client was called");
+  assert(
+    capturedRequest.model.includes("haiku"),
+    "subagent: fast model maps to haiku",
+    `got: ${capturedRequest.model}`
+  );
+  assert(capturedRequest.max_tokens === 512, "subagent: max_tokens passed through");
+  assert(
+    capturedRequest.messages[0].content.includes("Summarize this code"),
+    "subagent: task passed as user message"
+  );
+  // Verify result contains the response text
+  assert(result.response.includes("utility functions"), "subagent: result contains model response");
+
+  // Test 2: balanced model maps to sonnet
+  let balancedModel = "";
+  const mockClient2 = {
+    messages: {
+      create: async (req: any) => {
+        balancedModel = req.model;
+        return {
+          content: [{ type: "text", text: "LGTM" }],
+          usage: { input_tokens: 30, output_tokens: 5 },
+        };
+      },
+    },
+  };
+
+  await executeSubagent(
+    "Review this code", "balanced", 2048, mockClient2 as any
+  );
+  assert(
+    balancedModel.includes("sonnet"),
+    "subagent: balanced model maps to sonnet",
+    `got: ${balancedModel}`
+  );
+
+  // Test 3: default model is fast (haiku)
+  let defaultModel = "";
+  const mockClient3 = {
+    messages: {
+      create: async (req: any) => {
+        defaultModel = req.model;
+        return {
+          content: [{ type: "text", text: "Done" }],
+          usage: { input_tokens: 10, output_tokens: 3 },
+        };
+      },
+    },
+  };
+
+  await executeSubagent("Do something", undefined, undefined, mockClient3 as any);
+  assert(
+    defaultModel.includes("haiku"),
+    "subagent: default model is haiku (fast)",
+    `got: ${defaultModel}`
+  );
+
+  // Test 4: error handling — API failure returns error message
+  const mockClientFail = {
+    messages: {
+      create: async () => {
+        throw new Error("API rate limit exceeded");
+      },
+    },
+  };
+
+  const errorResult = await executeSubagent(
+    "This will fail", "fast", 2048, mockClientFail as any
+  );
+  assert(
+    errorResult.response.includes("ERROR") && errorResult.response.includes("rate limit"),
+    "subagent: API error returns error message",
+    `got: ${errorResult.response}`
+  );
 }
 
 main().catch((err) => {

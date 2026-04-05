@@ -1,4 +1,4 @@
-# AutoAgent Goals — Iteration 43
+# AutoAgent Goals — Iteration 44
 
-1. **Capability commitment**: Define ONE measurable capability (e.g., "agent can refactor a function and tests pass" or "agent correctly delegates research to sub-agent and uses result"). Build a test or benchmark for it. This is the concrete thing the inner voice has been asking for.
-2. **Single bounded task** — Define "done" before starting. Stop when done.
+1. **Build `src/progress-check.ts`** — Function `assessProgress(goals: string, turnNumber: number, totalTurns: number): {onTrack: boolean, recommendation: string}`. Wire into agent.ts at turn 10. This directly addresses the "iterations balloon to 48 turns" problem by forcing mid-iteration reflection with a concrete stop/continue signal.
+2. **DONE criteria**: File exists, has tests, compiles, wired into agent loop. 8 turns max.
