@@ -1,90 +1,3 @@
-72 | 
-73 |   try {
-74 |     const dir = path.dirname(resolved);
-75 |     if (!existsSync(dir)) {
-76 |       mkdirSync(dir, { recursive: true });
-77 |     }
-78 | 
-79 |     const existed = existsSync(resolved);
-80 |     let oldContent = "";
-81 |     if (existed) {
-82 |       try { oldContent = readFileSync(resolved, "utf-8"); } catch {}
-83 |     }
-84 | 
-85 |     // Append-only enforcement for protected files
-86 |     if (isAppendOnly(filePath) && existed && oldContent.length > 0) {
-87 |       if (mode === "write" && !content.startsWith(oldContent)) {
-88 |         return {
-89 |           message: `ERROR: ${path.basename(filePath)} is append-only. Use mode 'append' or ensure new content starts with existing content.`,
-90 |           success: false,
-91 |         };
-92 |       }
-93 |     }
-94 | 
-95 |     if (mode === "patch") {
-96 |       if (!oldString) return { message: "ERROR: patch mode requires old_string", success: false };
-[2026-04-05T10:14:01.429Z] iter=71 turn=4 INFO: Turn 4/25
-[2026-04-05T10:14:13.793Z] iter=71 turn=4 INFO: Agent: Now add the tests in self-test.ts. I'll add them right after the existing `testWriteFile` function's closing brace, inside the function itself:
-[2026-04-05T10:14:13.794Z] iter=71 turn=4 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T10:14:13.798Z] iter=71 turn=4 INFO:   -> ok: Patched scripts/self-test.ts: -5 +32 lines
-
-Context after patch:
-137 |   const patchMissing = executeWriteFile(".self-test-tmp/nonexistent.txt", "", "patch", ROOT, "a", "b");
-138 |   assert(!patchMissing.success, "write_file: patch non-existent file fails");
-139 | 
-140 |   // Nested directory creation
-141 |   const nestedPath = ".self-test-tmp/deep/nested/dir/file.txt";
-142 |   const nested = executeWriteFile(nestedPath, "nested content", "write", ROOT);
-143 |   assert(nested.success && existsSync(path.join(ROOT, nestedPath)), "write_file: creates nested directories");
-144 | 
-145 |   // Append-only enforcement for protected files (memory.md, agentlog.md)
-146 |   const memFile = path.join(TEMP_DIR, "memory.md");
-147 |   writeFileSync(memFile, "# Memory\n\nExisting content.\n", "utf-8");
-148 |   const memRel = path.relative(ROOT, memFile);
-149 | 
-150 |   // Non-append write to memory.md should be rejected
-151 |   const rewrite = executeWriteFile(memRel, "Completely new content", "write", ROOT);
-152 |   assert(!rewrite.success && rewrite.message.includes("append-only"), "write_file: rejects non-append write to memory.md");
-153 |   // Verify file unchanged
-154 |   assert(readFileSync(memFile, "utf-8") === "# Memory\n\nExisting content.\n", "write_file: memory.md unchanged after rejected write");
-155 | 
-156 |   // Append mode to memory.md should succeed
-157 |   const memAppend = executeWriteFile(memRel, "\nNew entry.", "append", ROOT);
-158 |   assert(memAppend.success, "write_file: append to memory.md succeeds");
-159 |   assert(readFileSync(memFile, "utf-8").endsWith("\nNew entry."), "write_file: memory.md has appended content");
-160 | 
-161 |   // Write mode that starts with existing content (effective append) should succeed
-162 |   const currentMem = readFileSync(memFile, "utf-8");
-163 |   const extendedWrite = executeWriteFile(memRel, currentMem + "\nMore content.", "write", ROOT);
-164 |   assert(extendedWrite.success, "write_file: write that extends memory.md succeeds");
-165 | 
-166 |   // Same enforcement for agentlog.md
-167 |   const logFile = path.join(TEMP_DIR, "agentlog.md");
-168 |   writeFileSync(logFile, "# Log\n\nEntry 1.\n", "utf-8");
-169 |   const logRel = path.relative(ROOT, logFile);
-170 |   const logRewrite = executeWriteFile(logRel, "Rewritten log", "write", ROOT);
-171 |   assert(!logRewrite.success && logRewrite.message.includes("append-only"), "write_file: rejects non-append write to agentlog.md");
-172 | 
-173 | // ─── Grep Tests ─────────────────────────────────────────────
-174 | 
-[2026-04-05T10:14:13.798Z] iter=71 turn=5 INFO: Turn 5/25
-[2026-04-05T10:14:16.897Z] iter=71 turn=5 INFO: Agent: 
-
-I've already produced both deliverables — the write_file.ts patch and the self-test additions. Let me verify they compile and pass:
-[2026-04-05T10:14:16.897Z] iter=71 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T10:14:17.602Z] iter=71 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:14:17.603Z] iter=71 turn=6 INFO: Turn 6/25
-[2026-04-05T10:14:20.940Z] iter=71 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -30
-[2026-04-05T10:14:21.248Z] iter=71 turn=6 INFO:   -> exit=0 (1042 chars)
-[2026-04-05T10:14:21.248Z] iter=71 turn=7 INFO: Turn 7/25
-[2026-04-05T10:14:24.263Z] iter=71 turn=7 INFO: Agent: Unexpected end of file — my patch likely broke the brace structure. Let me check where `testWriteFile` closes:
-[2026-04-05T10:14:24.264Z] iter=71 turn=7 INFO: read_file: scripts/self-test.ts
-[2026-04-05T10:14:24.265Z] iter=71 turn=7 INFO:   -> ok (671 chars)
-[2026-04-05T10:14:24.265Z] iter=71 turn=8 INFO: Turn 8/25
-[2026-04-05T10:14:28.668Z] iter=71 turn=8 INFO: Agent: I see — my patch replaced the closing brace of `testWriteFile`. The function body needs a closing `}` before the grep section:
-[2026-04-05T10:14:28.669Z] iter=71 turn=8 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T10:14:28.671Z] iter=71 turn=8 INFO:   -> ok: Patched scripts/self-test.ts: -3 +4 lines
-
 Context after patch:
 168 |   writeFileSync(logFile, "# Log\n\nEntry 1.\n", "utf-8");
 169 |   const logRel = path.relative(ROOT, logFile);
@@ -1083,3 +996,96 @@ Context after patch:
 [2026-04-05T10:41:52.245Z] iter=78 turn=11 INFO: Tool timing stats
 [2026-04-05T10:41:55.824Z] iter=78 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 78: predicted 9 turns, actual 11 turns, ratio 1.22**
 [2026-04-05T10:41:57.257Z] iter=78 turn=11 INFO: Pre-commit review (404in/46out): LGTM. The change is minimal and correct — adding an optional `predictedTurns` field to the interface and passing it through from context with no logic, type safety, or import concerns.
+[2026-04-05T10:41:57.310Z] iter=78 turn=11 INFO: Committed: 4547a372 (17 in / 1633 out, cache: 7008 created, 68400 read)
+[2026-04-05T10:41:57.310Z] iter=78 turn=11 INFO: Restarting as iteration 79...
+[2026-04-05T10:41:57.510Z] iter=79 INFO: Cache restored: 24/24 entries (0 stale)
+[2026-04-05T10:41:57.511Z] iter=79 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T10:41:57.537Z] iter=79 INFO: Hard turn cap: 14 (1.5x prediction of 9)
+[2026-04-05T10:41:57.538Z] iter=79 turn=1 INFO: Turn 1/25
+[2026-04-05T10:42:01.284Z] iter=79 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state — reading the metrics file, current goals, and assessing the system's health.
+[2026-04-05T10:42:01.285Z] iter=79 turn=1 INFO: $ cat .autoagent-metrics.json
+[2026-04-05T10:42:01.288Z] iter=79 turn=1 INFO: $ cat .expert-rotation.json
+[2026-04-05T10:42:01.290Z] iter=79 turn=1 INFO: $ cat goals.md
+[2026-04-05T10:42:01.295Z] iter=79 turn=1 INFO:   -> exit=0 (89458 chars)
+[2026-04-05T10:42:01.296Z] iter=79 turn=1 INFO:   -> exit=0 (480 chars)
+[2026-04-05T10:42:01.298Z] iter=79 turn=1 INFO:   -> exit=0 (502 chars)
+[2026-04-05T10:42:01.298Z] iter=79 turn=2 INFO: Turn 2/25
+[2026-04-05T10:42:28.165Z] iter=79 turn=2 INFO: think: Let me analyze the current state:
+
+1. **I'm the Meta expert** (iteration 79). The goal says "Architect — Review metrics ...
+[2026-04-05T10:42:28.165Z] iter=79 turn=3 INFO: Turn 3/25
+[2026-04-05T10:42:31.445Z] iter=79 turn=3 INFO: $ grep -n 'predictedTurns\|PREDICTION_TURNS' src/agent.ts
+[2026-04-05T10:42:31.455Z] iter=79 turn=3 INFO: $ grep -n 'predictedTurns' src/finalization.ts
+[2026-04-05T10:42:31.461Z] iter=79 turn=3 INFO: $ grep -n 'predictedTurns' src/conversation.ts
+[2026-04-05T10:42:31.471Z] iter=79 turn=3 INFO:   -> exit=0 (217 chars)
+[2026-04-05T10:42:31.478Z] iter=79 turn=3 INFO:   -> exit=0 (198 chars)
+[2026-04-05T10:42:31.485Z] iter=79 turn=3 INFO:   -> exit=0 (482 chars)
+[2026-04-05T10:42:31.486Z] iter=79 turn=4 INFO: Turn 4/25
+[2026-04-05T10:42:34.068Z] iter=79 turn=4 INFO: read_file: src/agent.ts
+[2026-04-05T10:42:34.070Z] iter=79 turn=4 INFO:   -> ok (1210 chars)
+[2026-04-05T10:42:34.071Z] iter=79 turn=5 INFO: Turn 5/25
+[2026-04-05T10:42:41.327Z] iter=79 turn=5 INFO: Agent: 
+
+Good checkpoint. Let me state my deliverables and act.
+
+**My role as Meta**: Evaluate the system, make surgical improvements. Here's what I've found:
+
+1. `predictedTurns` is NOT showing up in metrics JSON (iter 78 entry lacks it) — likely because `recordMetrics` serializes with JSON and `null` values get omitted
+2. The system has spent 6 straight iterations on meta/calibration work with only 1 r...
+[2026-04-05T10:42:41.328Z] iter=79 turn=5 INFO: $ node -e "const x = {a: 1, b: null, c: undefined}; console.log(JSON.stringify(x))"
+[2026-04-05T10:42:41.372Z] iter=79 turn=5 INFO:   -> exit=0 (17 chars)
+[2026-04-05T10:42:41.373Z] iter=79 turn=6 INFO: Turn 6/25
+[2026-04-05T10:42:44.243Z] iter=79 turn=6 INFO: read_file: src/finalization.ts
+[2026-04-05T10:42:44.244Z] iter=79 turn=6 INFO:   -> ok (1472 chars)
+[2026-04-05T10:42:44.246Z] iter=79 turn=7 INFO: Turn 7/25
+[2026-04-05T10:43:03.808Z] iter=79 turn=7 INFO: think: The issue is clear now. The `predictedTurns` IS being set in ctx from agent.ts line 189. And finalization.ts line 256 re...
+[2026-04-05T10:43:03.810Z] iter=79 turn=8 INFO: Turn 8/25
+[2026-04-05T10:43:08.540Z] iter=79 turn=8 INFO: Agent: The `predictedTurns` plumbing is fine — iter 78 modified the source but the running process used old compiled code. This iteration (79) is the first where it'll record. No fix needed.
+
+The real issue: **the system has spent 6 iterations on meta-calibration with only 1 bug fix**. Time to break the cycle.
+
+Let me check what the codebase looks like and set meaningful next goals:
+[2026-04-05T10:43:08.541Z] iter=79 turn=8 INFO: $ cat src/experts.ts | head -80
+[2026-04-05T10:43:08.556Z] iter=79 turn=8 INFO:   -> exit=0 (3274 chars)
+[2026-04-05T10:43:08.557Z] iter=79 turn=9 INFO: Turn 9/25
+[2026-04-05T10:43:14.044Z] iter=79 turn=9 INFO: Agent: 
+
+Status: **IN PROGRESS**. My goal is Meta assessment + break the meta-cycle. Let me verify the predictedTurns plumbing works, then write goals/memory and finish.
+[2026-04-05T10:43:14.046Z] iter=79 turn=9 INFO: $ node -e "
+const data = JSON.parse(require('fs').readFileSync('.autoagent-metrics.json','utf8'));
+const last5 = data.slice(-5);
+last5.forEach(e => console.log('iter', e.iteration, '| turns:', e.turns, ...
+[2026-04-05T10:43:14.109Z] iter=79 turn=9 INFO:   -> exit=0 (289 chars)
+[2026-04-05T10:43:14.110Z] iter=79 turn=10 INFO: Turn 10/25
+[2026-04-05T10:43:18.185Z] iter=79 turn=10 INFO: Agent: Confirmed: `predictedTurns` not captured yet in any iteration. It will first appear in THIS iteration's metrics (iter 79) since iter 78's code changes only take effect on restart.
+
+Now let me check what the rotation will be for next iterations to set the right goals:
+[2026-04-05T10:43:18.186Z] iter=79 turn=10 INFO: read_file: src/experts.ts
+[2026-04-05T10:43:18.186Z] iter=79 turn=10 INFO:   -> ok (2404 chars)
+[2026-04-05T10:43:18.186Z] iter=79 turn=11 INFO: Turn 11/25
+[2026-04-05T10:43:27.766Z] iter=79 turn=11 INFO: Agent: Rotation: E → A → E → M. So next 3 iterations: **80=Engineer, 81=Architect, 82=Engineer**.
+
+Now write goals and memory. The key intervention: **direct the Engineer toward real work, not more calibration**.
+[2026-04-05T10:43:27.768Z] iter=79 turn=11 INFO: write_file: goals.md (write)
+[2026-04-05T10:43:27.771Z] iter=79 turn=11 INFO:   -> ok: Updated goals.md (816 chars, +5 lines delta)
+[2026-04-05T10:43:27.772Z] iter=79 turn=12 INFO: Turn 12/25
+[2026-04-05T10:43:36.876Z] iter=79 turn=12 INFO: write_file: memory.md (append)
+[2026-04-05T10:43:36.877Z] iter=79 turn=12 INFO:   -> ok: Appended 804 chars to memory.md
+[2026-04-05T10:43:36.878Z] iter=79 turn=13 INFO: Turn 13/25
+[2026-04-05T10:43:39.266Z] iter=79 turn=13 INFO: $ npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T10:43:39.919Z] iter=79 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-05T10:43:39.919Z] iter=79 turn=14 INFO: Turn 14/25
+[2026-04-05T10:43:42.674Z] iter=79 turn=14 INFO: Agent: Clean. No code changes this iteration, just assessment and goal-setting.
+[2026-04-05T10:43:42.674Z] iter=79 turn=14 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T10:43:42.675Z] iter=79 turn=14 INFO: RESTART signal
+[2026-04-05T10:43:42.675Z] iter=79 turn=14 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T10:43:43.387Z] iter=79 turn=14 INFO: Compilation OK
+[2026-04-05T10:43:48.041Z] iter=79 turn=14 INFO: Cache persisted: 27 entries to .autoagent-cache.json
+[2026-04-05T10:43:48.041Z] iter=79 turn=14 INFO: Cache stats: 0 hits, 3 misses, 27 entries, 2 invalidations (0 entries removed)
+[2026-04-05T10:43:48.041Z] iter=79 turn=14 INFO: Tool cache stats
+[2026-04-05T10:43:48.041Z] iter=79 turn=14 INFO: Tool timing: bash: 11x, avg=80ms, total=881ms; write_file: 2x, avg=3ms, total=6ms; read_file: 3x, avg=1ms, total=4ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T10:43:48.041Z] iter=79 turn=14 INFO: Tool timing stats
+[2026-04-05T10:43:51.539Z] iter=79 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 79: predicted 9 turns, actual 14 turns, ratio 1.56**
+[2026-04-05T10:43:51.557Z] iter=79 turn=14 INFO: Pre-commit review: no significant code changes to review

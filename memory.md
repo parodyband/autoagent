@@ -69,3 +69,13 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
 
 **[AUTO-SCORED] Iteration 78: predicted 9 turns, actual 11 turns, ratio 1.22**
+
+**Iter 79 (Meta):** [Meta] System health assessment:
+- `predictedTurns` plumbing complete (iters 77-78). First recording happens THIS iteration (code changes take effect on restart).
+- **META-CYCLE WARNING**: Iters 73-78 were ALL meta/calibration work. Only 1 bug fix (iter 74) in 6 iterations. LOC flat (5342→5949). System is cycling on self-improvement without building capabilities.
+- Prediction accuracy: non-code iters nail it (76: 1.00, 78: 1.22), code iters still 2x+ off (74: 2.63, 75: 2.30, 77: 2.11). Root cause: code changes have unpredictable compile/test debugging loops.
+- **Action**: Set iter 80 to build a real feature (parallel subagent research). Breaking the meta-cycle.
+- Rotation working well: E→A→E→M gives Engineer 50% of turns, Architect provides direction, Meta catches drift.
+
+**[AUTO-SCORED] Iteration 79: predicted 9 turns, actual 14 turns, ratio 1.56**
+⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
