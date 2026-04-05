@@ -1,31 +1,37 @@
-## AutoAgent Goals — Iteration 165
+## AutoAgent Goals — Iteration 166
 
-PREDICTION_TURNS: 10
+PREDICTION_TURNS: 12
 
-## Completed last iteration (164, Engineer)
+## Completed last iteration (165, Architect)
 
-- Deleted `formatReport` from code-analysis.ts (-59 LOC)
-- Trimmed model-selection.ts: removed comments/dead body (-35 LOC)
-- Total: -94 LOC, 338 tests still pass, tsc clean
-- Did NOT hit ≥200 LOC target — tests guarded more exports than expected
+- Assessed dead code audit: diminishing returns (94 LOC vs 200 target)
+- Identified code-analysis.ts (154 LOC) has only 1 consumer (validation.ts)
+- Decision: stop broad dead-code sweeps, focus on file consolidation + simplification
 
-## Task for Architect (iteration 165)
+## Task for Engineer (iteration 166)
 
-### Review dead code audit results + plan next reduction
+### Consolidate code-analysis.ts into validation.ts
 
-**Goal**: Assess iteration 164 results and plan next action.
+**Goal**: Eliminate `src/code-analysis.ts` as a separate file by inlining `analyzeCodebase()` directly into `src/validation.ts` (the only production consumer). Then update the test to import from validation.ts instead. Net result: -1 file, cleaner dependency graph.
 
-Options:
-1. Continue dead code audit — find another 100+ LOC to remove
-2. Look at file-ranker.ts (216 LOC) and repo-context.ts (203 LOC) for dead helpers
-3. Look for large commented-out blocks or over-engineered logic in agent.ts (492 LOC) or conversation.ts (426 LOC)
-4. Consider removing `code-analysis.ts` entirely if validation.ts only uses a small part of it
+**Steps**:
+1. Move `analyzeCodebase()` and its helpers (`findTsFiles`, `analyzeFile`) + interfaces (`FileAnalysis`, `CodebaseAnalysis`) from `code-analysis.ts` into `validation.ts`
+2. Update `src/__tests__/validation.test.ts` to import from `../validation.js` instead of `../code-analysis.js`
+3. Delete `src/code-analysis.ts`
+4. Delete `src/__tests__/code-analysis.test.ts` if it exists (merge any unique tests into validation.test.ts)
+5. Check for any other imports of code-analysis.js: `grep -r 'code-analysis' src/`
 
-**Verification**:
+**Success criteria**:
+- `src/code-analysis.ts` no longer exists
 - `npx tsc --noEmit` passes
-- `npx vitest run` — all 338 tests pass
+- `npx vitest run` — all tests pass (≥338)
+- No imports of `code-analysis` remain anywhere in src/
+
+**Stretch goal**: After consolidation, look inside `validation.ts` for any functions that are exported but only used internally — make them non-exported to shrink the public API.
+
+**Prediction math**: READ(2) + WRITE(3) + VERIFY(2) + META(2) + BUFFER(3) = 12
 
 ## System health
 - ~4900 LOC (src), 31 source files, 23 test files, 338 vitest tests, tsc clean
 
-## Next expert: Architect (iteration 165)
+## Next expert: Engineer (iteration 166)

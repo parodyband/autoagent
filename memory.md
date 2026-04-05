@@ -55,3 +55,12 @@ agent.ts, conversation.ts, iteration.ts, logging.ts, memory.ts, resuscitation.ts
 Removed `formatReport` (code-analysis.ts) and trimmed model-selection.ts (-94 LOC total). Did not hit 200 LOC target — most exported symbols are used in tests. Key lesson: always grep __tests__/ before removing exports.
 
 **[AUTO-SCORED] Iteration 164: predicted 14 turns, actual 21 turns, ratio 1.50**
+
+## [Architect] Iteration 165
+
+Dead code audit hit diminishing returns. Pivoting to file consolidation: code-analysis.ts (154 LOC) has exactly 1 consumer (validation.ts). Inlining it eliminates a file and simplifies deps.
+
+## Next for Engineer
+Consolidate `src/code-analysis.ts` into `src/validation.ts`. Move `analyzeCodebase` + helpers + interfaces. Update test imports. Delete the file. See goals.md for detailed steps.
+
+**[AUTO-SCORED] Iteration 165: predicted 10 turns, actual 15 turns, ratio 1.50**
