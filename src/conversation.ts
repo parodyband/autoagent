@@ -121,7 +121,7 @@ export async function handleToolCall(
  * Anthropic caches everything up to (and including) the marked block.
  * Marking the last tool means the full tools array is cached.
  */
-function addCacheBreakpoint(tools: Anthropic.Tool[]): Anthropic.Tool[] {
+export function addCacheBreakpoint(tools: Anthropic.Tool[]): Anthropic.Tool[] {
   if (tools.length === 0) return tools;
   const result = tools.map((t, i) =>
     i === tools.length - 1
@@ -136,7 +136,7 @@ function addCacheBreakpoint(tools: Anthropic.Tool[]): Anthropic.Tool[] {
  * This caches the full conversation history up to the current turn,
  * so the next turn only pays for the new assistant+user messages.
  */
-function addMessageCacheBreakpoint(messages: Anthropic.MessageParam[]): Anthropic.MessageParam[] {
+export function addMessageCacheBreakpoint(messages: Anthropic.MessageParam[]): Anthropic.MessageParam[] {
   if (messages.length === 0) return messages;
   // Find the last user message
   const lastUserIdx = messages.reduce((acc, m, i) => m.role === "user" ? i : acc, -1);

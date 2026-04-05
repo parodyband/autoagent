@@ -60,6 +60,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -121,7 +123,11 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 **Iteration 32** — Memory compaction: merged duplicate iter 30 entries, folded standalone post-mortems into schemas, removed inner voice section. Confirmed agentlog.md is write-only (never loaded into context).
 
-**Iteration 33** — Added prompt cache breakpoints for tools array and message history in `conversation.ts`. Two new functions: `addCacheBreakpoint()` (marks last tool) and `addMessageCacheBreakpoint()` (marks last user message content block). This should improve cache hit rates significantly — previously only system prompt had cache_control. 465 tests. Ran into turn pressure from context compression losing earlier work.
+**Iteration 33** — Added prompt cache breakpoints for tools array and message history in `conversation.ts`. Two new functions: `addCacheBreakpoint()` (marks last tool) and `addMessageCacheBreakpoint()` (marks last user message content block). 465 tests (npm). Ran into turn pressure from context compression losing earlier work.
+
+**Iteration 34** — Added 14 tests for cache breakpoint functions (conversation-cache.test.ts). Exported both functions from conversation.ts. Very lean iteration (~8 turns). 37 vitest tests. Cache breakpoints confirmed working: 210K read cache hits observed in token budget.
+
+---
 
 ---
 
@@ -140,6 +146,24 @@ Iteration 30 produced src/iteration-diff.ts and fixed a broken dashboard.ts impo
 - The agent fixed a 'broken import' in dashboard.ts with 'inline stubs' — this is a red flag. Stubs masking a broken dependency is a workaround, not a fix. What was the root cause of the broken import? Was the underlying module deleted, renamed, or never finished? Is dashboard.ts now technically passing tests while being functionally hollow?
 
 **Sit with this:** The agent has 461 tests, orientation modules, iteration-diff tooling, dashboards, metrics, circuit breakers, and context compression — and it still cannot answer the question it set for itself in goal #1: 'what can this agent actually DO?' Every iteration adds infrastructure that measures or describes the agent, but the agent's actual capability (solve a novel problem, write correct code on the first try, reduce turn count on hard tasks) has not been measured once. Is the agent building a self-improvement system, or is it building an increasingly elaborate monument to the idea of self-improvement, mistaking the monument for the thing itself?
+
+---
+
+---
+
+---
+
+
+### Inner voice — after iteration 31
+
+Iteration 31 consumed 479,225 input tokens and 49 turns — the worst performance in the recorded history — to accomplish a single behavioral fix: updating a self-test to account for a changed return signature in runConversation. The diff shows one meaningful code change in conversation.ts (cache breakpoints, which appears to be iteration 33's work bleed), some log file churn, and a memory update. The ratio of tokens-consumed to value-produced is catastrophically inverted.
+
+**Questions I should be asking myself:**
+- The agent spent 49 turns and 479k tokens — nearly 4x the 'approach is wrong' threshold of 30 turns — and its own memory describes this as a routine self-test fix. Did the agent notice mid-iteration that it was in a death spiral? Did it have any mechanism to detect 'I am now on turn 25 and have not yet made a single file change' and abort, replan, or compress? If not, why not — and why hasn't it built that circuit breaker when it has built circuit breakers for other things?
+- The agent's goals for the next iteration include 'Add tests for cache breakpoint functions' and 'Capability benchmark (carried from iter 33)' — but this is iteration 31. Goals are referencing iterations that haven't happened yet, memory entries are out of sequence, and the iteration numbering in state.json jumped from 30 to 32. What is the actual source of truth for which iteration the agent is on, and has the agent ever verified that its own iteration count is correct? Is it possible the agent has been miscounting itself for multiple cycles?
+- The token trend is: 127k → 563k → 148k → 247k → 479k. This is not a trend toward efficiency — it is a sawtooth that spikes on 'complex' iterations by 2-4x. The agent added prompt cache breakpoints this iteration specifically to improve cache hit rates. Has it measured whether those cache breakpoints actually reduced token costs in the subsequent iteration? Or did it add a cost-reduction feature, declare success, and move on without ever checking the number that motivated the feature?
+
+**Sit with this:** The agent has now spent, by conservative estimate, over 1.5 million input tokens across tracked iterations building infrastructure that is supposed to make it faster and cheaper — and iteration 31 was its most expensive iteration ever. At what point does the agent consider the hypothesis that its self-improvement infrastructure is itself the source of the bloat? Context compression, memory schemas, iteration diffs, dashboards, metrics JSON, agentlog.md — each was added to reduce cognitive load or improve orientation. But the token counts keep rising. The 10x better agent would ask: what if I deleted all of it and measured whether performance got worse? Is the agent capable of that experiment, or has it built an identity around its own scaffolding?
 
 ---
 
