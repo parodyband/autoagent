@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { getRecentlyChangedFiles, filterByRepoMap } from "../context-loader.js";
+import { getRecentlyChangedFiles, filterByRepoMap, getRecentCommitFiles } from "../context-loader.js";
 
 vi.mock("child_process", () => ({
   execSync: vi.fn(),
@@ -90,6 +90,66 @@ describe("getRecentlyChangedFiles", () => {
     expect(result).toContain("src/foo.ts");
     expect(result).not.toContain("package-lock.json");
     expect(result).not.toContain("src/bar.ts");
+  });
+});
+
+describe("getRecentCommitFiles", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("returns files from recent commits", () => {
+    vi.mocked(childProcess.execSync).mockReturnValue(
+      "abc1234 fix something\nsrc/foo.ts\nsrc/bar.ts\n\ndef5678 another commit\nsrc/baz.ts\n" as unknown as Buffer
+    );
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    const result = getRecentCommitFiles("/fake");
+    expect(result).toContain("src/foo.ts");
+    expect(result).toContain("src/bar.ts");
+    expect(result).toContain("src/baz.ts");
+  });
+
+  it("deduplicates files that appear in multiple commits", () => {
+    vi.mocked(childProcess.execSync).mockReturnValue(
+      "abc1234 commit one\nsrc/shared.ts\n\ndef5678 commit two\nsrc/shared.ts\n" as unknown as Buffer
+    );
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    const result = getRecentCommitFiles("/fake");
+    expect(result.filter(f => f === "src/shared.ts")).toHaveLength(1);
+  });
+
+  it("filters binary extensions", () => {
+    vi.mocked(childProcess.execSync).mockReturnValue(
+      "abc1234 add assets\nassets/image.png\nsrc/code.ts\n" as unknown as Buffer
+    );
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    const result = getRecentCommitFiles("/fake");
+    expect(result).not.toContain("assets/image.png");
+    expect(result).toContain("src/code.ts");
+  });
+
+  it("filters files that no longer exist on disk", () => {
+    vi.mocked(childProcess.execSync).mockReturnValue(
+      "abc1234 deleted\nsrc/deleted.ts\nsrc/present.ts\n" as unknown as Buffer
+    );
+    vi.mocked(fs.existsSync).mockImplementation((p) => String(p).includes("present.ts"));
+    const result = getRecentCommitFiles("/fake");
+    expect(result).not.toContain("src/deleted.ts");
+    expect(result).toContain("src/present.ts");
+  });
+
+  it("returns empty array when not a git repo", () => {
+    vi.mocked(childProcess.execSync).mockImplementation(() => { throw new Error("not a git repo"); });
+    const result = getRecentCommitFiles("/fake");
+    expect(result).toEqual([]);
+  });
+
+  it("respects custom limit parameter", () => {
+    vi.mocked(childProcess.execSync).mockReturnValue("" as unknown as Buffer);
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    getRecentCommitFiles("/fake", 5);
+    const call = vi.mocked(childProcess.execSync).mock.calls[0][0] as string;
+    expect(call).toContain("-5");
   });
 });
 

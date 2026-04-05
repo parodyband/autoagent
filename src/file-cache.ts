@@ -136,3 +136,39 @@ export class FileCache {
 
 /** Singleton cache shared across the process. */
 export const globalFileCache = new FileCache();
+
+/**
+ * Tracks the mtime (ms) at the time each file was last read by the agent.
+ * Used to detect external modifications before write_file executes.
+ */
+export class MtimeTracker {
+  private readonly mtimes = new Map<string, number>();
+
+  /** Record the mtime for a file path (absolute). */
+  record(filePath: string, mtimeMs: number): void {
+    this.mtimes.set(filePath, mtimeMs);
+  }
+
+  /**
+   * Check if a file has been modified since it was last read.
+   * Returns true if modified, false if unchanged or never read.
+   */
+  isStale(filePath: string, currentMtimeMs: number): boolean {
+    const recorded = this.mtimes.get(filePath);
+    if (recorded === undefined) return false; // never read — not stale
+    return currentMtimeMs > recorded;
+  }
+
+  /** Remove a tracked entry (e.g. after a write). */
+  delete(filePath: string): void {
+    this.mtimes.delete(filePath);
+  }
+
+  /** Clear all tracked mtimes. */
+  clear(): void {
+    this.mtimes.clear();
+  }
+}
+
+/** Singleton mtime tracker shared across the process. */
+export const globalMtimeTracker = new MtimeTracker();

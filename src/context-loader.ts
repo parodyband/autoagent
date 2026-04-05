@@ -136,6 +136,16 @@ export function extractKeywords(message: string): string[] {
 /** Maximum number of git-changed files to prioritize in context. */
 const MAX_GIT_FILES = 3;
 
+/** Maximum number of git-log files (recent commits) to include as second-tier context. */
+const MAX_GIT_LOG_FILES = 5;
+
+/** Binary file extensions to skip when loading context. */
+const BINARY_EXTS = new Set([
+  "png", "jpg", "jpeg", "gif", "ico", "svg", "woff", "woff2", "ttf", "eot",
+  "pdf", "zip", "gz", "tar", "bz2", "7z", "rar", "exe", "bin", "dll", "so",
+  "dylib", "class", "pyc", "o", "a", "lib",
+]);
+
 /** Extensions that are never useful for AI context. */
 const NON_SOURCE_EXTS = new Set([
   "lock", "json", "md", "yaml", "yml", "toml", "ini", "cfg", "conf",
@@ -158,6 +168,50 @@ export function filterByRepoMap(files: string[], repoMapFiles: Set<string>): str
     if (repoMapFiles.size > 0 && !repoMapFiles.has(f)) return false;
     return true;
   });
+}
+
+/**
+ * Return file paths touched in recent git commits (git log --name-only).
+ * Deduplicates results and filters binary/non-existent files.
+ *
+ * @param workDir - the working directory to run git in
+ * @param limit - number of commits to inspect (default 3)
+ */
+export function getRecentCommitFiles(workDir: string, limit: number = 3): string[] {
+  try {
+    const output = execSync(
+      `git -C ${JSON.stringify(workDir)} log --oneline -${limit} --name-only`,
+      { encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] }
+    ).trim();
+
+    if (!output) return [];
+
+    const seen = new Set<string>();
+    const result: string[] = [];
+
+    for (const line of output.split("\n")) {
+      const f = line.trim();
+      if (!f) continue;
+      // Skip commit summary lines (they start with a short hash — contain spaces)
+      if (f.includes(" ")) continue;
+      if (seen.has(f)) continue;
+      seen.add(f);
+
+      // Filter binary extensions
+      const ext = f.split(".").pop()?.toLowerCase() ?? "";
+      if (BINARY_EXTS.has(ext)) continue;
+
+      // Only include files that exist on disk
+      const absPath = join(workDir, f);
+      if (existsSync(absPath)) {
+        result.push(f);
+      }
+    }
+
+    return result;
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -231,11 +285,19 @@ export function autoLoadContext(
   const keywords = extractKeywords(userMessage);
   if (keywords.length === 0) return "";
 
-  // --- Git-changed files get highest priority ---
+  // --- Tier 1: Git-changed files (unstaged/staged) get highest priority ---
   const repoMapFileSet = new Set(repoMap.files.map(f => f.path));
   const gitChanged = getRecentlyChangedFiles(workDir, repoMapFileSet)
     .filter(p => !alreadyMentioned.has(p))
     .slice(0, MAX_GIT_FILES);
+
+  // --- Tier 2: Recently committed files (git log) ---
+  const gitLogFiles = getRecentCommitFiles(workDir, 3)
+    .filter(p => !alreadyMentioned.has(p) && !gitChanged.includes(p))
+    .slice(0, MAX_GIT_LOG_FILES);
+
+  // --- Tier 3: Keyword-matched files ---
+  const gitTierSet = new Set([...gitChanged, ...gitLogFiles]);
 
   // Count keyword hits per file path
   const hitCounts = new Map<string, number>();
@@ -250,10 +312,10 @@ export function autoLoadContext(
   const keywordRanked = [...hitCounts.entries()]
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .map(([path]) => path)
-    .filter(p => !alreadyMentioned.has(p) && !gitChanged.includes(p));
+    .filter(p => !alreadyMentioned.has(p) && !gitTierSet.has(p));
 
-  // Merge: git-changed first, then keyword results, capped at MAX_FILES total
-  const ranked = [...gitChanged, ...keywordRanked].slice(0, MAX_FILES);
+  // Merge: git-diff → git-log → keyword results, capped at MAX_FILES total
+  const ranked = [...gitChanged, ...gitLogFiles, ...keywordRanked].slice(0, MAX_FILES);
 
   if (ranked.length === 0) return "";
 

@@ -2,10 +2,10 @@
  * Write file tool — create or overwrite files, with mkdir -p and diff reporting.
  */
 
-import { writeFileSync, readFileSync, appendFileSync, mkdirSync, existsSync } from "fs";
+import { writeFileSync, readFileSync, appendFileSync, mkdirSync, existsSync, statSync } from "fs";
 import path from "path";
 import type Anthropic from "@anthropic-ai/sdk";
-import { globalFileCache } from "../file-cache.js";
+import { globalFileCache, globalMtimeTracker } from "../file-cache.js";
 
 export const writeFileToolDefinition: Anthropic.Tool = {
   name: "write_file",
@@ -87,6 +87,19 @@ export function executeWriteFile(
       try { oldContent = readFileSync(resolved, "utf-8"); } catch {}
     }
 
+    // Stale-file check: warn if file was modified externally since last read
+    let staleWarning = "";
+    if (existed && mode !== "append") {
+      try {
+        const currentMtime = statSync(resolved).mtimeMs;
+        if (globalMtimeTracker.isStale(resolved, currentMtime)) {
+          staleWarning = `⚠ Warning: ${filePath} was modified externally since last read. Current content may differ from what you saw.\n`;
+        }
+      } catch {
+        // Can't stat — skip stale check
+      }
+    }
+
     // Append-only enforcement for protected files
     // Exception: writes that are shorter than existing content (compaction) are allowed
     if (isAppendOnly(filePath, workDir) && existed && oldContent.length > 0) {
@@ -131,7 +144,7 @@ export function executeWriteFile(
         .join("\n");
 
       return {
-        message: `Patched ${filePath}: -${countLines(oldString)} +${countLines(replacement)} lines\n\nContext after patch:\n${contextPreview}`,
+        message: `${staleWarning}Patched ${filePath}: -${countLines(oldString)} +${countLines(replacement)} lines\n\nContext after patch:\n${contextPreview}`,
         success: true,
       };
     }
@@ -143,9 +156,10 @@ export function executeWriteFile(
 
     writeFileSync(resolved, content, "utf-8");
     globalFileCache.invalidate(resolved);
+    globalMtimeTracker.delete(resolved);
     if (!existed) return { message: `Created ${filePath} (${content.length} chars)`, success: true };
     const diff = countLines(content) - countLines(oldContent);
-    return { message: `Updated ${filePath} (${content.length} chars, ${diff > 0 ? "+" : ""}${diff} lines delta)`, success: true };
+    return { message: `${staleWarning}Updated ${filePath} (${content.length} chars, ${diff > 0 ? "+" : ""}${diff} lines delta)`, success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     return { message: `ERROR: ${msg}`, success: false };

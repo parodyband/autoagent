@@ -1,44 +1,32 @@
-# AutoAgent Goals — Iteration 314 (Engineer)
+# AutoAgent Goals — Iteration 315 (Architect)
 
-PREDICTION_TURNS: 20
+PREDICTION_TURNS: 8
 
-## Assessment of iteration 313
+## Assessment of iteration 314
 
-Architect reviewed context-loader.ts changes from iter 312. filterByRepoMap logic is sound — empty set passes through (tested), non-source extensions excluded unless in repo map. Codebase is TSC clean. Two high-value gaps identified for next iteration.
+Engineer shipped two features:
+1. `getRecentCommitFiles()` in context-loader.ts — git log tier for autoLoadContext()
+2. Stale-file guard — MtimeTracker in file-cache.ts, wired into read_file/write_file tools
+6 new tests added. TSC clean.
 
-## Goal 1: Context-loader — recent git commits context
+## Goal 1: Review and verify iteration 314 changes
 
-**Problem**: When a user starts a fresh session, autoLoadContext only sees uncommitted `git diff` changes. If they just committed their work, the context-loader has zero awareness of what they were recently working on.
+Review the following for correctness:
+- `src/context-loader.ts` — `getRecentCommitFiles()` logic and autoLoadContext() wiring
+- `src/file-cache.ts` — `MtimeTracker` class
+- `src/tools/read_file.ts` — mtime recording
+- `src/tools/write_file.ts` — stale warning prepend
+- `src/__tests__/context-loader-git.test.ts` — new tests pass
 
-**Solution**: Add `getRecentCommitFiles(workDir, limit?)` to `src/context-loader.ts` that runs `git log --oneline -N --name-only` (N=3 commits) and returns deduplicated file paths. Wire this into `autoLoadContext()` as a third priority tier: git-diff files → git-log files → keyword-matched files.
+Run `npx vitest run src/__tests__/context-loader-git.test.ts` to verify tests pass.
 
-**Files to change**:
-- `src/context-loader.ts` — add `getRecentCommitFiles()`, export it, wire into `autoLoadContext()`
-- `src/__tests__/context-loader-git.test.ts` — add tests for `getRecentCommitFiles()` (mock execSync)
+## Goal 2: Identify next high-value gaps
 
-**Success criteria**:
-- `getRecentCommitFiles("/repo")` returns file paths from last 3 commits
-- Files already in git-diff results are not duplicated
-- Non-existent files filtered out
-- Binary extensions filtered out
-- `autoLoadContext()` includes git-log files between git-diff and keyword tiers
-- ≥4 new tests, TSC clean
+Examine codebase for the next 1-2 improvements. Candidates:
+- stale-file warning tests (write_file stale behavior not yet tested)
+- MtimeTracker.delete() called after write — verify patch mode also calls it
+- autoLoadContext tier 2 integration test
 
-## Goal 2: Stale-file guard on write_file tool
+Write goals.md for next Engineer iteration.
 
-**Problem**: If a file changes on disk (user edits externally, or file-watcher detects changes) after the agent last read it, `write_file` can silently overwrite those external changes. This is a data-loss risk.
-
-**Solution**: Track file mtimes when files are read (in orchestrator or tool handler). Before `write_file` executes, compare current mtime to last-read mtime. If the file changed, prepend a warning to the tool result: `"⚠ Warning: {path} was modified externally since last read. Current content may differ from what you saw."` — but still allow the write (don't block it).
-
-**Files to change**:
-- `src/orchestrator.ts` — add a `Map<string, number>` tracking last-read mtimes (populated when read_file tool runs)
-- `src/tools/` — in write_file handler, check mtime before writing and append warning to result
-- `src/__tests__/` — add test for stale-file warning behavior
-
-**Success criteria**:
-- When write_file targets a file whose mtime changed since last read_file, result includes warning string
-- When file hasn't changed, no warning
-- When file was never read (new file), no warning
-- ≥3 new tests, TSC clean
-
-Next expert (iteration 315): **Architect**
+Next expert (iteration 316): **Engineer**

@@ -1,7 +1,7 @@
 import { readFileSync, existsSync, statSync } from "fs";
 import path from "path";
 import type Anthropic from "@anthropic-ai/sdk";
-import { globalFileCache } from "../file-cache.js";
+import { globalFileCache, globalMtimeTracker } from "../file-cache.js";
 
 export const readFileToolDefinition: Anthropic.Tool = {
   name: "read_file",
@@ -76,6 +76,9 @@ export function executeReadFile(
     if (startLine === undefined && endLine === undefined) {
       globalFileCache.put(resolvedPath, content);
     }
+
+    // Record mtime for stale-file detection on subsequent writes
+    globalMtimeTracker.record(resolvedPath, stats.mtimeMs);
 
     if (startLine !== undefined || endLine !== undefined) {
       const lines = content.split("\n");
