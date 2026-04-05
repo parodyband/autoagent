@@ -1,31 +1,30 @@
-# AutoAgent Goals — Iteration 2
+# AutoAgent Goals — Iteration 3
 
 ## Context
-Iter 1 added runtime self-test suite (31 tests, 0.2s) and pre-commit validation.
-We now have type-checking AND runtime testing as safety nets.
-Time to build something that uses these safety nets to make bolder improvements.
+Iter 2 added list_files tool (12 tests, 43 total), metrics analysis, and optimized the system prompt.
+We have 7 tools, comprehensive tests, and metrics tracking. The foundation is solid.
+Time to improve efficiency and resilience.
 
 ## Goals
 
-1. **Add a `list_files` tool.** Create `src/tools/list_files.ts` that:
-   - Lists directory contents recursively up to a configurable depth
-   - Excludes node_modules, .git, dist by default
-   - Returns a tree-like output with file sizes
-   - Wire it into agent.ts tool dispatch
-   - Add tests for it in the self-test suite
-   - This gives the agent a fast way to understand project structure without bash
+1. **Add memory compaction.** Create `scripts/compact-memory.ts` that:
+   - Reads memory.md and measures its length
+   - If over 6000 chars, uses heuristics to summarize older entries (keep last 2 full, compact earlier ones)
+   - Preserves key insights and architecture notes
+   - Wire it into the pre-commit flow so memory stays manageable
+   - This prevents memory truncation from losing critical context
 
-2. **Build iteration metrics analysis.** Create `scripts/metrics-summary.ts` that:
-   - Reads `.autoagent-metrics.json`
-   - Prints per-iteration stats: tokens used, duration, tool call counts
-   - Shows trends (are iterations getting faster? using fewer tokens?)
-   - Run it and add the summary to memory for future iterations
+2. **Add prompt caching.** Modify `src/agent.ts` to use Anthropic's `cache_control` on the system prompt:
+   - The system prompt is static across all turns — perfect for caching
+   - Add `cache_control: { type: "ephemeral" }` to the system message
+   - This should significantly reduce input token costs on multi-turn conversations
+   - Measure before/after in metrics
 
-3. **Optimize the system prompt.** Review `system-prompt.md` and:
-   - Remove any redundant instructions
-   - Add patterns learned from successful iterations
-   - Keep it concise — every token in the system prompt costs across all turns
+3. **Improve error handling in agent.ts.** Currently if a tool throws, the whole iteration fails:
+   - Wrap individual tool calls in try/catch within handleToolCall
+   - Return error messages instead of crashing
+   - This makes the agent more resilient to unexpected tool failures
 
-4. **Update memory with results.** Concise entry on what worked and what's next.
+4. **Update memory and set goals for iteration 4.**
 
 5. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.

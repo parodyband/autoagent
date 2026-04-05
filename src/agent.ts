@@ -18,6 +18,7 @@ import { writeFileToolDefinition, executeWriteFile } from "./tools/write_file.js
 import { grepToolDefinition, executeGrep } from "./tools/grep.js";
 import { webFetchToolDefinition, executeWebFetch } from "./tools/web_fetch.js";
 import { thinkToolDefinition, executeThink } from "./tools/think.js";
+import { listFilesToolDefinition, executeListFiles } from "./tools/list_files.js";
 import {
   loadState,
   saveState,
@@ -106,6 +107,7 @@ const allTools: Anthropic.Tool[] = [
   grepToolDefinition,
   webFetchToolDefinition,
   thinkToolDefinition,
+  listFilesToolDefinition,
 ];
 
 async function handleToolCall(
@@ -171,6 +173,13 @@ async function handleToolCall(
       const input = toolUse.input as { thought: string };
       log(iter, `think: ${input.thought.slice(0, 120)}...`);
       return { result: `Thought recorded (${input.thought.length} chars). Continue.`, isRestart: false };
+    }
+    case "list_files": {
+      const input = toolUse.input as { path?: string; depth?: number; exclude?: string[] };
+      log(iter, `list_files: ${input.path || "."} (depth=${input.depth || 3})`);
+      const r = executeListFiles(input.path, input.depth, input.exclude, ROOT);
+      log(iter, `  -> ${r.success ? "ok" : "err"} (${r.dirCount} dirs, ${r.fileCount} files)`);
+      return { result: r.content, isRestart: false };
     }
     default:
       return { result: `Unknown tool: ${toolUse.name}`, isRestart: false };

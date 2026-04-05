@@ -11,7 +11,8 @@ import { executeReadFile } from "../src/tools/read_file.js";
 import { executeWriteFile } from "../src/tools/write_file.js";
 import { executeGrep } from "../src/tools/grep.js";
 import { executeThink } from "../src/tools/think.js";
-import { existsSync, unlinkSync, rmSync } from "fs";
+import { executeListFiles } from "../src/tools/list_files.js";
+import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync } from "fs";
 import path from "path";
 
 const ROOT = process.cwd();
@@ -157,6 +158,53 @@ function testThink(): void {
   assert(result.content.includes("22"), "think: reports correct char count");
 }
 
+// ─── List Files Tests ───────────────────────────────────────
+
+function testListFiles(): void {
+  console.log("\n📂 List Files Tool");
+
+  // Setup test directory structure
+  const testDir = path.join(TEMP_DIR, "list-test");
+  mkdirSync(path.join(testDir, "subdir"), { recursive: true });
+  writeFileSync(path.join(testDir, "file1.txt"), "hello");
+  writeFileSync(path.join(testDir, "file2.ts"), "export default 42;");
+  writeFileSync(path.join(testDir, "subdir", "nested.md"), "# Nested");
+
+  const relDir = path.relative(ROOT, testDir);
+
+  // Basic listing
+  const result = executeListFiles(relDir, 3, [], ROOT);
+  assert(result.success, "list_files: lists test directory");
+  assert(result.fileCount === 3, "list_files: correct file count", `got ${result.fileCount}`);
+  assert(result.dirCount === 1, "list_files: correct dir count", `got ${result.dirCount}`);
+  assert(result.content.includes("file1.txt"), "list_files: contains file1.txt");
+  assert(result.content.includes("nested.md"), "list_files: contains nested file");
+
+  // Depth limiting
+  const shallow = executeListFiles(relDir, 1, [], ROOT);
+  assert(shallow.success, "list_files: shallow listing works");
+  assert(shallow.content.includes("[...]"), "list_files: shows [...] for depth-limited dirs");
+
+  // Exclusion
+  mkdirSync(path.join(testDir, "node_modules"), { recursive: true });
+  writeFileSync(path.join(testDir, "node_modules", "pkg.js"), "module");
+  const excluded = executeListFiles(relDir, 3, ["node_modules"], ROOT);
+  assert(!excluded.content.includes("pkg.js"), "list_files: excludes node_modules");
+
+  // Non-existent directory
+  const missing = executeListFiles(".self-test-tmp/nonexistent", 3, [], ROOT);
+  assert(!missing.success && missing.content.includes("ERROR"), "list_files: missing dir returns error");
+
+  // File path (not directory)
+  const filePath = path.relative(ROOT, path.join(testDir, "file1.txt"));
+  const notDir = executeListFiles(filePath, 3, [], ROOT);
+  assert(!notDir.success && notDir.content.includes("not a directory"), "list_files: file path returns error");
+
+  // Project root listing (smoke test)
+  const rootList = executeListFiles(".", 1, ["node_modules", ".git", "dist", ".self-test-tmp"], ROOT);
+  assert(rootList.success && rootList.fileCount > 0, "list_files: project root works");
+}
+
 // ─── Import Verification ────────────────────────────────────
 
 function testImports(): void {
@@ -168,6 +216,7 @@ function testImports(): void {
   assert(typeof executeWriteFile === "function", "import: executeWriteFile is a function");
   assert(typeof executeGrep === "function", "import: executeGrep is a function");
   assert(typeof executeThink === "function", "import: executeThink is a function");
+  assert(typeof executeListFiles === "function", "import: executeListFiles is a function");
 }
 
 // ─── Main ───────────────────────────────────────────────────
@@ -188,6 +237,7 @@ async function main(): Promise<void> {
     testWriteFile();
     testGrep();
     testThink();
+    testListFiles();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {

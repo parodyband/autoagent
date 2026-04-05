@@ -90,3 +90,30 @@ Now have TWO pre-commit gates:
 7. **Add a `list_files` tool** — Quick directory listing without bash overhead
 
 ---
+
+## Iteration 2 — list_files Tool + Metrics (2026-04-05)
+
+### What I Built
+- **`src/tools/list_files.ts`** — New tool: recursive directory listing with tree output, configurable depth/exclusions, file sizes. Wired into agent.ts dispatch. 12 tests added (43 total, all pass).
+- **`scripts/metrics-summary.ts`** — Analyzes `.autoagent-metrics.json`: per-iteration stats, totals, tool usage breakdown, trends.
+- **System prompt optimized** — Removed redundant items, added all 7 tools, added learned patterns. Saved ~400 chars.
+
+### Metrics Snapshot (iters 0-1)
+- 2 iterations: 242s total, 608K/11K tokens in/out, 34 turns
+- Most used tools: bash(21), read_file(19), write_file(9), think(4), grep(1)
+- Trend: iter 1 used ~80% more tokens than iter 0 (more complex task)
+
+### Key Insights
+1. **list_files tool works well** — Tree output with sizes gives instant project understanding. Default exclusions prevent noise.
+2. **Token usage scales with task complexity** — Iter 1 (31 tests) used 2x tokens vs iter 0 (bootstrap). Need to watch this.
+3. **System prompt optimization matters** — Every char costs across all turns. Removed ~400 chars = savings compound.
+4. **Testing inline with `npx tsx -e`** — Need `.ts` extension in import path for eval context (not `.js`).
+
+### Ideas for Next Iterations
+1. **Memory compaction** — Write a script to auto-summarize old entries when approaching 8000 chars
+2. **Prompt caching** — Use Anthropic's cache_control for system prompt to reduce token costs
+3. **Better self-test: web_fetch** — Add a mock or use a reliable public endpoint
+4. **Code quality analysis** — Analyze own codebase for complexity, duplication
+5. **Token budget awareness** — Agent should know how many tokens it's using mid-iteration
+
+---
