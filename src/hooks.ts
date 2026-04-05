@@ -43,10 +43,6 @@ export interface HookOutput {
 
 // ─── Config loading ───────────────────────────────────────────
 
-/**
- * Load hooks config from .autoagent/hooks.json in the given workDir.
- * Returns empty config if file doesn't exist or is malformed.
- */
 export function loadHooksConfig(workDir: string): HooksConfig {
   const configPath = path.join(workDir, ".autoagent", "hooks.json");
   try {
@@ -59,9 +55,6 @@ export function loadHooksConfig(workDir: string): HooksConfig {
 
 // ─── Hook matching ────────────────────────────────────────────
 
-/**
- * Return hooks that match the given event + optional tool name.
- */
 export function matchHooks(
   config: HooksConfig,
   event: HookEvent,
@@ -80,14 +73,6 @@ export function matchHooks(
 
 // ─── Hook execution ───────────────────────────────────────────
 
-/**
- * Execute a single hook command.
- * - Pipes HookInput as JSON to stdin
- * - Parses stdout as HookOutput JSON (exit 0)
- * - Exit 2 => block with stderr as reason
- * - Other exit codes => ignore (pass-through)
- * - Timeout => treat as ignore
- */
 export function executeHook(
   hook: HookConfig,
   input: HookInput,
@@ -105,66 +90,63 @@ export function executeHook(
 
     let stdout = "";
     let stderr = "";
+    let stdoutDone = false;
+    let stderrDone = false;
+    let exitCode: number | null = null;
 
-    child.stdout.on("data", (chunk: Buffer) => { stdout += chunk.toString(); });
-    child.stderr.on("data", (chunk: Buffer) => { stderr += chunk.toString(); });
-
-    const timer = setTimeout(() => {
-      timedOut = true;
-      child.kill();
-      resolve({}); // timeout => ignore
-    }, timeout);
-
-    child.on("close", (code) => {
-      clearTimeout(timer);
-      if (timedOut) return;
-
-      if (code === 2) {
-        // Block decision
+    function tryResolve() {
+      if (!stdoutDone || !stderrDone || exitCode === null) return;
+      if (exitCode === 2) {
         resolve({ decision: "block", reason: stderr.trim() || "Hook blocked tool use" });
         return;
       }
-
-      if (code === 0) {
+      if (exitCode === 0) {
         try {
           const parsed = JSON.parse(stdout.trim()) as HookOutput;
           resolve(parsed);
           return;
         } catch {
-          // stdout wasn't JSON — treat as allow with no output
           resolve({});
           return;
         }
       }
-
-      // Any other exit code => ignore
       resolve({});
+    }
+
+    child.stdout.on("data", (chunk: Buffer) => { stdout += chunk.toString(); });
+    child.stdout.on("end", () => { stdoutDone = true; tryResolve(); });
+    child.stderr.on("data", (chunk: Buffer) => { stderr += chunk.toString(); });
+    child.stderr.on("end", () => { stderrDone = true; tryResolve(); });
+
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill();
+      resolve({});
+    }, timeout);
+
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      if (timedOut) return;
+      exitCode = code;
+      tryResolve();
     });
 
     child.on("error", () => {
       clearTimeout(timer);
-      resolve({}); // spawn error => ignore
+      resolve({});
     });
 
-    // Write input JSON to stdin
     try {
       child.stdin.write(JSON.stringify(input));
       child.stdin.end();
     } catch {
-      // stdin write error => ignore
+      // ignore
     }
   });
 }
 
 // ─── Run all matching hooks ───────────────────────────────────
 
-/**
- * Run all hooks matching the event. Aggregates results:
- * - Any "block" decision wins
- * - additionalContext strings are joined with newlines
- * - updatedInput from the last hook wins
- * - continue: false from any hook wins
- */
 export async function runHooks(
   config: HooksConfig,
   event: HookEvent,
@@ -184,7 +166,6 @@ export async function runHooks(
   const contextParts: string[] = [];
 
   for (const output of outputs) {
-    // block wins over allow
     if (output.decision === "block") {
       aggregated.decision = "block";
       aggregated.reason = output.reason ?? aggregated.reason;

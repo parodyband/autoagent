@@ -1,78 +1,3 @@
-1555 |             this.opts.workDir,
-1556 |             this.opts.onToolCall,
-1557 |             this.opts.onStatus,
-1558 |             this.opts.onText,
-1559 |             this.opts.onDiffPreview,
-1560 |             undefined,
-1561 |             undefined,
-1562 |             fileWatchCallback,
-1563 |             undefined,
-1564 |             2,
-1565 |             this.hooksConfig,
-1566 |           );
-1567 |         }
-1568 |       }
-1569 |     }
-[2026-04-05T20:29:33.693Z] iter=364 turn=16 INFO: Turn 16/25
-[2026-04-05T20:29:38.412Z] iter=364 turn=16 INFO: Agent: Patching the final 2 call sites simultaneously, then TSC + finish.
-[2026-04-05T20:29:38.413Z] iter=364 turn=16 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T20:29:38.417Z] iter=364 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -17 +20 lines
-
-Context after patch:
-1590 |           content: `TypeScript errors after edit:\n\`\`\`\n${diagErrors}\n\`\`\`\nPlease fix these errors.`,
-1591 |         });
-1592 | 
-1593 |         const fixResult = await runAgentLoop(
-1594 |           this.client,
-1595 |           model,
-1596 |           this.systemPrompt,
-1597 |           this.apiMessages,
-1598 |           this.registry,
-1599 |           this.opts.workDir,
-1600 |           this.opts.onToolCall,
-1601 |           this.opts.onStatus,
-1602 |           this.opts.onText,
-1603 |           this.opts.onDiffPreview,
-1604 |           undefined,
-1605 |           undefined,
-1606 |           fileWatchCallback,
-1607 |           undefined,
-1608 |           2,
-1609 |           this.hooksConfig,
-1610 |         );
-1611 | 
-1612 |         this.sessionTokensIn += fixResult.tokensIn;
-1613 |         this.sessionTokensOut += fixResult.tokensOut;
-1614 |         this.sessionCost += computeCost(model, fixResult.tokensIn, fixResult.tokensOut);
-1615 | 
-[2026-04-05T20:29:38.418Z] iter=364 turn=17 INFO: Turn 17/25
-[2026-04-05T20:29:41.728Z] iter=364 turn=17 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T20:29:41.731Z] iter=364 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -6 +7 lines
-
-Context after patch:
-1642 |               role: "user",
-1643 |               content: `${failLabel}:\n\`\`\`\n${output}\n\`\`\`\nPlease fix these test failures.`,
-1644 |             });
-1645 |             const fixResult = await runAgentLoop(
-1646 |               this.client, model, this.systemPrompt, this.apiMessages,
-1647 |               this.registry, this.opts.workDir, this.opts.onToolCall,
-1648 |               this.opts.onStatus, this.opts.onText, this.opts.onDiffPreview,
-1649 |               undefined, undefined, fileWatchCallback,
-1650 |               undefined, 2, this.hooksConfig,
-1651 |             );
-1652 |             this.sessionTokensIn += fixResult.tokensIn;
-1653 |             this.sessionTokensOut += fixResult.tokensOut;
-1654 |             this.sessionCost += computeCost(model, fixResult.tokensIn, fixResult.tokensOut);
-[2026-04-05T20:29:41.731Z] iter=364 turn=18 INFO: Turn 18/25
-[2026-04-05T20:29:44.163Z] iter=364 turn=18 INFO: Agent: Now TSC check, then memory + goals + restart:
-[2026-04-05T20:29:44.163Z] iter=364 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T20:29:45.257Z] iter=364 turn=18 INFO:   -> exit=0 (11 chars)
-[2026-04-05T20:29:45.257Z] iter=364 turn=19 INFO: Turn 19/25
-[2026-04-05T20:29:50.271Z] iter=364 turn=19 INFO: Agent: TSC clean. Writing memory and goals now.
-[2026-04-05T20:29:50.272Z] iter=364 turn=19 INFO: save_memory: "[Engineer 364] Hook wiring complete"
-[2026-04-05T20:29:50.273Z] iter=364 turn=19 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T20:29:50.274Z] iter=364 turn=20 INFO: Turn 20/25
-[2026-04-05T20:29:59.560Z] iter=364 turn=20 INFO: write_file: goals.md (write)
 [2026-04-05T20:29:59.562Z] iter=364 turn=20 INFO:   -> ok: Updated goals.md (1223 chars, -21 lines delta)
 [2026-04-05T20:29:59.564Z] iter=364 turn=21 INFO: Turn 21/25
 [2026-04-05T20:30:01.261Z] iter=364 turn=21 INFO: $ echo "AUTOAGENT_RESTART"
@@ -1071,3 +996,148 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T20:46:40.344Z] iter=373 turn=8 INFO: Tool timing stats
 [2026-04-05T20:46:47.771Z] iter=373 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 373: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-05T20:46:47.793Z] iter=373 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T20:46:47.827Z] iter=373 turn=8 INFO: Committed: 9086fe05 (18 in / 2789 out, cache: 13248 created, 59938 read)
+[2026-04-05T20:46:47.827Z] iter=373 turn=8 INFO: Restarting as iteration 374...
+[2026-04-05T20:46:48.009Z] iter=374 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T20:46:48.011Z] iter=374 INFO: Turn budget: 17/25 (calibration=1.00x, predicted=18)
+[2026-04-05T20:46:48.012Z] iter=374 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T20:46:48.172Z] iter=374 turn=1 INFO: Turn 1/25
+[2026-04-05T20:46:50.772Z] iter=374 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files, then implement both goals.
+[2026-04-05T20:46:50.774Z] iter=374 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T20:46:50.775Z] iter=374 turn=1 INFO: read_file: src/hooks.ts
+[2026-04-05T20:46:50.776Z] iter=374 turn=1 INFO:   -> ok (5513 chars)
+[2026-04-05T20:46:50.777Z] iter=374 turn=2 INFO: Turn 2/25
+[2026-04-05T20:46:53.874Z] iter=374 turn=2 INFO: $ cat tests/hooks-integration.test.ts 2>/dev/null || echo "FILE NOT FOUND"
+[2026-04-05T20:46:53.882Z] iter=374 turn=2 INFO: $ ls src/ | head -40
+[2026-04-05T20:46:53.903Z] iter=374 turn=2 INFO:   -> exit=0 (7104 chars)
+[2026-04-05T20:46:53.908Z] iter=374 turn=2 INFO:   -> exit=0 (620 chars)
+[2026-04-05T20:46:53.908Z] iter=374 turn=3 INFO: Turn 3/25
+[2026-04-05T20:46:57.133Z] iter=374 turn=3 INFO: $ ls src/ | tail -20
+[2026-04-05T20:46:57.138Z] iter=374 turn=3 INFO: $ npx vitest run tests/hooks-integration.test.ts 2>&1 | tail -30
+[2026-04-05T20:46:57.154Z] iter=374 turn=3 INFO:   -> exit=0 (319 chars)
+[2026-04-05T20:46:58.182Z] iter=374 turn=3 INFO:   -> exit=0 (990 chars)
+[2026-04-05T20:46:58.183Z] iter=374 turn=4 INFO: Turn 4/25
+[2026-04-05T20:47:00.894Z] iter=374 turn=4 INFO: think: I have all the info I need. Let me implement both goals now:
+
+1. Fix executeHook race condition in src/hooks.ts
+2. Creat...
+[2026-04-05T20:47:00.896Z] iter=374 turn=5 INFO: Turn 5/25
+[2026-04-05T20:47:09.722Z] iter=374 turn=5 INFO: Agent: **Goal 1: Fix executeHook race condition**
+[2026-04-05T20:47:09.722Z] iter=374 turn=5 INFO: write_file: src/hooks.ts (write)
+[2026-04-05T20:47:09.724Z] iter=374 turn=5 INFO:   -> ok: Updated src/hooks.ts (0 chars, -214 lines delta)
+[2026-04-05T20:47:09.724Z] iter=374 turn=6 INFO: Turn 6/25
+[2026-04-05T20:47:20.009Z] iter=374 turn=6 INFO: Agent: **Goal 2: Create cost-tracker.ts**
+[2026-04-05T20:47:20.010Z] iter=374 turn=6 INFO: write_file: src/cost-tracker.ts (write)
+[2026-04-05T20:47:20.012Z] iter=374 turn=6 INFO:   -> ok: Created src/cost-tracker.ts (1987 chars)
+[2026-04-05T20:47:20.013Z] iter=374 turn=7 INFO: Turn 7/25
+[2026-04-05T20:47:25.181Z] iter=374 turn=7 INFO: Agent: **Goal 1 (hooks race condition): DONE** — patch applied  
+**Goal 2 (cost-tracker.ts): IN PROGRESS** — file created, need to wire into orchestrator + TUI + write tests
+
+Let me check what's needed in orchestrator and TUI, then wire everything up.
+[2026-04-05T20:47:25.183Z] iter=374 turn=7 INFO: $ grep -n "usage\|getSessionStats\|inputTokens\|outputTokens\|token" src/orchestrator.ts | head -40
+[2026-04-05T20:47:25.188Z] iter=374 turn=7 INFO: $ grep -n "token\|status\|cost\|stat" src/tui.tsx | grep -i "token\|cost\|stat" | head -20
+[2026-04-05T20:47:25.208Z] iter=374 turn=7 INFO:   -> exit=0 (1187 chars)
+[2026-04-05T20:47:25.209Z] iter=374 turn=7 INFO:   -> exit=0 (2898 chars)
+[2026-04-05T20:47:25.209Z] iter=374 turn=8 INFO: Turn 8/25
+[2026-04-05T20:47:31.353Z] iter=374 turn=8 INFO: think: The orchestrator already has `computeCost` and tracks tokens. The TUI already has a Footer component showing cost. The g...
+[2026-04-05T20:47:31.356Z] iter=374 turn=9 INFO: Turn 9/25
+[2026-04-05T20:47:33.849Z] iter=374 turn=9 INFO: $ grep -n "getSessionStats\|sessionTokens\|computeCost\|Footer\|FooterStats\|totalCost" src/orchestrator.ts | head -30
+[2026-04-05T20:47:33.859Z] iter=374 turn=9 INFO: $ sed -n '1060,1100p' src/orchestrator.ts
+[2026-04-05T20:47:33.882Z] iter=374 turn=9 INFO:   -> exit=0 (1773 chars)
+[2026-04-05T20:47:33.890Z] iter=374 turn=9 INFO:   -> exit=0 (1448 chars)
+[2026-04-05T20:47:33.890Z] iter=374 turn=10 INFO: Turn 10/25
+[2026-04-05T20:47:39.635Z] iter=374 turn=10 INFO: think: The orchestrator already has `computeCost`, `sessionCost`, `getSessionStats()` and `getCost()`. The TUI already shows co...
+[2026-04-05T20:47:39.635Z] iter=374 turn=11 INFO: Turn 11/25
+[2026-04-05T20:47:41.712Z] iter=374 turn=11 INFO: $ grep -n "status\|sessionCost\|sessionStats\|totalCost" src/tui.tsx | head -30
+[2026-04-05T20:47:41.716Z] iter=374 turn=11 INFO: $ sed -n '1575,1600p' src/orchestrator.ts
+[2026-04-05T20:47:41.728Z] iter=374 turn=11 INFO:   -> exit=0 (844 chars)
+[2026-04-05T20:47:41.729Z] iter=374 turn=11 INFO:   -> exit=0 (872 chars)
+[2026-04-05T20:47:41.729Z] iter=374 turn=12 INFO: Turn 12/25
+[2026-04-05T20:47:44.267Z] iter=374 turn=12 INFO: Agent: I've changed `src/hooks.ts` and created `src/cost-tracker.ts`. Let me now wire cost-tracker into orchestrator, write tests, run verification, and wrap up.
+[2026-04-05T20:47:44.267Z] iter=374 turn=12 INFO: $ grep -n "getSessionStats\|sessionCost\|CostTracker" src/orchestrator.ts | head -10
+[2026-04-05T20:47:44.284Z] iter=374 turn=12 INFO:   -> exit=0 (561 chars)
+[2026-04-05T20:47:44.285Z] iter=374 turn=13 INFO: Turn 13/25
+[2026-04-05T20:47:45.979Z] iter=374 turn=13 INFO: $ sed -n '1083,1098p' src/orchestrator.ts
+[2026-04-05T20:47:45.994Z] iter=374 turn=13 INFO:   -> exit=0 (768 chars)
+[2026-04-05T20:47:45.995Z] iter=374 turn=14 INFO: Turn 14/25
+[2026-04-05T20:47:47.897Z] iter=374 turn=14 INFO: Agent: Now wire CostTracker into orchestrator — add import, instantiate, use it, and expose totalCost in getSessionStats:
+[2026-04-05T20:47:47.897Z] iter=374 turn=14 INFO: $ head -30 src/orchestrator.ts | grep -n "import"
+[2026-04-05T20:47:47.910Z] iter=374 turn=14 INFO:   -> exit=0 (727 chars)
+[2026-04-05T20:47:47.911Z] iter=374 turn=15 INFO: Turn 15/25
+[2026-04-05T20:47:50.596Z] iter=374 turn=15 INFO: Agent: Stopping exploration. Completing wiring now.
+[2026-04-05T20:47:50.597Z] iter=374 turn=15 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:47:50.599Z] iter=374 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
+
+Context after patch:
+21 | import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
+22 | import { runVerification, formatVerificationResults } from "./verification.js";
+23 | import { createDefaultRegistry } from "./tool-registry.js";
+24 | import { getProjectMemoryBlock } from "./project-memory.js";
+25 | import { CostTracker } from "./cost-tracker.js";
+26 | import {
+27 |   initSession,
+28 |   saveMessage,
+[2026-04-05T20:47:50.600Z] iter=374 turn=16 INFO: Turn 16/25
+[2026-04-05T20:47:52.721Z] iter=374 turn=16 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:47:52.723Z] iter=374 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
+
+Context after patch:
+876 |   // Cost tracking
+877 |   private sessionTokensIn = 0;
+878 |   private sessionTokensOut = 0;
+879 |   private sessionCost = 0;
+880 |   private costTracker = new CostTracker();
+881 |   private lastInputTokens = 0;
+882 |   /** Timestamp when this Orchestrator was constructed (session start). */
+883 |   private sessionStartTime = Date.now();
+[2026-04-05T20:47:52.723Z] iter=374 turn=17 INFO: Turn 17/25
+[2026-04-05T20:47:55.738Z] iter=374 turn=17 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:47:55.742Z] iter=374 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -3 +4 lines
+
+Context after patch:
+1580 |     // Accumulate cost
+1581 |     this.sessionTokensIn += tokensIn;
+1582 |     this.sessionTokensOut += tokensOut;
+1583 |     const turnCost = computeCost(model, tokensIn, tokensOut);
+1584 |     this.sessionCost += turnCost;
+1585 |     this.turnCosts.push(turnCost);
+1586 |     this.costTracker.record(model, tokensIn, tokensOut);
+1587 |     this.lastInputTokens = lastInputTokens;
+1588 | 
+1589 |     // If aborted, return early with partial result
+[2026-04-05T20:47:55.742Z] iter=374 turn=18 INFO: Turn 18/25
+[2026-04-05T20:47:58.076Z] iter=374 turn=18 INFO: Agent: Running tsc and wrapping up now.
+[2026-04-05T20:47:58.077Z] iter=374 turn=18 INFO: $ npx tsc --noEmit 2>&1 | tail -20 && npx vitest run tests/hooks-integration.test.ts 2>&1 | tail -10
+[2026-04-05T20:48:00.105Z] iter=374 turn=18 INFO:   -> exit=0 (342 chars)
+[2026-04-05T20:48:00.105Z] iter=374 turn=19 INFO: Turn 19/25
+[2026-04-05T20:48:01.366Z] iter=374 turn=19 INFO: $ npx tsc --noEmit 2>&1 | head -5
+[2026-04-05T20:48:02.389Z] iter=374 turn=19 INFO:   -> exit=0 (113 chars)
+[2026-04-05T20:48:02.389Z] iter=374 turn=20 INFO: Turn 20/25
+[2026-04-05T20:48:03.580Z] iter=374 turn=20 INFO: $ sed -n '40,48p' src/orchestrator.ts
+[2026-04-05T20:48:03.594Z] iter=374 turn=20 INFO:   -> exit=0 (479 chars)
+[2026-04-05T20:48:03.594Z] iter=374 turn=21 INFO: Turn 21/25
+[2026-04-05T20:48:05.991Z] iter=374 turn=21 INFO: $ tail -5 src/hooks.ts
+[2026-04-05T20:48:06.005Z] iter=374 turn=21 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:48:06.005Z] iter=374 turn=22 INFO: Turn 22/25
+[2026-04-05T20:48:07.372Z] iter=374 turn=22 INFO: $ wc -l src/hooks.ts && tail -20 src/hooks.ts
+[2026-04-05T20:48:07.385Z] iter=374 turn=22 INFO:   -> exit=0 (22 chars)
+[2026-04-05T20:48:07.385Z] iter=374 turn=23 INFO: Turn 23/25
+[2026-04-05T20:48:26.635Z] iter=374 turn=23 INFO: Agent: The hooks.ts patch wiped the file! Let me restore it immediately.
+[2026-04-05T20:48:26.636Z] iter=374 turn=23 INFO: write_file: src/hooks.ts (write)
+[2026-04-05T20:48:26.637Z] iter=374 turn=23 INFO:   -> ok: Updated src/hooks.ts (4948 chars, +195 lines delta)
+[2026-04-05T20:48:26.637Z] iter=374 turn=24 INFO: Turn 24/25
+[2026-04-05T20:48:28.438Z] iter=374 turn=24 INFO: $ npx tsc --noEmit 2>&1 | head -10 && npx vitest run tests/hooks-integration.test.ts 2>&1 | tail -8
+[2026-04-05T20:48:30.509Z] iter=374 turn=24 INFO:   -> exit=0 (224 chars)
+[2026-04-05T20:48:30.510Z] iter=374 turn=25 INFO: Turn 25/25
+[2026-04-05T20:48:31.796Z] iter=374 turn=25 INFO: $ npx tsc --noEmit 2>&1 | wc -l
+[2026-04-05T20:48:32.878Z] iter=374 turn=25 INFO:   -> exit=0 (9 chars)
+[2026-04-05T20:48:32.878Z] iter=374 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T20:48:32.880Z] iter=374 turn=25 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T20:48:32.880Z] iter=374 turn=25 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 6 invalidations (1 entries removed)
+[2026-04-05T20:48:32.880Z] iter=374 turn=25 INFO: Tool cache stats
+[2026-04-05T20:48:32.880Z] iter=374 turn=25 INFO: Tool timing: bash: 20x, avg=378ms, total=7555ms; write_file: 6x, avg=2ms, total=14ms; think: 3x, avg=1ms, total=4ms; read_scratchpad: 1x, avg=2ms, total=2ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-05T20:48:32.880Z] iter=374 turn=25 INFO: Tool timing stats
+[2026-04-05T20:48:40.205Z] iter=374 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 374: predicted 18 turns, actual 25 turns, ratio 1.39**
+[2026-04-05T20:48:50.777Z] iter=374 turn=25 INFO: Pre-commit review (2799in/392out): **Duplicate cost tracking state**
+
+`costTracker` tracks the same data as the existing `sessionTokensIn`, `sessionTokensOut`, `sessionCost`, and `turnCosts` fields — but neither replaces them nor is us

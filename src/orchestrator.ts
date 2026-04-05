@@ -22,6 +22,7 @@ import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decompos
 import { runVerification, formatVerificationResults } from "./verification.js";
 import { createDefaultRegistry } from "./tool-registry.js";
 import { getProjectMemoryBlock } from "./project-memory.js";
+import { CostTracker } from "./cost-tracker.js";
 import {
   initSession,
   saveMessage,
@@ -876,6 +877,7 @@ export class Orchestrator {
   private sessionTokensIn = 0;
   private sessionTokensOut = 0;
   private sessionCost = 0;
+  private costTracker = new CostTracker();
   private lastInputTokens = 0;
   /** Timestamp when this Orchestrator was constructed (session start). */
   private sessionStartTime = Date.now();
@@ -1581,6 +1583,7 @@ export class Orchestrator {
     const turnCost = computeCost(model, tokensIn, tokensOut);
     this.sessionCost += turnCost;
     this.turnCosts.push(turnCost);
+    this.costTracker.record(model, tokensIn, tokensOut);
     this.lastInputTokens = lastInputTokens;
 
     // If aborted, return early with partial result
