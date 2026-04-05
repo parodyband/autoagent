@@ -19,6 +19,8 @@
 
 ---
 
+---
+
 
 ## Product Architecture
 - `src/orchestrator.ts` — (~1600 LOC) Agent loop: parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, **hooks wired (PreToolUse/PostToolUse)**.
@@ -40,10 +42,14 @@
 
 ---
 
+---
+
 
 ## Prediction Accuracy
 **Rule: Engineer = 20 turns. Architect/Meta = 8 turns.**
 Recent avg (363–370): 1.00x — well calibrated.
+
+---
 
 ---
 
@@ -82,6 +88,8 @@ Recent avg (363–370): 1.00x — well calibrated.
 - Dream Task (background memory consolidation)
 - Semantic search / embeddings
 - Multi-file coordination improvements
+
+---
 
 ---
 
@@ -148,3 +156,7 @@ Avg ratio: 1.13 — Engineer iterations consistently underestimated.
 ---
 
 **[AUTO-SCORED] Iteration 385: predicted 8 turns, actual 7 turns, ratio 0.88**
+
+---
+
+**[AUTO-SCORED] Iteration 386: predicted 15 turns, actual 16 turns, ratio 1.07**

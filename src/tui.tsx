@@ -25,6 +25,8 @@ import { buildExportContent as buildExportContentHelper } from "./export-helper.
 import { shouldShowWelcome } from "./welcome.js";
 import type { Task, TaskPlan } from "./task-planner.js";
 import { handlePlanCommand } from "./plan-commands.js";
+import { runDream } from "./dream.js";
+import Anthropic from "@anthropic-ai/sdk";
 import { Markdown } from "./markdown-renderer.js";
 
 // Parse args
@@ -535,6 +537,16 @@ function App() {
       setStatus("");
       return;
     }
+    if (trimmed === "/dream") {
+      setMessages(prev => [...prev, { role: "assistant", content: "🌙 Running memory consolidation..." }]);
+      try {
+        const result = await runDream(process.cwd(), new Anthropic());
+        setMessages(prev => [...prev, { role: "assistant", content: `🌙 Dream complete: +${result.added} entries, -${result.removed} entries removed.` }]);
+      } catch (err: any) {
+        setMessages(prev => [...prev, { role: "assistant", content: `Dream failed: ${err.message}` }]);
+      }
+      return;
+    }
     if (trimmed === "/reindex") {
       setStatus("Re-indexing repo...");
       orchestratorRef.current?.reindex();
@@ -599,6 +611,7 @@ function App() {
           "  /resume   — List and restore a previous session",
           "  /rewind   — Restore conversation to a prior checkpoint",
           "  /compact  — Manually compact conversation context",
+          "  /dream    — Consolidate session memory",
           "  /diff     — Show uncommitted git changes",
           "  /undo     — Revert the last autoagent commit",
           "  /plan Q   — Create and execute a task plan for Q",

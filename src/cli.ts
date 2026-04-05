@@ -94,6 +94,15 @@ if (process.argv[2] === "init") {
   }
 }
 
+// ─── dream subcommand ────────────────────────────────────────
+if (process.argv[2] === "dream") {
+  const { runDream } = await import("./dream.js");
+  const Anthropic = (await import("@anthropic-ai/sdk")).default;
+  const result = await runDream(process.cwd(), new Anthropic());
+  console.log(`🌙 Dream complete: +${result.added} entries, -${result.removed} entries removed.`);
+  process.exit(0);
+}
+
 // ─── Orchestrator setup ─────────────────────────────────────
 
 let isResponding = false;
