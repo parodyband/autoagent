@@ -26,6 +26,7 @@ import type { Logger } from "./logging.js";
 import type { ToolRegistry } from "./tool-registry.js";
 import { compressMessages, type CompressionConfig, DEFAULT_COMPRESSION_CONFIG } from "./context-compression.js";
 import { dynamicBudgetWarning, type TurnBudget } from "./turn-budget.js";
+import { callWithRetry } from "./api-retry.js";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -199,7 +200,7 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
     }
   }
 
-  const response = await ctx.client.messages.create({
+  const response = await callWithRetry(ctx.client, {
     model: ctx.model,
     max_tokens: ctx.maxTokens,
     system: [{

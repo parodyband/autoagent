@@ -27,6 +27,7 @@ import { recordMetrics, type IterationMetrics } from "../src/finalization.js";
 import { handleToolCall, processTurn, runConversation, type IterationCtx, type TurnResult } from "../src/conversation.js";
 import { countConsecutiveFailures, buildRecoveryNote, buildRecoveryGoals, resuscitate, handleIterationFailure, type ResuscitationConfig } from "../src/resuscitation.js";
 import { executeSubagent } from "../src/tools/subagent.js";
+import { callWithRetry } from "../src/api-retry.js";
 import { getIterationCommits, computeDiffStats, getAllIterationDiffs } from "../src/iteration-diff.js";
 import type { IterationState } from "../src/iteration.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync } from "fs";
@@ -721,6 +722,7 @@ async function main(): Promise<void> {
     testLogRotation();
     await testResuscitationE2E();
     await testSubagent();
+    await testApiRetry();
     // Inline model-selection smoke test (avoids vitest import in tsx context)
     console.log("  model-selection smoke test...");
     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
@@ -2015,6 +2017,137 @@ async function testSubagent(): Promise<void> {
     "subagent: API error returns error message",
     `got: ${errorResult.response}`
   );
+}
+
+// ─── callWithRetry Tests ────────────────────────────────────
+
+async function testApiRetry(): Promise<void> {
+  console.log("\n🔄 callWithRetry Tests");
+
+  // Test 1: Succeeds on first try — no retry needed
+  {
+    let callCount = 0;
+    const mockClient = {
+      messages: {
+        create: async (_params: unknown) => {
+          callCount++;
+          return {
+            content: [{ type: "text", text: "ok" }],
+            usage: { input_tokens: 10, output_tokens: 5 },
+            stop_reason: "end_turn",
+            role: "assistant",
+            type: "message",
+            model: "test",
+            id: "msg_test1",
+          };
+        },
+      },
+    } as any;
+    const result = await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] });
+    assert(callCount === 1, "retry: succeeds on first try with no retries");
+    assert(result.content[0].type === "text", "retry: returns valid response");
+  }
+
+  // Test 2: Retries on 429, succeeds on 2nd attempt
+  {
+    let callCount = 0;
+    const mockClient = {
+      messages: {
+        create: async (_params: unknown) => {
+          callCount++;
+          if (callCount === 1) {
+            const err = Object.assign(new Error("Rate limit"), { status: 429 });
+            Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
+            throw err;
+          }
+          return {
+            content: [{ type: "text", text: "ok after retry" }],
+            usage: { input_tokens: 10, output_tokens: 5 },
+            stop_reason: "end_turn",
+            role: "assistant",
+            type: "message",
+            model: "test",
+            id: "msg_test2",
+          };
+        },
+      },
+    } as any;
+    // Use maxRetries=1 to keep test fast (no real delay needed — we mock setTimeout)
+    // We need to speed up backoff for tests: override with maxRetries=1, delay is 1s
+    // Instead, just verify the behavior with a small retry count by catching timing
+    const result = await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 1);
+    assert(callCount === 2, "retry: retries once on 429 then succeeds", `callCount=${callCount}`);
+    assert((result.content[0] as any).text === "ok after retry", "retry: returns response from second attempt");
+  }
+
+  // Test 3: Gives up after maxRetries and throws
+  {
+    let callCount = 0;
+    const mockClient = {
+      messages: {
+        create: async (_params: unknown) => {
+          callCount++;
+          const err = Object.assign(new Error("Overloaded"), { status: 529 });
+          Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
+          throw err;
+        },
+      },
+    } as any;
+    let threw = false;
+    try {
+      await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 2);
+    } catch {
+      threw = true;
+    }
+    assert(threw, "retry: throws after maxRetries exhausted");
+    assert(callCount === 3, "retry: made exactly maxRetries+1 attempts", `callCount=${callCount}`);
+  }
+
+  // Test 4: Does NOT retry on 400
+  {
+    let callCount = 0;
+    const mockClient = {
+      messages: {
+        create: async (_params: unknown) => {
+          callCount++;
+          const err = Object.assign(new Error("Bad request"), { status: 400 });
+          Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
+          throw err;
+        },
+      },
+    } as any;
+    let threw = false;
+    try {
+      await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3);
+    } catch {
+      threw = true;
+    }
+    assert(threw, "retry: throws immediately on 400");
+    assert(callCount === 1, "retry: does NOT retry on 400 (client error)", `callCount=${callCount}`);
+  }
+
+  // Test 5: Does NOT retry on 401
+  {
+    let callCount = 0;
+    const mockClient = {
+      messages: {
+        create: async (_params: unknown) => {
+          callCount++;
+          const err = Object.assign(new Error("Unauthorized"), { status: 401 });
+          Object.setPrototypeOf(err, (await import("@anthropic-ai/sdk")).default.APIError.prototype);
+          throw err;
+        },
+      },
+    } as any;
+    let threw = false;
+    try {
+      await callWithRetry(mockClient, { model: "test", max_tokens: 10, messages: [] }, 3);
+    } catch {
+      threw = true;
+    }
+    assert(threw, "retry: throws immediately on 401");
+    assert(callCount === 1, "retry: does NOT retry on 401 (auth error)", `callCount=${callCount}`);
+  }
 }
 
 main().catch((err) => {
