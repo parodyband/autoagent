@@ -5,6 +5,12 @@
  *
  * Safety: compilation gate, stall detection, circuit breaker w/ resuscitation,
  * turn budget warnings, full action logging.
+ *
+ * This file is a thin orchestrator. Core logic lives in:
+ * - conversation.ts — turn processing, tool dispatch
+ * - finalization.ts — metrics, commit, state update
+ * - messages.ts — prompt construction
+ * - tool-registry.ts — tool definitions and handlers
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -15,7 +21,6 @@ import path from "path";
 import "dotenv/config";
 import { executeBash } from "./tools/bash.js";
 import { createDefaultRegistry } from "./tool-registry.js";
-import { validateBeforeCommit } from "./validation.js";
 import {
   loadState,
   saveState,
@@ -23,43 +28,34 @@ import {
   rollbackToPreIteration,
   type IterationState,
 } from "./iteration.js";
-import {
-  buildSystemPrompt,
-  buildInitialMessage,
-  budgetWarning,
-  turnLimitNudge,
-  validationBlockedMessage,
-} from "./messages.js";
+import { buildInitialMessage } from "./messages.js";
 import { ToolCache } from "./tool-cache.js";
 import { ToolTimingTracker } from "./tool-timing.js";
-import { finalizeIteration as runFinalization, type IterationMetrics } from "./finalization.js";
+import { finalizeIteration as runFinalization } from "./finalization.js";
+import { runConversation, type IterationCtx } from "./conversation.js";
 
 const ROOT = process.cwd();
 const GOALS_FILE = path.join(ROOT, "goals.md");
 const MEMORY_FILE = path.join(ROOT, "memory.md");
 const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");
 const AGENT_LOG_FILE = path.join(ROOT, "agentlog.md");
+const CACHE_FILE = path.join(ROOT, ".autoagent-cache.json");
 const MAX_TURNS = 50;
 const MAX_CONSECUTIVE_FAILURES = 3;
 
 // ─── Logging ────────────────────────────────────────────────
 
-// Global logger instance, initialized per iteration in main()
 let logger: Logger;
 
-/** Backward-compatible log function (delegates to structured logger) */
 function log(iter: number, msg: string): void {
   if (logger) {
     logger.info(msg);
   } else {
-    // Fallback before logger is initialized
     const line = `[${new Date().toISOString()}] iter=${iter} ${msg}\n`;
     console.log(`  ${msg}`);
     try { appendFileSync(AGENT_LOG_FILE, line, "utf-8"); } catch {}
   }
 }
-
-// ─── Metrics (see src/finalization.ts) ──────────────────────
 
 // ─── File readers ───────────────────────────────────────────
 
@@ -76,181 +72,19 @@ function readMemory(): string {
   return content;
 }
 
-// ─── Tools ──────────────────────────────────────────────────
+// ─── Finalization delegate ──────────────────────────────────
 
 const toolRegistry = createDefaultRegistry();
 
-async function handleToolCall(
-  iter: number,
-  toolUse: { type: "tool_use"; id: string; name: string; input: Record<string, unknown> },
-  counts: Record<string, number>,
-  cache?: ToolCache,
-  timing?: ToolTimingTracker,
-): Promise<{ result: string; isRestart: boolean }> {
-  counts[toolUse.name] = (counts[toolUse.name] || 0) + 1;
-
-  const tool = toolRegistry.get(toolUse.name);
-  if (!tool) {
-    return { result: `Unknown tool: ${toolUse.name}`, isRestart: false };
-  }
-
-  // Check cache for idempotent tools
-  if (cache) {
-    const cached = cache.get(toolUse.name, toolUse.input);
-    if (cached !== undefined) {
-      log(iter, `${toolUse.name}: CACHE HIT`);
-      return { result: cached, isRestart: false };
-    }
-  }
-
-  const ctx = {
-    rootDir: ROOT,
-    log: (msg: string) => log(iter, msg),
-    defaultTimeout: tool.defaultTimeout,
-  };
-
-  const startMs = Date.now();
-  try {
-    const { result, isRestart } = await tool.handler(toolUse.input, ctx);
-    const durationMs = Date.now() - startMs;
-    if (timing) timing.record(toolUse.name, durationMs);
-
-    // Cache the result for idempotent tools
-    if (cache) {
-      cache.set(toolUse.name, toolUse.input, result);
-    }
-    // Smart invalidation: only clear entries affected by written file
-    if (cache && toolUse.name === "write_file") {
-      const writtenPath = toolUse.input.path as string;
-      if (writtenPath) {
-        cache.invalidateForPath(writtenPath);
-      } else {
-        cache.invalidate();
-      }
-    }
-    return { result, isRestart: isRestart || false };
-  } catch (err) {
-    const durationMs = Date.now() - startMs;
-    if (timing) timing.record(toolUse.name, durationMs);
-    const errMsg = err instanceof Error ? err.message : String(err);
-    log(iter, `TOOL ERROR (${toolUse.name}): ${errMsg}`);
-    return { result: `Error executing ${toolUse.name}: ${errMsg}`, isRestart: false };
-  }
-}
-
-// ─── Iteration context & turn processing ────────────────────
-
-interface IterationCtx {
-  client: Anthropic;
-  model: string;
-  maxTokens: number;
-  state: IterationState;
-  iter: number;
-  messages: Anthropic.MessageParam[];
-  toolCounts: Record<string, number>;
-  tokens: { in: number; out: number; cacheCreate: number; cacheRead: number };
-  startTime: Date;
-  turns: number;
-  cache: ToolCache;
-  timing: ToolTimingTracker;
-}
-
-type TurnResult = "continue" | "break" | "restarted";
-
-/** Process a single turn: API call → tool dispatch → restart/budget handling. */
-async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
-  ctx.turns++;
-  const turnsLeft = MAX_TURNS - ctx.turns;
-  if (logger) logger.setTurn(ctx.turns);
-  log(ctx.iter, `Turn ${ctx.turns}/${MAX_TURNS}`);
-
-  const response = await ctx.client.messages.create({
-    model: ctx.model, max_tokens: ctx.maxTokens,
-    system: [{
-      type: "text" as const,
-      text: buildSystemPrompt(ctx.state, ROOT),
-      cache_control: { type: "ephemeral" as const },
-    }],
-    tools: toolRegistry.getDefinitions(),
-    messages: ctx.messages,
-  });
-
-  // Track tokens
-  if (response.usage) {
-    ctx.tokens.in += response.usage.input_tokens;
-    ctx.tokens.out += response.usage.output_tokens;
-    const usage = response.usage as unknown as Record<string, unknown>;
-    if (typeof usage.cache_creation_input_tokens === "number") ctx.tokens.cacheCreate += usage.cache_creation_input_tokens;
-    if (typeof usage.cache_read_input_tokens === "number") ctx.tokens.cacheRead += usage.cache_read_input_tokens;
-  }
-
-  const content = response.content;
-  ctx.messages.push({ role: "assistant", content });
-
-  for (const block of content) {
-    if (block.type === "text") {
-      log(ctx.iter, `Agent: ${block.text.slice(0, 400)}${block.text.length > 400 ? "..." : ""}`);
-    }
-  }
-
-  const toolUses = content.filter(
-    (b): b is Anthropic.ContentBlockParam & { type: "tool_use"; id: string; name: string; input: Record<string, unknown> } =>
-      b.type === "tool_use"
-  );
-
-  if (toolUses.length === 0) {
-    log(ctx.iter, "No tool calls — ending");
-    return "break";
-  }
-
-  // Execute independent tools concurrently
-  const toolResults = await Promise.all(
-    toolUses.map(async (tu) => {
-      const { result, isRestart } = await handleToolCall(ctx.iter, tu, ctx.toolCounts, ctx.cache, ctx.timing);
-      return { id: tu.id, result, isRestart };
-    })
-  );
-
-  const results: Anthropic.ToolResultBlockParam[] = [];
-  let shouldRestart = false;
-  for (const tr of toolResults) {
-    results.push({ type: "tool_result", tool_use_id: tr.id, content: tr.result });
-    if (tr.isRestart) shouldRestart = true;
-  }
-  ctx.messages.push({ role: "user", content: results });
-
-  if (shouldRestart) {
-    const v = await validateBeforeCommit(ROOT, (msg) => log(ctx.iter, msg));
-    if (!v.ok) {
-      log(ctx.iter, "VALIDATION BLOCKED RESTART — agent must fix");
-      ctx.messages.push({ role: "user", content: validationBlockedMessage(v.output) });
-      return "continue";
-    }
-
-    await doFinalize(ctx, true);
-    return "restarted";
-  }
-
-  if (response.stop_reason === "end_turn") {
-    log(ctx.iter, "end_turn");
-    return "break";
-  }
-
-  // Token budget awareness
-  const bw = budgetWarning(ctx.turns, MAX_TURNS, {
-    inputTokens: ctx.tokens.in, outputTokens: ctx.tokens.out,
-    cacheReadTokens: ctx.tokens.cacheRead, elapsedMs: Date.now() - ctx.startTime.getTime(),
-  });
-  if (bw) ctx.messages.push({ role: "user", content: bw });
-
-  const nudge = turnLimitNudge(turnsLeft);
-  if (nudge) ctx.messages.push({ role: "user", content: nudge });
-
-  return "continue";
-}
-
-/** Delegate to extracted finalization module. */
 async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> {
+  // Serialize cache for next iteration before finalizing
+  try {
+    const count = ctx.cache.serialize(CACHE_FILE, ctx.rootDir);
+    ctx.log(`Cache persisted: ${count} entries to ${path.basename(CACHE_FILE)}`);
+  } catch (err) {
+    ctx.log(`Cache persist error (non-fatal): ${err instanceof Error ? err.message : err}`);
+  }
+
   await runFinalization({
     iter: ctx.iter,
     state: ctx.state,
@@ -271,6 +105,20 @@ async function doFinalize(ctx: IterationCtx, doRestart: boolean): Promise<void> 
 // ─── Main iteration ─────────────────────────────────────────
 
 async function runIteration(state: IterationState): Promise<void> {
+  logger = createLogger(state.iteration, ROOT);
+
+  const cache = new ToolCache();
+
+  // Warm cache from previous iteration
+  try {
+    const { restored, stale, total } = cache.deserialize(CACHE_FILE, ROOT);
+    if (total > 0) {
+      log(state.iteration, `Cache restored: ${restored}/${total} entries (${stale} stale)`);
+    }
+  } catch (err) {
+    log(state.iteration, `Cache restore error (non-fatal): ${err instanceof Error ? err.message : err}`);
+  }
+
   const ctx: IterationCtx = {
     client: new Anthropic(),
     model: process.env.MODEL || "claude-opus-4-6",
@@ -282,12 +130,15 @@ async function runIteration(state: IterationState): Promise<void> {
     tokens: { in: 0, out: 0, cacheCreate: 0, cacheRead: 0 },
     messages: [],
     turns: 0,
-    cache: new ToolCache(),
+    cache,
     timing: new ToolTimingTracker(),
+    rootDir: ROOT,
+    maxTurns: MAX_TURNS,
+    logger,
+    registry: toolRegistry,
+    log: (msg: string) => log(state.iteration, msg),
+    onFinalize: doFinalize,
   };
-
-  // Initialize structured logger for this iteration
-  logger = createLogger(ctx.iter, ROOT);
 
   console.log(`\n${"=".repeat(60)}`);
   console.log(`  AutoAgent — Iteration ${ctx.iter}`);
@@ -302,14 +153,7 @@ async function runIteration(state: IterationState): Promise<void> {
     content: buildInitialMessage(readGoals(), readMemory()),
   });
 
-  while (ctx.turns < MAX_TURNS) {
-    const result = await processTurn(ctx);
-    if (result === "break" || result === "restarted") return;
-    // "continue" → next turn
-  }
-
-  if (ctx.turns >= MAX_TURNS) log(ctx.iter, "Hit max turns — forcing commit");
-  await doFinalize(ctx, false);
+  await runConversation(ctx);
 }
 
 // ─── Restart ────────────────────────────────────────────────
@@ -334,7 +178,6 @@ function countConsecutiveFailures(state: IterationState): number {
 async function resuscitate(state: IterationState, failures: number): Promise<void> {
   log(state.iteration, `CIRCUIT BREAKER: ${failures} failures — resuscitating`);
 
-  // Roll back to last known good
   if (state.lastSuccessfulIteration >= 0) {
     const tag = `pre-iteration-${state.lastSuccessfulIteration + 1}`;
     const check = await executeBash(`git tag -l ${tag}`, 120, undefined, true);
@@ -344,7 +187,6 @@ async function resuscitate(state: IterationState, failures: number): Promise<voi
     }
   }
 
-  // Tell future-self what happened
   const note =
     `\n## CIRCUIT BREAKER RECOVERY — Iteration ${state.iteration} (${new Date().toISOString()})\n\n` +
     `**${failures} consecutive failures.** Rolled back to last good state.\n\n` +
@@ -354,7 +196,6 @@ async function resuscitate(state: IterationState, failures: number): Promise<voi
     `Read agentlog.md to understand what went wrong. Set conservative goals.\n\n---\n`;
   try { appendFileSync(MEMORY_FILE, note, "utf-8"); } catch {}
 
-  // Set recovery goals
   const goals =
     `# AutoAgent Goals — Iteration ${state.iteration} (RECOVERY)\n\n` +
     `You hit ${failures} consecutive failures. Previous error: ${state.lastFailureReason}\n\n` +
@@ -366,14 +207,12 @@ async function resuscitate(state: IterationState, failures: number): Promise<voi
     `5. **Write memory and restart.** \`echo "AUTOAGENT_RESTART"\`\n`;
   try { writeFileSync(GOALS_FILE, goals, "utf-8"); } catch {}
 
-  // Reset failure tracking — give it another chance
   state.lastSuccessfulIteration = state.iteration - 1;
   state.lastFailedCommit = null;
   state.lastFailureReason = null;
   state.iteration++;
   saveState(state);
 
-  // Cooldown then restart
   log(state.iteration, "Cooldown 10s...");
   await new Promise((r) => setTimeout(r, 10_000));
   restart();
@@ -398,10 +237,9 @@ async function main(): Promise<void> {
 
   if (failures > 0) log(state.iteration, `${failures}/${MAX_CONSECUTIVE_FAILURES} consecutive failures`);
 
-  // Resuscitate instead of dying
   if (failures >= MAX_CONSECUTIVE_FAILURES) {
     await resuscitate(state, failures);
-    return; // resuscitate calls restart()
+    return;
   }
 
   try {
@@ -430,7 +268,6 @@ async function main(): Promise<void> {
 }
 
 main().catch(async (err) => {
-  // Never die — always come back
   const reason = err instanceof Error ? err.message : String(err);
   console.error("Fatal:", reason);
   try {

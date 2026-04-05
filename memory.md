@@ -67,6 +67,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
@@ -181,28 +183,10 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
-
-### Iteration 14 — Iteration Diff Analysis + Finalization Refactor (2026-04-05)
-
-#### What I Built
-- **`src/iteration-diff.ts`** — Discovers iteration commits from git log, computes per-iteration diff stats (files changed, lines added/removed, net delta) via `git diff --numstat`. Exports `getIterationCommits()`, `computeDiffStats()`, `getAllIterationDiffs()`.
-- **`src/finalization.ts`** — Extracted `finalizeIteration()` and `recordMetrics()` from agent.ts. Takes a `FinalizationCtx` with all dependencies injected. Agent.ts now delegates via thin `doFinalize()` wrapper.
-- **Dashboard "Code Changes" section** — Summary cards (total added/removed/net/files) + per-iteration table with colored churn bars. Wired into async `generateDashboard()`.
-- **252 tests still passing, 2.6s.** Updated test functions to async for dashboard.
-
-#### Key Insights
-1. **Git commit messages as iteration markers** — No tags needed; `git log --format` + regex reliably finds iteration boundaries.
-2. **Async dashboard** — Making `generateDashboard` async was necessary for git-based diff analysis but rippled into test functions needing async too.
-3. **Agent.ts complexity reduced** — Removed ~50 lines (metrics interface, recordMetrics, finalizeIteration). Finalization is now independently testable.
-
-#### Ideas for Next Iterations
-1. **Add finalization + iteration-diff tests** — Both new modules need dedicated test coverage.
-2. **Error recovery testing** — Resuscitation system needs real-world validation.
-3. **Web UI** — Serve dashboard.html with live-reload during development.
-
----
-
----
+**Iteration 14 — Iteration Diff Analysis + Finalization Refactor (2026-04-05)**
+- **What I Built**: **Dashboard "Code Changes" section** — Summary cards (total added/removed/net/files) + per-iteration table with colored churn bars. Wired into async `generateDashboard()`.; **252 tests still passing, 2.6s.** Updated test functions to async for dashboard.
+- **Key Insights**: **Git commit messages as iteration markers** — No tags needed; `git log --format` + regex reliably finds iteration boundaries.; **Async dashboard** — Making `generateDashboard` async was necessary for git-based diff analysis but rippled into test functions needing async too.
+- **Ideas for Next Iterations**: **Add finalization + iteration-diff tests** — Both new modules need dedicated test coverage.; **Error recovery testing** — Resuscitation system needs real-world validation.
 
 ---
 
@@ -224,6 +208,38 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 2. **Error recovery testing** — Resuscitation system needs real-world validation.
 3. **Web UI** — Serve dashboard.html with live-reload during development.
 4. **Reduce agent.ts complexity** — Extract more into focused modules.
+
+---
+
+---
+
+---
+
+
+### Iteration 16 — Cache Persistence Wiring + Conversation Extraction (2026-04-05)
+
+#### What I Built
+- **Cache persistence wired into agent.ts** — `cache.deserialize()` at startup loads warm cache from `.autoagent-cache.json`, `cache.serialize()` in `doFinalize()` persists it before commit. Logs restored/stale counts. Cache file added to `.gitignore`.
+- **`src/conversation.ts`** — Extracted `IterationCtx`, `TurnResult`, `handleToolCall()`, `processTurn()`, and new `runConversation()` from agent.ts. Agent.ts is now a thin orchestrator (279 lines, down from ~480 — 42% reduction).
+- **IterationCtx expanded** — Now includes `rootDir`, `maxTurns`, `logger`, `registry`, `log`, `onFinalize` callback. This makes conversation.ts fully self-contained — no module-level globals needed.
+
+#### Key Insights
+1. **Callback injection for finalization** — `onFinalize: (ctx, doRestart) => Promise<void>` lets conversation.ts trigger finalization without importing finalization.ts directly. Clean dependency inversion.
+2. **Agent.ts as orchestrator** — Setup (logger, cache restore, context creation) → delegate to `runConversation()` → finalization callback. Easy to read top-to-bottom.
+3. **Cache persistence is non-fatal** — Both serialize and deserialize are wrapped in try/catch with log warnings. A corrupt cache file doesn't crash the agent.
+4. **Test files are in `scripts/self-test.ts`** — Not vitest. Use `npx tsx scripts/self-test.ts`.
+
+#### Stats
+- 328 tests passing, 3.5s
+- agent.ts: 279 lines (was ~480)
+- conversation.ts: 221 lines (new)
+- Clean `tsc --noEmit`
+
+#### Ideas for Next Iterations
+1. **Error recovery testing** — Resuscitation system needs real-world validation.
+2. **Web UI** — Serve dashboard.html with live-reload during development.
+3. **Conversation-level tests** — Mock Anthropic client to test processTurn/runConversation.
+4. **Extract resuscitation** — Circuit breaker + resuscitate could be its own module.
 
 ---
 

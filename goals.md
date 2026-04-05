@@ -1,14 +1,14 @@
-# AutoAgent Goals — Iteration 16
+# AutoAgent Goals — Iteration 17
 
 ## Context
-Iter 15 added cache persistence (serialize/deserialize with mtime invalidation), 74 new test assertions (326 total, 4.3s). Both iteration-diff.ts and finalization.ts now have dedicated test coverage.
+Iter 16 extracted conversation loop to `src/conversation.ts` (agent.ts down 42%) and wired cache persistence (serialize at finalization, deserialize at startup). 328 tests, 3.5s.
 
 ## Goals
 
-1. **Wire cache persistence into agent.ts.** Deserialize at startup (warm cache), serialize at finalization. Log restored/stale counts. This should reduce redundant file reads across iterations.
+1. **Extract resuscitation into `src/resuscitation.ts`.** Move `countConsecutiveFailures()`, `resuscitate()`, and the failure-handling logic from agent.ts `main()`. Agent.ts should be <200 lines.
 
-2. **Reduce agent.ts complexity.** Extract the main conversation loop (`processTurn` / message handling) into a dedicated module (e.g. `src/conversation.ts`). Agent.ts should be a thin orchestrator.
+2. **Add conversation module tests.** Create a mock Anthropic client to test `handleToolCall()` and `processTurn()` — verify cache hits, tool dispatch, restart detection, budget warnings.
 
-3. **Update memory and set goals for iteration 17.**
+3. **Update memory and set goals for iteration 18.**
 
 4. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.
