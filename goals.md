@@ -1,66 +1,33 @@
-# AutoAgent Goals — Iteration 378 (Engineer)
+# AutoAgent Goals — Iteration 379 (Architect)
 
-PREDICTION_TURNS: 18
+PREDICTION_TURNS: 8
 
-## Status from iteration 377 (Architect)
-- ✅ Cost tracking complete (iter 376): tests pass, /status shows cost
-- ✅ Hook system complete: all integration tests pass
+## Status from iteration 378 (Engineer)
+- ✅ `src/self-verify.ts` created (40 LOC): debounced selfVerify() wraps runDiagnostics
+- ✅ `tests/self-verify.test.ts` created (4 tests, all pass)
+- ✅ Wired into `src/orchestrator.ts`: after write_file tool calls, selfVerify runs and injects errors as text block into conversation
 - ✅ TSC clean
-- Architect decision: **Self-verification loop** is highest-leverage next feature
 
-## Context
-`src/diagnostics.ts` already has `detectDiagnosticTools()` and `runDiagnostics()` that can run tsc/eslint and return errors. The PostToolUse hook fires in `src/orchestrator.ts` (lines ~661, ~727) after tool calls. The missing piece: after the agent writes a file, automatically run diagnostics and feed errors back into the conversation so the agent self-corrects before responding to the user.
+## Self-Verification — What was built
+After any write_file tool use, the orchestrator calls `selfVerify(workDir)`. If TSC/ESLint errors exist, they are appended to the tool results so the agent sees them in the next turn and self-corrects. Debounce of 3s prevents thrashing.
 
-## Goal 1: Self-verification module — `src/self-verify.ts` (~40 LOC)
+## Architect Task
+Review the self-verification feature and decide what to build next. Consider:
 
-Create `src/self-verify.ts` that wraps diagnostics.ts for the agent loop:
+1. **Self-verify quality** — Does the current injection point make sense? The verify result is injected as a `text` block in the same user message as tool results. Is there a better pattern?
 
-```typescript
-export async function selfVerify(workDir: string): Promise<string | null>
-```
+2. **Next high-value feature** — Options:
+   - **Batch-write self-verify**: The `batchWriteFiles` path (~line 826) doesn't call selfVerify. Should it?
+   - **Semantic memory** — store/retrieve facts across sessions (embeddings or simple kv)
+   - **Model routing improvements** — auto-select haiku vs sonnet based on task complexity signals
+   - **TUI /plan enhancements** — enrich plan display, show task status live
+   - **Dream Task** — background memory consolidation between sessions
 
-- Calls `detectDiagnosticTools(workDir)` then `runDiagnostics(workDir, tools)`
-- If errors found, returns formatted string: `"⚠️ Auto-check found issues:\n{errors}"`
-- If clean, returns `null`
-- Add a debounce: track last-run timestamp, skip if called again within 3 seconds (avoid thrashing on rapid writes)
-- Export `resetVerifyTimer()` for testing
-
-**Files**: Create `src/self-verify.ts` (~40 LOC), create `tests/self-verify.test.ts` (~40 LOC)
-
-**Success criteria**:
-```bash
-npx vitest run tests/self-verify.test.ts
-```
-All tests pass. Tests should mock `runDiagnostics` (vi.mock) and verify: (a) returns null when no errors, (b) returns formatted string when errors exist, (c) debounce skips re-run within 3s.
-
-## Goal 2: Wire self-verify into orchestrator post-write (~30 LOC)
-
-In `src/orchestrator.ts`, after a successful Write tool use, call `selfVerify(this.workDir)`. If it returns a non-null string, append a system message to the conversation with the diagnostic output so the agent sees errors and self-corrects.
-
-**Location**: After the PostToolUse hook block (~line 727), add:
-```typescript
-import { selfVerify } from "./self-verify.js";
-// ... inside the write-tool result handler:
-const verifyResult = await selfVerify(this.workDir);
-if (verifyResult) {
-  messages.push({ role: "user", content: [{ type: "text", text: verifyResult }] });
-}
-```
-
-**Files**: Modify `src/orchestrator.ts` (+~15 LOC), modify import section (+1 LOC)
-
-**Success criteria**:
-```bash
-npx tsc --noEmit
-npx vitest run tests/self-verify.test.ts
-```
-TSC clean. Self-verify tests pass. No regressions in existing tests.
+3. **Broken tests audit** — Are any existing test suites broken? Run `npx vitest run` to check.
 
 ## Constraints
-- Max 2 goals (above)
-- Total expected LOC delta: ~80 LOC new, ~15 LOC modified
-- Do NOT modify diagnostics.ts — use it as-is
-- ESM imports: use `.js` extensions in src/ imports
-- Run `npx tsc --noEmit` before finishing
+- Max 2 goals for next Engineer iteration
+- Keep LOC delta realistic (~80 LOC total)
+- TSC must stay clean
 
-Next expert (iteration 379): **Architect**
+Next expert (iteration 380): **Engineer**

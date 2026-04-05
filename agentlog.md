@@ -1,83 +1,3 @@
-[2026-04-05T20:38:42.965Z] iter=368 turn=18 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T20:38:44.089Z] iter=368 turn=18 INFO: Compilation OK
-[2026-04-05T20:38:51.999Z] iter=368 turn=18 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-05T20:38:51.999Z] iter=368 turn=18 INFO: Tool timing: bash: 17x, avg=1180ms, total=20064ms; read_scratchpad: 1x, avg=3ms, total=3ms; write_file: 2x, avg=2ms, total=3ms; think: 2x, avg=1ms, total=2ms; save_memory: 1x, avg=2ms, total=2ms
-[2026-04-05T20:38:51.999Z] iter=368 turn=18 INFO: Tool timing stats
-[2026-04-05T20:38:59.670Z] iter=368 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 368: predicted 18 turns, actual 18 turns, ratio 1.00**
-[2026-04-05T20:39:07.274Z] iter=368 turn=18 INFO: Pre-commit review (2179in/292out): **Issues:**
-
-- **Platform-dependent tests**: The `exit 2` test uses shell syntax (`>&2; exit 2`) that will fail on Windows. If this project targets cross-platform use, this needs a platform guard or a
-[2026-04-05T20:39:07.340Z] iter=368 turn=18 INFO: Committed: 0b19a0a9 (32 in / 4428 out, cache: 19815 created, 253537 read)
-[2026-04-05T20:39:07.340Z] iter=368 turn=18 INFO: Restarting as iteration 369...
-[2026-04-05T20:39:07.550Z] iter=369 INFO: Cache restored: 55/55 entries (0 stale)
-[2026-04-05T20:39:07.552Z] iter=369 INFO: Turn budget: 12/25 (calibration=1.11x, predicted=8)
-[2026-04-05T20:39:07.553Z] iter=369 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T20:39:07.745Z] iter=369 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T20:39:07.745Z] iter=369 turn=1 INFO: Turn 1/25
-[2026-04-05T20:39:12.085Z] iter=369 turn=1 INFO: Agent: 
-
-I'll start by reviewing the current state, scoring iteration 368, and then planning the next Engineer iteration.
-[2026-04-05T20:39:12.086Z] iter=369 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | tail -20
-[2026-04-05T20:39:12.089Z] iter=369 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/hooks-integration.test.ts 2>&1 | tail -20
-[2026-04-05T20:39:12.091Z] iter=369 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/task-planner-context.test.ts 2>&1 | tail -30
-[2026-04-05T20:39:12.107Z] iter=369 turn=1 INFO:   -> exit=0 (361 chars)
-[2026-04-05T20:39:13.206Z] iter=369 turn=1 INFO:   -> exit=0 (287 chars)
-[2026-04-05T20:39:13.245Z] iter=369 turn=1 INFO:   -> exit=0 (786 chars)
-[2026-04-05T20:39:13.246Z] iter=369 turn=2 INFO: Turn 2/25
-[2026-04-05T20:39:19.158Z] iter=369 turn=2 INFO: Agent: 
-
-You're right. My deliverables are clear:
-
-1. **Score iteration 368** → save to memory
-2. **Fix the pre-existing test failure** → patch the test file
-3. **Write goals.md for Engineer iteration 370**
-
-Let me do all three now.
-[2026-04-05T20:39:19.159Z] iter=369 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '125,140p' tests/task-planner-context.test.ts
-[2026-04-05T20:39:19.168Z] iter=369 turn=2 INFO:   -> exit=0 (547 chars)
-[2026-04-05T20:39:19.168Z] iter=369 turn=3 INFO: Turn 3/25
-[2026-04-05T20:39:26.185Z] iter=369 turn=3 INFO: think: The test failure is that `onFailure` is called with the full task object (which has fields like `dependsOn`, `descriptio...
-[2026-04-05T20:39:26.186Z] iter=369 turn=4 INFO: Turn 4/25
-[2026-04-05T20:39:29.617Z] iter=369 turn=4 INFO: Agent: 
-
-Status: Goal 1 (score) NOT STARTED, Goal 2 (fix test) IN PROGRESS, Goal 3 (write goals) NOT STARTED. Let me finish all three now.
-[2026-04-05T20:39:29.619Z] iter=369 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/task-planner-context.test.ts 2>&1 | grep -A 30 "replanOnFailure"
-[2026-04-05T20:39:30.656Z] iter=369 turn=4 INFO:   -> exit=0 (899 chars)
-[2026-04-05T20:39:30.656Z] iter=369 turn=5 INFO: Turn 5/25
-[2026-04-05T20:39:34.337Z] iter=369 turn=5 INFO: Agent: Now I see the issue clearly — the plan object now includes a `baseCommit` field. Let me fix it and do everything else.
-[2026-04-05T20:39:34.338Z] iter=369 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'baseCommit\|createPlan\|makePlan' tests/task-planner-context.test.ts | head -20
-[2026-04-05T20:39:34.360Z] iter=369 turn=5 INFO:   -> exit=0 (630 chars)
-[2026-04-05T20:39:34.364Z] iter=369 turn=6 INFO: Turn 6/25
-[2026-04-05T20:39:37.564Z] iter=369 turn=6 INFO: Agent: 
-
-Wrapping up now. Fixing the test, scoring, writing goals, and restarting.
-[2026-04-05T20:39:37.565Z] iter=369 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '18,24p' tests/task-planner-context.test.ts
-[2026-04-05T20:39:37.581Z] iter=369 turn=6 INFO:   -> exit=0 (237 chars)
-[2026-04-05T20:39:37.581Z] iter=369 turn=7 INFO: Turn 7/25
-[2026-04-05T20:39:40.029Z] iter=369 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'baseCommit' src/task-planner.ts | head -5
-[2026-04-05T20:39:40.046Z] iter=369 turn=7 INFO:   -> exit=0 (175 chars)
-[2026-04-05T20:39:40.047Z] iter=369 turn=8 INFO: Turn 8/25
-[2026-04-05T20:39:45.012Z] iter=369 turn=8 INFO: Agent: The `executePlan` adds `baseCommit` at runtime. The test's `makePlan` doesn't include it so the assertion fails. Fix: make the assertion use `expect.objectContaining` for the plan argument.
-[2026-04-05T20:39:45.014Z] iter=369 turn=8 INFO: write_file: tests/task-planner-context.test.ts (patch)
-[2026-04-05T20:39:45.019Z] iter=369 turn=8 INFO:   -> ok: Patched tests/task-planner-context.test.ts: -1 +4 lines
-
-Context after patch:
-132 |     );
-133 | 
-134 |     expect(onFailure).toHaveBeenCalledOnce();
-135 |     expect(onFailure).toHaveBeenCalledWith(
-136 |       expect.objectContaining({ goal: originalPlan.goal, createdAt: originalPlan.createdAt }),
-137 |       expect.objectContaining({ id: "t1", status: "failed" }),
-138 |     );
-139 |     // Recovery plan's task should be done
-140 |     expect(finalPlan.tasks[0].status).toBe("done");
-141 |   });
-[2026-04-05T20:39:45.021Z] iter=369 turn=9 INFO: Turn 9/25
-[2026-04-05T20:39:48.177Z] iter=369 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/task-planner-context.test.ts 2>&1 | tail -8
-[2026-04-05T20:39:48.179Z] iter=369 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T20:39:49.253Z] iter=369 turn=9 INFO:   -> exit=0 (234 chars)
-[2026-04-05T20:39:49.348Z] iter=369 turn=9 INFO:   -> exit=0 (11 chars)
-[2026-04-05T20:39:49.348Z] iter=369 turn=10 INFO: Turn 10/25
 [2026-04-05T20:40:06.761Z] iter=369 turn=10 INFO: Agent: All tests pass, TSC clean. Now save score, write goals, restart.
 [2026-04-05T20:40:06.762Z] iter=369 turn=10 INFO: save_memory: "[AUTO-SCORED] Iteration 369"
 [2026-04-05T20:40:06.763Z] iter=369 turn=10 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
@@ -1076,3 +996,112 @@ Context after patch:
 [2026-04-05T20:54:38.505Z] iter=377 turn=9 INFO: Tool timing stats
 [2026-04-05T20:54:45.666Z] iter=377 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 377: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-05T20:54:45.689Z] iter=377 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T20:54:45.726Z] iter=377 turn=9 INFO: Committed: 948b4038 (19 in / 2939 out, cache: 12891 created, 76514 read)
+[2026-04-05T20:54:45.726Z] iter=377 turn=9 INFO: Restarting as iteration 378...
+[2026-04-05T20:54:45.925Z] iter=378 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T20:54:45.928Z] iter=378 INFO: Turn budget: 18/25 (calibration=1.13x, predicted=18)
+[2026-04-05T20:54:45.928Z] iter=378 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T20:54:46.111Z] iter=378 turn=1 INFO: Turn 1/25
+[2026-04-05T20:54:47.736Z] iter=378 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T20:54:47.737Z] iter=378 turn=1 INFO: read_file: CACHE HIT
+[2026-04-05T20:54:47.738Z] iter=378 turn=2 INFO: Turn 2/25
+[2026-04-05T20:54:50.409Z] iter=378 turn=2 INFO: $ grep -n "PostToolUse\|write\|Write\|workDir" src/orchestrator.ts | grep -i "write\|PostTool" | head -40
+[2026-04-05T20:54:50.412Z] iter=378 turn=2 INFO: $ grep -n "workDir\|this\.workDir" src/orchestrator.ts | head -20
+[2026-04-05T20:54:50.427Z] iter=378 turn=2 INFO:   -> exit=0 (2911 chars)
+[2026-04-05T20:54:50.429Z] iter=378 turn=2 INFO:   -> exit=0 (993 chars)
+[2026-04-05T20:54:50.430Z] iter=378 turn=3 INFO: Turn 3/25
+[2026-04-05T20:54:52.273Z] iter=378 turn=3 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:54:52.274Z] iter=378 turn=3 INFO:   -> ok (2883 chars)
+[2026-04-05T20:54:52.275Z] iter=378 turn=4 INFO: Turn 4/25
+[2026-04-05T20:55:09.623Z] iter=378 turn=4 INFO: think: I have enough context. Let me build the two deliverables:
+1. Create `src/self-verify.ts` (~40 LOC)
+2. Create `tests/self...
+[2026-04-05T20:55:09.624Z] iter=378 turn=5 INFO: Turn 5/25
+[2026-04-05T20:55:17.375Z] iter=378 turn=5 INFO: Agent: Creating both files now:
+[2026-04-05T20:55:17.375Z] iter=378 turn=5 INFO: write_file: src/self-verify.ts (write)
+[2026-04-05T20:55:17.376Z] iter=378 turn=5 INFO:   -> ok: Created src/self-verify.ts (1160 chars)
+[2026-04-05T20:55:17.377Z] iter=378 turn=6 INFO: Turn 6/25
+[2026-04-05T20:55:26.310Z] iter=378 turn=6 INFO: write_file: tests/self-verify.test.ts (write)
+[2026-04-05T20:55:26.311Z] iter=378 turn=6 INFO:   -> ok: Created tests/self-verify.test.ts (2170 chars)
+[2026-04-05T20:55:26.312Z] iter=378 turn=7 INFO: Turn 7/25
+[2026-04-05T20:55:31.338Z] iter=378 turn=7 INFO: Agent: **Goal 1 (self-verify.ts + tests)**: DONE
+**Goal 2 (wire into orchestrator)**: NOT STARTED
+
+Wiring now:
+[2026-04-05T20:55:31.339Z] iter=378 turn=7 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:55:31.341Z] iter=378 turn=7 INFO:   -> ok (990 chars)
+[2026-04-05T20:55:31.341Z] iter=378 turn=8 INFO: Turn 8/25
+[2026-04-05T20:55:33.131Z] iter=378 turn=8 INFO: $ grep -n "^import" src/orchestrator.ts | tail -20
+[2026-04-05T20:55:33.142Z] iter=378 turn=8 INFO:   -> exit=0 (1332 chars)
+[2026-04-05T20:55:33.142Z] iter=378 turn=9 INFO: Turn 9/25
+[2026-04-05T20:55:35.237Z] iter=378 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:55:35.238Z] iter=378 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
+
+Context after patch:
+41 | import { enhanceToolError } from "./tool-recovery.js";
+42 | import { detectProject } from "./project-detector.js";
+43 | import { detectLoop } from "./loop-detector.js";
+44 | import { loadHooksConfig, runHooks, type HooksConfig } from "./hooks.js";
+45 | import { selfVerify } from "./self-verify.js";
+46 | import * as fs from "fs";
+47 | import { FileWatcher } from "./file-watcher.js";
+48 | import { scoredPrune } from "./context-pruner.js";
+[2026-04-05T20:55:35.239Z] iter=378 turn=10 INFO: Turn 10/25
+[2026-04-05T20:55:41.355Z] iter=378 turn=10 INFO: Agent: Now add the selfVerify call after the write tool result is collected:
+[2026-04-05T20:55:41.356Z] iter=378 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:55:41.358Z] iter=378 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -9 +17 lines
+
+Context after patch:
+731 |         if (postWriteResult.additionalContext) {
+732 |           rawResult += "\n\n[Hook context]: " + postWriteResult.additionalContext;
+733 |         }
+734 |         if (onFileWatch) {
+735 |           onFileWatch("write", (tu.input as { path?: string }).path ?? "");
+736 |         }
+737 |         const result = compressToolOutput(tu.name, rawResult);
+738 |         results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
+739 |       }
+740 |     }
+741 | 
+742 |     // Self-verification: after any write_file calls, run diagnostics and inject errors
+743 |     if (writeTools.length > 0) {
+744 |       const verifyResult = await selfVerify(workDir);
+745 |       if (verifyResult) {
+746 |         results.push({ type: "text", text: verifyResult } as unknown as typeof results[0]);
+747 |       }
+748 |     }
+749 | 
+750 |     apiMessages.push({ role: "user", content: results });
+751 | 
+752 |     // Loop detection: check after each round
+753 |     const loopCheck = detectLoop(apiMessages);
+[2026-04-05T20:55:41.359Z] iter=378 turn=11 INFO: Turn 11/25
+[2026-04-05T20:55:43.948Z] iter=378 turn=11 INFO: Agent: Now run tests and TSC:
+[2026-04-05T20:55:43.949Z] iter=378 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/self-verify.test.ts 2>&1
+[2026-04-05T20:55:44.966Z] iter=378 turn=11 INFO:   -> exit=0 (271 chars)
+[2026-04-05T20:55:44.966Z] iter=378 turn=12 INFO: Turn 12/25
+[2026-04-05T20:55:46.802Z] iter=378 turn=12 INFO: Agent: All goals done. Running TSC then wrapping up.
+[2026-04-05T20:55:46.803Z] iter=378 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T20:55:47.857Z] iter=378 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:55:47.857Z] iter=378 turn=13 INFO: Turn 13/25
+[2026-04-05T20:55:52.421Z] iter=378 turn=13 INFO: Agent: TSC clean. Writing memory and updating goals:
+[2026-04-05T20:55:52.422Z] iter=378 turn=13 INFO: save_memory: "[Engineer 378] Self-verification loop"
+[2026-04-05T20:55:52.423Z] iter=378 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:55:52.423Z] iter=378 turn=14 INFO: Turn 14/25
+[2026-04-05T20:56:04.471Z] iter=378 turn=14 INFO: write_file: goals.md (write)
+[2026-04-05T20:56:04.475Z] iter=378 turn=14 INFO:   -> ok: Updated goals.md (1720 chars, -33 lines delta)
+[2026-04-05T20:56:04.476Z] iter=378 turn=15 INFO: Turn 15/25
+[2026-04-05T20:56:06.485Z] iter=378 turn=15 INFO: Agent: All work is done. TSC already confirmed clean.
+[2026-04-05T20:56:06.486Z] iter=378 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:56:06.487Z] iter=378 turn=15 INFO: RESTART signal
+[2026-04-05T20:56:06.487Z] iter=378 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:56:07.552Z] iter=378 turn=15 INFO: Compilation OK
+[2026-04-05T20:56:15.321Z] iter=378 turn=15 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T20:56:15.321Z] iter=378 turn=15 INFO: Cache stats: 1 hits, 2 misses, 55 entries, 5 invalidations (2 entries removed)
+[2026-04-05T20:56:15.321Z] iter=378 turn=15 INFO: Tool cache stats
+[2026-04-05T20:56:15.321Z] iter=378 turn=15 INFO: Tool timing: bash: 6x, avg=353ms, total=2118ms; write_file: 5x, avg=2ms, total=11ms; read_file: 2x, avg=2ms, total=4ms; read_scratchpad: 1x, avg=1ms, total=1ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T20:56:15.321Z] iter=378 turn=15 INFO: Tool timing stats
+[2026-04-05T20:56:22.578Z] iter=378 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 378: predicted 18 turns, actual 15 turns, ratio 0.83**
+[2026-04-05T20:56:32.847Z] iter=378 turn=15 INFO: Pre-commit review (967in/365out): ## Issues Found
+
+- **Global mutable state breaks concurrent/parallel use**: `lastRunAt` is module-level state, so if the agent ever runs multiple `workDir` contexts concurrently (or tests run in paral

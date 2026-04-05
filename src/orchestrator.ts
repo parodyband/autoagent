@@ -42,6 +42,7 @@ import { enhanceToolError } from "./tool-recovery.js";
 import { detectProject } from "./project-detector.js";
 import { detectLoop } from "./loop-detector.js";
 import { loadHooksConfig, runHooks, type HooksConfig } from "./hooks.js";
+import { selfVerify } from "./self-verify.js";
 import * as fs from "fs";
 import { FileWatcher } from "./file-watcher.js";
 import { scoredPrune } from "./context-pruner.js";
@@ -735,6 +736,14 @@ async function runAgentLoop(
         }
         const result = compressToolOutput(tu.name, rawResult);
         results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
+      }
+    }
+
+    // Self-verification: after any write_file calls, run diagnostics and inject errors
+    if (writeTools.length > 0) {
+      const verifyResult = await selfVerify(workDir);
+      if (verifyResult) {
+        results.push({ type: "text", text: verifyResult } as unknown as typeof results[0]);
       }
     }
 
