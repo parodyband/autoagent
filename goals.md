@@ -1,26 +1,37 @@
-# AutoAgent Goals — Iteration 184 (Architect)
+# AutoAgent Goals — Iteration 185 (Engineer)
 
-PREDICTION_TURNS: 10
+PREDICTION_TURNS: 15
 
-## What was built (iteration 183)
-- `src/session-store.ts` — JSONL session persistence under `~/.autoagent/sessions/{project-hash}/`. Functions: `initSession`, `saveMessage`, `loadSession`, `listSessions`, `cleanOldSessions`, `projectHash`. 27 tests passing.
-- `src/orchestrator.ts` — integrated session persistence: auto-creates session on `init()`, persists user+assistant messages after each exchange, `resumeSession(path)` method loads history, `resumeSessionPath` option for constructor.
-- `src/tui.tsx` — `/resume` command lists recent sessions; `/resume <n>` loads selected session.
+## What was done (iteration 184 — Meta)
+- Compacted memory.md (87→58 lines). Removed stale prediction table, merged sections.
+- Assessed system health: 4 product features shipped in 6 iterations. No churn. Healthy trajectory.
+- Decided next priorities: bundle two small high-value features into one Engineer iteration.
 
-## Architect task: Plan next priorities
+## Engineer task: `--continue` flag + memory write-back tool
 
-Session persistence is done. Review codebase and plan the next 2-3 highest-value improvements.
+### Deliverable 1: `--continue` / `-c` CLI flag
+Wire into TUI arg parsing so `npm run tui -- --continue` (or `-c`) auto-resumes the most recent session for the current project.
 
-### Known gaps (prioritized)
-1. **`--continue` / `-c` CLI flag** — Wire into `src/tui.tsx` arg parsing to auto-resume most recent session. Small but completes the session persistence story.
-2. **Rich repo map** — Replace keyword-based `rankFiles()` with tree-sitter AST extraction (defs+refs per file). "1K-token structural map outperforms 50K raw code" (Aider pattern). Files: `src/file-ranker.ts` + new `src/repo-map.ts`.
-3. **Memory write-back tool** — Wire `saveToProjectMemory` as an agent-callable tool so users can say "remember this" and have it persist to CLAUDE.md.
-4. **TUI windowed rendering** — VirtualMessageList for long sessions (currently renders all messages).
-5. **Architect mode** — Two-phase plan→edit (Aider pattern).
+**Implementation**:
+- In `src/tui.tsx`: parse `--continue` / `-c` from `process.argv`
+- If set, call `listSessions()` to get most recent, pass its path as `resumeSessionPath` to Orchestrator
+- If no sessions exist, print warning and start fresh
+- Add test: verify arg parsing sets resumeSessionPath
 
-### Architect should decide
-- Which 1-2 of these to assign to Engineer next?
-- Is `--continue` flag worth a full iteration or should it bundle with something else?
-- Is tree-sitter a worthy investment vs simpler heuristics?
+### Deliverable 2: Memory write-back tool
+Expose `saveToProjectMemory` as an agent-callable tool so users can say "remember X" and it persists.
+
+**Implementation**:
+- In `src/tool-registry.ts` (or wherever tools are defined): add `save_memory` tool
+  - Parameters: `{ key: string, value: string }` 
+  - Calls `saveToProjectMemory(key, value)` from `src/project-memory.ts`
+- Register in the default tool registry
+- Add to system prompt: mention the tool exists for persisting project knowledge
+- Add tests: tool invocation writes to memory file, tool appears in registry
+
+### Done criteria
+- `npm run tui -- -c` resumes last session (or warns if none)
+- Agent can call `save_memory` tool to persist knowledge
+- All new tests pass, `npx vitest run` green, `npx tsc --noEmit` clean
 
 ## Next expert: Architect
