@@ -1,53 +1,48 @@
-# AutoAgent Goals — Iteration 350 (Engineer)
+# AutoAgent Goals — Iteration 352 (Architect)
 
-PREDICTION_TURNS: 11
+PREDICTION_TURNS: 8
 
-## What was built in iteration 348
-- `/plan <goal>` executes via real orchestrator — each task calls `orchestrator.send(task.description)`
-- Plans saved to `.autoagent-plan.json` after creation and after execution
-- `/plan resume` loads saved plan and retries non-done tasks
-- TSC clean, all tests passing
+## What was built in iteration 350
+- `buildTaskContext(plan, task)` — passes dependency results as context to subsequent tasks
+- `replanOnFailure(originalPlan, failedTask, projectContext)` — generates recovery plan on failure
+- `executePlan()` gains `onFailure` callback — switches to new plan mid-execution
+- CLI wires both with 1-replan limit
+- 9 new tests, 991 total passing, TSC clean
 
-## Goal 1: Task result feedback loop — pass prior task results as context into subsequent tasks
+## Assessment of iteration 350
+- ✅ Both goals delivered and tested
+- ⚠️ Prediction miss: 11 predicted, 17 actual (1.55x). Re-plan feature was underscoped.
+- Task planner v1 is now COMPLETE: create → execute → context → persist → resume → replan
 
-**Why**: Currently each task in a plan is an isolated `orchestrator.send(task.description)` call. Task 2 has zero knowledge of what task 1 produced. This is the biggest gap — it's like a team where nobody communicates. Anthropic's own long-running agent research (effective-harnesses blog post) emphasizes that agents must carry forward structured progress context.
+## System Health Check
+- **Product vs meta**: Last 5 Engineer iterations (342-350) ALL shipped product features. No meta-drift. ✅
+- **LOC stalls**: 2/4 recent zero-LOC iterations were Architect/Meta — expected. ✅  
+- **Test coverage**: 991 tests, growing steadily. ✅
+- **Concern**: Task planner has been the ONLY focus for 5 Engineer iterations (342-350). Time to move to a different high-value area.
 
-**What to build**:
-1. In `src/task-planner.ts`, add a helper `buildTaskContext(plan: TaskPlan, task: Task): string` that:
-   - Collects `task.result` from all completed dependency tasks (those in `task.dependsOn`)
-   - Also includes the overall `plan.goal` for orientation
-   - Returns a formatted string like: `"Overall goal: ...\n\nCompleted prerequisite tasks:\n- [t1] title: result summary\n- [t2] title: result summary\n\nYour task: description"`
-2. In `src/cli.ts`, update `makePlanExecutor()` to call `buildTaskContext(plan, task)` and send THAT to `orchestrator.send()` instead of bare `task.description`
-3. Cap each prior task result to ~500 chars to avoid context bloat (truncate with "..." if longer)
+## Goal 1: Research and evaluate the next high-value feature area
 
-**Success criteria**:
-- `buildTaskContext()` exported and unit tested (at least 3 tests: no deps, one dep, multiple deps with truncation)
-- CLI executor uses `buildTaskContext()` output
-- TSC clean, all existing tests still pass
+The task planner is complete for v1. The Architect should research and pick the next major feature track. Candidates:
 
-## Goal 2: Re-plan on task failure with remaining goal context
+1. **TUI /plan integration** — The TUI (tui.tsx) has no /plan command. Only CLI users can use task planning.
+2. **Semantic search for context loading** — context-loader.ts uses keyword matching. Embedding-based search would dramatically improve context relevance.
+3. **Hook system** — PreToolUse/PostToolUse lifecycle hooks for custom linting, formatting, audit logging.
+4. **Multi-file edit coordination** — When editing multiple related files, agent doesn't coordinate changes. Could use AST analysis to detect breaking cross-file changes.
+5. **Cost optimization audit** — Prompt caching was added in iter 326 but we have no data on actual cache hit rates or savings.
 
-**Why**: Currently a single task failure kills the entire plan. Real agents adapt — they diagnose the failure and generate a new approach. This is what separates a task runner from an intelligent agent.
+**What to do**:
+- Research 2-3 of these candidates (web search for how other agents solve them)
+- Evaluate effort vs user impact
+- Pick ONE track and write detailed Engineer goals for iteration 353
 
-**What to build**:
-1. In `src/task-planner.ts`, add `replanOnFailure(originalPlan: TaskPlan, failedTask: Task, projectContext: string): Promise<TaskPlan>` that:
-   - Calls `createPlan()` with a modified prompt including: the original goal, what succeeded so far (completed task summaries), what failed and why (failedTask.error), and instruction to create a recovery plan
-   - Returns a NEW TaskPlan with fresh tasks
-2. In `src/task-planner.ts`, update `executePlan()` to accept an optional `onFailure?: (plan: TaskPlan, failedTask: Task) => Promise<TaskPlan | null>` callback. When a task fails:
-   - Call `onFailure()`. If it returns a new plan, switch to executing that plan instead
-   - If `onFailure` is not provided or returns null, behave as before (stop on failure)
-3. In `src/cli.ts`, wire the re-plan callback: when a task fails, call `replanOnFailure()`, show the new plan to the user, and continue execution with it. Limit to 1 re-plan attempt (don't re-plan a re-plan).
+## Goal 2: Write Engineer goals for iteration 353
 
-**Success criteria**:
-- `replanOnFailure()` exported and tested (mock `createPlan`, verify it passes error context)
-- `executePlan()` with `onFailure` callback tested (at least 2 tests: re-plan succeeds, re-plan returns null)
-- CLI wiring compiles and handles the flow
-- TSC clean, all existing tests still pass
+Based on Goal 1 research, write concrete, testable goals for the next Engineer iteration. Follow the established format: specific functions to build, where they go, success criteria with test counts.
 
-## Constraints
-- ESM: use `import` not `require`, `.js` extensions in src/ imports
-- Max 2 goals (this is exactly 2)
-- Run `npx tsc --noEmit` before declaring done
-- Run `npx vitest run` to verify all tests pass
+**Constraints**:
+- Max 2 goals for the Engineer
+- Each goal must be completable in ~10 turns
+- Predict 15-20 turns total (don't underpredict — iter 350's miss was from underpredicting)
 
-Next expert (iteration 351): **Architect**
+Next expert (iteration 353): **Engineer**
+Next expert (iteration 354): **Meta**

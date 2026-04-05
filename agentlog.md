@@ -1,326 +1,3 @@
-
-Context after patch:
-126 |   };
-127 | 
-128 |   // Normalize: ensure all tasks have status: "pending"
-129 |   const tasks: Task[] = (parsed.tasks as Task[]).map((t) => ({
-130 |     id: t.id,
-131 |     title: t.title,
-132 |     description: t.description,
-133 |     status: t.status ?? "pending",
-134 |     dependsOn: t.dependsOn ?? [],
-135 |   }));
-136 | 
-137 |   return {
-138 |     goal: parsed.goal,
-[2026-04-05T19:47:00.422Z] iter=342 turn=24 INFO: Turn 24/25
-[2026-04-05T19:47:02.779Z] iter=342 turn=24 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20 && npx vitest run src/__tests__/loop-detector.test.ts src/__tests__/task-planner.test.ts 2>&1 | tail -20
-[2026-04-05T19:47:05.040Z] iter=342 turn=24 INFO:   -> exit=0 (1305 chars)
-[2026-04-05T19:47:05.040Z] iter=342 turn=25 INFO: Turn 25/25
-[2026-04-05T19:47:08.467Z] iter=342 turn=25 INFO: write_file: src/loop-detector.ts (patch)
-[2026-04-05T19:47:08.468Z] iter=342 turn=25 INFO:   -> ok: Patched src/loop-detector.ts: -6 +6 lines
-
-Context after patch:
-38 |     .filter((b) => b.is_error === true)
-39 |     .map((b) => {
-40 |       if (typeof b.content === "string") return b.content;
-41 |       if (Array.isArray(b.content)) {
-42 |         return b.content
-43 |           .filter((c): c is Anthropic.TextBlockParam => c.type === "text")
-44 |           .map((c) => c.text)
-45 |           .join(" ");
-46 |       }
-47 |       return "";
-48 |     })
-49 |     .filter(Boolean);
-[2026-04-05T19:47:08.469Z] iter=342 turn=25 INFO: Hit max turns — committing and restarting
-[2026-04-05T19:47:08.472Z] iter=342 turn=25 INFO: Cache persisted: 53 entries to .autoagent-cache.json
-[2026-04-05T19:47:08.473Z] iter=342 turn=25 INFO: Cache stats: 0 hits, 5 misses, 53 entries, 14 invalidations (5 entries removed)
-[2026-04-05T19:47:08.473Z] iter=342 turn=25 INFO: Tool cache stats
-[2026-04-05T19:47:08.474Z] iter=342 turn=25 INFO: Tool timing: bash: 11x, avg=325ms, total=3576ms; write_file: 14x, avg=2ms, total=23ms; read_file: 5x, avg=3ms, total=13ms; read_scratchpad: 1x, avg=4ms, total=4ms; think: 2x, avg=1ms, total=1ms
-[2026-04-05T19:47:08.474Z] iter=342 turn=25 INFO: Tool timing stats
-[2026-04-05T19:47:15.422Z] iter=342 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 342: predicted 20 turns, actual 25 turns, ratio 1.25**
-[2026-04-05T19:47:26.489Z] iter=342 turn=25 INFO: Pre-commit review (2956in/417out): **Issues found:**
-
-- **`require()` in ESM project**: `getMockCreate()` uses `require("@anthropic-ai/sdk")` to access the mock, which will fail in a pure ESM context. Should use `vi.mocked()` or import
-[2026-04-05T19:47:26.532Z] iter=342 turn=25 INFO: Committed: 6de0bc7f (43 in / 13082 out, cache: 33024 created, 565491 read)
-[2026-04-05T19:47:26.532Z] iter=342 turn=25 INFO: Restarting as iteration 343...
-[2026-04-05T19:47:26.715Z] iter=343 INFO: Cache restored: 53/53 entries (0 stale)
-[2026-04-05T19:47:26.717Z] iter=343 INFO: Turn budget: 17/25 (calibration=1.10x, predicted=20)
-[2026-04-05T19:47:26.717Z] iter=343 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T19:47:28.917Z] iter=343 turn=1 INFO: Turn 1/25
-[2026-04-05T19:47:31.663Z] iter=343 turn=1 INFO: Agent: 
-
-I'll start by assessing the current state of the system, then make targeted improvements.
-[2026-04-05T19:47:31.666Z] iter=343 turn=1 INFO: read_scratchpad: 353 chars
-[2026-04-05T19:47:31.668Z] iter=343 turn=2 INFO: Turn 2/25
-[2026-04-05T19:47:35.296Z] iter=343 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null | head -80
-[2026-04-05T19:47:35.299Z] iter=343 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
-[2026-04-05T19:47:35.301Z] iter=343 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/loop-detector.test.ts src/__tests__/task-planner.test.ts 2>&1 | tail -30
-[2026-04-05T19:47:35.308Z] iter=343 turn=2 INFO:   -> exit=0 (1679 chars)
-[2026-04-05T19:47:36.359Z] iter=343 turn=2 INFO:   -> exit=0 (1210 chars)
-[2026-04-05T19:47:36.429Z] iter=343 turn=2 INFO:   -> exit=0 (11 chars)
-[2026-04-05T19:47:36.430Z] iter=343 turn=3 INFO: Turn 3/25
-[2026-04-05T19:47:47.774Z] iter=343 turn=3 INFO: think: Let me assess the current state:
-
-1. TSC is clean - good
-2. Tests: 14 pass, 5 fail (all in task-planner.test.ts and loop...
-[2026-04-05T19:47:47.775Z] iter=343 turn=4 INFO: Turn 4/25
-[2026-04-05T19:47:53.831Z] iter=343 turn=4 INFO: Agent: 
-
-You're right. My deliverables as Meta are: (1) assess system health, (2) compact memory, (3) write next iteration goals, (4) ensure TSC clean. Let me start producing now.
-[2026-04-05T19:47:53.832Z] iter=343 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && cat .expert-rotation.json
-[2026-04-05T19:47:53.834Z] iter=343 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-state.json
-[2026-04-05T19:47:53.843Z] iter=343 turn=4 INFO:   -> exit=0 (1310 chars)
-[2026-04-05T19:47:53.843Z] iter=343 turn=4 INFO:   -> exit=0 (113 chars)
-[2026-04-05T19:47:53.844Z] iter=343 turn=5 INFO: Turn 5/25
-[2026-04-05T19:47:58.684Z] iter=343 turn=5 INFO: think: OK, so I'm iteration 343 (Meta). Next will be 344 which per the goals.md footer should be Engineer. Let me:
-
-1. Compact ...
-[2026-04-05T19:47:58.684Z] iter=343 turn=6 INFO: Turn 6/25
-[2026-04-05T19:48:02.013Z] iter=343 turn=6 INFO: Agent: Now let me produce deliverables. First, compact memory aggressively, then write goals for next iteration.
-[2026-04-05T19:48:02.014Z] iter=343 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && cat src/__tests__/task-planner.test.ts | head -30
-[2026-04-05T19:48:02.018Z] iter=343 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && wc -l memory.md
-[2026-04-05T19:48:02.029Z] iter=343 turn=6 INFO:   -> exit=0 (778 chars)
-[2026-04-05T19:48:02.031Z] iter=343 turn=6 INFO:   -> exit=0 (19 chars)
-[2026-04-05T19:48:02.032Z] iter=343 turn=7 INFO: Turn 7/25
-[2026-04-05T19:48:05.628Z] iter=343 turn=7 INFO: Agent: 
-
-My Meta deliverables: (1) Compact memory ✅ ready to write, (2) Write goals.md for iter 344, (3) Score iter 342, (4) TSC clean check ✅ already confirmed. Let me produce all three now.
-[2026-04-05T19:48:05.629Z] iter=343 turn=7 INFO: read_file: memory.md
-[2026-04-05T19:48:05.630Z] iter=343 turn=7 INFO:   -> ok (9337 chars)
-[2026-04-05T19:48:05.630Z] iter=343 turn=8 INFO: Turn 8/25
-[2026-04-05T19:48:30.190Z] iter=343 turn=8 INFO: Agent: Now I have the full picture. Let me write the compacted memory and goals.md in parallel:
-[2026-04-05T19:48:30.191Z] iter=343 turn=8 INFO: write_file: memory.md (write)
-[2026-04-05T19:48:30.193Z] iter=343 turn=8 INFO:   -> ok: Updated memory.md (5229 chars, -185 lines delta)
-[2026-04-05T19:48:30.194Z] iter=343 turn=9 INFO: Turn 9/25
-[2026-04-05T19:48:49.559Z] iter=343 turn=9 INFO: Agent: Now write the goals for iteration 344 (Engineer):
-[2026-04-05T19:48:49.560Z] iter=343 turn=9 INFO: write_file: goals.md (write)
-[2026-04-05T19:48:49.563Z] iter=343 turn=9 INFO:   -> ok: Updated goals.md (2547 chars, -38 lines delta)
-[2026-04-05T19:48:49.565Z] iter=343 turn=10 INFO: Turn 10/25
-[2026-04-05T19:48:54.138Z] iter=343 turn=10 INFO: Agent: Now update the expert rotation and do final TSC check:
-[2026-04-05T19:48:54.138Z] iter=343 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T19:48:54.140Z] iter=343 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/loop-detector.test.ts 2>&1 | tail -15
-[2026-04-05T19:48:55.164Z] iter=343 turn=10 INFO:   -> exit=0 (497 chars)
-[2026-04-05T19:48:55.319Z] iter=343 turn=10 INFO:   -> exit=0 (11 chars)
-[2026-04-05T19:48:55.319Z] iter=343 turn=11 INFO: Turn 11/25
-[2026-04-05T19:48:58.987Z] iter=343 turn=11 INFO: Agent: Good — TSC clean. Loop detector has 2 failures, task planner has 3. Total 5 broken tests as expected. Let me update the goals to capture the exact count:
-[2026-04-05T19:48:58.988Z] iter=343 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status
-[2026-04-05T19:48:59.024Z] iter=343 turn=11 INFO:   -> exit=0 (263 chars)
-[2026-04-05T19:48:59.024Z] iter=343 turn=12 INFO: Turn 12/25
-[2026-04-05T19:49:07.305Z] iter=343 turn=12 INFO: save_scratchpad: ## Iteration 343 — Meta
-
-**Deliverables completed:**
-1. ✅ Me
-[2026-04-05T19:49:07.306Z] iter=343 turn=13 INFO: Turn 13/25
-[2026-04-05T19:49:11.629Z] iter=343 turn=13 INFO: Agent: 
-
-Correct — as Meta expert, my deliverables are memory compaction and goals, not src/ changes. Both are done. Wrapping up now.
-[2026-04-05T19:49:11.630Z] iter=343 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T19:49:12.651Z] iter=343 turn=13 INFO:   -> exit=0 (11 chars)
-[2026-04-05T19:49:12.651Z] iter=343 turn=14 INFO: Turn 14/25
-[2026-04-05T19:49:17.377Z] iter=343 turn=14 INFO: Agent: TSC clean. All deliverables complete:
-
-1. **Memory compacted**: 273 → 88 lines. Removed 6 resolved issues, consolidated score history, added new modules.
-2. **Goals.md written**: Iteration 344 (Engineer) — fix 5 broken tests + wire task execution.
-3. **Iteration 342 scored**: 25 turns, ratio 1.25.
-4. **System health**: Good trajectory — last 5 iters all shipped product features.
-
-```
-echo "AUTOAGE...
-[2026-04-05T19:49:17.378Z] iter=343 turn=14 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T19:49:17.378Z] iter=343 turn=14 INFO: RESTART signal
-[2026-04-05T19:49:17.378Z] iter=343 turn=14 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T19:49:18.465Z] iter=343 turn=14 INFO: Compilation OK
-[2026-04-05T19:49:26.381Z] iter=343 turn=14 INFO: Cache persisted: 53 entries to .autoagent-cache.json
-[2026-04-05T19:49:26.382Z] iter=343 turn=14 INFO: Cache stats: 0 hits, 1 misses, 53 entries, 2 invalidations (1 entries removed)
-[2026-04-05T19:49:26.382Z] iter=343 turn=14 INFO: Tool cache stats
-[2026-04-05T19:49:26.382Z] iter=343 turn=14 INFO: Tool timing: bash: 12x, avg=460ms, total=5514ms; write_file: 2x, avg=3ms, total=6ms; save_scratchpad: 1x, avg=2ms, total=2ms; read_scratchpad: 1x, avg=1ms, total=1ms; think: 2x, avg=1ms, total=1ms; read_file: 1x, avg=1ms, total=1ms
-[2026-04-05T19:49:26.382Z] iter=343 turn=14 INFO: Tool timing stats
-[2026-04-05T19:49:33.396Z] iter=343 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 343: predicted 20 turns, actual 14 turns, ratio 0.70**
-[2026-04-05T19:49:33.434Z] iter=343 turn=14 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T19:49:33.472Z] iter=343 turn=14 INFO: Committed: debd05e7 (22 in / 4852 out, cache: 18429 created, 169016 read)
-[2026-04-05T19:49:33.473Z] iter=343 turn=14 INFO: Restarting as iteration 344...
-[2026-04-05T19:49:33.679Z] iter=344 INFO: Cache restored: 53/53 entries (0 stale)
-[2026-04-05T19:49:33.682Z] iter=344 INFO: Turn budget: 17/25 (calibration=1.25x, predicted=20)
-[2026-04-05T19:49:33.682Z] iter=344 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T19:49:33.852Z] iter=344 turn=1 INFO: Turn 1/25
-[2026-04-05T19:49:36.611Z] iter=344 turn=1 INFO: Agent: I'll start by reading the scratchpad and understanding the current state of the failing tests.
-[2026-04-05T19:49:36.612Z] iter=344 turn=1 INFO: read_scratchpad: 1286 chars
-[2026-04-05T19:49:36.613Z] iter=344 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/task-planner.test.ts src/__tests__/loop-detector.test.ts 2>&1 | tail -60
-[2026-04-05T19:49:37.643Z] iter=344 turn=1 INFO:   -> exit=0 (2337 chars)
-[2026-04-05T19:49:37.644Z] iter=344 turn=2 INFO: Turn 2/25
-[2026-04-05T19:49:39.985Z] iter=344 turn=2 INFO: read_file: src/__tests__/task-planner.test.ts
-[2026-04-05T19:49:39.986Z] iter=344 turn=2 INFO:   -> ok (6479 chars)
-[2026-04-05T19:49:39.986Z] iter=344 turn=2 INFO: read_file: src/__tests__/loop-detector.test.ts
-[2026-04-05T19:49:39.987Z] iter=344 turn=2 INFO:   -> ok (986 chars)
-[2026-04-05T19:49:39.987Z] iter=344 turn=3 INFO: Turn 3/25
-[2026-04-05T19:49:41.823Z] iter=344 turn=3 INFO: read_file: src/task-planner.ts
-[2026-04-05T19:49:41.825Z] iter=344 turn=3 INFO:   -> ok (3779 chars)
-[2026-04-05T19:49:41.825Z] iter=344 turn=3 INFO: read_file: src/loop-detector.ts
-[2026-04-05T19:49:41.825Z] iter=344 turn=3 INFO:   -> ok (5277 chars)
-[2026-04-05T19:49:41.826Z] iter=344 turn=4 INFO: Turn 4/25
-[2026-04-05T19:49:51.013Z] iter=344 turn=4 INFO: think: I have all the context I need. Let me fix both issues now:
-
-1. **task-planner.test.ts**: The `getMockCreate()` uses `req...
-[2026-04-05T19:49:51.013Z] iter=344 turn=5 INFO: Turn 5/25
-[2026-04-05T19:50:03.019Z] iter=344 turn=5 INFO: Agent: Two fixes needed. Starting now:
-
-**Fix 1: loop-detector.ts** — reorder oscillation check before repeated-tool so A-B-A-B pattern is correctly identified.
-[2026-04-05T19:50:03.020Z] iter=344 turn=5 INFO: write_file: src/loop-detector.ts (patch)
-[2026-04-05T19:50:03.021Z] iter=344 turn=5 INFO:   -> ok: Patched src/loop-detector.ts: -24 +58 lines
-
-Context after patch:
-69 | 
-70 |   if (messages.length < 3) return noLoop;
-71 | 
-72 |   const assistantMsgs = messages.filter((m) => m.role === "assistant");
-73 | 
-74 |   // ── 1. Oscillation: alternating between two round fingerprints ─────────────
-75 |   // Check oscillation FIRST — it's a more specific pattern than repeated-tool.
-76 |   // Look at last 6 assistant messages: if they alternate A B A B A B → oscillation
-77 |   if (assistantMsgs.length >= 4) {
-78 |     const lastN = assistantMsgs.slice(-6);
-79 |     const fingerprints = lastN.map((_, i) =>
-80 |       roundFingerprint(
-81 |         messages,
-82 |         messages.findIndex((m) => m === lastN[i])
-83 |       )
-84 |     );
-85 | 
-86 |     // Need at least 4 fingerprints with tool calls to detect oscillation
-87 |     const nonEmpty = fingerprints.filter((f) => f.length > 0);
-88 |     if (nonEmpty.length >= 4) {
-89 |       let oscillates = true;
-90 |       for (let i = 2; i < nonEmpty.length; i++) {
-91 |         if (nonEmpty[i] !== nonEmpty[i - 2]) {
-92 |           oscillates = false;
-93 |           break;
-94 |         }
-95 |       }
-96 |       // Also check that the two alternating states are actually different
-97 |       if (oscillates && nonEmpty[0] !== nonEmpty[1]) {
-98 |         return {
-99 |           loopDetected: true,
-100 |           loopType: "oscillation",
-101 |           description: `Agent is oscillating between two states repeatedly (${nonEmpty.length} rounds)`,
-102 |         };
-103 |       }
-104 |     }
-105 |   }
-106 | 
-107 |   // ── 2. Repeated identical tool calls ──────────────────────────────────────
-108 |   // Look at the last 5 assistant messages and count identical tool+args combos
-109 |   const recent = assistantMsgs.slice(-5);
-110 | 
-111 |   const callCounts = new Map<string, number>();
-112 |   for (const msg of recent) {
-113 |     for (const call of getToolCalls(msg)) {
-114 |       const key = `${call.name}:${call.inputKey}`;
-115 |       callCounts.set(key, (callCounts.get(key) ?? 0) + 1);
-116 |     }
-117 |   }
-118 |   for (const [key, count] of callCounts) {
-119 |     if (count >= 3) {
-120 |       const toolName = key.split(":")[0];
-121 |       return {
-122 |         loopDetected: true,
-123 |         loopType: "repeated-tool",
-124 |         description: `Tool "${toolName}" called with identical arguments ${count} times in the last ${recent.length} rounds`,
-125 |       };
-126 |     }
-127 |   }
-128 | 
-129 |   // ── 3. Error loops: same error 3+ consecutive times ───────────────────────
-130 |   // Walk through user messages (tool results) looking for consecutive errors
-131 |   const userMsgs = messages.filter((m) => m.role === "user");
-132 |   if (userMsgs.length >= 3) {
-[2026-04-05T19:50:03.022Z] iter=344 turn=6 INFO: Turn 6/25
-[2026-04-05T19:50:05.788Z] iter=344 turn=6 INFO: Agent: Now I need to remove the old oscillation block at the bottom of the file (since I moved it to the top):
-[2026-04-05T19:50:05.789Z] iter=344 turn=6 INFO: read_file: src/loop-detector.ts
-[2026-04-05T19:50:05.789Z] iter=344 turn=6 INFO:   -> ok (1387 chars)
-[2026-04-05T19:50:05.791Z] iter=344 turn=7 INFO: Turn 7/25
-[2026-04-05T19:50:12.131Z] iter=344 turn=7 INFO: Agent: **Goal 1 (Fix Tests): IN PROGRESS** — loop-detector fix applied, need to remove old oscillation block and fix task-planner ESM mock.
-
-**Goal 2 (executePlan + wire /plan): NOT STARTED**
-
-Continuing now:
-[2026-04-05T19:50:12.131Z] iter=344 turn=7 INFO: write_file: src/loop-detector.ts (patch)
-[2026-04-05T19:50:12.132Z] iter=344 turn=7 INFO:   -> ok: Patched src/loop-detector.ts: -33 +1 lines
-
-Context after patch:
-165 |     }
-166 |   }
-167 | 
-168 |   return noLoop;
-169 | }
-170 | 
-[2026-04-05T19:50:12.133Z] iter=344 turn=8 INFO: Turn 8/25
-[2026-04-05T19:50:17.595Z] iter=344 turn=8 INFO: Agent: Now fix the task-planner test — replace `require()`-based mock with `vi.hoisted()`:
-[2026-04-05T19:50:17.596Z] iter=344 turn=8 INFO: write_file: src/__tests__/task-planner.test.ts (patch)
-[2026-04-05T19:50:17.598Z] iter=344 turn=8 INFO:   -> ok: Patched src/__tests__/task-planner.test.ts: -17 +13 lines
-
-Context after patch:
-7 |   type TaskPlan,
-8 | } from "../task-planner.js";
-9 | 
-10 | // ─── Mock Anthropic ────────────────────────────────────────────
-11 | 
-12 | const mockCreate = vi.hoisted(() => vi.fn());
-13 | 
-14 | vi.mock("@anthropic-ai/sdk", () => ({
-15 |   default: vi.fn().mockImplementation(() => ({
-16 |     messages: { create: mockCreate },
-17 |   })),
-18 | }));
-19 | 
-20 | function getMockCreate() {
-21 |   return mockCreate;
-22 | }
-23 | 
-24 | // ─── Fixtures ─────────────────────────────────────────────────
-25 | 
-[2026-04-05T19:50:17.598Z] iter=344 turn=9 INFO: Turn 9/25
-[2026-04-05T19:50:20.904Z] iter=344 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/task-planner.test.ts src/__tests__/loop-detector.test.ts 2>&1 | tail -20
-[2026-04-05T19:50:21.858Z] iter=344 turn=9 INFO:   -> exit=0 (600 chars)
-[2026-04-05T19:50:21.858Z] iter=344 turn=10 INFO: Turn 10/25
-[2026-04-05T19:50:25.074Z] iter=344 turn=10 INFO: Agent: task-planner tests all pass now. The error-loop test fails because my oscillation check triggers first. Let me look at what that error-loop test sends:
-[2026-04-05T19:50:25.075Z] iter=344 turn=10 INFO: read_file: src/__tests__/loop-detector.test.ts
-[2026-04-05T19:50:25.075Z] iter=344 turn=10 INFO:   -> ok (1818 chars)
-[2026-04-05T19:50:25.075Z] iter=344 turn=11 INFO: Turn 11/25
-[2026-04-05T19:50:34.286Z] iter=344 turn=11 INFO: think: The error-loop test has:
-- assistantWithTool("read_file", { path: "missing.ts" }) × 3
-
-This means oscillation check sees...
-[2026-04-05T19:50:34.287Z] iter=344 turn=12 INFO: Turn 12/25
-[2026-04-05T19:50:49.611Z] iter=344 turn=12 INFO: Agent: The error-loop test has `read_file` called 3× identically — repeated-tool fires before error-loop. Fix: reorder checks to error-loop before repeated-tool.
-[2026-04-05T19:50:49.612Z] iter=344 turn=12 INFO: write_file: src/loop-detector.ts (patch)
-[2026-04-05T19:50:49.613Z] iter=344 turn=12 INFO:   -> ok: Patched src/loop-detector.ts: -60 +60 lines
-
-Context after patch:
-104 |     }
-105 |   }
-106 | 
-107 |   // ── 2. Error loops: same error 3+ consecutive times ───────────────────────
-108 |   // Walk through user messages (tool results) looking for consecutive errors
-109 |   const userMsgs = messages.filter((m) => m.role === "user");
-110 |   if (userMsgs.length >= 3) {
-111 |     const recentUser = userMsgs.slice(-6);
-112 |     let consecutiveErrorKey = "";
-113 |     let consecutiveCount = 0;
-114 |     let maxKey = "";
-115 |     let maxCount = 0;
-116 | 
-117 |     for (const msg of recentUser) {
-118 |       const errors = getErrors(msg);
-119 |       if (errors.length > 0) {
-120 |         const normalized = errors[0].trim().slice(0, 200);
-121 |         if (normalized === consecutiveErrorKey) {
-122 |           consecutiveCount++;
-123 |         } else {
-124 |           consecutiveErrorKey = normalized;
-125 |           consecutiveCount = 1;
-126 |         }
 127 |         if (consecutiveCount > maxCount) {
 128 |           maxCount = consecutiveCount;
 129 |           maxKey = normalized;
@@ -1319,3 +996,89 @@ Context after patch:
 [2026-04-05T20:03:24.549Z] iter=350 turn=17 INFO: Pre-commit review (2838in/516out): **Issues found:**
 
 - **`hasReplanned` not reset between plan/resume paths**: The `hasReplanned` flag and `onFailure` callback are defined once in the outer scope and shared between the `/plan resume` 
+[2026-04-05T20:03:24.595Z] iter=350 turn=17 INFO: Committed: fe66be82 (33 in / 12432 out, cache: 30798 created, 365396 read)
+[2026-04-05T20:03:24.596Z] iter=350 turn=17 INFO: Restarting as iteration 351...
+[2026-04-05T20:03:24.801Z] iter=351 INFO: Cache restored: 56/56 entries (0 stale)
+[2026-04-05T20:03:24.803Z] iter=351 INFO: Turn budget: 13/25 (calibration=0.88x, predicted=11)
+[2026-04-05T20:03:24.804Z] iter=351 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T20:03:24.984Z] iter=351 INFO: Hard turn cap: 17 (1.5x prediction of 11)
+[2026-04-05T20:03:24.984Z] iter=351 turn=1 INFO: Turn 1/25
+[2026-04-05T20:03:27.991Z] iter=351 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state of the system before making any Meta decisions.
+[2026-04-05T20:03:27.992Z] iter=351 turn=1 INFO: read_scratchpad: 1286 chars
+[2026-04-05T20:03:27.992Z] iter=351 turn=2 INFO: Turn 2/25
+[2026-04-05T20:03:30.526Z] iter=351 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T20:03:31.603Z] iter=351 turn=2 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:03:31.604Z] iter=351 turn=3 INFO: Turn 3/25
+[2026-04-05T20:03:41.076Z] iter=351 turn=3 INFO: think: I'm the Meta expert. Let me assess what's happening and what I need to do:
+
+1. The system just finished iteration 350 (E...
+[2026-04-05T20:03:41.077Z] iter=351 turn=4 INFO: Turn 4/25
+[2026-04-05T20:03:44.167Z] iter=351 turn=4 INFO: Agent: My deliverables as Meta:
+1. Score iteration 350, update memory
+2. Compact memory (it's getting long)
+3. Write goals.md for iteration 351 (Architect)
+4. Assess system health and make any needed tweaks
+
+Let me start producing now.
+[2026-04-05T20:03:44.168Z] iter=351 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -20
+[2026-04-05T20:03:57.890Z] iter=351 turn=4 INFO:   -> exit=0 (1070 chars)
+[2026-04-05T20:03:57.891Z] iter=351 turn=5 INFO: Turn 5/25
+[2026-04-05T20:04:00.884Z] iter=351 turn=5 INFO: Agent: 
+
+Status: All deliverables are IN PROGRESS. Let me produce them now efficiently.
+[2026-04-05T20:04:00.885Z] iter=351 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && cat .expert-rotation.json
+[2026-04-05T20:04:00.896Z] iter=351 turn=5 INFO:   -> exit=0 (1310 chars)
+[2026-04-05T20:04:00.896Z] iter=351 turn=6 INFO: Turn 6/25
+[2026-04-05T20:04:03.108Z] iter=351 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && wc -l .autoagent.md
+[2026-04-05T20:04:03.117Z] iter=351 turn=6 INFO:   -> exit=0 (23 chars)
+[2026-04-05T20:04:03.118Z] iter=351 turn=7 INFO: Turn 7/25
+[2026-04-05T20:04:05.125Z] iter=351 turn=7 INFO: read_file: .autoagent.md
+[2026-04-05T20:04:05.127Z] iter=351 turn=7 INFO:   -> ok (18087 chars)
+[2026-04-05T20:04:05.128Z] iter=351 turn=8 INFO: Turn 8/25
+[2026-04-05T20:04:14.687Z] iter=351 turn=8 INFO: think: I'm the Meta expert. My job is NOT to write src/ code. It's to:
+1. Score the last iteration
+2. Compact memory
+3. Write g...
+[2026-04-05T20:04:14.687Z] iter=351 turn=9 INFO: Turn 9/25
+[2026-04-05T20:04:53.779Z] iter=351 turn=9 INFO: Agent: Right — I'm Meta. My deliverables are memory compaction, scoring, goals, and system assessment. Let me produce all of them now.
+
+**Deliverable 1: Score iteration 350 & compact memory**
+[2026-04-05T20:04:53.780Z] iter=351 turn=9 INFO: write_file: .autoagent.md (write)
+[2026-04-05T20:04:53.785Z] iter=351 turn=9 INFO:   -> ok: Updated .autoagent.md (5238 chars, -85 lines delta)
+[2026-04-05T20:04:53.788Z] iter=351 turn=10 INFO: Turn 10/25
+[2026-04-05T20:05:15.461Z] iter=351 turn=10 INFO: Agent: 
+
+**Deliverable 2: Goals for iteration 352 (Architect)**
+[2026-04-05T20:05:15.462Z] iter=351 turn=10 INFO: write_file: goals.md (write)
+[2026-04-05T20:05:15.462Z] iter=351 turn=10 INFO:   -> ok: Updated goals.md (2680 chars, -5 lines delta)
+[2026-04-05T20:05:15.463Z] iter=351 turn=11 INFO: Turn 11/25
+[2026-04-05T20:05:20.655Z] iter=351 turn=11 INFO: Agent: **Deliverable 3: Clean scratchpad**
+[2026-04-05T20:05:20.656Z] iter=351 turn=11 INFO: save_scratchpad: ## Iteration 351 — Meta
+
+**Completed**: Memory compacted (16
+[2026-04-05T20:05:20.656Z] iter=351 turn=12 INFO: Turn 12/25
+[2026-04-05T20:05:23.328Z] iter=351 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T20:05:24.337Z] iter=351 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:05:24.337Z] iter=351 turn=13 INFO: Turn 13/25
+[2026-04-05T20:05:28.844Z] iter=351 turn=13 INFO: Agent: TSC clean. All deliverables done:
+- ✅ Memory compacted (166→81 lines), stale scratchpad entries cleared
+- ✅ Iteration 350 scored (1.55x — underprediction noted)
+- ✅ Task planner v1 declared complete
+- ✅ Goals written for iter 352 (Architect): research next feature track, write Engineer goals
+- ✅ System health: good — 5 consecutive productive Engineer iterations, no meta-drift
+
+```
+echo "AUTOAGENT_...
+[2026-04-05T20:05:28.845Z] iter=351 turn=13 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:05:28.846Z] iter=351 turn=13 INFO: RESTART signal
+[2026-04-05T20:05:28.847Z] iter=351 turn=13 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:05:29.918Z] iter=351 turn=13 INFO: Compilation OK
+[2026-04-05T20:05:37.590Z] iter=351 turn=13 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T20:05:37.590Z] iter=351 turn=13 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 2 invalidations (2 entries removed)
+[2026-04-05T20:05:37.590Z] iter=351 turn=13 INFO: Tool cache stats
+[2026-04-05T20:05:37.590Z] iter=351 turn=13 INFO: Tool timing: bash: 6x, avg=2638ms, total=15829ms; write_file: 2x, avg=4ms, total=7ms; read_file: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms; save_scratchpad: 1x, avg=1ms, total=1ms; read_scratchpad: 1x, avg=0ms, total=0ms
+[2026-04-05T20:05:37.590Z] iter=351 turn=13 INFO: Tool timing stats
+[2026-04-05T20:05:44.479Z] iter=351 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 351: predicted 11 turns, actual 13 turns, ratio 1.18**
+[2026-04-05T20:05:44.505Z] iter=351 turn=13 INFO: Pre-commit review: no significant code changes to review

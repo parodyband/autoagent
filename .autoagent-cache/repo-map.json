@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775419381789,
+  "generatedAt": 1775419427913,
   "files": [
     {
       "path": "src/context-loader.ts",
@@ -1418,6 +1418,40 @@
         }
       ],
       "lastModified": 1775419258858.946
+    },
+    {
+      "path": "src/__tests__/task-planner.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "../task-planner.js"
+        }
+      ],
+      "lastModified": 1775418862227.2693
+    },
+    {
+      "path": "tests/task-planner-context.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "../src/task-planner.js"
+        },
+        {
+          "names": [],
+          "from": "../src/task-planner.js"
+        }
+      ],
+      "lastModified": 1775419372896.4697
     }
   ]
 }
