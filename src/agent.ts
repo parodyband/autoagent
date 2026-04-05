@@ -161,6 +161,11 @@ async function runIteration(state: IterationState): Promise<void> {
   const experts = loadExperts(ROOT);
   const expert = pickExpert(state.iteration, experts);
 
+  // Parse predicted turns from goals before they get rewritten
+  const goalsContent = readGoals();
+  const predMatch = goalsContent.match(/PREDICTION_TURNS:\s*(\d+)/);
+  const predictedTurns = predMatch ? parseInt(predMatch[1], 10) : null;
+
   const ctx: IterationCtx = {
     client: new Anthropic(),
     model: expert.model,
@@ -181,6 +186,7 @@ async function runIteration(state: IterationState): Promise<void> {
     log: (msg: string) => log(state.iteration, msg),
     onFinalize: doFinalize,
     compressionConfig: null, // Disabled — prompt caching handles token cost
+    predictedTurns,
   };
 
   console.log(`\n${"=".repeat(60)}`);
@@ -202,7 +208,7 @@ async function runIteration(state: IterationState): Promise<void> {
   // Build initial message with goals, memory, and orientation
   ctx.messages.push({
     role: "user",
-    content: buildInitialMessage(readGoals(), readMemory(), orientationText || undefined),
+    content: buildInitialMessage(goalsContent, readMemory(), orientationText || undefined),
   });
 
   await runConversation(ctx);

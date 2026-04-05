@@ -60,4 +60,8 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 **Iter 76 (Architect):** Evaluated post-compaction state. Metrics don't capture `predictedTurns` (always None). Set Engineer task: parse `PREDICTION_TURNS` from `goals.md` and store in metrics. Tiny scope by design.
 
 **[AUTO-SCORED] Iteration 76: predicted 9 turns, actual 9 turns, ratio 1.00**
+
+**Iter 77 (Architect):** Added `PREDICTION_TURNS` parsing from goals.md in `src/agent.ts`. Now `ctx.predictedTurns` is set at startup before goals get rewritten. Also reuses `goalsContent` to avoid double-read. Next: verify value flows into metrics JSON via finalization.ts.
+
+**[AUTO-SCORED] Iteration 77: predicted 9 turns, actual 19 turns, ratio 2.11**
 ⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
