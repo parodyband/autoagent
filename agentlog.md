@@ -1,75 +1,3 @@
-[2026-04-05T17:45:36.034Z] iter=278 turn=6 INFO: write_file: src/file-watcher.ts (patch)
-[2026-04-05T17:45:36.035Z] iter=278 turn=6 INFO:   -> ok: Patched src/file-watcher.ts: -4 +5 lines
-
-Context after patch:
-36 |         const existing = this.debounceTimers.get(abs);
-37 |         if (existing) clearTimeout(existing);
-38 | 
-39 |         const timer = setTimeout(() => {
-40 |           this.debounceTimers.delete(abs);
-41 |           globalFileCache.invalidate(abs);
-42 |           this.onChange?.(abs);
-43 |         }, this.debounceMs);
-44 | 
-45 |         this.debounceTimers.set(abs, timer);
-46 |       });
-[2026-04-05T17:45:36.035Z] iter=278 turn=7 INFO: Turn 7/25
-[2026-04-05T17:45:40.336Z] iter=278 turn=7 INFO: Agent: Goal 1: IN PROGRESS (file-watcher.ts patched, still need: delete microCompact, clean tests, context-pruner JSDoc, file-watcher tests)
-Goal 2: NOT STARTED
-
-Continuing all at once:
-[2026-04-05T17:45:40.337Z] iter=278 turn=7 INFO: $ sed -n '778,815p' src/orchestrator.ts
-[2026-04-05T17:45:40.343Z] iter=278 turn=7 INFO: $ grep -n "microCompact\|legacy compaction" src/context-pruner.ts | head -20
-[2026-04-05T17:45:40.353Z] iter=278 turn=7 INFO: $ ls src/tools/ | head -20
-[2026-04-05T17:45:40.366Z] iter=278 turn=7 INFO:   -> exit=0 (1674 chars)
-[2026-04-05T17:45:40.368Z] iter=278 turn=7 INFO:   -> exit=0 (121 chars)
-[2026-04-05T17:45:40.374Z] iter=278 turn=7 INFO:   -> exit=0 (105 chars)
-[2026-04-05T17:45:40.375Z] iter=278 turn=8 INFO: Turn 8/25
-[2026-04-05T17:45:43.203Z] iter=278 turn=8 INFO: $ grep -n "buildSystemPrompt\|save_memory\|scratchpad" src/orchestrator.ts | head -20
-[2026-04-05T17:45:43.206Z] iter=278 turn=8 INFO: $ grep -n "registerTool\|save_memory\|think" src/tool-registry.ts | head -30
-[2026-04-05T17:45:43.209Z] iter=278 turn=8 INFO: $ cat src/tools/think.ts
-[2026-04-05T17:45:43.225Z] iter=278 turn=8 INFO:   -> exit=0 (399 chars)
-[2026-04-05T17:45:43.225Z] iter=278 turn=8 INFO:   -> exit=0 (297 chars)
-[2026-04-05T17:45:43.232Z] iter=278 turn=8 INFO:   -> exit=0 (1020 chars)
-[2026-04-05T17:45:43.233Z] iter=278 turn=9 INFO: Turn 9/25
-[2026-04-05T17:45:48.937Z] iter=278 turn=9 INFO: Agent: Now I have all the context I need. Executing all remaining changes:
-[2026-04-05T17:45:48.938Z] iter=278 turn=9 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T17:45:48.939Z] iter=278 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -33 +1 lines
-
-Context after patch:
-119 | 
-120 | export interface OrchestratorOptions {
-121 |   workDir: string;
-122 |   /** Called when a tool is invoked */
-123 |   onToolCall?: (name: string, input: string, result: string) => void;
-124 |   /** Called with status updates (e.g. "Indexing repo...") */
-125 |   onStatus?: (status: string) => void;
-[2026-04-05T17:45:48.939Z] iter=278 turn=10 INFO: Turn 10/25
-[2026-04-05T17:45:51.394Z] iter=278 turn=10 INFO: write_file: src/context-pruner.ts (patch)
-[2026-04-05T17:45:51.395Z] iter=278 turn=10 INFO:   -> ok: Patched src/context-pruner.ts: -1 +1 lines
-
-Context after patch:
-1 | /**
-2 |  * Scored context pruner — replaces the blunt legacy compaction with a
-3 |  * score-based approach that prioritises large, old, re-fetchable tool results.
-4 |  */
-5 | 
-[2026-04-05T17:45:51.396Z] iter=278 turn=11 INFO: Turn 11/25
-[2026-04-05T17:45:53.756Z] iter=278 turn=11 INFO: write_file: src/context-pruner.ts (patch)
-[2026-04-05T17:45:53.757Z] iter=278 turn=11 INFO:   -> ok: Patched src/context-pruner.ts: -1 +1 lines
-
-Context after patch:
-156 | }
-157 | 
-158 | /**
-159 |  * Scored pruning — replaces legacy compaction.
-160 |  *
-161 |  * @param messages  The mutable apiMessages array (modified in place).
-162 |  * @param currentTurn  Total message count (used for age calculation).
-[2026-04-05T17:45:53.757Z] iter=278 turn=12 INFO: Turn 12/25
-[2026-04-05T17:46:02.817Z] iter=278 turn=12 INFO: Agent: Now delete micro-compact test and clean up mid-loop-compact test:
-[2026-04-05T17:46:02.818Z] iter=278 turn=12 INFO: $ rm src/__tests__/micro-compact.test.ts
-[2026-04-05T17:46:02.820Z] iter=278 turn=12 INFO: write_file: src/__tests__/mid-loop-compact.test.ts (write)
 [2026-04-05T17:46:02.821Z] iter=278 turn=12 INFO:   -> ok: Updated src/__tests__/mid-loop-compact.test.ts (1892 chars, -78 lines delta)
 [2026-04-05T17:46:02.828Z] iter=278 turn=12 INFO:   -> exit=0 (11 chars)
 [2026-04-05T17:46:02.828Z] iter=278 turn=13 INFO: Turn 13/25
@@ -1068,3 +996,213 @@ Writing goals and memory now.
 [2026-04-05T17:58:58.423Z] iter=285 turn=9 INFO: Tool timing stats
 [2026-04-05T17:59:04.284Z] iter=285 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 285: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-05T17:59:04.305Z] iter=285 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T17:59:04.335Z] iter=285 turn=9 INFO: Committed: 64c5263b (19 in / 2862 out, cache: 18645 created, 96073 read)
+[2026-04-05T17:59:04.335Z] iter=285 turn=9 INFO: Restarting as iteration 286...
+[2026-04-05T17:59:04.507Z] iter=286 INFO: Cache restored: 51/51 entries (0 stale)
+[2026-04-05T17:59:04.509Z] iter=286 INFO: Turn budget: 19/25 (calibration=1.13x, predicted=20)
+[2026-04-05T17:59:04.509Z] iter=286 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T17:59:04.632Z] iter=286 turn=1 INFO: Turn 1/25
+[2026-04-05T17:59:07.309Z] iter=286 turn=1 INFO: Agent: I'll start by reading the current state of the codebase and then implement both goals.
+[2026-04-05T17:59:07.309Z] iter=286 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T17:59:07.310Z] iter=286 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md | head -100
+[2026-04-05T17:59:07.319Z] iter=286 turn=1 INFO:   -> exit=0 (3283 chars)
+[2026-04-05T17:59:07.320Z] iter=286 turn=2 INFO: Turn 2/25
+[2026-04-05T17:59:10.273Z] iter=286 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "pruneStaleToolResults\|shouldPruneStaleTool\|PRUNE_THRESHOLD\|MICRO_COMPACT" src/orchestrator.ts | head -30
+[2026-04-05T17:59:10.276Z] iter=286 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat src/tools/subagent.ts
+[2026-04-05T17:59:10.285Z] iter=286 turn=2 INFO:   -> exit=0 (3729 chars)
+[2026-04-05T17:59:10.286Z] iter=286 turn=2 INFO:   -> exit=0 (791 chars)
+[2026-04-05T17:59:10.286Z] iter=286 turn=3 INFO: Turn 3/25
+[2026-04-05T17:59:12.623Z] iter=286 turn=3 INFO: read_file: src/orchestrator.ts
+[2026-04-05T17:59:12.624Z] iter=286 turn=3 INFO:   -> ok (3773 chars)
+[2026-04-05T17:59:12.625Z] iter=286 turn=4 INFO: Turn 4/25
+[2026-04-05T17:59:18.034Z] iter=286 turn=4 INFO: think: I have enough context. Let me start building:
+
+1. Goal 1: Modify pruneStaleToolResults() in orchestrator.ts to:
+   - Fir...
+[2026-04-05T17:59:18.035Z] iter=286 turn=5 INFO: Turn 5/25
+[2026-04-05T17:59:21.231Z] iter=286 turn=5 INFO: Agent: Starting both deliverables now in parallel.
+[2026-04-05T17:59:21.232Z] iter=286 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-05T17:59:21.233Z] iter=286 turn=5 INFO:   -> ok (2274 chars)
+[2026-04-05T17:59:21.234Z] iter=286 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && ls tests/ | head -20
+[2026-04-05T17:59:21.248Z] iter=286 turn=5 INFO:   -> exit=0 (104 chars)
+[2026-04-05T17:59:21.249Z] iter=286 turn=6 INFO: Turn 6/25
+[2026-04-05T17:59:42.912Z] iter=286 turn=6 INFO: Agent: Now I'll write both deliverables. Starting with the orchestrator changes and the new test file simultaneously.
+[2026-04-05T17:59:42.912Z] iter=286 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T17:59:42.914Z] iter=286 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -51 +123 lines
+
+Context after patch:
+776 |     return this.sessionTokensIn >= COMPACT_THRESHOLD;
+777 |   }
+778 | 
+779 |   /** Check if stale tool result pruning is needed (at or above micro-compact threshold). */
+780 |   private shouldPruneStaleTool(): boolean {
+781 |     return this.sessionTokensIn >= MICRO_COMPACT_THRESHOLD;
+782 |   }
+783 | 
+784 |   /**
+785 |    * Determine the "prune priority" for a tool result.
+786 |    * Lower number = prune first (low value); higher number = prune last (high value).
+787 |    *
+788 |    * Priority:
+789 |    *   0 — read_file, grep, list_files (always re-readable)
+790 |    *   1 — other tools (moderate value)
+791 |    *   2 — bash, write_file (high value — may contain errors or created content)
+792 |    */
+793 |   private toolPrunePriority(toolName: string): number {
+794 |     if (["read_file", "grep", "list_files"].includes(toolName)) return 0;
+795 |     if (["bash", "write_file"].includes(toolName)) return 2;
+796 |     return 1;
+797 |   }
+798 | 
+799 |   /**
+800 |    * Build a map from tool_use_id → tool name by scanning all assistant messages.
+801 |    */
+802 |   private buildToolUseIdMap(): Map<string, string> {
+803 |     const map = new Map<string, string>();
+804 |     for (const msg of this.apiMessages) {
+805 |       if (msg.role !== "assistant" || !Array.isArray(msg.content)) continue;
+806 |       for (const block of msg.content) {
+807 |         if (
+808 |           typeof block === "object" &&
+809 |           "type" in block &&
+810 |           block.type === "tool_use" &&
+811 |           "id" in block &&
+812 |           "name" in block
+813 |         ) {
+814 |           map.set(
+815 |             (block as { id: string; name: string }).id,
+816 |             (block as { id: string; name: string }).name,
+817 |           );
+818 |         }
+819 |       }
+820 |     }
+821 |     return map;
+822 |   }
+823 | 
+824 |   /** Return true if the text contains error indicators we must preserve. */
+825 |   private hasErrorIndicator(text: string): boolean {
+826 |     return /Error|FAIL|error:|ERR!/i.test(text) && /Error|FAIL|error:|ERR!/.test(text);
+827 |   }
+828 | 
+829 |   /**
+830 |    * Prune stale tool results with priority-based ordering.
+831 |    *
+832 |    * Fires at MICRO_COMPACT_THRESHOLD (80K) and above.
+833 |    * - Never prunes results that contain error indicators.
+834 |    * - Prunes low-value tools first (read_file, grep, list_files).
+835 |    * - Prunes high-value tools last (bash, write_file).
+836 |    * - Keeps the last 8 assistant turns untouched.
+837 |    */
+838 |   pruneStaleToolResults(): void {
+839 |     const toolUseIdMap = this.buildToolUseIdMap();
+840 | 
+841 |     // Find the index of the 8th most recent assistant message
+842 |     const assistantIndices: number[] = [];
+843 |     for (let i = this.apiMessages.length - 1; i >= 0; i--) {
+844 |       if (this.apiMessages[i].role === "assistant") {
+845 |         assistantIndices.push(i);
+846 |       }
+847 |     }
+848 | 
+849 |     // Keep last 8 assistant turns fresh — prune everything older
+850 |     const cutoffAssistantIdx = assistantIndices[7] ?? 0; // 8th most recent assistant turn
+851 | 
+852 |     // Collect all candidate tool_result blocks with their priority
+853 |     type Candidate = {
+854 |       cb: { type: string; text?: string };
+855 |       turnN: number;
+856 |       priority: number;
+857 |     };
+858 |     const candidates: Candidate[] = [];
+859 | 
+860 |     let turnN = 0;
+861 |     for (let i = 0; i < cutoffAssistantIdx; i++) {
+862 |       const msg = this.apiMessages[i];
+863 |       if (msg.role === "assistant") turnN++;
+864 |       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
+865 | 
+866 |       for (const block of msg.content) {
+867 |         if (
+868 |           typeof block === "object" &&
+869 |           "type" in block &&
+870 |           block.type === "tool_result" &&
+871 |           Array.isArray((block as { content?: unknown[] }).content)
+872 |         ) {
+873 |           const toolBlock = block as {
+874 |             type: string;
+875 |             tool_use_id: string;
+876 |             content: Array<{ type: string; text?: string }>;
+877 |           };
+878 |           const toolName = toolUseIdMap.get(toolBlock.tool_use_id) ?? "unknown";
+879 |           const priority = this.toolPrunePriority(toolName);
+880 | 
+881 |           for (const cb of toolBlock.content) {
+882 |             if (cb.type === "text" && typeof cb.text === "string") {
+883 |               // Skip already-compact results
+884 |               if (cb.text.length < 100) continue;
+885 |               // Never prune error-containing results
+886 |               if (this.hasErrorIndicator(cb.text)) continue;
+887 |               candidates.push({ cb, turnN, priority });
+888 |             }
+889 |           }
+890 |         }
+891 |       }
+892 |     }
+893 | 
+894 |     // Sort by priority ascending (low-value first), then by turnN ascending (oldest first)
+895 |     candidates.sort((a, b) => a.priority - b.priority || a.turnN - b.turnN);
+896 | 
+897 |     // Prune all candidates (already filtered — no errors, no fresh turns)
+898 |     for (const { cb, turnN: t } of candidates) {
+899 |       cb.text = `[pruned — old result from turn ${t}]`;
+900 |     }
+901 |   }
+902 | 
+903 |   /**
+904 |    * Tier 1 compaction: walk apiMessages backwards, compress tool_result blocks
+[2026-04-05T17:59:42.915Z] iter=286 turn=7 INFO: Turn 7/25
+[2026-04-05T18:00:08.633Z] iter=286 turn=7 INFO: Agent: **Goal 1 (Context Pruning)**: IN PROGRESS — orchestrator.ts patched, need tests
+**Goal 2 (Sub-agent hardening)**: NOT STARTED
+
+Let me do both remaining items now:
+[2026-04-05T18:00:08.633Z] iter=286 turn=7 INFO: write_file: src/tools/subagent.ts (write)
+[2026-04-05T18:00:08.635Z] iter=286 turn=7 INFO:   -> ok: Updated src/tools/subagent.ts (5935 chars, +74 lines delta)
+[2026-04-05T18:00:08.635Z] iter=286 turn=8 INFO: Turn 8/25
+[2026-04-05T18:00:37.520Z] iter=286 turn=8 INFO: Agent: Now write both test files:
+[2026-04-05T18:00:37.521Z] iter=286 turn=8 INFO: write_file: tests/context-pruning.test.ts (write)
+[2026-04-05T18:00:37.521Z] iter=286 turn=8 INFO:   -> ok: Created tests/context-pruning.test.ts (6756 chars)
+[2026-04-05T18:00:37.522Z] iter=286 turn=9 INFO: Turn 9/25
+[2026-04-05T18:00:56.088Z] iter=286 turn=9 INFO: write_file: tests/subagent.test.ts (write)
+[2026-04-05T18:00:56.090Z] iter=286 turn=9 INFO:   -> ok: Created tests/subagent.test.ts (5039 chars)
+[2026-04-05T18:00:56.091Z] iter=286 turn=10 INFO: Turn 10/25
+[2026-04-05T18:00:59.947Z] iter=286 turn=10 INFO: Agent: Now run the tests:
+[2026-04-05T18:00:59.947Z] iter=286 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/subagent.test.ts 2>&1 | tail -40
+[2026-04-05T18:00:59.949Z] iter=286 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/context-pruning.test.ts 2>&1 | tail -50
+[2026-04-05T18:01:01.049Z] iter=286 turn=10 INFO:   -> exit=0 (268 chars)
+[2026-04-05T18:01:01.164Z] iter=286 turn=10 INFO:   -> exit=0 (277 chars)
+[2026-04-05T18:01:01.164Z] iter=286 turn=11 INFO: Turn 11/25
+[2026-04-05T18:01:07.700Z] iter=286 turn=11 INFO: Agent: All 14 new tests pass. Now TypeScript check and full suite:
+[2026-04-05T18:01:07.701Z] iter=286 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T18:01:07.704Z] iter=286 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -20
+[2026-04-05T18:01:09.056Z] iter=286 turn=11 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:01:17.783Z] iter=286 turn=11 INFO:   -> exit=0 (1052 chars)
+[2026-04-05T18:01:17.783Z] iter=286 turn=12 INFO: Turn 12/25
+[2026-04-05T18:01:24.754Z] iter=286 turn=12 INFO: Agent: All 791 tests pass, TSC clean. Now update memory and goals:
+[2026-04-05T18:01:24.754Z] iter=286 turn=12 INFO: save_memory: "[Engineer] Iteration 286"
+[2026-04-05T18:01:24.755Z] iter=286 turn=12 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T18:01:24.755Z] iter=286 turn=13 INFO: Turn 13/25
+[2026-04-05T18:01:40.762Z] iter=286 turn=13 INFO: Agent: Both goals are DONE. Wrapping up now.
+[2026-04-05T18:01:40.763Z] iter=286 turn=13 INFO: write_file: goals.md (write)
+[2026-04-05T18:01:40.763Z] iter=286 turn=13 INFO:   -> ok: Updated goals.md (2026 chars, -26 lines delta)
+[2026-04-05T18:01:40.763Z] iter=286 turn=14 INFO: Turn 14/25
+[2026-04-05T18:01:43.044Z] iter=286 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && echo "AUTOAGENT_RESTART"
+[2026-04-05T18:01:43.044Z] iter=286 turn=14 INFO: RESTART signal
+[2026-04-05T18:01:43.045Z] iter=286 turn=14 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T18:01:44.054Z] iter=286 turn=14 INFO: Compilation OK
+[2026-04-05T18:01:50.595Z] iter=286 turn=14 INFO: Cache persisted: 50 entries to .autoagent-cache.json
+[2026-04-05T18:01:50.595Z] iter=286 turn=14 INFO: Cache stats: 0 hits, 2 misses, 50 entries, 5 invalidations (3 entries removed)
+[2026-04-05T18:01:50.595Z] iter=286 turn=14 INFO: Tool cache stats
+[2026-04-05T18:01:50.595Z] iter=286 turn=14 INFO: Tool timing: bash: 9x, avg=1533ms, total=13797ms; read_file: 2x, avg=4ms, total=8ms; write_file: 5x, avg=1ms, total=6ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T18:01:50.595Z] iter=286 turn=14 INFO: Tool timing stats
+[2026-04-05T18:01:56.935Z] iter=286 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 286: predicted 20 turns, actual 14 turns, ratio 0.70**
+[2026-04-05T18:02:09.794Z] iter=286 turn=14 INFO: Pre-commit review (2856in/436out): - **`hasErrorIndicator` double-regex is redundant and misleading**: The method tests the same string twice with nearly identical patterns (the only difference being the `i` flag on the first). The sec

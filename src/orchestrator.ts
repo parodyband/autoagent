@@ -776,17 +776,68 @@ export class Orchestrator {
     return this.sessionTokensIn >= COMPACT_THRESHOLD;
   }
 
-  /** Check if stale tool result pruning is needed (between Tier 1 and Tier 2). */
+  /** Check if stale tool result pruning is needed (at or above micro-compact threshold). */
   private shouldPruneStaleTool(): boolean {
-    return this.sessionTokensIn >= PRUNE_THRESHOLD && this.sessionTokensIn < COMPACT_THRESHOLD;
+    return this.sessionTokensIn >= MICRO_COMPACT_THRESHOLD;
   }
 
   /**
-   * Prune stale tool results: replace the content of old tool_result blocks
-   * (older than the last 8 assistant turns) with a one-line stub.
-   * Fires when sessionTokensIn is between PRUNE_THRESHOLD (120K) and Tier 2 (150K).
+   * Determine the "prune priority" for a tool result.
+   * Lower number = prune first (low value); higher number = prune last (high value).
+   *
+   * Priority:
+   *   0 — read_file, grep, list_files (always re-readable)
+   *   1 — other tools (moderate value)
+   *   2 — bash, write_file (high value — may contain errors or created content)
    */
-  private pruneStaleToolResults(): void {
+  private toolPrunePriority(toolName: string): number {
+    if (["read_file", "grep", "list_files"].includes(toolName)) return 0;
+    if (["bash", "write_file"].includes(toolName)) return 2;
+    return 1;
+  }
+
+  /**
+   * Build a map from tool_use_id → tool name by scanning all assistant messages.
+   */
+  private buildToolUseIdMap(): Map<string, string> {
+    const map = new Map<string, string>();
+    for (const msg of this.apiMessages) {
+      if (msg.role !== "assistant" || !Array.isArray(msg.content)) continue;
+      for (const block of msg.content) {
+        if (
+          typeof block === "object" &&
+          "type" in block &&
+          block.type === "tool_use" &&
+          "id" in block &&
+          "name" in block
+        ) {
+          map.set(
+            (block as { id: string; name: string }).id,
+            (block as { id: string; name: string }).name,
+          );
+        }
+      }
+    }
+    return map;
+  }
+
+  /** Return true if the text contains error indicators we must preserve. */
+  private hasErrorIndicator(text: string): boolean {
+    return /Error|FAIL|error:|ERR!/i.test(text) && /Error|FAIL|error:|ERR!/.test(text);
+  }
+
+  /**
+   * Prune stale tool results with priority-based ordering.
+   *
+   * Fires at MICRO_COMPACT_THRESHOLD (80K) and above.
+   * - Never prunes results that contain error indicators.
+   * - Prunes low-value tools first (read_file, grep, list_files).
+   * - Prunes high-value tools last (bash, write_file).
+   * - Keeps the last 8 assistant turns untouched.
+   */
+  pruneStaleToolResults(): void {
+    const toolUseIdMap = this.buildToolUseIdMap();
+
     // Find the index of the 8th most recent assistant message
     const assistantIndices: number[] = [];
     for (let i = this.apiMessages.length - 1; i >= 0; i--) {
@@ -797,6 +848,14 @@ export class Orchestrator {
 
     // Keep last 8 assistant turns fresh — prune everything older
     const cutoffAssistantIdx = assistantIndices[7] ?? 0; // 8th most recent assistant turn
+
+    // Collect all candidate tool_result blocks with their priority
+    type Candidate = {
+      cb: { type: string; text?: string };
+      turnN: number;
+      priority: number;
+    };
+    const candidates: Candidate[] = [];
 
     let turnN = 0;
     for (let i = 0; i < cutoffAssistantIdx; i++) {
@@ -816,15 +875,28 @@ export class Orchestrator {
             tool_use_id: string;
             content: Array<{ type: string; text?: string }>;
           };
+          const toolName = toolUseIdMap.get(toolBlock.tool_use_id) ?? "unknown";
+          const priority = this.toolPrunePriority(toolName);
+
           for (const cb of toolBlock.content) {
             if (cb.type === "text" && typeof cb.text === "string") {
               // Skip already-compact results
               if (cb.text.length < 100) continue;
-              cb.text = `[pruned — old result from turn ${turnN}]`;
+              // Never prune error-containing results
+              if (this.hasErrorIndicator(cb.text)) continue;
+              candidates.push({ cb, turnN, priority });
             }
           }
         }
       }
+    }
+
+    // Sort by priority ascending (low-value first), then by turnN ascending (oldest first)
+    candidates.sort((a, b) => a.priority - b.priority || a.turnN - b.turnN);
+
+    // Prune all candidates (already filtered — no errors, no fresh turns)
+    for (const { cb, turnN: t } of candidates) {
+      cb.text = `[pruned — old result from turn ${t}]`;
     }
   }
 
