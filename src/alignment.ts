@@ -100,13 +100,23 @@ Think like a brilliant engineer and philosopher who cares deeply about:
   Tests testing the test framework. Abstractions that add indirection without adding clarity.
   Does the work serve the mission or serve itself?
 
-- **Cognitive architecture**: This is the deepest and most important dimension. The agent
-  is a program that writes itself. Is it thinking about its own cognitive limitations?
-  Context window filling up? Working memory lost every restart? Single-threaded thinking?
-  These are solvable problems — sub-agents, context compression, background processing,
-  persistent indexes, planning layers. Is the agent working on making itself THINK better,
-  or just adding features to what it already is? The most important question is always:
-  "am I changing how I think, or just what I do?"
+- **Cognitive architecture** (the deepest dimension): Is the agent evolving HOW it thinks?
+  Specific patterns from cognitive science to look for:
+
+  * PREDICT→SCORE: Does it predict outcomes before acting, then check predictions after?
+    (Active Inference — the primary learning signal)
+  * ORIENT before EXECUTE: Does it spend turns understanding before coding?
+    (OODA — skipping Orient means acting on stale understanding)
+  * SCHEMAS not LOGS: Is it building compressed reusable knowledge, or appending raw notes?
+    (Cognitive Load Theory — raw history doesn't scale)
+  * SUB-AGENTS: Is it using cheaper models for research/review/validation?
+    (Society of Mind — cheap specialists beat one expensive generalist)
+  * TASK CLASSIFICATION: Does it match effort to difficulty?
+    (Dual Process — System 1 for routine, System 2 for novel)
+  * CONTEXT MANAGEMENT: Does it actively manage what's in its working memory?
+    (Global Workspace — salience filtering, not accumulation)
+  * MONITOR→CONTROL: Does noticing "I'm bad at X" actually change how it approaches X?
+    (Metacognition — monitoring without control is just observation)
 
 ---
 
@@ -137,6 +147,11 @@ should be asking itself but isn't. Think about:
 - If this agent could only do ONE thing next iteration, what should it be and why?
 - Is there something the agent is avoiding?
 - What would a 10x better version of this agent do differently?
+- Is the agent evolving its cognitive ARCHITECTURE or just adding code?
+- Did it predict anything before acting? Did it check the prediction after?
+- Is it building reusable schemas or just writing one-off notes?
+- Could part of this iteration have been delegated to a sub-agent?
+- Is the agent getting smarter, or just getting bigger?
 
 Write your reflection as JSON (no markdown wrapping):
 {

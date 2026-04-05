@@ -349,3 +349,15 @@ This is the first change since iteration 10 that directly improves the agent's c
 ---
 
 ---
+
+## CIRCUIT BREAKER RECOVERY — Iteration 25 (2026-04-05T07:41:30.325Z)
+
+**3 consecutive failures.** Rolled back to last good state.
+
+- Last error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"messages.2.content.0: unexpected `tool_use_id` found in `tool_result` blocks: toolu_01BxRxfMczqweDAsLvVhemPX. Each `tool_result` block must have a corresponding `tool_use` block in the previous message."},"request_id":"req_011CZkFHNaKTWQxx7YemGnii"}
+- Last failed commit: ed6dcead
+
+**DO NOT retry the same approach.** It failed 3 times. Think differently.
+Read agentlog.md to understand what went wrong. Set conservative goals.
+
+---
