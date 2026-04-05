@@ -245,9 +245,11 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
   // Compress conversation context if it exceeds threshold
   if (ctx.compressionConfig !== null) {
     const compressionCfg = ctx.compressionConfig ?? DEFAULT_COMPRESSION_CONFIG;
+    const beforeTokens = JSON.stringify(ctx.messages).length / 4;
     const { messages: compressed, compressed: didCompress, removedCount } = compressMessages(ctx.messages, compressionCfg);
     if (didCompress) {
-      ctx.log(`Context compressed: ${ctx.messages.length} → ${compressed.length} messages (${removedCount} summarized)`);
+      const afterTokens = JSON.stringify(compressed).length / 4;
+      ctx.log(`Context compressed: ${ctx.messages.length} → ${compressed.length} messages (${removedCount} summarized, ~${Math.round(beforeTokens - afterTokens)} tokens saved)`);
       ctx.messages = compressed;
     }
   }

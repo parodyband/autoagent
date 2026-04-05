@@ -27,9 +27,9 @@ export interface CompressionConfig {
 }
 
 export const DEFAULT_COMPRESSION_CONFIG: CompressionConfig = {
-  threshold: 20,
-  keepRecent: 10,
-  maxResultChars: 150,
+  threshold: 16,
+  keepRecent: 8,
+  maxResultChars: 200,
   maxTextChars: 100,
 };
 

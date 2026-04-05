@@ -217,7 +217,7 @@ describe("compressMessages", () => {
   });
 
   it("handles default config", () => {
-    // Default threshold is 20, so 10+ turns needed
+    // Default threshold is 16, so 8+ turns needed
     const messages: Anthropic.MessageParam[] = [
       makeUserMessage("Initial"),
       ...generateTurns(12), // 24 messages -> total 25
