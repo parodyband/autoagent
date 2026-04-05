@@ -1199,3 +1199,16 @@ Context after patch:
 [2026-04-05T12:27:23.884Z] iter=136 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "feat: add task-decomposer.ts with shouldDecompose/decomposeTasks/formatSubtasks
 
 - src/task-decomposer.ts: breaks complex tasks int...
+[2026-04-05T12:27:23.931Z] iter=136 turn=18 INFO:   -> exit=0 (253 chars)
+[2026-04-05T12:27:23.931Z] iter=136 turn=19 INFO: Turn 19/25
+[2026-04-05T12:27:25.728Z] iter=136 turn=19 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T12:27:25.729Z] iter=136 turn=19 INFO: RESTART signal
+[2026-04-05T12:27:25.729Z] iter=136 turn=19 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:27:26.440Z] iter=136 turn=19 INFO: Compilation OK
+[2026-04-05T12:27:31.467Z] iter=136 turn=19 INFO: Cache persisted: 43 entries to .autoagent-cache.json
+[2026-04-05T12:27:31.467Z] iter=136 turn=19 INFO: Cache stats: 0 hits, 3 misses, 43 entries, 9 invalidations (3 entries removed)
+[2026-04-05T12:27:31.467Z] iter=136 turn=19 INFO: Tool cache stats
+[2026-04-05T12:27:31.467Z] iter=136 turn=19 INFO: Tool timing: bash: 8x, avg=477ms, total=3818ms; write_file: 9x, avg=2ms, total=16ms; read_file: 3x, avg=2ms, total=7ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T12:27:31.467Z] iter=136 turn=19 INFO: Tool timing stats
+[2026-04-05T12:27:35.637Z] iter=136 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 136: predicted 18 turns, actual 19 turns, ratio 1.06**
+[2026-04-05T12:27:35.656Z] iter=136 turn=19 INFO: Pre-commit review: no significant code changes to review
