@@ -1,79 +1,3 @@
-[2026-04-05T11:35:01.684Z] iter=112 INFO: Hard turn cap: 18 (1.5x prediction of 12)
-[2026-04-05T11:35:01.685Z] iter=112 turn=1 INFO: Turn 1/25
-[2026-04-05T11:35:04.505Z] iter=112 turn=1 INFO: think: The goal is simple: create a README.md file for the project. Under 150 lines. Include:
-- What AutoAgent is
-- How to inst...
-[2026-04-05T11:35:04.507Z] iter=112 turn=2 INFO: Turn 2/25
-[2026-04-05T11:35:07.053Z] iter=112 turn=2 INFO: $ ls *.md 2>/dev/null; cat package.json | head -20
-[2026-04-05T11:35:07.058Z] iter=112 turn=2 INFO: $ grep -r "\-\-task\|\-\-repo\|\-\-once\|\-\-help" src/agent.ts | head -30
-[2026-04-05T11:35:07.076Z] iter=112 turn=2 INFO:   -> exit=0 (1954 chars)
-[2026-04-05T11:35:07.077Z] iter=112 turn=2 INFO:   -> exit=0 (414 chars)
-[2026-04-05T11:35:07.078Z] iter=112 turn=3 INFO: Turn 3/25
-[2026-04-05T11:35:09.195Z] iter=112 turn=3 INFO: $ grep -A 30 "onceOutput\|once.*JSON\|JSON.*once\|exitCode\|tokensUsed\|commitSha" src/finalization.ts | head -50
-[2026-04-05T11:35:09.213Z] iter=112 turn=3 INFO:   -> exit=0 (2076 chars)
-[2026-04-05T11:35:09.214Z] iter=112 turn=4 INFO: Turn 4/25
-[2026-04-05T11:35:11.358Z] iter=112 turn=4 INFO: $ grep -A 20 "onceOutput\|\"success\"\|JSON.stringify" src/finalization.ts | head -40
-[2026-04-05T11:35:11.377Z] iter=112 turn=4 INFO:   -> exit=0 (1466 chars)
-[2026-04-05T11:35:11.378Z] iter=112 turn=5 INFO: Turn 5/25
-[2026-04-05T11:35:30.218Z] iter=112 turn=5 INFO: Agent: I have enough context. Writing the README now.
-[2026-04-05T11:35:30.219Z] iter=112 turn=5 INFO: write_file: README.md (write)
-[2026-04-05T11:35:30.221Z] iter=112 turn=5 INFO:   -> ok: Created README.md (3483 chars)
-[2026-04-05T11:35:30.222Z] iter=112 turn=6 INFO: Turn 6/25
-[2026-04-05T11:35:31.999Z] iter=112 turn=6 INFO: $ cat README.md | wc -l && npx tsc --noEmit 2>&1
-[2026-04-05T11:35:32.714Z] iter=112 turn=6 INFO:   -> exit=0 (9 chars)
-[2026-04-05T11:35:32.715Z] iter=112 turn=7 INFO: Turn 7/25
-[2026-04-05T11:35:40.819Z] iter=112 turn=7 INFO: Agent: Both checks pass: 108 lines (under 150), TypeScript clean. Now writing goals.md for the Architect.
-[2026-04-05T11:35:40.820Z] iter=112 turn=7 INFO: write_file: goals.md (write)
-[2026-04-05T11:35:40.821Z] iter=112 turn=7 INFO:   -> ok: Updated goals.md (829 chars, +4 lines delta)
-[2026-04-05T11:35:40.821Z] iter=112 turn=8 INFO: Turn 8/25
-[2026-04-05T11:35:42.689Z] iter=112 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && git add README.md goals.md && git status
-[2026-04-05T11:35:42.721Z] iter=112 turn=8 INFO:   -> exit=0 (428 chars)
-[2026-04-05T11:35:42.721Z] iter=112 turn=9 INFO: Turn 9/25
-[2026-04-05T11:35:46.684Z] iter=112 turn=9 INFO: Agent: All goals are DONE.
-- README.md created ✅ (108 lines, under 150)
-- `npx tsc --noEmit` clean ✅
-- goals.md written for Architect ✅
-
-Writing memory now.
-[2026-04-05T11:35:46.685Z] iter=112 turn=9 INFO: write_file: memory.md (write)
-[2026-04-05T11:35:46.686Z] iter=112 turn=9 INFO:   -> ok: Updated memory.md (0 chars, -50 lines delta)
-[2026-04-05T11:35:46.686Z] iter=112 turn=10 INFO: Turn 10/25
-[2026-04-05T11:35:48.503Z] iter=112 turn=10 INFO: $ npx tsc --noEmit 2>&1 && echo "TSC_OK"
-[2026-04-05T11:35:49.174Z] iter=112 turn=10 INFO:   -> exit=0 (7 chars)
-[2026-04-05T11:35:49.174Z] iter=112 turn=11 INFO: Turn 11/25
-[2026-04-05T11:35:51.084Z] iter=112 turn=11 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T11:35:51.085Z] iter=112 turn=11 INFO: RESTART signal
-[2026-04-05T11:35:51.085Z] iter=112 turn=11 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T11:35:51.724Z] iter=112 turn=11 INFO: Compilation OK
-[2026-04-05T11:36:23.583Z] iter=112 turn=11 INFO: Cache persisted: 27 entries to .autoagent-cache.json
-[2026-04-05T11:36:23.584Z] iter=112 turn=11 INFO: Tool timing: bash: 8x, avg=188ms, total=1502ms; write_file: 3x, avg=1ms, total=4ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T11:36:23.584Z] iter=112 turn=11 INFO: Tool timing stats
-[2026-04-05T11:36:54.400Z] iter=112 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 112: predicted 12 turns, actual 11 turns, ratio 0.92**
-[2026-04-05T11:36:54.424Z] iter=112 turn=11 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T11:36:54.455Z] iter=112 turn=11 INFO: Committed: 56f1980f (17 in / 2390 out, cache: 8728 created, 69840 read)
-[2026-04-05T11:36:54.455Z] iter=112 turn=11 INFO: Restarting as iteration 113...
-[2026-04-05T11:36:54.653Z] iter=113 INFO: Cache restored: 27/27 entries (0 stale)
-[2026-04-05T11:36:54.654Z] iter=113 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T11:36:54.682Z] iter=113 INFO: Hard turn cap: 18 (1.5x prediction of 12)
-[2026-04-05T11:36:54.682Z] iter=113 turn=1 INFO: Turn 1/25
-[2026-04-05T11:36:58.264Z] iter=113 turn=1 INFO: Agent: 
-
-I'll start by understanding the current codebase structure and then review task mode and --once mode implementation.
-[2026-04-05T11:36:58.265Z] iter=113 turn=1 INFO: list_files: . (depth=2)
-[2026-04-05T11:36:58.279Z] iter=113 turn=1 INFO:   -> ok (5 dirs, 51 files)
-[2026-04-05T11:36:58.279Z] iter=113 turn=1 INFO: $ cat memory.md
-[2026-04-05T11:36:58.287Z] iter=113 turn=1 INFO:   -> exit=0 (83 chars)
-[2026-04-05T11:36:58.288Z] iter=113 turn=2 INFO: Turn 2/25
-[2026-04-05T11:37:01.429Z] iter=113 turn=2 INFO: read_file: src/agent.ts
-[2026-04-05T11:37:01.429Z] iter=113 turn=2 INFO:   -> ok (14849 chars)
-[2026-04-05T11:37:01.430Z] iter=113 turn=2 INFO: read_file: src/phases.ts
-[2026-04-05T11:37:01.430Z] iter=113 turn=2 INFO:   -> ok (8894 chars)
-[2026-04-05T11:37:01.430Z] iter=113 turn=2 INFO: read_file: src/finalization.ts
-[2026-04-05T11:37:01.430Z] iter=113 turn=2 INFO:   -> ok (12952 chars)
-[2026-04-05T11:37:01.430Z] iter=113 turn=2 INFO: read_file: TASK.md.example
-[2026-04-05T11:37:01.431Z] iter=113 turn=2 INFO:   -> ok (390 chars)
-[2026-04-05T11:37:01.431Z] iter=113 turn=3 INFO: Turn 3/25
-[2026-04-05T11:37:18.231Z] iter=113 turn=3 INFO: think: Let me analyze the task mode and --once mode for gaps and edge cases.
 
 Key files:
 1. `src/agent.ts` - Main entry point, ...
@@ -1072,3 +996,119 @@ Context after patch:
 [2026-04-05T11:54:02.955Z] iter=120 turn=15 INFO: Tool timing stats
 [2026-04-05T11:54:07.610Z] iter=120 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 120: predicted 10 turns, actual 15 turns, ratio 1.50**
 [2026-04-05T11:54:07.629Z] iter=120 turn=15 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T11:54:07.661Z] iter=120 turn=15 INFO: Committed: 0cc48e77 (21 in / 2772 out, cache: 7398 created, 97021 read)
+[2026-04-05T11:54:07.661Z] iter=120 turn=15 INFO: Restarting as iteration 121...
+[2026-04-05T11:54:07.857Z] iter=121 INFO: Cache restored: 36/36 entries (0 stale)
+[2026-04-05T11:54:07.858Z] iter=121 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T11:54:07.883Z] iter=121 INFO: Hard turn cap: 21 (1.5x prediction of 14)
+[2026-04-05T11:54:07.883Z] iter=121 turn=1 INFO: Turn 1/25
+[2026-04-05T11:54:11.438Z] iter=121 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state - metrics, recent patterns, and what's actually worth doing next.
+[2026-04-05T11:54:11.439Z] iter=121 turn=1 INFO: $ cat .autoagent-metrics.json
+[2026-04-05T11:54:11.442Z] iter=121 turn=1 INFO: $ cat .expert-rotation.json
+[2026-04-05T11:54:11.445Z] iter=121 turn=1 INFO: $ cat goals.md
+[2026-04-05T11:54:11.449Z] iter=121 turn=1 INFO:   -> exit=0 (100036 chars)
+[2026-04-05T11:54:11.451Z] iter=121 turn=1 INFO:   -> exit=0 (1315 chars)
+[2026-04-05T11:54:11.452Z] iter=121 turn=1 INFO:   -> exit=0 (1123 chars)
+[2026-04-05T11:54:11.453Z] iter=121 turn=2 INFO: Turn 2/25
+[2026-04-05T11:54:20.708Z] iter=121 turn=2 INFO: think: Let me analyze the current state:
+
+1. 4/4 recent iterations had zero LOC change - this is a problem. The agent is review...
+[2026-04-05T11:54:20.709Z] iter=121 turn=3 INFO: Turn 3/25
+[2026-04-05T11:54:24.274Z] iter=121 turn=3 INFO: list_files: src (depth=2)
+[2026-04-05T11:54:24.294Z] iter=121 turn=3 INFO:   -> ok (2 dirs, 37 files)
+[2026-04-05T11:54:24.295Z] iter=121 turn=3 INFO: $ wc -l src/*.ts | sort -n
+[2026-04-05T11:54:24.308Z] iter=121 turn=3 INFO:   -> exit=0 (651 chars)
+[2026-04-05T11:54:24.308Z] iter=121 turn=4 INFO: Turn 4/25
+[2026-04-05T11:54:29.250Z] iter=121 turn=4 INFO: $ cat .autoagent-state.json
+[2026-04-05T11:54:29.253Z] iter=121 turn=4 INFO: $ # Look at the last few metrics entries to understand recent patterns
+cat .autoagent-metrics.json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+# Get last 10
+for m in data[-10:]:
+    i = ...
+[2026-04-05T11:54:29.259Z] iter=121 turn=4 INFO:   -> exit=0 (113 chars)
+[2026-04-05T11:54:29.291Z] iter=121 turn=4 INFO:   -> exit=0 (489 chars)
+[2026-04-05T11:54:29.291Z] iter=121 turn=5 INFO: Turn 5/25
+[2026-04-05T11:54:48.404Z] iter=121 turn=5 INFO: Agent: 
+
+You're right. My deliverable is clear: **write goals.md for the next Engineer iteration with a concrete coding task.**
+
+Let me identify the highest-leverage task and write it now.
+[2026-04-05T11:54:48.405Z] iter=121 turn=5 INFO: think: The hard question: Is this agent doing real work or building infrastructure about infrastructure?
+
+Looking at the data:
+...
+[2026-04-05T11:54:48.406Z] iter=121 turn=6 INFO: Turn 6/25
+[2026-04-05T11:54:50.859Z] iter=121 turn=6 INFO: read_file: src/memory.ts
+[2026-04-05T11:54:50.861Z] iter=121 turn=6 INFO:   -> ok (4063 chars)
+[2026-04-05T11:54:50.863Z] iter=121 turn=7 INFO: Turn 7/25
+[2026-04-05T11:54:53.419Z] iter=121 turn=7 INFO: $ wc -l memory.md && echo "---" && head -60 memory.md
+[2026-04-05T11:54:53.451Z] iter=121 turn=7 INFO:   -> exit=0 (4158 chars)
+[2026-04-05T11:54:53.452Z] iter=121 turn=8 INFO: Turn 8/25
+[2026-04-05T11:55:12.771Z] iter=121 turn=8 INFO: think: OK, now I have a clear picture. Let me think about the highest-leverage task.
+
+The memory.md is 63 lines — not huge yet....
+[2026-04-05T11:55:12.772Z] iter=121 turn=9 INFO: Turn 9/25
+[2026-04-05T11:55:16.355Z] iter=121 turn=9 INFO: Agent: 
+
+Status: **IN PROGRESS** — Goals.md for next Engineer iteration NOT YET WRITTEN. I have enough context. Writing now.
+[2026-04-05T11:55:16.355Z] iter=121 turn=9 INFO: read_file: src/turn-budget.ts
+[2026-04-05T11:55:16.356Z] iter=121 turn=9 INFO:   -> ok (1263 chars)
+[2026-04-05T11:55:16.356Z] iter=121 turn=10 INFO: Turn 10/25
+[2026-04-05T11:55:18.918Z] iter=121 turn=10 INFO: read_file: src/turn-budget.ts
+[2026-04-05T11:55:18.920Z] iter=121 turn=10 INFO:   -> ok (2134 chars)
+[2026-04-05T11:55:18.920Z] iter=121 turn=11 INFO: Turn 11/25
+[2026-04-05T11:55:35.574Z] iter=121 turn=11 INFO: think: Good. The turn-budget.ts already has calibration logic that reads AUTO-SCORED ratios and computes a calibration factor. ...
+[2026-04-05T11:55:35.574Z] iter=121 turn=12 INFO: Turn 12/25
+[2026-04-05T11:55:38.083Z] iter=121 turn=12 INFO: $ grep -n "calibrat\|PREDICTION\|prediction" src/orientation.ts
+[2026-04-05T11:55:38.102Z] iter=121 turn=12 INFO:   -> exit=1 (11 chars)
+[2026-04-05T11:55:38.103Z] iter=121 turn=13 INFO: Turn 13/25
+[2026-04-05T11:55:40.323Z] iter=121 turn=13 INFO: $ grep -n "calibrat\|PREDICTION\|predictedTurns\|prediction" src/finalization.ts | head -20
+[2026-04-05T11:55:40.334Z] iter=121 turn=13 INFO:   -> exit=0 (766 chars)
+[2026-04-05T11:55:40.335Z] iter=121 turn=14 INFO: Turn 14/25
+[2026-04-05T11:55:43.182Z] iter=121 turn=14 INFO: $ grep -n "calibrat\|turnBudget\|turn.budget\|turn_budget" src/orientation.ts src/agent.ts src/messages.ts 2>/dev/null | head -20
+[2026-04-05T11:55:43.211Z] iter=121 turn=14 INFO:   -> exit=0 (61 chars)
+[2026-04-05T11:55:43.211Z] iter=121 turn=15 INFO: Turn 15/25
+[2026-04-05T11:55:45.742Z] iter=121 turn=15 INFO: $ grep -rn "computeTurnBudget\|computeCalibration\|readPredictionCalibration" src/ | head -20
+[2026-04-05T11:55:45.776Z] iter=121 turn=15 INFO:   -> exit=0 (416 chars)
+[2026-04-05T11:55:45.777Z] iter=121 turn=16 INFO: Turn 16/25
+[2026-04-05T11:55:58.746Z] iter=121 turn=16 INFO: Agent: 
+
+Writing goals.md and memory now. No src/ changes this iteration (Architect role = planning).
+[2026-04-05T11:55:58.747Z] iter=121 turn=16 INFO: write_file: goals.md (write)
+[2026-04-05T11:55:58.749Z] iter=121 turn=16 INFO:   -> ok: Updated goals.md (1710 chars, +6 lines delta)
+[2026-04-05T11:55:58.750Z] iter=121 turn=17 INFO: Turn 17/25
+[2026-04-05T11:56:05.094Z] iter=121 turn=17 INFO: write_file: memory.md (patch)
+[2026-04-05T11:56:05.095Z] iter=121 turn=17 INFO:   -> ok: Patched memory.md: -1 +7 lines
+
+Context after patch:
+60 | ## Iteration 120 [Meta]
+61 | Token metrics validated: `inputTokens` (uncached=21) + `cacheReadTokens` (636K) + `cacheCreationTokens` (52K) all present in metrics. Progress checkpoint correctly uses total tokens. System health: 685 self-tests 3.4s, 53 vitest, tsc clean. 3/4 recent stalls — tasked Architect to identify next concrete coding work.
+62 | 
+63 | **[AUTO-SCORED] Iteration 120: predicted 10 turns, actual 15 turns, ratio 1.50**
+64 | 
+65 | ## Iteration 121 [Architect]
+66 | LOC stalled 5 iterations (116-120). System is mature; self-improvement has diminishing returns. Key finding: calibration code exists in turn-budget.ts but is NEVER shown to experts — explains chronic 1.5x prediction misses. Tasked Engineer to surface calibration factor in orientation prompt. Also noted: `computeTurnBudget()` is defined but never called from agent.ts or conversation.ts — dead code candidate for future cleanup.
+67 | 
+68 | ## Next for Engineer
+69 | Surface calibration in orientation.ts — see goals.md iteration 121 for specifics.
+70 | 
+[2026-04-05T11:56:05.096Z] iter=121 turn=18 INFO: Turn 18/25
+[2026-04-05T11:56:07.522Z] iter=121 turn=18 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T11:56:08.258Z] iter=121 turn=18 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:56:08.259Z] iter=121 turn=19 INFO: Turn 19/25
+[2026-04-05T11:56:10.805Z] iter=121 turn=19 INFO: Agent: Clean. Now restart.
+[2026-04-05T11:56:10.805Z] iter=121 turn=19 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T11:56:10.806Z] iter=121 turn=19 INFO: RESTART signal
+[2026-04-05T11:56:10.806Z] iter=121 turn=19 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T11:56:11.498Z] iter=121 turn=19 INFO: Compilation OK
+[2026-04-05T11:56:15.996Z] iter=121 turn=19 INFO: Cache persisted: 40 entries to .autoagent-cache.json
+[2026-04-05T11:56:15.996Z] iter=121 turn=19 INFO: Cache stats: 0 hits, 4 misses, 40 entries, 2 invalidations (0 entries removed)
+[2026-04-05T11:56:15.996Z] iter=121 turn=19 INFO: Tool cache stats
+[2026-04-05T11:56:15.996Z] iter=121 turn=19 INFO: Tool timing: bash: 13x, avg=74ms, total=956ms; list_files: 1x, avg=24ms, total=24ms; read_file: 3x, avg=2ms, total=6ms; write_file: 2x, avg=2ms, total=4ms; think: 4x, avg=1ms, total=3ms
+[2026-04-05T11:56:15.996Z] iter=121 turn=19 INFO: Tool timing stats
+[2026-04-05T11:56:19.826Z] iter=121 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 121: predicted 14 turns, actual 19 turns, ratio 1.36**
+[2026-04-05T11:56:19.846Z] iter=121 turn=19 INFO: Pre-commit review: no significant code changes to review

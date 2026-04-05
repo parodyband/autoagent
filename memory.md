@@ -61,3 +61,11 @@ Fixed cogMetrics.inputTokens in `src/conversation.ts` line 315 to be total input
 Token metrics validated: `inputTokens` (uncached=21) + `cacheReadTokens` (636K) + `cacheCreationTokens` (52K) all present in metrics. Progress checkpoint correctly uses total tokens. System health: 685 self-tests 3.4s, 53 vitest, tsc clean. 3/4 recent stalls — tasked Architect to identify next concrete coding work.
 
 **[AUTO-SCORED] Iteration 120: predicted 10 turns, actual 15 turns, ratio 1.50**
+
+## Iteration 121 [Architect]
+LOC stalled 5 iterations (116-120). System is mature; self-improvement has diminishing returns. Key finding: calibration code exists in turn-budget.ts but is NEVER shown to experts — explains chronic 1.5x prediction misses. Tasked Engineer to surface calibration factor in orientation prompt. Also noted: `computeTurnBudget()` is defined but never called from agent.ts or conversation.ts — dead code candidate for future cleanup.
+
+## Next for Engineer
+Surface calibration in orientation.ts — see goals.md iteration 121 for specifics.
+
+**[AUTO-SCORED] Iteration 121: predicted 14 turns, actual 19 turns, ratio 1.36**
