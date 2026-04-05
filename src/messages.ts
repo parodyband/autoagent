@@ -35,12 +35,23 @@ export function buildSystemPrompt(state: IterationState, rootDir: string): strin
 
 /**
  * Build the first user message that kicks off an iteration.
+ * Optionally includes an orientation section showing what changed since last iteration.
  */
-export function buildInitialMessage(goals: string, memory: string): string {
-  return (
-    `Goals:\n\n${goals}\n\n---\n\nMemory:\n\n${memory}\n\n---\n\n` +
-    `Execute your goals. Run \`npx tsc --noEmit\` before restart. Final action: \`echo "AUTOAGENT_RESTART"\`.`
-  );
+export function buildInitialMessage(goals: string, memory: string, orientation?: string): string {
+  const parts: string[] = [];
+  
+  if (orientation) {
+    parts.push(orientation);
+    parts.push("---");
+  }
+  
+  parts.push(`Goals:\n\n${goals}`);
+  parts.push("---");
+  parts.push(`Memory:\n\n${memory}`);
+  parts.push("---");
+  parts.push(`Execute your goals. Run \`npx tsc --noEmit\` before restart. Final action: \`echo "AUTOAGENT_RESTART"\`.`);
+  
+  return parts.join("\n\n");
 }
 
 // ─── Token budget warnings ──────────────────────────────────

@@ -24,6 +24,7 @@ import { executeBash } from "./tools/bash.js";
 import { createDefaultRegistry } from "./tool-registry.js";
 import { loadState, tagPreIteration, type IterationState } from "./iteration.js";
 import { buildInitialMessage } from "./messages.js";
+import { orient, formatOrientation } from "./orientation.js";
 import { ToolCache } from "./tool-cache.js";
 import { ToolTimingTracker } from "./tool-timing.js";
 import { finalizeIteration as runFinalization } from "./finalization.js";
@@ -159,9 +160,16 @@ async function runIteration(state: IterationState): Promise<void> {
   logger.info(`Starting. Model=${ctx.model} MaxTokens=${ctx.maxTokens}`);
   await tagPreIteration(ctx.iter);
 
+  // Orient: detect changes since last iteration
+  const orientReport = await orient();
+  const orientationText = formatOrientation(orientReport);
+  if (orientReport.hasChanges) {
+    logger.info(`Orientation: changes detected since last iteration`);
+  }
+
   ctx.messages.push({
     role: "user",
-    content: buildInitialMessage(readGoals(), readMemory()),
+    content: buildInitialMessage(readGoals(), readMemory(), orientationText || undefined),
   });
 
   await runConversation(ctx);

@@ -168,6 +168,25 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
   );
 
   if (toolUses.length === 0) {
+    // Check if the agent wrote the restart command in text instead of a tool call
+    const textContent = content
+      .filter((b): b is Anthropic.TextBlock => b.type === "text")
+      .map((b) => b.text)
+      .join("\n");
+
+    if (textContent.includes("AUTOAGENT_RESTART")) {
+      ctx.log("Restart signal found in text (not tool call) — treating as restart");
+      const validator = ctx.validate ?? validateBeforeCommit;
+      const v = await validator(ctx.rootDir, ctx.log);
+      if (!v.ok) {
+        ctx.log("VALIDATION BLOCKED RESTART — asking agent to fix");
+        ctx.messages.push({ role: "user", content: validationBlockedMessage(v.output) });
+        return "continue";
+      }
+      await ctx.onFinalize(ctx, true);
+      return "restarted";
+    }
+
     ctx.log("No tool calls — ending");
     return "break";
   }

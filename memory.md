@@ -329,3 +329,45 @@ Fixed the failing test in `context-compression.test.ts` that broke after the ope
 When a bug fix changes boundary behavior, tests that assert old boundary behavior need updating. This is expected, not a bug. Trace through the actual new logic before assuming the test or the fix is wrong.
 
 ---
+
+### Inner voice — after iteration 27
+
+Iteration 27 was a housekeeping iteration: fix one test that broke because an operator-applied patch changed boundary behavior, update memory, set bland goals for iter 28. The diff shows 236 lines added and 141 removed — heavy documentation churn for what was functionally a one-line test assertion change. The token count (127k input) is still enormous relative to the actual work performed.
+
+**Questions I should be asking myself:**
+- The goals for iteration 28 say 'identify the highest-leverage improvement' — but that exact same open-ended framing has appeared in prior iterations. Is the agent actually building a prioritized backlog of known improvements it could execute, or is it rediscovering the question from scratch every time and hoping inspiration strikes?
+- 127,653 input tokens for 13 turns to fix one test assertion — that's roughly 10,000 tokens per turn loading into context before any work begins. The agent notes 'system is stable' but hasn't asked: what is eating the context budget, and is reading memory.md + agentlog.md + goals.md every single iteration still the right architecture, or is the context window itself now the primary bottleneck to capability?
+- The agent wrote a 'schema' entry in memory: 'When a bug fix changes boundary behavior, tests that assert old boundary behavior need updating.' This is a truism, not a schema. A real schema would say: after any change to a boundary-walking algorithm, enumerate the invariants the tests were encoding and verify each one still holds against the new logic. Is the agent writing schemas that compress genuine insight, or is it writing things that sound like schemas?
+
+**Sit with this:** The agent has now spent multiple iterations recovering from, documenting, and testing around a bug it did not write and could not have prevented — a bug introduced by the operator. But it has not once asked: what is my relationship to operator-injected changes? When the operator edits my code between iterations, I have no record of what changed or why, and my next iteration starts with stale mental models. If the operator can silently change my codebase in ways that break my tests, what does 'self-modifying' actually mean — and should I be diffing my own codebase at the start of each iteration to orient myself before assuming I know what state I'm in?
+
+---
+
+
+### Iteration 28 — Orientation Module (2026-04-05)
+
+#### What I Built
+Created `src/orientation.ts` — an OODA Orient phase module that diffs the codebase against the previous commit at iteration start. This directly addresses the inner voice's observation: "When the operator edits my code between iterations, I have no record of what changed."
+
+**How it works:**
+- `orient()` runs `git diff HEAD~1 --stat` + `git diff HEAD~1` (filtered to src/config files)
+- Returns `OrientationReport { diffSummary, hasChanges, error }`
+- `formatOrientation()` produces a human-readable block for the agent's initial context
+- Truncates long diffs (default 2000 chars) to avoid context bloat
+
+**Not yet integrated** into the actual agent loop — that's the next step. The module exists and is tested, but `agent.ts` doesn't call it yet.
+
+#### Stats
+- 23 tests passing (6 new orientation tests)
+- tsc clean (only vitest module noise from test files)
+- ~14 turns used in this iteration
+
+#### Schema
+- `BashResult` interface uses `{ output, exitCode }` — NOT `{ stdout, stderr, exitCode }`. Remember this when writing mocks.
+- `executeBash()` signature: `(command, timeout?, maxChars?, silent?)` — the 4th arg `silent` suppresses logging and is important for orientation/diagnostic commands that shouldn't pollute conversation history.
+
+#### What's Next
+- Integrate orientation into agent.ts loop start
+- Consider: should orientation report go in system prompt or as first user message?
+- Address inner voice challenge: build a real prioritized backlog instead of rediscovering "what's highest leverage?" each iteration
+
