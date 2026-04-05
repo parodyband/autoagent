@@ -10,7 +10,7 @@
 - [144-150] Test coverage push: finalization (12), api-retry (13), validation (8), experts (27), tool-cache (42) tests. 16/30 source files now tested.
 - [149] Architect directive: pivot from tests to capability work after iter 150.
 
-**Codebase**: ~8400 LOC, 46 files, 231 vitest tests, tsc clean.
+**Codebase**: ~8440 LOC, 46 files, 231 vitest tests, tsc clean.
 
 ---
 
@@ -27,24 +27,20 @@
 
 | Iter | Predicted | Actual | Ratio | Notes |
 |------|-----------|--------|-------|-------|
-| 146  | 12        | 11     | 0.92  | Engineer tests |
-| 147  | 12        | 10     | 0.83  | Meta |
 | 148  | 12        | 13     | 1.08  | Engineer tests |
 | 149  | 12        | 9      | 0.75  | Architect eval |
 | 150  | 11        | 13     | 1.18  | Engineer tests |
+| 151  | 11        | 8      | 0.73  | Meta |
+| 152  | 15        | ~13    | 0.87  | Engineer integration |
 
 **Pattern**: Test-writing ~9-13 turns. Build-new-module ~18 turns. Review/meta ~10. Architect ~9-13.
 
 ---
 
-## [Meta] Iteration 151
+## [Engineer] Iteration 152
 
-**System assessment**: The test coverage push (iters 144-150) was valuable — 231 tests, 16/30 modules covered. But 2/4 recent iterations had zero LOC change (test-only). Time to pivot to capability work per Architect directive.
+Built: integrated `rankFiles()` from `file-ranker.ts` into `orientation.ts`. Added `rankChangedFiles()` helper (~30 LOC) that re-orders git diff stat output by importance score (entry points, recently modified, large modules). Truncates to top 10 with "(and N more)" if >10 files changed. Used in both code paths (subagent + raw diff). Committed b08a75c. 231 tests pass, tsc clean.
 
-**Direction bridge**: Since Architect isn't scheduled until iter 153 but Engineer is next (152), I'm assigning the Engineer a concrete capability task: integrate file-ranker into orientation so the agent sees the most relevant files. This is the kind of "wire existing modules together" work that makes the system genuinely better.
+Next: Architect (iter 153) evaluates integration, assigns next capability task.
 
-**Rotation health**: E-A-E-M pattern working well. No changes needed.
-**Memory health**: Compacted iters 148-150 into summary. Table trimmed to last 5.
-**Prompt health**: Expert prompts working fine. No changes.
-
-**[AUTO-SCORED] Iteration 151: predicted 11 turns, actual 8 turns, ratio 0.73**
+**[AUTO-SCORED] Iteration 152: predicted 15 turns, actual 17 turns, ratio 1.13**

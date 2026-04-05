@@ -1,85 +1,3 @@
-[2026-04-05T12:34:28.773Z] iter=140 turn=9 INFO:   -> ok: Patched src/conversation.ts: -12 +13 lines
-
-Context after patch:
-327 |   }
-328 |   ctx.messages.push({ role: "user", content: results });
-329 | 
-330 |   if (shouldRestart) {
-331 |     const doValidate = ctx.validate ?? validateBeforeCommit;
-332 |     const v = await doValidate(ctx.rootDir, ctx.log);
-333 |     if (!v.ok) {
-334 |       ctx.log("VALIDATION BLOCKED RESTART — agent must fix");
-335 |       ctx.messages.push({ role: "user", content: validationBlockedMessage(v.output) });
-336 |       return "continue";
-337 |     }
-338 | 
-339 |     if (await checkVerificationAndContinue(ctx)) return "continue";
-340 |     await ctx.onFinalize(ctx, true);
-341 |     return "restarted";
-342 |   }
-343 | 
-344 |   if (response.stop_reason === "end_turn") {
-345 |     ctx.log("end_turn");
-[2026-04-05T12:34:28.774Z] iter=140 turn=10 INFO: Turn 10/25
-[2026-04-05T12:34:33.255Z] iter=140 turn=10 INFO: Agent: Now patch the "break" path in `runConversation`:
-[2026-04-05T12:34:33.256Z] iter=140 turn=10 INFO: write_file: src/conversation.ts (patch)
-[2026-04-05T12:34:33.257Z] iter=140 turn=10 INFO:   -> ok: Patched src/conversation.ts: -6 +7 lines
-
-Context after patch:
-405 | 
-406 |   while (ctx.turns < hardCap) {
-407 |     const result = await processTurn(ctx);
-408 |     if (result === "restarted") return; // already finalized + restarted
-409 |     if (result === "break") {
-410 |       if (await checkVerificationAndContinue(ctx)) continue; // give agent recovery turns
-411 |       ctx.log("Agent stopped — committing and restarting");
-412 |       await ctx.onFinalize(ctx, true);
-413 |       return;
-414 |     }
-415 |   }
-416 | 
-417 |   if (ctx.predictedTurns && hardCap < ctx.maxTurns) {
-[2026-04-05T12:34:33.258Z] iter=140 turn=11 INFO: Turn 11/25
-[2026-04-05T12:34:40.741Z] iter=140 turn=11 INFO: Agent: Now patch `agent.ts` — wire up `verificationFn` in ctx and remove the dead post-conversation block:
-[2026-04-05T12:34:40.742Z] iter=140 turn=11 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T12:34:40.744Z] iter=140 turn=11 INFO:   -> ok: Patched src/agent.ts: -2 +18 lines
-
-Context after patch:
-297 |     log(state.iteration, `Key files ranked (${keyFilesText.length} chars)`);
-298 |   }
-299 | 
-300 |   // Expert gets its own system prompt
-301 |   ctx.systemPromptBuilder = (s, r) => buildExpertPrompt(expert, s, r);
-302 | 
-303 |   // Wire up verification: runs before finalization, gives agent a chance to fix failures.
-304 |   // Only active when operating on an external repo (workDir !== ROOT).
-305 |   if (workDir !== ROOT && repoContextText) {
-306 |     ctx.verificationFn = async (): Promise<string | null> => {
-307 |       const verResults = await runVerification(workDir, repoContextText);
-308 |       if (verResults.length === 0) return null;
-309 |       const passed = verResults.filter(r => r.passed).length;
-310 |       log(state.iteration, `Verification: ${passed}/${verResults.length} checks passed`);
-311 |       const allPassed = verResults.every(r => r.passed);
-312 |       if (allPassed) return null;
-313 |       return formatVerificationResults(verResults);
-314 |     };
-315 |     ctx.maxVerificationTurns = 5;
-316 |     ctx.verificationTurnsUsed = 0;
-317 |   }
-318 | 
-319 |   // Task decomposition: if TASK.md is complex, break it into subtasks and inject
-320 |   let subtasksText: string | undefined;
-[2026-04-05T12:34:40.745Z] iter=140 turn=12 INFO: Turn 12/25
-[2026-04-05T12:34:45.899Z] iter=140 turn=12 INFO: Agent: Now remove the dead post-conversation verification block from `agent.ts`:
-[2026-04-05T12:34:45.900Z] iter=140 turn=12 INFO: write_file: src/agent.ts (patch)
-[2026-04-05T12:34:45.900Z] iter=140 turn=12 INFO:   -> ok: Patched src/agent.ts: -19 +2 lines
-
-Context after patch:
-347 |     content: initialContent,
-348 |   });
-349 | 
-350 |   await runConversation(ctx);
-351 | }
 352 | 
 353 | // ─── Entry point ────────────────────────────────────────────
 354 | 
@@ -1078,3 +996,197 @@ Let me do all three now.
 [2026-04-05T12:56:05.533Z] iter=151 turn=8 INFO: Tool timing stats
 [2026-04-05T12:56:09.623Z] iter=151 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 151: predicted 11 turns, actual 8 turns, ratio 0.73**
 [2026-04-05T12:56:09.642Z] iter=151 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T12:56:09.674Z] iter=151 turn=8 INFO: Committed: 5fb87ee9 (12 in / 4380 out, cache: 18384 created, 73397 read)
+[2026-04-05T12:56:09.674Z] iter=151 turn=8 INFO: Restarting as iteration 152...
+[2026-04-05T12:56:09.875Z] iter=152 INFO: Cache restored: 52/53 entries (1 stale)
+[2026-04-05T12:56:09.877Z] iter=152 INFO: Turn budget: 14/25 (calibration=1.00x, predicted=15)
+[2026-04-05T12:56:09.877Z] iter=152 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T12:56:09.908Z] iter=152 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-05T12:56:09.908Z] iter=152 turn=1 INFO: Turn 1/25
+[2026-04-05T12:56:12.946Z] iter=152 turn=1 INFO: think: Let me read the relevant files to understand what I need to build. I need to:
+1. Look at `src/orientation.ts` to underst...
+[2026-04-05T12:56:12.946Z] iter=152 turn=2 INFO: Turn 2/25
+[2026-04-05T12:56:18.467Z] iter=152 turn=2 INFO: read_file: src/orientation.ts
+[2026-04-05T12:56:18.468Z] iter=152 turn=2 INFO:   -> ok (8280 chars)
+[2026-04-05T12:56:18.468Z] iter=152 turn=2 INFO: read_file: src/file-ranker.ts
+[2026-04-05T12:56:18.468Z] iter=152 turn=2 INFO:   -> ok (6534 chars)
+[2026-04-05T12:56:18.469Z] iter=152 turn=3 INFO: Turn 3/25
+[2026-04-05T12:57:11.121Z] iter=152 turn=3 INFO: think: Now I understand the structure. Let me think about what I need to do:
+
+1. In `orientation.ts`, the `extractSrcFiles` fun...
+[2026-04-05T12:57:11.122Z] iter=152 turn=4 INFO: Turn 4/25
+[2026-04-05T12:57:15.369Z] iter=152 turn=4 INFO: Agent: Now I'll implement the integration:
+[2026-04-05T12:57:15.369Z] iter=152 turn=4 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T12:57:15.371Z] iter=152 turn=4 INFO:   -> ok: Patched src/orientation.ts: -4 +5 lines
+
+Context after patch:
+9 |  * This module implements the OODA "Orient" phase.
+10 |  */
+11 | 
+12 | import { readFileSync } from "fs";
+13 | import { executeBash } from "./tools/bash.js";
+14 | import { parallelResearch } from "./tools/subagent.js";
+15 | import { readPredictionCalibration, computeCalibration } from "./turn-budget.js";
+16 | import { rankFiles } from "./file-ranker.js";
+17 | 
+18 | export interface OrientationReport {
+19 |   /** Summary of files changed since last iteration commit */
+[2026-04-05T12:57:15.372Z] iter=152 turn=5 INFO: Turn 5/25
+[2026-04-05T12:57:22.162Z] iter=152 turn=5 INFO: Agent: I've already started. Let me continue with the remaining patches.
+[2026-04-05T12:57:22.164Z] iter=152 turn=5 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T12:57:22.166Z] iter=152 turn=5 INFO:   -> ok: Patched src/orientation.ts: -5 +40 lines
+
+Context after patch:
+36 |   codeQuality?: { totalLOC: number };
+37 | }
+38 | 
+39 | /**
+40 |  * Re-order changed files in git diff stat output by importance score.
+41 |  * Truncates to top 10 files if more than 10 changed, with "(and N more)" note.
+42 |  */
+43 | function rankChangedFiles(statOutput: string, cwd: string = "."): string {
+44 |   const lines = statOutput.split("\n");
+45 |   const fileLines = lines.filter(line => line.includes("|"));
+46 |   const otherLines = lines.filter(line => !line.includes("|") && line.trim());
+47 | 
+48 |   if (fileLines.length <= 1) return statOutput;
+49 | 
+50 |   const ranked = rankFiles(cwd);
+51 |   const scoreMap = new Map<string, number>(ranked.map(f => [f.path, f.score]));
+52 | 
+53 |   const scoredLines = fileLines.map(line => ({
+54 |     line,
+55 |     score: scoreMap.get(line.trim().split("|")[0].trim()) ?? -1,
+56 |   }));
+57 |   scoredLines.sort((a, b) => b.score - a.score);
+58 | 
+59 |   const MAX_FILES = 10;
+60 |   const orderedLines = scoredLines.map(s => s.line);
+61 |   let truncationNote = "";
+62 |   if (orderedLines.length > MAX_FILES) {
+63 |     const remaining = orderedLines.length - MAX_FILES;
+64 |     orderedLines.splice(MAX_FILES);
+65 |     truncationNote = `... (and ${remaining} more)`;
+66 |   }
+67 | 
+68 |   const parts = [...orderedLines];
+69 |   if (truncationNote) parts.push(truncationNote);
+70 |   parts.push(...otherLines);
+71 |   return parts.join("\n");
+72 | }
+73 | 
+74 | /**
+75 |  * Extract src filenames from a git diff --stat output.
+76 |  * Returns only lines that look like file paths (contain a pipe character).
+77 |  */
+78 | function extractSrcFiles(statOutput: string): string[] {
+79 |   return statOutput
+80 |     .split("\n")
+81 |     .filter(line => line.includes("|") && line.trim().startsWith("src/"))
+[2026-04-05T12:57:22.167Z] iter=152 turn=6 INFO: Turn 6/25
+[2026-04-05T12:57:28.136Z] iter=152 turn=6 INFO: Agent: Now add the `rankChangedFiles` call in `orient()` and use it in both code paths:
+[2026-04-05T12:57:28.137Z] iter=152 turn=6 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T12:57:28.139Z] iter=152 turn=6 INFO:   -> ok: Patched src/orientation.ts: -8 +11 lines
+
+Context after patch:
+110 |     return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary(cwd) };
+111 |   }
+112 | 
+113 |   const statOutput = statResult.output.trim();
+114 |   if (!statOutput) {
+115 |     return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary(cwd) };
+116 |   }
+117 | 
+118 |   // Rank changed files by importance so the most relevant appear first
+119 |   const rankedStatOutput = rankChangedFiles(statOutput, cwd ?? ".");
+120 | 
+121 |   // Try parallel subagent summaries when 5+ src files changed
+122 |   if (useSubagentSummaries) {
+123 |     const srcFiles = extractSrcFiles(statOutput);
+124 |     if (srcFiles.length >= 5) {
+125 |       try {
+126 |         const fileDiffs = await Promise.all(
+[2026-04-05T12:57:28.141Z] iter=152 turn=7 INFO: Turn 7/25
+[2026-04-05T12:57:31.890Z] iter=152 turn=7 INFO: Agent: Now use `rankedStatOutput` in both output paths:
+[2026-04-05T12:57:31.890Z] iter=152 turn=7 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T12:57:31.891Z] iter=152 turn=7 INFO:   -> ok: Patched src/orientation.ts: -2 +2 lines
+
+Context after patch:
+140 |           .map((file, i) => `- **${file}**: ${summaries[i].response.trim()}`)
+141 |           .join("\n");
+142 | 
+143 |         const diffSummary =
+144 |           `Files changed:\n${rankedStatOutput}\n\nPer-file summaries (src):\n${perFileSummaries}`;
+145 | 
+146 |         return {
+147 |           diffSummary,
+[2026-04-05T12:57:31.891Z] iter=152 turn=8 INFO: Turn 8/25
+[2026-04-05T12:57:35.212Z] iter=152 turn=8 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T12:57:35.214Z] iter=152 turn=8 INFO:   -> ok: Patched src/orientation.ts: -3 +3 lines
+
+Context after patch:
+169 |     diffContent = diffContent.slice(0, maxDiffChars) + "\n... (truncated)";
+170 |   }
+171 | 
+172 |   const summary = diffContent
+173 |     ? `Files changed:\n${rankedStatOutput}\n\nDiff (src only):\n${diffContent}`
+174 |     : `Files changed:\n${rankedStatOutput}`;
+175 | 
+176 |   return {
+177 |     diffSummary: summary,
+[2026-04-05T12:57:35.214Z] iter=152 turn=9 INFO: Turn 9/25
+[2026-04-05T12:57:39.645Z] iter=152 turn=9 INFO: Agent: **Goal status:**
+- ✅ Import `rankFiles` from file-ranker
+- ✅ Add `rankChangedFiles()` helper  
+- ✅ Call it in `orient()` and use in both output paths
+- ⬜ Verify: tsc + tests pass
+
+Let me verify now:
+[2026-04-05T12:57:39.646Z] iter=152 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC_OK"
+[2026-04-05T12:57:40.323Z] iter=152 turn=9 INFO:   -> exit=0 (7 chars)
+[2026-04-05T12:57:40.323Z] iter=152 turn=10 INFO: Turn 10/25
+[2026-04-05T12:57:42.338Z] iter=152 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -20
+[2026-04-05T12:57:44.489Z] iter=152 turn=10 INFO:   -> exit=0 (880 chars)
+[2026-04-05T12:57:44.490Z] iter=152 turn=11 INFO: Turn 11/25
+[2026-04-05T12:57:47.924Z] iter=152 turn=11 INFO: Agent: All 231 tests pass. Let me do the manual check:
+[2026-04-05T12:57:47.925Z] iter=152 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && node -e "
+import('./dist/orientation.js').catch(() => 
+  import('./src/orientation.js').catch(() => null)
+)" 2>/dev/null || node --input-type=module <<'EOF'
+imp...
+[2026-04-05T12:57:47.969Z] iter=152 turn=11 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:57:47.969Z] iter=152 turn=12 INFO: Turn 12/25
+[2026-04-05T12:57:50.838Z] iter=152 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx -e "
+import { orient, formatOrientation } from './src/orientation.ts';
+const report = await orient(1000, false);
+console.log(formatOrientation(report));...
+[2026-04-05T12:57:51.084Z] iter=152 turn=12 INFO:   -> exit=0 (1331 chars)
+[2026-04-05T12:57:51.085Z] iter=152 turn=13 INFO: Turn 13/25
+[2026-04-05T12:57:53.448Z] iter=152 turn=13 INFO: Agent: tsc and tests pass. Let me commit and wrap up.
+[2026-04-05T12:57:53.449Z] iter=152 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && git add src/orientation.ts && git diff --cached --stat
+[2026-04-05T12:57:53.502Z] iter=152 turn=13 INFO:   -> exit=0 (121 chars)
+[2026-04-05T12:57:53.503Z] iter=152 turn=14 INFO: Turn 14/25
+[2026-04-05T12:57:57.288Z] iter=152 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && git commit -m "feat: integrate file-ranker into orientation — rank changed files by importance
+
+- Add rankChangedFiles() helper in orientation.ts
+- Import rankF...
+[2026-04-05T12:57:57.329Z] iter=152 turn=14 INFO:   -> exit=0 (147 chars)
+[2026-04-05T12:57:57.329Z] iter=152 turn=15 INFO: Turn 15/25
+[2026-04-05T12:58:05.891Z] iter=152 turn=15 INFO: write_file: goals.md (write)
+[2026-04-05T12:58:05.892Z] iter=152 turn=15 INFO:   -> ok: Updated goals.md (1080 chars, -2 lines delta)
+[2026-04-05T12:58:05.892Z] iter=152 turn=16 INFO: Turn 16/25
+[2026-04-05T12:58:23.347Z] iter=152 turn=16 INFO: Agent: Already committed. Writing memory and restarting.
+[2026-04-05T12:58:23.348Z] iter=152 turn=16 INFO: write_file: memory.md (write)
+[2026-04-05T12:58:23.351Z] iter=152 turn=16 INFO:   -> ok: Updated memory.md (2295 chars, -6 lines delta)
+[2026-04-05T12:58:23.351Z] iter=152 turn=17 INFO: Turn 17/25
+[2026-04-05T12:58:25.759Z] iter=152 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "TSC_OK" && git add goals.md memory.md && git commit -m "meta: update goals and memory for iter 153" && echo "AUTOAGENT_RESTART"
+[2026-04-05T12:58:25.759Z] iter=152 turn=17 INFO: RESTART signal
+[2026-04-05T12:58:25.759Z] iter=152 turn=17 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:58:26.433Z] iter=152 turn=17 INFO: Compilation OK
+[2026-04-05T12:58:31.618Z] iter=152 turn=17 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T12:58:31.618Z] iter=152 turn=17 INFO: Cache stats: 0 hits, 2 misses, 53 entries, 7 invalidations (1 entries removed)
+[2026-04-05T12:58:31.618Z] iter=152 turn=17 INFO: Tool cache stats
+[2026-04-05T12:58:31.618Z] iter=152 turn=17 INFO: Tool timing: bash: 7x, avg=459ms, total=3214ms; write_file: 7x, avg=2ms, total=15ms; read_file: 2x, avg=2ms, total=3ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T12:58:31.618Z] iter=152 turn=17 INFO: Tool timing stats
+[2026-04-05T12:58:36.087Z] iter=152 turn=17 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 152: predicted 15 turns, actual 17 turns, ratio 1.13**
+[2026-04-05T12:58:36.106Z] iter=152 turn=17 INFO: Pre-commit review: no significant code changes to review
