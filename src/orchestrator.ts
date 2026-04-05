@@ -14,6 +14,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import { compressToolOutput } from "./tool-output-compressor.js";
 import { fingerprintRepo } from "./repo-context.js";
 import { rankFiles } from "./file-ranker.js";
 import { buildSymbolIndex, formatRepoMap } from "./symbol-index.js";
@@ -282,7 +283,8 @@ async function runAgentLoop(
 
     const results: Anthropic.ToolResultBlockParam[] = [];
     for (const tu of toolUses) {
-      const result = await execTool(tu.name, tu.input as Record<string, unknown>);
+      const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+      const result = compressToolOutput(tu.name, rawResult);
       results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
     }
     apiMessages.push({ role: "user", content: results });

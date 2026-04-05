@@ -1,5 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { routeModel, buildSystemPrompt, computeCost, MODEL_PRICING } from "../orchestrator.js";
+
+vi.mock("../file-ranker.js", () => ({
+  rankFiles: () => [],
+}));
+
+vi.mock("../symbol-index.js", () => ({
+  buildSymbolIndex: () => ({ symbols: [], files: [] }),
+  formatRepoMap: () => "",
+}));
 
 const MODEL_COMPLEX = "claude-sonnet-4-6";
 const MODEL_SIMPLE = "claude-haiku-4-5";
