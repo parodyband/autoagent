@@ -141,7 +141,10 @@ export interface CostInfo {
  * Simple read/explain tasks → haiku (fast, cheap).
  * Code changes or complex queries → sonnet.
  */
-export function routeModel(userMessage: string): string {
+export function routeModel(userMessage: string, opts?: {
+  lastInputTokens?: number;
+  hasCodeEditsInHistory?: boolean;
+}): string {
   const lower = userMessage.toLowerCase();
 
   const codeScore = CODE_CHANGE_KEYWORDS.filter(k => lower.includes(k)).length;
@@ -149,6 +152,12 @@ export function routeModel(userMessage: string): string {
 
   // Long messages are usually complex
   const isLong = userMessage.length > 300;
+
+  // Large context implies complex ongoing work
+  if (opts?.lastInputTokens && opts.lastInputTokens > 80_000) return MODEL_COMPLEX;
+
+  // Short follow-up after code edits — keep using capable model
+  if (opts?.hasCodeEditsInHistory && userMessage.length < 100) return MODEL_COMPLEX;
 
   if (codeScore > 0 || isLong) return MODEL_COMPLEX;
   if (readScore > 0 && codeScore === 0) return MODEL_SIMPLE;
@@ -770,7 +779,15 @@ export class Orchestrator {
     if (!this.initialized) await this.init();
 
     // 1. Model routing
-    const model = this.modelOverride ?? routeModel(userMessage);
+    const hasCodeEditsInHistory = this.apiMessages.some(m =>
+      m.role === "assistant" &&
+      Array.isArray(m.content) &&
+      m.content.some((b: { type: string }) => b.type === "tool_use")
+    );
+    const model = this.modelOverride ?? routeModel(userMessage, {
+      lastInputTokens: this.lastInputTokens,
+      hasCodeEditsInHistory,
+    });
     this.opts.onStatus?.(`Using ${model === MODEL_COMPLEX ? "Sonnet" : "Haiku"}...`);
 
     // 1b. Token budget warning — emit ratio before compaction so TUI can warn user

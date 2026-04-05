@@ -300,6 +300,7 @@ function App() {
   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
   const [contextBudgetRatio, setContextBudgetRatio] = useState(0);
+  const [contextWarning, setContextWarning] = useState(false);
   const [fileSuggestions, setFileSuggestions] = useState<string[]>([]);
   const [fileSuggestionIdx, setFileSuggestionIdx] = useState(0);
   const repoMapRef = useRef<import("./tree-sitter-map.js").RepoMap | null>(null);
@@ -338,6 +339,9 @@ function App() {
       },
       onContextBudget: (ratio) => {
         setContextBudgetRatio(ratio);
+      },
+      onContextWarning: () => {
+        setContextWarning(true);
       },
     });
     orchestratorRef.current = orch;
@@ -430,6 +434,7 @@ function App() {
     if (trimmed === "/clear") {
       orchestratorRef.current?.clearHistory();
       setMessages([]);
+      setContextWarning(false);
       setFooterStats({ tokensIn: 0, tokensOut: 0, cost: 0, model: currentModel, contextTokens: 0, contextLimit: 200_000 });
       setStatus("Cleared");
       setTimeout(() => setStatus(""), 1000);
@@ -608,6 +613,7 @@ function App() {
     const userMsg: Message = { role: "user", content: trimmed };
     setMessages(prev => [...prev, userMsg]);
 
+    setContextWarning(false); // reset warning on new message
     setLoading(true);
     setStatus("Thinking...");
     setStreamBuffer(""); // clear any leftover
@@ -701,6 +707,13 @@ function App() {
       {contextBudgetRatio >= 0.8 && (
         <Box marginTop={1}>
           <Text color="yellow">⚠ Context {Math.round(contextBudgetRatio * 100)}% full — compaction will trigger soon</Text>
+        </Box>
+      )}
+
+      {/* Persistent context warning banner from onContextWarning callback */}
+      {contextWarning && (
+        <Box marginTop={1}>
+          <Text color="yellow">⚠ Context 80%+ full — consider /clear or start a new session</Text>
         </Box>
       )}
 

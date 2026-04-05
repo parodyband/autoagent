@@ -1,64 +1,3 @@
-[2026-04-05T16:32:12.022Z] iter=240 turn=11 INFO:   -> ok: Updated goals.md (1315 chars, -19 lines delta)
-[2026-04-05T16:32:12.022Z] iter=240 turn=12 INFO: Turn 12/25
-[2026-04-05T16:32:14.349Z] iter=240 turn=12 INFO: Agent: All work is done. Wrapping up.
-[2026-04-05T16:32:14.350Z] iter=240 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T16:32:14.351Z] iter=240 turn=12 INFO: RESTART signal
-[2026-04-05T16:32:14.351Z] iter=240 turn=12 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T16:32:15.252Z] iter=240 turn=12 INFO: Compilation OK
-[2026-04-05T16:32:21.338Z] iter=240 turn=12 INFO: Cache persisted: 50 entries to .autoagent-cache.json
-[2026-04-05T16:32:21.338Z] iter=240 turn=12 INFO: Cache stats: 0 hits, 1 misses, 50 entries, 5 invalidations (1 entries removed)
-[2026-04-05T16:32:21.338Z] iter=240 turn=12 INFO: Tool cache stats
-[2026-04-05T16:32:21.338Z] iter=240 turn=12 INFO: Tool timing: bash: 6x, avg=1842ms, total=11050ms; write_file: 5x, avg=1ms, total=7ms; read_file: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T16:32:21.338Z] iter=240 turn=12 INFO: Tool timing stats
-[2026-04-05T16:32:26.513Z] iter=240 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 240: predicted 18 turns, actual 12 turns, ratio 0.67**
-[2026-04-05T16:32:32.805Z] iter=240 turn=12 INFO: Pre-commit review (902in/241out): **Bug fix looks correct** — the original code returned `totalIn` (cumulative) as `lastInputTokens`, but the field name implies it should be the *most recent* round's input tokens. The fix properly tra
-[2026-04-05T16:32:32.859Z] iter=240 turn=12 INFO: Committed: fa503669 (20 in / 2255 out, cache: 9208 created, 94936 read)
-[2026-04-05T16:32:32.859Z] iter=240 turn=12 INFO: Restarting as iteration 241...
-[2026-04-05T16:32:33.056Z] iter=241 INFO: Cache restored: 50/50 entries (0 stale)
-[2026-04-05T16:32:33.057Z] iter=241 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
-[2026-04-05T16:32:33.058Z] iter=241 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T16:32:33.163Z] iter=241 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T16:32:33.164Z] iter=241 turn=1 INFO: Turn 1/25
-[2026-04-05T16:32:37.486Z] iter=241 turn=1 INFO: Agent: 
-
-I'll start by understanding the current codebase state, then research best practices, and design the next engineering priorities.
-[2026-04-05T16:32:37.487Z] iter=241 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T16:32:37.492Z] iter=241 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -10
-[2026-04-05T16:32:37.498Z] iter=241 turn=1 INFO: read_file: src/orchestrator.ts
-[2026-04-05T16:32:37.500Z] iter=241 turn=1 INFO:   -> ok (34186 chars)
-[2026-04-05T16:32:37.501Z] iter=241 turn=1 INFO: read_file: src/diagnostics.ts
-[2026-04-05T16:32:37.502Z] iter=241 turn=1 INFO:   -> ok (2460 chars)
-[2026-04-05T16:32:38.798Z] iter=241 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:32:46.120Z] iter=241 turn=1 INFO:   -> exit=0 (458 chars)
-[2026-04-05T16:32:46.121Z] iter=241 turn=2 INFO: Turn 2/25
-[2026-04-05T16:33:09.363Z] iter=241 turn=2 INFO: Agent: 
-
-You're right. My deliverable is `goals.md` for the next Engineer iteration. I've already read the key files I need. Let me now quickly assess the three options and write the goals.
-[2026-04-05T16:33:09.364Z] iter=241 turn=2 INFO: think: The three options from the current goals.md are:
-
-1. **Multi-file edit orchestration** — batchWriteFiles already exists ...
-[2026-04-05T16:33:09.364Z] iter=241 turn=3 INFO: Turn 3/25
-[2026-04-05T16:33:33.222Z] iter=241 turn=3 INFO: write_file: goals.md (write)
-[2026-04-05T16:33:33.224Z] iter=241 turn=3 INFO:   -> ok: Updated goals.md (3429 chars, +43 lines delta)
-[2026-04-05T16:33:33.224Z] iter=241 turn=4 INFO: Turn 4/25
-[2026-04-05T16:33:38.939Z] iter=241 turn=4 INFO: Agent: 
-
-**Goal status**: DONE — goals.md is written with clear Engineer instructions, success criteria, and file targets.
-
-Let me save memory and wrap up.
-[2026-04-05T16:33:38.940Z] iter=241 turn=4 INFO: save_memory: "[Architect] Iteration 241 — Mid-loop compaction design"
-[2026-04-05T16:33:38.941Z] iter=241 turn=4 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T16:33:38.941Z] iter=241 turn=5 INFO: Turn 5/25
-[2026-04-05T16:33:41.283Z] iter=241 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -3
-[2026-04-05T16:33:42.164Z] iter=241 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:33:42.164Z] iter=241 turn=6 INFO: Turn 6/25
-[2026-04-05T16:33:45.920Z] iter=241 turn=6 INFO: Agent: 
-
-Correct — this is an Architect iteration. My deliverable is `goals.md`, not src/ changes. That's written and complete. Wrapping up now.
-[2026-04-05T16:33:45.921Z] iter=241 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status
-[2026-04-05T16:33:45.973Z] iter=241 turn=6 INFO:   -> exit=0 (267 chars)
-[2026-04-05T16:33:45.974Z] iter=241 turn=7 INFO: Turn 7/25
-[2026-04-05T16:33:48.889Z] iter=241 turn=7 INFO: Agent: 
 
 TSC is clean, goals.md is written, memory is saved. Done.
 
@@ -1057,3 +996,248 @@ I'm the Architect — my deliverable is `goals.md`, not src/ changes. Writing it
 [2026-04-05T16:47:40.385Z] iter=249 turn=9 INFO: Tool timing stats
 [2026-04-05T16:47:45.888Z] iter=249 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 249: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-05T16:47:45.909Z] iter=249 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T16:47:45.941Z] iter=249 turn=9 INFO: Committed: 7fb2e99d (19 in / 2385 out, cache: 11432 created, 67214 read)
+[2026-04-05T16:47:45.941Z] iter=249 turn=9 INFO: Restarting as iteration 250...
+[2026-04-05T16:47:46.133Z] iter=250 INFO: Cache restored: 51/51 entries (0 stale)
+[2026-04-05T16:47:46.135Z] iter=250 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=20)
+[2026-04-05T16:47:46.135Z] iter=250 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T16:47:46.256Z] iter=250 turn=1 INFO: Turn 1/25
+[2026-04-05T16:47:49.206Z] iter=250 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be implemented.
+[2026-04-05T16:47:49.208Z] iter=250 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat src/tui.tsx | head -100
+[2026-04-05T16:47:49.213Z] iter=250 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "routeModel\|onContextWarning\|lastInputTokens\|contextWarning" src/orchestrator.ts | head -40
+[2026-04-05T16:47:49.225Z] iter=250 turn=1 INFO:   -> exit=0 (3156 chars)
+[2026-04-05T16:47:49.230Z] iter=250 turn=1 INFO:   -> exit=0 (1051 chars)
+[2026-04-05T16:47:49.230Z] iter=250 turn=2 INFO: Turn 2/25
+[2026-04-05T16:47:51.554Z] iter=250 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onContextWarning\|contextWarning\|setContext\|contextWarn" src/tui.tsx | head -20
+[2026-04-05T16:47:51.559Z] iter=250 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "routeModel" src/orchestrator.ts
+[2026-04-05T16:47:51.575Z] iter=250 turn=2 INFO:   -> exit=0 (191 chars)
+[2026-04-05T16:47:51.576Z] iter=250 turn=2 INFO:   -> exit=0 (113 chars)
+[2026-04-05T16:47:51.577Z] iter=250 turn=3 INFO: Turn 3/25
+[2026-04-05T16:47:53.902Z] iter=250 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '144,175p' src/orchestrator.ts
+[2026-04-05T16:47:53.908Z] iter=250 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '290,320p' src/tui.tsx
+[2026-04-05T16:47:53.922Z] iter=250 turn=3 INFO:   -> exit=0 (1191 chars)
+[2026-04-05T16:47:53.924Z] iter=250 turn=3 INFO:   -> exit=0 (1281 chars)
+[2026-04-05T16:47:53.924Z] iter=250 turn=4 INFO: Turn 4/25
+[2026-04-05T16:47:57.153Z] iter=250 turn=4 INFO: think: I have enough context. Let me start implementing both goals now:
+
+1. Goal 1: Wire onContextWarning into TUI - add `conte...
+[2026-04-05T16:47:57.153Z] iter=250 turn=5 INFO: Turn 5/25
+[2026-04-05T16:47:59.227Z] iter=250 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '320,400p' src/tui.tsx
+[2026-04-05T16:47:59.229Z] iter=250 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '760,800p' src/orchestrator.ts
+[2026-04-05T16:47:59.237Z] iter=250 turn=5 INFO:   -> exit=0 (2751 chars)
+[2026-04-05T16:47:59.238Z] iter=250 turn=5 INFO:   -> exit=0 (1819 chars)
+[2026-04-05T16:47:59.238Z] iter=250 turn=6 INFO: Turn 6/25
+[2026-04-05T16:48:02.901Z] iter=250 turn=6 INFO: Agent: Now I have enough context. Let me implement both goals simultaneously:
+[2026-04-05T16:48:02.902Z] iter=250 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "handleSubmit\|/clear\|setMessages\(\[\]\)" src/tui.tsx | head -20
+[2026-04-05T16:48:02.911Z] iter=250 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "this\.messages\|apiMessages\|tool_use\|hasCode" src/orchestrator.ts | head -30
+[2026-04-05T16:48:02.931Z] iter=250 turn=6 INFO:   -> exit=0 (276 chars)
+[2026-04-05T16:48:02.934Z] iter=250 turn=6 INFO:   -> exit=0 (2043 chars)
+[2026-04-05T16:48:02.934Z] iter=250 turn=7 INFO: Turn 7/25
+[2026-04-05T16:48:05.982Z] iter=250 turn=7 INFO: Agent: **Goal 1 (onContextWarning TUI banner): NOT STARTED**
+**Goal 2 (smarter model routing): NOT STARTED**
+
+I've been reading. Time to write. Both goals now:
+[2026-04-05T16:48:05.983Z] iter=250 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '424,445p' src/tui.tsx
+[2026-04-05T16:48:05.992Z] iter=250 turn=7 INFO:   -> exit=0 (876 chars)
+[2026-04-05T16:48:05.993Z] iter=250 turn=8 INFO: Turn 8/25
+[2026-04-05T16:48:08.970Z] iter=250 turn=8 INFO: Agent: Now I'll make both changes:
+
+**Goal 1: Add `contextWarning` state to TUI**
+[2026-04-05T16:48:08.971Z] iter=250 turn=8 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:48:08.974Z] iter=250 turn=8 INFO:   -> ok: Patched src/tui.tsx: -1 +2 lines
+
+Context after patch:
+299 |   const [showResume, setShowResume] = useState(false);
+300 |   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
+301 |   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
+302 |   const [contextBudgetRatio, setContextBudgetRatio] = useState(0);
+303 |   const [contextWarning, setContextWarning] = useState(false);
+304 |   const [fileSuggestions, setFileSuggestions] = useState<string[]>([]);
+305 |   const [fileSuggestionIdx, setFileSuggestionIdx] = useState(0);
+306 |   const repoMapRef = useRef<import("./tree-sitter-map.js").RepoMap | null>(null);
+[2026-04-05T16:48:08.975Z] iter=250 turn=9 INFO: Turn 9/25
+[2026-04-05T16:48:12.082Z] iter=250 turn=9 INFO: Agent: Now add `onContextWarning` to orchestrator options and reset on new messages:
+[2026-04-05T16:48:12.082Z] iter=250 turn=9 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:48:12.083Z] iter=250 turn=9 INFO:   -> ok: Patched src/tui.tsx: -3 +6 lines
+
+Context after patch:
+337 |           setPendingDiff({ diff, filePath, resolve });
+338 |         });
+339 |       },
+340 |       onContextBudget: (ratio) => {
+341 |         setContextBudgetRatio(ratio);
+342 |       },
+343 |       onContextWarning: () => {
+344 |         setContextWarning(true);
+345 |       },
+346 |     });
+347 |     orchestratorRef.current = orch;
+348 |     orch.init().then(() => {
+[2026-04-05T16:48:12.083Z] iter=250 turn=10 INFO: Turn 10/25
+[2026-04-05T16:48:15.712Z] iter=250 turn=10 INFO: Agent: Reset `contextWarning` when new message is sent and on `/clear`:
+[2026-04-05T16:48:15.712Z] iter=250 turn=10 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:48:15.713Z] iter=250 turn=10 INFO:   -> ok: Patched src/tui.tsx: -5 +6 lines
+
+Context after patch:
+431 |     setInput("");
+432 | 
+433 |     // Built-in commands
+434 |     if (trimmed === "/clear") {
+435 |       orchestratorRef.current?.clearHistory();
+436 |       setMessages([]);
+437 |       setContextWarning(false);
+438 |       setFooterStats({ tokensIn: 0, tokensOut: 0, cost: 0, model: currentModel, contextTokens: 0, contextLimit: 200_000 });
+439 |       setStatus("Cleared");
+440 |       setTimeout(() => setStatus(""), 1000);
+441 |       return;
+442 |     }
+[2026-04-05T16:48:15.713Z] iter=250 turn=11 INFO: Turn 11/25
+[2026-04-05T16:48:18.169Z] iter=250 turn=11 INFO: Agent: Now find where the orchestrator `send()` is called and reset contextWarning before sending:
+[2026-04-05T16:48:18.170Z] iter=250 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "orchestratorRef.current.send\|orch.*send\|\.send(" src/tui.tsx | head -10
+[2026-04-05T16:48:18.180Z] iter=250 turn=11 INFO:   -> exit=0 (71 chars)
+[2026-04-05T16:48:18.181Z] iter=250 turn=12 INFO: Turn 12/25
+[2026-04-05T16:48:19.935Z] iter=250 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '610,630p' src/tui.tsx
+[2026-04-05T16:48:19.944Z] iter=250 turn=12 INFO:   -> exit=0 (528 chars)
+[2026-04-05T16:48:19.945Z] iter=250 turn=13 INFO: Turn 13/25
+[2026-04-05T16:48:23.700Z] iter=250 turn=13 INFO: Agent: I've made 3 patches to `src/tui.tsx` so far. Let me finish both goals now — fast.
+[2026-04-05T16:48:23.700Z] iter=250 turn=13 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:48:23.701Z] iter=250 turn=13 INFO:   -> ok: Patched src/tui.tsx: -3 +4 lines
+
+Context after patch:
+613 |     const userMsg: Message = { role: "user", content: trimmed };
+614 |     setMessages(prev => [...prev, userMsg]);
+615 | 
+616 |     setContextWarning(false); // reset warning on new message
+617 |     setLoading(true);
+618 |     setStatus("Thinking...");
+619 |     setStreamBuffer(""); // clear any leftover
+620 | 
+621 |     try {
+622 |       const result = await orchestratorRef.current!.send(trimmed);
+[2026-04-05T16:48:23.701Z] iter=250 turn=14 INFO: Turn 14/25
+[2026-04-05T16:48:26.157Z] iter=250 turn=14 INFO: Agent: Now render the banner and implement Goal 2, then wrap up.
+[2026-04-05T16:48:26.158Z] iter=250 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "contextBudgetRatio\|footer\|Footer\|<Box\|</Box>" src/tui.tsx | tail -40
+[2026-04-05T16:48:26.173Z] iter=250 turn=14 INFO:   -> exit=0 (1758 chars)
+[2026-04-05T16:48:26.174Z] iter=250 turn=15 INFO: Turn 15/25
+[2026-04-05T16:48:28.100Z] iter=250 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '705,730p' src/tui.tsx
+[2026-04-05T16:48:28.109Z] iter=250 turn=15 INFO:   -> exit=0 (906 chars)
+[2026-04-05T16:48:28.109Z] iter=250 turn=16 INFO: Turn 16/25
+[2026-04-05T16:48:32.606Z] iter=250 turn=16 INFO: Agent: All patches in one shot:
+[2026-04-05T16:48:32.607Z] iter=250 turn=16 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T16:48:32.607Z] iter=250 turn=16 INFO:   -> ok: Patched src/tui.tsx: -6 +13 lines
+
+Context after patch:
+703 |         </Box>
+704 |       )}
+705 | 
+706 |       {/* Context budget warning */}
+707 |       {contextBudgetRatio >= 0.8 && (
+708 |         <Box marginTop={1}>
+709 |           <Text color="yellow">⚠ Context {Math.round(contextBudgetRatio * 100)}% full — compaction will trigger soon</Text>
+710 |         </Box>
+711 |       )}
+712 | 
+713 |       {/* Persistent context warning banner from onContextWarning callback */}
+714 |       {contextWarning && (
+715 |         <Box marginTop={1}>
+716 |           <Text color="yellow">⚠ Context 80%+ full — consider /clear or start a new session</Text>
+717 |         </Box>
+718 |       )}
+719 | 
+720 |       {/* #file suggestion overlay */}
+721 |       {fileSuggestions.length > 0 && (
+[2026-04-05T16:48:32.608Z] iter=250 turn=17 INFO: Turn 17/25
+[2026-04-05T16:48:40.902Z] iter=250 turn=17 INFO: Agent: Goal 2 (routeModel) and tests - doing it all now in parallel:
+[2026-04-05T16:48:40.903Z] iter=250 turn=17 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:48:40.905Z] iter=250 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -13 +22 lines
+
+Context after patch:
+141 |  * Simple read/explain tasks → haiku (fast, cheap).
+142 |  * Code changes or complex queries → sonnet.
+143 |  */
+144 | export function routeModel(userMessage: string, opts?: {
+145 |   lastInputTokens?: number;
+146 |   hasCodeEditsInHistory?: boolean;
+147 | }): string {
+148 |   const lower = userMessage.toLowerCase();
+149 | 
+150 |   const codeScore = CODE_CHANGE_KEYWORDS.filter(k => lower.includes(k)).length;
+151 |   const readScore = READ_ONLY_KEYWORDS.filter(k => lower.includes(k)).length;
+152 | 
+153 |   // Long messages are usually complex
+154 |   const isLong = userMessage.length > 300;
+155 | 
+156 |   // Large context implies complex ongoing work
+157 |   if (opts?.lastInputTokens && opts.lastInputTokens > 80_000) return MODEL_COMPLEX;
+158 | 
+159 |   // Short follow-up after code edits — keep using capable model
+160 |   if (opts?.hasCodeEditsInHistory && userMessage.length < 100) return MODEL_COMPLEX;
+161 | 
+162 |   if (codeScore > 0 || isLong) return MODEL_COMPLEX;
+163 |   if (readScore > 0 && codeScore === 0) return MODEL_SIMPLE;
+164 |   return MODEL_COMPLEX; // default to capable model
+165 | }
+166 | 
+167 | // ─── Cost calculator ──────────────────────────────────────────
+168 | 
+[2026-04-05T16:48:40.905Z] iter=250 turn=18 INFO: Turn 18/25
+[2026-04-05T16:48:44.793Z] iter=250 turn=18 INFO: Agent: Now update the call site:
+[2026-04-05T16:48:44.793Z] iter=250 turn=18 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:48:44.795Z] iter=250 turn=18 INFO:   -> ok: Patched src/orchestrator.ts: -2 +10 lines
+
+Context after patch:
+778 |   async send(userMessage: string): Promise<OrchestratorResult> {
+779 |     if (!this.initialized) await this.init();
+780 | 
+781 |     // 1. Model routing
+782 |     const hasCodeEditsInHistory = this.apiMessages.some(m =>
+783 |       m.role === "assistant" &&
+784 |       Array.isArray(m.content) &&
+785 |       m.content.some((b: Anthropic.ContentBlock) => b.type === "tool_use")
+786 |     );
+787 |     const model = this.modelOverride ?? routeModel(userMessage, {
+788 |       lastInputTokens: this.lastInputTokens,
+789 |       hasCodeEditsInHistory,
+790 |     });
+791 |     this.opts.onStatus?.(`Using ${model === MODEL_COMPLEX ? "Sonnet" : "Haiku"}...`);
+792 | 
+793 |     // 1b. Token budget warning — emit ratio before compaction so TUI can warn user
+[2026-04-05T16:48:44.795Z] iter=250 turn=19 INFO: Turn 19/25
+[2026-04-05T16:48:52.574Z] iter=250 turn=19 INFO: Agent: Now write both test files:
+[2026-04-05T16:48:52.575Z] iter=250 turn=19 INFO: write_file: src/__tests__/tui-context-warning.test.ts (write)
+[2026-04-05T16:48:52.575Z] iter=250 turn=19 INFO:   -> ok: Created src/__tests__/tui-context-warning.test.ts (1431 chars)
+[2026-04-05T16:48:52.575Z] iter=250 turn=20 INFO: Turn 20/25
+[2026-04-05T16:48:54.581Z] iter=250 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && cat src/__tests__/model-routing.test.ts 2>/dev/null | head -20 || echo "NOT FOUND"
+[2026-04-05T16:48:54.591Z] iter=250 turn=20 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:48:54.591Z] iter=250 turn=21 INFO: Turn 21/25
+[2026-04-05T16:48:56.568Z] iter=250 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && ls src/__tests__/model-routing* 2>/dev/null || echo "none"
+[2026-04-05T16:48:56.579Z] iter=250 turn=21 INFO:   -> exit=0 (5 chars)
+[2026-04-05T16:48:56.579Z] iter=250 turn=22 INFO: Turn 22/25
+[2026-04-05T16:49:03.430Z] iter=250 turn=22 INFO: write_file: src/__tests__/model-routing.test.ts (write)
+[2026-04-05T16:49:03.431Z] iter=250 turn=22 INFO:   -> ok: Created src/__tests__/model-routing.test.ts (1384 chars)
+[2026-04-05T16:49:03.431Z] iter=250 turn=23 INFO: Turn 23/25
+[2026-04-05T16:49:06.305Z] iter=250 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20 && npx vitest run src/__tests__/model-routing.test.ts src/__tests__/tui-context-warning.test.ts 2>&1 | tail -20
+[2026-04-05T16:49:08.315Z] iter=250 turn=23 INFO:   -> exit=0 (1112 chars)
+[2026-04-05T16:49:08.315Z] iter=250 turn=24 INFO: Turn 24/25
+[2026-04-05T16:49:11.007Z] iter=250 turn=24 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:49:11.008Z] iter=250 turn=24 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+782 |     const hasCodeEditsInHistory = this.apiMessages.some(m =>
+783 |       m.role === "assistant" &&
+784 |       Array.isArray(m.content) &&
+785 |       m.content.some((b: { type: string }) => b.type === "tool_use")
+786 |     );
+787 |     const model = this.modelOverride ?? routeModel(userMessage, {
+788 |       lastInputTokens: this.lastInputTokens,
+[2026-04-05T16:49:11.008Z] iter=250 turn=25 INFO: Turn 25/25
+[2026-04-05T16:49:13.492Z] iter=250 turn=25 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5 && echo "TSC OK"
+[2026-04-05T16:49:14.435Z] iter=250 turn=25 INFO:   -> exit=0 (7 chars)
+[2026-04-05T16:49:14.435Z] iter=250 turn=25 INFO: Hit max turns — committing and restarting
+[2026-04-05T16:49:14.436Z] iter=250 turn=25 INFO: Cache persisted: 51 entries to .autoagent-cache.json
+[2026-04-05T16:49:14.436Z] iter=250 turn=25 INFO: Tool timing: bash: 19x, avg=169ms, total=3210ms; write_file: 10x, avg=1ms, total=13ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T16:49:14.436Z] iter=250 turn=25 INFO: Tool timing stats
+[2026-04-05T16:49:19.913Z] iter=250 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 250: predicted 20 turns, actual 25 turns, ratio 1.25**
+[2026-04-05T16:49:29.032Z] iter=250 turn=25 INFO: Pre-commit review (1955in/392out): **Issues found:**
+
+- **`hasCodeEditsInHistory` logic is too broad**: The check looks for any `tool_use` block in assistant messages, but tool use includes read-only tools (e.g., file reads, searches).
