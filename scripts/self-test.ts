@@ -725,7 +725,7 @@ async function main(): Promise<void> {
     await testApiRetry();
     testTaskMdLifecycle();
     testTurnBudgetWiring();
-    testExpertStateWiring();
+    await testExpertStateWiring();
     // Inline model-selection smoke test (avoids vitest import in tsx context)
     console.log("  model-selection smoke test...");
     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
@@ -2230,7 +2230,7 @@ function testTurnBudgetWiring(): void {
   );
 }
 
-function testExpertStateWiring(): void {
+async function testExpertStateWiring(): Promise<void> {
   console.log("\n🔄 Expert State Wiring");
 
   // Verify saveExpertState is imported and called in agent.ts

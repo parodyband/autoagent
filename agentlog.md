@@ -1,174 +1,3 @@
-[2026-04-05T12:00:07.142Z] iter=123 turn=20 INFO: Tool timing stats
-[2026-04-05T12:00:11.300Z] iter=123 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 123: predicted 16 turns, actual 20 turns, ratio 1.25**
-[2026-04-05T12:00:19.072Z] iter=123 turn=20 INFO: Pre-commit review (650in/319out): **Issues:**
-
-- **`computeTurnBudget` is synchronous but reads a file (`METRICS_FILE`)** — if it uses `fs.readFileSync`, that's a blocking call on every iteration in what is likely an async context. If
-[2026-04-05T12:00:19.129Z] iter=123 turn=20 INFO: Committed: af426f0c (28 in / 4468 out, cache: 20477 created, 250311 read)
-[2026-04-05T12:00:19.129Z] iter=123 turn=20 INFO: Restarting as iteration 124...
-[2026-04-05T12:00:19.358Z] iter=124 INFO: Cache restored: 37/37 entries (0 stale)
-[2026-04-05T12:00:19.359Z] iter=124 INFO: Turn budget: 20/25 (calibration=1.36x, predicted=20)
-[2026-04-05T12:00:19.360Z] iter=124 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T12:00:19.387Z] iter=124 turn=1 INFO: Turn 1/25
-[2026-04-05T12:00:24.297Z] iter=124 turn=1 INFO: think: Let me read the goals and understand what I need to build:
-
-1. Add vitest tests for `computeTurnBudget()` — verify it re...
-[2026-04-05T12:00:24.298Z] iter=124 turn=2 INFO: Turn 2/25
-[2026-04-05T12:00:26.800Z] iter=124 turn=2 INFO: $ cat src/turn-budget.ts
-[2026-04-05T12:00:26.807Z] iter=124 turn=2 INFO: $ ls src/tests/ | head -20
-[2026-04-05T12:00:26.820Z] iter=124 turn=2 INFO:   -> exit=0 (8365 chars)
-[2026-04-05T12:00:26.825Z] iter=124 turn=2 INFO:   -> exit=0 (42 chars)
-[2026-04-05T12:00:26.826Z] iter=124 turn=3 INFO: Turn 3/25
-[2026-04-05T12:00:30.045Z] iter=124 turn=3 INFO: $ ls tests/ 2>/dev/null || ls *.test.ts 2>/dev/null || find . -name "*.test.ts" -not -path "*/node_modules/*" | head -20
-[2026-04-05T12:00:30.047Z] iter=124 turn=3 INFO: $ grep -r "computeTurnBudget\|dynamicBudgetWarning" src/agent.ts | head -10
-[2026-04-05T12:00:30.057Z] iter=124 turn=3 INFO:   -> exit=0 (174 chars)
-[2026-04-05T12:00:30.090Z] iter=124 turn=3 INFO:   -> exit=0 (196 chars)
-[2026-04-05T12:00:30.090Z] iter=124 turn=4 INFO: Turn 4/25
-[2026-04-05T12:00:33.473Z] iter=124 turn=4 INFO: $ ls src/__tests__/
-[2026-04-05T12:00:33.478Z] iter=124 turn=4 INFO: $ cat src/__tests__/orientation.test.ts | head -50
-[2026-04-05T12:00:33.497Z] iter=124 turn=4 INFO:   -> exit=0 (116 chars)
-[2026-04-05T12:00:33.499Z] iter=124 turn=4 INFO:   -> exit=0 (1605 chars)
-[2026-04-05T12:00:33.500Z] iter=124 turn=5 INFO: Turn 5/25
-[2026-04-05T12:00:37.529Z] iter=124 turn=5 INFO: think: I have enough context. I need to:
-1. Write vitest tests for `computeTurnBudget()` in `src/__tests__/turn-budget.test.ts`...
-[2026-04-05T12:00:37.530Z] iter=124 turn=6 INFO: Turn 6/25
-[2026-04-05T12:00:39.846Z] iter=124 turn=6 INFO: $ grep -n "testTaskMdLifecycle\|function test\|selfTest\|PASS\|FAIL" scripts/self-test.ts | tail -30
-[2026-04-05T12:00:39.863Z] iter=124 turn=6 INFO:   -> exit=0 (1549 chars)
-[2026-04-05T12:00:39.864Z] iter=124 turn=7 INFO: Turn 7/25
-[2026-04-05T12:00:42.021Z] iter=124 turn=7 INFO: $ grep -n "testTaskMdLifecycle\|testTurnBudget\|main()" scripts/self-test.ts | tail -20
-[2026-04-05T12:00:42.036Z] iter=124 turn=7 INFO:   -> exit=0 (147 chars)
-[2026-04-05T12:00:42.037Z] iter=124 turn=8 INFO: Turn 8/25
-[2026-04-05T12:00:44.670Z] iter=124 turn=8 INFO: $ sed -n '2157,2210p' scripts/self-test.ts
-[2026-04-05T12:00:44.686Z] iter=124 turn=8 INFO:   -> exit=0 (2042 chars)
-[2026-04-05T12:00:44.687Z] iter=124 turn=9 INFO: Turn 9/25
-[2026-04-05T12:01:16.728Z] iter=124 turn=9 INFO: Agent: Goals status:
-- Vitest tests for `computeTurnBudget()`: **NOT STARTED**
-- Self-test assertion for wiring: **NOT STARTED**
-
-Writing both now.
-[2026-04-05T12:01:16.729Z] iter=124 turn=9 INFO: write_file: src/__tests__/turn-budget.test.ts (write)
-[2026-04-05T12:01:16.737Z] iter=124 turn=9 INFO:   -> ok: Created src/__tests__/turn-budget.test.ts (7646 chars)
-[2026-04-05T12:01:16.739Z] iter=124 turn=10 INFO: Turn 10/25
-[2026-04-05T12:01:20.219Z] iter=124 turn=10 INFO: Agent: Now add the self-test assertion:
-[2026-04-05T12:01:20.220Z] iter=124 turn=10 INFO: $ sed -n '720,735p' scripts/self-test.ts
-[2026-04-05T12:01:20.236Z] iter=124 turn=10 INFO:   -> exit=0 (780 chars)
-[2026-04-05T12:01:20.237Z] iter=124 turn=11 INFO: Turn 11/25
-[2026-04-05T12:01:24.095Z] iter=124 turn=11 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T12:01:24.098Z] iter=124 turn=11 INFO:   -> ok: Patched scripts/self-test.ts: -2 +3 lines
-
-Context after patch:
-723 |     await testResuscitationE2E();
-724 |     await testSubagent();
-725 |     await testApiRetry();
-726 |     testTaskMdLifecycle();
-727 |     testTurnBudgetWiring();
-728 |     // Inline model-selection smoke test (avoids vitest import in tsx context)
-729 |     console.log("  model-selection smoke test...");
-730 |     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
-731 |     assert(selectModel({ description: "test", forceModel: "balanced" }) === "balanced", "force balanced");
-[2026-04-05T12:01:24.099Z] iter=124 turn=12 INFO: Turn 12/25
-[2026-04-05T12:01:32.052Z] iter=124 turn=12 INFO: Agent: Now add the `testTurnBudgetWiring` function at the end of the file (before `main()` call):
-[2026-04-05T12:01:32.053Z] iter=124 turn=12 INFO: write_file: scripts/self-test.ts (patch)
-[2026-04-05T12:01:32.056Z] iter=124 turn=12 INFO:   -> ok: Patched scripts/self-test.ts: -4 +28 lines
-
-Context after patch:
-2205 |   }
-2206 | }
-2207 | 
-2208 | function testTurnBudgetWiring(): void {
-2209 |   console.log("\n📐 Turn Budget Wiring");
-2210 | 
-2211 |   // Static check: computeTurnBudget is imported and called in agent.ts.
-2212 |   // This prevents regression of the dead-code period where computeTurnBudget
-2213 |   // was defined but never invoked (iteration 121 finding).
-2214 |   const agentSrc = readFileSync(path.join(ROOT, "src/agent.ts"), "utf8");
-2215 | 
-2216 |   assert(
-2217 |     agentSrc.includes('import { computeTurnBudget }'),
-2218 |     "turn-budget-wiring: computeTurnBudget is imported in agent.ts",
-2219 |   );
-2220 |   assert(
-2221 |     agentSrc.includes('computeTurnBudget('),
-2222 |     "turn-budget-wiring: computeTurnBudget() is called in agent.ts",
-2223 |   );
-2224 | 
-2225 |   // Ensure the call assigns the result (not a fire-and-forget)
-2226 |   assert(
-2227 |     /const turnBudget\s*=\s*computeTurnBudget\(/.test(agentSrc),
-2228 |     "turn-budget-wiring: computeTurnBudget() result is assigned to turnBudget",
-2229 |   );
-2230 | }
-2231 | 
-2232 | main().catch((err) => {
-2233 |   console.error("Self-test crashed:", err);
-2234 |   process.exit(1);
-2235 | });
-2236 | 
-[2026-04-05T12:01:32.057Z] iter=124 turn=13 INFO: Turn 13/25
-[2026-04-05T12:01:35.233Z] iter=124 turn=13 INFO: Agent: Now run all checks:
-[2026-04-05T12:01:35.234Z] iter=124 turn=13 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T12:01:35.237Z] iter=124 turn=13 INFO: $ npx vitest run src/__tests__/turn-budget.test.ts 2>&1
-[2026-04-05T12:01:35.905Z] iter=124 turn=13 INFO:   -> exit=0 (11 chars)
-[2026-04-05T12:01:36.198Z] iter=124 turn=13 INFO:   -> exit=0 (284 chars)
-[2026-04-05T12:01:36.198Z] iter=124 turn=14 INFO: Turn 14/25
-[2026-04-05T12:01:39.152Z] iter=124 turn=14 INFO: $ npx vitest run 2>&1 | tail -15
-[2026-04-05T12:01:39.157Z] iter=124 turn=14 INFO: $ npx tsx scripts/self-test.ts 2>&1 | tail -20
-[2026-04-05T12:01:40.213Z] iter=124 turn=14 INFO:   -> exit=0 (562 chars)
-[2026-04-05T12:01:43.236Z] iter=124 turn=14 INFO:   -> exit=0 (711 chars)
-[2026-04-05T12:01:43.237Z] iter=124 turn=15 INFO: Turn 15/25
-[2026-04-05T12:01:49.900Z] iter=124 turn=15 INFO: Agent: All green. 71 vitest (up from 53), 696 self-tests (up from 691), tsc clean. Now commit and update goals/memory.
-[2026-04-05T12:01:49.901Z] iter=124 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && git add src/__tests__/turn-budget.test.ts scripts/self-test.ts && git commit -m "Add vitest tests for computeTurnBudget + self-test wiring check
-
-- 18 new vites...
-[2026-04-05T12:01:49.942Z] iter=124 turn=15 INFO:   -> exit=0 (171 chars)
-[2026-04-05T12:01:49.942Z] iter=124 turn=16 INFO: Turn 16/25
-[2026-04-05T12:02:00.298Z] iter=124 turn=16 INFO: Agent: Goals are DONE. Wrapping up now.
-[2026-04-05T12:02:00.299Z] iter=124 turn=16 INFO: write_file: goals.md (write)
-[2026-04-05T12:02:00.300Z] iter=124 turn=16 INFO:   -> ok: Updated goals.md (1029 chars, -1 lines delta)
-[2026-04-05T12:02:00.301Z] iter=124 turn=17 INFO: Turn 17/25
-[2026-04-05T12:02:09.459Z] iter=124 turn=17 INFO: write_file: memory.md (patch)
-[2026-04-05T12:02:09.461Z] iter=124 turn=17 INFO:   -> ok: Patched memory.md: -7 +11 lines
-
-Context after patch:
-79 | ---
-80 | 
-81 | 
-82 | ## Iteration 123 [Meta]
-83 | 
-84 | Wired up `computeTurnBudget()` — was dead code since creation. Added import to agent.ts, compute budget after parsing predictedTurns, assign to `ctx.turnBudget`. conversation.ts already had the plumbing: `dynamicBudgetWarning()` fires at 80% and 100% of recommended budget. Now the adaptive budget system is live: metrics → calibration → budget → warnings → behavior change. This closes the feedback loop that was broken (code existed but was never called). tsc clean, 53 vitest pass.
-85 | 
-86 | ---
-87 | 
-88 | **[AUTO-SCORED] Iteration 123: predicted 16 turns, actual 20 turns, ratio 1.25**
-89 | 
-90 | ## Iteration 124 [Engineer]
-91 | 
-92 | Added full test coverage for turn-budget system. 18 vitest tests in `src/__tests__/turn-budget.test.ts` covering `computeCalibration`, `readPredictionCalibration`, `computeTurnBudget` (no metrics, empty, normal, calibration applied, failed exclusion, clamp, warnAt), and `dynamicBudgetWarning`. Added `testTurnBudgetWiring()` self-test: static check that `computeTurnBudget` is imported, called, and assigned in agent.ts — prevents dead-code regression. vitest: 71 (was 53), self-tests: 696 (was 691), tsc clean.
-93 | 
-[2026-04-05T12:02:09.461Z] iter=124 turn=18 INFO: Turn 18/25
-[2026-04-05T12:02:13.145Z] iter=124 turn=18 INFO: $ npx tsc --noEmit 2>&1 && echo "TSC_CLEAN"
-[2026-04-05T12:02:13.883Z] iter=124 turn=18 INFO:   -> exit=0 (10 chars)
-[2026-04-05T12:02:13.883Z] iter=124 turn=19 INFO: Turn 19/25
-[2026-04-05T12:02:16.018Z] iter=124 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && git add goals.md memory.md && git commit -m "Update goals/memory for iteration 124 completion"
-[2026-04-05T12:02:16.055Z] iter=124 turn=19 INFO:   -> exit=0 (118 chars)
-[2026-04-05T12:02:16.055Z] iter=124 turn=20 INFO: Turn 20/25
-[2026-04-05T12:02:18.059Z] iter=124 turn=20 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T12:02:18.060Z] iter=124 turn=20 INFO: RESTART signal
-[2026-04-05T12:02:18.060Z] iter=124 turn=20 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T12:02:18.783Z] iter=124 turn=20 INFO: Compilation OK
-[2026-04-05T12:02:23.559Z] iter=124 turn=20 INFO: Cache persisted: 37 entries to .autoagent-cache.json
-[2026-04-05T12:02:23.560Z] iter=124 turn=20 INFO: Tool timing: bash: 18x, avg=433ms, total=7799ms; write_file: 5x, avg=4ms, total=20ms; think: 2x, avg=1ms, total=2ms
-[2026-04-05T12:02:23.560Z] iter=124 turn=20 INFO: Tool timing stats
-[2026-04-05T12:02:28.310Z] iter=124 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 124: predicted 20 turns, actual 20 turns, ratio 1.00**
-[2026-04-05T12:02:28.329Z] iter=124 turn=20 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T12:02:28.357Z] iter=124 turn=20 INFO: Committed: 1361e2b0 (30 in / 6263 out, cache: 17544 created, 252659 read)
-[2026-04-05T12:02:28.357Z] iter=124 turn=20 INFO: Restarting as iteration 125...
-[2026-04-05T12:02:28.541Z] iter=125 INFO: Cache restored: 37/37 entries (0 stale)
-[2026-04-05T12:02:28.543Z] iter=125 INFO: Turn budget: 21/25 (calibration=1.25x, predicted=20)
-[2026-04-05T12:02:28.544Z] iter=125 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T12:02:28.575Z] iter=125 turn=1 INFO: Turn 1/25
-[2026-04-05T12:02:32.754Z] iter=125 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the system, then identify the highest-leverage next task.
 [2026-04-05T12:02:32.756Z] iter=125 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
 [2026-04-05T12:02:32.763Z] iter=125 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -15
 [2026-04-05T12:02:32.771Z] iter=125 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && node scripts/self-test.ts 2>&1 | tail -5
@@ -1167,3 +996,129 @@ The self-test has a pre-existing bug from iteration 128: `await import()` inside
 [2026-04-05T12:17:12.965Z] iter=131 turn=21 INFO: Tool timing stats
 [2026-04-05T12:17:13.268Z] iter=131 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 131: predicted 14 turns, actual 21 turns, ratio 1.50**
 [2026-04-05T12:17:16.656Z] iter=131 turn=21 INFO: Pre-commit review (730in/124out): **LGTM** — the auto-correction logic is straightforward, the rename from `predictedTurns` to `rawPrediction` is clean, and the improved log message (raw vs. effective) makes the calibration feedback l
+[2026-04-05T12:17:16.707Z] iter=131 turn=21 INFO: Committed: aa4a3321 (33 in / 5523 out, cache: 89448 created, 1475957 read)
+[2026-04-05T12:17:16.707Z] iter=131 turn=21 INFO: Restarting as iteration 132...
+[2026-04-05T12:17:16.922Z] iter=132 INFO: Cache restored: 41/42 entries (1 stale)
+[2026-04-05T12:17:16.924Z] iter=132 INFO: Turn budget: 23/25 (calibration=1.00x, raw=18, effective=18)
+[2026-04-05T12:17:16.924Z] iter=132 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T12:17:16.954Z] iter=132 turn=1 INFO: Turn 1/25
+[2026-04-05T12:17:21.667Z] iter=132 turn=1 INFO: think: Let me read the goals.md to understand what I need to do for this iteration (132). The goals say next expert is Architec...
+[2026-04-05T12:17:21.669Z] iter=132 turn=2 INFO: Turn 2/25
+[2026-04-05T12:17:24.412Z] iter=132 turn=2 INFO: read_file: CACHE HIT
+[2026-04-05T12:17:24.413Z] iter=132 turn=2 INFO: read_file: src/agent.ts
+[2026-04-05T12:17:24.414Z] iter=132 turn=2 INFO:   -> ok (1849 chars)
+[2026-04-05T12:17:24.415Z] iter=132 turn=3 INFO: Turn 3/25
+[2026-04-05T12:17:28.716Z] iter=132 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && node -e "
+import('./src/repo-context.js').then(m => {
+  const result = m.fingerprintRepo('.');
+  console.log(result);
+}).catch(e => console.error('Error:', e.me...
+[2026-04-05T12:17:28.769Z] iter=132 turn=3 INFO:   -> exit=0 (137 chars)
+[2026-04-05T12:17:28.769Z] iter=132 turn=4 INFO: Turn 4/25
+[2026-04-05T12:17:31.683Z] iter=132 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx src/repo-context.ts 2>&1 || echo "---"
+# Try running the function directly
+cat > /tmp/test-repo-context.ts << 'EOF'
+import { fingerprintRepo } from './s...
+[2026-04-05T12:17:32.329Z] iter=132 turn=4 INFO:   -> exit=1 (1166 chars)
+[2026-04-05T12:17:32.330Z] iter=132 turn=5 INFO: Turn 5/25
+[2026-04-05T12:17:47.567Z] iter=132 turn=5 INFO: think: My deliverables for this iteration (132, Architect role):
+1. Test repo-context fingerprinting - done (found it works but...
+[2026-04-05T12:17:47.568Z] iter=132 turn=6 INFO: Turn 6/25
+[2026-04-05T12:17:50.233Z] iter=132 turn=6 INFO: Agent: My deliverables: goals.md with Engineer spec for iter 133, updated memory.md. Writing now.
+[2026-04-05T12:17:50.235Z] iter=132 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx --tsconfig tsconfig.json -e "
+import { fingerprintRepo } from './src/repo-context.js';
+console.log(fingerprintRepo('.'));
+" 2>&1
+[2026-04-05T12:17:50.560Z] iter=132 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:17:50.560Z] iter=132 turn=7 INFO: Turn 7/25
+[2026-04-05T12:17:52.694Z] iter=132 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx src/repo-context.ts 2>&1; echo "exit: $?"
+[2026-04-05T12:17:53.045Z] iter=132 turn=7 INFO:   -> exit=0 (8 chars)
+[2026-04-05T12:17:53.046Z] iter=132 turn=8 INFO: Turn 8/25
+[2026-04-05T12:17:55.949Z] iter=132 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && cat > /tmp/rc-test.mts << 'EOF'
+import { fingerprintRepo } from '/Users/austin/Documents/autoagent/src/repo-context.ts';
+const out = fingerprintRepo('/Users/aus...
+[2026-04-05T12:17:56.382Z] iter=132 turn=8 INFO:   -> exit=0 (574 chars)
+[2026-04-05T12:17:56.382Z] iter=132 turn=9 INFO: Turn 9/25
+[2026-04-05T12:18:00.560Z] iter=132 turn=9 INFO: Agent: Status check:
+- Test repo-context: **DONE** — works, output is solid (correct project type, build/test commands missing because package.json scripts aren't named "build"/"test" exactly... wait, let me note this)
+- Assess calibration fix: **DONE** — logic is sound
+- Write goals.md for iter 133: **NOT STARTED**
+- Update memory.md: **NOT STARTED**
+
+Writing goals.md now:
+[2026-04-05T12:18:00.561Z] iter=132 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && cat package.json | grep -A 20 '"scripts"'
+[2026-04-05T12:18:00.576Z] iter=132 turn=9 INFO:   -> exit=0 (280 chars)
+[2026-04-05T12:18:00.577Z] iter=132 turn=10 INFO: Turn 10/25
+[2026-04-05T12:18:21.334Z] iter=132 turn=10 INFO: write_file: goals.md (write)
+[2026-04-05T12:18:21.335Z] iter=132 turn=10 INFO:   -> ok: Updated goals.md (3400 chars, +42 lines delta)
+[2026-04-05T12:18:21.336Z] iter=132 turn=11 INFO: Turn 11/25
+[2026-04-05T12:18:39.486Z] iter=132 turn=11 INFO: write_file: memory.md (write)
+[2026-04-05T12:18:39.488Z] iter=132 turn=11 INFO:   -> err: ERROR: memory.md is append-only. Use mode 'append' or ensure new content starts with existing content. (Shorter rewrites allowed for compaction.)
+[2026-04-05T12:18:39.489Z] iter=132 turn=12 INFO: Turn 12/25
+[2026-04-05T12:18:44.403Z] iter=132 turn=12 INFO: read_file: memory.md
+[2026-04-05T12:18:44.405Z] iter=132 turn=12 INFO:   -> ok (2172 chars)
+[2026-04-05T12:18:44.406Z] iter=132 turn=13 INFO: Turn 13/25
+[2026-04-05T12:18:51.159Z] iter=132 turn=13 INFO: write_file: memory.md (append)
+[2026-04-05T12:18:51.159Z] iter=132 turn=13 INFO:   -> ok: Appended 628 chars to memory.md
+[2026-04-05T12:18:51.160Z] iter=132 turn=14 INFO: Turn 14/25
+[2026-04-05T12:18:53.139Z] iter=132 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T12:18:53.787Z] iter=132 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:18:53.787Z] iter=132 turn=15 INFO: Turn 15/25
+[2026-04-05T12:18:55.841Z] iter=132 turn=15 INFO: Agent: TSC clean. All goals done.
+[2026-04-05T12:18:55.842Z] iter=132 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T12:18:55.842Z] iter=132 turn=15 INFO: RESTART signal
+[2026-04-05T12:18:55.843Z] iter=132 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:18:56.505Z] iter=132 turn=15 INFO: Compilation OK
+[2026-04-05T12:18:56.832Z] iter=132 turn=15 INFO: VALIDATION BLOCKED RESTART — agent must fix
+[2026-04-05T12:18:56.832Z] iter=132 turn=16 INFO: Turn 16/25
+[2026-04-05T12:18:59.183Z] iter=132 turn=16 INFO: read_file: scripts/self-test.ts
+[2026-04-05T12:18:59.184Z] iter=132 turn=16 INFO:   -> ok (997 chars)
+[2026-04-05T12:18:59.184Z] iter=132 turn=17 INFO: Turn 17/25
+[2026-04-05T12:19:00.982Z] iter=132 turn=17 INFO: read_file: scripts/self-test.ts
+[2026-04-05T12:19:00.983Z] iter=132 turn=17 INFO:   -> ok (664 chars)
+[2026-04-05T12:19:00.983Z] iter=132 turn=18 INFO: Turn 18/25
+[2026-04-05T12:19:03.317Z] iter=132 turn=18 INFO: think: The error is at line 2249: `await import(...)` inside a non-async function. The function containing line 2249 must not b...
+[2026-04-05T12:19:03.319Z] iter=132 turn=19 INFO: Turn 19/25
+[2026-04-05T12:19:05.433Z] iter=132 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^function\|^async function" scripts/self-test.ts | grep -A1 -B1 "2[12][0-9][0-9]:"
+[2026-04-05T12:19:05.453Z] iter=132 turn=19 INFO:   -> exit=0 (187 chars)
+[2026-04-05T12:19:05.454Z] iter=132 turn=20 INFO: Turn 20/25
+[2026-04-05T12:19:08.476Z] iter=132 turn=20 INFO: Agent: `testExpertStateWiring` at line 2233 is a sync function but uses `await import`. Fix it:
+[2026-04-05T12:19:08.477Z] iter=132 turn=20 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T12:19:08.478Z] iter=132 turn=20 INFO:   -> ok: Patched scripts/self-test.ts: -1 +1 lines
+
+Context after patch:
+2230 |   );
+2231 | }
+2232 | 
+2233 | async function testExpertStateWiring(): Promise<void> {
+2234 |   console.log("\n🔄 Expert State Wiring");
+2235 | 
+2236 |   // Verify saveExpertState is imported and called in agent.ts
+[2026-04-05T12:19:08.479Z] iter=132 turn=21 INFO: Turn 21/25
+[2026-04-05T12:19:11.758Z] iter=132 turn=21 INFO: Agent: Now find where `testExpertStateWiring` is called and ensure it's awaited:
+[2026-04-05T12:19:11.759Z] iter=132 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "testExpertStateWiring\|async function main\|^function main\|await test" scripts/self-test.ts | tail -20
+[2026-04-05T12:19:11.785Z] iter=132 turn=21 INFO:   -> exit=0 (682 chars)
+[2026-04-05T12:19:11.785Z] iter=132 turn=22 INFO: Turn 22/25
+[2026-04-05T12:19:14.084Z] iter=132 turn=22 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T12:19:14.086Z] iter=132 turn=22 INFO:   -> ok: Patched scripts/self-test.ts: -1 +1 lines
+
+Context after patch:
+725 |     await testApiRetry();
+726 |     testTaskMdLifecycle();
+727 |     testTurnBudgetWiring();
+728 |     await testExpertStateWiring();
+729 |     // Inline model-selection smoke test (avoids vitest import in tsx context)
+730 |     console.log("  model-selection smoke test...");
+731 |     assert(selectModel({ description: "test", forceModel: "fast" }) === "fast", "force fast");
+[2026-04-05T12:19:14.086Z] iter=132 turn=23 INFO: Turn 23/25
+[2026-04-05T12:19:16.453Z] iter=132 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "AUTOAGENT_RESTART"
+[2026-04-05T12:19:16.454Z] iter=132 turn=23 INFO: RESTART signal
+[2026-04-05T12:19:16.454Z] iter=132 turn=23 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:19:17.130Z] iter=132 turn=23 INFO: Compilation OK
+[2026-04-05T12:19:21.867Z] iter=132 turn=23 INFO: Cache persisted: 42 entries to .autoagent-cache.json
+[2026-04-05T12:19:21.868Z] iter=132 turn=23 INFO: Cache stats: 1 hits, 4 misses, 42 entries, 5 invalidations (3 entries removed)
+[2026-04-05T12:19:21.868Z] iter=132 turn=23 INFO: Tool cache stats
+[2026-04-05T12:19:21.868Z] iter=132 turn=23 INFO: Tool timing: bash: 11x, avg=229ms, total=2522ms; write_file: 5x, avg=2ms, total=9ms; read_file: 4x, avg=2ms, total=7ms; think: 3x, avg=2ms, total=5ms
+[2026-04-05T12:19:21.868Z] iter=132 turn=23 INFO: Tool timing stats
+[2026-04-05T12:19:26.653Z] iter=132 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 132: predicted 18 turns, actual 23 turns, ratio 1.28**
+[2026-04-05T12:19:28.539Z] iter=132 turn=23 INFO: Pre-commit review (446in/43out): LGTM. The change correctly adds `await` to an async test function call and updates its signature to `Promise<void>`, preventing the test from completing before its async operations resolve.

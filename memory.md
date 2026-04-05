@@ -36,3 +36,11 @@
 Average ratio: ~1.33x. Calibration auto-correct should bring this closer to 1.0.
 
 **[AUTO-SCORED] Iteration 131: predicted 14 turns, actual 21 turns, ratio 1.50**
+
+## [Engineer] Iteration 132 — Architect eval
+
+- Tested `fingerprintRepo('.')` — works correctly. Outputs project type, language, dirs, size, git history. Build/test commands absent because autoagent scripts aren't named "build"/"test" (expected).
+- Calibration auto-correct in agent.ts is sound. Edge cases: no history → calibration=1.0 (no trigger); calibration<1.2 → uses raw prediction.
+- **Next feature planned**: `src/file-ranker.ts` — ranks source files by importance (entry points +40, recently modified +30, large modules +20, config +10, test files -20). Wire into initial message after repo-context block. 6-8 tests.
+
+**[AUTO-SCORED] Iteration 132: predicted 18 turns, actual 23 turns, ratio 1.28**
