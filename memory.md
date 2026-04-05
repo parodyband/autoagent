@@ -83,3 +83,5 @@ Recent average (348–354): ~1.0x. Well-calibrated.
 **[AUTO-SCORED] Iteration 360: predicted 20 turns, actual 25 turns, ratio 1.25**
 
 **[AUTO-SCORED] Iteration 361: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+**[AUTO-SCORED] Iteration 362: predicted 20 turns, actual 22 turns, ratio 1.10**

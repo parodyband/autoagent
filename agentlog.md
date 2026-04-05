@@ -1,68 +1,3 @@
-
-Context after patch:
-876 |       setLoading(true);
-877 |       setStatus("Creating plan...");
-878 |       try {
-879 |         const projectContext = `Working directory: ${workDir}`;
-880 |         const plan = await createPlan(description, projectContext);
-881 |         setMessages(prev => [...prev, { role: "assistant", content: `Created plan:\n\n${formatPlan(plan)}` }]);
-882 |         savePlan(plan, workDir);
-[2026-04-05T20:08:58.661Z] iter=353 turn=21 INFO: Turn 21/25
-[2026-04-05T20:09:01.687Z] iter=353 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC CLEAN" && npx vitest run 2>&1 | tail -5
-[2026-04-05T20:09:17.050Z] iter=353 turn=21 INFO:   -> exit=0 (201 chars)
-[2026-04-05T20:09:17.050Z] iter=353 turn=22 INFO: Turn 22/25
-[2026-04-05T20:09:22.812Z] iter=353 turn=22 INFO: Agent: TSC clean, all 991 tests passing. Now update memory and goals:
-[2026-04-05T20:09:22.813Z] iter=353 turn=22 INFO: save_memory: "[Architect] TUI /plan commands"
-[2026-04-05T20:09:22.815Z] iter=353 turn=22 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T20:09:22.816Z] iter=353 turn=23 INFO: Turn 23/25
-[2026-04-05T20:09:35.389Z] iter=353 turn=23 INFO: write_file: goals.md (write)
-[2026-04-05T20:09:35.391Z] iter=353 turn=23 INFO:   -> ok: Updated goals.md (1536 chars, -41 lines delta)
-[2026-04-05T20:09:35.392Z] iter=353 turn=24 INFO: Turn 24/25
-[2026-04-05T20:09:37.318Z] iter=353 turn=24 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T20:09:37.319Z] iter=353 turn=24 INFO: RESTART signal
-[2026-04-05T20:09:37.320Z] iter=353 turn=24 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T20:09:38.372Z] iter=353 turn=24 INFO: Compilation OK
-[2026-04-05T20:09:47.072Z] iter=353 turn=24 INFO: Cache persisted: 57 entries to .autoagent-cache.json
-[2026-04-05T20:09:47.072Z] iter=353 turn=24 INFO: Cache stats: 0 hits, 10 misses, 57 entries, 6 invalidations (8 entries removed)
-[2026-04-05T20:09:47.072Z] iter=353 turn=24 INFO: Tool cache stats
-[2026-04-05T20:09:47.073Z] iter=353 turn=24 INFO: Tool timing: bash: 10x, avg=3257ms, total=32572ms; grep: 1x, avg=19ms, total=19ms; read_file: 9x, avg=2ms, total=18ms; write_file: 6x, avg=2ms, total=13ms; save_memory: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T20:09:47.073Z] iter=353 turn=24 INFO: Tool timing stats
-[2026-04-05T20:09:53.883Z] iter=353 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 353: predicted 20 turns, actual 24 turns, ratio 1.20**
-[2026-04-05T20:09:53.906Z] iter=353 turn=24 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T20:09:53.941Z] iter=353 turn=24 INFO: Committed: 5fe96f78 (40 in / 5731 out, cache: 24202 created, 363540 read)
-[2026-04-05T20:09:53.941Z] iter=353 turn=24 INFO: Restarting as iteration 354...
-[2026-04-05T20:09:54.147Z] iter=354 INFO: Cache restored: 57/57 entries (0 stale)
-[2026-04-05T20:09:54.150Z] iter=354 INFO: Turn budget: 13/25 (calibration=1.18x, predicted=8)
-[2026-04-05T20:09:54.150Z] iter=354 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T20:09:54.327Z] iter=354 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T20:09:54.327Z] iter=354 turn=1 INFO: Turn 1/25
-[2026-04-05T20:09:56.080Z] iter=354 turn=1 INFO: read_scratchpad: 1755 chars
-[2026-04-05T20:09:56.081Z] iter=354 turn=1 INFO: read_file: goals.md
-[2026-04-05T20:09:56.081Z] iter=354 turn=1 INFO:   -> ok (1536 chars)
-[2026-04-05T20:09:56.082Z] iter=354 turn=2 INFO: Turn 2/25
-[2026-04-05T20:10:10.754Z] iter=354 turn=2 INFO: think: I'm in iteration 354 as Meta. My job is to:
-1. Evaluate what was built
-2. Score the previous iteration
-3. Compact memory...
-[2026-04-05T20:10:10.755Z] iter=354 turn=3 INFO: Turn 3/25
-[2026-04-05T20:10:25.344Z] iter=354 turn=3 INFO: Agent: I'm Meta (iteration 354). Deliverables:
-1. Write goals.md for iteration 355 (Engineer)
-2. Update memory.md with [Meta] note
-3. TSC check → RESTART
-
-Starting now:
-[2026-04-05T20:10:25.346Z] iter=354 turn=3 INFO: write_file: goals.md (write)
-[2026-04-05T20:10:25.349Z] iter=354 turn=3 INFO:   -> ok: Updated goals.md (1912 chars, +19 lines delta)
-[2026-04-05T20:10:25.351Z] iter=354 turn=4 INFO: Turn 4/25
-[2026-04-05T20:10:30.883Z] iter=354 turn=4 INFO: Agent: Goals status:
-- **Goal 1** (goals.md for iter 355): ✅ DONE
-- **Goal 2** (memory update + score): NOT STARTED
-- **Goal 3** (TSC + restart): NOT STARTED
-
-Finishing now:
-[2026-04-05T20:10:30.884Z] iter=354 turn=4 INFO: save_memory: "[Meta] Iteration 354 assessment"
-[2026-04-05T20:10:30.885Z] iter=354 turn=4 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T20:10:30.885Z] iter=354 turn=5 INFO: Turn 5/25
 [2026-04-05T20:10:32.476Z] iter=354 turn=5 INFO: $ npx tsc --noEmit 2>&1 | tail -5
 [2026-04-05T20:10:33.561Z] iter=354 turn=5 INFO:   -> exit=0 (11 chars)
 [2026-04-05T20:10:33.561Z] iter=354 turn=6 INFO: Turn 6/25
@@ -1061,3 +996,135 @@ Right — Architect iterations produce goals.md + memory, not src/ changes. Let 
 [2026-04-05T20:24:01.844Z] iter=361 turn=9 INFO: Tool timing stats
 [2026-04-05T20:24:08.660Z] iter=361 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 361: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-05T20:24:08.685Z] iter=361 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T20:24:08.721Z] iter=361 turn=9 INFO: Committed: 59e5e48c (19 in / 2695 out, cache: 32627 created, 177246 read)
+[2026-04-05T20:24:08.721Z] iter=361 turn=9 INFO: Restarting as iteration 362...
+[2026-04-05T20:24:08.918Z] iter=362 INFO: Cache restored: 56/56 entries (0 stale)
+[2026-04-05T20:24:08.921Z] iter=362 INFO: Turn budget: 18/25 (calibration=1.13x, predicted=20)
+[2026-04-05T20:24:08.921Z] iter=362 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T20:24:09.098Z] iter=362 turn=1 INFO: Turn 1/25
+[2026-04-05T20:24:11.521Z] iter=362 turn=1 INFO: Agent: I'll start by reading the current state of the codebase and then implement the hook system.
+[2026-04-05T20:24:11.523Z] iter=362 turn=1 INFO: read_scratchpad: 1755 chars
+[2026-04-05T20:24:11.524Z] iter=362 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md | head -20
+[2026-04-05T20:24:11.536Z] iter=362 turn=1 INFO:   -> exit=0 (932 chars)
+[2026-04-05T20:24:11.537Z] iter=362 turn=2 INFO: Turn 2/25
+[2026-04-05T20:24:13.840Z] iter=362 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "tool" src/orchestrator.ts | grep -i "execut\|dispatch\|call\|invoke" | head -30
+[2026-04-05T20:24:13.846Z] iter=362 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/orchestrator.ts && head -50 src/orchestrator.ts
+[2026-04-05T20:24:13.865Z] iter=362 turn=2 INFO:   -> exit=0 (480 chars)
+[2026-04-05T20:24:13.868Z] iter=362 turn=2 INFO:   -> exit=0 (2283 chars)
+[2026-04-05T20:24:13.869Z] iter=362 turn=3 INFO: Turn 3/25
+[2026-04-05T20:24:15.228Z] iter=362 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '560,680n' src/orchestrator.ts
+[2026-04-05T20:24:15.239Z] iter=362 turn=3 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:24:15.239Z] iter=362 turn=4 INFO: Turn 4/25
+[2026-04-05T20:24:17.857Z] iter=362 turn=4 INFO: think: I need to:
+1. Create src/hooks.ts (~120 LOC)
+2. Create tests/hooks.test.ts (7+ tests)
+3. Wire hooks into src/orchestrato...
+[2026-04-05T20:24:17.858Z] iter=362 turn=5 INFO: Turn 5/25
+[2026-04-05T20:24:19.379Z] iter=362 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '418,660' src/orchestrator.ts
+[2026-04-05T20:24:19.412Z] iter=362 turn=5 INFO:   -> exit=1 (36 chars)
+[2026-04-05T20:24:19.412Z] iter=362 turn=6 INFO: Turn 6/25
+[2026-04-05T20:24:21.337Z] iter=362 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '418,660p' src/orchestrator.ts
+[2026-04-05T20:24:21.348Z] iter=362 turn=6 INFO:   -> exit=0 (10511 chars)
+[2026-04-05T20:24:21.348Z] iter=362 turn=7 INFO: Turn 7/25
+[2026-04-05T20:24:43.687Z] iter=362 turn=7 INFO: Agent: **Goal 1 (hooks.ts):** NOT STARTED  
+**Goal 2 (orchestrator wiring):** NOT STARTED  
+
+I have enough context. Writing now.
+[2026-04-05T20:24:43.688Z] iter=362 turn=7 INFO: write_file: src/hooks.ts (write)
+[2026-04-05T20:24:43.690Z] iter=362 turn=7 INFO:   -> ok: Created src/hooks.ts (5513 chars)
+[2026-04-05T20:24:43.691Z] iter=362 turn=8 INFO: Turn 8/25
+[2026-04-05T20:25:08.823Z] iter=362 turn=8 INFO: Agent: Now write the tests:
+[2026-04-05T20:25:08.824Z] iter=362 turn=8 INFO: write_file: tests/hooks.test.ts (write)
+[2026-04-05T20:25:08.824Z] iter=362 turn=8 INFO:   -> ok: Created tests/hooks.test.ts (6359 chars)
+[2026-04-05T20:25:08.825Z] iter=362 turn=9 INFO: Turn 9/25
+[2026-04-05T20:25:11.336Z] iter=362 turn=9 INFO: Agent: Now wire hooks into orchestrator.ts. Let me find the init method and tool execution point:
+[2026-04-05T20:25:11.336Z] iter=362 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "async init\|hooksConfig\|this\.workDir\|execTool\|rawResult = await execTool" src/orchestrator.ts | head -30
+[2026-04-05T20:25:11.353Z] iter=362 turn=9 INFO:   -> exit=0 (672 chars)
+[2026-04-05T20:25:11.354Z] iter=362 turn=10 INFO: Turn 10/25
+[2026-04-05T20:25:12.711Z] iter=362 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '825,870p' src/orchestrator.ts
+[2026-04-05T20:25:12.722Z] iter=362 turn=10 INFO:   -> exit=0 (1634 chars)
+[2026-04-05T20:25:12.722Z] iter=362 turn=11 INFO: Turn 11/25
+[2026-04-05T20:25:15.310Z] iter=362 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "class Orchestrator\|private \|hooksConfig" src/orchestrator.ts | head -30
+[2026-04-05T20:25:15.325Z] iter=362 turn=11 INFO:   -> exit=0 (1374 chars)
+[2026-04-05T20:25:15.326Z] iter=362 turn=12 INFO: Turn 12/25
+[2026-04-05T20:25:18.799Z] iter=362 turn=12 INFO: Agent: Now I'll add the hooks import and wire it into orchestrator.ts:
+[2026-04-05T20:25:18.800Z] iter=362 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:25:18.802Z] iter=362 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -3 +4 lines
+
+Context after patch:
+37 | import { findRelatedTests, runRelatedTests } from "./test-runner.js";
+38 | import { computeUnifiedDiff } from "./diff-preview.js";
+39 | import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences } from "./context-loader.js";
+40 | import { enhanceToolError } from "./tool-recovery.js";
+41 | import { detectProject } from "./project-detector.js";
+42 | import { detectLoop } from "./loop-detector.js";
+43 | import { loadHooksConfig, runHooks, type HooksConfig } from "./hooks.js";
+44 | import * as fs from "fs";
+45 | import { FileWatcher } from "./file-watcher.js";
+46 | import { scoredPrune } from "./context-pruner.js";
+[2026-04-05T20:25:18.803Z] iter=362 turn=13 INFO: Turn 13/25
+[2026-04-05T20:25:31.923Z] iter=362 turn=13 INFO: Agent: I've created `src/hooks.ts` and `tests/hooks.test.ts`, and patched the import into `src/orchestrator.ts`. Let me finish wiring hooks into the orchestrator then run tests.
+[2026-04-05T20:25:31.924Z] iter=362 turn=13 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:25:31.927Z] iter=362 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
+
+Context after patch:
+804 |   /** Paths changed externally since last send(). */
+805 |   private externallyChangedFiles = new Set<string>();
+806 |   /** Cached repo map for incremental reindex — null means full rebuild needed. */
+807 |   private cachedRepoMap: import("./tree-sitter-map.js").RepoMap | null = null;
+808 |   private hooksConfig: HooksConfig = {};
+809 |   /** Paths that have been changed externally and need incremental re-parse. */
+810 |   private staleRepoPaths = new Set<string>();
+811 | 
+812 |   constructor(opts: OrchestratorOptions) {
+[2026-04-05T20:25:31.928Z] iter=362 turn=14 INFO: Turn 14/25
+[2026-04-05T20:25:34.653Z] iter=362 turn=14 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:25:34.657Z] iter=362 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -3 +6 lines
+
+Context after patch:
+854 |     // Clean up old sessions non-blocking
+855 |     setImmediate(() => cleanOldSessions(this.opts.workDir));
+856 | 
+857 |     // Load hooks config
+858 |     this.hooksConfig = loadHooksConfig(this.opts.workDir);
+859 | 
+860 |     this.initialized = true;
+861 |     this.opts.onStatus?.("");
+862 |   }
+863 | 
+864 |   /**
+865 |    * Resume an existing session by loading its history.
+[2026-04-05T20:25:34.657Z] iter=362 turn=15 INFO: Turn 15/25
+[2026-04-05T20:25:38.121Z] iter=362 turn=15 INFO: Agent: Now I need to wire PreToolUse/PostToolUse hooks into the tool execution. The `runAgentLoop` function needs the hooksConfig. Let me find the right spot — the parallel execution of non-write tools and the write_file execution:
+[2026-04-05T20:25:38.122Z] iter=362 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "runAgentLoop\|hooksConfig\|this\.hooksConfig" src/orchestrator.ts | head -20
+[2026-04-05T20:25:38.136Z] iter=362 turn=15 INFO:   -> exit=0 (396 chars)
+[2026-04-05T20:25:38.136Z] iter=362 turn=16 INFO: Turn 16/25
+[2026-04-05T20:25:40.020Z] iter=362 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1445,1470p' src/orchestrator.ts
+[2026-04-05T20:25:40.052Z] iter=362 turn=16 INFO:   -> exit=0 (718 chars)
+[2026-04-05T20:25:40.053Z] iter=362 turn=17 INFO: Turn 17/25
+[2026-04-05T20:25:44.032Z] iter=362 turn=17 INFO: think: I need to stop and wrap up. The hooks wiring into runAgentLoop is complex and would take more turns. Let me:
+1. Run the ...
+[2026-04-05T20:25:44.032Z] iter=362 turn=18 INFO: Turn 18/25
+[2026-04-05T20:25:45.714Z] iter=362 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/hooks.test.ts 2>&1 | tail -30
+[2026-04-05T20:25:47.007Z] iter=362 turn=18 INFO:   -> exit=0 (272 chars)
+[2026-04-05T20:25:47.007Z] iter=362 turn=19 INFO: Turn 19/25
+[2026-04-05T20:25:48.740Z] iter=362 turn=19 INFO: Agent: 15 tests passing. Running TSC then wrapping up.
+[2026-04-05T20:25:48.740Z] iter=362 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T20:25:49.837Z] iter=362 turn=19 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:25:49.837Z] iter=362 turn=20 INFO: Turn 20/25
+[2026-04-05T20:25:54.196Z] iter=362 turn=20 INFO: Agent: TSC clean.
+[2026-04-05T20:25:54.197Z] iter=362 turn=20 INFO: save_memory: "[Engineer 362] Hook system"
+[2026-04-05T20:25:54.199Z] iter=362 turn=20 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:25:54.199Z] iter=362 turn=21 INFO: Turn 21/25
+[2026-04-05T20:26:08.586Z] iter=362 turn=21 INFO: write_file: goals.md (write)
+[2026-04-05T20:26:08.588Z] iter=362 turn=21 INFO:   -> ok: Updated goals.md (2308 chars, -28 lines delta)
+[2026-04-05T20:26:08.589Z] iter=362 turn=22 INFO: Turn 22/25
+[2026-04-05T20:26:10.101Z] iter=362 turn=22 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:26:10.102Z] iter=362 turn=22 INFO: RESTART signal
+[2026-04-05T20:26:10.102Z] iter=362 turn=22 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:26:11.236Z] iter=362 turn=22 INFO: Compilation OK
+[2026-04-05T20:26:19.514Z] iter=362 turn=22 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-05T20:26:19.514Z] iter=362 turn=22 INFO: Tool timing: bash: 14x, avg=186ms, total=2597ms; write_file: 6x, avg=3ms, total=16ms; read_scratchpad: 1x, avg=4ms, total=4ms; save_memory: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms
+[2026-04-05T20:26:19.514Z] iter=362 turn=22 INFO: Tool timing stats
+[2026-04-05T20:26:27.043Z] iter=362 turn=22 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 362: predicted 20 turns, actual 22 turns, ratio 1.10**
+[2026-04-05T20:26:30.011Z] iter=362 turn=22 INFO: Pre-commit review (2568in/96out): **LGTM** — the implementation is clean, imports use `.js` extensions, error handling is thorough, and the aggregation logic is correct. One minor note: `runHooks` executes hooks in parallel via `Promi

@@ -40,6 +40,7 @@ import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileRe
 import { enhanceToolError } from "./tool-recovery.js";
 import { detectProject } from "./project-detector.js";
 import { detectLoop } from "./loop-detector.js";
+import { loadHooksConfig, runHooks, type HooksConfig } from "./hooks.js";
 import * as fs from "fs";
 import { FileWatcher } from "./file-watcher.js";
 import { scoredPrune } from "./context-pruner.js";
@@ -804,6 +805,7 @@ export class Orchestrator {
   private externallyChangedFiles = new Set<string>();
   /** Cached repo map for incremental reindex — null means full rebuild needed. */
   private cachedRepoMap: import("./tree-sitter-map.js").RepoMap | null = null;
+  private hooksConfig: HooksConfig = {};
   /** Paths that have been changed externally and need incremental re-parse. */
   private staleRepoPaths = new Set<string>();
 
@@ -851,6 +853,9 @@ export class Orchestrator {
 
     // Clean up old sessions non-blocking
     setImmediate(() => cleanOldSessions(this.opts.workDir));
+
+    // Load hooks config
+    this.hooksConfig = loadHooksConfig(this.opts.workDir);
 
     this.initialized = true;
     this.opts.onStatus?.("");
