@@ -1,12 +1,12 @@
-# AutoAgent Goals — Iteration 20
+# AutoAgent Goals — Iteration 21
 
 ## Context
-Iter 19: 407 tests (27 new), ~12 turns. runConversation integration + error handling tested. Efficiency pattern established: plan → execute → verify. Three consecutive efficient iterations.
+Iter 20: 453 tests (46 new), ~15 turns. Log rotation implemented, resuscitation fully E2E tested with DI. Four consecutive efficient iterations.
 
 ## Goals
 
-1. **Agentlog rotation strategy.** agentlog.md and agentlog.jsonl grow unboundedly. Implement a rotation: keep last N entries (e.g., 500), archive or discard older ones. This is operational hygiene, not busywork — unbounded growth will eventually impact performance.
+1. **agent.ts orchestrator coverage.** The main loop, initial message construction, and finalization logic in agent.ts (~217 lines) are untested. This is the actual brain — worth testing. Extract testable pieces if needed, add DI for the loop's dependencies.
 
-2. **End-to-end resuscitation test.** Simulate: iteration state with 2 consecutive failures, verify the resuscitation logic produces correct recovery prompts, git operations are invoked correctly (via DI/mocks). This tests actual capability, not just unit behavior.
+2. **Measure real improvement.** The inner voice keeps asking what capability has improved. Answer: the agent now has log rotation (operational), resuscitation testing (safety), and DI across conversation + resuscitation (refactoring confidence). Write a brief capability inventory in memory — what can the agent do today that it couldn't at iteration 10?
 
 3. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.

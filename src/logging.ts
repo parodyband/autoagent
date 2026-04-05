@@ -6,7 +6,7 @@
  * iteration, turn, level, message, and optional metadata.
  */
 
-import { appendFileSync, existsSync, readFileSync } from "fs";
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
 // ─── Types ──────────────────────────────────────────────────
@@ -108,15 +108,49 @@ export class Logger {
 
 // ─── Factory ────────────────────────────────────────────────
 
-/** Create a Logger with standard paths relative to project root */
-export function createLogger(iteration: number, rootDir: string, options?: { console?: boolean }): Logger {
+/** Create a Logger with standard paths relative to project root. Rotates logs automatically. */
+export function createLogger(iteration: number, rootDir: string, options?: { console?: boolean; rotate?: boolean }): Logger {
+  const jsonlPath = path.join(rootDir, "agentlog.jsonl");
+  const humanPath = path.join(rootDir, "agentlog.md");
+
+  // Rotate logs at the start of each iteration (unless explicitly disabled)
+  if (options?.rotate !== false) {
+    rotateLogFile(jsonlPath, LOG_ROTATION_LIMITS.jsonl);
+    rotateLogFile(humanPath, LOG_ROTATION_LIMITS.human);
+  }
+
   return new Logger({
     iteration,
-    jsonlPath: path.join(rootDir, "agentlog.jsonl"),
-    humanPath: path.join(rootDir, "agentlog.md"),
+    jsonlPath,
+    humanPath,
     console: options?.console,
   });
 }
+
+// ─── Log Rotation ───────────────────────────────────────────
+
+/**
+ * Rotate a log file by keeping only the last `maxLines` lines.
+ * Returns the number of lines removed, or 0 if no rotation was needed.
+ */
+export function rotateLogFile(filePath: string, maxLines: number): number {
+  if (!existsSync(filePath)) return 0;
+  const content = readFileSync(filePath, "utf-8");
+  const lines = content.split("\n");
+  // Don't count trailing empty line from final newline
+  const effectiveLines = lines.length > 0 && lines[lines.length - 1] === "" ? lines.length - 1 : lines.length;
+  if (effectiveLines <= maxLines) return 0;
+  const removedCount = effectiveLines - maxLines;
+  const kept = lines.slice(removedCount);
+  writeFileSync(filePath, kept.join("\n"), "utf-8");
+  return removedCount;
+}
+
+/** Default rotation limits */
+export const LOG_ROTATION_LIMITS = {
+  jsonl: 500,
+  human: 1000,
+} as const;
 
 // ─── Utilities ──────────────────────────────────────────────
 

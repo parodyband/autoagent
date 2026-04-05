@@ -3135,3 +3135,152 @@ Let me check if there's something else wrong. Let me look at the actual web_fetc
 [2026-04-05T07:19:45.802Z] iter=19 turn=24 INFO: Tool cache stats
 [2026-04-05T07:19:45.802Z] iter=19 turn=24 INFO: Tool timing: bash: 12x, avg=365ms, total=4382ms; read_file: 5x, avg=3ms, total=14ms; write_file: 5x, avg=2ms, total=10ms; think: 3x, avg=1ms, total=3ms
 [2026-04-05T07:19:45.802Z] iter=19 turn=24 INFO: Tool timing stats
+[2026-04-05T07:19:49.321Z] iter=19 turn=24 INFO: Committed: e9356e8a (333670 in / 5783 out, cache: 0 created, 0 read)
+[2026-04-05T07:19:49.322Z] iter=19 turn=24 INFO: Inner critic reflecting...
+[2026-04-05T07:20:03.681Z] iter=19 turn=24 INFO: Inner critic: 3 questions raised
+[2026-04-05T07:20:03.683Z] iter=19 turn=24 INFO: Restarting as iteration 20...
+[2026-04-05T07:20:03.907Z] iter=20 INFO: Cache restored: 10/10 entries (0 stale)
+[2026-04-05T07:20:03.908Z] iter=20 INFO: Starting. Model=claude-opus-4-6 MaxTokens=16384
+[2026-04-05T07:20:03.918Z] iter=20 turn=1 INFO: Turn 1/50
+[2026-04-05T07:20:13.750Z] iter=20 turn=1 INFO: think: Let me think carefully about this iteration before acting.
+
+The inner voice raises a sharp point: "Who are the 407 tests...
+[2026-04-05T07:20:13.752Z] iter=20 turn=2 INFO: Turn 2/50
+[2026-04-05T07:20:20.454Z] iter=20 turn=2 INFO: $ wc -l agentlog.md agentlog.jsonl 2>/dev/null; echo "---"; ls -la agentlog.* 2>/dev/null
+[2026-04-05T07:20:20.458Z] iter=20 turn=2 INFO: grep: "agentlog"
+[2026-04-05T07:20:20.484Z] iter=20 turn=2 INFO:   -> 0 matches
+[2026-04-05T07:20:20.486Z] iter=20 turn=2 INFO:   -> exit=0 (189 chars)
+[2026-04-05T07:20:20.487Z] iter=20 turn=3 INFO: Turn 3/50
+[2026-04-05T07:20:24.084Z] iter=20 turn=3 INFO: grep: "agentlog|actionLog|action.log|writeLog|appendLog"
+[2026-04-05T07:20:24.119Z] iter=20 turn=3 INFO:   -> 0 matches
+[2026-04-05T07:20:24.119Z] iter=20 turn=3 INFO: grep: "agentlog" in .
+[2026-04-05T07:20:24.137Z] iter=20 turn=3 INFO:   -> 5 matches
+[2026-04-05T07:20:24.137Z] iter=20 turn=4 INFO: Turn 4/50
+[2026-04-05T07:20:26.348Z] iter=20 turn=4 INFO: read_file: src/logging.ts
+[2026-04-05T07:20:26.351Z] iter=20 turn=4 INFO:   -> ok (3955 chars)
+[2026-04-05T07:20:26.352Z] iter=20 turn=5 INFO: Turn 5/50
+[2026-04-05T07:20:36.953Z] iter=20 turn=5 INFO: think: Now I understand the logging system. The Logger appends to agentlog.jsonl and agentlog.md on every log call. Both files ...
+[2026-04-05T07:20:36.955Z] iter=20 turn=6 INFO: Turn 6/50
+[2026-04-05T07:20:38.929Z] iter=20 turn=6 INFO: read_file: src/resuscitation.ts
+[2026-04-05T07:20:38.929Z] iter=20 turn=6 INFO:   -> ok (4575 chars)
+[2026-04-05T07:20:38.930Z] iter=20 turn=7 INFO: Turn 7/50
+[2026-04-05T07:20:57.363Z] iter=20 turn=7 INFO: think: Now I have a clear picture. Let me plan both changes:
+
+**1. Log Rotation**
+Add a `rotateLogs` function to logging.ts:
+- ...
+[2026-04-05T07:20:57.364Z] iter=20 turn=8 INFO: Turn 8/50
+[2026-04-05T07:21:06.018Z] iter=20 turn=8 INFO: Agent: Let me implement log rotation and resuscitation testability in one coherent change.
+[2026-04-05T07:21:06.019Z] iter=20 turn=8 INFO: write_file: src/logging.ts (patch)
+[2026-04-05T07:21:06.021Z] iter=20 turn=8 INFO:   -> ok: Patched src/logging.ts: -17 +42 lines
+[2026-04-05T07:21:06.022Z] iter=20 turn=9 INFO: Turn 9/50
+[2026-04-05T07:21:09.752Z] iter=20 turn=9 INFO: Agent: Now add the `writeFileSync` import (it already has `appendFileSync` and `readFileSync` but needs `writeFileSync`):
+[2026-04-05T07:21:09.752Z] iter=20 turn=9 INFO: write_file: src/logging.ts (patch)
+[2026-04-05T07:21:09.753Z] iter=20 turn=9 INFO:   -> ok: Patched src/logging.ts: -1 +1 lines
+[2026-04-05T07:21:09.753Z] iter=20 turn=10 INFO: Turn 10/50
+[2026-04-05T07:21:15.271Z] iter=20 turn=10 INFO: Agent: Now update `createLogger` to rotate logs on creation:
+[2026-04-05T07:21:15.271Z] iter=20 turn=10 INFO: write_file: src/logging.ts (patch)
+[2026-04-05T07:21:15.272Z] iter=20 turn=10 INFO:   -> ok: Patched src/logging.ts: -9 +18 lines
+[2026-04-05T07:21:15.272Z] iter=20 turn=11 INFO: Turn 11/50
+[2026-04-05T07:21:23.119Z] iter=20 turn=11 INFO: Agent: Now add DI to resuscitation.ts by extracting pure functions and adding optional overrides:
+[2026-04-05T07:21:23.120Z] iter=20 turn=11 INFO: write_file: src/resuscitation.ts (patch)
+[2026-04-05T07:21:23.121Z] iter=20 turn=11 INFO:   -> ok: Patched src/resuscitation.ts: -6 +36 lines
+[2026-04-05T07:21:23.121Z] iter=20 turn=12 INFO: Turn 12/50
+[2026-04-05T07:21:34.161Z] iter=20 turn=12 INFO: Agent: Now update the `resuscitate` function to use DI overrides and extracted functions:
+[2026-04-05T07:21:34.162Z] iter=20 turn=12 INFO: write_file: src/resuscitation.ts (patch)
+[2026-04-05T07:21:34.164Z] iter=20 turn=12 INFO:   -> ok: Patched src/resuscitation.ts: -46 +35 lines
+[2026-04-05T07:21:34.165Z] iter=20 turn=13 INFO: Turn 13/50
+[2026-04-05T07:21:43.493Z] iter=20 turn=13 INFO: Agent: Now update `handleIterationFailure` similarly:
+[2026-04-05T07:21:43.494Z] iter=20 turn=13 INFO: write_file: src/resuscitation.ts (patch)
+[2026-04-05T07:21:43.494Z] iter=20 turn=13 INFO:   -> ok: Patched src/resuscitation.ts: -25 +29 lines
+[2026-04-05T07:21:43.494Z] iter=20 turn=14 INFO: Turn 14/50
+[2026-04-05T07:21:46.103Z] iter=20 turn=14 INFO: Agent: Now let's verify compilation:
+[2026-04-05T07:21:46.104Z] iter=20 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T07:21:46.697Z] iter=20 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T07:21:46.697Z] iter=20 turn=15 INFO: Turn 15/50
+[2026-04-05T07:21:50.419Z] iter=20 turn=15 INFO: Agent: Good, compiles clean. Now let me write the tests. First, let me check the existing test structure:
+[2026-04-05T07:21:50.420Z] iter=20 turn=15 INFO: $ ls scripts/self-test.ts | head -1; grep -c "test(" scripts/self-test.ts
+[2026-04-05T07:21:50.436Z] iter=20 turn=15 INFO:   -> exit=1 (23 chars)
+[2026-04-05T07:21:50.436Z] iter=20 turn=16 INFO: Turn 16/50
+[2026-04-05T07:21:55.061Z] iter=20 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && grep -c "it(" scripts/self-test.ts
+[2026-04-05T07:21:55.072Z] iter=20 turn=16 INFO:   -> exit=0 (2 chars)
+[2026-04-05T07:21:55.073Z] iter=20 turn=17 INFO: Turn 17/50
+[2026-04-05T07:21:58.463Z] iter=20 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "describe.*[Ll]og\|describe.*[Rr]esuscit" scripts/self-test.ts | head -10
+[2026-04-05T07:21:58.476Z] iter=20 turn=17 INFO:   -> exit=0 (11 chars)
+[2026-04-05T07:21:58.476Z] iter=20 turn=18 INFO: Turn 18/50
+[2026-04-05T07:22:01.335Z] iter=20 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && tail -20 scripts/self-test.ts
+[2026-04-05T07:22:01.345Z] iter=20 turn=18 INFO:   -> exit=0 (538 chars)
+[2026-04-05T07:22:01.345Z] iter=20 turn=19 INFO: Turn 19/50
+[2026-04-05T07:22:04.811Z] iter=20 turn=19 INFO: Agent: Let me find where to add tests - I need to see the test helper pattern:
+[2026-04-05T07:22:04.813Z] iter=20 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "function it\|function describe\|^async function test\|// ─── " scripts/self-test.ts | head -30
+[2026-04-05T07:22:04.834Z] iter=20 turn=19 INFO:   -> exit=0 (1886 chars)
+[2026-04-05T07:22:04.835Z] iter=20 turn=20 INFO: Turn 20/50
+[2026-04-05T07:22:07.401Z] iter=20 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "testResuscitation\|testLogging\|testLog" scripts/self-test.ts | head
+[2026-04-05T07:22:07.416Z] iter=20 turn=20 INFO:   -> exit=0 (234 chars)
+[2026-04-05T07:22:07.416Z] iter=20 turn=21 INFO: Turn 21/50
+[2026-04-05T07:22:11.296Z] iter=20 turn=21 INFO: read_file: scripts/self-test.ts
+[2026-04-05T07:22:11.298Z] iter=20 turn=21 INFO:   -> ok (1709 chars)
+[2026-04-05T07:22:11.300Z] iter=20 turn=21 INFO: read_file: scripts/self-test.ts
+[2026-04-05T07:22:11.301Z] iter=20 turn=21 INFO:   -> ok (2437 chars)
+[2026-04-05T07:22:11.302Z] iter=20 turn=22 INFO: Turn 22/50
+[2026-04-05T07:22:15.761Z] iter=20 turn=22 INFO: Agent: Now let me see the end of the logging tests and find where I can add new tests:
+[2026-04-05T07:22:15.763Z] iter=20 turn=22 INFO: read_file: scripts/self-test.ts
+[2026-04-05T07:22:15.765Z] iter=20 turn=22 INFO:   -> ok (817 chars)
+[2026-04-05T07:22:15.766Z] iter=20 turn=23 INFO: Turn 23/50
+[2026-04-05T07:22:18.688Z] iter=20 turn=23 INFO: Agent: Now I need to check imports at the top:
+[2026-04-05T07:22:18.689Z] iter=20 turn=23 INFO: read_file: scripts/self-test.ts
+[2026-04-05T07:22:18.689Z] iter=20 turn=23 INFO:   -> ok (2342 chars)
+[2026-04-05T07:22:18.689Z] iter=20 turn=24 INFO: Turn 24/50
+[2026-04-05T07:22:22.676Z] iter=20 turn=24 INFO: Agent: Now I'll add the imports I need and write the new tests. Let me update the import for logging and resuscitation:
+[2026-04-05T07:22:22.677Z] iter=20 turn=24 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T07:22:22.679Z] iter=20 turn=24 INFO:   -> ok: Patched scripts/self-test.ts: -1 +1 lines
+[2026-04-05T07:22:22.679Z] iter=20 turn=25 INFO: Turn 25/50
+[2026-04-05T07:22:26.134Z] iter=20 turn=25 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T07:22:26.135Z] iter=20 turn=25 INFO:   -> ok: Patched scripts/self-test.ts: -1 +1 lines
+[2026-04-05T07:22:26.135Z] iter=20 turn=26 INFO: Turn 26/50
+[2026-04-05T07:22:29.694Z] iter=20 turn=26 INFO: think: I'm at turn 25/50. I need to be efficient. Let me write all the new tests in one shot, add them to the test runner, veri...
+[2026-04-05T07:22:29.695Z] iter=20 turn=27 INFO: Turn 27/50
+[2026-04-05T07:22:33.344Z] iter=20 turn=27 INFO: Agent: Let me find where to insert the new tests (before the closing `testResuscitation` function) and where to register them in main:
+[2026-04-05T07:22:33.346Z] iter=20 turn=27 INFO: read_file: scripts/self-test.ts
+[2026-04-05T07:22:33.347Z] iter=20 turn=27 INFO:   -> ok (1938 chars)
+[2026-04-05T07:22:33.348Z] iter=20 turn=28 INFO: Turn 28/50
+[2026-04-05T07:22:37.373Z] iter=20 turn=28 INFO: Agent: Now I'll add the new test functions and register them. Let me insert them before the closing `testResuscitation` and add calls in main:
+[2026-04-05T07:22:37.374Z] iter=20 turn=28 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T07:22:37.375Z] iter=20 turn=28 INFO:   -> ok: Patched scripts/self-test.ts: -2 +4 lines
+[2026-04-05T07:22:37.375Z] iter=20 turn=29 INFO: Turn 29/50
+[2026-04-05T07:22:40.301Z] iter=20 turn=29 INFO: Agent: Now add the test functions before the final closing brace. Let me find where `testResuscitation` ends:
+[2026-04-05T07:22:40.302Z] iter=20 turn=29 INFO: read_file: scripts/self-test.ts
+[2026-04-05T07:22:40.303Z] iter=20 turn=29 INFO:   -> ok (498 chars)
+[2026-04-05T07:22:40.303Z] iter=20 turn=30 INFO: Turn 30/50
+[2026-04-05T07:23:20.661Z] iter=20 turn=30 INFO: write_file: scripts/self-test.ts (patch)
+[2026-04-05T07:23:20.663Z] iter=20 turn=30 INFO:   -> ok: Patched scripts/self-test.ts: -5 +183 lines
+[2026-04-05T07:23:20.663Z] iter=20 turn=31 INFO: Turn 31/50
+[2026-04-05T07:23:23.337Z] iter=20 turn=31 INFO: Agent: Now compile and run tests:
+[2026-04-05T07:23:23.337Z] iter=20 turn=31 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T07:23:24.016Z] iter=20 turn=31 INFO:   -> exit=0 (11 chars)
+[2026-04-05T07:23:24.016Z] iter=20 turn=32 INFO: Turn 32/50
+[2026-04-05T07:23:28.096Z] iter=20 turn=32 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -40
+[2026-04-05T07:23:31.775Z] iter=20 turn=32 INFO:   -> exit=0 (1328 chars)
+[2026-04-05T07:23:31.775Z] iter=20 turn=33 INFO: Turn 33/50
+[2026-04-05T07:23:50.711Z] iter=20 turn=33 INFO: Agent: All 453 tests pass (46 new). Now update memory and goals:
+[2026-04-05T07:23:50.712Z] iter=20 turn=33 INFO: write_file: memory.md (append)
+[2026-04-05T07:23:50.712Z] iter=20 turn=33 INFO:   -> ok: Appended 2229 chars to memory.md
+[2026-04-05T07:23:50.712Z] iter=20 turn=34 INFO: Turn 34/50
+[2026-04-05T07:23:59.363Z] iter=20 turn=34 INFO: write_file: goals.md (write)
+[2026-04-05T07:23:59.365Z] iter=20 turn=34 INFO:   -> ok: Updated goals.md (909 chars, 0 lines delta)
+[2026-04-05T07:23:59.365Z] iter=20 turn=35 INFO: Turn 35/50
+[2026-04-05T07:24:02.299Z] iter=20 turn=35 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TYPE CHECK OK"
+[2026-04-05T07:24:02.922Z] iter=20 turn=35 INFO:   -> exit=0 (14 chars)
+[2026-04-05T07:24:02.922Z] iter=20 turn=36 INFO: Turn 36/50
+[2026-04-05T07:24:05.472Z] iter=20 turn=36 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status --short
+[2026-04-05T07:24:05.497Z] iter=20 turn=36 INFO:   -> exit=0 (149 chars)
+[2026-04-05T07:24:05.497Z] iter=20 turn=37 INFO: Turn 37/50
+[2026-04-05T07:24:08.239Z] iter=20 turn=37 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T07:24:08.240Z] iter=20 turn=37 INFO: RESTART signal
+[2026-04-05T07:24:08.240Z] iter=20 turn=37 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T07:24:08.914Z] iter=20 turn=37 INFO: Compilation OK
+[2026-04-05T07:24:13.820Z] iter=20 turn=37 INFO: Cache persisted: 11 entries to .autoagent-cache.json
+[2026-04-05T07:24:13.820Z] iter=20 turn=37 INFO: Cache stats: 0 hits, 11 misses, 11 entries, 12 invalidations (10 entries removed)
+[2026-04-05T07:24:13.820Z] iter=20 turn=37 INFO: Tool cache stats
+[2026-04-05T07:24:13.820Z] iter=20 turn=37 INFO: Tool timing: bash: 13x, avg=440ms, total=5722ms; grep: 3x, avg=33ms, total=98ms; read_file: 8x, avg=2ms, total=18ms; write_file: 12x, avg=1ms, total=16ms; think: 4x, avg=1ms, total=5ms
+[2026-04-05T07:24:13.820Z] iter=20 turn=37 INFO: Tool timing stats

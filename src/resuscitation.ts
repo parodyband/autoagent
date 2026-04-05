@@ -25,6 +25,36 @@ export interface ResuscitationConfig {
   goalsFile: string;
   log: (iter: number, msg: string) => void;
   restart: () => never;
+  /** DI overrides for testing */
+  _executeBash?: typeof executeBash;
+  _saveState?: typeof saveState;
+  _rollbackToPreIteration?: typeof rollbackToPreIteration;
+}
+
+// ─── Pure text generators (extracted for testability) ───────
+
+export function buildRecoveryNote(iteration: number, failures: number, lastReason: string | null, lastCommit: string | null): string {
+  return (
+    `\n## CIRCUIT BREAKER RECOVERY — Iteration ${iteration} (${new Date().toISOString()})\n\n` +
+    `**${failures} consecutive failures.** Rolled back to last good state.\n\n` +
+    `- Last error: ${lastReason}\n` +
+    `- Last failed commit: ${lastCommit?.slice(0, 8) || "unknown"}\n\n` +
+    `**DO NOT retry the same approach.** It failed ${failures} times. Think differently.\n` +
+    `Read agentlog.md to understand what went wrong. Set conservative goals.\n\n---\n`
+  );
+}
+
+export function buildRecoveryGoals(iteration: number, failures: number, lastReason: string | null): string {
+  return (
+    `# AutoAgent Goals — Iteration ${iteration} (RECOVERY)\n\n` +
+    `You hit ${failures} consecutive failures. Previous error: ${lastReason}\n\n` +
+    `## Goals\n\n` +
+    `1. **Read agentlog.md and memory.md.** Understand what failed and why.\n` +
+    `2. **Think from first principles** (use think tool). Why did it fail? What's different about a correct approach?\n` +
+    `3. **Make a minimal safe change** or just stabilize with good notes.\n` +
+    `4. **Verify** with \`npx tsc --noEmit\`.\n` +
+    `5. **Write memory and restart.** \`echo "AUTOAGENT_RESTART"\`\n`
+  );
 }
 
 // ─── Failure counting ───────────────────────────────────────
@@ -45,42 +75,31 @@ export async function resuscitate(
   failures: number,
   config: ResuscitationConfig,
 ): Promise<void> {
+  const execBash = config._executeBash ?? executeBash;
+  const save = config._saveState ?? saveState;
+
   config.log(state.iteration, `CIRCUIT BREAKER: ${failures} failures — resuscitating`);
 
   if (state.lastSuccessfulIteration >= 0) {
     const tag = `pre-iteration-${state.lastSuccessfulIteration + 1}`;
-    const check = await executeBash(`git tag -l ${tag}`, 120, undefined, true);
+    const check = await execBash(`git tag -l ${tag}`, 120, undefined, true);
     if (check.output.trim()) {
-      await executeBash(`git reset --hard ${tag}`, 120, undefined, true);
+      await execBash(`git reset --hard ${tag}`, 120, undefined, true);
       config.log(state.iteration, `Rolled back to ${tag}`);
     }
   }
 
-  const note =
-    `\n## CIRCUIT BREAKER RECOVERY — Iteration ${state.iteration} (${new Date().toISOString()})\n\n` +
-    `**${failures} consecutive failures.** Rolled back to last good state.\n\n` +
-    `- Last error: ${state.lastFailureReason}\n` +
-    `- Last failed commit: ${state.lastFailedCommit?.slice(0, 8) || "unknown"}\n\n` +
-    `**DO NOT retry the same approach.** It failed ${failures} times. Think differently.\n` +
-    `Read agentlog.md to understand what went wrong. Set conservative goals.\n\n---\n`;
+  const note = buildRecoveryNote(state.iteration, failures, state.lastFailureReason, state.lastFailedCommit);
   try { appendFileSync(config.memoryFile, note, "utf-8"); } catch {}
 
-  const goals =
-    `# AutoAgent Goals — Iteration ${state.iteration} (RECOVERY)\n\n` +
-    `You hit ${failures} consecutive failures. Previous error: ${state.lastFailureReason}\n\n` +
-    `## Goals\n\n` +
-    `1. **Read agentlog.md and memory.md.** Understand what failed and why.\n` +
-    `2. **Think from first principles** (use think tool). Why did it fail? What's different about a correct approach?\n` +
-    `3. **Make a minimal safe change** or just stabilize with good notes.\n` +
-    `4. **Verify** with \`npx tsc --noEmit\`.\n` +
-    `5. **Write memory and restart.** \`echo "AUTOAGENT_RESTART"\`\n`;
+  const goals = buildRecoveryGoals(state.iteration, failures, state.lastFailureReason);
   try { writeFileSync(config.goalsFile, goals, "utf-8"); } catch {}
 
   state.lastSuccessfulIteration = state.iteration - 1;
   state.lastFailedCommit = null;
   state.lastFailureReason = null;
   state.iteration++;
-  saveState(state);
+  save(state);
 
   config.log(state.iteration, "Cooldown 10s...");
   await new Promise((r) => setTimeout(r, 10_000));
@@ -98,19 +117,23 @@ export async function handleIterationFailure(
   error: unknown,
   config: ResuscitationConfig,
 ): Promise<void> {
+  const execBash = config._executeBash ?? executeBash;
+  const save = config._saveState ?? saveState;
+  const rollback = config._rollbackToPreIteration ?? rollbackToPreIteration;
+
   const reason = error instanceof Error ? error.message : String(error);
   config.log(state.iteration, `ITERATION FAILED: ${reason}`);
 
-  const shaResult = await executeBash("git rev-parse HEAD 2>/dev/null", 120, undefined, true);
+  const shaResult = await execBash("git rev-parse HEAD 2>/dev/null", 120, undefined, true);
   const failedSha = shaResult.output.trim();
 
-  await rollbackToPreIteration(state.iteration);
+  await rollback(state.iteration);
   config.log(state.iteration, `Rolled back to pre-iteration-${state.iteration}`);
 
   state.lastFailedCommit = failedSha;
   state.lastFailureReason = reason;
   state.iteration++;
-  saveState(state);
+  save(state);
 
   const entry = `\n## Iteration ${state.iteration - 1} — FAILED (${new Date().toISOString()})\n\n- **Error**: ${reason}\n- **Rolled back**\n\n---\n`;
   try { appendFileSync(config.memoryFile, entry, "utf-8"); } catch {}

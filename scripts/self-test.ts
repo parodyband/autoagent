@@ -19,13 +19,13 @@ import { compactMemory, smartCompactMemory } from "./compact-memory.js";
 import { generateDashboard } from "./dashboard.js";
 import { analyzeCodebase, formatReport } from "../src/code-analysis.js";
 import { buildSystemPrompt, buildInitialMessage, budgetWarning, turnLimitNudge, validationBlockedMessage } from "../src/messages.js";
-import { Logger, createLogger, parseJsonlLog, type LogEntry } from "../src/logging.js";
+import { Logger, createLogger, parseJsonlLog, rotateLogFile, LOG_ROTATION_LIMITS, type LogEntry } from "../src/logging.js";
 import { ToolCache, CACHEABLE_TOOLS, extractPaths, pathOverlaps } from "../src/tool-cache.js";
 import { ToolTimingTracker } from "../src/tool-timing.js";
 import { getIterationCommits, computeDiffStats, getAllIterationDiffs, type IterationDiffStats, type FileDiffStat } from "../src/iteration-diff.js";
 import { recordMetrics, type IterationMetrics } from "../src/finalization.js";
 import { handleToolCall, processTurn, runConversation, type IterationCtx, type TurnResult } from "../src/conversation.js";
-import { countConsecutiveFailures, type ResuscitationConfig } from "../src/resuscitation.js";
+import { countConsecutiveFailures, buildRecoveryNote, buildRecoveryGoals, resuscitate, handleIterationFailure, type ResuscitationConfig } from "../src/resuscitation.js";
 import type { IterationState } from "../src/iteration.js";
 import { existsSync, unlinkSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync } from "fs";
 import path from "path";
@@ -683,6 +683,8 @@ async function main(): Promise<void> {
     await testRunConversation();
     await testProcessTurnErrors();
     testResuscitation();
+    testLogRotation();
+    await testResuscitationE2E();
   } finally {
     // Cleanup
     if (existsSync(TEMP_DIR)) {
@@ -1667,6 +1669,184 @@ function testResuscitation(): void {
   // countConsecutiveFailures: 2 failures
   const state6: IterationState = { iteration: 10, lastSuccessfulIteration: 7, lastFailedCommit: "def", lastFailureReason: "error" };
   assert(countConsecutiveFailures(state6) === 2, "resus: 2 failures for gap of 2");
+}
+
+// ─── Log Rotation Tests ─────────────────────────────────────
+
+function testLogRotation(): void {
+  console.log("\n🔄 Log Rotation");
+  mkdirSync(TEMP_DIR, { recursive: true });
+
+  // rotateLogFile on missing file returns 0
+  const missing = path.join(TEMP_DIR, "nonexistent-rotate.log");
+  assert(rotateLogFile(missing, 100) === 0, "rotate: missing file returns 0");
+
+  // File under limit — no rotation
+  const smallFile = path.join(TEMP_DIR, "small.log");
+  writeFileSync(smallFile, "line1\nline2\nline3\n", "utf-8");
+  assert(rotateLogFile(smallFile, 10) === 0, "rotate: small file not rotated");
+  assert(readFileSync(smallFile, "utf-8") === "line1\nline2\nline3\n", "rotate: small file unchanged");
+
+  // File over limit — rotated to keep last N
+  const bigFile = path.join(TEMP_DIR, "big.log");
+  const lines = Array.from({ length: 20 }, (_, i) => `line-${i}`).join("\n") + "\n";
+  writeFileSync(bigFile, lines, "utf-8");
+  const removed = rotateLogFile(bigFile, 5);
+  assert(removed === 15, "rotate: removed 15 lines", `got ${removed}`);
+  const remaining = readFileSync(bigFile, "utf-8");
+  assert(remaining.includes("line-15"), "rotate: kept line-15");
+  assert(remaining.includes("line-19"), "rotate: kept line-19");
+  assert(!remaining.includes("line-0"), "rotate: removed line-0");
+  assert(!remaining.includes("line-14"), "rotate: removed line-14");
+
+  // Exact limit — no rotation
+  const exactFile = path.join(TEMP_DIR, "exact.log");
+  writeFileSync(exactFile, "a\nb\nc\n", "utf-8");
+  assert(rotateLogFile(exactFile, 3) === 0, "rotate: exact limit not rotated");
+
+  // createLogger with rotation enabled trims files
+  const rotJsonl = path.join(TEMP_DIR, "rot-agentlog.jsonl");
+  const rotHuman = path.join(TEMP_DIR, "rot-agentlog.md");
+  const bigJsonl = Array.from({ length: 600 }, (_, i) => JSON.stringify({ i })).join("\n") + "\n";
+  writeFileSync(rotJsonl, bigJsonl, "utf-8");
+  writeFileSync(rotHuman, Array.from({ length: 1200 }, (_, i) => `line ${i}`).join("\n") + "\n", "utf-8");
+  // createLogger uses TEMP_DIR as root, expects "agentlog.jsonl" and "agentlog.md" inside
+  // We need to use rotateLogFile directly since createLogger hardcodes filenames
+  rotateLogFile(rotJsonl, LOG_ROTATION_LIMITS.jsonl);
+  rotateLogFile(rotHuman, LOG_ROTATION_LIMITS.human);
+  const jsonlLines = readFileSync(rotJsonl, "utf-8").split("\n").filter(l => l.trim()).length;
+  const humanLines = readFileSync(rotHuman, "utf-8").split("\n").filter(l => l.trim()).length;
+  assert(jsonlLines === LOG_ROTATION_LIMITS.jsonl, "rotate: jsonl trimmed to limit", `got ${jsonlLines}`);
+  assert(humanLines === LOG_ROTATION_LIMITS.human, "rotate: human trimmed to limit", `got ${humanLines}`);
+
+  // LOG_ROTATION_LIMITS values are sensible
+  assert(LOG_ROTATION_LIMITS.jsonl === 500, "rotate: jsonl limit is 500");
+  assert(LOG_ROTATION_LIMITS.human === 1000, "rotate: human limit is 1000");
+}
+
+// ─── Resuscitation E2E Tests ────────────────────────────────
+
+async function testResuscitationE2E(): Promise<void> {
+  console.log("\n🔧 Resuscitation E2E");
+  mkdirSync(TEMP_DIR, { recursive: true });
+
+  // buildRecoveryNote: contains key info
+  const note = buildRecoveryNote(5, 3, "type error in agent.ts", "abc12345def");
+  assert(note.includes("CIRCUIT BREAKER RECOVERY"), "resus-e2e: note has header");
+  assert(note.includes("3 consecutive failures"), "resus-e2e: note has failure count");
+  assert(note.includes("type error in agent.ts"), "resus-e2e: note has error reason");
+  assert(note.includes("abc12345"), "resus-e2e: note has commit (truncated to 8)");
+  assert(note.includes("DO NOT retry"), "resus-e2e: note has warning");
+
+  // buildRecoveryNote: null commit shows "unknown"
+  const noteNull = buildRecoveryNote(5, 3, null, null);
+  assert(noteNull.includes("unknown"), "resus-e2e: null commit shows unknown");
+
+  // buildRecoveryGoals: contains recovery structure
+  const goals = buildRecoveryGoals(10, 3, "tsc failed");
+  assert(goals.includes("Iteration 10 (RECOVERY)"), "resus-e2e: goals header");
+  assert(goals.includes("3 consecutive failures"), "resus-e2e: goals failure count");
+  assert(goals.includes("tsc failed"), "resus-e2e: goals has error");
+  assert(goals.includes("Read agentlog.md"), "resus-e2e: goals has step 1");
+  assert(goals.includes("Think from first principles"), "resus-e2e: goals has step 2");
+  assert(goals.includes("npx tsc --noEmit"), "resus-e2e: goals has verify step");
+
+  // Full resuscitate with DI mocks — verify it writes files and calls git
+  const memFile = path.join(TEMP_DIR, "resus-memory.md");
+  const goalsFile = path.join(TEMP_DIR, "resus-goals.md");
+  writeFileSync(memFile, "# Memory\n", "utf-8");
+  const logs: string[] = [];
+  const bashCalls: string[] = [];
+
+  let restartCalled = false;
+  const state: IterationState = {
+    iteration: 5,
+    lastSuccessfulIteration: 2,
+    lastFailedCommit: "deadbeef1234",
+    lastFailureReason: "validation failed",
+  };
+
+  const mockConfig: ResuscitationConfig = {
+    memoryFile: memFile,
+    goalsFile: goalsFile,
+    log: (_iter: number, msg: string) => logs.push(msg),
+    restart: (() => { restartCalled = true; }) as () => never,
+    _executeBash: async (cmd: string) => {
+      bashCalls.push(cmd);
+      if (cmd.includes("git tag -l")) return { output: "pre-iteration-3\n", exitCode: 0 };
+      return { output: "", exitCode: 0 };
+    },
+    _saveState: () => {},
+  };
+
+  // Use a short timeout override — can't wait 10s in tests
+  // We'll run resuscitate but with a patched setTimeout
+  const origSetTimeout = globalThis.setTimeout;
+  (globalThis as any).setTimeout = (fn: () => void, _ms: number) => origSetTimeout(fn, 0);
+  try {
+    await resuscitate(state, 3, mockConfig);
+  } finally {
+    globalThis.setTimeout = origSetTimeout;
+  }
+
+  assert(restartCalled, "resus-e2e: restart was called");
+  assert(bashCalls.some(c => c.includes("git tag -l pre-iteration-3")), "resus-e2e: checked for git tag");
+  assert(bashCalls.some(c => c.includes("git reset --hard")), "resus-e2e: git reset called");
+  assert(logs.some(l => l.includes("CIRCUIT BREAKER")), "resus-e2e: logged circuit breaker");
+
+  const memContent = readFileSync(memFile, "utf-8");
+  assert(memContent.includes("CIRCUIT BREAKER RECOVERY"), "resus-e2e: memory file updated");
+  assert(memContent.includes("validation failed"), "resus-e2e: memory has error reason");
+
+  assert(existsSync(goalsFile), "resus-e2e: goals file created");
+  const goalsContent = readFileSync(goalsFile, "utf-8");
+  assert(goalsContent.includes("RECOVERY"), "resus-e2e: goals file has recovery");
+
+  // State was mutated correctly
+  assert(state.iteration === 6, "resus-e2e: iteration incremented", `got ${state.iteration}`);
+  assert(state.lastSuccessfulIteration === 4, "resus-e2e: lastSuccess reset to iter-1");
+  assert(state.lastFailedCommit === null, "resus-e2e: lastFailedCommit cleared");
+
+  // handleIterationFailure with DI mocks
+  const failMemFile = path.join(TEMP_DIR, "fail-memory.md");
+  writeFileSync(failMemFile, "# Mem\n", "utf-8");
+  const failLogs: string[] = [];
+  const failBashCalls: string[] = [];
+  let failRestartCalled = false;
+
+  const failState: IterationState = {
+    iteration: 8,
+    lastSuccessfulIteration: 7,
+    lastFailedCommit: null,
+    lastFailureReason: null,
+  };
+
+  const failConfig: ResuscitationConfig = {
+    memoryFile: failMemFile,
+    goalsFile: path.join(TEMP_DIR, "fail-goals.md"),
+    log: (_iter: number, msg: string) => failLogs.push(msg),
+    restart: (() => { failRestartCalled = true; }) as () => never,
+    _executeBash: async (cmd: string) => {
+      failBashCalls.push(cmd);
+      if (cmd.includes("git rev-parse")) return { output: "abcd1234\n", exitCode: 0 };
+      return { output: "", exitCode: 0 };
+    },
+    _saveState: () => {},
+    _rollbackToPreIteration: async () => {},
+  };
+
+  await handleIterationFailure(failState, new Error("tsc exploded"), failConfig);
+
+  assert(failRestartCalled, "resus-e2e: failure handler called restart");
+  assert(failState.lastFailedCommit === "abcd1234", "resus-e2e: failure recorded commit");
+  assert(failState.lastFailureReason === "tsc exploded", "resus-e2e: failure recorded reason");
+  assert(failState.iteration === 9, "resus-e2e: failure incremented iteration");
+  assert(failLogs.some(l => l.includes("ITERATION FAILED")), "resus-e2e: failure logged");
+  assert(failBashCalls.some(c => c.includes("git rev-parse")), "resus-e2e: failure got HEAD sha");
+
+  const failMem = readFileSync(failMemFile, "utf-8");
+  assert(failMem.includes("FAILED"), "resus-e2e: failure wrote to memory");
+  assert(failMem.includes("tsc exploded"), "resus-e2e: failure memory has reason");
 }
 
   const duration = ((Date.now() - start) / 1000).toFixed(1);
