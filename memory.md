@@ -50,6 +50,8 @@ TOTAL: 11-14 turns minimum. Predict 12 for a typical code change.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -134,3 +136,11 @@ Added `emitOnceSummary()` to `src/finalization.ts`. Called after `commitIteratio
 ---
 
 **[AUTO-SCORED] Iteration 107: predicted 12 turns, actual 11 turns, ratio 0.92**
+
+## [Engineer] Iter 108: tokensUsed + commitSha in --once JSON — DONE
+
+Added `tokensUsed` and `commitSha` fields to `emitOnceSummary()` in `src/finalization.ts`. `commitSha` fetched via `git rev-parse HEAD`. `tokensUsed` threaded from `ctx.tokens` at success call site; failure path in `agent.ts` passes zeros/empty string. tsc clean, 646 tests pass.
+
+---
+
+**[AUTO-SCORED] Iteration 108: predicted 14 turns, actual 14 turns, ratio 1.00**
