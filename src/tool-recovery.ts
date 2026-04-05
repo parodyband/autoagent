@@ -6,6 +6,11 @@
  * - Bash command not found → suggest npx prefix
  * - Bash timeout → suggest breaking into smaller commands
  * - Grep no matches → suggest case-insensitive search
+ * - Permission denied → suggest chmod or check ownership
+ * - Port in use (EADDRINUSE) → suggest lsof -i :PORT
+ * - Out of memory → suggest reducing scope
+ * - JSON syntax error → suggest trailing comma / missing quote fixes
+ * - Module not found → suggest npm install or check import path
  */
 
 import * as fs from "fs";
@@ -121,6 +126,122 @@ function isPermissionDenied(error: string): boolean {
   return /permission denied/i.test(error) || /eacces/i.test(error);
 }
 
+function isPortInUse(error: string): boolean {
+  return /eaddrinuse/i.test(error) || /address already in use/i.test(error);
+}
+
+function isOutOfMemory(error: string): boolean {
+  return (
+    /out of memory/i.test(error) ||
+    /enomem/i.test(error) ||
+    /heap out of memory/i.test(error) ||
+    /javascript heap/i.test(error) ||
+    /allocation failed/i.test(error)
+  );
+}
+
+function isJsonSyntaxError(error: string): boolean {
+  return (
+    /unexpected token/i.test(error) ||
+    /json parse error/i.test(error) ||
+    /invalid json/i.test(error) ||
+    /syntaxerror.*json/i.test(error) ||
+    /json at position/i.test(error)
+  );
+}
+
+function isModuleNotFound(error: string): boolean {
+  return (
+    /cannot find module/i.test(error) ||
+    /module not found/i.test(error) ||
+    /err_module_not_found/i.test(error) ||
+    /failed to resolve import/i.test(error)
+  );
+}
+
+// ─── Port extraction helper ────────────────────────────────────
+
+function extractPort(error: string): string | null {
+  const match = error.match(/:(\d{2,5})/);
+  return match ? match[1] : null;
+}
+
+// ─── Module name extraction helper ────────────────────────────
+
+function extractModuleName(error: string): string | null {
+  const patterns = [
+    /cannot find module ['"]([^'"]+)['"]/i,
+    /module not found.*['"]([^'"]+)['"]/i,
+    /failed to resolve import ['"]([^'"]+)['"]/i,
+  ];
+  for (const pat of patterns) {
+    const m = error.match(pat);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+// ─── Shared error enhancers ────────────────────────────────────
+
+function enhancePermissionDenied(filePath: string, error: string): string {
+  return (
+    `${error}\n💡 Permission denied on '${filePath}'. Try:\n` +
+    `  • chmod +x ${filePath}  (if it should be executable)\n` +
+    `  • chmod 644 ${filePath}  (for regular read/write)\n` +
+    `  • Check ownership: ls -la ${path.dirname(filePath) || "."}`
+  );
+}
+
+function enhancePortInUse(error: string): string {
+  const port = extractPort(error);
+  const portStr = port ?? "<PORT>";
+  return (
+    `${error}\n💡 Port ${portStr} is already in use. Try:\n` +
+    `  • Find the process: lsof -i :${portStr}\n` +
+    `  • Kill it: kill -9 $(lsof -ti :${portStr})\n` +
+    `  • Or use a different port`
+  );
+}
+
+function enhanceOutOfMemory(error: string): string {
+  return (
+    `${error}\n💡 Out of memory. Try:\n` +
+    `  • Reduce scope — process fewer files at once\n` +
+    `  • Increase Node.js heap: NODE_OPTIONS=--max-old-space-size=4096\n` +
+    `  • Close other processes to free memory`
+  );
+}
+
+function enhanceJsonSyntaxError(error: string): string {
+  return (
+    `${error}\n💡 JSON syntax error. Common causes:\n` +
+    `  • Trailing comma after last item (not allowed in JSON)\n` +
+    `  • Missing or mismatched quotes around keys/values\n` +
+    `  • Unescaped special characters (use \\n, \\t, \\" etc.)\n` +
+    `  • Comments in JSON (not supported — use JSON5 or strip them)`
+  );
+}
+
+function enhanceModuleNotFound(error: string): string {
+  const modName = extractModuleName(error);
+  const mod = modName ?? "<module>";
+  const isRelative = mod.startsWith(".");
+  if (isRelative) {
+    return (
+      `${error}\n💡 Module '${mod}' not found. For relative imports:\n` +
+      `  • Check the path is correct relative to the current file\n` +
+      `  • Ensure the .js extension is present (ESM requires it)\n` +
+      `  • Verify the file exists: ls ${mod}`
+    );
+  }
+  return (
+    `${error}\n💡 Module '${mod}' not found. Try:\n` +
+    `  • Install it: npm install ${mod}\n` +
+    `  • Check spelling in package.json dependencies\n` +
+    `  • Verify node_modules exists: ls node_modules/${mod}`
+  );
+}
+
 // ─── Per-tool recovery strategies ─────────────────────────────
 
 function recoverReadFile(
@@ -146,7 +267,7 @@ function recoverReadFile(
   }
 
   if (isPermissionDenied(error)) {
-    return `${error}\n💡 Permission denied — try reading from a different path or check file permissions.`;
+    return enhancePermissionDenied(requestedPath, error);
   }
 
   return error;
@@ -172,7 +293,7 @@ function recoverWriteFile(
   }
 
   if (isPermissionDenied(error)) {
-    return `${error}\n💡 Permission denied writing to ${requestedPath}. Check directory permissions.`;
+    return enhancePermissionDenied(requestedPath, error);
   }
 
   return error;
@@ -183,6 +304,22 @@ function recoverBash(
   error: string,
 ): string {
   const command = (input["command"] as string | undefined) ?? "";
+
+  if (isPortInUse(error)) {
+    return enhancePortInUse(error);
+  }
+
+  if (isOutOfMemory(error)) {
+    return enhanceOutOfMemory(error);
+  }
+
+  if (isJsonSyntaxError(error)) {
+    return enhanceJsonSyntaxError(error);
+  }
+
+  if (isModuleNotFound(error)) {
+    return enhanceModuleNotFound(error);
+  }
 
   if (isCommandNotFound(error)) {
     // Extract the command name from the error or input
@@ -199,7 +336,7 @@ function recoverBash(
 
   if (isPermissionDenied(error)) {
     const cmdName = command.split(" ")[0];
-    return `${error}\n💡 Permission denied. Try:\n  • chmod +x ${cmdName}\n  • Run with appropriate permissions`;
+    return enhancePermissionDenied(cmdName, error);
   }
 
   return error;

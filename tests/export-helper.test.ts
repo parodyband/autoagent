@@ -102,3 +102,100 @@ describe("buildExportContent", () => {
     expect(content.length).toBeGreaterThan(50);
   });
 });
+
+describe("buildExportContent — formatting improvements", () => {
+  let tmpDir: string;
+  let exportPath: string;
+
+  beforeEach(() => {
+    tmpDir = makeTempDir();
+    exportPath = path.join(tmpDir, "export.md");
+  });
+
+  afterEach(() => {
+    if (existsSync(tmpDir)) rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it("includes HR separators between turns", () => {
+    const messages = [
+      { role: "user" as const, content: "Hello" },
+      { role: "assistant" as const, content: "Hi there" },
+    ];
+    buildExportContent(messages, "claude-3-5-sonnet", { tokensIn: 0, tokensOut: 0, cost: 0 }, tmpDir, exportPath);
+    const content = readFileSync(exportPath, "utf-8");
+    // Should have multiple HR separators
+    const hrCount = (content.match(/^---$/gm) ?? []).length;
+    expect(hrCount).toBeGreaterThanOrEqual(3);
+  });
+
+  it("renders tool calls as <details> blocks", () => {
+    const messages = [
+      {
+        role: "assistant" as const,
+        content: 'Running command.\n{"type":"tool_use","id":"t1","name":"bash","input":{"command":"ls -la"}}\nDone.',
+      },
+    ];
+    buildExportContent(messages, "claude-3-5-sonnet", { tokensIn: 0, tokensOut: 0, cost: 0 }, tmpDir, exportPath);
+    const content = readFileSync(exportPath, "utf-8");
+    expect(content).toContain("<details>");
+    expect(content).toContain("</details>");
+    expect(content).toContain("<summary>");
+    expect(content).toContain("bash");
+  });
+
+  it("tool call <details> block contains the input JSON", () => {
+    const messages = [
+      {
+        role: "assistant" as const,
+        content: '{"type":"tool_use","id":"t1","name":"read_file","input":{"path":"src/foo.ts"}}',
+      },
+    ];
+    buildExportContent(messages, "claude-3-5-sonnet", { tokensIn: 0, tokensOut: 0, cost: 0 }, tmpDir, exportPath);
+    const content = readFileSync(exportPath, "utf-8");
+    expect(content).toContain("src/foo.ts");
+    expect(content).toContain("**Input:**");
+  });
+
+  it("produces a table of contents for user messages", () => {
+    const messages = [
+      { role: "user" as const, content: "Fix the login bug" },
+      { role: "assistant" as const, content: "Sure" },
+      { role: "user" as const, content: "Now add tests" },
+    ];
+    buildExportContent(messages, "claude-3-5-sonnet", { tokensIn: 0, tokensOut: 0, cost: 0 }, tmpDir, exportPath);
+    const content = readFileSync(exportPath, "utf-8");
+    expect(content).toContain("## Table of Contents");
+    expect(content).toContain("Fix the login bug");
+    expect(content).toContain("Now add tests");
+  });
+
+  it("TOC anchor links use lowercase-hyphenated format", () => {
+    const messages = [
+      { role: "user" as const, content: "Hello world" },
+    ];
+    buildExportContent(messages, "claude-3-5-sonnet", { tokensIn: 0, tokensOut: 0, cost: 0 }, tmpDir, exportPath);
+    const content = readFileSync(exportPath, "utf-8");
+    // Anchor should be lowercase hyphenated
+    expect(content).toMatch(/\(#user-message-\d+\)/);
+  });
+
+  it("user messages use numbered headings for anchor targets", () => {
+    const messages = [
+      { role: "user" as const, content: "First message" },
+      { role: "user" as const, content: "Second message" },
+    ];
+    buildExportContent(messages, "claude-3-5-sonnet", { tokensIn: 0, tokensOut: 0, cost: 0 }, tmpDir, exportPath);
+    const content = readFileSync(exportPath, "utf-8");
+    expect(content).toContain("## User Message 1");
+    expect(content).toContain("## User Message 2");
+  });
+
+  it("skips TOC when there are no user messages", () => {
+    const messages = [
+      { role: "assistant" as const, content: "Hello" },
+    ];
+    buildExportContent(messages, "claude-3-5-sonnet", { tokensIn: 0, tokensOut: 0, cost: 0 }, tmpDir, exportPath);
+    const content = readFileSync(exportPath, "utf-8");
+    expect(content).not.toContain("## Table of Contents");
+  });
+});

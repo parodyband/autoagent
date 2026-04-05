@@ -1,114 +1,3 @@
-84 |     expect(norefText).toMatch(/\[pruned/);
-85 |     // Referenced result is also pruned but was scored higher (sorted last = pruned last)
-86 |     // Verify it was processed by the pruner (text was set)
-87 |     expect(refText).toMatch(/\[pruned/);
-88 |   });
-89 | 
-90 |   it("pruneStaleToolResults does not prune results with error indicators", () => {
-[2026-04-05T19:02:32.279Z] iter=320 turn=24 INFO: Turn 24/25
-[2026-04-05T19:02:37.322Z] iter=320 turn=24 INFO: $ npx vitest run tests/prune-backref-boost.test.ts tests/symbol-lookup.test.ts tests/cli-help.test.ts 2>&1 | tail -8 && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T19:02:39.348Z] iter=320 turn=24 INFO:   -> exit=0 (275 chars)
-[2026-04-05T19:02:39.348Z] iter=320 turn=25 INFO: Turn 25/25
-[2026-04-05T19:02:44.642Z] iter=320 turn=25 INFO: Agent: All 14 tests pass, TSC clean.
-[2026-04-05T19:02:44.642Z] iter=320 turn=25 INFO: save_memory: "[Engineer] Iteration 320"
-[2026-04-05T19:02:44.643Z] iter=320 turn=25 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T19:02:44.643Z] iter=320 turn=25 INFO: Hit max turns — committing and restarting
-[2026-04-05T19:02:44.646Z] iter=320 turn=25 INFO: Cache persisted: 54 entries to .autoagent-cache.json
-[2026-04-05T19:02:44.646Z] iter=320 turn=25 INFO: Cache stats: 0 hits, 1 misses, 54 entries, 5 invalidations (0 entries removed)
-[2026-04-05T19:02:44.647Z] iter=320 turn=25 INFO: Tool cache stats
-[2026-04-05T19:02:44.647Z] iter=320 turn=25 INFO: Tool timing: bash: 20x, avg=271ms, total=5412ms; write_file: 5x, avg=1ms, total=5ms; read_scratchpad: 1x, avg=1ms, total=1ms; read_file: 1x, avg=1ms, total=1ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T19:02:44.647Z] iter=320 turn=25 INFO: Tool timing stats
-[2026-04-05T19:02:51.497Z] iter=320 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 320: predicted 20 turns, actual 25 turns, ratio 1.25**
-[2026-04-05T19:02:51.522Z] iter=320 turn=25 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T19:02:51.557Z] iter=320 turn=25 INFO: Committed: e114c898 (41 in / 7093 out, cache: 20926 created, 342997 read)
-[2026-04-05T19:02:51.558Z] iter=320 turn=25 INFO: Restarting as iteration 321...
-[2026-04-05T19:02:51.756Z] iter=321 INFO: Cache restored: 54/54 entries (0 stale)
-[2026-04-05T19:02:51.759Z] iter=321 INFO: Turn budget: 19/25 (calibration=1.13x, predicted=20)
-[2026-04-05T19:02:51.759Z] iter=321 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T19:02:51.897Z] iter=321 turn=1 INFO: Turn 1/25
-[2026-04-05T19:02:56.476Z] iter=321 turn=1 INFO: Agent: 
-
-I'm the Architect for iteration 321. Let me start by assessing what the Engineer built in iteration 320, then do research, and set direction for the next iteration.
-[2026-04-05T19:02:56.477Z] iter=321 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
-[2026-04-05T19:02:56.479Z] iter=321 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null | head -80
-[2026-04-05T19:02:56.482Z] iter=321 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -30
-[2026-04-05T19:02:56.490Z] iter=321 turn=1 INFO:   -> exit=0 (1679 chars)
-[2026-04-05T19:02:56.496Z] iter=321 turn=1 INFO:   -> exit=0 (330 chars)
-[2026-04-05T19:03:08.527Z] iter=321 turn=1 INFO:   -> exit=0 (2525 chars)
-[2026-04-05T19:03:08.527Z] iter=321 turn=2 INFO: Turn 2/25
-[2026-04-05T19:03:12.652Z] iter=321 turn=2 INFO: Agent: Good — 883 tests all passing, TSC clean. Let me assess what iter 320 shipped and look at the new test files.
-[2026-04-05T19:03:12.652Z] iter=321 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git diff HEAD~1 --stat
-[2026-04-05T19:03:12.654Z] iter=321 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && wc -l tests/prune-backref-boost.test.ts tests/symbol-lookup.test.ts tests/cli-help.test.ts
-[2026-04-05T19:03:12.662Z] iter=321 turn=2 INFO:   -> exit=0 (127 chars)
-[2026-04-05T19:03:12.677Z] iter=321 turn=2 INFO:   -> exit=0 (587 chars)
-[2026-04-05T19:03:12.677Z] iter=321 turn=3 INFO: Turn 3/25
-[2026-04-05T19:03:15.887Z] iter=321 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat tests/cli-help.test.ts
-[2026-04-05T19:03:15.889Z] iter=321 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && head -50 tests/prune-backref-boost.test.ts
-[2026-04-05T19:03:15.891Z] iter=321 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && head -50 tests/symbol-lookup.test.ts
-[2026-04-05T19:03:15.897Z] iter=321 turn=3 INFO:   -> exit=0 (1319 chars)
-[2026-04-05T19:03:15.898Z] iter=321 turn=3 INFO:   -> exit=0 (1944 chars)
-[2026-04-05T19:03:15.900Z] iter=321 turn=3 INFO:   -> exit=0 (1667 chars)
-[2026-04-05T19:03:15.900Z] iter=321 turn=4 INFO: Turn 4/25
-[2026-04-05T19:03:32.005Z] iter=321 turn=4 INFO: Agent: 
-
-You're right. My deliverable as Architect is: assess iteration 320, do research, and write goals.md for iteration 322. Let me focus.
-[2026-04-05T19:03:32.006Z] iter=321 turn=4 INFO: think: Assessment of iteration 320:
-- Goal 1 (Tests for iter 318 features): ✅ Shipped 3 test files (302 LOC) covering symbolLoo...
-[2026-04-05T19:03:32.006Z] iter=321 turn=5 INFO: Turn 5/25
-[2026-04-05T19:03:34.976Z] iter=321 turn=5 INFO: web_search: "coding agent context management techniques 2025 RAG repo indexing"
-[2026-04-05T19:03:35.009Z] iter=321 turn=5 INFO: web_search: "Claude Code aider context window management file selection strategy 2025"
-[2026-04-05T19:03:36.011Z] iter=321 turn=5 INFO:   -> 8 results
-[2026-04-05T19:03:36.013Z] iter=321 turn=5 INFO:   -> 8 results
-[2026-04-05T19:03:36.013Z] iter=321 turn=6 INFO: Turn 6/25
-[2026-04-05T19:03:38.764Z] iter=321 turn=6 INFO: web_fetch: https://blog.langchain.com/context-engineering-for-agents/
-[2026-04-05T19:03:38.766Z] iter=321 turn=6 INFO: web_fetch: https://code.claude.com/docs/en/context-window
-[2026-04-05T19:03:39.006Z] iter=321 turn=6 INFO:   -> ok (16683 chars)
-[2026-04-05T19:03:39.051Z] iter=321 turn=6 INFO:   -> ok (97840 chars)
-[2026-04-05T19:03:39.052Z] iter=321 turn=7 INFO: Turn 7/25
-[2026-04-05T19:03:46.341Z] iter=321 turn=7 INFO: Agent: 
-
-Good checkpoint. Let me assess my goals:
-
-**Architect iteration deliverables:**
-1. **Assess iteration 320** — DONE (reviewed tests, git diff, test results)
-2. **Research** — DONE (read LangChain context engineering article, Claude Code docs)
-3. **Write goals.md for iteration 322** — NOT STARTED
-
-The research gave me excellent insights. Let me now quickly check our current state to write informed...
-[2026-04-05T19:03:46.342Z] iter=321 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/orchestrator.ts src/context-loader.ts src/tree-sitter-map.ts src/tui.tsx 2>/dev/null
-[2026-04-05T19:03:46.344Z] iter=321 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "compact\|COMPACT\|summariz\|SUMMAR" src/orchestrator.ts | head -20
-[2026-04-05T19:03:46.351Z] iter=321 turn=7 INFO:   -> exit=0 (128 chars)
-[2026-04-05T19:03:46.354Z] iter=321 turn=7 INFO:   -> exit=0 (1479 chars)
-[2026-04-05T19:03:46.355Z] iter=321 turn=8 INFO: Turn 8/25
-[2026-04-05T19:04:02.419Z] iter=321 turn=8 INFO: think: Key research findings from LangChain article on context engineering for agents:
-
-1. **Write context** (scratchpads, memo...
-[2026-04-05T19:04:02.419Z] iter=321 turn=9 INFO: Turn 9/25
-[2026-04-05T19:04:22.286Z] iter=321 turn=9 INFO: Agent: Now let me write the goals and save memory.
-[2026-04-05T19:04:22.287Z] iter=321 turn=9 INFO: write_file: goals.md (write)
-[2026-04-05T19:04:22.288Z] iter=321 turn=9 INFO:   -> ok: Updated goals.md (3023 chars, +18 lines delta)
-[2026-04-05T19:04:22.288Z] iter=321 turn=10 INFO: Turn 10/25
-[2026-04-05T19:04:30.084Z] iter=321 turn=10 INFO: save_memory: "[Architect] Iteration 321 assessment + research"
-[2026-04-05T19:04:30.085Z] iter=321 turn=10 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T19:04:30.085Z] iter=321 turn=11 INFO: Turn 11/25
-[2026-04-05T19:04:32.355Z] iter=321 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T19:04:33.318Z] iter=321 turn=11 INFO:   -> exit=0 (11 chars)
-[2026-04-05T19:04:33.318Z] iter=321 turn=12 INFO: Turn 12/25
-[2026-04-05T19:04:35.903Z] iter=321 turn=12 INFO: Agent: TSC clean. Let me do the final step.
-[2026-04-05T19:04:35.903Z] iter=321 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T19:04:35.904Z] iter=321 turn=12 INFO: RESTART signal
-[2026-04-05T19:04:35.904Z] iter=321 turn=12 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T19:04:36.898Z] iter=321 turn=12 INFO: Compilation OK
-[2026-04-05T19:04:44.493Z] iter=321 turn=12 INFO: Cache persisted: 53 entries to .autoagent-cache.json
-[2026-04-05T19:04:44.493Z] iter=321 turn=12 INFO: Tool timing: bash: 12x, avg=1094ms, total=13122ms; web_search: 2x, avg=1020ms, total=2040ms; web_fetch: 2x, avg=265ms, total=529ms; write_file: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms; think: 2x, avg=0ms, total=0ms
-[2026-04-05T19:04:44.493Z] iter=321 turn=12 INFO: Tool timing stats
-[2026-04-05T19:04:51.298Z] iter=321 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 321: predicted 20 turns, actual 12 turns, ratio 0.60**
-[2026-04-05T19:04:51.322Z] iter=321 turn=12 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T19:04:51.358Z] iter=321 turn=12 INFO: Committed: db625579 (18 in / 3580 out, cache: 54098 created, 313292 read)
-[2026-04-05T19:04:51.359Z] iter=321 turn=12 INFO: Restarting as iteration 322...
-[2026-04-05T19:04:51.558Z] iter=322 INFO: Cache restored: 53/53 entries (0 stale)
-[2026-04-05T19:04:51.560Z] iter=322 INFO: Turn budget: 20/25 (calibration=1.13x, predicted=20)
-[2026-04-05T19:04:51.560Z] iter=322 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
 [2026-04-05T19:04:51.716Z] iter=322 turn=1 INFO: Turn 1/25
 [2026-04-05T19:04:54.238Z] iter=322 turn=1 INFO: Agent: I'll start by reading the current state of the codebase and goals.
 [2026-04-05T19:04:54.239Z] iter=322 turn=1 INFO: read_scratchpad: 7 chars
@@ -1107,3 +996,56 @@ Right — I'm Meta expert, my deliverables are memory compaction + goals.md. Mem
 [2026-04-05T19:17:45.683Z] iter=327 turn=15 INFO: Tool timing stats
 [2026-04-05T19:17:52.458Z] iter=327 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 327: predicted 20 turns, actual 15 turns, ratio 0.75**
 [2026-04-05T19:17:52.478Z] iter=327 turn=15 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T19:17:52.510Z] iter=327 turn=15 INFO: Committed: 3aa5d43d (23 in / 5340 out, cache: 60348 created, 674564 read)
+[2026-04-05T19:17:52.510Z] iter=327 turn=15 INFO: Restarting as iteration 328...
+[2026-04-05T19:17:52.690Z] iter=328 INFO: Cache restored: 53/53 entries (0 stale)
+[2026-04-05T19:17:52.692Z] iter=328 INFO: Turn budget: 23/25 (calibration=1.00x, predicted=20)
+[2026-04-05T19:17:52.692Z] iter=328 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T19:17:52.826Z] iter=328 turn=1 INFO: Turn 1/25
+[2026-04-05T19:17:54.943Z] iter=328 turn=1 INFO: read_scratchpad: 353 chars
+[2026-04-05T19:17:54.944Z] iter=328 turn=1 INFO: $ cat src/tool-recovery.ts
+[2026-04-05T19:17:54.953Z] iter=328 turn=1 INFO:   -> exit=0 (8344 chars)
+[2026-04-05T19:17:54.954Z] iter=328 turn=2 INFO: Turn 2/25
+[2026-04-05T19:17:57.554Z] iter=328 turn=2 INFO: $ find . -name "*.test.ts" | xargs grep -l "tool-recovery\|enhanceToolError" 2>/dev/null
+[2026-04-05T19:17:57.560Z] iter=328 turn=2 INFO: $ grep -r "buildExportContent\|export" src/ --include="*.ts" --include="*.tsx" -l | head -20
+[2026-04-05T19:17:57.585Z] iter=328 turn=2 INFO:   -> exit=0 (427 chars)
+[2026-04-05T19:17:57.628Z] iter=328 turn=2 INFO:   -> exit=0 (38 chars)
+[2026-04-05T19:17:57.628Z] iter=328 turn=3 INFO: Turn 3/25
+[2026-04-05T19:17:59.457Z] iter=328 turn=3 INFO: $ cat src/export-helper.ts
+[2026-04-05T19:17:59.461Z] iter=328 turn=3 INFO: $ cat src/__tests__/tool-recovery.test.ts
+[2026-04-05T19:17:59.470Z] iter=328 turn=3 INFO:   -> exit=0 (1625 chars)
+[2026-04-05T19:17:59.471Z] iter=328 turn=3 INFO:   -> exit=0 (2893 chars)
+[2026-04-05T19:17:59.471Z] iter=328 turn=4 INFO: Turn 4/25
+[2026-04-05T19:18:05.071Z] iter=328 turn=4 INFO: think: I have all the context I need. Let me start writing immediately.
+
+Goal 1: Add 5 new error patterns to enhanceToolError()...
+[2026-04-05T19:18:05.071Z] iter=328 turn=5 INFO: Turn 5/25
+[2026-04-05T19:18:58.531Z] iter=328 turn=5 INFO: Agent: Both goals, starting now. Writing both files simultaneously:
+[2026-04-05T19:18:58.532Z] iter=328 turn=5 INFO: write_file: src/tool-recovery.ts (write)
+[2026-04-05T19:18:58.533Z] iter=328 turn=5 INFO:   -> ok: Updated src/tool-recovery.ts (12437 chars, +137 lines delta)
+[2026-04-05T19:18:58.534Z] iter=328 turn=6 INFO: Turn 6/25
+[2026-04-05T19:19:22.487Z] iter=328 turn=6 INFO: write_file: src/export-helper.ts (write)
+[2026-04-05T19:19:22.489Z] iter=328 turn=6 INFO:   -> ok: Updated src/export-helper.ts (5775 chars, +137 lines delta)
+[2026-04-05T19:19:22.489Z] iter=328 turn=7 INFO: Turn 7/25
+[2026-04-05T19:19:25.380Z] iter=328 turn=7 INFO: Agent: Goal 1 (tool-recovery.ts): IN PROGRESS — code written, need tests
+Goal 2 (export-helper.ts): IN PROGRESS — code written, need tests
+
+Writing tests for both now:
+[2026-04-05T19:19:25.381Z] iter=328 turn=7 INFO: $ find . -name "*.test.ts" | xargs grep -l "export-helper\|buildExportContent" 2>/dev/null
+[2026-04-05T19:19:25.450Z] iter=328 turn=7 INFO:   -> exit=0 (61 chars)
+[2026-04-05T19:19:25.451Z] iter=328 turn=8 INFO: Turn 8/25
+[2026-04-05T19:19:26.631Z] iter=328 turn=8 INFO: $ cat tests/export-helper.test.ts
+[2026-04-05T19:19:26.639Z] iter=328 turn=8 INFO:   -> exit=0 (4544 chars)
+[2026-04-05T19:19:26.640Z] iter=328 turn=9 INFO: Turn 9/25
+[2026-04-05T19:19:41.332Z] iter=328 turn=9 INFO: Agent: Now I'll append new tests for both goals to their respective test files:
+[2026-04-05T19:19:41.332Z] iter=328 turn=9 INFO: write_file: tests/export-helper.test.ts (append)
+[2026-04-05T19:19:41.333Z] iter=328 turn=9 INFO:   -> ok: Appended 3879 chars to tests/export-helper.test.ts
+[2026-04-05T19:19:41.333Z] iter=328 turn=10 INFO: Turn 10/25
+[2026-04-05T19:19:54.435Z] iter=328 turn=10 INFO: write_file: src/__tests__/tool-recovery.test.ts (append)
+[2026-04-05T19:19:54.436Z] iter=328 turn=10 INFO:   -> ok: Appended 3801 chars to src/__tests__/tool-recovery.test.ts
+[2026-04-05T19:19:54.436Z] iter=328 turn=11 INFO: Turn 11/25
+[2026-04-05T19:19:56.632Z] iter=328 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tool-recovery.test.ts tests/export-helper.test.ts 2>&1 | tail -40
+[2026-04-05T19:19:57.647Z] iter=328 turn=11 INFO:   -> exit=0 (794 chars)
+[2026-04-05T19:19:57.648Z] iter=328 turn=12 INFO: Turn 12/25
+[2026-04-05T19:20:02.934Z] iter=328 turn=12 INFO: think: The failing test "skips assistant messages that are purely tool calls" expects no "## Assistant" heading when the conten...
+[2026-04-05T19:20:02.935Z] iter=328 turn=13 INFO: Turn 13/25
