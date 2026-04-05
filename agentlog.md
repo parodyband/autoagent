@@ -1,71 +1,3 @@
-9 |  */
-10 | 
-11 | import { readFileSync, existsSync } from "fs";
-12 | import { join, resolve } from "path";
-13 | import { execSync } from "child_process";
-14 | import type { RepoMap } from "./tree-sitter-map.js";
-15 | import { fuzzySearch } from "./tree-sitter-map.js";
-16 | 
-17 | const STOPWORDS = new Set([
-18 |   "the", "and", "for", "are", "but", "not", "you", "all", "can", "has",
-[2026-04-05T18:41:41.565Z] iter=310 turn=15 INFO: Turn 15/25
-[2026-04-05T18:41:59.787Z] iter=310 turn=15 INFO: Agent: Now add `getRecentlyChangedFiles` before `autoLoadContext`, and update `autoLoadContext` to use it:
-[2026-04-05T18:41:59.787Z] iter=310 turn=15 INFO: write_file: src/context-loader.ts (patch)
-[2026-04-05T18:41:59.788Z] iter=310 turn=15 INFO:   -> ok: Patched src/context-loader.ts: -37 +90 lines
-
-Context after patch:
-133 |   return [...new Set(words)];
-134 | }
-135 | 
-136 | /** Maximum number of git-changed files to prioritize in context. */
-137 | const MAX_GIT_FILES = 3;
-138 | 
-139 | /**
-140 |  * Return recently-changed file paths from `git diff` (unstaged + staged).
-141 |  * Returns an empty array if not in a git repo or no changes are found.
-142 |  * Binary files and missing files are silently filtered out.
-143 |  *
-144 |  * @param workDir - the working directory to run git in
-145 |  */
-146 | export function getRecentlyChangedFiles(workDir: string): string[] {
-147 |   try {
-148 |     const run = (args: string) =>
-149 |       execSync(`git -C ${JSON.stringify(workDir)} ${args}`, {
-150 |         encoding: "utf8",
-151 |         stdio: ["pipe", "pipe", "pipe"],
-152 |       });
-153 | 
-154 |     const unstaged = run("diff --name-only").trim();
-155 |     const staged = run("diff --cached --name-only").trim();
-156 | 
-157 |     const seen = new Set<string>();
-158 |     const result: string[] = [];
-159 | 
-160 |     for (const line of [...unstaged.split("\n"), ...staged.split("\n")]) {
-161 |       const f = line.trim();
-162 |       if (!f || seen.has(f)) continue;
-163 |       seen.add(f);
-164 | 
-165 |       // Skip binary-looking files (no extension or known binary exts)
-166 |       const ext = f.split(".").pop() ?? "";
-167 |       const binaryExts = new Set(["png", "jpg", "jpeg", "gif", "ico", "svg", "woff", "woff2", "ttf", "eot", "pdf", "zip", "gz", "tar"]);
-168 |       if (binaryExts.has(ext.toLowerCase())) continue;
-169 | 
-170 |       // Only include files that still exist on disk
-171 |       const absPath = join(workDir, f);
-172 |       if (existsSync(absPath)) {
-173 |         result.push(f);
-174 |       }
-175 |     }
-176 | 
-177 |     return result;
-178 |   } catch {
-179 |     // Not a git repo, or git not available
-180 |     return [];
-181 |   }
-182 | }
-183 | 
-184 | /**
 185 |  * Auto-load file contents relevant to the user's query.
 186 |  *
 187 |  * @param repoMap - current repo map
@@ -1064,3 +996,396 @@ Goals.md is written, memory is compacted. Final steps:
 [2026-04-05T18:52:31.089Z] iter=315 turn=8 INFO: Tool timing stats
 [2026-04-05T18:52:37.473Z] iter=315 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 315: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-05T18:52:37.497Z] iter=315 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T18:52:37.531Z] iter=315 turn=8 INFO: Committed: 4a405855 (18 in / 3744 out, cache: 24475 created, 118347 read)
+[2026-04-05T18:52:37.531Z] iter=315 turn=8 INFO: Restarting as iteration 316...
+[2026-04-05T18:52:37.730Z] iter=316 INFO: Cache restored: 57/57 entries (0 stale)
+[2026-04-05T18:52:37.732Z] iter=316 INFO: Turn budget: 18/25 (calibration=1.00x, predicted=20)
+[2026-04-05T18:52:37.732Z] iter=316 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T18:52:37.868Z] iter=316 turn=1 INFO: Turn 1/25
+[2026-04-05T18:52:40.943Z] iter=316 turn=1 INFO: Agent: I'll start by reading the scratchpad and current state of the codebase to understand what needs to be done.
+[2026-04-05T18:52:40.944Z] iter=316 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T18:52:40.944Z] iter=316 turn=1 INFO: $ cat goals.md
+[2026-04-05T18:52:40.953Z] iter=316 turn=1 INFO:   -> exit=0 (1658 chars)
+[2026-04-05T18:52:40.954Z] iter=316 turn=2 INFO: Turn 2/25
+[2026-04-05T18:52:42.679Z] iter=316 turn=2 INFO: $ cat src/tools/write_file.ts
+[2026-04-05T18:52:42.681Z] iter=316 turn=2 INFO: $ ls src/__tests__/ | grep -E "context|write"
+[2026-04-05T18:52:42.687Z] iter=316 turn=2 INFO:   -> exit=0 (6375 chars)
+[2026-04-05T18:52:42.690Z] iter=316 turn=2 INFO:   -> exit=0 (281 chars)
+[2026-04-05T18:52:42.690Z] iter=316 turn=3 INFO: Turn 3/25
+[2026-04-05T18:52:46.369Z] iter=316 turn=3 INFO: think: I can see the bug clearly:
+
+In patch mode (around line 120-160), after `writeFileSync(resolved, patched, "utf-8")` and `...
+[2026-04-05T18:52:46.370Z] iter=316 turn=4 INFO: Turn 4/25
+[2026-04-05T18:52:49.337Z] iter=316 turn=4 INFO: think: I have all the info I need. Let me act:
+
+1. Fix: Add `globalMtimeTracker.delete(resolved)` in patch mode after `globalFi...
+[2026-04-05T18:52:49.337Z] iter=316 turn=5 INFO: Turn 5/25
+[2026-04-05T18:52:53.945Z] iter=316 turn=5 INFO: Agent: **Deliverables:**
+1. Fix patch-mode mtime bug in `src/tools/write_file.ts`
+2. Add stale-file tests in `src/__tests__/tools-write-file.test.ts`
+3. Add git-log tier tests in `src/__tests__/context-loader-git.test.ts`
+
+Starting now:
+[2026-04-05T18:52:53.945Z] iter=316 turn=5 INFO: write_file: src/tools/write_file.ts (patch)
+[2026-04-05T18:52:53.947Z] iter=316 turn=5 INFO:   -> ok: Patched src/tools/write_file.ts: -4 +5 lines
+
+Context after patch:
+118 |         return { message: `ERROR: old_string not found in ${filePath}. Must match exactly.`, success: false };
+119 |       }
+120 |       const patched = oldContent.replace(oldString, newString ?? "");
+121 |       writeFileSync(resolved, patched, "utf-8");
+122 |       globalFileCache.invalidate(resolved);
+123 |       globalMtimeTracker.delete(resolved);
+124 | 
+125 |       // Show surrounding context so the agent doesn't need to re-read the file
+126 |       const replacement = newString ?? "";
+127 |       const patchStart = patched.indexOf(replacement);
+128 |       const contextLines = 3;
+[2026-04-05T18:52:53.947Z] iter=316 turn=5 INFO: $ cat src/__tests__/tools-write-file.test.ts
+[2026-04-05T18:52:53.955Z] iter=316 turn=5 INFO:   -> exit=0 (3506 chars)
+[2026-04-05T18:52:53.955Z] iter=316 turn=6 INFO: Turn 6/25
+[2026-04-05T18:52:56.811Z] iter=316 turn=6 INFO: Agent: Now I'll add the stale-file tests to the existing test file:
+[2026-04-05T18:52:56.812Z] iter=316 turn=6 INFO: $ cat src/__tests__/context-loader-git.test.ts
+[2026-04-05T18:52:56.820Z] iter=316 turn=6 INFO:   -> exit=0 (7032 chars)
+[2026-04-05T18:52:56.820Z] iter=316 turn=7 INFO: Turn 7/25
+[2026-04-05T18:53:02.443Z] iter=316 turn=7 INFO: Agent: **Goal status:**
+- Goal 1 (Fix patch-mode mtime bug): **DONE** (fix applied)
+- Goal 1 tests (stale-file tests): **IN PROGRESS** (need to add)
+- Goal 2 (git-log tier tests): **NOT STARTED**
+
+I need to look at `autoLoadContext` to understand the git-log tier, then write both test blocks. Let me check what's exported:
+[2026-04-05T18:53:02.443Z] iter=316 turn=7 INFO: $ grep -n "autoLoadContext\|getRecentCommitFiles\|alreadyMentioned\|tier" src/context-loader.ts | head -60
+[2026-04-05T18:53:02.446Z] iter=316 turn=7 INFO: $ grep -n "globalMtimeTracker\|isStale\|delete\|record" src/file-cache.ts | head -40
+[2026-04-05T18:53:02.455Z] iter=316 turn=7 INFO:   -> exit=0 (616 chars)
+[2026-04-05T18:53:02.456Z] iter=316 turn=7 INFO:   -> exit=0 (465 chars)
+[2026-04-05T18:53:02.456Z] iter=316 turn=8 INFO: Turn 8/25
+[2026-04-05T18:53:04.183Z] iter=316 turn=8 INFO: $ sed -n '270,340p' src/context-loader.ts
+[2026-04-05T18:53:04.192Z] iter=316 turn=8 INFO:   -> exit=0 (2625 chars)
+[2026-04-05T18:53:04.192Z] iter=316 turn=9 INFO: Turn 9/25
+[2026-04-05T18:53:17.701Z] iter=316 turn=9 INFO: Agent: Now I have everything I need. Let me write both test blocks:
+[2026-04-05T18:53:17.701Z] iter=316 turn=9 INFO: write_file: src/__tests__/tools-write-file.test.ts (patch)
+[2026-04-05T18:53:17.702Z] iter=316 turn=9 INFO:   -> ok: Patched src/__tests__/tools-write-file.test.ts: -1 +59 lines
+
+Context after patch:
+73 |   });
+74 | });
+75 | 
+76 | describe("stale-file warning", () => {
+77 |   // We need to import globalMtimeTracker to manipulate it in tests
+78 |   // But since it's a singleton, we simulate read→external-modify→write
+79 | 
+80 |   it("shows ⚠ warning when file was read then externally modified", async () => {
+81 |     const { globalMtimeTracker } = await import("../file-cache.js");
+82 |     const filePath = path.join(tmpDir, "stale.txt");
+83 |     // Create file
+84 |     executeWriteFile("stale.txt", "original", "write", tmpDir);
+85 |     // Simulate: we "read" it by recording an old mtime
+86 |     const { statSync } = await import("fs");
+87 |     const mtime = statSync(filePath).mtimeMs;
+88 |     globalMtimeTracker.record(filePath, mtime - 1000); // recorded older than actual
+89 |     // Now write — should see stale warning
+90 |     const result = executeWriteFile("stale.txt", "new content", "write", tmpDir);
+91 |     expect(result.success).toBe(true);
+92 |     expect(result.message).toContain("⚠");
+93 |     globalMtimeTracker.delete(filePath);
+94 |   });
+95 | 
+96 |   it("no warning when file was read and NOT externally modified", async () => {
+97 |     const { globalMtimeTracker } = await import("../file-cache.js");
+98 |     const filePath = path.join(tmpDir, "fresh.txt");
+99 |     executeWriteFile("fresh.txt", "original", "write", tmpDir);
+100 |     const { statSync } = await import("fs");
+101 |     const mtime = statSync(filePath).mtimeMs;
+102 |     globalMtimeTracker.record(filePath, mtime); // exact mtime — not stale
+103 |     const result = executeWriteFile("fresh.txt", "new content", "write", tmpDir);
+104 |     expect(result.success).toBe(true);
+105 |     expect(result.message).not.toContain("⚠");
+106 |     globalMtimeTracker.delete(filePath);
+107 |   });
+108 | 
+109 |   it("no warning for files never read", () => {
+110 |     executeWriteFile("never-read.txt", "original", "write", tmpDir);
+111 |     const result = executeWriteFile("never-read.txt", "new content", "write", tmpDir);
+112 |     expect(result.success).toBe(true);
+113 |     expect(result.message).not.toContain("⚠");
+114 |   });
+115 | 
+116 |   it("patch mode clears tracker — no false warning on subsequent write", async () => {
+117 |     const { globalMtimeTracker } = await import("../file-cache.js");
+118 |     const filePath = path.join(tmpDir, "patch-stale.txt");
+119 |     executeWriteFile("patch-stale.txt", "hello world", "write", tmpDir);
+120 |     const { statSync } = await import("fs");
+121 |     // Record a stale mtime (old read time)
+122 |     globalMtimeTracker.record(filePath, statSync(filePath).mtimeMs - 1000);
+123 |     // Patch it — this should clear the tracker
+124 |     const patchResult = executeWriteFile("patch-stale.txt", "", "patch", tmpDir, "world", "earth");
+125 |     expect(patchResult.success).toBe(true);
+126 |     // Now write again — tracker was cleared by patch, so no stale warning
+127 |     const writeResult = executeWriteFile("patch-stale.txt", "brand new", "write", tmpDir);
+128 |     expect(writeResult.success).toBe(true);
+129 |     expect(writeResult.message).not.toContain("⚠");
+130 |     globalMtimeTracker.delete(filePath);
+131 |   });
+132 | });
+133 | 
+134 | describe("isAppendOnly", () => {
+135 |   it("memory.md is append-only", () => {
+136 |     expect(isAppendOnly("memory.md")).toBe(true);
+137 |   });
+[2026-04-05T18:53:17.703Z] iter=316 turn=10 INFO: Turn 10/25
+[2026-04-05T18:53:34.598Z] iter=316 turn=10 INFO: Agent: Now add the git-log tier tests to context-loader-git.test.ts:
+[2026-04-05T18:53:34.598Z] iter=316 turn=10 INFO: write_file: src/__tests__/context-loader-git.test.ts (patch)
+[2026-04-05T18:53:34.599Z] iter=316 turn=10 INFO:   -> ok: Patched src/__tests__/context-loader-git.test.ts: -1 +82 lines
+
+Context after patch:
+153 |   });
+154 | });
+155 | 
+156 | describe("autoLoadContext git-log tier", () => {
+157 |   afterEach(() => {
+158 |     vi.restoreAllMocks();
+159 |   });
+160 | 
+161 |   it("includes git-log files in tier 2 (between git-diff and keyword results)", () => {
+162 |     // git diff returns one file, git log returns a different file
+163 |     vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
+164 |       const c = cmd as string;
+165 |       if (c.includes("git log")) {
+166 |         return "abc1234 recent commit\nsrc/log-file.ts\n" as unknown as Buffer;
+167 |       }
+168 |       // git diff (staged and unstaged)
+169 |       return "src/diff-file.ts\n" as unknown as Buffer;
+170 |     });
+171 |     vi.mocked(fs.existsSync).mockReturnValue(true);
+172 |     vi.mocked(fs.readFileSync).mockImplementation((p: unknown) => {
+173 |       const filePath = p as string;
+174 |       if (filePath.includes("log-file")) return "log file content" as unknown as Buffer;
+175 |       if (filePath.includes("diff-file")) return "diff file content" as unknown as Buffer;
+176 |       return "" as unknown as Buffer;
+177 |     });
+178 | 
+179 |     const { autoLoadContext } = require("../context-loader.js");
+180 |     const repoMap = {
+181 |       files: [
+182 |         { path: "src/diff-file.ts", symbols: ["diffFunc"] },
+183 |         { path: "src/log-file.ts", symbols: ["logFunc"] },
+184 |       ],
+185 |     };
+186 |     const result = autoLoadContext(repoMap, "fix the diffFunc and logFunc", "/fake");
+187 |     expect(result).toContain("log-file.ts");
+188 |     expect(result).toContain("diff-file.ts");
+189 |   });
+190 | 
+191 |   it("excludes git-log files already in alreadyMentioned", () => {
+192 |     vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
+193 |       const c = cmd as string;
+194 |       if (c.includes("git log")) {
+195 |         return "abc1234 recent commit\nsrc/already-known.ts\nsrc/new-file.ts\n" as unknown as Buffer;
+196 |       }
+197 |       return "" as unknown as Buffer;
+198 |     });
+199 |     vi.mocked(fs.existsSync).mockReturnValue(true);
+200 |     vi.mocked(fs.readFileSync).mockReturnValue("content" as unknown as Buffer);
+201 | 
+202 |     const { autoLoadContext } = require("../context-loader.js");
+203 |     const repoMap = {
+204 |       files: [
+205 |         { path: "src/already-known.ts", symbols: ["knownFunc"] },
+206 |         { path: "src/new-file.ts", symbols: ["newFunc"] },
+207 |       ],
+208 |     };
+209 |     const alreadyMentioned = new Set(["src/already-known.ts"]);
+210 |     const result = autoLoadContext(repoMap, "fix knownFunc and newFunc", "/fake", alreadyMentioned);
+211 |     expect(result).not.toContain("already-known.ts");
+212 |     expect(result).toContain("new-file.ts");
+213 |   });
+214 | 
+215 |   it("git-log files don't duplicate git-diff files", () => {
+216 |     const sharedFile = "src/shared.ts";
+217 |     vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
+218 |       const c = cmd as string;
+219 |       if (c.includes("git log")) {
+220 |         return `abc1234 recent\n${sharedFile}\n` as unknown as Buffer;
+221 |       }
+222 |       // git diff also returns same file
+223 |       return `${sharedFile}\n` as unknown as Buffer;
+224 |     });
+225 |     vi.mocked(fs.existsSync).mockReturnValue(true);
+226 |     vi.mocked(fs.readFileSync).mockReturnValue("shared content" as unknown as Buffer);
+227 | 
+228 |     const { autoLoadContext } = require("../context-loader.js");
+229 |     const repoMap = { files: [{ path: sharedFile, symbols: ["sharedFunc"] }] };
+230 |     const result = autoLoadContext(repoMap, "fix sharedFunc", "/fake");
+231 |     // File should appear only once in output
+232 |     const occurrences = (result.match(/shared\.ts/g) ?? []).length;
+233 |     expect(occurrences).toBe(1);
+234 |   });
+235 | });
+236 | 
+237 | describe("filterByRepoMap", () => {
+238 |   it("keeps files present in repo map", () => {
+239 |     const files = ["src/foo.ts", "src/bar.ts"];
+240 |     const repoMapFiles = new Set(["src/foo.ts", "src/bar.ts"]);
+[2026-04-05T18:53:34.599Z] iter=316 turn=11 INFO: Turn 11/25
+[2026-04-05T18:53:37.157Z] iter=316 turn=11 INFO: Agent: Now run the tests to see if they pass:
+[2026-04-05T18:53:37.158Z] iter=316 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tools-write-file.test.ts src/__tests__/context-loader-git.test.ts 2>&1 | tail -50
+[2026-04-05T18:53:38.202Z] iter=316 turn=11 INFO:   -> exit=0 (2155 chars)
+[2026-04-05T18:53:38.203Z] iter=316 turn=12 INFO: Turn 12/25
+[2026-04-05T18:53:42.904Z] iter=316 turn=12 INFO: think: The issue is that `autoLoadContext` is not imported at the top of context-loader-git.test.ts - only `getRecentlyChangedF...
+[2026-04-05T18:53:42.905Z] iter=316 turn=13 INFO: Turn 13/25
+[2026-04-05T18:53:46.479Z] iter=316 turn=13 INFO: Agent: I have real changes in src/. Let me fix the failing tests and wrap up.
+
+The issue: `require()` doesn't work in ESM. Need to use the top-level import:
+[2026-04-05T18:53:46.479Z] iter=316 turn=13 INFO: write_file: src/__tests__/context-loader-git.test.ts (patch)
+[2026-04-05T18:53:46.479Z] iter=316 turn=13 INFO:   -> ok: Patched src/__tests__/context-loader-git.test.ts: -1 +1 lines
+
+Context after patch:
+1 | import { describe, it, expect, vi, afterEach } from "vitest";
+2 | import { getRecentlyChangedFiles, filterByRepoMap, getRecentCommitFiles, autoLoadContext } from "../context-loader.js";
+3 | 
+4 | vi.mock("child_process", () => ({
+5 |   execSync: vi.fn(),
+[2026-04-05T18:53:46.480Z] iter=316 turn=14 INFO: Turn 14/25
+[2026-04-05T18:53:59.992Z] iter=316 turn=14 INFO: Agent: Now replace the `require()` calls with the imported function:
+[2026-04-05T18:53:59.993Z] iter=316 turn=14 INFO: write_file: src/__tests__/context-loader-git.test.ts (patch)
+[2026-04-05T18:53:59.993Z] iter=316 turn=14 INFO:   -> ok: Patched src/__tests__/context-loader-git.test.ts: -52 +49 lines
+
+Context after patch:
+176 |       return "" as unknown as Buffer;
+177 |     });
+178 | 
+179 |     const repoMap = {
+180 |       files: [
+181 |         { path: "src/diff-file.ts", symbols: ["diffFunc"] },
+182 |         { path: "src/log-file.ts", symbols: ["logFunc"] },
+183 |       ],
+184 |     };
+185 |     const result = autoLoadContext(repoMap, "fix the diffFunc and logFunc", "/fake");
+186 |     expect(result).toContain("log-file.ts");
+187 |     expect(result).toContain("diff-file.ts");
+188 |   });
+189 | 
+190 |   it("excludes git-log files already in alreadyMentioned", () => {
+191 |     vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
+192 |       const c = cmd as string;
+193 |       if (c.includes("git log")) {
+194 |         return "abc1234 recent commit\nsrc/already-known.ts\nsrc/new-file.ts\n" as unknown as Buffer;
+195 |       }
+196 |       return "" as unknown as Buffer;
+197 |     });
+198 |     vi.mocked(fs.existsSync).mockReturnValue(true);
+199 |     vi.mocked(fs.readFileSync).mockReturnValue("content" as unknown as Buffer);
+200 | 
+201 |     const repoMap = {
+202 |       files: [
+203 |         { path: "src/already-known.ts", symbols: ["knownFunc"] },
+204 |         { path: "src/new-file.ts", symbols: ["newFunc"] },
+205 |       ],
+206 |     };
+207 |     const alreadyMentioned = new Set(["src/already-known.ts"]);
+208 |     const result = autoLoadContext(repoMap, "fix knownFunc and newFunc", "/fake", alreadyMentioned);
+209 |     expect(result).not.toContain("already-known.ts");
+210 |     expect(result).toContain("new-file.ts");
+211 |   });
+212 | 
+213 |   it("git-log files don't duplicate git-diff files", () => {
+214 |     const sharedFile = "src/shared.ts";
+215 |     vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
+216 |       const c = cmd as string;
+217 |       if (c.includes("git log")) {
+218 |         return `abc1234 recent\n${sharedFile}\n` as unknown as Buffer;
+219 |       }
+220 |       // git diff also returns same file
+221 |       return `${sharedFile}\n` as unknown as Buffer;
+222 |     });
+223 |     vi.mocked(fs.existsSync).mockReturnValue(true);
+224 |     vi.mocked(fs.readFileSync).mockReturnValue("shared content" as unknown as Buffer);
+225 | 
+226 |     const repoMap = { files: [{ path: sharedFile, symbols: ["sharedFunc"] }] };
+227 |     const result = autoLoadContext(repoMap, "fix sharedFunc", "/fake");
+228 |     // File should appear only once in output
+229 |     const occurrences = (result.match(/shared\.ts/g) ?? []).length;
+230 |     expect(occurrences).toBe(1);
+[2026-04-05T18:53:59.994Z] iter=316 turn=15 INFO: Turn 15/25
+[2026-04-05T18:54:02.343Z] iter=316 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tools-write-file.test.ts src/__tests__/context-loader-git.test.ts 2>&1 | tail -40
+[2026-04-05T18:54:03.358Z] iter=316 turn=15 INFO:   -> exit=0 (1556 chars)
+[2026-04-05T18:54:03.359Z] iter=316 turn=16 INFO: Turn 16/25
+[2026-04-05T18:54:20.881Z] iter=316 turn=16 INFO: Agent: The repoMap structure needs `exports` array. Fix the test repoMap objects:
+[2026-04-05T18:54:20.881Z] iter=316 turn=16 INFO: write_file: src/__tests__/context-loader-git.test.ts (patch)
+[2026-04-05T18:54:20.882Z] iter=316 turn=16 INFO:   -> ok: Patched src/__tests__/context-loader-git.test.ts: -48 +48 lines
+
+Context after patch:
+176 |       return "" as unknown as Buffer;
+177 |     });
+178 | 
+179 |     const repoMap = {
+180 |       files: [
+181 |         { path: "src/diff-file.ts", exports: [{ name: "diffFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
+182 |         { path: "src/log-file.ts", exports: [{ name: "logFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
+183 |       ],
+184 |     };
+185 |     const result = autoLoadContext(repoMap as any, "fix the diffFunc and logFunc", "/fake");
+186 |     expect(result).toContain("log-file.ts");
+187 |     expect(result).toContain("diff-file.ts");
+188 |   });
+189 | 
+190 |   it("excludes git-log files already in alreadyMentioned", () => {
+191 |     vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
+192 |       const c = cmd as string;
+193 |       if (c.includes("git log")) {
+194 |         return "abc1234 recent commit\nsrc/already-known.ts\nsrc/new-file.ts\n" as unknown as Buffer;
+195 |       }
+196 |       return "" as unknown as Buffer;
+197 |     });
+198 |     vi.mocked(fs.existsSync).mockReturnValue(true);
+199 |     vi.mocked(fs.readFileSync).mockReturnValue("content" as unknown as Buffer);
+200 | 
+201 |     const repoMap = {
+202 |       files: [
+203 |         { path: "src/already-known.ts", exports: [{ name: "knownFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
+204 |         { path: "src/new-file.ts", exports: [{ name: "newFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
+205 |       ],
+206 |     };
+207 |     const alreadyMentioned = new Set(["src/already-known.ts"]);
+208 |     const result = autoLoadContext(repoMap as any, "fix knownFunc and newFunc", "/fake", alreadyMentioned);
+209 |     expect(result).not.toContain("already-known.ts");
+210 |     expect(result).toContain("new-file.ts");
+211 |   });
+212 | 
+213 |   it("git-log files don't duplicate git-diff files", () => {
+214 |     const sharedFile = "src/shared.ts";
+215 |     vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
+216 |       const c = cmd as string;
+217 |       if (c.includes("git log")) {
+218 |         return `abc1234 recent\n${sharedFile}\n` as unknown as Buffer;
+219 |       }
+220 |       // git diff also returns same file
+221 |       return `${sharedFile}\n` as unknown as Buffer;
+222 |     });
+223 |     vi.mocked(fs.existsSync).mockReturnValue(true);
+224 |     vi.mocked(fs.readFileSync).mockReturnValue("shared content" as unknown as Buffer);
+225 | 
+226 |     const repoMap = { files: [{ path: sharedFile, exports: [{ name: "sharedFunc", kind: "function", line: 1 }], size: 100, mtime: 0 }] };
+227 |     const result = autoLoadContext(repoMap, "fix sharedFunc", "/fake");
+228 |     // File should appear only once in output
+229 |     const occurrences = (result.match(/shared\.ts/g) ?? []).length;
+[2026-04-05T18:54:20.882Z] iter=316 turn=17 INFO: Turn 17/25
+[2026-04-05T18:54:25.579Z] iter=316 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tools-write-file.test.ts src/__tests__/context-loader-git.test.ts 2>&1 | tail -15 && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T18:54:27.577Z] iter=316 turn=17 INFO:   -> exit=0 (350 chars)
+[2026-04-05T18:54:27.577Z] iter=316 turn=18 INFO: Turn 18/25
+[2026-04-05T18:54:32.350Z] iter=316 turn=18 INFO: Agent: All 35 tests pass, TSC clean. Now wrap up:
+[2026-04-05T18:54:32.350Z] iter=316 turn=18 INFO: save_memory: "[Engineer] Iteration 316"
+[2026-04-05T18:54:32.351Z] iter=316 turn=18 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T18:54:32.351Z] iter=316 turn=19 INFO: Turn 19/25
+[2026-04-05T18:54:38.494Z] iter=316 turn=19 INFO: write_file: goals.md (write)
+[2026-04-05T18:54:38.495Z] iter=316 turn=19 INFO:   -> ok: Updated goals.md (795 chars, -13 lines delta)
+[2026-04-05T18:54:38.495Z] iter=316 turn=20 INFO: Turn 20/25
+[2026-04-05T18:54:40.747Z] iter=316 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5 && echo "TSC OK" && echo "AUTOAGENT_RESTART"
+[2026-04-05T18:54:40.747Z] iter=316 turn=20 INFO: RESTART signal
+[2026-04-05T18:54:40.747Z] iter=316 turn=20 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T18:54:41.755Z] iter=316 turn=20 INFO: Compilation OK
+[2026-04-05T18:54:48.770Z] iter=316 turn=20 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-05T18:54:48.770Z] iter=316 turn=20 INFO: Tool timing: bash: 12x, avg=344ms, total=4132ms; write_file: 7x, avg=2ms, total=11ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 3x, avg=0ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T18:54:48.770Z] iter=316 turn=20 INFO: Tool timing stats
+[2026-04-05T18:54:55.082Z] iter=316 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 316: predicted 20 turns, actual 20 turns, ratio 1.00**
+[2026-04-05T18:54:57.737Z] iter=316 turn=20 INFO: Pre-commit review (2953in/62out): **LGTM** — the tests are well-structured with proper cleanup (`globalMtimeTracker.delete`), the ESM imports use `.js` extensions, and the logic correctly validates tier ordering, deduplication, and st

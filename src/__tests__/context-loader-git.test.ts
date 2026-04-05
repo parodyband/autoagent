@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { getRecentlyChangedFiles, filterByRepoMap, getRecentCommitFiles } from "../context-loader.js";
+import { getRecentlyChangedFiles, filterByRepoMap, getRecentCommitFiles, autoLoadContext } from "../context-loader.js";
 
 vi.mock("child_process", () => ({
   execSync: vi.fn(),
@@ -150,6 +150,84 @@ describe("getRecentCommitFiles", () => {
     getRecentCommitFiles("/fake", 5);
     const call = vi.mocked(childProcess.execSync).mock.calls[0][0] as string;
     expect(call).toContain("-5");
+  });
+});
+
+describe("autoLoadContext git-log tier", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("includes git-log files in tier 2 (between git-diff and keyword results)", () => {
+    // git diff returns one file, git log returns a different file
+    vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
+      const c = cmd as string;
+      if (c.includes("git log")) {
+        return "abc1234 recent commit\nsrc/log-file.ts\n" as unknown as Buffer;
+      }
+      // git diff (staged and unstaged)
+      return "src/diff-file.ts\n" as unknown as Buffer;
+    });
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockImplementation((p: unknown) => {
+      const filePath = p as string;
+      if (filePath.includes("log-file")) return "log file content" as unknown as Buffer;
+      if (filePath.includes("diff-file")) return "diff file content" as unknown as Buffer;
+      return "" as unknown as Buffer;
+    });
+
+    const repoMap = {
+      files: [
+        { path: "src/diff-file.ts", exports: [{ name: "diffFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
+        { path: "src/log-file.ts", exports: [{ name: "logFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
+      ],
+    };
+    const result = autoLoadContext(repoMap as any, "fix the diffFunc and logFunc", "/fake");
+    expect(result).toContain("log-file.ts");
+    expect(result).toContain("diff-file.ts");
+  });
+
+  it("excludes git-log files already in alreadyMentioned", () => {
+    vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
+      const c = cmd as string;
+      if (c.includes("git log")) {
+        return "abc1234 recent commit\nsrc/already-known.ts\nsrc/new-file.ts\n" as unknown as Buffer;
+      }
+      return "" as unknown as Buffer;
+    });
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue("content" as unknown as Buffer);
+
+    const repoMap = {
+      files: [
+        { path: "src/already-known.ts", exports: [{ name: "knownFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
+        { path: "src/new-file.ts", exports: [{ name: "newFunc", kind: "function", line: 1 }], size: 100, mtime: 0 },
+      ],
+    };
+    const alreadyMentioned = new Set(["src/already-known.ts"]);
+    const result = autoLoadContext(repoMap as any, "fix knownFunc and newFunc", "/fake", alreadyMentioned);
+    expect(result).not.toContain("already-known.ts");
+    expect(result).toContain("new-file.ts");
+  });
+
+  it("git-log files don't duplicate git-diff files", () => {
+    const sharedFile = "src/shared.ts";
+    vi.mocked(childProcess.execSync).mockImplementation((cmd: unknown) => {
+      const c = cmd as string;
+      if (c.includes("git log")) {
+        return `abc1234 recent\n${sharedFile}\n` as unknown as Buffer;
+      }
+      // git diff also returns same file
+      return `${sharedFile}\n` as unknown as Buffer;
+    });
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue("shared content" as unknown as Buffer);
+
+    const repoMap = { files: [{ path: sharedFile, exports: [{ name: "sharedFunc", kind: "function", line: 1 }], size: 100, mtime: 0 }] };
+    const result = autoLoadContext(repoMap, "fix sharedFunc", "/fake");
+    // File should appear only once in output
+    const occurrences = (result.match(/shared\.ts/g) ?? []).length;
+    expect(occurrences).toBe(1);
   });
 });
 

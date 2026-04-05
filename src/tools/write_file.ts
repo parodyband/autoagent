@@ -120,6 +120,7 @@ export function executeWriteFile(
       const patched = oldContent.replace(oldString, newString ?? "");
       writeFileSync(resolved, patched, "utf-8");
       globalFileCache.invalidate(resolved);
+      globalMtimeTracker.delete(resolved);
 
       // Show surrounding context so the agent doesn't need to re-read the file
       const replacement = newString ?? "";

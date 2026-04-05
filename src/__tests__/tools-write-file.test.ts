@@ -73,6 +73,64 @@ describe("executeWriteFile", () => {
   });
 });
 
+describe("stale-file warning", () => {
+  // We need to import globalMtimeTracker to manipulate it in tests
+  // But since it's a singleton, we simulate read→external-modify→write
+
+  it("shows ⚠ warning when file was read then externally modified", async () => {
+    const { globalMtimeTracker } = await import("../file-cache.js");
+    const filePath = path.join(tmpDir, "stale.txt");
+    // Create file
+    executeWriteFile("stale.txt", "original", "write", tmpDir);
+    // Simulate: we "read" it by recording an old mtime
+    const { statSync } = await import("fs");
+    const mtime = statSync(filePath).mtimeMs;
+    globalMtimeTracker.record(filePath, mtime - 1000); // recorded older than actual
+    // Now write — should see stale warning
+    const result = executeWriteFile("stale.txt", "new content", "write", tmpDir);
+    expect(result.success).toBe(true);
+    expect(result.message).toContain("⚠");
+    globalMtimeTracker.delete(filePath);
+  });
+
+  it("no warning when file was read and NOT externally modified", async () => {
+    const { globalMtimeTracker } = await import("../file-cache.js");
+    const filePath = path.join(tmpDir, "fresh.txt");
+    executeWriteFile("fresh.txt", "original", "write", tmpDir);
+    const { statSync } = await import("fs");
+    const mtime = statSync(filePath).mtimeMs;
+    globalMtimeTracker.record(filePath, mtime); // exact mtime — not stale
+    const result = executeWriteFile("fresh.txt", "new content", "write", tmpDir);
+    expect(result.success).toBe(true);
+    expect(result.message).not.toContain("⚠");
+    globalMtimeTracker.delete(filePath);
+  });
+
+  it("no warning for files never read", () => {
+    executeWriteFile("never-read.txt", "original", "write", tmpDir);
+    const result = executeWriteFile("never-read.txt", "new content", "write", tmpDir);
+    expect(result.success).toBe(true);
+    expect(result.message).not.toContain("⚠");
+  });
+
+  it("patch mode clears tracker — no false warning on subsequent write", async () => {
+    const { globalMtimeTracker } = await import("../file-cache.js");
+    const filePath = path.join(tmpDir, "patch-stale.txt");
+    executeWriteFile("patch-stale.txt", "hello world", "write", tmpDir);
+    const { statSync } = await import("fs");
+    // Record a stale mtime (old read time)
+    globalMtimeTracker.record(filePath, statSync(filePath).mtimeMs - 1000);
+    // Patch it — this should clear the tracker
+    const patchResult = executeWriteFile("patch-stale.txt", "", "patch", tmpDir, "world", "earth");
+    expect(patchResult.success).toBe(true);
+    // Now write again — tracker was cleared by patch, so no stale warning
+    const writeResult = executeWriteFile("patch-stale.txt", "brand new", "write", tmpDir);
+    expect(writeResult.success).toBe(true);
+    expect(writeResult.message).not.toContain("⚠");
+    globalMtimeTracker.delete(filePath);
+  });
+});
+
 describe("isAppendOnly", () => {
   it("memory.md is append-only", () => {
     expect(isAppendOnly("memory.md")).toBe(true);
