@@ -141,12 +141,14 @@ function MessageDisplay({ msg }: { msg: Message }) {
   );
 }
 
-/** Diff preview display — shown when agent proposes a file edit. */
+/** Diff preview display — shown when agent proposes a file edit (or batch of edits). */
 function DiffPreviewDisplay({ diff, filePath }: { diff: string; filePath: string }) {
   const lines = diff.split("\n");
+  const isBatch = /^\d+ files$/.test(filePath);
+  const header = isBatch ? `📝 Batch edit: ${filePath} changed` : `📝 ${filePath}`;
   return (
     <Box flexDirection="column" borderStyle="round" borderColor="yellow" paddingX={1} marginTop={1}>
-      <Text bold>📝 {filePath}</Text>
+      <Text bold>{header}</Text>
       {lines.map((line, i) => {
         if (line.startsWith("---") || line.startsWith("+++")) {
           return <Text key={i} color="yellow" bold>{line}</Text>;

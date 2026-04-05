@@ -308,36 +308,149 @@ async function runAgentLoop(
 
     if (toolUses.length === 0) break;
 
+    // Separate write_file tools from non-write tools
+    const writeTools = toolUses.filter(tu => tu.name === "write_file");
+    const nonWriteTools = toolUses.filter(tu => tu.name !== "write_file");
+
     const results: Anthropic.ToolResultBlockParam[] = [];
-    for (const tu of toolUses) {
-      // Intercept write_file for diff preview confirmation
-      if (tu.name === "write_file" && onDiffPreview) {
-        const inp = tu.input as { path?: string; content?: string; mode?: string };
-        const relPath = inp.path ?? "";
-        const newContent = inp.content ?? "";
-        const fullPath = fs.existsSync(relPath) ? relPath
-          : `${workDir}/${relPath}`;
-        let oldContent = "";
-        try { oldContent = fs.readFileSync(fullPath, "utf-8"); } catch { /* new file */ }
-        const diff = computeUnifiedDiff(oldContent, newContent, relPath);
-        if (diff) {
-          const accepted = await onDiffPreview(diff, relPath);
-          if (!accepted) {
-            results.push({ type: "tool_result", tool_use_id: tu.id, content: `User rejected edit to ${relPath}` });
-            continue;
-          }
-        }
-      }
+
+    // Execute non-write tools first (reads, greps, thinks)
+    for (const tu of nonWriteTools) {
       const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
       const result = compressToolOutput(tu.name, rawResult);
       results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
     }
+
+    // Handle write_file tools — batch if 2+ and onDiffPreview is set
+    if (writeTools.length >= 2 && onDiffPreview) {
+      const batchResults = await batchWriteFiles(writeTools, workDir, execTool, onDiffPreview);
+      results.push(...batchResults);
+    } else {
+      // Single write_file (or no preview callback) — existing per-file flow
+      for (const tu of writeTools) {
+        if (tu.name === "write_file" && onDiffPreview) {
+          const inp = tu.input as { path?: string; content?: string; mode?: string };
+          const relPath = inp.path ?? "";
+          const newContent = inp.content ?? "";
+          const fullPath = fs.existsSync(relPath) ? relPath
+            : `${workDir}/${relPath}`;
+          let oldContent = "";
+          try { oldContent = fs.readFileSync(fullPath, "utf-8"); } catch { /* new file */ }
+          const diff = computeUnifiedDiff(oldContent, newContent, relPath);
+          if (diff) {
+            const accepted = await onDiffPreview(diff, relPath);
+            if (!accepted) {
+              results.push({ type: "tool_result", tool_use_id: tu.id, content: `User rejected edit to ${relPath}` });
+              continue;
+            }
+          }
+        }
+        const rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
+        const result = compressToolOutput(tu.name, rawResult);
+        results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
+      }
+    }
+
     apiMessages.push({ role: "user", content: results });
 
     if (finalMessage.stop_reason === "end_turn") break;
   }
 
   return { text: fullText, tokensIn: totalIn, tokensOut: totalOut };
+}
+
+/**
+ * Batch-preview and apply multiple write_file tool calls together.
+ * Shows a single unified diff for all files, then applies or rejects atomically.
+ * On partial failure, rolls back already-written files.
+ */
+async function batchWriteFiles(
+  toolUses: Array<Anthropic.ToolUseBlock>,
+  workDir: string,
+  execTool: (name: string, input: Record<string, unknown>) => Promise<string>,
+  onDiffPreview: (diff: string, label: string) => Promise<boolean>,
+): Promise<Anthropic.ToolResultBlockParam[]> {
+  type FileEdit = {
+    id: string;
+    relPath: string;
+    fullPath: string;
+    oldContent: string;
+    newContent: string;
+    diff: string;
+    input: Record<string, unknown>;
+  };
+
+  // Collect phase — compute diffs without writing
+  const edits: FileEdit[] = [];
+  for (const tu of toolUses) {
+    const inp = tu.input as { path?: string; content?: string; mode?: string };
+    const relPath = inp.path ?? "";
+    const newContent = inp.content ?? "";
+    const fullPath = fs.existsSync(relPath) ? relPath : `${workDir}/${relPath}`;
+    let oldContent = "";
+    try { oldContent = fs.readFileSync(fullPath, "utf-8"); } catch { /* new file */ }
+    const diff = computeUnifiedDiff(oldContent, newContent, relPath);
+    edits.push({ id: tu.id, relPath, fullPath, oldContent, newContent, diff, input: tu.input as Record<string, unknown> });
+  }
+
+  // Preview phase — combine all diffs into one preview
+  const diffsWithContent = edits.filter(e => e.diff);
+  if (diffsWithContent.length > 0) {
+    const combinedDiff = diffsWithContent
+      .map(e => e.diff)
+      .join("\n--- file boundary ---\n");
+    const label = `${edits.length} files`;
+    const accepted = await onDiffPreview(combinedDiff, label);
+    if (!accepted) {
+      return edits.map(e => ({
+        type: "tool_result" as const,
+        tool_use_id: e.id,
+        content: `User rejected batch edit to ${e.relPath}`,
+      }));
+    }
+  }
+
+  // Apply phase — snapshot first for rollback, then write
+  const snapshots: Array<{ fullPath: string; oldContent: string; existed: boolean }> = [];
+  const results: Anthropic.ToolResultBlockParam[] = [];
+
+  for (const edit of edits) {
+    const existed = fs.existsSync(edit.fullPath);
+    snapshots.push({ fullPath: edit.fullPath, oldContent: edit.oldContent, existed });
+    try {
+      const rawResult = await execTool("write_file", edit.input);
+      const result = compressToolOutput("write_file", rawResult);
+      results.push({ type: "tool_result", tool_use_id: edit.id, content: result });
+    } catch (err) {
+      // Rollback all already-written files
+      for (const snap of snapshots.slice(0, -1)) {
+        try {
+          if (snap.existed) {
+            fs.writeFileSync(snap.fullPath, snap.oldContent, "utf-8");
+          } else {
+            fs.unlinkSync(snap.fullPath);
+          }
+        } catch { /* best-effort rollback */ }
+      }
+      const errMsg = err instanceof Error ? err.message : String(err);
+      // Return error for failed edit and rejections for remaining
+      const failIdx = edits.indexOf(edit);
+      const errorResults: Anthropic.ToolResultBlockParam[] = [];
+      for (let i = 0; i < edits.length; i++) {
+        if (i < failIdx) {
+          // Already-applied: rolled back
+          errorResults.push({ type: "tool_result", tool_use_id: edits[i].id, content: `Rolled back due to batch failure: ${errMsg}` });
+        } else if (i === failIdx) {
+          errorResults.push({ type: "tool_result", tool_use_id: edits[i].id, content: `Error applying batch edit: ${errMsg}` });
+        } else {
+          errorResults.push({ type: "tool_result", tool_use_id: edits[i].id, content: `Skipped due to batch failure` });
+        }
+      }
+      return errorResults;
+    }
+  }
+
+  return results;
 }
 
 // ─── Orchestrator class ───────────────────────────────────────
