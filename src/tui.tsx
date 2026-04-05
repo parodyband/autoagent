@@ -344,9 +344,8 @@ function App() {
       onContextWarning: () => {
         setContextWarning(true);
       },
-      onExternalFileChange: (_count) => {
-        // Collect changed file paths from orchestrator externallyChangedFiles
-        // We only get the count here; use a ref to track paths via onFileWatch
+      onExternalFileChange: (paths) => {
+        setExternalChanges(paths);
       },
     });
     orchestratorRef.current = orch;
@@ -421,6 +420,10 @@ function App() {
       acceptFileSuggestion(fileSuggestions[fileSuggestionIdx]);
       return;
     }
+    if (!loading && (ch === "c" || ch === "C") && externalChanges.length > 0) {
+      setExternalChanges([]);
+      return;
+    }
     if (key.escape) {
       if (fileSuggestions.length > 0) {
         setFileSuggestions([]);
@@ -443,6 +446,13 @@ function App() {
       setFooterStats({ tokensIn: 0, tokensOut: 0, cost: 0, model: currentModel, contextTokens: 0, contextLimit: 200_000 });
       setStatus("Cleared");
       setTimeout(() => setStatus(""), 1000);
+      return;
+    }
+    if (trimmed === "/compact") {
+      setStatus("Compacting context...");
+      await orchestratorRef.current?.compactNow();
+      setMessages(prev => [...prev, { role: "assistant", content: "Context compacted." }]);
+      setStatus("");
       return;
     }
     if (trimmed === "/reindex") {
@@ -476,6 +486,7 @@ function App() {
           "  /reindex  — Re-index the repository files",
           "  /resume   — List and restore a previous session",
           "  /rewind   — Restore conversation to a prior checkpoint",
+          "  /compact  — Manually compact conversation context",
           "  /diff     — Show uncommitted git changes",
           "  /undo     — Revert the last autoagent commit",
           "  /exit     — Quit AutoAgent",
@@ -791,6 +802,12 @@ function App() {
               {i === fileSuggestionIdx ? "▸ " : "  "}{f}
             </Text>
           ))}
+        </Box>
+      )}
+
+      {externalChanges.length > 0 && (
+        <Box marginTop={1}>
+          <Text color="yellow">⚠ External changes: {externalChanges.map(p => path.basename(p)).join(", ")}  [C to clear]</Text>
         </Box>
       )}
 

@@ -148,7 +148,7 @@ export interface OrchestratorOptions {
    * Called when one or more watched files are changed externally.
    * Receives the count of changed files since last send().
    */
-  onExternalFileChange?: (count: number) => void;
+  onExternalFileChange?: (paths: string[]) => void;
 }
 
 export interface OrchestratorResult {
@@ -640,7 +640,7 @@ export class Orchestrator {
     // Wire up file watcher callback
     this.fileWatcher.onChange = (filePath: string) => {
       this.externallyChangedFiles.add(filePath);
-      this.opts.onExternalFileChange?.(this.externallyChangedFiles.size);
+      this.opts.onExternalFileChange?.([...this.externallyChangedFiles]);
     };
   }
 
@@ -907,6 +907,12 @@ export class Orchestrator {
     // Reset token counter after compaction (context is now much smaller)
     this.sessionTokensIn = Math.min(this.sessionTokensIn, 20_000);
     this.opts.onStatus?.("");
+  }
+
+  /** Manually trigger context compaction (called from /compact TUI command). */
+  async compactNow(): Promise<void> {
+    await this.compact();
+    this.opts.onStatus?.("Context compacted.");
   }
 
   /**
