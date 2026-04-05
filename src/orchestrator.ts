@@ -275,6 +275,7 @@ async function runAgentLoop(
   const tools = registry.getDefinitions();
 
   let totalIn = 0, totalOut = 0;
+  let lastInput = 0;
   let fullText = "";
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
@@ -307,7 +308,8 @@ async function runAgentLoop(
 
     const finalMessage = await stream.finalMessage();
 
-    totalIn += finalMessage.usage?.input_tokens ?? 0;
+    lastInput = finalMessage.usage?.input_tokens ?? 0;
+    totalIn += lastInput;
     totalOut += finalMessage.usage?.output_tokens ?? 0;
     apiMessages.push({ role: "assistant", content: finalMessage.content });
 
@@ -365,7 +367,7 @@ async function runAgentLoop(
     if (finalMessage.stop_reason === "end_turn") break;
   }
 
-  return { text: fullText, tokensIn: totalIn, tokensOut: totalOut, lastInputTokens: totalIn };
+  return { text: fullText, tokensIn: totalIn, tokensOut: totalOut, lastInputTokens: lastInput };
 }
 
 /**

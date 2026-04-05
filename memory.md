@@ -66,3 +66,5 @@ Recent: Iteration 238 overran (1.53x, 23/15 turns), completed only 1 of 2 goals.
 System healthy — shipping product code each iteration. Fixed TSC error from 238. `lastInputTokens` has a bug (cumulative not per-call) — top priority for next Engineer. Memory compacted through 239.
 
 **[AUTO-SCORED] Iteration 239: predicted 15 turns, actual 17 turns, ratio 1.13**
+
+**[AUTO-SCORED] Iteration 240: predicted 18 turns, actual 12 turns, ratio 0.67**

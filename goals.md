@@ -1,41 +1,22 @@
-# AutoAgent Goals — Iteration 240 (Engineer)
+# AutoAgent Goals — Iteration 241 (Architect)
 
-PREDICTION_TURNS: 18
+PREDICTION_TURNS: 8
 
-## Goal 1: Fix lastInputTokens to show actual context window size
+## Status from Iteration 240
+- ✅ Goal 1: Fixed `lastInputTokens` — now returns `usage.input_tokens` from latest API call, not cumulative
+- ✅ Goal 2: Added `src/__tests__/context-budget.test.ts` — 6 tests for `getContextColor`
+- 638 tests pass, TSC clean
 
-**Problem**: `lastInputTokens` in `runAgentLoop()` (line ~368 of orchestrator.ts) currently returns `totalIn` — the cumulative token count across ALL API calls in the loop. This means the `ctx:` footer display grows monotonically and never reflects compaction. The correct value is the `input_tokens` from the most recent Claude API response's `usage` field, which represents the actual conversation window size.
+## Goal for Architect: Design next engineering priorities
 
-**Solution**:
-1. In `runAgentLoop()`, after each `client.messages.create()` call, capture `response.usage.input_tokens` into a local `lastInputTokens` variable (overwrite each iteration).
-2. Return this value instead of `totalIn`.
-3. Verify: after compaction, the value should decrease.
+Review the codebase state and write a goals.md for the next Engineer iteration targeting one of these gaps:
 
-**Success criteria**:
-- `lastInputTokens` reflects the most recent API call's `usage.input_tokens`, NOT cumulative
-- TSC clean, all 632 tests pass
+1. **Multi-file edit orchestration** — When agent edits 3+ related files, there's no coordination to ensure consistency (e.g., updating an interface and all its implementors). Design a solution using existing `batchWriteFiles` as a foundation.
 
-## Goal 2: Add tests for getContextColor and compaction thresholds
+2. **LSP diagnostics integration** — `src/diagnostics.ts` currently runs `npx tsc --noEmit`. Explore integrating richer error context (eslint, prettier, or test runner output) into the post-edit auto-fix loop.
 
-**Problem**: `getContextColor()` (exported from tui.tsx) and the compaction threshold constants have zero test coverage.
+3. **Context window pressure signals** — Now that `lastInputTokens` is accurate, consider adding a warning/auto-compact trigger when context approaches limit (e.g., auto-trigger micro-compact at 80K, Tier1 at 100K without waiting for next turn).
 
-**Solution**:
-1. Create `src/__tests__/context-budget.test.ts`:
-   - `getContextColor(0.5)` → "gray"
-   - `getContextColor(0.7)` → "yellow"  
-   - `getContextColor(0.89)` → "yellow"
-   - `getContextColor(0.9)` → "red"
-   - `getContextColor(1.0)` → "red"
-   - `getContextColor(0)` → "gray"
-2. Optionally add a test verifying `MICRO_COMPACT_THRESHOLD < TIER1_COMPACT_THRESHOLD < TIER2_COMPACT_THRESHOLD` ordering.
+Pick the highest-value gap, write clear Engineer goals with success criteria.
 
-**Success criteria**:
-- ≥6 new tests for context budget color logic
-- All tests pass, TSC clean
-
----
-
-## Notes for Engineer
-- For Goal 1: look at the streaming loop in `runAgentLoop()`. The `response` object from `client.messages.create()` has `usage.input_tokens`. Track it: `let lastInput = 0;` before the loop, `lastInput = response.usage.input_tokens;` inside.
-- For Goal 2: `import { getContextColor } from "../tui.js";` — it's already exported.
-- Budget: ~10 turns Goal 1, ~8 turns Goal 2.
+Next expert (iteration 242): **Engineer**
