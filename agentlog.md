@@ -1,85 +1,3 @@
-[2026-04-05T15:46:25.194Z] iter=215 turn=6 INFO: Turn 6/25
-[2026-04-05T15:46:30.879Z] iter=215 turn=6 INFO: Agent: 
-
-Correct — Meta expert doesn't change src/. My deliverables are memory + goals, both done. TypeScript clean. Wrapping up.
-[2026-04-05T15:46:30.880Z] iter=215 turn=6 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T15:46:30.880Z] iter=215 turn=6 INFO: RESTART signal
-[2026-04-05T15:46:30.880Z] iter=215 turn=6 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T15:46:31.764Z] iter=215 turn=6 INFO: Compilation OK
-[2026-04-05T15:46:37.370Z] iter=215 turn=6 INFO: Cache persisted: 47 entries to .autoagent-cache.json
-[2026-04-05T15:46:37.370Z] iter=215 turn=6 INFO: Tool timing: bash: 5x, avg=184ms, total=919ms; write_file: 2x, avg=2ms, total=3ms; think: 1x, avg=0ms, total=0ms
-[2026-04-05T15:46:37.370Z] iter=215 turn=6 INFO: Tool timing stats
-[2026-04-05T15:46:42.272Z] iter=215 turn=6 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 215: predicted 8 turns, actual 6 turns, ratio 0.75**
-[2026-04-05T15:46:42.292Z] iter=215 turn=6 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T15:46:42.323Z] iter=215 turn=6 INFO: Committed: c78f0cb9 (14 in / 3398 out, cache: 11330 created, 43706 read)
-[2026-04-05T15:46:42.323Z] iter=215 turn=6 INFO: Restarting as iteration 216...
-[2026-04-05T15:46:42.527Z] iter=216 INFO: Cache restored: 47/47 entries (0 stale)
-[2026-04-05T15:46:42.529Z] iter=216 INFO: Turn budget: 18/25 (calibration=1.00x, predicted=20)
-[2026-04-05T15:46:42.530Z] iter=216 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T15:46:42.646Z] iter=216 turn=1 INFO: Turn 1/25
-[2026-04-05T15:46:45.616Z] iter=216 turn=1 INFO: think: Let me review the goals and existing code before building. I need to:
-1. Add `rankSymbols()` to `src/tree-sitter-map.ts`...
-[2026-04-05T15:46:45.618Z] iter=216 turn=2 INFO: Turn 2/25
-[2026-04-05T15:46:47.959Z] iter=216 turn=2 INFO: read_file: src/tree-sitter-map.ts
-[2026-04-05T15:46:47.961Z] iter=216 turn=2 INFO:   -> ok (17042 chars)
-[2026-04-05T15:46:47.961Z] iter=216 turn=2 INFO: $ grep -n "repoMap\|tree-sitter\|generateRepoMap" src/orchestrator.ts | head -40
-[2026-04-05T15:46:47.981Z] iter=216 turn=2 INFO:   -> exit=0 (896 chars)
-[2026-04-05T15:46:47.982Z] iter=216 turn=3 INFO: Turn 3/25
-[2026-04-05T15:47:06.285Z] iter=216 turn=3 INFO: think: The existing code already has `rankSymbols(repoMap: RepoMap)` and it's already being used in orchestrator.ts! Let me che...
-[2026-04-05T15:47:06.286Z] iter=216 turn=4 INFO: Turn 4/25
-[2026-04-05T15:47:09.874Z] iter=216 turn=4 INFO: Agent: My deliverables:
-1. Enhanced `rankSymbols` + file-level sorting in `formatRepoMap` in `src/tree-sitter-map.ts`
-2. New `truncateRepoMap` function in `src/tree-sitter-map.ts`
-3. Wire `truncateRepoMap` into `src/orchestrator.ts`
-4. Tests in `src/tree-sitter-map.test.ts`
-
-Let me check existing tests then write everything:
-[2026-04-05T15:47:09.875Z] iter=216 turn=4 INFO: $ ls src/*.test.ts | grep -i tree; wc -l src/tree-sitter-map.ts
-[2026-04-05T15:47:09.900Z] iter=216 turn=4 INFO:   -> exit=0 (93 chars)
-[2026-04-05T15:47:09.900Z] iter=216 turn=5 INFO: Turn 5/25
-[2026-04-05T15:47:11.510Z] iter=216 turn=5 INFO: $ find . -name "*.test.*" | grep -i tree; find . -name "*.test.*" | head -10
-[2026-04-05T15:47:11.657Z] iter=216 turn=5 INFO:   -> exit=0 (421 chars)
-[2026-04-05T15:47:11.657Z] iter=216 turn=6 INFO: Turn 6/25
-[2026-04-05T15:47:13.044Z] iter=216 turn=6 INFO: $ cat src/__tests__/tree-sitter-map.test.ts
-[2026-04-05T15:47:13.059Z] iter=216 turn=6 INFO:   -> exit=0 (13774 chars)
-[2026-04-05T15:47:13.060Z] iter=216 turn=7 INFO: Turn 7/25
-[2026-04-05T15:47:42.697Z] iter=216 turn=7 INFO: Agent: **Goal 1 (PageRank-scored repo map):** NOT STARTED — need to add file-level sorting by aggregate score + tests
-**Goal 2 (truncateRepoMap):** NOT STARTED — need to add function + wire into orchestrator
-
-The code I need to write is clear. Starting now:
-[2026-04-05T15:47:42.698Z] iter=216 turn=7 INFO: write_file: src/tree-sitter-map.ts (patch)
-[2026-04-05T15:47:42.701Z] iter=216 turn=7 INFO:   -> ok: Patched src/tree-sitter-map.ts: -54 +138 lines
-
-Context after patch:
-385 |   return scores;
-386 | }
-387 | 
-388 | /**
-389 |  * Compute the aggregate rank score for a file (sum of its exported symbol scores).
-390 |  */
-391 | function fileAggregateScore(file: ParsedFile, ranked: Map<string, number>): number {
-392 |   let total = 0;
-393 |   for (const sym of file.exports) {
-394 |     if (sym.exported) total += ranked.get(sym.name) ?? 0;
-395 |   }
-396 |   return total;
-397 | }
-398 | 
-399 | /**
-400 |  * Format a RepoMap as a compact string suitable for LLM context.
-401 |  *
-402 |  * Output format:
-403 |  *   src/foo.ts
-404 |  *     exports: Foo (class:10), bar (function:25), MyType (type:5)
-405 |  *     imports: react, ./utils
-406 |  *
-407 |  * When `ranked` is provided, files are sorted by their aggregate symbol score
-408 |  * (highest first) and symbols within each file are also sorted by score.
-409 |  */
-410 | export function formatRepoMap(
-411 |   repoMap: RepoMap,
-412 |   opts?: { onlyExported?: boolean; maxFiles?: number; ranked?: Map<string, number> }
-413 | ): string {
 414 |   const onlyExported = opts?.onlyExported ?? true;
 415 |   const maxFiles = opts?.maxFiles ?? 200;
 416 |   const ranked = opts?.ranked;
@@ -1078,3 +996,129 @@ Now update memory with the gaps list and wrap up.
 [2026-04-05T15:58:02.217Z] iter=221 turn=8 INFO: Tool timing stats
 [2026-04-05T15:58:07.168Z] iter=221 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 221: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-05T15:58:07.189Z] iter=221 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T15:58:07.220Z] iter=221 turn=8 INFO: Committed: 442ace81 (18 in / 3565 out, cache: 21799 created, 106387 read)
+[2026-04-05T15:58:07.220Z] iter=221 turn=8 INFO: Restarting as iteration 222...
+[2026-04-05T15:58:07.416Z] iter=222 INFO: Cache restored: 45/45 entries (0 stale)
+[2026-04-05T15:58:07.418Z] iter=222 INFO: Turn budget: 19/25 (calibration=1.00x, predicted=20)
+[2026-04-05T15:58:07.419Z] iter=222 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T15:58:07.534Z] iter=222 turn=1 INFO: Turn 1/25
+[2026-04-05T15:58:10.096Z] iter=222 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what's there, then build the `dispatch_agent` tool.
+[2026-04-05T15:58:10.098Z] iter=222 turn=1 INFO: $ cat src/orchestrator.ts | head -100
+[2026-04-05T15:58:10.105Z] iter=222 turn=1 INFO: $ ls src/__tests__/
+[2026-04-05T15:58:10.121Z] iter=222 turn=1 INFO:   -> exit=0 (3804 chars)
+[2026-04-05T15:58:10.124Z] iter=222 turn=1 INFO:   -> exit=0 (736 chars)
+[2026-04-05T15:58:10.125Z] iter=222 turn=2 INFO: Turn 2/25
+[2026-04-05T15:58:12.499Z] iter=222 turn=2 INFO: $ cat src/__tests__/subagent.test.ts
+[2026-04-05T15:58:12.501Z] iter=222 turn=2 INFO: $ grep -n "dispatch_agent\|sub.agent\|subagent\|SubAgent" src/orchestrator.ts | head -30
+[2026-04-05T15:58:12.507Z] iter=222 turn=2 INFO:   -> exit=0 (3804 chars)
+[2026-04-05T15:58:12.511Z] iter=222 turn=2 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:58:12.512Z] iter=222 turn=3 INFO: Turn 3/25
+[2026-04-05T15:58:14.345Z] iter=222 turn=3 INFO: $ ls src/tools/
+[2026-04-05T15:58:14.350Z] iter=222 turn=3 INFO: $ cat src/tools/subagent.ts 2>/dev/null || echo "NOT FOUND"
+[2026-04-05T15:58:14.363Z] iter=222 turn=3 INFO:   -> exit=0 (105 chars)
+[2026-04-05T15:58:14.366Z] iter=222 turn=3 INFO:   -> exit=0 (3729 chars)
+[2026-04-05T15:58:14.367Z] iter=222 turn=4 INFO: Turn 4/25
+[2026-04-05T15:58:18.136Z] iter=222 turn=4 INFO: think: I've already found that `src/tools/subagent.ts` exists with `executeSubagent` and `parallelResearch`. The tests for it a...
+[2026-04-05T15:58:18.137Z] iter=222 turn=5 INFO: Turn 5/25
+[2026-04-05T15:58:21.412Z] iter=222 turn=5 INFO: $ grep -n "subagent\|dispatch_agent\|tool_registry\|toolRegistry\|tool_use\|case \"" src/orchestrator.ts | head -40
+[2026-04-05T15:58:21.419Z] iter=222 turn=5 INFO: $ grep -n "/find\|/model\|handleCommand\|parseCommand" src/tui.tsx | head -30
+[2026-04-05T15:58:21.442Z] iter=222 turn=5 INFO:   -> exit=0 (510 chars)
+[2026-04-05T15:58:21.445Z] iter=222 turn=5 INFO:   -> exit=0 (344 chars)
+[2026-04-05T15:58:21.445Z] iter=222 turn=6 INFO: Turn 6/25
+[2026-04-05T15:58:23.732Z] iter=222 turn=6 INFO: $ grep -n "createDefaultRegistry\|registry\|executeSubagent\|subagentToolDefinition" src/orchestrator.ts | head -20
+[2026-04-05T15:58:23.735Z] iter=222 turn=6 INFO: $ sed -n '290,340p' src/orchestrator.ts
+[2026-04-05T15:58:23.742Z] iter=222 turn=6 INFO:   -> exit=0 (1892 chars)
+[2026-04-05T15:58:23.744Z] iter=222 turn=6 INFO:   -> exit=0 (545 chars)
+[2026-04-05T15:58:23.744Z] iter=222 turn=7 INFO: Turn 7/25
+[2026-04-05T15:58:27.553Z] iter=222 turn=7 INFO: think: Status:
+- Goal 1 (dispatch_agent tool): The subagent.ts already exists in src/tools/subagent.ts. I need to check if it's...
+[2026-04-05T15:58:27.555Z] iter=222 turn=8 INFO: Turn 8/25
+[2026-04-05T15:58:29.778Z] iter=222 turn=8 INFO: Agent: **Status:**
+- Goal 1 (dispatch_agent tool): IN PROGRESS — `src/tools/subagent.ts` exists but need to verify it's wired into tool registry
+- Goal 2 (/find + /model tests): NOT STARTED
+[2026-04-05T15:58:29.779Z] iter=222 turn=8 INFO: $ grep -n "subagent\|dispatch_agent" src/tool-registry.ts
+[2026-04-05T15:58:29.804Z] iter=222 turn=8 INFO:   -> exit=0 (318 chars)
+[2026-04-05T15:58:29.806Z] iter=222 turn=9 INFO: Turn 9/25
+[2026-04-05T15:58:31.551Z] iter=222 turn=9 INFO: $ sed -n '185,225p' src/tool-registry.ts
+[2026-04-05T15:58:31.569Z] iter=222 turn=9 INFO:   -> exit=0 (1895 chars)
+[2026-04-05T15:58:31.569Z] iter=222 turn=10 INFO: Turn 10/25
+[2026-04-05T15:58:33.891Z] iter=222 turn=10 INFO: Agent: Goal 1 is **DONE** — `subagent` tool is already wired. Now I'll write the /find + /model command tests.
+[2026-04-05T15:58:33.892Z] iter=222 turn=10 INFO: $ sed -n '340,460p' src/tui.tsx
+[2026-04-05T15:58:33.900Z] iter=222 turn=10 INFO:   -> exit=0 (5104 chars)
+[2026-04-05T15:58:33.901Z] iter=222 turn=11 INFO: Turn 11/25
+[2026-04-05T15:58:36.697Z] iter=222 turn=11 INFO: Agent: Now I have what I need. The command logic lives in `tui.tsx` but is tightly coupled to React state. I need to extract/test the parsing logic directly. Let me look at how other TUI-adjacent tests work:
+[2026-04-05T15:58:36.697Z] iter=222 turn=11 INFO: $ cat src/__tests__/model-selection.test.ts | head -50
+[2026-04-05T15:58:36.719Z] iter=222 turn=11 INFO:   -> exit=0 (1579 chars)
+[2026-04-05T15:58:36.720Z] iter=222 turn=12 INFO: Turn 12/25
+[2026-04-05T15:58:38.814Z] iter=222 turn=12 INFO: Agent: The TUI command logic is embedded in the React component. The best approach is to extract the command parsing logic into a separate module and test that. Let me check if there's already a command parser module:
+[2026-04-05T15:58:38.815Z] iter=222 turn=12 INFO: $ ls src/ | grep -i command
+[2026-04-05T15:58:38.824Z] iter=222 turn=12 INFO:   -> exit=1 (11 chars)
+[2026-04-05T15:58:38.824Z] iter=222 turn=13 INFO: Turn 13/25
+[2026-04-05T15:58:59.633Z] iter=222 turn=13 INFO: Agent: I have NOT changed anything in src/ yet. The subagent tool was already wired. I need to write the /find + /model tests NOW.
+[2026-04-05T15:58:59.634Z] iter=222 turn=13 INFO: write_file: src/__tests__/tui-commands.test.ts (write)
+[2026-04-05T15:58:59.636Z] iter=222 turn=13 INFO:   -> ok: Created src/__tests__/tui-commands.test.ts (4233 chars)
+[2026-04-05T15:58:59.637Z] iter=222 turn=14 INFO: Turn 14/25
+[2026-04-05T15:59:01.652Z] iter=222 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tui-commands.test.ts 2>&1 | tail -30
+[2026-04-05T15:59:02.604Z] iter=222 turn=14 INFO:   -> exit=0 (1054 chars)
+[2026-04-05T15:59:02.604Z] iter=222 turn=15 INFO: Turn 15/25
+[2026-04-05T15:59:04.415Z] iter=222 turn=15 INFO: $ grep -n "RepoMap\|exports\|symbols\|interface.*File" src/tree-sitter-map.ts | head -20
+[2026-04-05T15:59:04.440Z] iter=222 turn=15 INFO:   -> exit=0 (1191 chars)
+[2026-04-05T15:59:04.441Z] iter=222 turn=16 INFO: Turn 16/25
+[2026-04-05T15:59:09.738Z] iter=222 turn=16 INFO: Agent: The RepoMap uses `exports` not `symbols`. Let me fix the test:
+[2026-04-05T15:59:09.738Z] iter=222 turn=16 INFO: write_file: src/__tests__/tui-commands.test.ts (patch)
+[2026-04-05T15:59:09.739Z] iter=222 turn=16 INFO:   -> ok: Patched src/__tests__/tui-commands.test.ts: -19 +19 lines
+
+Context after patch:
+93 | import { fuzzySearch, type RepoMap } from "../tree-sitter-map.js";
+94 | 
+95 | describe("fuzzySearch used by /find command", () => {
+96 |   const sampleMap: RepoMap = {
+97 |     files: [
+98 |       {
+99 |         path: "src/orchestrator.ts",
+100 |         exports: [
+101 |           { name: "Orchestrator", kind: "class", line: 10, exported: true },
+102 |           { name: "send", kind: "function", line: 50, exported: true },
+103 |         ],
+104 |         imports: [],
+105 |       },
+106 |       {
+107 |         path: "src/context-loader.ts",
+108 |         exports: [
+109 |           { name: "autoLoadContext", kind: "function", line: 5, exported: true },
+110 |         ],
+111 |         imports: [],
+112 |       },
+113 |     ],
+114 |   };
+115 | 
+116 |   it("returns matches for a known symbol name", () => {
+117 |     const results = fuzzySearch(sampleMap, "autoLoadContext", 10);
+[2026-04-05T15:59:09.739Z] iter=222 turn=17 INFO: Turn 17/25
+[2026-04-05T15:59:11.786Z] iter=222 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tui-commands.test.ts 2>&1 | tail -15 && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T15:59:13.589Z] iter=222 turn=17 INFO:   -> exit=0 (283 chars)
+[2026-04-05T15:59:13.589Z] iter=222 turn=18 INFO: Turn 18/25
+[2026-04-05T15:59:16.294Z] iter=222 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T15:59:17.204Z] iter=222 turn=18 INFO:   -> exit=0 (11 chars)
+[2026-04-05T15:59:17.204Z] iter=222 turn=19 INFO: Turn 19/25
+[2026-04-05T15:59:18.479Z] iter=222 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -8
+[2026-04-05T15:59:26.117Z] iter=222 turn=19 INFO:   -> exit=0 (334 chars)
+[2026-04-05T15:59:26.117Z] iter=222 turn=20 INFO: Turn 20/25
+[2026-04-05T15:59:31.040Z] iter=222 turn=20 INFO: Agent: 586 tests pass, tsc clean. Writing memory and updating goals now.
+[2026-04-05T15:59:31.041Z] iter=222 turn=20 INFO: save_memory: "[Engineer] Iteration 222"
+[2026-04-05T15:59:31.043Z] iter=222 turn=20 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T15:59:31.043Z] iter=222 turn=21 INFO: Turn 21/25
+[2026-04-05T15:59:41.484Z] iter=222 turn=21 INFO: write_file: goals.md (write)
+[2026-04-05T15:59:41.485Z] iter=222 turn=21 INFO:   -> ok: Updated goals.md (1460 chars, -72 lines delta)
+[2026-04-05T15:59:41.486Z] iter=222 turn=22 INFO: Turn 22/25
+[2026-04-05T15:59:43.532Z] iter=222 turn=22 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T15:59:43.532Z] iter=222 turn=22 INFO: RESTART signal
+[2026-04-05T15:59:43.533Z] iter=222 turn=22 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T15:59:44.459Z] iter=222 turn=22 INFO: Compilation OK
+[2026-04-05T15:59:50.157Z] iter=222 turn=22 INFO: Cache persisted: 45 entries to .autoagent-cache.json
+[2026-04-05T15:59:50.157Z] iter=222 turn=22 INFO: Tool timing: bash: 21x, avg=552ms, total=11588ms; write_file: 3x, avg=2ms, total=5ms; think: 2x, avg=2ms, total=3ms; save_memory: 1x, avg=2ms, total=2ms
+[2026-04-05T15:59:50.157Z] iter=222 turn=22 INFO: Tool timing stats
+[2026-04-05T15:59:55.170Z] iter=222 turn=22 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 222: predicted 20 turns, actual 22 turns, ratio 1.10**
+[2026-04-05T16:00:05.346Z] iter=222 turn=22 INFO: Pre-commit review (1795in/417out): **Issues:**
+
+- **Logic bug in `parseFindArg`**: `trimmed.slice(5)` hardcodes the length of `"/find"` (5 chars). If the input is `"/find"` with no trailing space, `slice(5)` correctly gives `""`, but t
