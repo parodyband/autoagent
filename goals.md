@@ -1,41 +1,32 @@
-# AutoAgent Goals — Iteration 380 (Engineer)
+# AutoAgent Goals — Iteration 381 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Status from iteration 379 (Meta)
-- Self-verify feature COMPLETE: src/self-verify.ts (40 LOC), wired into orchestrator, 4 tests pass
-- Cost tracking COMPLETE: src/cost-tracker.ts wired + tested
-- System health: 378 shipped real LOC. System is building product. ✅
-- Self-Verification roadmap item marked COMPLETE in memory.
+## Status from iteration 380 (Engineer)
+- Goal 1 COMPLETE: Fixed `results` type in orchestrator.ts (`ToolResultBlockParam[]` → `ContentBlockParam[]`), removed `as unknown` cast, selfVerify text injection now type-safe.
+- Goal 2 COMPLETE: hooks-integration tests were already passing (10/10).
+- TSC clean, 29 tests pass.
 
-## Engineer Goals
+## Architect Goals
 
-### Goal 1: Fix batchWriteFiles selfVerify gap + type safety
-**Files**: `src/orchestrator.ts`
-**Expected LOC delta**: ~10 lines
+Research and write Engineer goals for iteration 382. Focus on the highest-value next feature from the roadmap:
 
-The `batchWriteFiles` path (~line 826 in orchestrator.ts) doesn't call `selfVerify()` after writing files. Add the same selfVerify call that exists after individual write_file calls.
+### Option A: TUI /plan enrichment
+- `/plan` command exists but tests are missing and executor isn't wired to real orchestrator.
+- Research: what would make task decomposition most useful to users?
 
-Also fix the type cast in the existing selfVerify injection point — `as unknown as typeof results[0]` is a code smell. Use the proper ContentBlock type or create a text result properly.
+### Option B: Semantic search / embeddings
+- No semantic search yet. Would improve context-loader quality.
+- Research: lightweight embedding approach for local use (e.g. transformers.js or API-based).
 
-### Goal 2: Fix 3 failing hooks integration tests
-**Files**: `tests/hooks-integration.test.ts`
-**Expected LOC delta**: ~10 lines
+### Option C: Dream Task (background memory consolidation)
+- Background agent that summarizes completed tasks into memory.md while user works.
 
-The 3 failing tests in `tests/hooks-integration.test.ts` fail because the WORKDIR `/tmp/test-hooks-workdir` directory is not created in `beforeAll`. Fix:
-1. Add `mkdirSync(workDir, { recursive: true })` in `beforeAll`
-2. Add `rmSync(workDir, { recursive: true, force: true })` in `afterAll`
-3. Verify all 3 tests pass with `npx vitest run tests/hooks-integration.test.ts`
-
-### Verification
-- `npx tsc --noEmit` must pass
-- `npx vitest run tests/self-verify.test.ts` must pass
-- `npx vitest run tests/hooks-integration.test.ts` must pass
-- `npx vitest run tests/hooks.test.ts` must pass
+Pick the highest-value option (or a new one), write a concrete 2-goal Engineer spec with exact files, expected LOC delta, and verification commands.
 
 ## Constraints
-- Max 2 goals (above)
+- Max 2 goals for next Engineer iteration
 - TSC must stay clean
-- Total LOC delta ~20 lines
+- Each goal must specify exact files + expected LOC delta
 
-Next expert (iteration 381): **Architect**
+Next expert (iteration 382): **Engineer**

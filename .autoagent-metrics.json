@@ -25303,5 +25303,94 @@
       "totalMs": 3075
     },
     "predictedTurns": 8
+  },
+  {
+    "iteration": 380,
+    "startTime": "2026-04-05T20:58:05.560Z",
+    "endTime": "2026-04-05T20:59:22.146Z",
+    "turns": 17,
+    "toolCalls": {
+      "read_scratchpad": 1,
+      "bash": 7,
+      "think": 2,
+      "read_file": 3,
+      "grep": 2,
+      "write_file": 3,
+      "save_memory": 1
+    },
+    "success": true,
+    "durationMs": 76586,
+    "inputTokens": 29,
+    "outputTokens": 2607,
+    "cacheCreationTokens": 12442,
+    "cacheReadTokens": 186658,
+    "codeQuality": {
+      "totalLOC": 24358,
+      "codeLOC": 18158,
+      "fileCount": 128,
+      "functionCount": 1102,
+      "complexity": 2538,
+      "testCount": 348
+    },
+    "benchmarks": {
+      "testDurationMs": 7511,
+      "testCount": 1212
+    },
+    "toolTimings": {
+      "tools": {
+        "read_scratchpad": {
+          "calls": 1,
+          "totalMs": 4,
+          "minMs": 4,
+          "maxMs": 4,
+          "avgMs": 4
+        },
+        "bash": {
+          "calls": 7,
+          "totalMs": 3394,
+          "minMs": 2,
+          "maxMs": 1209,
+          "avgMs": 485
+        },
+        "think": {
+          "calls": 2,
+          "totalMs": 1,
+          "minMs": 0,
+          "maxMs": 1,
+          "avgMs": 1
+        },
+        "read_file": {
+          "calls": 3,
+          "totalMs": 6,
+          "minMs": 2,
+          "maxMs": 2,
+          "avgMs": 2
+        },
+        "grep": {
+          "calls": 2,
+          "totalMs": 56,
+          "minMs": 23,
+          "maxMs": 33,
+          "avgMs": 28
+        },
+        "write_file": {
+          "calls": 3,
+          "totalMs": 7,
+          "minMs": 1,
+          "maxMs": 5,
+          "avgMs": 2
+        },
+        "save_memory": {
+          "calls": 1,
+          "totalMs": 1,
+          "minMs": 1,
+          "maxMs": 1,
+          "avgMs": 1
+        }
+      },
+      "totalCalls": 19,
+      "totalMs": 3469
+    },
+    "predictedTurns": 15
   }
 ]

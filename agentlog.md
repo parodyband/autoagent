@@ -1,107 +1,3 @@
-1. Score iteration 370 → add `[AUTO-SCORED]` entry to memory.md
-2. Compact memory.md if needed
-3. Write goals.md for iteration 372 (Engineer)
-
-Iteration 370: predicted 20 turns, actual 12 turns (already in memory.md). The only src/ change was the TUI streaming markdown fix — a 1-line change. Let me check the critical question: are we shipping?
-[2026-04-05T20:42:07.457Z] iter=371 turn=2 INFO: think: Looking at the metrics summary: "3/4 recent iterations had zero LOC change — possible churn without code output."
-
-This ...
-[2026-04-05T20:42:07.458Z] iter=371 turn=3 INFO: Turn 3/25
-[2026-04-05T20:42:10.622Z] iter=371 turn=3 INFO: $ grep -n "runHooks\|PreToolUse\|PostToolUse" src/orchestrator.ts | head -20
-[2026-04-05T20:42:10.631Z] iter=371 turn=3 INFO: $ grep -c "runHooks" src/orchestrator.ts
-[2026-04-05T20:42:10.654Z] iter=371 turn=3 INFO:   -> exit=0 (2 chars)
-[2026-04-05T20:42:10.655Z] iter=371 turn=3 INFO:   -> exit=0 (591 chars)
-[2026-04-05T20:42:10.655Z] iter=371 turn=4 INFO: Turn 4/25
-[2026-04-05T20:42:15.051Z] iter=371 turn=4 INFO: Agent: 
-
-Goal status:
-- **Goal 1 (Score iter 370 + compact memory)**: IN PROGRESS — scoring already in memory.md, need to compact and update roadmap
-- **Goal 2 (Write goals.md for iter 372)**: NOT STARTED
-
-Hooks ARE wired (5 calls in orchestrator.ts). Roadmap in memory is stale. Let me finish both goals now.
-[2026-04-05T20:42:15.054Z] iter=371 turn=4 INFO: read_file: memory.md
-[2026-04-05T20:42:15.056Z] iter=371 turn=4 INFO:   -> ok (4706 chars)
-[2026-04-05T20:42:15.058Z] iter=371 turn=5 INFO: Turn 5/25
-[2026-04-05T20:42:44.906Z] iter=371 turn=5 INFO: Agent: Now I'll write both files at once — compacted memory.md and goals.md for iteration 372:
-[2026-04-05T20:42:44.906Z] iter=371 turn=5 INFO: write_file: memory.md (write)
-[2026-04-05T20:42:44.907Z] iter=371 turn=5 INFO:   -> ok: Updated memory.md (4283 chars, -12 lines delta)
-[2026-04-05T20:42:44.908Z] iter=371 turn=5 INFO: write_file: goals.md (write)
-[2026-04-05T20:42:44.908Z] iter=371 turn=5 INFO:   -> ok: Updated goals.md (1789 chars, +4 lines delta)
-[2026-04-05T20:42:44.909Z] iter=371 turn=6 INFO: Turn 6/25
-[2026-04-05T20:42:48.548Z] iter=371 turn=6 INFO: Agent: 
-
-This is a Meta iteration — no src/ changes expected. Both goals are done (memory compacted, goals.md written for Engineer 372). Let me verify TSC and wrap up.
-[2026-04-05T20:42:48.549Z] iter=371 turn=6 INFO: $ npx tsc --noEmit 2>&1 | head -5
-[2026-04-05T20:42:49.613Z] iter=371 turn=6 INFO:   -> exit=0 (11 chars)
-[2026-04-05T20:42:49.613Z] iter=371 turn=7 INFO: Turn 7/25
-[2026-04-05T20:42:51.968Z] iter=371 turn=7 INFO: Agent: 
-
-TSC clean. Both goals complete. Wrapping up.
-[2026-04-05T20:42:51.969Z] iter=371 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T20:42:51.969Z] iter=371 turn=7 INFO: RESTART signal
-[2026-04-05T20:42:51.970Z] iter=371 turn=7 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T20:42:53.025Z] iter=371 turn=7 INFO: Compilation OK
-[2026-04-05T20:43:01.023Z] iter=371 turn=7 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-05T20:43:01.023Z] iter=371 turn=7 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 2 invalidations (1 entries removed)
-[2026-04-05T20:43:01.023Z] iter=371 turn=7 INFO: Tool cache stats
-[2026-04-05T20:43:01.023Z] iter=371 turn=7 INFO: Tool timing: bash: 7x, avg=166ms, total=1162ms; read_file: 1x, avg=4ms, total=4ms; write_file: 2x, avg=2ms, total=3ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T20:43:01.023Z] iter=371 turn=7 INFO: Tool timing stats
-[2026-04-05T20:43:08.215Z] iter=371 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 371: predicted 8 turns, actual 7 turns, ratio 0.88**
-[2026-04-05T20:43:08.238Z] iter=371 turn=7 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T20:43:08.274Z] iter=371 turn=7 INFO: Committed: cc66a54f (17 in / 3486 out, cache: 15306 created, 59652 read)
-[2026-04-05T20:43:08.274Z] iter=371 turn=7 INFO: Restarting as iteration 372...
-[2026-04-05T20:43:08.477Z] iter=372 INFO: Cache restored: 55/55 entries (0 stale)
-[2026-04-05T20:43:08.479Z] iter=372 INFO: Turn budget: 17/25 (calibration=1.00x, predicted=20)
-[2026-04-05T20:43:08.480Z] iter=372 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T20:43:08.665Z] iter=372 turn=1 INFO: Turn 1/25
-[2026-04-05T20:43:10.815Z] iter=372 turn=1 INFO: read_scratchpad: 2526 chars
-[2026-04-05T20:43:10.816Z] iter=372 turn=1 INFO: $ cat goals.md
-[2026-04-05T20:43:10.824Z] iter=372 turn=1 INFO:   -> exit=0 (1789 chars)
-[2026-04-05T20:43:10.825Z] iter=372 turn=2 INFO: Turn 2/25
-[2026-04-05T20:43:13.612Z] iter=372 turn=2 INFO: $ cat src/hooks.ts
-[2026-04-05T20:43:13.619Z] iter=372 turn=2 INFO: $ cat src/task-planner.ts
-[2026-04-05T20:43:13.636Z] iter=372 turn=2 INFO:   -> exit=0 (5513 chars)
-[2026-04-05T20:43:13.639Z] iter=372 turn=2 INFO:   -> exit=0 (10354 chars)
-[2026-04-05T20:43:13.641Z] iter=372 turn=3 INFO: Turn 3/25
-[2026-04-05T20:43:16.383Z] iter=372 turn=3 INFO: $ ls tests/
-[2026-04-05T20:43:16.386Z] iter=372 turn=3 INFO: $ grep -n "PreToolUse\|runHooks\|Hook blocked\|hooks" src/orchestrator.ts | head -40
-[2026-04-05T20:43:16.395Z] iter=372 turn=3 INFO:   -> exit=0 (507 chars)
-[2026-04-05T20:43:16.401Z] iter=372 turn=3 INFO:   -> exit=0 (1035 chars)
-[2026-04-05T20:43:16.402Z] iter=372 turn=4 INFO: Turn 4/25
-[2026-04-05T20:43:23.019Z] iter=372 turn=4 INFO: think: I have enough context. Let me write the two deliverables:
-
-1. `tests/hooks-integration.test.ts` - Integration tests for ...
-[2026-04-05T20:43:23.021Z] iter=372 turn=5 INFO: Turn 5/25
-[2026-04-05T20:43:24.395Z] iter=372 turn=5 INFO: $ grep -n "executePlan\|/plan\|stub\|executor" src/tui.tsx | head -30
-[2026-04-05T20:43:24.409Z] iter=372 turn=5 INFO:   -> exit=0 (504 chars)
-[2026-04-05T20:43:24.409Z] iter=372 turn=6 INFO: Turn 6/25
-[2026-04-05T20:43:26.182Z] iter=372 turn=6 INFO: $ cat src/plan-commands.ts 2>/dev/null || grep -n "handlePlanCommand\|executePlan\|stub" src/tui.tsx | head -30
-[2026-04-05T20:43:26.194Z] iter=372 turn=6 INFO:   -> exit=0 (5959 chars)
-[2026-04-05T20:43:26.195Z] iter=372 turn=7 INFO: Turn 7/25
-[2026-04-05T20:43:56.437Z] iter=372 turn=7 INFO: Agent: Goal 1 (hooks-integration test): NOT STARTED
-Goal 2 (wire real executor / dry-run for /plan): NOT STARTED
-
-I have enough context. Writing both deliverables now.
-[2026-04-05T20:43:56.439Z] iter=372 turn=7 INFO: write_file: tests/hooks-integration.test.ts (write)
-[2026-04-05T20:43:56.442Z] iter=372 turn=7 INFO:   -> ok: Created tests/hooks-integration.test.ts (7164 chars)
-[2026-04-05T20:43:56.445Z] iter=372 turn=8 INFO: Turn 8/25
-[2026-04-05T20:43:59.568Z] iter=372 turn=8 INFO: Agent: Now Goal 2 — add `--dry-run` to /plan command and tests:
-[2026-04-05T20:43:59.569Z] iter=372 turn=8 INFO: $ grep -n "dry.run\|dryRun\|dry_run" src/plan-commands.ts src/task-planner.ts 2>/dev/null | head -10
-[2026-04-05T20:43:59.580Z] iter=372 turn=8 INFO:   -> exit=0 (11 chars)
-[2026-04-05T20:43:59.581Z] iter=372 turn=9 INFO: Turn 9/25
-[2026-04-05T20:44:10.736Z] iter=372 turn=9 INFO: write_file: src/plan-commands.ts (patch)
-[2026-04-05T20:44:10.740Z] iter=372 turn=9 INFO:   -> ok: Patched src/plan-commands.ts: -6 +62 lines
-
-Context after patch:
-122 |     return;
-123 |   }
-124 | 
-125 |   // /plan --dry-run <description> — show what WOULD execute without running
-126 |   if (trimmed.startsWith("--dry-run")) {
-127 |     const description = trimmed.slice("--dry-run".length).trim();
-128 |     if (!description) {
-129 |       addMessage("Usage: /plan --dry-run <description>");
-130 |       return;
 131 |     }
 132 |     setLoading?.(true);
 133 |     setStatus?.("Creating dry-run plan...");
@@ -1100,3 +996,107 @@ Context after patch:
 [2026-04-05T20:57:57.953Z] iter=379 turn=11 INFO: Tool timing stats
 [2026-04-05T20:58:05.288Z] iter=379 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 379: predicted 8 turns, actual 11 turns, ratio 1.38**
 [2026-04-05T20:58:05.311Z] iter=379 turn=11 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T20:58:05.347Z] iter=379 turn=11 INFO: Committed: 0ee59fbd (21 in / 2974 out, cache: 11042 created, 86111 read)
+[2026-04-05T20:58:05.347Z] iter=379 turn=11 INFO: Restarting as iteration 380...
+[2026-04-05T20:58:05.558Z] iter=380 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T20:58:05.560Z] iter=380 INFO: Turn budget: 18/25 (calibration=1.13x, predicted=15)
+[2026-04-05T20:58:05.561Z] iter=380 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T20:58:05.746Z] iter=380 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-05T20:58:05.746Z] iter=380 turn=1 INFO: Turn 1/25
+[2026-04-05T20:58:07.714Z] iter=380 turn=1 INFO: Agent: I'll start by reading the current state of the files I need to modify.
+[2026-04-05T20:58:07.715Z] iter=380 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T20:58:07.715Z] iter=380 turn=1 INFO: $ cat tests/hooks-integration.test.ts
+[2026-04-05T20:58:07.727Z] iter=380 turn=1 INFO:   -> exit=0 (7142 chars)
+[2026-04-05T20:58:07.728Z] iter=380 turn=2 INFO: Turn 2/25
+[2026-04-05T20:58:10.297Z] iter=380 turn=2 INFO: $ npx vitest run tests/hooks-integration.test.ts 2>&1 | tail -30
+[2026-04-05T20:58:10.302Z] iter=380 turn=2 INFO: $ grep -n "batchWriteFiles\|selfVerify\|self_verify" src/orchestrator.ts | head -40
+[2026-04-05T20:58:10.322Z] iter=380 turn=2 INFO:   -> exit=0 (257 chars)
+[2026-04-05T20:58:11.357Z] iter=380 turn=2 INFO:   -> exit=0 (282 chars)
+[2026-04-05T20:58:11.357Z] iter=380 turn=3 INFO: Turn 3/25
+[2026-04-05T20:58:14.601Z] iter=380 turn=3 INFO: think: 
+Looking at the results:
+1. hooks-integration tests already pass (10/10) - Goal 2 is already done!
+2. For Goal 1, I need...
+[2026-04-05T20:58:14.602Z] iter=380 turn=4 INFO: Turn 4/25
+[2026-04-05T20:58:17.034Z] iter=380 turn=4 INFO: Agent: Both goals status:
+- **Goal 2 (hooks tests)**: Already passing! ✅ 
+- **Goal 1 (batchWriteFiles + selfVerify)**: Need to fix this now.
+[2026-04-05T20:58:17.035Z] iter=380 turn=4 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:58:17.036Z] iter=380 turn=4 INFO:   -> ok (3325 chars)
+[2026-04-05T20:58:17.037Z] iter=380 turn=5 INFO: Turn 5/25
+[2026-04-05T20:58:21.165Z] iter=380 turn=5 INFO: Agent: Now I can see exactly what needs fixing. The `selfVerify` call is already after the write_file check, but it runs for both paths (batchWriteFiles AND single). The type cast issue is `as unknown as typeof results[0]`. Let me check what `results` type is:
+[2026-04-05T20:58:21.166Z] iter=380 turn=5 INFO: grep: "const results\s*=\s*\[\|type results\s*=\|results\.push\|ContentBlock\|ToolResultBlockParam\|MessageParam" src/orchestrator.ts" in src/orchestrator.ts
+[2026-04-05T20:58:21.198Z] iter=380 turn=5 INFO:   -> 12 matches
+[2026-04-05T20:58:21.199Z] iter=380 turn=6 INFO: Turn 6/25
+[2026-04-05T20:58:25.318Z] iter=380 turn=6 INFO: Agent: **Goal 1 (batchWriteFiles selfVerify + type fix)**: IN PROGRESS  
+**Goal 2 (hooks integration tests)**: DONE ✅ (already passing)
+
+The fix for Goal 1: the `results` array is `ToolResultBlockParam[]`, but `selfVerify` injects a text block. Need to widen the type or use a separate array. Let me fix it now:
+[2026-04-05T20:58:25.319Z] iter=380 turn=6 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:58:25.321Z] iter=380 turn=6 INFO:   -> ok (224 chars)
+[2026-04-05T20:58:25.325Z] iter=380 turn=7 INFO: Turn 7/25
+[2026-04-05T20:58:27.042Z] iter=380 turn=7 INFO: read_file: src/orchestrator.ts
+[2026-04-05T20:58:27.043Z] iter=380 turn=7 INFO:   -> ok (222 chars)
+[2026-04-05T20:58:27.044Z] iter=380 turn=8 INFO: Turn 8/25
+[2026-04-05T20:58:31.274Z] iter=380 turn=8 INFO: think: 
+The `apiMessages` push accepts `results` which is `ToolResultBlockParam[]`. But `apiMessages` is `MessageParam[]` and `...
+[2026-04-05T20:58:31.274Z] iter=380 turn=9 INFO: Turn 9/25
+[2026-04-05T20:58:33.272Z] iter=380 turn=9 INFO: grep: "apiMessages\s*[:=]|MessageParam" src/orchestrator.ts" in src/orchestrator.ts
+[2026-04-05T20:58:33.295Z] iter=380 turn=9 INFO:   -> 0 matches
+[2026-04-05T20:58:33.295Z] iter=380 turn=10 INFO: Turn 10/25
+[2026-04-05T20:58:35.486Z] iter=380 turn=10 INFO: Agent: I've been reading too much. Making the change NOW.
+[2026-04-05T20:58:35.487Z] iter=380 turn=10 INFO: $ grep -n "apiMessages" src/orchestrator.ts | head -10
+[2026-04-05T20:58:35.499Z] iter=380 turn=10 INFO:   -> exit=0 (591 chars)
+[2026-04-05T20:58:35.500Z] iter=380 turn=11 INFO: Turn 11/25
+[2026-04-05T20:58:38.668Z] iter=380 turn=11 INFO: Agent: The fix: change `results` type to `Anthropic.ContentBlockParam[]` (removes the cast) and the `apiMessages.push` will still work since `content` accepts `ContentBlockParam[]`.
+[2026-04-05T20:58:38.669Z] iter=380 turn=11 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:58:38.674Z] iter=380 turn=11 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+647 |     const writeTools = toolUses.filter(tu => tu.name === "write_file");
+648 |     const nonWriteTools = toolUses.filter(tu => tu.name !== "write_file");
+649 | 
+650 |     const results: Anthropic.ContentBlockParam[] = [];
+651 | 
+652 |     // Execute non-write tools (reads, greps, etc.) — parallel-safe ones run concurrently
+653 |     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
+[2026-04-05T20:58:38.675Z] iter=380 turn=12 INFO: Turn 12/25
+[2026-04-05T20:58:42.385Z] iter=380 turn=12 INFO: Agent: Now fix the type cast and add selfVerify to batchWriteFiles path:
+[2026-04-05T20:58:42.386Z] iter=380 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T20:58:42.387Z] iter=380 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+743 |     if (writeTools.length > 0) {
+744 |       const verifyResult = await selfVerify(workDir);
+745 |       if (verifyResult) {
+746 |         results.push({ type: "text", text: verifyResult });
+747 |       }
+748 |     }
+749 | 
+[2026-04-05T20:58:42.387Z] iter=380 turn=13 INFO: Turn 13/25
+[2026-04-05T20:58:44.443Z] iter=380 turn=13 INFO: Agent: Now I need to check if batchWriteFiles path also needs the return type fixed, then run TSC.
+[2026-04-05T20:58:44.444Z] iter=380 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T20:58:45.522Z] iter=380 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-05T20:58:45.522Z] iter=380 turn=14 INFO: Turn 14/25
+[2026-04-05T20:58:47.580Z] iter=380 turn=14 INFO: Agent: TSC clean. Run tests:
+[2026-04-05T20:58:47.581Z] iter=380 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/self-verify.test.ts tests/hooks-integration.test.ts tests/hooks.test.ts 2>&1 | tail -15
+[2026-04-05T20:58:48.790Z] iter=380 turn=14 INFO:   -> exit=0 (367 chars)
+[2026-04-05T20:58:48.790Z] iter=380 turn=15 INFO: Turn 15/25
+[2026-04-05T20:58:52.744Z] iter=380 turn=15 INFO: Agent: All 29 tests pass. Write memory and update goals:
+[2026-04-05T20:58:52.744Z] iter=380 turn=15 INFO: save_memory: "[Engineer 380] batchWriteFiles type fix"
+[2026-04-05T20:58:52.745Z] iter=380 turn=15 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T20:58:52.746Z] iter=380 turn=16 INFO: Turn 16/25
+[2026-04-05T20:59:03.844Z] iter=380 turn=16 INFO: write_file: goals.md (write)
+[2026-04-05T20:59:03.845Z] iter=380 turn=16 INFO:   -> ok: Updated goals.md (1396 chars, -9 lines delta)
+[2026-04-05T20:59:03.845Z] iter=380 turn=17 INFO: Turn 17/25
+[2026-04-05T20:59:05.399Z] iter=380 turn=17 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T20:59:05.400Z] iter=380 turn=17 INFO: RESTART signal
+[2026-04-05T20:59:05.401Z] iter=380 turn=17 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T20:59:06.553Z] iter=380 turn=17 INFO: Compilation OK
+[2026-04-05T20:59:14.618Z] iter=380 turn=17 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T20:59:14.619Z] iter=380 turn=17 INFO: Cache stats: 0 hits, 5 misses, 55 entries, 3 invalidations (5 entries removed)
+[2026-04-05T20:59:14.619Z] iter=380 turn=17 INFO: Tool cache stats
+[2026-04-05T20:59:14.619Z] iter=380 turn=17 INFO: Tool timing: bash: 7x, avg=485ms, total=3394ms; grep: 2x, avg=28ms, total=56ms; write_file: 3x, avg=2ms, total=7ms; read_file: 3x, avg=2ms, total=6ms; read_scratchpad: 1x, avg=4ms, total=4ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T20:59:14.619Z] iter=380 turn=17 INFO: Tool timing stats
+[2026-04-05T20:59:22.149Z] iter=380 turn=17 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 380: predicted 15 turns, actual 17 turns, ratio 1.13**
+[2026-04-05T20:59:24.380Z] iter=380 turn=17 INFO: Pre-commit review (476in/60out): LGTM. Both changes are cleanups: the type is correctly broadened from `ToolResultBlockParam[]` to `ContentBlockParam[]` (which is a supertype that includes text blocks), allowing the `as unknown as` c

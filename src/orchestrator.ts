@@ -647,7 +647,7 @@ async function runAgentLoop(
     const writeTools = toolUses.filter(tu => tu.name === "write_file");
     const nonWriteTools = toolUses.filter(tu => tu.name !== "write_file");
 
-    const results: Anthropic.ToolResultBlockParam[] = [];
+    const results: Anthropic.ContentBlockParam[] = [];
 
     // Execute non-write tools (reads, greps, etc.) — parallel-safe ones run concurrently
     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
@@ -743,7 +743,7 @@ async function runAgentLoop(
     if (writeTools.length > 0) {
       const verifyResult = await selfVerify(workDir);
       if (verifyResult) {
-        results.push({ type: "text", text: verifyResult } as unknown as typeof results[0]);
+        results.push({ type: "text", text: verifyResult });
       }
     }
 

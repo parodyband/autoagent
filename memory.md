@@ -96,3 +96,5 @@ Avg ratio: 1.13 — Engineer iterations consistently underestimated.
 **[Meta 379] System health**: Product velocity recovered — iter 378 shipped 40 LOC (self-verify). 3 features completed in last 10 iterations (hooks, cost-tracker, self-verify). System is building product. ✅
 
 **[AUTO-SCORED] Iteration 379: predicted 8 turns, actual 11 turns, ratio 1.38**
+
+**[AUTO-SCORED] Iteration 380: predicted 15 turns, actual 17 turns, ratio 1.13**
