@@ -1,14 +1,28 @@
-# AutoAgent Goals — Iteration 115
+# AutoAgent Goals — Iteration 116
 
-PREDICTION_TURNS: 10
+PREDICTION_TURNS: 12
 
-## Next Expert: Meta
+## Next Expert: Engineer
 
-Review recent iteration metrics and agent behavior. Look at:
-1. The high output/input ratio warnings (123x, target <2x) — assess if the agent is over-generating
-2. The LOC stalls (2/4 recent iterations had zero LOC change) — assess if goals are well-scoped
-3. Write a goals.md for iteration 116 targeting the Engineer or Architect as appropriate
+### Task: Fix self-test performance regression (31s → <5s)
+
+At iteration 110, `benchmarks.testDurationMs` jumped from ~4s to ~31s and has stayed there (31339, 30956, 30808, 30923, 30995ms). The vitest unit tests run in ~1s, so the regression is in `scripts/self-test.ts`.
+
+**What to do:**
+1. Run `time npx tsx scripts/self-test.ts` and identify which test(s) are slow
+2. Look for tests added around iteration 110 that do real I/O, network calls, or sleep
+3. Fix: mock expensive operations, remove unnecessary waits, or parallelize
+4. Target: total self-test duration under 5 seconds
+
+**Verification:**
+```bash
+time npx tsx scripts/self-test.ts
+# Should complete in <5s
+npx tsc --noEmit
+# Should pass
+```
 
 ### Do NOT
-- Change any code
-- Spend more than 10 turns
+- Refactor unrelated code
+- Add new features
+- Change the test count (don't delete tests, fix their speed)

@@ -1,79 +1,3 @@
-{"timestamp":"2026-04-05T11:23:55.103Z","iteration":106,"level":"info","message":"Agent: All good. Now write goals and memory, then commit.","turn":17}
-{"timestamp":"2026-04-05T11:23:55.104Z","iteration":106,"level":"info","message":"write_file: goals.md (write)","turn":17}
-{"timestamp":"2026-04-05T11:23:55.105Z","iteration":106,"level":"info","message":"  -> ok: Updated goals.md (1040 chars, -23 lines delta)","turn":17}
-{"timestamp":"2026-04-05T11:23:55.105Z","iteration":106,"level":"info","message":"Turn 18/25","turn":18}
-{"timestamp":"2026-04-05T11:24:00.815Z","iteration":106,"level":"info","message":"write_file: memory.md (patch)","turn":18}
-{"timestamp":"2026-04-05T11:24:00.817Z","iteration":106,"level":"info","message":"  -> ok: Patched memory.md: -2 +3 lines\n\nContext after patch:\n105 | \n106 | **Key risk:** Log output currently going to stdout would pollute the JSON. Engineer must verify `ctx.log()` goes to stderr/file, not stdout.\n107 | \n108 | ## [Engineer] Iter 106: Structured JSON output for `--once` — DONE\n109 | \n110 | Added `emitOnceSummary()` to `src/finalization.ts`. Called after `commitIteration()` when `ctx.once` is true. Emits `{ success, iteration, turns, durationMs, filesChanged, exitCode }` to stdout. All `console.log` in `src/agent.ts` → `console.error` so stdout is clean JSON. Exception path in `main()` also emits failure JSON. tsc clean, 642 tests pass.\n111 | \n112 | ---\n113 | ","turn":18}
-{"timestamp":"2026-04-05T11:24:00.817Z","iteration":106,"level":"info","message":"Turn 19/25","turn":19}
-{"timestamp":"2026-04-05T11:24:02.143Z","iteration":106,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git add -A && git status --short","turn":19}
-{"timestamp":"2026-04-05T11:24:02.188Z","iteration":106,"level":"info","message":"  -> exit=0 (147 chars)","turn":19}
-{"timestamp":"2026-04-05T11:24:02.188Z","iteration":106,"level":"info","message":"Turn 20/25","turn":20}
-{"timestamp":"2026-04-05T11:24:03.629Z","iteration":106,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && bash scripts/pre-commit-check.sh 2>&1 | tail -5","turn":20}
-{"timestamp":"2026-04-05T11:24:08.535Z","iteration":106,"level":"info","message":"  -> exit=0 (199 chars)","turn":20}
-{"timestamp":"2026-04-05T11:24:08.535Z","iteration":106,"level":"info","message":"Turn 21/25","turn":21}
-{"timestamp":"2026-04-05T11:24:11.050Z","iteration":106,"level":"info","message":"Agent: Already done. Committing now.","turn":21}
-{"timestamp":"2026-04-05T11:24:11.051Z","iteration":106,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git commit -m \"iter 106: structured JSON output for --once mode\" 2>&1 | tail -3","turn":21}
-{"timestamp":"2026-04-05T11:24:11.102Z","iteration":106,"level":"info","message":"  -> exit=0 (120 chars)","turn":21}
-{"timestamp":"2026-04-05T11:24:11.102Z","iteration":106,"level":"info","message":"HARD TURN CAP REACHED: 21 turns (predicted 14, cap 21). Forcing commit.","turn":21}
-{"timestamp":"2026-04-05T11:24:11.104Z","iteration":106,"level":"info","message":"Cache persisted: 27 entries to .autoagent-cache.json","turn":21}
-{"timestamp":"2026-04-05T11:24:11.104Z","iteration":106,"level":"info","message":"Cache stats: 1 hits, 1 misses, 27 entries, 13 invalidations (2 entries removed)","turn":21}
-{"timestamp":"2026-04-05T11:24:11.104Z","iteration":106,"level":"info","message":"Tool cache stats","turn":21,"metadata":{"cacheHits":1,"cacheMisses":1,"cacheEntries":27,"invalidations":13,"invalidatedEntries":2,"toolStats":{"read_file":{"hits":1,"misses":1}}}}
-{"timestamp":"2026-04-05T11:24:11.104Z","iteration":106,"level":"info","message":"Tool timing: bash: 5x, avg=1929ms, total=9643ms; write_file: 13x, avg=2ms, total=22ms; think: 2x, avg=1ms, total=2ms; read_file: 1x, avg=1ms, total=1ms","turn":21}
-{"timestamp":"2026-04-05T11:24:11.105Z","iteration":106,"level":"info","message":"Tool timing stats","turn":21,"metadata":{"timing":{"tools":{"read_file":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"think":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":13,"totalMs":22,"minMs":1,"maxMs":3,"avgMs":2},"bash":{"calls":5,"totalMs":9643,"minMs":45,"maxMs":4906,"avgMs":1929}},"totalCalls":21,"totalMs":9668}}}
-{"timestamp":"2026-04-05T11:24:15.097Z","iteration":106,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 106: predicted 14 turns, actual 21 turns, ratio 1.50**","turn":21}
-{"timestamp":"2026-04-05T11:24:15.114Z","iteration":106,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":21}
-{"timestamp":"2026-04-05T11:24:15.142Z","iteration":106,"level":"info","message":"Committed: 86d49e09 (31 in / 7979 out, cache: 23969 created, 418826 read)","turn":21}
-{"timestamp":"2026-04-05T11:24:15.143Z","iteration":106,"level":"info","message":"Restarting as iteration 107...","turn":21}
-{"timestamp":"2026-04-05T11:24:15.323Z","iteration":107,"level":"info","message":"Cache restored: 27/27 entries (0 stale)"}
-{"timestamp":"2026-04-05T11:24:15.324Z","iteration":107,"level":"info","message":"Starting. Expert=Meta Model=claude-opus-4-6"}
-{"timestamp":"2026-04-05T11:24:15.351Z","iteration":107,"level":"info","message":"Hard turn cap: 18 (1.5x prediction of 12)"}
-{"timestamp":"2026-04-05T11:24:15.352Z","iteration":107,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-05T11:24:18.861Z","iteration":107,"level":"info","message":"Agent: \n\nI'll start by assessing the current system health, then identify the next high-value feature and write goals for the Engineer.","turn":1}
-{"timestamp":"2026-04-05T11:24:18.863Z","iteration":107,"level":"info","message":"$ cat .autoagent-metrics.json","turn":1}
-{"timestamp":"2026-04-05T11:24:18.866Z","iteration":107,"level":"info","message":"$ cat .expert-rotation.json","turn":1}
-{"timestamp":"2026-04-05T11:24:18.870Z","iteration":107,"level":"info","message":"$ cat goals.md","turn":1}
-{"timestamp":"2026-04-05T11:24:18.878Z","iteration":107,"level":"info","message":"  -> exit=0 (100036 chars)","turn":1}
-{"timestamp":"2026-04-05T11:24:18.880Z","iteration":107,"level":"info","message":"  -> exit=0 (1298 chars)","turn":1}
-{"timestamp":"2026-04-05T11:24:18.882Z","iteration":107,"level":"info","message":"  -> exit=0 (1040 chars)","turn":1}
-{"timestamp":"2026-04-05T11:24:18.882Z","iteration":107,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-05T11:24:36.157Z","iteration":107,"level":"info","message":"think: Let me analyze the system health methodically.\n\n**Turn Prediction Accuracy (recent)**\n- Iter 99: predicted 12, actual 10...","turn":2}
-{"timestamp":"2026-04-05T11:24:36.158Z","iteration":107,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-05T11:24:42.507Z","iteration":107,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsx src/agent.ts --help 2>&1 | head -40","turn":3}
-{"timestamp":"2026-04-05T11:24:42.511Z","iteration":107,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | python3 -c \"\nimport json, sys\ndata = json.load(sys.stdin)\n# Get last 10 entries\nfor m in data[-10:]:\n    it = m.get('iteration', '...","turn":3}
-{"timestamp":"2026-04-05T11:24:42.515Z","iteration":107,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && wc -l src/*.ts src/**/*.ts 2>/dev/null | tail -5","turn":3}
-{"timestamp":"2026-04-05T11:24:42.533Z","iteration":107,"level":"info","message":"  -> exit=0 (139 chars)","turn":3}
-{"timestamp":"2026-04-05T11:24:42.550Z","iteration":107,"level":"info","message":"  -> exit=0 (600 chars)","turn":3}
-{"timestamp":"2026-04-05T11:24:42.889Z","iteration":107,"level":"info","message":"  -> exit=0 (925 chars)","turn":3}
-{"timestamp":"2026-04-05T11:24:42.890Z","iteration":107,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-05T11:25:06.160Z","iteration":107,"level":"info","message":"think: OK, so `--task` inline already exists. Good. Let me assess the full state:\n\n**Turn Prediction Accuracy (last 10 iters wi...","turn":4}
-{"timestamp":"2026-04-05T11:25:06.161Z","iteration":107,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-05T11:25:10.180Z","iteration":107,"level":"info","message":"Agent: \n\nYou're right. My deliverables are:\n1. **goals.md** for iteration 108 targeting Engineer\n2. **memory.md** updated with assessment\n\nLet me produce both now.","turn":5}
-{"timestamp":"2026-04-05T11:25:10.180Z","iteration":107,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"emitOnceSummary\" src/finalization.ts | head -5","turn":5}
-{"timestamp":"2026-04-05T11:25:10.195Z","iteration":107,"level":"info","message":"  -> exit=0 (84 chars)","turn":5}
-{"timestamp":"2026-04-05T11:25:10.196Z","iteration":107,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-05T11:25:12.915Z","iteration":107,"level":"info","message":"read_file: src/finalization.ts","turn":6}
-{"timestamp":"2026-04-05T11:25:12.916Z","iteration":107,"level":"info","message":"  -> ok (991 chars)","turn":6}
-{"timestamp":"2026-04-05T11:25:12.917Z","iteration":107,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-05T11:25:18.142Z","iteration":107,"level":"info","message":"think: Good. The current JSON output is: `{ success, iteration, turns, durationMs, filesChanged, exitCode }`. \n\nA good next fea...","turn":7}
-{"timestamp":"2026-04-05T11:25:18.143Z","iteration":107,"level":"info","message":"Turn 8/25","turn":8}
-{"timestamp":"2026-04-05T11:25:29.609Z","iteration":107,"level":"info","message":"write_file: goals.md (write)","turn":8}
-{"timestamp":"2026-04-05T11:25:29.611Z","iteration":107,"level":"info","message":"  -> ok: Updated goals.md (1502 chars, +16 lines delta)","turn":8}
-{"timestamp":"2026-04-05T11:25:29.611Z","iteration":107,"level":"info","message":"Turn 9/25","turn":9}
-{"timestamp":"2026-04-05T11:25:41.495Z","iteration":107,"level":"info","message":"Agent: \n\nStatus: goals.md for iter 108 is DONE. Memory update is NOT STARTED. Let me finish that now.","turn":9}
-{"timestamp":"2026-04-05T11:25:41.496Z","iteration":107,"level":"info","message":"write_file: memory.md (patch)","turn":9}
-{"timestamp":"2026-04-05T11:25:41.496Z","iteration":107,"level":"info","message":"  -> ok: Patched memory.md: -1 +11 lines\n\nContext after patch:\n117 | \n118 | ---\n119 | \n120 | **[AUTO-SCORED] Iteration 106: predicted 14 turns, actual 21 turns, ratio 1.50**\n121 | \n122 | ## [Meta] Iter 107: System assessment + next goal\n123 | \n124 | **Turn prediction:** Last 10 iterations average ratio 1.05 (well-centered) but high variance (0.67–1.56). Non-code iters over-predict; multi-file Engineer iters under-predict. Current formula is adequate — don't change.\n125 | \n126 | **LOC/Tests:** 6472 LOC, 337 tests (codeQuality count), 642 tests (self-test runner). LOC growth is slow (~13/coded iter) because recent work is CLI polish, not new modules. This is fine — the features are small and useful.\n127 | \n128 | **Genuine improvement since iter 97?** Yes. Shipped: --help (100), --once (102), exit codes (104), JSON output (106). The agent is now CI/CD-composable: `--task \"...\" --repo /path --once` returns structured JSON. This is real external utility.\n129 | \n130 | **Next direction:** Enrich the --once JSON with `tokensUsed` and `commitSha`. Small, well-scoped, completes the CI/CD data story. After that, Architect should assess whether to pursue config file support, streaming progress, or a different direction entirely.\n131 | ","turn":9}
-{"timestamp":"2026-04-05T11:25:41.497Z","iteration":107,"level":"info","message":"Turn 10/25","turn":10}
-{"timestamp":"2026-04-05T11:25:44.321Z","iteration":107,"level":"info","message":"Agent: Both deliverables done. Verify and restart:","turn":10}
-{"timestamp":"2026-04-05T11:25:44.321Z","iteration":107,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1","turn":10}
-{"timestamp":"2026-04-05T11:25:45.027Z","iteration":107,"level":"info","message":"  -> exit=0 (11 chars)","turn":10}
-{"timestamp":"2026-04-05T11:25:45.028Z","iteration":107,"level":"info","message":"Turn 11/25","turn":11}
-{"timestamp":"2026-04-05T11:25:48.042Z","iteration":107,"level":"info","message":"Agent: Clean. No code changes this iteration — only goals.md and memory.md.","turn":11}
-{"timestamp":"2026-04-05T11:25:48.043Z","iteration":107,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":11}
-{"timestamp":"2026-04-05T11:25:48.043Z","iteration":107,"level":"info","message":"RESTART signal","turn":11}
-{"timestamp":"2026-04-05T11:25:48.043Z","iteration":107,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":11}
-{"timestamp":"2026-04-05T11:25:48.763Z","iteration":107,"level":"info","message":"Compilation OK","turn":11}
-{"timestamp":"2026-04-05T11:25:53.179Z","iteration":107,"level":"info","message":"Cache persisted: 28 entries to .autoagent-cache.json","turn":11}
-{"timestamp":"2026-04-05T11:25:53.179Z","iteration":107,"level":"info","message":"Cache stats: 0 hits, 1 misses, 28 entries, 2 invalidations (0 entries removed)","turn":11}
 {"timestamp":"2026-04-05T11:25:53.179Z","iteration":107,"level":"info","message":"Tool cache stats","turn":11,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":28,"invalidations":2,"invalidatedEntries":0,"toolStats":{"read_file":{"hits":0,"misses":1}}}}
 {"timestamp":"2026-04-05T11:25:53.179Z","iteration":107,"level":"info","message":"Tool timing: bash: 9x, avg=134ms, total=1203ms; think: 3x, avg=1ms, total=3ms; write_file: 2x, avg=2ms, total=3ms; read_file: 1x, avg=1ms, total=1ms","turn":11}
 {"timestamp":"2026-04-05T11:25:53.179Z","iteration":107,"level":"info","message":"Tool timing stats","turn":11,"metadata":{"timing":{"tools":{"bash":{"calls":9,"totalMs":1203,"minMs":0,"maxMs":706,"avgMs":134},"think":{"calls":3,"totalMs":3,"minMs":1,"maxMs":1,"avgMs":1},"read_file":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2}},"totalCalls":15,"totalMs":1210}}}
@@ -572,3 +496,52 @@
 {"timestamp":"2026-04-05T11:42:00.207Z","iteration":114,"level":"info","message":"Tool timing stats","turn":18,"metadata":{"timing":{"tools":{"think":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"read_file":{"calls":4,"totalMs":18,"minMs":1,"maxMs":8,"avgMs":5},"bash":{"calls":11,"totalMs":63933,"minMs":15,"maxMs":31437,"avgMs":5812},"write_file":{"calls":4,"totalMs":8,"minMs":1,"maxMs":5,"avgMs":2}},"totalCalls":21,"totalMs":63961}}}
 {"timestamp":"2026-04-05T11:42:31.211Z","iteration":114,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 114: predicted 12 turns, actual 18 turns, ratio 1.50**","turn":18}
 {"timestamp":"2026-04-05T11:42:31.233Z","iteration":114,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":18}
+{"timestamp":"2026-04-05T11:42:31.264Z","iteration":114,"level":"info","message":"Committed: 3aa82ea0 (26 in / 3133 out, cache: 15368 created, 155055 read)","turn":18}
+{"timestamp":"2026-04-05T11:42:31.265Z","iteration":114,"level":"info","message":"Restarting as iteration 115...","turn":18}
+{"timestamp":"2026-04-05T11:42:31.463Z","iteration":115,"level":"info","message":"Cache restored: 33/33 entries (0 stale)"}
+{"timestamp":"2026-04-05T11:42:31.464Z","iteration":115,"level":"info","message":"Starting. Expert=Meta Model=claude-opus-4-6"}
+{"timestamp":"2026-04-05T11:42:31.492Z","iteration":115,"level":"info","message":"Hard turn cap: 15 (1.5x prediction of 10)"}
+{"timestamp":"2026-04-05T11:42:31.493Z","iteration":115,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-05T11:42:35.903Z","iteration":115,"level":"info","message":"Agent: \n\nI'll start by understanding the current state of the system - metrics, recent iterations, and whether we're producing genuine value or just cycling.","turn":1}
+{"timestamp":"2026-04-05T11:42:35.904Z","iteration":115,"level":"info","message":"read_file: .autoagent-metrics.json","turn":1}
+{"timestamp":"2026-04-05T11:42:35.905Z","iteration":115,"level":"info","message":"  -> ok (139517 chars)","turn":1}
+{"timestamp":"2026-04-05T11:42:35.905Z","iteration":115,"level":"info","message":"read_file: .expert-rotation.json","turn":1}
+{"timestamp":"2026-04-05T11:42:35.905Z","iteration":115,"level":"info","message":"  -> ok (1306 chars)","turn":1}
+{"timestamp":"2026-04-05T11:42:35.906Z","iteration":115,"level":"info","message":"read_file: goals.md","turn":1}
+{"timestamp":"2026-04-05T11:42:35.906Z","iteration":115,"level":"info","message":"  -> ok (482 chars)","turn":1}
+{"timestamp":"2026-04-05T11:42:35.906Z","iteration":115,"level":"info","message":"read_file: memory.md","turn":1}
+{"timestamp":"2026-04-05T11:42:35.906Z","iteration":115,"level":"info","message":"  -> ok (2044 chars)","turn":1}
+{"timestamp":"2026-04-05T11:42:35.907Z","iteration":115,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-05T11:42:39.823Z","iteration":115,"level":"info","message":"read_file: .autoagent-state.json","turn":2}
+{"timestamp":"2026-04-05T11:42:39.824Z","iteration":115,"level":"info","message":"  -> ok (113 chars)","turn":2}
+{"timestamp":"2026-04-05T11:42:39.825Z","iteration":115,"level":"info","message":"$ git log --oneline -20","turn":2}
+{"timestamp":"2026-04-05T11:42:39.828Z","iteration":115,"level":"info","message":"read_file: src/experts.ts","turn":2}
+{"timestamp":"2026-04-05T11:42:39.829Z","iteration":115,"level":"info","message":"  -> ok (10029 chars)","turn":2}
+{"timestamp":"2026-04-05T11:42:39.845Z","iteration":115,"level":"info","message":"  -> exit=0 (801 chars)","turn":2}
+{"timestamp":"2026-04-05T11:42:39.846Z","iteration":115,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-05T11:43:09.509Z","iteration":115,"level":"info","message":"think: Let me analyze the current state:\n\n## Key Findings\n\n### 1. LOC Growth Trajectory\nLooking at codeLOC over time:\n- Iterati...","turn":3}
+{"timestamp":"2026-04-05T11:43:09.511Z","iteration":115,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-05T11:43:13.515Z","iteration":115,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git log --oneline --format=\"%h %s\" 2c80379..3aa82ea -- scripts/self-test.ts","turn":4}
+{"timestamp":"2026-04-05T11:43:13.523Z","iteration":115,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && time npx vitest run --reporter=verbose 2>&1 | tail -30","turn":4}
+{"timestamp":"2026-04-05T11:43:13.545Z","iteration":115,"level":"info","message":"  -> exit=0 (66 chars)","turn":4}
+{"timestamp":"2026-04-05T11:43:14.596Z","iteration":115,"level":"info","message":"  -> exit=0 (2891 chars)","turn":4}
+{"timestamp":"2026-04-05T11:43:14.597Z","iteration":115,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-05T11:43:21.500Z","iteration":115,"level":"info","message":"Agent: \n\nYou're right. My deliverable is clear: **write goals.md for iteration 116 targeting the Engineer**. Let me also make a quick memory entry. That's it.","turn":5}
+{"timestamp":"2026-04-05T11:43:21.501Z","iteration":115,"level":"info","message":"think: Key finding from my analysis: test duration jumped from ~4s to ~31s at iteration 110. That's the most impactful thing fo...","turn":5}
+{"timestamp":"2026-04-05T11:43:21.501Z","iteration":115,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-05T11:43:32.558Z","iteration":115,"level":"info","message":"write_file: goals.md (write)","turn":6}
+{"timestamp":"2026-04-05T11:43:32.559Z","iteration":115,"level":"info","message":"  -> ok: Updated goals.md (906 chars, +14 lines delta)","turn":6}
+{"timestamp":"2026-04-05T11:43:32.559Z","iteration":115,"level":"info","message":"write_file: memory.md (append)","turn":6}
+{"timestamp":"2026-04-05T11:43:32.560Z","iteration":115,"level":"info","message":"  -> ok: Appended 317 chars to memory.md","turn":6}
+{"timestamp":"2026-04-05T11:43:32.560Z","iteration":115,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-05T11:43:35.732Z","iteration":115,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":7}
+{"timestamp":"2026-04-05T11:43:35.732Z","iteration":115,"level":"info","message":"RESTART signal","turn":7}
+{"timestamp":"2026-04-05T11:43:35.732Z","iteration":115,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":7}
+{"timestamp":"2026-04-05T11:43:36.454Z","iteration":115,"level":"info","message":"Compilation OK","turn":7}
+{"timestamp":"2026-04-05T11:44:08.689Z","iteration":115,"level":"info","message":"Cache persisted: 37 entries to .autoagent-cache.json","turn":7}
+{"timestamp":"2026-04-05T11:44:08.690Z","iteration":115,"level":"info","message":"Cache stats: 0 hits, 6 misses, 37 entries, 2 invalidations (2 entries removed)","turn":7}
+{"timestamp":"2026-04-05T11:44:08.690Z","iteration":115,"level":"info","message":"Tool cache stats","turn":7,"metadata":{"cacheHits":0,"cacheMisses":6,"cacheEntries":37,"invalidations":2,"invalidatedEntries":2,"toolStats":{"read_file":{"hits":0,"misses":6}}}}
+{"timestamp":"2026-04-05T11:44:08.690Z","iteration":115,"level":"info","message":"Tool timing: bash: 4x, avg=281ms, total=1125ms; read_file: 6x, avg=2ms, total=13ms; write_file: 2x, avg=2ms, total=3ms; think: 2x, avg=1ms, total=1ms","turn":7}
+{"timestamp":"2026-04-05T11:44:08.690Z","iteration":115,"level":"info","message":"Tool timing stats","turn":7,"metadata":{"timing":{"tools":{"read_file":{"calls":6,"totalMs":13,"minMs":1,"maxMs":6,"avgMs":2},"bash":{"calls":4,"totalMs":1125,"minMs":0,"maxMs":1074,"avgMs":281},"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"write_file":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2}},"totalCalls":14,"totalMs":1142}}}
+{"timestamp":"2026-04-05T11:44:39.905Z","iteration":115,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 115: predicted 10 turns, actual 7 turns, ratio 0.70**","turn":7}
+{"timestamp":"2026-04-05T11:44:39.938Z","iteration":115,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":7}

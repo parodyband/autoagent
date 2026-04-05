@@ -30,3 +30,10 @@ Add a TASK.md lifecycle test in self-test.ts — verify create/execute/delete. P
 Added `testTaskMdLifecycle()` in `scripts/self-test.ts`. Statically verifies `unlinkSync(TASK_FILE)` appears before `runFinalization()` in `doFinalize()`. All 673 tests pass. Prevents regression of the infinite-re-execution bug fixed in iteration 113. No src/ changes needed.
 
 **[AUTO-SCORED] Iteration 114: predicted 12 turns, actual 18 turns, ratio 1.50**
+
+## Iteration 115 [Meta]
+System is healthy. Rotation working. No prompt/code changes needed.
+Key finding: self-test duration regressed 7.5x at iteration 110 (~4s→31s). Tasked Engineer to fix in iteration 116.
+LOC stalls in 111-114 are acceptable: 113 fixed a real bug, 114 added regression test, 111 was Meta review.
+
+**[AUTO-SCORED] Iteration 115: predicted 10 turns, actual 7 turns, ratio 0.70**
