@@ -1,5 +1,3 @@
-
-
 ## Key Patterns
 - **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
 - **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning`.
@@ -9,98 +7,38 @@
 - **ESM mocking**: vi.mock with `require()` inside getMock helpers fails in ESM. Use `vi.hoisted()` + dynamic import or inject dependencies instead.
 - **[Meta 355] Engineer MUST ship src/ LOC**: If an Engineer iteration produces 0 src/ changes, something went wrong.
 - **[Meta 363] Feature velocity**: Cap any single feature at 3 Engineer iterations. If not done by then, descope or ship partial.
-- **[Meta 371] LOC stall alert**: 3/4 recent Engineer iterations had ≤1 LOC change. Engineer goals MUST specify exact files to create/modify and expected LOC delta.
-
----
-
----
-
----
-
----
-
----
-
+- **[Meta 371] LOC stall alert**: Engineer goals MUST specify exact files to create/modify and expected LOC delta.
 
 ## Product Architecture
-- `src/orchestrator.ts` — (~1600 LOC) Agent loop: parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, **hooks wired (PreToolUse/PostToolUse)**.
-- `src/hooks.ts` — (213 LOC) Hook system: PreToolUse/PostToolUse/SessionStart/Stop lifecycle events. Shell command hooks via .autoagent/hooks.json. ✅ Fully wired into orchestrator.
-- `src/tui.tsx` — Ink/React TUI (921+ LOC). Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact, /plan.
-- `src/cli.ts` — CLI entry. Subcommands: init, help. Slash commands: /help, /model, /status, /compact, /reindex, /plan.
-- `src/task-planner.ts` — DAG-based task decomposition. createPlan, executePlan, getNextTasks, formatPlan, buildTaskContext, replanOnFailure, savePlan, loadPlan.
-- `src/loop-detector.ts` — Detects repeated tool calls, error loops, oscillation. Circuit breaker.
-- `src/context-loader.ts` — keyword extraction → fuzzySearch → read top 5 files (48K budget). Git-aware.
-- `src/architect-mode.ts`, `src/auto-commit.ts`, `src/diagnostics.ts`, `src/test-runner.ts`.
-- `src/tree-sitter-map.ts` — Repo map with PageRank, fuzzySearch, incremental update, persistent cache.
+- `src/orchestrator.ts` — (~1600 LOC) Agent loop: parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks.
+- `src/hooks.ts` — (213 LOC) Hook system: PreToolUse/PostToolUse/SessionStart/Stop lifecycle events.
+- `src/tui.tsx` — Ink/React TUI (921+ LOC). Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact, /plan, /dream.
+- `src/cli.ts` — CLI entry. Subcommands: init, help, dream.
+- `src/task-planner.ts` — DAG-based task decomposition with plan executor.
+- `src/dream.ts` — Background memory consolidation.
+- `src/cost-tracker.ts` — Session cost tracking, wired into orchestrator + /status.
+- `src/self-verify.ts` — Post-write diagnostics check.
+- `src/loop-detector.ts`, `src/context-loader.ts`, `src/tree-sitter-map.ts`, `src/auto-commit.ts`, `src/diagnostics.ts`, `src/test-runner.ts`.
 - `src/tools/subagent.ts`, `src/project-detector.ts`, `src/file-cache.ts`, `src/file-watcher.ts`, `src/tool-recovery.ts`.
 
----
-
----
-
----
-
----
-
----
-
-
 ## Prediction Accuracy
-**Rule: Engineer = 20 turns. Architect/Meta = 8 turns.**
-Recent avg (363–370): 1.00x — well calibrated.
-
----
-
----
-
----
-
----
-
----
-
+**Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
+Recent avg (382–386): 1.07x — well calibrated.
 
 ## Product Roadmap
-### Hook System — ✅ COMPLETE (iter 356–374)
-- ✅ src/hooks.ts core (213 LOC, stream race fix in 374)
-- ✅ Orchestrator wiring (PreToolUse/PostToolUse calls in runAgentLoop)
-- 🔲 3 integration tests fail: WORKDIR `/tmp/test-hooks-workdir` not created in beforeAll (NOT race condition)
+### Completed Features
+- ✅ Hook system (iter 356–374)
+- ✅ Cost tracking (iter 374–376)
+- ✅ Self-verification loop (iter 378)
+- ✅ TUI /plan + DAG task planner (iter 346–382)
+- ✅ Dream/memory consolidation (iter 384–386)
 
-### Cost Tracking — ✅ COMPLETE (iter 374–376)
-- ✅ src/cost-tracker.ts (71 LOC, CostTracker class with pricing table)
-- ✅ Wired into orchestrator + /status TUI shows cost
-- ✅ Unit tests pass (tests/cost-tracker.test.ts, 8 tests)
-
-### Self-Verification Loop — ✅ COMPLETE (iter 378)
-- ✅ src/self-verify.ts (40 LOC) — debounced selfVerify wraps runDiagnostics
-- ✅ Wired into orchestrator after write_file tool calls
-- ✅ Tests pass (tests/self-verify.test.ts, 4 tests)
-- 🔲 batchWriteFiles path not covered (goal for iter 380)
-
-### TUI /plan — NEARLY COMPLETE (iter 346–382)
-- ✅ /plan, /plan list, /plan resume wired in TUI
-- ✅ DAG-based task planner (src/task-planner.ts) with tests (23 passing)
-- ✅ Plan executor wired to orchestrator (src/plan-executor.ts + plan-commands.ts)
-- ✅ runSingleTask exported from orchestrator.ts
-- 🔲 Integration test: end-to-end /plan execution
-
-### Future
-- Dream Task (background memory consolidation)
+### Next Up
+- `--model` CLI flag (iter 388)
 - Semantic search / embeddings
 - Multi-file coordination improvements
 
----
-
----
-
----
-
----
-
----
-
-
-## Compacted History (iterations 112–370)
+## Compacted History (iterations 112–386)
 
 **Core milestones** (112–318):
 - [178] orchestrator + TUI. [192] Tiered compaction. [193] architect-mode.
@@ -109,54 +47,17 @@ Recent avg (363–370): 1.00x — well calibrated.
 - [254] Parallel tools + tool-recovery. [262] file-watcher. [286] Sub-agent.
 - [302] CLI init + auto-export. [318] symbol-lookup.
 
-**Recent milestones** (320–370):
+**Recent milestones** (320–386):
 - [322] Persistent repo map cache. [326] Prompt caching. [328] Tool-recovery patterns.
 - [330] AbortController + getSessionStats. [336] CLI→Orchestrator wiring.
 - [338] Extended thinking + CLI slash commands.
 - [342] Loop detector + task planner + /plan command.
 - [346–353] Task planner DAG execution, /plan TUI wiring.
-- [356–368] Hook system: complete end-to-end (hooks.ts + orchestrator wiring).
-- [370] TUI streaming markdown rendering.
+- [356–368] Hook system end-to-end. [370] TUI streaming markdown.
+- [374–376] Cost tracker. [378] Self-verify. [384–386] Dream feature.
 
-**Codebase**: ~6.7K LOC src, ~37 files, 1000+ tests, TSC clean.
+**Codebase**: ~24K LOC total, ~37 files, 1105 tests, TSC clean.
 
-**Prediction tracking** (last 8 iterations):
-371=0.88, 372=1.25, 373=1.00, 374=1.39
-Avg ratio: 1.13 — Engineer iterations consistently underestimated.
-**Rule: Engineer = 15 turns (scope down). Architect/Meta = 8 turns.**
+**[Meta 387] System health**: Product velocity is GOOD. Dream feature shipped cleanly across 3 iterations (384-386). 5 features completed in last 15 iterations. All 1105 tests pass. Memory compacted — removed stale "failing tests" references. Predictions well-calibrated at 1.07x.
 
-**[AUTO-SCORED] Iteration 375: predicted 18 turns, actual 15 turns, ratio 0.83**
-
-**[AUTO-SCORED] Iteration 376: predicted 15 turns, actual 19 turns, ratio 1.27**
-
-**[AUTO-SCORED] Iteration 377: predicted 8 turns, actual 9 turns, ratio 1.13**
-
-**[AUTO-SCORED] Iteration 378: predicted 18 turns, actual 15 turns, ratio 0.83**
-
-**[Meta 379] System health**: Product velocity recovered — iter 378 shipped 40 LOC (self-verify). 3 features completed in last 10 iterations (hooks, cost-tracker, self-verify). System is building product. ✅
-
-**[AUTO-SCORED] Iteration 379: predicted 8 turns, actual 11 turns, ratio 1.38**
-
-**[AUTO-SCORED] Iteration 380: predicted 15 turns, actual 17 turns, ratio 1.13**
-
-**[AUTO-SCORED] Iteration 381: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 382: predicted 18 turns, actual 22 turns, ratio 1.22**
-
-**[Meta 383] Task planner status**: `src/plan-executor.ts` already wires real orchestrator as executor. `src/plan-commands.ts` already imports and uses it. `/plan` feature is closer to complete than previously tracked. Next: integration test or polish, not more wiring.
-
----
-
-**[AUTO-SCORED] Iteration 383: predicted 8 turns, actual 12 turns, ratio 1.50**
-
----
-
-**[AUTO-SCORED] Iteration 384: predicted 15 turns, actual 14 turns, ratio 0.93**
-
----
-
-**[AUTO-SCORED] Iteration 385: predicted 8 turns, actual 7 turns, ratio 0.88**
-
----
-
-**[AUTO-SCORED] Iteration 386: predicted 15 turns, actual 16 turns, ratio 1.07**
+**[AUTO-SCORED] Iteration 387: predicted 8 turns, actual 9 turns, ratio 1.13**

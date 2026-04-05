@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775421655605,
+  "generatedAt": 1775423349692,
   "files": [
     {
       "path": "src/context-loader.ts",
@@ -872,52 +872,6 @@
       "lastModified": 1775418341410.3752
     },
     {
-      "path": "src/cli.ts",
-      "exports": [
-        {
-          "name": "printHelp",
-          "kind": "function",
-          "line": 31,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "readline"
-        },
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "url"
-        },
-        {
-          "names": [],
-          "from": "child_process"
-        },
-        {
-          "names": [],
-          "from": "dotenv/config"
-        },
-        {
-          "names": [],
-          "from": "./orchestrator.js"
-        },
-        {
-          "names": [],
-          "from": "./init-command.js"
-        }
-      ],
-      "lastModified": 1775419306149.6353
-    },
-    {
       "path": "src/__tests__/task-planner.test.ts",
       "exports": [],
       "imports": [
@@ -1023,7 +977,7 @@
           "from": "path"
         }
       ],
-      "lastModified": 1775420683690.1445
+      "lastModified": 1775422106637.0295
     },
     {
       "path": "src/plan-commands.ts",
@@ -1067,7 +1021,7 @@
           "from": "./plan-summary.js"
         }
       ],
-      "lastModified": 1775420500881.7385
+      "lastModified": 1775421854796.1045
     },
     {
       "path": "src/plan-summary.ts",
@@ -1124,104 +1078,6 @@
       "lastModified": 1775420269666.4895
     },
     {
-      "path": "src/task-planner.ts",
-      "exports": [
-        {
-          "name": "Task",
-          "kind": "interface",
-          "line": 12,
-          "exported": true
-        },
-        {
-          "name": "TaskPlan",
-          "kind": "interface",
-          "line": 22,
-          "exported": true
-        },
-        {
-          "name": "TaskExecutor",
-          "kind": "type",
-          "line": 31,
-          "exported": true
-        },
-        {
-          "name": "OnFailureCallback",
-          "kind": "type",
-          "line": 34,
-          "exported": true
-        },
-        {
-          "name": "getNextTasks",
-          "kind": "function",
-          "line": 47,
-          "exported": true
-        },
-        {
-          "name": "formatPlan",
-          "kind": "function",
-          "line": 60,
-          "exported": true
-        },
-        {
-          "name": "buildTaskContext",
-          "kind": "function",
-          "line": 94,
-          "exported": true
-        },
-        {
-          "name": "executePlan",
-          "kind": "function",
-          "line": 131,
-          "exported": true
-        },
-        {
-          "name": "createPlan",
-          "kind": "function",
-          "line": 203,
-          "exported": true
-        },
-        {
-          "name": "replanOnFailure",
-          "kind": "function",
-          "line": 281,
-          "exported": true
-        },
-        {
-          "name": "PLAN_FILENAME",
-          "kind": "const",
-          "line": 313,
-          "exported": true
-        },
-        {
-          "name": "savePlan",
-          "kind": "function",
-          "line": 318,
-          "exported": true
-        },
-        {
-          "name": "loadPlan",
-          "kind": "function",
-          "line": 327,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        }
-      ],
-      "lastModified": 1775420282647.42
-    },
-    {
       "path": "src/plan-executor.ts",
       "exports": [
         {
@@ -1276,132 +1132,228 @@
       "lastModified": 1775421320933.3784
     },
     {
+      "path": "src/cli.ts",
+      "exports": [
+        {
+          "name": "printHelp",
+          "kind": "function",
+          "line": 31,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "readline"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "url"
+        },
+        {
+          "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
+          "from": "dotenv/config"
+        },
+        {
+          "names": [],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [],
+          "from": "./init-command.js"
+        }
+      ],
+      "lastModified": 1775423281967.244
+    },
+    {
+      "path": "src/dream.ts",
+      "exports": [
+        {
+          "name": "DreamResult",
+          "kind": "interface",
+          "line": 14,
+          "exported": true
+        },
+        {
+          "name": "FsLike",
+          "kind": "interface",
+          "line": 20,
+          "exported": true
+        },
+        {
+          "name": "consolidateMemory",
+          "kind": "function",
+          "line": 47,
+          "exported": true
+        },
+        {
+          "name": "runDream",
+          "kind": "function",
+          "line": 85,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        }
+      ],
+      "lastModified": 1775423126940.2239
+    },
+    {
       "path": "src/orchestrator.ts",
       "exports": [
         {
           "name": "PARALLEL_SAFE_TOOLS",
           "kind": "const",
-          "line": 54,
+          "line": 56,
           "exported": true
         },
         {
           "name": "MICRO_COMPACT_THRESHOLD",
           "kind": "const",
-          "line": 69,
+          "line": 71,
           "exported": true
         },
         {
           "name": "COMPACT_TIER1_THRESHOLD",
           "kind": "const",
-          "line": 71,
+          "line": 73,
           "exported": true
         },
         {
           "name": "COMPACT_THRESHOLD",
           "kind": "const",
-          "line": 73,
+          "line": 75,
           "exported": true
         },
         {
           "name": "CONTEXT_WARNING_THRESHOLD",
           "kind": "const",
-          "line": 75,
+          "line": 77,
           "exported": true
         },
         {
           "name": "PRUNE_THRESHOLD",
           "kind": "const",
-          "line": 76,
+          "line": 78,
           "exported": true
         },
         {
           "name": "selectCompactionTier",
           "kind": "function",
-          "line": 82,
+          "line": 84,
           "exported": true
         },
         {
           "name": "MODEL_PRICING",
           "kind": "const",
-          "line": 90,
+          "line": 92,
           "exported": true
         },
         {
           "name": "ConversationCheckpoint",
           "kind": "interface",
-          "line": 113,
+          "line": 115,
           "exported": true
         },
         {
           "name": "MAX_CHECKPOINTS",
           "kind": "const",
-          "line": 121,
+          "line": 123,
           "exported": true
         },
         {
           "name": "OrchestratorOptions",
           "kind": "interface",
-          "line": 123,
+          "line": 125,
           "exported": true
         },
         {
           "name": "OrchestratorResult",
           "kind": "interface",
-          "line": 163,
+          "line": 165,
           "exported": true
         },
         {
           "name": "CostInfo",
           "kind": "interface",
-          "line": 172,
+          "line": 174,
           "exported": true
         },
         {
           "name": "routeModel",
           "kind": "function",
-          "line": 187,
+          "line": 189,
           "exported": true
         },
         {
           "name": "computeCost",
           "kind": "function",
-          "line": 215,
+          "line": 217,
           "exported": true
         },
         {
           "name": "buildSystemPrompt",
           "kind": "function",
-          "line": 227,
+          "line": 229,
           "exported": true
         },
         {
           "name": "buildCachedSystem",
           "kind": "function",
-          "line": 300,
+          "line": 302,
           "exported": true
         },
         {
           "name": "injectMessageCacheBreakpoints",
           "kind": "function",
-          "line": 311,
+          "line": 313,
           "exported": true
         },
         {
           "name": "isToolError",
           "kind": "function",
-          "line": 407,
+          "line": 409,
           "exported": true
         },
         {
           "name": "pruneStaleToolResults",
           "kind": "function",
-          "line": 468,
+          "line": 470,
           "exported": true
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 863,
+          "line": 873,
+          "exported": true
+        },
+        {
+          "name": "runSingleTask",
+          "kind": "function",
+          "line": 1762,
           "exported": true
         }
       ],
@@ -1473,6 +1425,12 @@
         },
         {
           "names": [
+            "CostTracker"
+          ],
+          "from": "./cost-tracker.js"
+        },
+        {
+          "names": [
             "autoCommit",
             "type AutoCommitResult"
           ],
@@ -1534,6 +1492,12 @@
         },
         {
           "names": [
+            "selfVerify"
+          ],
+          "from": "./self-verify.js"
+        },
+        {
+          "names": [
             "* as fs"
           ],
           "from": "fs"
@@ -1552,7 +1516,111 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775421151376.369
+      "lastModified": 1775422930635.5347
+    },
+    {
+      "path": "src/task-planner.ts",
+      "exports": [
+        {
+          "name": "Task",
+          "kind": "interface",
+          "line": 12,
+          "exported": true
+        },
+        {
+          "name": "TaskPlan",
+          "kind": "interface",
+          "line": 22,
+          "exported": true
+        },
+        {
+          "name": "TaskExecutor",
+          "kind": "type",
+          "line": 31,
+          "exported": true
+        },
+        {
+          "name": "OnFailureCallback",
+          "kind": "type",
+          "line": 34,
+          "exported": true
+        },
+        {
+          "name": "getNextTasks",
+          "kind": "function",
+          "line": 47,
+          "exported": true
+        },
+        {
+          "name": "formatPlan",
+          "kind": "function",
+          "line": 60,
+          "exported": true
+        },
+        {
+          "name": "buildTaskContext",
+          "kind": "function",
+          "line": 94,
+          "exported": true
+        },
+        {
+          "name": "executePlan",
+          "kind": "function",
+          "line": 131,
+          "exported": true
+        },
+        {
+          "name": "createPlan",
+          "kind": "function",
+          "line": 203,
+          "exported": true
+        },
+        {
+          "name": "replanOnFailure",
+          "kind": "function",
+          "line": 281,
+          "exported": true
+        },
+        {
+          "name": "createOrchestratorExecutor",
+          "kind": "function",
+          "line": 321,
+          "exported": true
+        },
+        {
+          "name": "PLAN_FILENAME",
+          "kind": "const",
+          "line": 339,
+          "exported": true
+        },
+        {
+          "name": "savePlan",
+          "kind": "function",
+          "line": 344,
+          "exported": true
+        },
+        {
+          "name": "loadPlan",
+          "kind": "function",
+          "line": 353,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        }
+      ],
+      "lastModified": 1775422919845.6897
     },
     {
       "path": "src/tui.tsx",
@@ -1560,25 +1628,25 @@
         {
           "name": "Message",
           "kind": "interface",
-          "line": 70,
+          "line": 72,
           "exported": true
         },
         {
           "name": "getContextColor",
           "kind": "function",
-          "line": 97,
+          "line": 99,
           "exported": true
         },
         {
           "name": "extractFileQuery",
           "kind": "function",
-          "line": 111,
+          "line": 113,
           "exported": true
         },
         {
           "name": "getFileSuggestions",
           "kind": "function",
-          "line": 124,
+          "line": 126,
           "exported": true
         }
       ],
@@ -1704,13 +1772,64 @@
         },
         {
           "names": [
+            "runDream"
+          ],
+          "from": "./dream.js"
+        },
+        {
+          "names": [
+            "Anthropic"
+          ],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [
             "Markdown"
           ],
           "from": "./markdown-renderer.js"
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775421647486.0203
+      "lastModified": 1775423278131.9907
+    },
+    {
+      "path": "src/self-verify.ts",
+      "exports": [
+        {
+          "name": "resetVerifyTimer",
+          "kind": "function",
+          "line": 16,
+          "exported": true
+        },
+        {
+          "name": "selfVerify",
+          "kind": "function",
+          "line": 29,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "./diagnostics.js"
+        }
+      ],
+      "lastModified": 1775422517376.5208
+    },
+    {
+      "path": "tests/dream.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "../src/dream.js"
+        }
+      ],
+      "lastModified": 1775423143164.422
     }
   ]
 }

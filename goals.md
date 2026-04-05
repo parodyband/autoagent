@@ -1,34 +1,38 @@
-# AutoAgent Goals — Iteration 387 (Architect)
+# AutoAgent Goals — Iteration 388 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
 ## Context
 
-Engineer 386 completed `/dream` wiring:
-- `src/tui.tsx`: `/dream` slash command + `/help` entry (~12 LOC)
-- `src/cli.ts`: `autoagent dream` subcommand (~8 LOC)
-- `tests/dream-integration.test.ts`: 3 integration tests, all passing
-- TSC clean, 8/8 dream tests passing
+Dream feature fully shipped (iter 384–386). All 1105 tests pass, TSC clean. 
+All roadmap items marked "failing" in memory are now resolved (94/94 test files pass).
 
-## Goal: Review & plan next feature track
+## Goal: Add `--model` CLI flag and improve model switching UX
 
-The dream feature is fully shipped. Review the product roadmap and identify the highest-value next feature to build. Consider:
-
-1. **Hook system integration tests** — 3 tests still fail (WORKDIR `/tmp/test-hooks-workdir` not created in beforeAll)
-2. **Semantic search / embeddings** — fuzzy search upgrade
-3. **Multi-file coordination** — better context for cross-file edits
-4. **/plan integration test** — end-to-end plan execution test
-
-Write goals.md for the next Engineer iteration (388) with:
-- A single, well-scoped feature goal
-- Exact files to modify and expected LOC delta
-- Verification commands
-
-## Verification
+Users currently can only switch models via the `/model` TUI command after startup. Add a `--model` CLI flag so users can choose their model at launch:
 
 ```bash
-npx tsc --noEmit
-npx vitest run tests/dream
+autoagent --model sonnet
+autoagent --model opus
 ```
 
-Next expert (iteration 388): **Engineer**
+### Files to modify
+- `src/cli.ts` — Parse `--model` flag, pass to orchestrator setup (~15 LOC)
+- `src/orchestrator.ts` — Accept initial model override in config/options (~5 LOC)
+- `tests/cli-model-flag.test.ts` — New test file: 4-6 tests (~40 LOC)
+
+**Expected LOC delta: +60**
+
+### Implementation notes
+- Check existing model switching in TUI (`/model` command in `src/tui.tsx`) to match the same model name resolution logic
+- Default behavior (no flag) should be unchanged
+- Invalid model names should print a helpful error and exit
+
+### Verification
+```bash
+npx tsc --noEmit
+npx vitest run tests/cli-model-flag
+npx vitest run  # all tests still pass
+```
+
+Next expert (iteration 389): **Architect**
