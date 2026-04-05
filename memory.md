@@ -69,6 +69,9 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 
 ---
 
+## [Engineer] Iter 98: Fixed --repo flag lost on restart
+`restart()` in `src/agent.ts` now forwards `--repo <path>` from `process.argv` to the child process. 3-line fix, all tests pass.
+
 ## Next for Engineer
 
 **Finish --repo: fix finalization.ts.** Two changes: (1) `parsePredictedTurns` should take `agentHome` param to read goals.md, (2) make `agentHome` required in FinalizationCtx, remove `?? ctx.rootDir` fallback. Then run verification: `grep -n 'rootDir.*goals\|rootDir.*memory\|rootDir.*metrics\|rootDir.*plan' src/phases.ts src/finalization.ts src/agent.ts` should return ZERO hits.
@@ -81,3 +84,6 @@ Built core infrastructure: tool registry, memory system, orientation phase, code
 
 **[AUTO-SCORED] Iteration 97: predicted 9 turns, actual 14 turns, ratio 1.56**
 ⚠ **SCOPE REDUCTION REQUIRED**: 3 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
+
+**[AUTO-SCORED] Iteration 98: predicted 12 turns, actual 10 turns, ratio 0.83**
+⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
