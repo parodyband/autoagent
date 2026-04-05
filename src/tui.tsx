@@ -25,6 +25,7 @@ import { buildExportContent as buildExportContentHelper } from "./export-helper.
 import { shouldShowWelcome } from "./welcome.js";
 import type { Task, TaskPlan } from "./task-planner.js";
 import { handlePlanCommand } from "./plan-commands.js";
+import { Markdown } from "./markdown-renderer.js";
 
 // Parse args
 let workDir = process.cwd();

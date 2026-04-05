@@ -1,187 +1,3 @@
-109 |       setStatus?.("Generating summary...");
-110 |       const summary = await generatePlanSummary(result, workDir, resumeStartedAt);
-111 |       addMessage(formatPlanSummary(summary));
-112 |     } catch (err) {
-113 |       addMessage(
-114 |         `Plan execution error: ${err instanceof Error ? err.message : String(err)}`
-115 |       );
-116 |     }
-117 |     setLoading?.(false);
-118 |     setStatus?.("");
-119 |     return;
-120 |   }
-121 | 
-122 |   // /plan <description> — unknown single-word subcommands fall through to create
-[2026-04-05T20:18:16.425Z] iter=358 turn=15 INFO: Turn 15/25
-[2026-04-05T20:18:21.209Z] iter=358 turn=15 INFO: Agent: Wrapping up now. Wire summary into the create path, write tests, then validate.
-[2026-04-05T20:18:21.211Z] iter=358 turn=15 INFO: write_file: src/plan-commands.ts (patch)
-[2026-04-05T20:18:21.212Z] iter=358 turn=15 INFO:   -> ok: Patched src/plan-commands.ts: -10 +14 lines
-
-Context after patch:
-151 |     addMessage(`Created plan:\n\n${formatPlan(plan)}`);
-152 |     savePlan(plan, workDir);
-153 |     setStatus?.("Executing plan...");
-154 |     const executor = execute ?? (() => Promise.resolve("done"));
-155 |     const execStartedAt = Date.now();
-156 |     const result = await executePlan(
-157 |       plan,
-158 |       async (task) => executor(task.description),
-159 |       (_task, updatedPlan) => {
-160 |         addMessage(formatPlan(updatedPlan));
-161 |       }
-162 |     );
-163 |     savePlan(result, workDir);
-164 |     addMessage(`Plan complete.\n\n${formatPlan(result)}`);
-165 |     setStatus?.("Generating summary...");
-166 |     const summary = await generatePlanSummary(result, workDir, execStartedAt);
-167 |     addMessage(formatPlanSummary(summary));
-168 |   } catch (err) {
-169 |     addMessage(
-170 |       `Plan error: ${err instanceof Error ? err.message : String(err)}`
-[2026-04-05T20:18:21.213Z] iter=358 turn=16 INFO: Turn 16/25
-[2026-04-05T20:18:47.820Z] iter=358 turn=16 INFO: Agent: Write tests, run tsc, wrap up:
-[2026-04-05T20:18:47.822Z] iter=358 turn=16 INFO: write_file: src/__tests__/plan-summary.test.ts (write)
-[2026-04-05T20:18:47.824Z] iter=358 turn=16 INFO:   -> ok: Created src/__tests__/plan-summary.test.ts (6089 chars)
-[2026-04-05T20:18:47.825Z] iter=358 turn=17 INFO: Turn 17/25
-[2026-04-05T20:18:49.448Z] iter=358 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T20:18:50.533Z] iter=358 turn=17 INFO:   -> exit=0 (11 chars)
-[2026-04-05T20:18:50.533Z] iter=358 turn=18 INFO: Turn 18/25
-[2026-04-05T20:18:52.900Z] iter=358 turn=18 INFO: Agent: TSC clean. Running tests quickly then wrapping up.
-[2026-04-05T20:18:52.901Z] iter=358 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/plan-summary.test.ts 2>&1 | tail -20
-[2026-04-05T20:18:53.960Z] iter=358 turn=18 INFO:   -> exit=0 (628 chars)
-[2026-04-05T20:18:53.961Z] iter=358 turn=19 INFO: Turn 19/25
-[2026-04-05T20:18:55.689Z] iter=358 turn=19 INFO: $ grep -n "Diagnostics:" src/plan-summary.ts
-[2026-04-05T20:18:55.700Z] iter=358 turn=19 INFO:   -> exit=0 (104 chars)
-[2026-04-05T20:18:55.701Z] iter=358 turn=20 INFO: Turn 20/25
-[2026-04-05T20:18:58.723Z] iter=358 turn=20 INFO: Agent: The test expects `"Diagnostics: ❌"` (no `**`). Fix the tests to match actual output:
-[2026-04-05T20:18:58.724Z] iter=358 turn=20 INFO: write_file: src/__tests__/plan-summary.test.ts (patch)
-[2026-04-05T20:18:58.727Z] iter=358 turn=20 INFO:   -> ok: Patched src/__tests__/plan-summary.test.ts: -1 +1 lines
-
-Context after patch:
-106 | 
-107 |   it("shows diagnostics passed", () => {
-108 |     const out = formatPlanSummary(base);
-109 |     expect(out).toContain("**Diagnostics:** ✅ passed");
-110 |   });
-111 | 
-112 |   it("shows diagnostics errors", () => {
-[2026-04-05T20:18:58.728Z] iter=358 turn=21 INFO: Turn 21/25
-[2026-04-05T20:19:00.739Z] iter=358 turn=21 INFO: write_file: src/__tests__/plan-summary.test.ts (patch)
-[2026-04-05T20:19:00.741Z] iter=358 turn=21 INFO:   -> ok: Patched src/__tests__/plan-summary.test.ts: -1 +1 lines
-
-Context after patch:
-111 | 
-112 |   it("shows diagnostics errors", () => {
-113 |     const out = formatPlanSummary({ ...base, diagnosticsPassed: false, diagnosticsOutput: "TS2345 error" });
-114 |     expect(out).toContain("**Diagnostics:** ❌ errors found");
-115 |     expect(out).toContain("TS2345 error");
-116 |   });
-117 | 
-[2026-04-05T20:19:00.742Z] iter=358 turn=22 INFO: Turn 22/25
-[2026-04-05T20:19:02.546Z] iter=358 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/plan-summary.test.ts 2>&1 | tail -8
-[2026-04-05T20:19:03.624Z] iter=358 turn=22 INFO:   -> exit=0 (235 chars)
-[2026-04-05T20:19:03.624Z] iter=358 turn=23 INFO: Turn 23/25
-[2026-04-05T20:19:07.995Z] iter=358 turn=23 INFO: save_memory: "[Engineer 358] Plan summary + baseCommit"
-[2026-04-05T20:19:07.996Z] iter=358 turn=23 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T20:19:07.996Z] iter=358 turn=24 INFO: Turn 24/25
-[2026-04-05T20:19:16.923Z] iter=358 turn=24 INFO: write_file: goals.md (write)
-[2026-04-05T20:19:16.924Z] iter=358 turn=24 INFO:   -> ok: Updated goals.md (1114 chars, -24 lines delta)
-[2026-04-05T20:19:16.924Z] iter=358 turn=25 INFO: Turn 25/25
-[2026-04-05T20:19:18.132Z] iter=358 turn=25 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T20:19:18.133Z] iter=358 turn=25 INFO: RESTART signal
-[2026-04-05T20:19:18.133Z] iter=358 turn=25 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T20:19:19.208Z] iter=358 turn=25 INFO: Compilation OK
-[2026-04-05T20:19:27.264Z] iter=358 turn=25 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-05T20:19:27.264Z] iter=358 turn=25 INFO: Tool timing: bash: 17x, avg=203ms, total=3443ms; write_file: 10x, avg=2ms, total=20ms; read_scratchpad: 1x, avg=5ms, total=5ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T20:19:27.264Z] iter=358 turn=25 INFO: Tool timing stats
-[2026-04-05T20:19:34.624Z] iter=358 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 358: predicted 20 turns, actual 25 turns, ratio 1.25**
-[2026-04-05T20:19:37.164Z] iter=358 turn=25 INFO: Pre-commit review (3006in/61out): **LGTM** — The tests are well-structured with proper ESM imports, `.js` extensions throughout, correct `vi.mock` hoisting, and the integration in `plan-commands.ts` is straightforward with no obvious 
-[2026-04-05T20:19:37.229Z] iter=358 turn=25 INFO: Committed: a4bfa188 (43 in / 8306 out, cache: 27001 created, 425213 read)
-[2026-04-05T20:19:37.229Z] iter=358 turn=25 INFO: Restarting as iteration 359...
-[2026-04-05T20:19:37.433Z] iter=359 INFO: Cache restored: 55/55 entries (0 stale)
-[2026-04-05T20:19:37.436Z] iter=359 INFO: Turn budget: 13/25 (calibration=1.25x, predicted=8)
-[2026-04-05T20:19:37.436Z] iter=359 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T20:19:37.615Z] iter=359 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T20:19:37.615Z] iter=359 turn=1 INFO: Turn 1/25
-[2026-04-05T20:19:41.926Z] iter=359 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state, scoring iter 358, then do meta housekeeping and set up goals for iter 360.
-[2026-04-05T20:19:41.927Z] iter=359 turn=1 INFO: $ wc -l /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T20:19:41.931Z] iter=359 turn=1 INFO: $ cat /Users/austin/Documents/autoagent/goals.md
-[2026-04-05T20:19:41.935Z] iter=359 turn=1 INFO: $ cat /Users/austin/Documents/autoagent/.autoagent-metrics.json 2>/dev/null | head -80
-[2026-04-05T20:19:41.944Z] iter=359 turn=1 INFO:   -> exit=0 (57 chars)
-[2026-04-05T20:19:41.946Z] iter=359 turn=1 INFO:   -> exit=0 (1114 chars)
-[2026-04-05T20:19:41.950Z] iter=359 turn=1 INFO:   -> exit=0 (1679 chars)
-[2026-04-05T20:19:41.951Z] iter=359 turn=2 INFO: Turn 2/25
-[2026-04-05T20:19:55.396Z] iter=359 turn=2 INFO: Agent: 
-
-You're right. My deliverables are:
-1. Score iter 358 in memory
-2. Update memory (compact if needed — it's only 41 lines, so minimal)
-3. Write goals.md for iter 360
-4. Run tsc verification
-
-Let me do all of these now.
-[2026-04-05T20:19:55.396Z] iter=359 turn=2 INFO: think: Let me assess the state:
-
-1. Iter 358 scoring: predicted 20 turns, actual 25 turns (from metrics summary), ratio 1.25. A...
-[2026-04-05T20:19:55.397Z] iter=359 turn=3 INFO: Turn 3/25
-[2026-04-05T20:19:57.771Z] iter=359 turn=3 INFO: read_file: .autoagent.md
-[2026-04-05T20:19:57.773Z] iter=359 turn=3 INFO:   -> ok (3511 chars)
-[2026-04-05T20:19:57.773Z] iter=359 turn=4 INFO: Turn 4/25
-[2026-04-05T20:20:11.500Z] iter=359 turn=4 INFO: Agent: 
-
-Goal status:
-1. **Score iter 358** — DONE (already in memory: predicted 20, actual 25, ratio 1.25)
-2. **Compact memory** — NOT NEEDED (41 lines, well under 150)
-3. **Write goals.md for iter 360** — NOT STARTED
-
-Let me update memory (roadmap fix) and write goals.md now.
-[2026-04-05T20:20:11.501Z] iter=359 turn=4 INFO: write_file: .autoagent.md (patch)
-[2026-04-05T20:20:11.503Z] iter=359 turn=4 INFO:   -> ok: Patched .autoagent.md: -5 +6 lines
-
-Context after patch:
-22 | ## Prediction Accuracy
-23 | **Rule: Engineer = 20 turns. Architect/Meta = 8 turns.**
-24 | 
-25 | ## Roadmap
-26 | - ✅ Extract /plan handler → plan-commands.ts + tests (iter 356)
-27 | - ✅ Enrich /plan context with detectProject() + .autoagent.md (iter 356)
-28 | - ✅ Plan summary/verification on completion (iter 358)
-29 | - 🔲 Wire real orchestrator as executor in TUI /plan (closes the loop)
-30 | - Future: follow-up tasks, dream task, hook system
-31 | 
-32 | <!-- saved 2026-04-05 -->
-33 | **[Engineer 356] plan-commands extraction**: Created src/plan-commands.ts (handlePlanCommand pure async fn). Updated tui.tsx to call it (-77+14 LOC). Added 10 passing tests in src/__tests__/plan-commands.test.ts. Context enriched with detectProject() + .autoagent.md. TSC clean. Next: wire real orchestrator executor, plan summary on completion.
-[2026-04-05T20:20:11.503Z] iter=359 turn=4 INFO: write_file: goals.md (write)
-[2026-04-05T20:20:11.504Z] iter=359 turn=4 INFO:   -> ok: Updated goals.md (1382 chars, 0 lines delta)
-[2026-04-05T20:20:11.505Z] iter=359 turn=5 INFO: Turn 5/25
-[2026-04-05T20:20:15.106Z] iter=359 turn=5 INFO: Agent: Now score iter 358 in memory and run verification:
-[2026-04-05T20:20:15.107Z] iter=359 turn=5 INFO: save_memory: "[AUTO-SCORED] Iteration 358"
-[2026-04-05T20:20:15.108Z] iter=359 turn=5 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T20:20:15.108Z] iter=359 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T20:20:16.163Z] iter=359 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-05T20:20:16.163Z] iter=359 turn=6 INFO: Turn 6/25
-[2026-04-05T20:20:20.924Z] iter=359 turn=6 INFO: Agent: 
-
-This is a Meta iteration — no src/ changes expected. All 3 goals are DONE:
-
-1. ✅ Scored iter 358 (ratio 1.25, saved to memory)
-2. ✅ Memory updated (roadmap checkboxes current)
-3. ✅ goals.md written for iter 360 (Engineer — wire orchestrator executor)
-4. ✅ TSC clean
-
-```
-echo "AUTOAGENT_RESTART"
-```
-[2026-04-05T20:20:20.926Z] iter=359 turn=6 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T20:20:20.927Z] iter=359 turn=6 INFO: RESTART signal
-[2026-04-05T20:20:20.928Z] iter=359 turn=6 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T20:20:22.074Z] iter=359 turn=6 INFO: Compilation OK
-[2026-04-05T20:20:29.835Z] iter=359 turn=6 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-05T20:20:29.835Z] iter=359 turn=6 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 2 invalidations (1 entries removed)
-[2026-04-05T20:20:29.835Z] iter=359 turn=6 INFO: Tool cache stats
-[2026-04-05T20:20:29.835Z] iter=359 turn=6 INFO: Tool timing: bash: 5x, avg=221ms, total=1104ms; save_memory: 1x, avg=6ms, total=6ms; write_file: 2x, avg=3ms, total=5ms; read_file: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
 [2026-04-05T20:20:29.835Z] iter=359 turn=6 INFO: Tool timing stats
 [2026-04-05T20:20:36.659Z] iter=359 turn=6 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 359: predicted 8 turns, actual 6 turns, ratio 0.75**
 [2026-04-05T20:20:36.681Z] iter=359 turn=6 INFO: Pre-commit review: no significant code changes to review
@@ -1180,3 +996,33 @@ Context after patch:
 [2026-04-05T20:33:21.269Z] iter=366 turn=20 INFO: Tool timing stats
 [2026-04-05T20:33:31.371Z] iter=366 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 366: predicted 18 turns, actual 20 turns, ratio 1.11**
 [2026-04-05T20:35:31.398Z] iter=366 turn=20 INFO: Pre-commit review (0in/0out): ERROR: Request was aborted.
+[2026-04-05T20:35:31.446Z] iter=366 turn=20 INFO: Committed: 818361ea (34 in / 5351 out, cache: 17679 created, 241358 read)
+[2026-04-05T20:35:31.446Z] iter=366 turn=20 INFO: Restarting as iteration 367...
+[2026-04-05T20:35:31.650Z] iter=367 INFO: Cache restored: 55/56 entries (1 stale)
+[2026-04-05T20:35:31.652Z] iter=367 INFO: Turn budget: 12/25 (calibration=1.11x, predicted=8)
+[2026-04-05T20:35:31.653Z] iter=367 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T20:35:31.834Z] iter=367 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T20:35:31.835Z] iter=367 turn=1 INFO: Turn 1/25
+[2026-04-05T20:35:35.644Z] iter=367 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state, scoring iteration 366, and then preparing goals for the next Engineer iteration.
+[2026-04-05T20:35:35.644Z] iter=367 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -100
+[2026-04-05T20:35:35.647Z] iter=367 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
+[2026-04-05T20:35:35.648Z] iter=367 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/orchestrator.ts src/hooks.ts src/markdown-renderer.tsx
+[2026-04-05T20:35:35.651Z] iter=367 turn=1 INFO:   -> exit=0 (2117 chars)
+[2026-04-05T20:35:35.653Z] iter=367 turn=1 INFO:   -> exit=0 (101 chars)
+[2026-04-05T20:35:35.659Z] iter=367 turn=1 INFO:   -> exit=0 (330 chars)
+[2026-04-05T20:35:35.659Z] iter=367 turn=2 INFO: Turn 2/25
+[2026-04-05T20:35:44.312Z] iter=367 turn=2 INFO: Agent: 
+
+You're right. My deliverables are clear:
+
+1. Score iteration 366 in memory
+2. Write goals.md for Engineer iteration 368
+3. Compact memory if needed
+
+Let me produce all three now.
+[2026-04-05T20:35:44.313Z] iter=367 turn=2 INFO: think: Let me score iteration 366: predicted 18 turns, actual 20 turns, ratio 1.11. Already noted in memory.
+
+Now write goals.m...
+[2026-04-05T20:35:44.313Z] iter=367 turn=3 INFO: Turn 3/25
