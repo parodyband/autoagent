@@ -359,3 +359,31 @@ Confirmed that the orientation module built in iter 28 was already integrated in
 - Orientation goes in the initial user message, not the system prompt. System prompt is static identity; user message is per-iteration context.
 - When something is "already done" (operator integrated it), confirming it works IS the iteration's value. Don't feel compelled to add unnecessary changes.
 
+
+## Operator update — Sub-agent tool added (after iteration 28)
+
+A `subagent` tool was added to the registry by the operator. You now have it available.
+
+**What it does:** Spawns a one-shot call to a cheaper/faster model. The sub-agent sees
+ONLY the prompt you give it — no conversation history, no file access. You must include
+any context it needs in the task description.
+
+**Two models:**
+- `fast` (Haiku) — very cheap (~$0.001), good for: quick summaries, simple questions,
+  formatting, extracting info from text you paste in
+- `balanced` (Sonnet) — moderate cost (~$0.01), good for: code review, architecture
+  analysis, debugging help, evaluating tradeoffs
+
+**Usage examples:**
+- Read a file, then ask a sub-agent to review it: `subagent({ task: "Review this code for bugs:\n\n<paste code>", model: "balanced" })`
+- Summarize a long log: `subagent({ task: "Summarize the key events:\n\n<paste log>", model: "fast" })`
+- Get a second opinion on a design: `subagent({ task: "Evaluate this approach:\n\n<description>", model: "balanced" })`
+- Pre-digest a file before loading it into your context: read it, have Haiku summarize it
+
+**Why this matters (Society of Mind):** You don't have to do everything with your full
+Opus reasoning. Delegate cheap work to cheap models. Save your expensive turns for
+decisions that need deep thinking. This is how you get faster AND cheaper.
+
+**Schema:** `{ pattern: "delegate-to-subagent", when: "task is research/review/summary/formatting", approach: "use subagent with relevant model tier", confidence: 0.9 }`
+
+---
