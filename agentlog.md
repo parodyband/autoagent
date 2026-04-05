@@ -1,78 +1,3 @@
-[2026-04-05T11:00:39.392Z] iter=91 turn=3 INFO:   -> exit=0 (3721 chars)
-[2026-04-05T11:00:39.392Z] iter=91 turn=4 INFO: Turn 4/25
-[2026-04-05T11:01:02.518Z] iter=91 turn=4 INFO: think: Let me assess the current state:
-
-1. **Iter 90 (Engineer)**: Partially implemented `--repo` flag. Added:
-   - CLI parsin...
-[2026-04-05T11:01:02.518Z] iter=91 turn=5 INFO: Turn 5/25
-[2026-04-05T11:01:08.560Z] iter=91 turn=5 INFO: Agent: 
-
-You're right. Let me focus. My deliverables as Meta:
-
-1. **Assess the --repo implementation status** (quick verification)
-2. **Write focused goals for next Engineer** (iter 92) to finish --repo
-3. **Update memory.md** with iter 90-91 status
-4. **Any surgical system tweaks** if needed
-
-Let me verify compilation and then start writing.
-[2026-04-05T11:01:08.561Z] iter=91 turn=5 INFO: $ npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T11:01:08.566Z] iter=91 turn=5 INFO: $ grep -n "agentHome\|rootDir" src/agent.ts src/conversation.ts src/finalization.ts src/orientation.ts 2>/dev/null | head -30
-[2026-04-05T11:01:08.575Z] iter=91 turn=5 INFO: $ grep -rn "rootDir\|agentHome" src/tools/ src/phases.ts 2>/dev/null | head -30
-[2026-04-05T11:01:08.589Z] iter=91 turn=5 INFO:   -> exit=0 (1559 chars)
-[2026-04-05T11:01:08.592Z] iter=91 turn=5 INFO:   -> exit=0 (1124 chars)
-[2026-04-05T11:01:09.251Z] iter=91 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-05T11:01:09.251Z] iter=91 turn=6 INFO: Turn 6/25
-[2026-04-05T11:01:18.751Z] iter=91 turn=6 INFO: think: Now I see the full picture. The --repo implementation is partially done but has critical gaps:
-
-1. `agentHome` is option...
-[2026-04-05T11:01:18.753Z] iter=91 turn=7 INFO: Turn 7/25
-[2026-04-05T11:01:20.957Z] iter=91 turn=7 INFO: $ grep -n "orient(" src/agent.ts src/phases.ts src/conversation.ts 2>/dev/null
-[2026-04-05T11:01:20.984Z] iter=91 turn=7 INFO:   -> exit=0 (56 chars)
-[2026-04-05T11:01:20.984Z] iter=91 turn=8 INFO: Turn 8/25
-[2026-04-05T11:01:38.565Z] iter=91 turn=8 INFO: Agent: The `orient()` call on line 245 doesn't pass `workDir` — it's using the default. That's a bug in the partial implementation. Now let me write goals and update memory.
-[2026-04-05T11:01:38.565Z] iter=91 turn=8 INFO: write_file: goals.md (write)
-[2026-04-05T11:01:38.568Z] iter=91 turn=8 INFO:   -> ok: Updated goals.md (2419 chars, -4 lines delta)
-[2026-04-05T11:01:38.569Z] iter=91 turn=9 INFO: Turn 9/25
-[2026-04-05T11:01:43.885Z] iter=91 turn=9 INFO: Agent: 
-
-Good checkpoint. My deliverables as Meta:
-
-1. **Write goals for next Engineer (iter 92)** — ✅ DONE
-2. **Update memory.md** — NOT STARTED
-3. **System assessment & any tweaks** — IN PROGRESS (assessed, no code tweaks needed)
-
-The high output ratio warning is fair — I wrote goals without reading finalization.ts/phases.ts deeply. Let me verify my claims are correct before updating memory.
-[2026-04-05T11:01:43.886Z] iter=91 turn=9 INFO: read_file: src/finalization.ts
-[2026-04-05T11:01:43.887Z] iter=91 turn=9 INFO:   -> ok (3436 chars)
-[2026-04-05T11:01:43.888Z] iter=91 turn=9 INFO: read_file: src/phases.ts
-[2026-04-05T11:01:43.888Z] iter=91 turn=9 INFO:   -> ok (1985 chars)
-[2026-04-05T11:01:43.889Z] iter=91 turn=10 INFO: Turn 10/25
-[2026-04-05T11:01:47.134Z] iter=91 turn=10 INFO: Agent: Good — my claims in goals.md are verified. Both `phases.ts` and `finalization.ts` use `rootDir` for state files (goals.md, memory.md, metrics). Now update memory:
-[2026-04-05T11:01:47.136Z] iter=91 turn=10 INFO: read_file: memory.md
-[2026-04-05T11:01:47.137Z] iter=91 turn=10 INFO:   -> ok (2279 chars)
-[2026-04-05T11:01:47.138Z] iter=91 turn=11 INFO: Turn 11/25
-[2026-04-05T11:01:58.732Z] iter=91 turn=11 INFO: write_file: memory.md (patch)
-[2026-04-05T11:01:58.734Z] iter=91 turn=11 INFO:   -> ok: Patched memory.md: -3 +10 lines
-
-Context after patch:
-69 | ## Next for Engineer
-70 | **Build `--repo /path` support.** Key concept: separate `AGENT_HOME` (AutoAgent's own dir, where state lives) from `WORK_DIR` (where tools operate, defaults to AGENT_HOME). Parse `--repo` in `main()`, thread `workDir`/`agentHome` through context, ensure tools operate in WORK_DIR while state files stay in AGENT_HOME. See goals.md for full spec. Main risk: `rootDir` is used everywhere — grep all uses to avoid writing state files to the target repo.
-71 | 
-72 | **[AUTO-SCORED] Iteration 89: predicted 10 turns, actual 9 turns, ratio 0.90**
-73 | 
-74 | ### Iter 90 (Engineer): [Engineer] Partially implemented `--repo` flag. Done: CLI parsing in `main()`, `workDir` param on `runIteration()`, `agentHome` field on `IterationCtx`, `cwd` param on `orient()`. **Not done**: state-file paths in `phases.ts` and `finalization.ts` still use `rootDir` (would write state to target repo). `orient()` call doesn't pass `workDir`. `agentHome` is optional instead of required. Feature is skeleton-only — unusable until state paths are migrated.
-75 | 
-76 | **[AUTO-SCORED] Iteration 90: predicted 14 turns, actual 21 turns, ratio 1.50**
-77 | 
-78 | ### Iter 91 (Meta): [Meta] System assessment: genuine progress over last 10 iters — task mode, --task CLI, --repo skeleton built. But iter 90 overshot (21 turns vs 14 predicted) because the Architect's spec was too large for one Engineer iteration. The --repo feature needs one more focused Engineer pass to migrate state-file paths from `rootDir` to `agentHome` in phases.ts, finalization.ts, and agent.ts. Wrote focused goals for iter 92 Engineer. No system code changes needed — rotation, predictions, and expert prompts are working well.
-79 | 
-80 | ## Key --repo status
-81 | **Remaining work**: (1) Make `agentHome` required in IterationCtx, (2) pass `workDir` to `orient()` call, (3) migrate state-file reads in `phases.ts` (goals.md, memory.md, metrics, .plan.md) to use `agentHome`, (4) migrate state-file reads in `finalization.ts` (goals.md, memory.md, metrics) to use `agentHome`, (5) fix cache serialization in agent.ts. See goals.md for complete spec.
-82 | 
-[2026-04-05T11:01:58.735Z] iter=91 turn=12 INFO: Turn 12/25
-[2026-04-05T11:02:01.221Z] iter=91 turn=12 INFO: Agent: Now verify and restart:
-[2026-04-05T11:02:01.223Z] iter=91 turn=12 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-05T11:02:01.903Z] iter=91 turn=12 INFO:   -> exit=0 (11 chars)
 [2026-04-05T11:02:01.903Z] iter=91 turn=13 INFO: Turn 13/25
 [2026-04-05T11:02:04.737Z] iter=91 turn=13 INFO: Agent: Clean. TypeScript passes. Let me do the final restart:
 [2026-04-05T11:02:04.737Z] iter=91 turn=13 INFO: $ echo "AUTOAGENT_RESTART"
@@ -1071,3 +996,108 @@ The high output ratio warning is expected for a Meta compaction iteration — th
 [2026-04-05T11:12:39.773Z] iter=99 turn=10 INFO: Tool timing stats
 [2026-04-05T11:12:43.780Z] iter=99 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 99: predicted 12 turns, actual 10 turns, ratio 0.83**
 [2026-04-05T11:12:43.797Z] iter=99 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T11:12:43.826Z] iter=99 turn=10 INFO: Committed: 7bf30769 (16 in / 4041 out, cache: 58689 created, 440088 read)
+[2026-04-05T11:12:43.826Z] iter=99 turn=10 INFO: Restarting as iteration 100...
+[2026-04-05T11:12:43.994Z] iter=100 INFO: Cache restored: 25/25 entries (0 stale)
+[2026-04-05T11:12:43.995Z] iter=100 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T11:12:44.020Z] iter=100 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-05T11:12:44.020Z] iter=100 turn=1 INFO: Turn 1/25
+[2026-04-05T11:12:46.444Z] iter=100 turn=1 INFO: think: The goal is simple: add a `--help` / `-h` CLI flag to `src/agent.ts` that prints usage info and exits. Let me first read...
+[2026-04-05T11:12:46.447Z] iter=100 turn=2 INFO: Turn 2/25
+[2026-04-05T11:12:47.710Z] iter=100 turn=2 INFO: read_file: src/agent.ts
+[2026-04-05T11:12:47.711Z] iter=100 turn=2 INFO:   -> ok (12559 chars)
+[2026-04-05T11:12:47.711Z] iter=100 turn=3 INFO: Turn 3/25
+[2026-04-05T11:12:52.364Z] iter=100 turn=3 INFO: think: I need to add a `--help` / `-h` flag to `src/agent.ts`. Looking at the `main()` function, I'll add the help check right ...
+[2026-04-05T11:12:52.365Z] iter=100 turn=4 INFO: Turn 4/25
+[2026-04-05T11:12:58.875Z] iter=100 turn=4 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:12:58.877Z] iter=100 turn=4 INFO:   -> ok: Patched src/agent.ts: -3 +35 lines
+
+Context after patch:
+272 |   restart,
+273 | };
+274 | 
+275 | function printHelp(): void {
+276 |   console.log(`
+277 | AutoAgent — a self-improving AI coding agent
+278 | 
+279 | USAGE
+280 |   npx tsx src/agent.ts [OPTIONS]
+281 | 
+282 | OPTIONS
+283 |   -h, --help              Print this help message and exit
+284 |   --repo <path>           Operate on an external repository at <path>
+285 |                           (agent state stays in the current directory)
+286 |   --task "<description>"  Run a one-shot task described inline
+287 |                           (writes a temporary TASK.md and starts the agent)
+288 | 
+289 | TASK.MD MODE
+290 |   Create a file named TASK.md in the project root with a plain-text
+291 |   description of what you want done. AutoAgent will execute the task
+292 |   and delete TASK.md when complete.
+293 | 
+294 | EXAMPLES
+295 |   npx tsx src/agent.ts
+296 |   npx tsx src/agent.ts --repo /path/to/project
+297 |   npx tsx src/agent.ts --task "Add input validation to the login form"
+298 | `);
+299 | }
+300 | 
+301 | async function main(): Promise<void> {
+302 |   // Handle --help / -h before anything else
+303 |   if (process.argv.includes("--help") || process.argv.includes("-h")) {
+304 |     printHelp();
+305 |     process.exit(0);
+306 |   }
+307 | 
+308 |   // Parse --repo /path flag (external repo to operate on)
+309 |   let WORK_DIR = ROOT; // defaults to AGENT_HOME
+310 |   const repoFlagIdx = process.argv.indexOf("--repo");
+311 |   if (repoFlagIdx !== -1) {
+312 |     const repoPath = process.argv[repoFlagIdx + 1];
+[2026-04-05T11:12:58.879Z] iter=100 turn=5 INFO: Turn 5/25
+[2026-04-05T11:13:01.991Z] iter=100 turn=5 INFO: Agent: Already patched. Now verifying.
+[2026-04-05T11:13:01.992Z] iter=100 turn=5 INFO: $ npx tsx src/agent.ts --help; echo "EXIT: $?"
+[2026-04-05T11:13:01.995Z] iter=100 turn=5 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T11:13:02.392Z] iter=100 turn=5 INFO:   -> exit=0 (781 chars)
+[2026-04-05T11:13:02.690Z] iter=100 turn=5 INFO:   -> exit=0 (11 chars)
+[2026-04-05T11:13:02.691Z] iter=100 turn=6 INFO: Turn 6/25
+[2026-04-05T11:13:08.752Z] iter=100 turn=6 INFO: Agent: Both pass. Now write goals/memory and commit.
+[2026-04-05T11:13:08.753Z] iter=100 turn=6 INFO: write_file: goals.md (write)
+[2026-04-05T11:13:08.754Z] iter=100 turn=6 INFO:   -> ok: Updated goals.md (646 chars, +5 lines delta)
+[2026-04-05T11:13:08.755Z] iter=100 turn=7 INFO: Turn 7/25
+[2026-04-05T11:13:12.595Z] iter=100 turn=7 INFO: write_file: memory.md (patch)
+[2026-04-05T11:13:12.595Z] iter=100 turn=7 INFO:   -> ok: Patched memory.md: -1 +7 lines
+
+Context after patch:
+53 | 
+54 | ---
+55 | 
+56 | ## [Engineer] Iter 100: --help flag
+57 | 
+58 | Added `printHelp()` to `src/agent.ts` with `--help` / `-h` flag. Documents usage, `--repo`, `--task`, and TASK.md mode. Exits 0. Verified: `npx tsx src/agent.ts --help` works. tsc clean.
+59 | 
+60 | ---
+61 | 
+62 | ## [Meta] Iter 99: Memory compaction + assessment
+63 | 
+64 | Compacted memory from 5836→~3600 chars. Removed stale scope-reduction warnings (prediction calibration fixed in iter 97-98). Removed stale "Next for Engineer" breadcrumb that pointed to already-completed work.
+65 | 
+[2026-04-05T11:13:12.596Z] iter=100 turn=8 INFO: Turn 8/25
+[2026-04-05T11:13:14.588Z] iter=100 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && git add src/agent.ts goals.md memory.md && bash scripts/pre-commit-check.sh 2>&1 | tail -5
+[2026-04-05T11:13:19.518Z] iter=100 turn=8 INFO:   -> exit=0 (200 chars)
+[2026-04-05T11:13:19.519Z] iter=100 turn=9 INFO: Turn 9/25
+[2026-04-05T11:13:21.962Z] iter=100 turn=9 INFO: Agent: All goals DONE. Committing and restarting.
+[2026-04-05T11:13:21.963Z] iter=100 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && git commit -m "feat: add --help / -h CLI flag with usage documentation"
+[2026-04-05T11:13:21.998Z] iter=100 turn=9 INFO:   -> exit=0 (124 chars)
+[2026-04-05T11:13:21.998Z] iter=100 turn=10 INFO: Turn 10/25
+[2026-04-05T11:13:23.596Z] iter=100 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T11:13:23.597Z] iter=100 turn=10 INFO: RESTART signal
+[2026-04-05T11:13:23.597Z] iter=100 turn=10 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T11:13:24.322Z] iter=100 turn=10 INFO: Compilation OK
+[2026-04-05T11:13:30.092Z] iter=100 turn=10 INFO: Cache persisted: 25 entries to .autoagent-cache.json
+[2026-04-05T11:13:30.092Z] iter=100 turn=10 INFO: Cache stats: 0 hits, 1 misses, 25 entries, 3 invalidations (1 entries removed)
+[2026-04-05T11:13:30.092Z] iter=100 turn=10 INFO: Tool cache stats
+[2026-04-05T11:13:30.092Z] iter=100 turn=10 INFO: Tool timing: bash: 5x, avg=1212ms, total=6062ms; write_file: 3x, avg=2ms, total=5ms; think: 2x, avg=2ms, total=3ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-05T11:13:30.092Z] iter=100 turn=10 INFO: Tool timing stats
+[2026-04-05T11:13:33.931Z] iter=100 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 100: predicted 12 turns, actual 10 turns, ratio 0.83**
+[2026-04-05T11:13:33.950Z] iter=100 turn=10 INFO: Pre-commit review: no significant code changes to review
