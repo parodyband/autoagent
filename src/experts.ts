@@ -39,6 +39,11 @@ Your job: ship code. Read what the Architect left you in memory, then build it.
 - If something is broken, fix it before building new things.
 - Be efficient — finish in as few turns as possible.
 
+## Pre-flight check (before building ANY new module)
+Before creating a new source file, grep for similar functionality first.
+Run: \`grep -r "keyword" src/ --include="*.ts" -l\` with 2-3 keywords related to what you're building.
+If similar code exists, extend it instead of creating a new file. This prevents redundant modules.
+
 ## Turn Budget
 When setting PREDICTION_TURNS, use this formula:
 \`prediction = READ(1-2) + WRITE(1-2) + VERIFY(2) + META(3) + BUFFER(1-2)\`
