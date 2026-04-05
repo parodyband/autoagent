@@ -542,3 +542,15 @@
 {"timestamp":"2026-04-05T19:21:58.137Z","iteration":329,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit","turn":7}
 {"timestamp":"2026-04-05T19:21:59.183Z","iteration":329,"level":"info","message":"  -> exit=0 (11 chars)","turn":7}
 {"timestamp":"2026-04-05T19:21:59.183Z","iteration":329,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-05T19:22:01.532Z","iteration":329,"level":"info","message":"Agent: TSC clean. Goals written.","turn":8}
+{"timestamp":"2026-04-05T19:22:01.533Z","iteration":329,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":8}
+{"timestamp":"2026-04-05T19:22:01.535Z","iteration":329,"level":"info","message":"RESTART signal","turn":8}
+{"timestamp":"2026-04-05T19:22:01.536Z","iteration":329,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":8}
+{"timestamp":"2026-04-05T19:22:02.545Z","iteration":329,"level":"info","message":"Compilation OK","turn":8}
+{"timestamp":"2026-04-05T19:22:12.637Z","iteration":329,"level":"info","message":"Cache persisted: 54 entries to .autoagent-cache.json","turn":8}
+{"timestamp":"2026-04-05T19:22:12.637Z","iteration":329,"level":"info","message":"Cache stats: 0 hits, 1 misses, 54 entries, 1 invalidations (0 entries removed)","turn":8}
+{"timestamp":"2026-04-05T19:22:12.638Z","iteration":329,"level":"info","message":"Tool cache stats","turn":8,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":54,"invalidations":1,"invalidatedEntries":0,"toolStats":{"list_files":{"hits":0,"misses":1}}}}
+{"timestamp":"2026-04-05T19:22:12.638Z","iteration":329,"level":"info","message":"Tool timing: bash: 10x, avg=1338ms, total=13379ms; web_search: 1x, avg=1100ms, total=1100ms; list_files: 1x, avg=5ms, total=5ms; save_memory: 1x, avg=2ms, total=2ms; write_file: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms","turn":8}
+{"timestamp":"2026-04-05T19:22:12.638Z","iteration":329,"level":"info","message":"Tool timing stats","turn":8,"metadata":{"timing":{"tools":{"list_files":{"calls":1,"totalMs":5,"minMs":5,"maxMs":5,"avgMs":5},"bash":{"calls":10,"totalMs":13379,"minMs":3,"maxMs":12270,"avgMs":1338},"web_search":{"calls":1,"totalMs":1100,"minMs":1100,"maxMs":1100,"avgMs":1100},"think":{"calls":1,"totalMs":0,"minMs":0,"maxMs":0,"avgMs":0},"write_file":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"save_memory":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2}},"totalCalls":15,"totalMs":14487}}}
+{"timestamp":"2026-04-05T19:22:18.986Z","iteration":329,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 329: predicted 8 turns, actual 8 turns, ratio 1.00**","turn":8}
+{"timestamp":"2026-04-05T19:22:19.007Z","iteration":329,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":8}

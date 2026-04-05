@@ -1050,3 +1050,15 @@ Writing goals.md now — this is an Architect iteration, my deliverable is goals
 [2026-04-05T19:21:58.137Z] iter=329 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
 [2026-04-05T19:21:59.183Z] iter=329 turn=7 INFO:   -> exit=0 (11 chars)
 [2026-04-05T19:21:59.183Z] iter=329 turn=8 INFO: Turn 8/25
+[2026-04-05T19:22:01.532Z] iter=329 turn=8 INFO: Agent: TSC clean. Goals written.
+[2026-04-05T19:22:01.533Z] iter=329 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T19:22:01.535Z] iter=329 turn=8 INFO: RESTART signal
+[2026-04-05T19:22:01.536Z] iter=329 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T19:22:02.545Z] iter=329 turn=8 INFO: Compilation OK
+[2026-04-05T19:22:12.637Z] iter=329 turn=8 INFO: Cache persisted: 54 entries to .autoagent-cache.json
+[2026-04-05T19:22:12.637Z] iter=329 turn=8 INFO: Cache stats: 0 hits, 1 misses, 54 entries, 1 invalidations (0 entries removed)
+[2026-04-05T19:22:12.638Z] iter=329 turn=8 INFO: Tool cache stats
+[2026-04-05T19:22:12.638Z] iter=329 turn=8 INFO: Tool timing: bash: 10x, avg=1338ms, total=13379ms; web_search: 1x, avg=1100ms, total=1100ms; list_files: 1x, avg=5ms, total=5ms; save_memory: 1x, avg=2ms, total=2ms; write_file: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T19:22:12.638Z] iter=329 turn=8 INFO: Tool timing stats
+[2026-04-05T19:22:18.986Z] iter=329 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 329: predicted 8 turns, actual 8 turns, ratio 1.00**
+[2026-04-05T19:22:19.007Z] iter=329 turn=8 INFO: Pre-commit review: no significant code changes to review
