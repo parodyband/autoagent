@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { globalFileCache } from "./file-cache.js";
 
 /**
  * FileWatcher — watches files for external changes and fires onChange callback.
@@ -37,6 +38,7 @@ export class FileWatcher {
 
         const timer = setTimeout(() => {
           this.debounceTimers.delete(abs);
+          globalFileCache.invalidate(abs);
           this.onChange?.(abs);
         }, this.debounceMs);
 

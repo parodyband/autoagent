@@ -17,6 +17,12 @@ import { subagentToolDefinition, executeSubagent } from "./tools/subagent.js";
 import { webSearchToolDefinition, executeWebSearch } from "./tools/web_search.js";
 import { autoSelectModel } from "./model-selection.js";
 import { saveToProjectMemory } from "./project-memory.js";
+import {
+  saveScratchpadToolDefinition,
+  readScratchpadToolDefinition,
+  executeSaveScratchpad,
+  executeReadScratchpad,
+} from "./tools/scratchpad.js";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -246,6 +252,21 @@ export function createDefaultRegistry(): ToolRegistry {
     },
     { defaultTimeout: 5 },
   );
+
+  // ── save_scratchpad ──────────────────────────────────
+  registry.register(saveScratchpadToolDefinition, async (input, ctx) => {
+    const { note } = input as { note: string };
+    const result = executeSaveScratchpad(note, ctx.rootDir);
+    ctx.log(`save_scratchpad: ${note.slice(0, 60)}`);
+    return { result };
+  }, { defaultTimeout: 5 });
+
+  // ── read_scratchpad ──────────────────────────────────
+  registry.register(readScratchpadToolDefinition, async (_input, ctx) => {
+    const result = executeReadScratchpad(ctx.rootDir);
+    ctx.log(`read_scratchpad: ${result.length} chars`);
+    return { result };
+  }, { defaultTimeout: 5 });
 
   return registry;
 }

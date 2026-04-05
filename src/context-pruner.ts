@@ -1,5 +1,5 @@
 /**
- * Scored context pruner — replaces the blunt microCompact() with a
+ * Scored context pruner — replaces the blunt legacy compaction with a
  * score-based approach that prioritises large, old, re-fetchable tool results.
  */
 
@@ -156,7 +156,7 @@ function collectToolResults(
 }
 
 /**
- * Scored pruning — replaces `microCompact()`.
+ * Scored pruning — replaces legacy compaction.
  *
  * @param messages  The mutable apiMessages array (modified in place).
  * @param currentTurn  Total message count (used for age calculation).

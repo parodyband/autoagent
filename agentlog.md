@@ -1,113 +1,3 @@
-421 |       return;
-422 |     }
-423 |     if (!loading && (ch === "c" || ch === "C") && externalChanges.length > 0) {
-424 |       setExternalChanges([]);
-425 |       return;
-426 |     }
-427 |     if (key.escape) {
-428 |       if (fileSuggestions.length > 0) {
-429 |         setFileSuggestions([]);
-430 |         return;
-431 |       }
-432 |       exit();
-433 |     }
-434 |   });
-435 | 
-436 |   const handleSubmit = useCallback(async (value: string) => {
-437 |     const trimmed = value.trim();
-[2026-04-05T17:29:31.430Z] iter=270 turn=13 INFO: Turn 13/25
-[2026-04-05T17:29:34.539Z] iter=270 turn=13 INFO: Agent: I've made changes to orchestrator.ts (signature fix) and tui.tsx (wiring + C key). Still need: banner render, /compact command, /compact in help, and file-watcher tests. Finishing now.
-[2026-04-05T17:29:34.539Z] iter=270 turn=13 INFO: read_file: src/tui.tsx
-[2026-04-05T17:29:34.540Z] iter=270 turn=13 INFO:   -> ok (1283 chars)
-[2026-04-05T17:29:34.540Z] iter=270 turn=14 INFO: Turn 14/25
-[2026-04-05T17:29:37.408Z] iter=270 turn=14 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T17:29:37.410Z] iter=270 turn=14 INFO:   -> ok: Patched src/tui.tsx: -3 +4 lines
-
-Context after patch:
-479 |           "  /reindex  — Re-index the repository files",
-480 |           "  /resume   — List and restore a previous session",
-481 |           "  /rewind   — Restore conversation to a prior checkpoint",
-482 |           "  /compact  — Manually compact conversation context",
-483 |           "  /diff     — Show uncommitted git changes",
-484 |           "  /undo     — Revert the last autoagent commit",
-485 |           "  /exit     — Quit AutoAgent",
-486 |         ].join("\n"),
-487 |       }]);
-488 |       return;
-[2026-04-05T17:29:37.411Z] iter=270 turn=15 INFO: Turn 15/25
-[2026-04-05T17:29:40.886Z] iter=270 turn=15 INFO: Agent: Now add /compact handler after /clear:
-[2026-04-05T17:29:40.886Z] iter=270 turn=15 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T17:29:40.887Z] iter=270 turn=15 INFO:   -> ok: Patched src/tui.tsx: -1 +8 lines
-
-Context after patch:
-448 |       setTimeout(() => setStatus(""), 1000);
-449 |       return;
-450 |     }
-451 |     if (trimmed === "/compact") {
-452 |       setStatus("Compacting context...");
-453 |       await orchestratorRef.current?.compactNow();
-454 |       setMessages(prev => [...prev, { role: "assistant", content: "Context compacted." }]);
-455 |       setStatus("");
-456 |       return;
-457 |     }
-458 |     if (trimmed === "/reindex") {
-459 |       setStatus("Re-indexing repo...");
-460 |       orchestratorRef.current?.reindex();
-461 |       // Rebuild repoMap for #file suggestions
-[2026-04-05T17:29:40.887Z] iter=270 turn=16 INFO: Turn 16/25
-[2026-04-05T17:29:43.548Z] iter=270 turn=16 INFO: Agent: Now add the banner render and `compactNow()` method, then write the test file:
-[2026-04-05T17:29:43.549Z] iter=270 turn=16 INFO: $ grep -n "contextWarning\|Footer\|externalChanges" src/tui.tsx | tail -20
-[2026-04-05T17:29:43.559Z] iter=270 turn=16 INFO:   -> exit=0 (716 chars)
-[2026-04-05T17:29:43.560Z] iter=270 turn=17 INFO: Turn 17/25
-[2026-04-05T17:29:47.443Z] iter=270 turn=17 INFO: Agent: Let me finish all remaining changes right now in parallel:
-[2026-04-05T17:29:47.444Z] iter=270 turn=17 INFO: read_file: src/tui.tsx
-[2026-04-05T17:29:47.446Z] iter=270 turn=17 INFO:   -> ok (1124 chars)
-[2026-04-05T17:29:47.447Z] iter=270 turn=17 INFO: grep: "compactNow\|public.*compact" in src/orchestrator.ts
-[2026-04-05T17:29:47.480Z] iter=270 turn=17 INFO:   -> 0 matches
-[2026-04-05T17:29:47.481Z] iter=270 turn=18 INFO: Turn 18/25
-[2026-04-05T17:29:50.820Z] iter=270 turn=18 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T17:29:50.821Z] iter=270 turn=18 INFO:   -> ok: Patched src/tui.tsx: -2 +8 lines
-
-Context after patch:
-805 |         </Box>
-806 |       )}
-807 | 
-808 |       {externalChanges.length > 0 && (
-809 |         <Box marginTop={1}>
-810 |           <Text color="yellow">⚠ External changes: {externalChanges.map(p => path.basename(p)).join(", ")}  [C to clear]</Text>
-811 |         </Box>
-812 |       )}
-813 | 
-814 |       {/* Footer: token + cost stats */}
-815 |       <Footer stats={footerStats} />
-816 | 
-817 |       {/* Input */}
-818 |       {!loading && (
-[2026-04-05T17:29:50.822Z] iter=270 turn=19 INFO: Turn 19/25
-[2026-04-05T17:29:55.223Z] iter=270 turn=19 INFO: Agent: Now add `compactNow()` to orchestrator.ts:
-[2026-04-05T17:29:55.224Z] iter=270 turn=19 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T17:29:55.225Z] iter=270 turn=19 INFO:   -> ok: Patched src/orchestrator.ts: -4 +10 lines
-
-Context after patch:
-909 |     this.opts.onStatus?.("");
-910 |   }
-911 | 
-912 |   /** Manually trigger context compaction (called from /compact TUI command). */
-913 |   async compactNow(): Promise<void> {
-914 |     await this.compact();
-915 |     this.opts.onStatus?.("Context compacted.");
-916 |   }
-917 | 
-918 |   /**
-919 |    * Process a user message through the full orchestration pipeline:
-920 |    * 1. Route to appropriate model
-921 |    * 2. Optionally compact context
-922 |    * 3. Optionally decompose complex tasks
-923 |    * 4. Run streaming agent loop
-924 |    * 5. Verify if code was changed
-[2026-04-05T17:29:55.226Z] iter=270 turn=20 INFO: Turn 20/25
-[2026-04-05T17:30:07.403Z] iter=270 turn=20 INFO: Agent: Writing file-watcher tests and finishing up:
-[2026-04-05T17:30:07.405Z] iter=270 turn=20 INFO: write_file: src/file-watcher.test.ts (write)
 [2026-04-05T17:30:07.407Z] iter=270 turn=20 INFO:   -> ok: Created src/file-watcher.test.ts (3254 chars)
 [2026-04-05T17:30:07.408Z] iter=270 turn=21 INFO: Turn 21/25
 [2026-04-05T17:30:09.356Z] iter=270 turn=21 INFO: $ grep -n "watchedCount\|isMuted\|unwatchAll\|unwatch\b" src/file-watcher.ts | head -20
@@ -1106,3 +996,211 @@ Wait, let me do this properly:
 [2026-04-05T17:45:08.661Z] iter=277 turn=16 INFO: Tool timing stats
 [2026-04-05T17:45:14.453Z] iter=277 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 277: predicted 20 turns, actual 16 turns, ratio 0.80**
 [2026-04-05T17:45:14.474Z] iter=277 turn=16 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T17:45:14.508Z] iter=277 turn=16 INFO: Committed: a841f95b (26 in / 5320 out, cache: 27409 created, 239148 read)
+[2026-04-05T17:45:14.508Z] iter=277 turn=16 INFO: Restarting as iteration 278...
+[2026-04-05T17:45:14.708Z] iter=278 INFO: Cache restored: 54/54 entries (0 stale)
+[2026-04-05T17:45:14.710Z] iter=278 INFO: Turn budget: 23/25 (calibration=1.00x, predicted=20)
+[2026-04-05T17:45:14.710Z] iter=278 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T17:45:14.833Z] iter=278 turn=1 INFO: Turn 1/25
+[2026-04-05T17:45:17.310Z] iter=278 turn=1 INFO: Agent: I'll read the current state of the relevant files before making changes.
+[2026-04-05T17:45:17.311Z] iter=278 turn=1 INFO: $ cat src/file-watcher.ts
+[2026-04-05T17:45:17.319Z] iter=278 turn=1 INFO: $ grep -n "microCompact" src/orchestrator.ts | head -30
+[2026-04-05T17:45:17.331Z] iter=278 turn=1 INFO:   -> exit=0 (3362 chars)
+[2026-04-05T17:45:17.337Z] iter=278 turn=1 INFO:   -> exit=0 (52 chars)
+[2026-04-05T17:45:17.338Z] iter=278 turn=2 INFO: Turn 2/25
+[2026-04-05T17:45:21.134Z] iter=278 turn=2 INFO: $ sed -n '770,820p' src/orchestrator.ts
+[2026-04-05T17:45:21.136Z] iter=278 turn=2 INFO: $ ls src/__tests__/micro-compact.test.ts src/__tests__/mid-loop-compact.test.ts 2>/dev/null; cat src/__tests__/mid-loop-compact.test.ts 2>/dev/null | head -120
+[2026-04-05T17:45:21.144Z] iter=278 turn=2 INFO:   -> exit=0 (2111 chars)
+[2026-04-05T17:45:21.152Z] iter=278 turn=2 INFO:   -> exit=0 (4600 chars)
+[2026-04-05T17:45:21.152Z] iter=278 turn=3 INFO: Turn 3/25
+[2026-04-05T17:45:23.850Z] iter=278 turn=3 INFO: $ cat src/__tests__/mid-loop-compact.test.ts | wc -l; sed -n '110,160p' src/__tests__/mid-loop-compact.test.ts
+[2026-04-05T17:45:23.857Z] iter=278 turn=3 INFO: $ cat src/__tests__/file-watcher.test.ts 2>/dev/null | head -100
+[2026-04-05T17:45:23.883Z] iter=278 turn=3 INFO:   -> exit=0 (812 chars)
+[2026-04-05T17:45:23.884Z] iter=278 turn=3 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:45:23.884Z] iter=278 turn=4 INFO: Turn 4/25
+[2026-04-05T17:45:29.078Z] iter=278 turn=4 INFO: think: I have enough context. Let me execute all changes now:
+
+1. file-watcher.ts: add globalFileCache import + invalidate call...
+[2026-04-05T17:45:29.078Z] iter=278 turn=5 INFO: Turn 5/25
+[2026-04-05T17:45:33.119Z] iter=278 turn=5 INFO: Agent: Deliverables: Goal 1 (FileCache invalidation + microCompact cleanup) and Goal 2 (scratchpad tool). Starting now.
+[2026-04-05T17:45:33.119Z] iter=278 turn=5 INFO: write_file: src/file-watcher.ts (patch)
+[2026-04-05T17:45:33.120Z] iter=278 turn=5 INFO:   -> ok: Patched src/file-watcher.ts: -2 +3 lines
+
+Context after patch:
+1 | import fs from "fs";
+2 | import path from "path";
+3 | import { globalFileCache } from "./file-cache.js";
+4 | 
+5 | /**
+6 |  * FileWatcher — watches files for external changes and fires onChange callback.
+[2026-04-05T17:45:33.121Z] iter=278 turn=6 INFO: Turn 6/25
+[2026-04-05T17:45:36.034Z] iter=278 turn=6 INFO: write_file: src/file-watcher.ts (patch)
+[2026-04-05T17:45:36.035Z] iter=278 turn=6 INFO:   -> ok: Patched src/file-watcher.ts: -4 +5 lines
+
+Context after patch:
+36 |         const existing = this.debounceTimers.get(abs);
+37 |         if (existing) clearTimeout(existing);
+38 | 
+39 |         const timer = setTimeout(() => {
+40 |           this.debounceTimers.delete(abs);
+41 |           globalFileCache.invalidate(abs);
+42 |           this.onChange?.(abs);
+43 |         }, this.debounceMs);
+44 | 
+45 |         this.debounceTimers.set(abs, timer);
+46 |       });
+[2026-04-05T17:45:36.035Z] iter=278 turn=7 INFO: Turn 7/25
+[2026-04-05T17:45:40.336Z] iter=278 turn=7 INFO: Agent: Goal 1: IN PROGRESS (file-watcher.ts patched, still need: delete microCompact, clean tests, context-pruner JSDoc, file-watcher tests)
+Goal 2: NOT STARTED
+
+Continuing all at once:
+[2026-04-05T17:45:40.337Z] iter=278 turn=7 INFO: $ sed -n '778,815p' src/orchestrator.ts
+[2026-04-05T17:45:40.343Z] iter=278 turn=7 INFO: $ grep -n "microCompact\|legacy compaction" src/context-pruner.ts | head -20
+[2026-04-05T17:45:40.353Z] iter=278 turn=7 INFO: $ ls src/tools/ | head -20
+[2026-04-05T17:45:40.366Z] iter=278 turn=7 INFO:   -> exit=0 (1674 chars)
+[2026-04-05T17:45:40.368Z] iter=278 turn=7 INFO:   -> exit=0 (121 chars)
+[2026-04-05T17:45:40.374Z] iter=278 turn=7 INFO:   -> exit=0 (105 chars)
+[2026-04-05T17:45:40.375Z] iter=278 turn=8 INFO: Turn 8/25
+[2026-04-05T17:45:43.203Z] iter=278 turn=8 INFO: $ grep -n "buildSystemPrompt\|save_memory\|scratchpad" src/orchestrator.ts | head -20
+[2026-04-05T17:45:43.206Z] iter=278 turn=8 INFO: $ grep -n "registerTool\|save_memory\|think" src/tool-registry.ts | head -30
+[2026-04-05T17:45:43.209Z] iter=278 turn=8 INFO: $ cat src/tools/think.ts
+[2026-04-05T17:45:43.225Z] iter=278 turn=8 INFO:   -> exit=0 (399 chars)
+[2026-04-05T17:45:43.225Z] iter=278 turn=8 INFO:   -> exit=0 (297 chars)
+[2026-04-05T17:45:43.232Z] iter=278 turn=8 INFO:   -> exit=0 (1020 chars)
+[2026-04-05T17:45:43.233Z] iter=278 turn=9 INFO: Turn 9/25
+[2026-04-05T17:45:48.937Z] iter=278 turn=9 INFO: Agent: Now I have all the context I need. Executing all remaining changes:
+[2026-04-05T17:45:48.938Z] iter=278 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T17:45:48.939Z] iter=278 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -33 +1 lines
+
+Context after patch:
+119 | 
+120 | export interface OrchestratorOptions {
+121 |   workDir: string;
+122 |   /** Called when a tool is invoked */
+123 |   onToolCall?: (name: string, input: string, result: string) => void;
+124 |   /** Called with status updates (e.g. "Indexing repo...") */
+125 |   onStatus?: (status: string) => void;
+[2026-04-05T17:45:48.939Z] iter=278 turn=10 INFO: Turn 10/25
+[2026-04-05T17:45:51.394Z] iter=278 turn=10 INFO: write_file: src/context-pruner.ts (patch)
+[2026-04-05T17:45:51.395Z] iter=278 turn=10 INFO:   -> ok: Patched src/context-pruner.ts: -1 +1 lines
+
+Context after patch:
+1 | /**
+2 |  * Scored context pruner — replaces the blunt legacy compaction with a
+3 |  * score-based approach that prioritises large, old, re-fetchable tool results.
+4 |  */
+5 | 
+[2026-04-05T17:45:51.396Z] iter=278 turn=11 INFO: Turn 11/25
+[2026-04-05T17:45:53.756Z] iter=278 turn=11 INFO: write_file: src/context-pruner.ts (patch)
+[2026-04-05T17:45:53.757Z] iter=278 turn=11 INFO:   -> ok: Patched src/context-pruner.ts: -1 +1 lines
+
+Context after patch:
+156 | }
+157 | 
+158 | /**
+159 |  * Scored pruning — replaces legacy compaction.
+160 |  *
+161 |  * @param messages  The mutable apiMessages array (modified in place).
+162 |  * @param currentTurn  Total message count (used for age calculation).
+[2026-04-05T17:45:53.757Z] iter=278 turn=12 INFO: Turn 12/25
+[2026-04-05T17:46:02.817Z] iter=278 turn=12 INFO: Agent: Now delete micro-compact test and clean up mid-loop-compact test:
+[2026-04-05T17:46:02.818Z] iter=278 turn=12 INFO: $ rm src/__tests__/micro-compact.test.ts
+[2026-04-05T17:46:02.820Z] iter=278 turn=12 INFO: write_file: src/__tests__/mid-loop-compact.test.ts (write)
+[2026-04-05T17:46:02.821Z] iter=278 turn=12 INFO:   -> ok: Updated src/__tests__/mid-loop-compact.test.ts (1892 chars, -78 lines delta)
+[2026-04-05T17:46:02.828Z] iter=278 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:46:02.828Z] iter=278 turn=13 INFO: Turn 13/25
+[2026-04-05T17:46:12.795Z] iter=278 turn=13 INFO: Agent: I've made real changes. Let me finish Goal 2 (scratchpad tool) and wrap up.
+[2026-04-05T17:46:12.796Z] iter=278 turn=13 INFO: write_file: src/tools/scratchpad.ts (write)
+[2026-04-05T17:46:12.796Z] iter=278 turn=13 INFO:   -> ok: Created src/tools/scratchpad.ts (2046 chars)
+[2026-04-05T17:46:12.797Z] iter=278 turn=14 INFO: Turn 14/25
+[2026-04-05T17:46:15.561Z] iter=278 turn=14 INFO: $ sed -n '1,20p' src/tool-registry.ts
+[2026-04-05T17:46:15.575Z] iter=278 turn=14 INFO: $ sed -n '210,260p' src/tool-registry.ts
+[2026-04-05T17:46:15.582Z] iter=278 turn=14 INFO:   -> exit=0 (1063 chars)
+[2026-04-05T17:46:15.584Z] iter=278 turn=14 INFO:   -> exit=0 (1480 chars)
+[2026-04-05T17:46:15.584Z] iter=278 turn=15 INFO: Turn 15/25
+[2026-04-05T17:46:18.326Z] iter=278 turn=15 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-05T17:46:18.327Z] iter=278 turn=15 INFO:   -> ok: Patched src/tool-registry.ts: -1 +7 lines
+
+Context after patch:
+16 | import { subagentToolDefinition, executeSubagent } from "./tools/subagent.js";
+17 | import { webSearchToolDefinition, executeWebSearch } from "./tools/web_search.js";
+18 | import { autoSelectModel } from "./model-selection.js";
+19 | import { saveToProjectMemory } from "./project-memory.js";
+20 | import {
+21 |   saveScratchpadToolDefinition,
+22 |   readScratchpadToolDefinition,
+23 |   executeSaveScratchpad,
+24 |   executeReadScratchpad,
+25 | } from "./tools/scratchpad.js";
+26 | 
+27 | // ─── Types ──────────────────────────────────────────────────
+28 | 
+[2026-04-05T17:46:18.328Z] iter=278 turn=16 INFO: Turn 16/25
+[2026-04-05T17:46:23.404Z] iter=278 turn=16 INFO: Agent: Let me finish registering the scratchpad tools and add the system prompt guidance, then wrap up.
+[2026-04-05T17:46:23.405Z] iter=278 turn=16 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-05T17:46:23.405Z] iter=278 turn=16 INFO:   -> ok: Patched src/tool-registry.ts: -2 +17 lines
+
+Context after patch:
+253 |     { defaultTimeout: 5 },
+254 |   );
+255 | 
+256 |   // ── save_scratchpad ──────────────────────────────────
+257 |   registry.register(saveScratchpadToolDefinition, async (input, ctx) => {
+258 |     const { note } = input as { note: string };
+259 |     const result = executeSaveScratchpad(note, ctx.rootDir);
+260 |     ctx.log(`save_scratchpad: ${note.slice(0, 60)}`);
+261 |     return { result };
+262 |   }, { defaultTimeout: 5 });
+263 | 
+264 |   // ── read_scratchpad ──────────────────────────────────
+265 |   registry.register(readScratchpadToolDefinition, async (_input, ctx) => {
+266 |     const result = executeReadScratchpad(ctx.rootDir);
+267 |     ctx.log(`read_scratchpad: ${result.length} chars`);
+268 |     return { result };
+269 |   }, { defaultTimeout: 5 });
+270 | 
+271 |   return registry;
+272 | }
+273 | 
+[2026-04-05T17:46:23.406Z] iter=278 turn=17 INFO: Turn 17/25
+[2026-04-05T17:46:25.567Z] iter=278 turn=17 INFO: $ grep -n "buildSystemPrompt" src/orchestrator.ts | head -5
+[2026-04-05T17:46:25.580Z] iter=278 turn=17 INFO:   -> exit=0 (181 chars)
+[2026-04-05T17:46:25.581Z] iter=278 turn=18 INFO: Turn 18/25
+[2026-04-05T17:46:27.438Z] iter=278 turn=18 INFO: $ sed -n '260,270p' src/orchestrator.ts
+[2026-04-05T17:46:27.446Z] iter=278 turn=18 INFO:   -> exit=0 (501 chars)
+[2026-04-05T17:46:27.447Z] iter=278 turn=19 INFO: Turn 19/25
+[2026-04-05T17:46:31.125Z] iter=278 turn=19 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T17:46:31.126Z] iter=278 turn=19 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
+
+Context after patch:
+261 | - After making code changes, always verify with the appropriate test/build command.
+262 | - If you encounter an error, diagnose and fix it before giving up.
+263 | - Never ask for confirmation — just do it.
+264 | - To persist instructions for future sessions, ask the user to say "remember: ..." or use the save_memory tool.
+265 | - For complex multi-step tasks, use save_scratchpad to record your plan, progress, and key findings. Use read_scratchpad after context compaction to recover working state.
+266 | 
+267 | ${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}`;
+268 | 
+[2026-04-05T17:46:31.127Z] iter=278 turn=20 INFO: Turn 20/25
+[2026-04-05T17:46:32.742Z] iter=278 turn=20 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T17:46:33.703Z] iter=278 turn=20 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:46:33.703Z] iter=278 turn=21 INFO: Turn 21/25
+[2026-04-05T17:46:35.425Z] iter=278 turn=21 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -20
+[2026-04-05T17:46:45.381Z] iter=278 turn=21 INFO:   -> exit=0 (1495 chars)
+[2026-04-05T17:46:45.381Z] iter=278 turn=22 INFO: Turn 22/25
+[2026-04-05T17:46:51.504Z] iter=278 turn=22 INFO: Agent: 758 tests pass, TSC clean. Now write memory and goals.
+[2026-04-05T17:46:51.505Z] iter=278 turn=22 INFO: save_memory: "[Engineer] Iteration 278"
+[2026-04-05T17:46:51.505Z] iter=278 turn=22 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T17:46:51.506Z] iter=278 turn=23 INFO: Turn 23/25
+[2026-04-05T17:47:03.066Z] iter=278 turn=23 INFO: write_file: goals.md (write)
+[2026-04-05T17:47:03.066Z] iter=278 turn=23 INFO:   -> ok: Updated goals.md (1351 chars, -58 lines delta)
+[2026-04-05T17:47:03.066Z] iter=278 turn=24 INFO: Turn 24/25
+[2026-04-05T17:47:09.423Z] iter=278 turn=24 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T17:47:09.423Z] iter=278 turn=24 INFO: RESTART signal
+[2026-04-05T17:47:09.423Z] iter=278 turn=24 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T17:47:10.403Z] iter=278 turn=24 INFO: Compilation OK
+[2026-04-05T17:47:16.688Z] iter=278 turn=24 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T17:47:16.688Z] iter=278 turn=24 INFO: Tool timing: bash: 20x, avg=562ms, total=11248ms; write_file: 11x, avg=1ms, total=11ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T17:47:16.688Z] iter=278 turn=24 INFO: Tool timing stats
+[2026-04-05T17:47:22.454Z] iter=278 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 278: predicted 20 turns, actual 24 turns, ratio 1.20**
+[2026-04-05T17:47:25.192Z] iter=278 turn=24 INFO: Pre-commit review (3034in/83out): LGTM. This diff removes duplicate/redundant test code — the `microCompact` tests were split across two files, and the canonical versions in `micro-compact.test.ts` are being consolidated by deleting t

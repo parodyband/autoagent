@@ -262,6 +262,7 @@ Rules:
 - If you encounter an error, diagnose and fix it before giving up.
 - Never ask for confirmation — just do it.
 - To persist instructions for future sessions, ask the user to say "remember: ..." or use the save_memory tool.
+- For complex multi-step tasks, use save_scratchpad to record your plan, progress, and key findings. Use read_scratchpad after context compaction to recover working state.
 
 ${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}`;
 
@@ -772,38 +773,6 @@ export class Orchestrator {
   /** Check if Tier 2 compaction is needed (summarize old messages). */
   private shouldCompact(): boolean {
     return this.sessionTokensIn >= COMPACT_THRESHOLD;
-  }
-
-  /**
-   * Micro-compaction: replace tool_result contents older than 5 turns with a
-   * short placeholder. Cheaper than Tier 1 — runs at 80K tokens.
-   * @deprecated — scoredPrune() is preferred. Kept for backward compatibility.
-   */
-  microCompact(currentTurn: number = 0): void {
-    this.opts.onStatus?.("Micro-compacting context...");
-
-    const assistantIndices: number[] = [];
-    for (let i = this.apiMessages.length - 1; i >= 0; i--) {
-      if (this.apiMessages[i].role === "assistant") assistantIndices.push(i);
-    }
-    const cutoffIdx = assistantIndices[4] ?? 0;
-
-    for (let i = 0; i < cutoffIdx; i++) {
-      const msg = this.apiMessages[i];
-      if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
-      for (const block of msg.content) {
-        if (typeof block === "object" && "type" in block && block.type === "tool_result") {
-          const toolBlock = block as { type: string; tool_use_id: string; content: Array<{ type: string; text?: string }> | string };
-          const turn = currentTurn > 0 ? currentTurn : i;
-          if (Array.isArray(toolBlock.content)) {
-            toolBlock.content = [{ type: "text", text: `[Tool output cleared — turn ${turn}]` }];
-          } else if (typeof toolBlock.content === "string") {
-            toolBlock.content = `[Tool output cleared — turn ${turn}]`;
-          }
-        }
-      }
-    }
-    this.opts.onStatus?.("");
   }
 
   /**
