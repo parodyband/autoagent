@@ -1,248 +1,3 @@
-[2026-04-05T17:50:32.555Z] iter=280 turn=12 INFO: Restarting as iteration 281...
-[2026-04-05T17:50:32.754Z] iter=281 INFO: Cache restored: 52/52 entries (0 stale)
-[2026-04-05T17:50:32.756Z] iter=281 INFO: Turn budget: 13/25 (calibration=1.13x, predicted=8)
-[2026-04-05T17:50:32.757Z] iter=281 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T17:50:32.881Z] iter=281 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T17:50:32.882Z] iter=281 turn=1 INFO: Turn 1/25
-[2026-04-05T17:50:36.997Z] iter=281 turn=1 INFO: Agent: 
-
-I'll start by reviewing the current state, then write focused goals for the Engineer iteration 282.
-[2026-04-05T17:50:36.998Z] iter=281 turn=1 INFO: $ cat goals.md
-[2026-04-05T17:50:37.002Z] iter=281 turn=1 INFO: $ cat .autoagent-metrics.json 2>/dev/null | head -80
-[2026-04-05T17:50:37.006Z] iter=281 turn=1 INFO: read_file: CACHE HIT
-[2026-04-05T17:50:37.011Z] iter=281 turn=1 INFO:   -> exit=0 (921 chars)
-[2026-04-05T17:50:37.017Z] iter=281 turn=1 INFO:   -> exit=0 (1679 chars)
-[2026-04-05T17:50:37.018Z] iter=281 turn=2 INFO: Turn 2/25
-[2026-04-05T17:50:43.549Z] iter=281 turn=2 INFO: Agent: 
-
-You're right. My deliverable is `goals.md` for Engineer iteration 282. Let me check how the orchestrator currently handles startup context, then write the goals immediately.
-[2026-04-05T17:50:43.550Z] iter=281 turn=2 INFO: $ grep -n "detectProject\|projectSummary\|project-detector\|ProjectSummary" src/orchestrator.ts | head -20
-[2026-04-05T17:50:43.557Z] iter=281 turn=2 INFO: $ grep -n "system.*message\|systemPrompt\|system_prompt\|role.*system" src/orchestrator.ts | head -20
-[2026-04-05T17:50:43.582Z] iter=281 turn=2 INFO:   -> exit=0 (260 chars)
-[2026-04-05T17:50:43.589Z] iter=281 turn=2 INFO:   -> exit=0 (805 chars)
-[2026-04-05T17:50:43.590Z] iter=281 turn=3 INFO: Turn 3/25
-[2026-04-05T17:50:47.132Z] iter=281 turn=3 INFO: think: Project summary injection is already wired in (line 886-893 of orchestrator.ts). So that gap is already addressed. Let m...
-[2026-04-05T17:50:47.133Z] iter=281 turn=4 INFO: Turn 4/25
-[2026-04-05T17:50:51.703Z] iter=281 turn=4 INFO: Agent: 
-
-Goals status: **NOT STARTED** — I need to write `goals.md` for Engineer iteration 282. Project summary injection is already wired (lines 886-893 of orchestrator.ts), so I'll pivot to smart context pruning as the goal. Let me write it now.
-[2026-04-05T17:50:51.703Z] iter=281 turn=4 INFO: $ grep -n "microCompact\|pruneOld\|tool_result\|compactConversation\|tieredCompact" src/orchestrator.ts | head -20
-[2026-04-05T17:50:51.715Z] iter=281 turn=4 INFO:   -> exit=0 (1203 chars)
-[2026-04-05T17:50:51.715Z] iter=281 turn=5 INFO: Turn 5/25
-[2026-04-05T17:50:54.473Z] iter=281 turn=5 INFO: $ sed -n '770,850p' src/orchestrator.ts
-[2026-04-05T17:50:54.482Z] iter=281 turn=5 INFO:   -> exit=0 (2917 chars)
-[2026-04-05T17:50:54.482Z] iter=281 turn=6 INFO: Turn 6/25
-[2026-04-05T17:51:19.544Z] iter=281 turn=6 INFO: Agent: 
-
-I'm the Architect — my deliverable is `goals.md`, not src/ changes. I now have the context I need. Writing it now.
-[2026-04-05T17:51:19.545Z] iter=281 turn=6 INFO: write_file: goals.md (write)
-[2026-04-05T17:51:19.546Z] iter=281 turn=6 INFO:   -> ok: Updated goals.md (3420 chars, +34 lines delta)
-[2026-04-05T17:51:19.547Z] iter=281 turn=7 INFO: Turn 7/25
-[2026-04-05T17:51:24.563Z] iter=281 turn=7 INFO: save_memory: "[Architect] Iteration 281 — Project summary already wired"
-[2026-04-05T17:51:24.564Z] iter=281 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T17:51:24.564Z] iter=281 turn=8 INFO: Turn 8/25
-[2026-04-05T17:51:26.702Z] iter=281 turn=8 INFO: $ npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T17:51:27.697Z] iter=281 turn=8 INFO:   -> exit=0 (11 chars)
-[2026-04-05T17:51:27.697Z] iter=281 turn=9 INFO: Turn 9/25
-[2026-04-05T17:51:30.448Z] iter=281 turn=9 INFO: Agent: TSC clean. Goals written for Engineer iteration 282.
-
-```
-echo "AUTOAGENT_RESTART"
-```
-[2026-04-05T17:51:30.449Z] iter=281 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T17:51:30.449Z] iter=281 turn=9 INFO: RESTART signal
-[2026-04-05T17:51:30.449Z] iter=281 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T17:51:31.433Z] iter=281 turn=9 INFO: Compilation OK
-[2026-04-05T17:51:37.803Z] iter=281 turn=9 INFO: Cache persisted: 52 entries to .autoagent-cache.json
-[2026-04-05T17:51:37.804Z] iter=281 turn=9 INFO: Cache stats: 1 hits, 0 misses, 52 entries, 1 invalidations (0 entries removed)
-[2026-04-05T17:51:37.804Z] iter=281 turn=9 INFO: Tool cache stats
-[2026-04-05T17:51:37.804Z] iter=281 turn=9 INFO: Tool timing: bash: 8x, avg=139ms, total=1110ms; think: 1x, avg=1ms, total=1ms; write_file: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T17:51:37.804Z] iter=281 turn=9 INFO: Tool timing stats
-[2026-04-05T17:51:43.404Z] iter=281 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 281: predicted 8 turns, actual 9 turns, ratio 1.13**
-[2026-04-05T17:51:43.425Z] iter=281 turn=9 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T17:51:43.456Z] iter=281 turn=9 INFO: Committed: edad4187 (19 in / 2159 out, cache: 15005 created, 90880 read)
-[2026-04-05T17:51:43.456Z] iter=281 turn=9 INFO: Restarting as iteration 282...
-[2026-04-05T17:51:43.627Z] iter=282 INFO: Cache restored: 52/52 entries (0 stale)
-[2026-04-05T17:51:43.629Z] iter=282 INFO: Turn budget: 19/25 (calibration=1.13x, predicted=20)
-[2026-04-05T17:51:43.629Z] iter=282 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T17:51:43.747Z] iter=282 turn=1 INFO: Turn 1/25
-[2026-04-05T17:51:46.680Z] iter=282 turn=1 INFO: read_scratchpad: 7 chars
-[2026-04-05T17:51:46.681Z] iter=282 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
-[2026-04-05T17:51:46.690Z] iter=282 turn=1 INFO:   -> exit=0 (3420 chars)
-[2026-04-05T17:51:46.691Z] iter=282 turn=2 INFO: Turn 2/25
-[2026-04-05T17:51:50.405Z] iter=282 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "COMPACT_THRESHOLD\|TIER1_THRESHOLD\|compactTier1\|microCompact\|shouldCompact\|sessionTokensIn" src/orchestrator.ts | head -40
-[2026-04-05T17:51:50.407Z] iter=282 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "detectProject\|buildSummary\|ProjectInfo\|entryPoints\|monorepo" src/project-detector.ts | head -40
-[2026-04-05T17:51:50.418Z] iter=282 turn=2 INFO:   -> exit=0 (246 chars)
-[2026-04-05T17:51:50.419Z] iter=282 turn=2 INFO:   -> exit=0 (1763 chars)
-[2026-04-05T17:51:50.419Z] iter=282 turn=3 INFO: Turn 3/25
-[2026-04-05T17:51:55.039Z] iter=282 turn=3 INFO: read_file: src/orchestrator.ts
-[2026-04-05T17:51:55.040Z] iter=282 turn=3 INFO:   -> ok (4020 chars)
-[2026-04-05T17:51:55.040Z] iter=282 turn=3 INFO: read_file: CACHE HIT
-[2026-04-05T17:51:55.041Z] iter=282 turn=4 INFO: Turn 4/25
-[2026-04-05T17:51:58.530Z] iter=282 turn=4 INFO: think: I have enough context. Let me start building both deliverables now:
-
-1. Goal 1: Add `pruneStaleToolResults()` and `shoul...
-[2026-04-05T17:51:58.532Z] iter=282 turn=5 INFO: Turn 5/25
-[2026-04-05T17:52:02.730Z] iter=282 turn=5 INFO: Agent: Let me start writing both deliverables simultaneously.
-[2026-04-05T17:52:02.732Z] iter=282 turn=5 INFO: read_file: src/orchestrator.ts
-[2026-04-05T17:52:02.733Z] iter=282 turn=5 INFO:   -> ok (3986 chars)
-[2026-04-05T17:52:02.734Z] iter=282 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "projectInfo\|detectProject\|buildSummary\|project summary\|projectSummary" src/orchestrator.ts | head -20
-[2026-04-05T17:52:02.760Z] iter=282 turn=5 INFO:   -> exit=0 (482 chars)
-[2026-04-05T17:52:02.760Z] iter=282 turn=6 INFO: Turn 6/25
-[2026-04-05T17:52:16.867Z] iter=282 turn=6 INFO: Agent: Now I have everything I need. Let me implement both goals:
-[2026-04-05T17:52:16.868Z] iter=282 turn=6 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T17:52:16.869Z] iter=282 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -4 +56 lines
-
-Context after patch:
-770 |     return this.sessionTokensIn >= COMPACT_TIER1_THRESHOLD && this.sessionTokensIn < COMPACT_THRESHOLD;
-771 |   }
-772 | 
-773 |   /** Check if Tier 2 compaction is needed (summarize old messages). */
-774 |   private shouldCompact(): boolean {
-775 |     return this.sessionTokensIn >= COMPACT_THRESHOLD;
-776 |   }
-777 | 
-778 |   /** Check if stale tool result pruning is needed (between Tier 1 and Tier 2). */
-779 |   private shouldPruneStaleTool(): boolean {
-780 |     return this.sessionTokensIn >= PRUNE_THRESHOLD && this.sessionTokensIn < COMPACT_THRESHOLD;
-781 |   }
-782 | 
-783 |   /**
-784 |    * Prune stale tool results: replace the content of old tool_result blocks
-785 |    * (older than the last 8 assistant turns) with a one-line stub.
-786 |    * Fires when sessionTokensIn is between PRUNE_THRESHOLD (120K) and Tier 2 (150K).
-787 |    */
-788 |   private pruneStaleToolResults(): void {
-789 |     // Find the index of the 8th most recent assistant message
-790 |     const assistantIndices: number[] = [];
-791 |     for (let i = this.apiMessages.length - 1; i >= 0; i--) {
-792 |       if (this.apiMessages[i].role === "assistant") {
-793 |         assistantIndices.push(i);
-794 |       }
-795 |     }
-796 | 
-797 |     // Keep last 8 assistant turns fresh — prune everything older
-798 |     const cutoffAssistantIdx = assistantIndices[7] ?? 0; // 8th most recent assistant turn
-799 | 
-800 |     let turnN = 0;
-801 |     for (let i = 0; i < cutoffAssistantIdx; i++) {
-802 |       const msg = this.apiMessages[i];
-803 |       if (msg.role === "assistant") turnN++;
-804 |       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
-805 | 
-806 |       for (const block of msg.content) {
-807 |         if (
-808 |           typeof block === "object" &&
-809 |           "type" in block &&
-810 |           block.type === "tool_result" &&
-811 |           Array.isArray((block as { content?: unknown[] }).content)
-812 |         ) {
-813 |           const toolBlock = block as {
-814 |             type: string;
-815 |             tool_use_id: string;
-816 |             content: Array<{ type: string; text?: string }>;
-817 |           };
-818 |           for (const cb of toolBlock.content) {
-819 |             if (cb.type === "text" && typeof cb.text === "string") {
-820 |               // Skip already-compact results
-821 |               if (cb.text.length < 100) continue;
-822 |               cb.text = `[pruned — old result from turn ${turnN}]`;
-823 |             }
-824 |           }
-825 |         }
-826 |       }
-827 |     }
-828 |   }
-829 | 
-830 |   /**
-831 |    * Tier 1 compaction: walk apiMessages backwards, compress tool_result blocks
-[2026-04-05T17:52:16.870Z] iter=282 turn=7 INFO: Turn 7/25
-[2026-04-05T17:52:20.862Z] iter=282 turn=7 INFO: Agent: **Goal 1 (smart context pruning): IN PROGRESS** — methods added, need to wire into runAgentLoop + add PRUNE_THRESHOLD constant + add test.
-**Goal 2 (project detector enrichment): NOT STARTED**
-
-Let me continue efficiently:
-[2026-04-05T17:52:20.863Z] iter=282 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "COMPACT_THRESHOLD\|PRUNE_THRESHOLD" src/orchestrator.ts | head -10
-[2026-04-05T17:52:20.874Z] iter=282 turn=7 INFO:   -> exit=0 (744 chars)
-[2026-04-05T17:52:20.874Z] iter=282 turn=8 INFO: Turn 8/25
-[2026-04-05T17:52:25.373Z] iter=282 turn=8 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T17:52:25.374Z] iter=282 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
-
-Context after patch:
-70 | /** Token threshold for Tier 2 compaction: summarize old messages (~150K). */
-71 | export const COMPACT_THRESHOLD = 150_000;
-72 | /** Context warning threshold: warn user when input tokens reach 80% of T2 threshold. */
-73 | export const CONTEXT_WARNING_THRESHOLD = COMPACT_THRESHOLD * 0.8; // 120_000
-74 | export const PRUNE_THRESHOLD = 120_000; // Between Tier 1 (100K) and Tier 2 (150K)
-75 | 
-76 | /**
-77 |  * Pure function: select which compaction tier to apply based on input token count.
-[2026-04-05T17:52:25.375Z] iter=282 turn=9 INFO: Turn 9/25
-[2026-04-05T17:52:30.391Z] iter=282 turn=9 INFO: Agent: Now wire `pruneStaleToolResults` into runAgentLoop and update project-detector.ts simultaneously:
-[2026-04-05T17:52:30.392Z] iter=282 turn=9 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T17:52:30.394Z] iter=282 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -3 +6 lines
-
-Context after patch:
-974 |       await this.compact(); // Tier 2: summarize
-975 |       // After compaction, notify TUI that budget is now low
-976 |       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
-977 |     } else if (this.shouldCompactTier1()) {
-978 |       this.compactTier1(); // Tier 1: compress old tool outputs
-979 |       if (this.shouldPruneStaleTool()) {
-980 |         this.pruneStaleToolResults(); // Aggressive eviction between T1 and T2
-981 |       }
-982 |     } else if (this.shouldMicroCompact()) {
-983 |       scoredPrune(this.apiMessages, this.apiMessages.length, 10_000); // Scored prune: target 10K token savings
-984 |     }
-985 | 
-[2026-04-05T17:52:30.395Z] iter=282 turn=10 INFO: Turn 10/25
-[2026-04-05T17:52:39.401Z] iter=282 turn=10 INFO: Agent: Now enrich project-detector.ts (Goal 2):
-[2026-04-05T17:52:39.402Z] iter=282 turn=10 INFO: write_file: src/project-detector.ts (patch)
-[2026-04-05T17:52:39.402Z] iter=282 turn=10 INFO:   -> ok: Patched src/project-detector.ts: -10 +11 lines
-
-Context after patch:
-1 | import * as fs from "fs";
-2 | import * as path from "path";
-3 | 
-4 | export interface ProjectSummary {
-5 |   name: string;
-6 |   type: string; // "node", "python", "rust", "go", "mixed", "monorepo", "unknown"
-7 |   framework?: string; // "next", "express", "fastapi", "react", "vue", etc.
-8 |   language: string;
-9 |   packageManager?: string; // "npm", "yarn", "pnpm", "pip", "cargo"
-10 |   testRunner?: string; // "vitest", "jest", "pytest", "cargo test"
-11 |   entryPoints?: string[];
-12 |   workspaces?: string[]; // for monorepo: list of workspace names
-13 |   summary: string; // 1-2 sentence human-readable summary
-14 | }
-15 | 
-16 | function readFileSafe(filePath: string): string | null {
-17 |   try {
-[2026-04-05T17:52:39.403Z] iter=282 turn=11 INFO: Turn 11/25
-[2026-04-05T17:52:54.974Z] iter=282 turn=11 INFO: write_file: src/project-detector.ts (patch)
-[2026-04-05T17:52:54.975Z] iter=282 turn=11 INFO:   -> ok: Patched src/project-detector.ts: -34 +89 lines
-
-Context after patch:
-66 |   return undefined;
-67 | }
-68 | 
-69 | /** Candidate entry point files to check, in priority order. */
-70 | const ENTRY_POINT_CANDIDATES = [
-71 |   "src/index.ts",
-72 |   "src/main.ts",
-73 |   "src/app.ts",
-74 |   "index.ts",
-75 |   "main.py",
-76 |   "src/lib.rs",
-77 |   "cmd/main.go",
-78 | ];
-79 | 
-80 | /** Detect entry points that exist in workDir (up to 3). */
-81 | function detectEntryPoints(workDir: string): string[] {
-82 |   const found: string[] = [];
-83 |   for (const candidate of ENTRY_POINT_CANDIDATES) {
-84 |     if (found.length >= 3) break;
-85 |     if (fileExists(path.join(workDir, candidate))) {
-86 |       found.push(candidate);
 87 |     }
 88 |   }
 89 |   return found;
@@ -1241,3 +996,92 @@ Context after patch:
 [2026-04-05T18:06:14.821Z] iter=288 turn=25 INFO: Pre-commit review (2395in/418out): **Issues found:**
 
 - **Logic bug in `hasErrorIndicator`**: The original double-check (case-insensitive + case-sensitive) was likely intentional to avoid false positives on words like "error-free" or "
+[2026-04-05T18:06:14.875Z] iter=288 turn=25 INFO: Committed: c10a623e (43 in / 4957 out, cache: 26415 created, 425339 read)
+[2026-04-05T18:06:14.875Z] iter=288 turn=25 INFO: Restarting as iteration 289...
+[2026-04-05T18:06:15.071Z] iter=289 INFO: Cache restored: 48/48 entries (0 stale)
+[2026-04-05T18:06:15.074Z] iter=289 INFO: Turn budget: 17/25 (calibration=1.13x, predicted=20)
+[2026-04-05T18:06:15.074Z] iter=289 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T18:06:17.404Z] iter=289 turn=1 INFO: Turn 1/25
+[2026-04-05T18:06:21.594Z] iter=289 turn=1 INFO: Agent: 
+
+I'll start by assessing what the Engineer built in iteration 288, then research, and write the next goals.
+[2026-04-05T18:06:21.596Z] iter=289 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T18:06:21.600Z] iter=289 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -30
+[2026-04-05T18:06:21.604Z] iter=289 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
+[2026-04-05T18:06:21.629Z] iter=289 turn=1 INFO:   -> exit=0 (330 chars)
+[2026-04-05T18:06:22.669Z] iter=289 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:06:31.943Z] iter=289 turn=1 INFO:   -> exit=0 (2494 chars)
+[2026-04-05T18:06:31.943Z] iter=289 turn=2 INFO: Turn 2/25
+[2026-04-05T18:06:35.523Z] iter=289 turn=2 INFO: Agent: TSC clean, 793 tests passing (up from ~791). Let me examine what was built in iteration 288.
+[2026-04-05T18:06:35.524Z] iter=289 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git diff d5a9e5d..c10a623 --stat
+[2026-04-05T18:06:35.531Z] iter=289 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git diff d5a9e5d..c10a623 -- src/ 2>&1 | head -200
+[2026-04-05T18:06:35.569Z] iter=289 turn=2 INFO:   -> exit=0 (676 chars)
+[2026-04-05T18:06:35.573Z] iter=289 turn=2 INFO:   -> exit=0 (6288 chars)
+[2026-04-05T18:06:35.573Z] iter=289 turn=3 INFO: Turn 3/25
+[2026-04-05T18:06:50.058Z] iter=289 turn=3 INFO: think: Let me assess iteration 288:
+
+**Goal 1: Expand context-loader file budget** ✅
+- MAX_FILES 3→5, CONTEXT_BUDGET 32K→48K
+- ...
+[2026-04-05T18:06:50.059Z] iter=289 turn=4 INFO: Turn 4/25
+[2026-04-05T18:06:54.511Z] iter=289 turn=4 INFO: Agent: 
+
+You're right. My deliverable is `goals.md` for the next Engineer iteration. Let me quickly check the key gap (is repoMap actually wired in the orchestrator?) then write goals.
+[2026-04-05T18:06:54.511Z] iter=289 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "runArchitectMode\|architectMode" src/orchestrator.ts | head -20
+[2026-04-05T18:06:54.513Z] iter=289 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "repoMap\|repo_map\|repomap" src/orchestrator.ts | head -20
+[2026-04-05T18:06:54.522Z] iter=289 turn=4 INFO:   -> exit=0 (80 chars)
+[2026-04-05T18:06:54.525Z] iter=289 turn=4 INFO:   -> exit=0 (888 chars)
+[2026-04-05T18:06:54.525Z] iter=289 turn=5 INFO: Turn 5/25
+[2026-04-05T18:06:56.834Z] iter=289 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1078,1092p' src/orchestrator.ts
+[2026-04-05T18:06:56.844Z] iter=289 turn=5 INFO:   -> exit=0 (496 chars)
+[2026-04-05T18:06:56.844Z] iter=289 turn=6 INFO: Turn 6/25
+[2026-04-05T18:07:00.284Z] iter=289 turn=6 INFO: think: Found it. The orchestrator calls `runArchitectMode(userMessage, this.repoMapBlock, makeSimpleCaller(this.client))` but d...
+[2026-04-05T18:07:00.284Z] iter=289 turn=7 INFO: Turn 7/25
+[2026-04-05T18:07:04.298Z] iter=289 turn=7 INFO: Agent: 
+
+Status: **NOT STARTED** — I'm the Architect, my deliverable is `goals.md`. Let me write it now.
+[2026-04-05T18:07:04.299Z] iter=289 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "buildSummary\|projectSummary\|project.summary\|enriched.*summary" src/orchestrator.ts | head -10
+[2026-04-05T18:07:04.305Z] iter=289 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "buildSummary" src/project-detector.ts | head -5
+[2026-04-05T18:07:04.326Z] iter=289 turn=7 INFO:   -> exit=0 (225 chars)
+[2026-04-05T18:07:04.330Z] iter=289 turn=7 INFO:   -> exit=0 (109 chars)
+[2026-04-05T18:07:04.331Z] iter=289 turn=8 INFO: Turn 8/25
+[2026-04-05T18:07:06.544Z] iter=289 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1005,1030p' src/orchestrator.ts
+[2026-04-05T18:07:06.569Z] iter=289 turn=8 INFO:   -> exit=0 (1055 chars)
+[2026-04-05T18:07:06.570Z] iter=289 turn=9 INFO: Turn 9/25
+[2026-04-05T18:07:30.102Z] iter=289 turn=9 INFO: Agent: Good — project summary is already wired. Now let me write the goals.
+[2026-04-05T18:07:30.103Z] iter=289 turn=9 INFO: write_file: goals.md (write)
+[2026-04-05T18:07:30.104Z] iter=289 turn=9 INFO:   -> ok: Updated goals.md (3216 chars, +9 lines delta)
+[2026-04-05T18:07:30.104Z] iter=289 turn=10 INFO: Turn 10/25
+[2026-04-05T18:07:33.454Z] iter=289 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "pruneStaleToolResults\|shouldPruneStaleTool" src/orchestrator.ts | head -10
+[2026-04-05T18:07:33.466Z] iter=289 turn=10 INFO:   -> exit=0 (216 chars)
+[2026-04-05T18:07:33.466Z] iter=289 turn=11 INFO: Turn 11/25
+[2026-04-05T18:07:36.248Z] iter=289 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '838,920p' src/orchestrator.ts
+[2026-04-05T18:07:36.280Z] iter=289 turn=11 INFO:   -> exit=0 (3031 chars)
+[2026-04-05T18:07:36.280Z] iter=289 turn=12 INFO: Turn 12/25
+[2026-04-05T18:07:53.039Z] iter=289 turn=12 INFO: think: Looking at the pruning code more carefully, I see it already sorts by priority then by turnN (oldest first). But it does...
+[2026-04-05T18:07:53.040Z] iter=289 turn=13 INFO: Turn 13/25
+[2026-04-05T18:07:57.751Z] iter=289 turn=13 INFO: Agent: 
+
+I'm the Architect — my deliverable is `goals.md`, not src/ changes. Goals are already written. Let me finalize now.
+[2026-04-05T18:07:57.752Z] iter=289 turn=13 INFO: save_memory: "[Architect] Iteration 289 assessment"
+[2026-04-05T18:07:57.752Z] iter=289 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T18:07:57.753Z] iter=289 turn=14 INFO: Turn 14/25
+[2026-04-05T18:08:00.413Z] iter=289 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
+[2026-04-05T18:08:01.330Z] iter=289 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:08:01.330Z] iter=289 turn=15 INFO: Turn 15/25
+[2026-04-05T18:08:04.097Z] iter=289 turn=15 INFO: Agent: 
+
+TSC clean, goals.md written, memory saved. Wrapping up.
+
+```
+echo "AUTOAGENT_RESTART"
+```
+[2026-04-05T18:08:04.097Z] iter=289 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T18:08:04.097Z] iter=289 turn=15 INFO: RESTART signal
+[2026-04-05T18:08:04.098Z] iter=289 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T18:08:05.058Z] iter=289 turn=15 INFO: Compilation OK
+[2026-04-05T18:08:11.543Z] iter=289 turn=15 INFO: Cache persisted: 48 entries to .autoagent-cache.json
+[2026-04-05T18:08:11.543Z] iter=289 turn=15 INFO: Tool timing: bash: 15x, avg=840ms, total=12606ms; think: 3x, avg=1ms, total=2ms; write_file: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T18:08:11.543Z] iter=289 turn=15 INFO: Tool timing stats
+[2026-04-05T18:08:17.202Z] iter=289 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 289: predicted 20 turns, actual 15 turns, ratio 0.75**
+[2026-04-05T18:08:17.223Z] iter=289 turn=15 INFO: Pre-commit review: no significant code changes to review
