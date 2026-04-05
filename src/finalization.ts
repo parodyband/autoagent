@@ -19,6 +19,8 @@ import {
 } from "./validation.js";
 import { commitIteration, saveState, type IterationState } from "./iteration.js";
 import { reflectOnIteration, writeReflection } from "./alignment.js";
+import { executeSubagent } from "./tools/subagent.js";
+import { executeBash } from "./tools/bash.js";
 import type { ToolCache } from "./tool-cache.js";
 import type { ToolTimingTracker, TimingStats } from "./tool-timing.js";
 import type { Logger } from "./logging.js";
@@ -130,6 +132,62 @@ function injectAccuracyScore(ctx: FinalizationCtx): void {
   ctx.log(`Accuracy score injected: ${line.split("\n")[0]}`);
 }
 
+// ─── Pre-commit code review via sub-agent ───────────────────
+// Sonnet reviews the diff of src/*.ts files before we commit.
+// This catches regressions, style issues, and unnecessary complexity.
+// Non-blocking: if the review fails or times out, we commit anyway.
+
+async function reviewBeforeCommit(ctx: FinalizationCtx): Promise<string | null> {
+  try {
+    // Stage everything first so we can see the full diff
+    await executeBash("git add -A", 30, undefined, true);
+    
+    // Get the diff of source files only (most valuable to review)
+    const diffResult = await executeBash(
+      "git diff --cached -- 'src/*.ts' 'src/**/*.ts' 'scripts/*.ts'",
+      30, undefined, true
+    );
+    
+    const diff = diffResult.output.trim();
+    if (!diff || diff.length < 50) {
+      ctx.log("Pre-commit review: no significant code changes to review");
+      return null;
+    }
+
+    // Truncate very large diffs to keep sub-agent costs reasonable
+    const maxDiffChars = 8000;
+    const truncatedDiff = diff.length > maxDiffChars
+      ? diff.slice(0, maxDiffChars) + "\n\n... (diff truncated)"
+      : diff;
+
+    const result = await executeSubagent(
+      `You are a code reviewer for a TypeScript ESM project (an autonomous AI agent that modifies itself).
+
+Review this git diff and report ONLY actual issues. Be concise — 3-5 bullet points max.
+
+Check for:
+1. **Regressions**: Does this break existing functionality?
+2. **Import errors**: Missing .js extensions, using require() instead of import?
+3. **Logic bugs**: Off-by-one, null checks, async/await mistakes?
+4. **Unnecessary complexity**: Could this be simpler?
+
+If the code looks good, say "LGTM" and one sentence why.
+
+\`\`\`diff
+${truncatedDiff}
+\`\`\``,
+      "balanced",  // Sonnet — good at code review
+      1024,
+    );
+
+    ctx.log(`Pre-commit review (${result.inputTokens}in/${result.outputTokens}out): ${result.response.slice(0, 200)}`);
+    return result.response;
+  } catch (err) {
+    ctx.log(`Pre-commit review error (non-fatal): ${err instanceof Error ? err.message : err}`);
+    return null;
+  }
+}
+
 /**
  * Log cache and timing stats, capture quality/benchmarks, record metrics,
  * commit the iteration, and update state.
@@ -183,6 +241,10 @@ export async function finalizeIteration(
   // Machine-verified turn count injected into memory.md BEFORE commit.
   // This prevents self-deception: the agent can't round or misreport.
   injectAccuracyScore(ctx);
+
+  // ─── Pre-commit code review ───────────────────────────────
+  // Sonnet reviews source changes before we commit. Non-blocking.
+  await reviewBeforeCommit(ctx);
 
   const sha = await commitIteration(ctx.iter);
   const label = doRestart ? "Committed" : "Committed (no restart)";

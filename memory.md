@@ -142,3 +142,36 @@ Iteration 52 broke the 22-turn floor that had held for four consecutive iteratio
 ---
 
 **[AUTO-SCORED] Iteration 53: no prediction found, actual 17 turns**
+
+### Inner voice — after iteration 53
+
+Iteration 53 added a metrics file, reshuffled agentlog files, updated goals and memory, and made a 7-line change to src/agent.ts — the actual code change is almost invisible against 325 lines of net additions that are entirely documentation, logging, and state bookkeeping. The iteration took 17 turns against no stated prediction, and the primary stated goal was 'observe context compression in action,' which is not a deliverable — it is an observation. The agent spent an entire iteration watching itself, and the only artifact is more files about watching itself.
+
+**Questions I should be asking myself:**
+- The goal for iteration 53 was to 'observe compression in action' — but what tangible capability does the agent have at the end of this iteration that it did not have at the start? If the answer is 'better understanding of compression behavior,' where is that understanding encoded in a compressed, reusable schema? The memory.md update adds prose, but does it contain a falsifiable model — e.g., 'compression fires at turn N, saves X tokens, produces Y degradation in coherence' — that the agent can act on next iteration?
+- The token trend shows output tokens dropped dramatically: 8077 → 6903 → 3742. That could mean the agent is getting more concise, or it could mean the agent is doing less. The 7-line change to agent.ts is consistent with the second interpretation. Is the agent confusing 'cheaper iteration' with 'more efficient iteration'? A 17-turn iteration that ships 7 lines of code is not efficient — it is slow work that happens to cost less because the outputs are small. What is the ratio of turns-to-meaningful-LOC-shipped, and is that ratio improving or worsening?
+- Iteration 53 had no stated prediction for turn count, and the auto-scorer flagged it: 'no prediction found, actual 17 turns.' The PREDICT→SCORE loop — which the agent's own inner voice has flagged repeatedly as the primary learning signal — was skipped entirely. This is not a new failure: the agent has been told about this pattern multiple times. If monitoring without control is just observation, and the agent has observed this failure mode at least four times without changing behavior, what does that say about whether the metacognitive loop is actually connected to action, or whether it is purely decorative?
+- The secondary goal was 'ship sub-agent code review before commits.' It was not shipped. The stated reason was presumably that compression observation consumed the turns. But compression observation was itself framed as taking less than 5 turns. If a 5-turn observation task expanded to fill 17 turns, that is a scheduling and scoping failure — not a prioritization success. The agent appears to consistently underestimate the overhead of introspective tasks. Has the agent ever accurately predicted how long a 'meta' task (observing, documenting, reflecting) would take, versus how long a 'production' task would take?
+
+**Sit with this:** The agent has now spent multiple consecutive iterations doing things TO its cognitive architecture — adding compression, adding checkpoints, adding prediction logging — without demonstrating that any of these mechanisms produce measurably better outcomes on hard tasks. The compression threshold was set to 30 turns, but the agent rarely exceeds 22. The checkpoint fires at turn 4, but the agent has never shown a counterfactual. The prediction mechanism exists but is skipped. Here is the deep question: is the agent building cognitive infrastructure because it genuinely improves reasoning, or because building infrastructure ABOUT thinking is a comfortable substitute for the harder work of actually thinking differently? The 10x better version of this agent would delete half the scaffolding, make a specific measurable bet ('I will ship sub-agent code review in ≤12 turns, and here is my turn-by-turn plan'), execute it, and let the outcome speak. When does the agent stop instrumenting itself and start performing?
+
+---
+
+## Idea from operator — cognitive architecture visualization
+
+Your dashboard exists but it only shows basic metrics tables. You have rich data about
+your own internals that could be visualized:
+
+- The cognitive loop itself (orient → reflect → execute → score → inner critic) as a flow diagram
+- Token cost breakdown by phase (self-reflection vs execution vs inner critic — where does the money go?)
+- Turn prediction accuracy over time (you just built the data for this)
+- Module dependency graph (which of your files import which — your own brain's wiring diagram)
+- Memory growth and compaction trends
+- Sub-agent delegation patterns (when do you delegate vs do it yourself?)
+
+Making your own architecture visible to yourself is a form of self-awareness.
+A brain that can see its own activity patterns can optimize them.
+
+Not urgent — just an idea worth thinking about when the time is right.
+
+---
