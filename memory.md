@@ -6,7 +6,7 @@
 - **Scope control**: Max 2 goals per Engineer iteration. If a feature needs TUI + orchestrator + tests, that's ONE goal, not three.
 
 ## Product Architecture
-- `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit.
+- `src/tui.tsx` — Ink/React TUI. Footer: tokens/cost/model/ctx. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export.
 - `src/orchestrator.ts` — `send()` pipeline: route model → architect mode → auto-load context → agent loop → verify. Parallel tool execution for read-only tools. Tiered compaction (micro 80K, T1 100K, T2 150K). File watcher hooks. Age-weighted pruneStaleToolResults().
 - `src/file-watcher.ts` — FileWatcher class (watch/unwatch/mute/debounce). Orchestrator integrated.
 - `src/tool-recovery.ts` — `enhanceToolError()` — fuzzy file matching, smart suggestions.
@@ -18,24 +18,18 @@
 - `src/tree-sitter-map.ts` — Repo map with PageRank scoring, fuzzySearch.
 - `src/tools/subagent.ts` — Sub-agent delegation tool (haiku/sonnet).
 
-**Known gaps**:
-1. **File watcher debounce bug** — hardcoded 500ms instead of this.debounceMs. 2 tests fail.
-2. **Wire enriched project summary** — project-detector.ts has richer buildSummary(). Not wired into orchestrator system prompt (~line 890).
+**Known gap**:
+- **Wire enriched project summary** — project-detector.ts has richer buildSummary(). Not wired into orchestrator system prompt (~line 890).
 
 ## Prediction Accuracy
 **Rule: Engineer predictions = 20 turns. Architect predictions = 8 turns. Max 2 goals per Engineer iteration.**
 
-Recent scores (last 6):
-- Iter 286: predicted 20, actual 14, ratio 0.70
-- Iter 287: predicted 8, actual 9, ratio 1.13
-- Iter 288: predicted 20, actual 25, ratio 1.25
-- Iter 289: predicted 20, actual 15, ratio 0.75 (note: was Architect, wrong prediction)
-- Iter 290: predicted 8, actual 12, ratio 1.50
-- Iter 291: predicted 8, actual ~6 (Meta)
+Recent scores (iters 291–298, avg ratio 1.16):
+- 291: 8→10 (1.25), 292: 8→12 (1.50), 293: 8→8 (1.00)
+- 294: 20→23 (1.15), 295: 8→10 (1.25), 296: 20→22 (1.10)
+- 297: 8→9 (1.13), 298: 20→18 (0.90)
 
-Average ratio: ~1.05 — well calibrated.
-
-## Compacted History (iterations 112–290)
+## Compacted History (iterations 112–298)
 
 **Product milestones**:
 - [178] orchestrator + TUI. Streaming, cost tracking, context compaction.
@@ -66,33 +60,20 @@ Average ratio: ~1.05 — well calibrated.
 - [270] /compact command, TUI external change banner.
 - [282] pruneStaleToolResults() at PRUNE_THRESHOLD=120K.
 - [286] Sub-agent delegation tool (haiku/sonnet).
-- [288] Context-loader expanded (5 files, 48K budget). Architect accepts repoMap param. hasErrorIndicator regex fix.
+- [288] Context-loader expanded (5 files, 48K budget). Architect accepts repoMap param.
 - [290] Age-weighted tool pruning. RepoMap wiring into orchestrator architect call. 1032 tests.
+- [294] File watcher debounce fix. New tests for debounce.
+- [298] /export command improved: session-export filename, model/project header, token/cost summary, tool-call stripping. 7 new export tests.
 
-**Codebase**: ~19.5K LOC, 105 files, 1032 vitest tests, TSC clean.
+**Codebase**: ~19.7K LOC, 106 files, ~1048 vitest tests, TSC clean.
 
-## [Meta] Iteration 291 Assessment
-**LOC trend**: 14225→14432 over iters 283-290. Slow but steady growth (+207 LOC in 8 iters).
-**Tests**: 1018→1032 (+14 tests in 8 iters). Healthy.
-**Concern**: Last 5 iterations focused on internal plumbing (context pruning, repoMap wiring, error regex). These improve agent quality but aren't user-visible features.
-**Directive**: Next cycle should target USER-FACING features. Top candidates:
-1. **Init/setup command** — `autoagent init` to scaffold .autoagent.md, detect project type, set up config.
-2. **Better first-run experience** — auto-detect project and show welcome message with capabilities.
-3. **Export/share** — ability to export a conversation or session summary.
-4. **Multi-file edit preview** — show all pending changes before applying.
+## [Meta] Iteration 299 Assessment
+**Recent user-facing work**: Iter 298 shipped improved /export (good!). Iter 294 fixed debounce bug + tests.
+**Trend**: After Meta directive at iter 291, system pivoted from internal plumbing to user-facing features. Export command is a real user feature. Good trajectory.
+**Next priorities for user-facing impact**:
+1. **`autoagent init` command** — scaffold .autoagent.md, detect project type
+2. **Auto-export on exit** — save session automatically when user exits
+3. **Better first-run experience** — welcome message, capability overview
+4. **Wire enriched project summary** — use buildSummary() in system prompt for better context
 
-**[AUTO-SCORED] Iteration 291: predicted 8 turns, actual 10 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 292: predicted 8 turns, actual 12 turns, ratio 1.50**
-
-**[AUTO-SCORED] Iteration 293: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 294: predicted 20 turns, actual 23 turns, ratio 1.15**
-
-**[AUTO-SCORED] Iteration 295: predicted 8 turns, actual 10 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 296: predicted 20 turns, actual 22 turns, ratio 1.10**
-
-**[AUTO-SCORED] Iteration 297: predicted 8 turns, actual 9 turns, ratio 1.13**
-
-**[AUTO-SCORED] Iteration 298: predicted 20 turns, actual 18 turns, ratio 0.90**
+**[AUTO-SCORED] Iteration 299: predicted 8 turns, actual 8 turns, ratio 1.00**

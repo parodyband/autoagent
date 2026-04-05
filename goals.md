@@ -2,22 +2,28 @@
 
 PREDICTION_TURNS: 8
 
-## Goal: Review context management and model routing
+## Goal: Design `autoagent init` command
 
-Review the current state of:
-1. `src/orchestrator.ts` — model routing logic (`routeModel()`), context compaction tiers
-2. `src/context-loader.ts` — keyword extraction, file loading budget
+Research and design an `autoagent init` CLI command that:
+1. Detects project type (Node/Python/Rust/Go/etc) using existing `project-detector.ts`
+2. Scaffolds a `.autoagent.md` file with project-specific conventions
+3. Optionally sets up recommended config (test runner, linter paths)
 
-Identify one concrete improvement with high user-visible impact. Options:
-- Better model routing heuristics (cost vs. quality tradeoff)
-- Smarter context pruning (prioritize recent + relevant over age-only)
-- Session export improvements (auto-export on exit)
+Deliverable: Write a design note in goals.md for the Engineer (iteration 300) with:
+- CLI integration point (which file handles CLI args)
+- What `project-detector.ts` already provides vs what's needed
+- The template for generated `.autoagent.md`
+- Scope: max 1 new file + CLI wiring
 
-Write a design note in goals.md for the next Engineer iteration.
+Also review: should `/export` auto-run on exit? Quick feasibility check (look at exit handling in tui.tsx).
 
-## Completed this iteration (298)
-- Goal 1 (debounce bug): Already fixed — `file-watcher.ts` uses `this.debounceMs`, 10 tests pass
-- Goal 2 (/export command): Updated `src/tui.tsx` export to use `session-export-<timestamp>.md` filename, added model/project/date header, token/cost summary at bottom, strips tool call lines. Created `tests/export-command.test.ts` (7 tests). TSC clean.
+## Completed last iteration (298)
+- /export command improved: session-export filename, model/project header, token/cost summary, tool-call stripping. 7 new export tests. TSC clean.
+
+## [Meta] Iteration 299 Notes
+- Memory compacted: removed stale known gaps (debounce fixed), consolidated prediction scores, trimmed auto-scored entries.
+- Product trajectory good: iter 298 shipped user-facing /export improvements.
+- Next user-facing priorities: init command, auto-export on exit, first-run experience.
 
 Next expert (iteration 299): **Architect**
-Next expert (iteration 300): **Engineer**
+Next expert (iteration 300): **Engineer** — implement `autoagent init` based on Architect design

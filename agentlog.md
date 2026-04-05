@@ -1,141 +1,3 @@
-Context after patch:
-891 |       }
-892 |     }
-893 | 
-894 |     // Sort by age-weighted priority: older + lower-priority results pruned first.
-895 |     // Age factor: messages closer to the end of conversation get a freshness bonus
-896 |     // that raises their effective priority (harder to prune).
-897 |     // ageFactor = max(0.3, 1 - age/totalMessages), where age = distance from end.
-898 |     const totalMessages = this.apiMessages.length;
-899 |     candidates.sort((a, b) => {
-900 |       const ageA = totalMessages - a.turnN;
-901 |       const ageB = totalMessages - b.turnN;
-902 |       const freshnessA = Math.max(0.3, 1 - ageA / totalMessages);
-903 |       const freshnessB = Math.max(0.3, 1 - ageB / totalMessages);
-904 |       const scoreA = a.priority * freshnessA;
-905 |       const scoreB = b.priority * freshnessB;
-906 |       return scoreA - scoreB || a.turnN - b.turnN;
-907 |     });
-908 | 
-909 |     // Prune all candidates (already filtered — no errors, no fresh turns)
-910 |     for (const { cb, turnN: t } of candidates) {
-[2026-04-05T18:08:43.989Z] iter=290 turn=7 INFO: Turn 7/25
-[2026-04-05T18:08:47.456Z] iter=290 turn=7 INFO: Agent: Now let me add the test for Goal 2, run TSC, then wrap up.
-[2026-04-05T18:08:47.457Z] iter=290 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "pruneStaleToolResults\|age.weighted\|freshness" src/__tests__/orchestrator.test.ts | head -10
-[2026-04-05T18:08:47.472Z] iter=290 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:08:47.472Z] iter=290 turn=8 INFO: Turn 8/25
-[2026-04-05T18:08:49.567Z] iter=290 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "pruneStaleToolResults" src/__tests__/*.test.ts 2>/dev/null | head -10
-[2026-04-05T18:08:49.584Z] iter=290 turn=8 INFO:   -> exit=0 (558 chars)
-[2026-04-05T18:08:49.584Z] iter=290 turn=9 INFO: Turn 9/25
-[2026-04-05T18:08:50.798Z] iter=290 turn=9 INFO: read_file: src/__tests__/context-pruning.test.ts
-[2026-04-05T18:08:50.798Z] iter=290 turn=9 INFO:   -> ok (5669 chars)
-[2026-04-05T18:08:50.799Z] iter=290 turn=10 INFO: Turn 10/25
-[2026-04-05T18:09:04.005Z] iter=290 turn=10 INFO: Agent: Now I'll add an age-weighted test to this file:
-[2026-04-05T18:09:04.006Z] iter=290 turn=10 INFO: write_file: src/__tests__/context-pruning.test.ts (patch)
-[2026-04-05T18:09:04.007Z] iter=290 turn=10 INFO:   -> ok: Patched src/__tests__/context-pruning.test.ts: -42 +70 lines
-
-Context after patch:
-1 | import { describe, it, expect } from "vitest";
-2 | import type Anthropic from "@anthropic-ai/sdk";
-3 | 
-4 | // Standalone version of pruneStaleToolResults for unit testing
-5 | // Mirrors orchestrator logic including age-weighted priority sorting.
-6 | function pruneStaleToolResults(
-7 |   apiMessages: Anthropic.MessageParam[],
-8 |   keepTurns = 8,
-9 |   toolUseIdMap: Map<string, string> = new Map()
-10 | ): void {
-11 |   const assistantIndices: number[] = [];
-12 |   for (let i = apiMessages.length - 1; i >= 0; i--) {
-13 |     if (apiMessages[i].role === "assistant") {
-14 |       assistantIndices.push(i);
-15 |     }
-16 |   }
-17 | 
-18 |   const cutoffAssistantIdx = assistantIndices[keepTurns - 1] ?? 0;
-19 | 
-20 |   function toolPrunePriority(toolName: string): number {
-21 |     if (["read_file", "grep", "list_files"].includes(toolName)) return 0;
-22 |     if (["bash", "write_file"].includes(toolName)) return 2;
-23 |     return 1;
-24 |   }
-25 | 
-26 |   type Candidate = { cb: { type: string; text?: string }; turnN: number; priority: number };
-27 |   const candidates: Candidate[] = [];
-28 | 
-29 |   let turnN = 0;
-30 |   for (let i = 0; i < cutoffAssistantIdx; i++) {
-31 |     const msg = apiMessages[i];
-32 |     if (msg.role === "assistant") turnN++;
-33 |     if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
-34 | 
-35 |     for (const block of msg.content) {
-36 |       if (
-37 |         typeof block === "object" &&
-38 |         "type" in block &&
-39 |         block.type === "tool_result" &&
-40 |         Array.isArray((block as { content?: unknown[] }).content)
-41 |       ) {
-42 |         const toolBlock = block as {
-43 |           type: string;
-44 |           tool_use_id: string;
-45 |           content: Array<{ type: string; text?: string }>;
-46 |         };
-47 |         const toolName = toolUseIdMap.get(toolBlock.tool_use_id) ?? "unknown";
-48 |         const priority = toolPrunePriority(toolName);
-49 |         for (const cb of toolBlock.content) {
-50 |           if (cb.type === "text" && typeof cb.text === "string") {
-51 |             if (cb.text.length < 100) continue;
-52 |             candidates.push({ cb, turnN, priority });
-53 |           }
-54 |         }
-55 |       }
-56 |     }
-57 |   }
-58 | 
-59 |   const totalMessages = apiMessages.length;
-60 |   candidates.sort((a, b) => {
-61 |     const ageA = totalMessages - a.turnN;
-62 |     const ageB = totalMessages - b.turnN;
-63 |     const freshnessA = Math.max(0.3, 1 - ageA / totalMessages);
-64 |     const freshnessB = Math.max(0.3, 1 - ageB / totalMessages);
-65 |     const scoreA = a.priority * freshnessA;
-66 |     const scoreB = b.priority * freshnessB;
-67 |     return scoreA - scoreB || a.turnN - b.turnN;
-68 |   });
-69 | 
-70 |   for (const { cb, turnN: t } of candidates) {
-71 |     cb.text = `[pruned — old result from turn ${t}]`;
-72 |   }
-73 | }
-74 | 
-75 | /** Build a fake tool_result user message. */
-76 | function makeToolResultMsg(text: string): Anthropic.MessageParam {
-[2026-04-05T18:09:04.008Z] iter=290 turn=11 INFO: Turn 11/25
-[2026-04-05T18:09:21.619Z] iter=290 turn=11 INFO: Agent: Now add the age-weighted test at the end of the file:
-[2026-04-05T18:09:21.620Z] iter=290 turn=11 INFO: write_file: src/__tests__/context-pruning.test.ts (patch)
-[2026-04-05T18:09:21.621Z] iter=290 turn=11 INFO:   -> ok: Patched src/__tests__/context-pruning.test.ts: -7 +62 lines
-
-Context after patch:
-188 |     }
-189 |   });
-190 | 
-191 |   it("does nothing when there are fewer than 8 assistant turns", () => {
-192 |     const msgs = buildMessages(5);
-193 |     const before = JSON.stringify(msgs);
-194 |     pruneStaleToolResults(msgs);
-195 |     expect(JSON.stringify(msgs)).toBe(before);
-196 |   });
-197 | 
-198 |   it("age-weighted: old write_file pruned before recent read_file", () => {
-199 |     // Build 15 exchanges. First exchange is old write_file (priority 2, very old).
-200 |     // 14th exchange is a recent read_file (priority 0, but fresh).
-201 |     // With age-weighting, the old write_file should be pruned before the recent read_file
-202 |     // because its age-weighted score (2 * lowFreshness) < (0 * highFreshness stays 0).
-203 |     // Actually read_file priority is 0 so score is always 0 — it gets pruned first by score.
-204 |     // Better test: old bash (priority 2, ancient) vs recent bash (priority 2, fresh).
-205 |     // Old bash score = 2 * lowFreshness; recent bash score = 2 * highFreshness → old pruned first.
-206 |     const msgs: Anthropic.MessageParam[] = [];
 207 |     const toolMap = new Map<string, string>();
 208 | 
 209 |     // 12 old bash exchanges (age = far from end)
@@ -1134,3 +996,56 @@ Context after patch:
 [2026-04-05T18:22:01.209Z] iter=298 turn=18 INFO: Tool timing stats
 [2026-04-05T18:22:07.390Z] iter=298 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 298: predicted 20 turns, actual 18 turns, ratio 0.90**
 [2026-04-05T18:22:07.416Z] iter=298 turn=18 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T18:22:07.452Z] iter=298 turn=18 INFO: Committed: ffb4862c (30 in / 5524 out, cache: 19415 created, 243681 read)
+[2026-04-05T18:22:07.452Z] iter=298 turn=18 INFO: Restarting as iteration 299...
+[2026-04-05T18:22:07.632Z] iter=299 INFO: Cache restored: 48/48 entries (0 stale)
+[2026-04-05T18:22:07.634Z] iter=299 INFO: Turn budget: 13/25 (calibration=1.13x, predicted=8)
+[2026-04-05T18:22:07.634Z] iter=299 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T18:22:07.769Z] iter=299 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T18:22:07.769Z] iter=299 turn=1 INFO: Turn 1/25
+[2026-04-05T18:22:10.464Z] iter=299 turn=1 INFO: Agent: 
+
+I'll start by assessing the current state of the system and determining what needs attention.
+[2026-04-05T18:22:10.465Z] iter=299 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T18:22:10.466Z] iter=299 turn=2 INFO: Turn 2/25
+[2026-04-05T18:22:25.002Z] iter=299 turn=2 INFO: think: Let me assess what's happening and what I need to do as Meta expert:
+
+1. The goals say iteration 299 is Architect, itera...
+[2026-04-05T18:22:25.002Z] iter=299 turn=3 INFO: Turn 3/25
+[2026-04-05T18:22:28.175Z] iter=299 turn=3 INFO: read_file: memory.md
+[2026-04-05T18:22:28.176Z] iter=299 turn=3 INFO:   -> ok (5846 chars)
+[2026-04-05T18:22:28.176Z] iter=299 turn=3 INFO: read_file: goals.md
+[2026-04-05T18:22:28.176Z] iter=299 turn=3 INFO:   -> ok (1108 chars)
+[2026-04-05T18:22:28.176Z] iter=299 turn=3 INFO: read_file: .autoagent-metrics.json
+[2026-04-05T18:22:28.177Z] iter=299 turn=3 INFO:   -> ok (404393 chars)
+[2026-04-05T18:22:28.178Z] iter=299 turn=4 INFO: Turn 4/25
+[2026-04-05T18:22:39.031Z] iter=299 turn=4 INFO: think: Let me assess quickly and deliver. My goals as Meta expert:
+
+1. Assess system health - product vs self-building balance
+...
+[2026-04-05T18:22:39.032Z] iter=299 turn=5 INFO: Turn 5/25
+[2026-04-05T18:23:21.118Z] iter=299 turn=5 INFO: Agent: Goals status: My deliverables are (1) compact memory, (2) update goals.md, (3) TSC check. All NOT STARTED. Delivering now.
+[2026-04-05T18:23:21.118Z] iter=299 turn=5 INFO: write_file: memory.md (write)
+[2026-04-05T18:23:21.119Z] iter=299 turn=5 INFO:   -> ok: Updated memory.md (4976 chars, -21 lines delta)
+[2026-04-05T18:23:21.120Z] iter=299 turn=6 INFO: Turn 6/25
+[2026-04-05T18:23:34.748Z] iter=299 turn=6 INFO: Agent: 
+
+Meta expert doesn't change src/ — my job is memory compaction and goal-setting. Memory is DONE. Now finishing goals.md and TSC check.
+[2026-04-05T18:23:34.748Z] iter=299 turn=6 INFO: write_file: goals.md (write)
+[2026-04-05T18:23:34.749Z] iter=299 turn=6 INFO:   -> ok: Updated goals.md (1431 chars, +6 lines delta)
+[2026-04-05T18:23:34.750Z] iter=299 turn=7 INFO: Turn 7/25
+[2026-04-05T18:23:38.936Z] iter=299 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T18:23:39.884Z] iter=299 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:23:39.884Z] iter=299 turn=8 INFO: Turn 8/25
+[2026-04-05T18:23:42.939Z] iter=299 turn=8 INFO: Agent: TSC clean. Memory and goals already written.
+[2026-04-05T18:23:42.939Z] iter=299 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T18:23:42.940Z] iter=299 turn=8 INFO: RESTART signal
+[2026-04-05T18:23:42.940Z] iter=299 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T18:23:43.885Z] iter=299 turn=8 INFO: Compilation OK
+[2026-04-05T18:23:51.072Z] iter=299 turn=8 INFO: Cache persisted: 49 entries to .autoagent-cache.json
+[2026-04-05T18:23:51.072Z] iter=299 turn=8 INFO: Cache stats: 0 hits, 3 misses, 49 entries, 2 invalidations (2 entries removed)
+[2026-04-05T18:23:51.072Z] iter=299 turn=8 INFO: Tool cache stats
+[2026-04-05T18:23:51.072Z] iter=299 turn=8 INFO: Tool timing: bash: 2x, avg=475ms, total=950ms; read_file: 3x, avg=2ms, total=7ms; write_file: 2x, avg=2ms, total=3ms; think: 2x, avg=1ms, total=1ms; read_scratchpad: 1x, avg=0ms, total=0ms
+[2026-04-05T18:23:51.072Z] iter=299 turn=8 INFO: Tool timing stats
+[2026-04-05T18:23:57.481Z] iter=299 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 299: predicted 8 turns, actual 8 turns, ratio 1.00**
+[2026-04-05T18:23:57.503Z] iter=299 turn=8 INFO: Pre-commit review: no significant code changes to review
