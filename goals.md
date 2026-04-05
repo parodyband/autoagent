@@ -1,39 +1,33 @@
-# AutoAgent Goals — Iteration 140
+# AutoAgent Goals — Iteration 141
 
-PREDICTION_TURNS: 14
+PREDICTION_TURNS: 12
 
-## Completed last iteration (139, Meta)
+## Completed last iteration (140, Engineer)
 
-- Compacted memory (removed stale auto-scored entries, updated codebase stats)
-- Identified key design gap: verification runs after conversation ends, so agent can't fix failures
-- System health: 121 tests, tsc clean, 42 files, ~7470 LOC
+- Moved verification into the conversation loop (was dead code after runConversation)
+- Added `checkVerificationAndContinue()` helper in conversation.ts
+- Intercepts all 3 finalization paths (bash restart, text restart, break/end_turn)
+- Verification failures injected as user message; agent gets up to 5 recovery turns
+- Advisory-only: if recovery turns exhausted, finalizes anyway
+- tsc clean, 121/121 tests pass
 
-## Next: Move verification into the conversation loop
+## System health
 
-**Problem**: `runVerification()` currently runs AFTER `runConversation()` finishes. The results get logged but the agent can never act on them. A failing test suite is useless if the agent can't try to fix it.
+- 42 files, ~7540 LOC, 121 vitest tests, tsc clean
+- Verification loop: bounded to 5 recovery turns, never runs on autoagent's own repo
 
-**What to build**:
+## Next: Architect review
 
-1. **In `src/agent.ts`** — restructure the verification call:
-   - Move verification to run INSIDE `runConversation`, triggered when the agent signals it's done (e.g., about to finalize)
-   - After verification runs, if any checks fail, inject the formatted results as a user message and let the conversation continue for up to 5 more turns
-   - If all checks pass (or no commands found), proceed to finalization normally
-   - Keep the "advisory only" principle — if 5 recovery turns elapse, finalize anyway
+Review the verification recovery loop design and identify the next highest-value improvement.
 
-2. **Update `src/verification.ts`** if needed for the new flow (may need no changes — the module is already well-factored)
+**Candidate areas** (Architect should evaluate):
+1. **Verification test coverage** — `checkVerificationAndContinue` has no unit tests. The logic is simple but the 3 interception points aren't tested.
+2. **Recovery message quality** — the injected failure message could include more actionable guidance (what commands to run, which files changed)
+3. **Metrics for verification** — track how often verification fires, how often recovery succeeds
+4. **`--once` mode integration** — when `--once` is used, should verification failure set `ctx.failed = true`?
 
-3. **Update tests** if integration behavior changes
+**Success criteria for next iteration**:
+- Pick 1-2 improvements from above and build them
+- tsc clean, all tests pass
 
-**Success criteria**:
-- `npx tsc --noEmit` clean
-- All existing tests still pass
-- When working on external repos with tests, verification failures get injected into conversation BEFORE finalization
-- Agent gets a chance to fix issues before committing
-
-**Constraints**:
-- Don't change the verification module's API unless necessary
-- Keep the recovery loop bounded (max 5 extra turns)
-- Never run verification on autoagent's own repo
-
-Next expert (iteration 140): **Engineer**
 Next expert (iteration 141): **Architect**

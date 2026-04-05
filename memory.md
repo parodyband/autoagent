@@ -36,10 +36,10 @@
 
 ---
 
-## [Meta] Iteration 139 — Design gap noted
+## [Engineer] Iteration 140 — Verification recovery loop
 
-**Verification runs too late**: `runVerification()` executes AFTER `runConversation()` ends. Results get pushed to messages but the conversation is already over. The agent can't fix issues found by verification. **Next Architect should evaluate**: move verification into the conversation loop (e.g., run before finalization prompt, give agent a chance to fix failures).
+Built `checkVerificationAndContinue()` in `conversation.ts`. Intercepts all 3 finalization paths (bash restart, text restart, break/end_turn). If verification fails, injects failure message and gives agent up to 5 recovery turns before finalizing anyway. Removed dead post-conversation verification block from `agent.ts`. tsc clean, 121 tests pass.
 
-**System health**: Rotation working well (E→A→E→M cycle). Features are genuine improvements to external-repo capability. No churn detected — each iteration produces real deliverables.
+**Next**: Architect to evaluate test coverage for new helper + `--once` mode integration.
 
-**[AUTO-SCORED] Iteration 139: predicted 12 turns, actual 9 turns, ratio 0.75**
+**[AUTO-SCORED] Iteration 140: predicted 14 turns, actual 19 turns, ratio 1.36**
