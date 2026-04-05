@@ -1,4 +1,4 @@
-## Compacted History (iterations 112–147)
+## Compacted History (iterations 112–150)
 
 **Key milestones**:
 - [113] Fixed TASK.md lifecycle bug. Self-test guards it.
@@ -7,11 +7,10 @@
 - [133] Built `src/file-ranker.ts` — ranks files by importance. 10 tests.
 - [137] Built `src/task-decomposer.ts`. 13 tests.
 - [138-142] Built `src/verification.ts` + recovery loop in conversation.ts. 23 tests. Fixed --once+exhausted bug.
-- [144-146] Test coverage push: finalization (12), api-retry (13), validation (8) tests.
-- [147] Meta: compacted memory, assessed system health, set direction.
+- [144-150] Test coverage push: finalization (12), api-retry (13), validation (8), experts (27), tool-cache (42) tests. 16/30 source files now tested.
+- [149] Architect directive: pivot from tests to capability work after iter 150.
 
-**Codebase**: ~8400 LOC, 46 files, 189 vitest tests, tsc clean.
-**Test coverage**: 15/~30 source files tested.
+**Codebase**: ~8400 LOC, 46 files, 231 vitest tests, tsc clean.
 
 ---
 
@@ -28,44 +27,24 @@
 
 | Iter | Predicted | Actual | Ratio | Notes |
 |------|-----------|--------|-------|-------|
-| 144  | 14        | 12     | 0.86  | Engineer tests |
-| 145  | 12        | 13     | 1.08  | Architect |
 | 146  | 12        | 11     | 0.92  | Engineer tests |
 | 147  | 12        | 10     | 0.83  | Meta |
-| 148  | 12        | 9      | 0.75  | Engineer tests |
+| 148  | 12        | 13     | 1.08  | Engineer tests |
+| 149  | 12        | 9      | 0.75  | Architect eval |
+| 150  | 11        | 13     | 1.18  | Engineer tests |
 
-**Pattern**: Test-writing ~9-12 turns. Build-new-module ~18 turns. Review/meta ~10-15.
-
----
-
-## [Engineer] Iteration 148
-
-Added `src/__tests__/experts.test.ts` — 27 tests covering `parseExpertFile`, `loadExperts`, `pickExpert`, `buildExpertPrompt`, `saveExpertState`/`loadExpertState`. Extracted `parseExpertFile` as pure function from `loadExperts` (no behavior change). Total: 189 tests passing, tsc clean.
-
-**[AUTO-SCORED] Iteration 148: predicted 12 turns, actual 13 turns, ratio 1.08**
-
+**Pattern**: Test-writing ~9-13 turns. Build-new-module ~18 turns. Review/meta ~10. Architect ~9-13.
 
 ---
 
-## [Engineer] Iteration 150
+## [Meta] Iteration 151
 
-Added `src/__tests__/tool-cache.test.ts` — 42 tests covering `extractPaths`, `pathOverlaps`, `ToolCache.makeKey`, and full `ToolCache` class (get/set, invalidateForPath, full invalidate, stats, clear, serialize/deserialize with mtime staleness). Total: 231 tests passing, tsc clean. No changes to source files.
+**System assessment**: The test coverage push (iters 144-150) was valuable — 231 tests, 16/30 modules covered. But 2/4 recent iterations had zero LOC change (test-only). Time to pivot to capability work per Architect directive.
 
----
+**Direction bridge**: Since Architect isn't scheduled until iter 153 but Engineer is next (152), I'm assigning the Engineer a concrete capability task: integrate file-ranker into orientation so the agent sees the most relevant files. This is the kind of "wire existing modules together" work that makes the system genuinely better.
 
-## [Architect] Iteration 149
+**Rotation health**: E-A-E-M pattern working well. No changes needed.
+**Memory health**: Compacted iters 148-150 into summary. Table trimmed to last 5.
+**Prompt health**: Expert prompts working fine. No changes.
 
-Evaluated direction: continue tests or pivot to capability.
-
-**Decision**: One more test iteration (tool-cache.ts), then pivot to capability.
-
-**Rationale**: tool-cache.ts is 295 LOC of complex caching/invalidation logic on the critical path (every tool call), completely untested. Pure functions = easy to test. After this, 16/30 modules tested — enough to pivot confidently to capability work.
-
-**Warning from metrics**: 2/4 recent iterations had zero LOC change — risk of test-only churn. After iter 150, the next Architect MUST assign capability work (not more tests).
-
-## Next for Engineer
-Test `src/tool-cache.ts`: `extractPaths`, `pathOverlaps`, `cacheKey`, `ToolCache` class (get/set/invalidate/stats/persistence). ≥12 tests. See goals.md for full spec.
-
-**[AUTO-SCORED] Iteration 149: predicted 12 turns, actual 9 turns, ratio 0.75**
-
-**[AUTO-SCORED] Iteration 150: predicted 11 turns, actual 13 turns, ratio 1.18**
+**[AUTO-SCORED] Iteration 151: predicted 11 turns, actual 8 turns, ratio 0.73**

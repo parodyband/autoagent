@@ -1,116 +1,3 @@
-57 |   /** Optional validator injection for testing. Defaults to validateBeforeCommit. */
-58 |   validate?: (rootDir: string, log: (msg: string) => void) => Promise<{ ok: boolean; output: string }>;
-59 |   /** Optional compression config. Set to null to disable compression. */
-60 |   compressionConfig?: CompressionConfig | null;
-61 |   /** Optional custom system prompt builder. Defaults to buildSystemPrompt from messages.ts. */
-62 |   systemPromptBuilder?: (state: IterationState, rootDir: string) => string;
-63 |   /** True when running a user task from TASK.md */
-64 |   taskMode?: boolean;
-65 |   /** When true, run exactly one iteration and exit cleanly (no restart) */
-66 |   once?: boolean;
-67 |   /** Set to true when the iteration has failed (used by --once exit code) */
-68 |   failed?: boolean;
-69 |   /**
-70 |    * Optional async function that runs verification checks before finalization.
-71 |    * Returns a formatted failure message string if checks failed, or null if all passed.
-72 |    * Only called when operating on an external repo (workDir !== ROOT).
-73 |    */
-74 |   verificationFn?: () => Promise<string | null>;
-75 |   /** Max extra turns allowed for verification recovery. Default: 5. */
-76 |   maxVerificationTurns?: number;
-77 |   /** Tracks how many verification recovery turns have been consumed. */
-78 |   verificationTurnsUsed?: number;
-79 | }
-80 | 
-81 | export type TurnResult = "continue" | "break" | "restarted";
-82 | 
-[2026-04-05T12:34:04.768Z] iter=140 turn=7 INFO: Turn 7/25
-[2026-04-05T12:34:14.838Z] iter=140 turn=7 INFO: Agent: Now add the helper function and modify the two restart paths in `processTurn`, and the "break" path in `runConversation`:
-[2026-04-05T12:34:14.839Z] iter=140 turn=7 INFO: write_file: src/conversation.ts (patch)
-[2026-04-05T12:34:14.840Z] iter=140 turn=7 INFO:   -> ok: Patched src/conversation.ts: -1 +42 lines
-
-Context after patch:
-80 | 
-81 | export type TurnResult = "continue" | "break" | "restarted";
-82 | 
-83 | // ─── Verification recovery ──────────────────────────────────
-84 | 
-85 | /**
-86 |  * Run pre-finalization verification if configured. If checks fail and recovery
-87 |  * turns remain, inject the failure message into ctx.messages and return true
-88 |  * (caller should continue the loop). Returns false to proceed with finalization.
-89 |  *
-90 |  * Advisory only: if max recovery turns are exhausted, logs a warning and
-91 |  * returns false so finalization proceeds regardless.
-92 |  */
-93 | export async function checkVerificationAndContinue(ctx: IterationCtx): Promise<boolean> {
-94 |   if (!ctx.verificationFn) return false;
-95 | 
-96 |   const maxRecovery = ctx.maxVerificationTurns ?? 5;
-97 |   const used = ctx.verificationTurnsUsed ?? 0;
-98 | 
-99 |   // Don't re-run verification if recovery turns already exhausted
-100 |   if (used >= maxRecovery) {
-101 |     ctx.log(`Verification recovery turns exhausted (${used}/${maxRecovery}) — finalizing anyway`);
-102 |     return false;
-103 |   }
-104 | 
-105 |   let failureMsg: string | null = null;
-106 |   try {
-107 |     failureMsg = await ctx.verificationFn();
-108 |   } catch (err) {
-109 |     ctx.log(`Verification error (non-fatal): ${err instanceof Error ? err.message : err}`);
-110 |     return false;
-111 |   }
-112 | 
-113 |   if (!failureMsg) {
-114 |     ctx.log("Verification passed — proceeding to finalize");
-115 |     return false;
-116 |   }
-117 | 
-118 |   ctx.verificationTurnsUsed = used + 1;
-119 |   ctx.log(`Verification failed (recovery turn ${ctx.verificationTurnsUsed}/${maxRecovery}) — giving agent a chance to fix`);
-120 |   ctx.messages.push({ role: "user", content: failureMsg });
-121 |   return true; // tell caller to continue the loop
-122 | }
-123 | 
-124 | // ─── Tool dispatch ──────────────────────────────────────────
-125 | 
-126 | /**
-127 |  * Handle a single tool call: check cache, execute, record timing,
-[2026-04-05T12:34:14.840Z] iter=140 turn=8 INFO: Turn 8/25
-[2026-04-05T12:34:22.102Z] iter=140 turn=8 INFO: Agent: Now patch the two restart paths in `processTurn` to call `checkVerificationAndContinue` before `onFinalize`:
-[2026-04-05T12:34:22.102Z] iter=140 turn=8 INFO: write_file: src/conversation.ts (patch)
-[2026-04-05T12:34:22.104Z] iter=140 turn=8 INFO:   -> ok: Patched src/conversation.ts: -12 +13 lines
-
-Context after patch:
-293 |       .map((b) => b.text)
-294 |       .join("\n");
-295 | 
-296 |     if (textContent.includes("AUTOAGENT_RESTART")) {
-297 |       ctx.log("Restart signal found in text (not tool call) — treating as restart");
-298 |       const validator = ctx.validate ?? validateBeforeCommit;
-299 |       const v = await validator(ctx.rootDir, ctx.log);
-300 |       if (!v.ok) {
-301 |         ctx.log("VALIDATION BLOCKED RESTART — asking agent to fix");
-302 |         ctx.messages.push({ role: "user", content: validationBlockedMessage(v.output) });
-303 |         return "continue";
-304 |       }
-305 |       if (await checkVerificationAndContinue(ctx)) return "continue";
-306 |       await ctx.onFinalize(ctx, true);
-307 |       return "restarted";
-308 |     }
-309 | 
-310 |     ctx.log("No tool calls — ending");
-311 |     return "break";
-[2026-04-05T12:34:22.104Z] iter=140 turn=9 INFO: Turn 9/25
-[2026-04-05T12:34:28.771Z] iter=140 turn=9 INFO: Agent: **Goal status:**
-1. Move verification into conversation loop — IN PROGRESS (helper added, need to patch tool-restart path + break path + agent.ts)
-2. tsc clean — NOT STARTED
-3. Tests pass — NOT STARTED
-
-Continuing — 3 patches left:
-[2026-04-05T12:34:28.771Z] iter=140 turn=9 INFO: write_file: src/conversation.ts (patch)
 [2026-04-05T12:34:28.773Z] iter=140 turn=9 INFO:   -> ok: Patched src/conversation.ts: -12 +13 lines
 
 Context after patch:
@@ -1109,3 +996,85 @@ Context after patch:
 [2026-04-05T12:54:12.569Z] iter=150 turn=13 INFO: Tool timing stats
 [2026-04-05T12:54:17.095Z] iter=150 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 150: predicted 11 turns, actual 13 turns, ratio 1.18**
 [2026-04-05T12:54:17.114Z] iter=150 turn=13 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T12:54:17.146Z] iter=150 turn=13 INFO: Committed: 82e0032e (19 in / 6894 out, cache: 16549 created, 148214 read)
+[2026-04-05T12:54:17.146Z] iter=150 turn=13 INFO: Restarting as iteration 151...
+[2026-04-05T12:54:17.349Z] iter=151 INFO: Cache restored: 52/52 entries (0 stale)
+[2026-04-05T12:54:17.350Z] iter=151 INFO: Turn budget: 15/25 (calibration=1.08x, predicted=11)
+[2026-04-05T12:54:17.350Z] iter=151 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T12:54:17.380Z] iter=151 INFO: Hard turn cap: 17 (1.5x prediction of 11)
+[2026-04-05T12:54:17.381Z] iter=151 turn=1 INFO: Turn 1/25
+[2026-04-05T12:54:21.840Z] iter=151 turn=1 INFO: Agent: 
+
+I need to assess the system state and decide what to do. Let me start by understanding the current situation.
+[2026-04-05T12:54:21.841Z] iter=151 turn=1 INFO: $ cat /Users/austin/Documents/autoagent/goals.md
+[2026-04-05T12:54:21.845Z] iter=151 turn=1 INFO: $ cat /Users/austin/Documents/autoagent/.autoagent-metrics.json 2>/dev/null | head -80
+[2026-04-05T12:54:21.849Z] iter=151 turn=1 INFO: $ cat /Users/austin/Documents/autoagent/.expert-rotation.json
+[2026-04-05T12:54:21.852Z] iter=151 turn=1 INFO: $ cat /Users/austin/Documents/autoagent/memory.md
+[2026-04-05T12:54:21.861Z] iter=151 turn=1 INFO:   -> exit=0 (1310 chars)
+[2026-04-05T12:54:21.862Z] iter=151 turn=1 INFO:   -> exit=0 (1679 chars)
+[2026-04-05T12:54:21.862Z] iter=151 turn=1 INFO:   -> exit=0 (1171 chars)
+[2026-04-05T12:54:21.864Z] iter=151 turn=1 INFO:   -> exit=0 (3459 chars)
+[2026-04-05T12:54:21.864Z] iter=151 turn=2 INFO: Turn 2/25
+[2026-04-05T12:54:37.091Z] iter=151 turn=2 INFO: think: Let me assess the situation:
+
+1. The rotation is: Engineer → Architect → Engineer → Meta (every 4 iterations). This has ...
+[2026-04-05T12:54:37.092Z] iter=151 turn=3 INFO: Turn 3/25
+[2026-04-05T12:54:44.054Z] iter=151 turn=3 INFO: $ cat /Users/austin/Documents/autoagent/src/experts.ts | head -100
+[2026-04-05T12:54:44.062Z] iter=151 turn=3 INFO: $ cat /Users/austin/Documents/autoagent/.autoagent-metrics.json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+# Show last 10 iterations
+for m in data[-10:]:
+    print(f'iter={m[\"iteration...
+[2026-04-05T12:54:44.075Z] iter=151 turn=3 INFO: $ cat /Users/austin/Documents/autoagent/.autoagent-state.json
+[2026-04-05T12:54:44.083Z] iter=151 turn=3 INFO:   -> exit=0 (4333 chars)
+[2026-04-05T12:54:44.091Z] iter=151 turn=3 INFO:   -> exit=0 (113 chars)
+[2026-04-05T12:54:44.120Z] iter=151 turn=3 INFO:   -> exit=0 (680 chars)
+[2026-04-05T12:54:44.120Z] iter=151 turn=4 INFO: Turn 4/25
+[2026-04-05T12:54:46.945Z] iter=151 turn=4 INFO: $ cat /Users/austin/Documents/autoagent/src/experts.ts | tail -200
+[2026-04-05T12:54:46.948Z] iter=151 turn=4 INFO: list_files: . (depth=2)
+[2026-04-05T12:54:46.963Z] iter=151 turn=4 INFO:   -> ok (5 dirs, 52 files)
+[2026-04-05T12:54:46.964Z] iter=151 turn=4 INFO:   -> exit=0 (7868 chars)
+[2026-04-05T12:54:46.965Z] iter=151 turn=5 INFO: Turn 5/25
+[2026-04-05T12:55:17.947Z] iter=151 turn=5 INFO: Agent: 
+
+You're right. Let me focus. My deliverables are:
+
+1. **Compact memory** (it's getting long with per-iteration entries)
+2. **Write goals.md** for the next expert (Architect, iteration 152)
+3. **Assess: is the system producing genuine improvement?**
+
+Let me do all three now.
+[2026-04-05T12:55:17.947Z] iter=151 turn=5 INFO: think: Assessment of the system:
+
+**Is it producing genuine improvement?** Since iteration 147 (last Meta):
+- Iter 148: +27 tes...
+[2026-04-05T12:55:17.948Z] iter=151 turn=6 INFO: Turn 6/25
+[2026-04-05T12:55:49.590Z] iter=151 turn=6 INFO: Agent: Now compact memory and write goals:
+[2026-04-05T12:55:49.590Z] iter=151 turn=6 INFO: write_file: memory.md (write)
+[2026-04-05T12:55:49.591Z] iter=151 turn=6 INFO:   -> ok: Updated memory.md (2596 chars, -23 lines delta)
+[2026-04-05T12:55:49.592Z] iter=151 turn=6 INFO: write_file: goals.md (write)
+[2026-04-05T12:55:49.592Z] iter=151 turn=6 INFO:   -> ok: Updated goals.md (1737 chars, +6 lines delta)
+[2026-04-05T12:55:49.593Z] iter=151 turn=7 INFO: Turn 7/25
+[2026-04-05T12:55:52.698Z] iter=151 turn=7 INFO: Agent: No code changes, so no need for `npx tsc --noEmit`. Let me verify the files are clean:
+[2026-04-05T12:55:52.699Z] iter=151 turn=7 INFO: $ wc -l memory.md goals.md
+[2026-04-05T12:55:52.709Z] iter=151 turn=7 INFO:   -> exit=0 (52 chars)
+[2026-04-05T12:55:52.710Z] iter=151 turn=8 INFO: Turn 8/25
+[2026-04-05T12:55:59.933Z] iter=151 turn=8 INFO: Agent: Good. Memory compacted from 71 lines to 48. Goals are clear and concrete.
+
+**Summary of this Meta iteration:**
+
+1. **System assessment**: The test coverage push (iters 144-150) added 69 tests across 5 modules. Valuable, but 2/4 recent iterations had zero LOC change. The system is not cycling — it's been doing real work — but the returns on test-only iterations are diminishing.
+
+2. **Direction**: P...
+[2026-04-05T12:55:59.935Z] iter=151 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T12:55:59.935Z] iter=151 turn=8 INFO: RESTART signal
+[2026-04-05T12:55:59.936Z] iter=151 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:56:00.621Z] iter=151 turn=8 INFO: Compilation OK
+[2026-04-05T12:56:05.533Z] iter=151 turn=8 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T12:56:05.533Z] iter=151 turn=8 INFO: Cache stats: 0 hits, 1 misses, 53 entries, 2 invalidations (0 entries removed)
+[2026-04-05T12:56:05.533Z] iter=151 turn=8 INFO: Tool cache stats
+[2026-04-05T12:56:05.533Z] iter=151 turn=8 INFO: Tool timing: bash: 10x, avg=20ms, total=199ms; list_files: 1x, avg=16ms, total=16ms; think: 2x, avg=1ms, total=2ms; write_file: 2x, avg=1ms, total=2ms
+[2026-04-05T12:56:05.533Z] iter=151 turn=8 INFO: Tool timing stats
+[2026-04-05T12:56:09.623Z] iter=151 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 151: predicted 11 turns, actual 8 turns, ratio 0.73**
+[2026-04-05T12:56:09.642Z] iter=151 turn=8 INFO: Pre-commit review: no significant code changes to review
