@@ -1,136 +1,3 @@
-36 | // ─── Constants ────────────────────────────────────────────────
-37 | 
-[2026-04-05T15:07:23.958Z] iter=194 turn=10 INFO: Turn 10/25
-[2026-04-05T15:07:26.532Z] iter=194 turn=10 INFO: Agent: Now fix the two `buildSystemPrompt` callers in the class (they assign to `this.systemPrompt` directly):
-[2026-04-05T15:07:26.532Z] iter=194 turn=10 INFO: $ grep -n "buildSystemPrompt\|this\.systemPrompt\|this\.repoMapBlock" src/orchestrator.ts
-[2026-04-05T15:07:26.541Z] iter=194 turn=10 INFO:   -> exit=0 (279 chars)
-[2026-04-05T15:07:26.542Z] iter=194 turn=11 INFO: Turn 11/25
-[2026-04-05T15:07:29.092Z] iter=194 turn=11 INFO: read_file: src/orchestrator.ts
-[2026-04-05T15:07:29.093Z] iter=194 turn=11 INFO:   -> ok (1199 chars)
-[2026-04-05T15:07:29.094Z] iter=194 turn=12 INFO: Turn 12/25
-[2026-04-05T15:07:31.059Z] iter=194 turn=12 INFO: read_file: src/orchestrator.ts
-[2026-04-05T15:07:31.060Z] iter=194 turn=12 INFO:   -> ok (434 chars)
-[2026-04-05T15:07:31.061Z] iter=194 turn=13 INFO: Turn 13/25
-[2026-04-05T15:07:33.903Z] iter=194 turn=13 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:07:33.904Z] iter=194 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -4 +5 lines
-
-Context after patch:
-307 |   private client: Anthropic;
-308 |   private registry: ReturnType<typeof createDefaultRegistry>;
-309 |   private repoFingerprint: string = "";
-310 |   private systemPrompt: string = "";
-311 |   private repoMapBlock: string = "";
-312 |   private apiMessages: Anthropic.MessageParam[] = [];
-313 |   private opts: OrchestratorOptions;
-314 |   private initialized = false;
-315 | 
-316 |   // Cost tracking
-317 |   private sessionTokensIn = 0;
-[2026-04-05T15:07:33.904Z] iter=194 turn=14 INFO: Turn 14/25
-[2026-04-05T15:07:37.082Z] iter=194 turn=14 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:07:37.083Z] iter=194 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -4 +5 lines
-
-Context after patch:
-331 |   async init(): Promise<void> {
-332 |     if (this.initialized) return;
-333 |     this.opts.onStatus?.("Indexing repo...");
-334 |     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
-335 |     ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
-336 |       buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
-337 | 
-338 |     // Session persistence: resume or create new
-339 |     if (this.opts.resumeSessionPath) {
-340 |       this.sessionPath = this.opts.resumeSessionPath;
-341 |       this.apiMessages = loadSession(this.sessionPath);
-[2026-04-05T15:07:37.083Z] iter=194 turn=15 INFO: Turn 15/25
-[2026-04-05T15:07:41.070Z] iter=194 turn=15 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:07:41.072Z] iter=194 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -5 +6 lines
-
-Context after patch:
-371 |     this.sessionCost = 0;
-372 |   }
-373 | 
-374 |   /** Re-index the repo (after significant changes). */
-375 |   reindex(): void {
-376 |     this.repoFingerprint = fingerprintRepo(this.opts.workDir);
-377 |     ({ systemPrompt: this.systemPrompt, repoMapBlock: this.repoMapBlock } =
-378 |       buildSystemPrompt(this.opts.workDir, this.repoFingerprint));
-379 |   }
-380 | 
-381 |   /** Get current session cost info. */
-382 |   getCost(): CostInfo {
-[2026-04-05T15:07:41.073Z] iter=194 turn=16 INFO: Turn 16/25
-[2026-04-05T15:07:44.756Z] iter=194 turn=16 INFO: Agent: I've been patching orchestrator.ts. Let me now finish the send() method, TUI, and tests in one batch.
-[2026-04-05T15:07:44.756Z] iter=194 turn=16 INFO: read_file: src/orchestrator.ts
-[2026-04-05T15:07:44.756Z] iter=194 turn=16 INFO:   -> ok (2211 chars)
-[2026-04-05T15:07:44.757Z] iter=194 turn=17 INFO: Turn 17/25
-[2026-04-05T15:07:56.125Z] iter=194 turn=17 INFO: Agent: Now replace the partial architect mode block with the proper `runArchitectMode()` call:
-[2026-04-05T15:07:56.126Z] iter=194 turn=17 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T15:07:56.128Z] iter=194 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -25 +25 lines
-
-Context after patch:
-521 |       }
-522 |     }
-523 | 
-524 |     // 3b. Architect mode: two-phase plan→edit for complex tasks
-525 |     const architectResult = await runArchitectMode(
-526 |       userMessage,
-527 |       this.repoMapBlock,
-528 |       makeSimpleCaller(this.client),
-529 |     );
-530 |     if (architectResult.activated) {
-531 |       this.opts.onStatus?.("Architect mode: plan generated");
-532 |       this.opts.onPlan?.(architectResult.plan);
-533 |     }
-534 | 
-535 |     // 4. Add user message to history and persist
-536 |     const userMsg: Anthropic.MessageParam = { role: "user", content: effectiveMessage };
-537 |     this.apiMessages.push(userMsg);
-538 |     if (this.sessionPath) saveMessage(this.sessionPath, userMsg);
-539 | 
-540 |     // 4b. Inject architect plan as prefilled assistant message
-541 |     if (architectResult.activated && architectResult.prefill) {
-542 |       this.apiMessages.push({ role: "assistant", content: architectResult.prefill });
-543 |       // Inject context file guidance so the executor reads them first
-544 |       if (architectResult.plan.contextFiles?.length) {
-545 |         const ctxNote = `Before editing, read these context files: ${architectResult.plan.contextFiles.join(", ")}`;
-546 |         this.apiMessages.push({ role: "user", content: ctxNote });
-547 |       }
-548 |     }
-549 | 
-550 |     this.opts.onStatus?.("Thinking...");
-551 | 
-[2026-04-05T15:07:56.129Z] iter=194 turn=18 INFO: Turn 18/25
-[2026-04-05T15:07:58.685Z] iter=194 turn=18 INFO: Agent: Now update the TUI to show plans. Let me find the relevant section:
-[2026-04-05T15:07:58.685Z] iter=194 turn=18 INFO: $ grep -n "onPlan\|plan\|PlanDisplay\|useState\|onText\|onStatus\|onToolCall" src/tui.tsx | head -40
-[2026-04-05T15:07:58.702Z] iter=194 turn=18 INFO:   -> exit=0 (895 chars)
-[2026-04-05T15:07:58.703Z] iter=194 turn=19 INFO: Turn 19/25
-[2026-04-05T15:08:02.881Z] iter=194 turn=19 INFO: read_file: src/tui.tsx
-[2026-04-05T15:08:02.881Z] iter=194 turn=19 INFO:   -> ok (4237 chars)
-[2026-04-05T15:08:02.881Z] iter=194 turn=20 INFO: Turn 20/25
-[2026-04-05T15:08:06.258Z] iter=194 turn=20 INFO: Agent: The TUI already has an `onPlan` handler that adds a message. I need to make it visually distinct with a proper component. Let me add a `PlanDisplay` component and update the plan state to use dedicated plan state:
-[2026-04-05T15:08:06.258Z] iter=194 turn=20 INFO: read_file: src/tui.tsx
-[2026-04-05T15:08:06.259Z] iter=194 turn=20 INFO:   -> ok (2826 chars)
-[2026-04-05T15:08:06.260Z] iter=194 turn=21 INFO: Turn 21/25
-[2026-04-05T15:08:13.327Z] iter=194 turn=21 INFO: Agent: Stopping exploration. Writing everything now.
-[2026-04-05T15:08:13.327Z] iter=194 turn=21 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T15:08:13.327Z] iter=194 turn=21 INFO:   -> ok: Patched src/tui.tsx: -2 +31 lines
-
-Context after patch:
-128 |   );
-129 | }
-130 | 
-131 | /** Architect plan display — shown before execution begins. */
-132 | function PlanDisplay({ plan }: { plan: EditPlan }) {
-133 |   return (
-134 |     <Box flexDirection="column" marginTop={1} borderStyle="round" borderColor="magenta" paddingX={1}>
-135 |       <Text bold color="magenta">📋 Architect Plan</Text>
-136 |       {plan.summary ? <Text color="white">{plan.summary}</Text> : null}
-137 |       {plan.steps.map((step, i) => {
-138 |         const icon = step.action === "create" ? "✚" : step.action === "delete" ? "✖" : "✎";
-139 |         const iconColor = step.action === "create" ? "green" : step.action === "delete" ? "red" : "yellow";
-140 |         return (
-141 |           <Box key={i} marginLeft={1}>
 142 |             <Text color={iconColor}>{icon} </Text>
 143 |             <Text color="cyan">{step.file}</Text>
 144 |             <Text color="gray"> — {step.description}</Text>
@@ -1129,3 +996,96 @@ Context after patch:
 [2026-04-05T15:23:20.382Z] iter=202 turn=18 INFO: Tool timing stats
 [2026-04-05T15:23:25.422Z] iter=202 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 202: predicted 15 turns, actual 18 turns, ratio 1.20**
 [2026-04-05T15:23:25.444Z] iter=202 turn=18 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T15:23:25.477Z] iter=202 turn=18 INFO: Committed: 5931169c (34 in / 4132 out, cache: 11986 created, 170998 read)
+[2026-04-05T15:23:25.477Z] iter=202 turn=18 INFO: Restarting as iteration 203...
+[2026-04-05T15:23:25.670Z] iter=203 INFO: Cache restored: 45/45 entries (0 stale)
+[2026-04-05T15:23:25.672Z] iter=203 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
+[2026-04-05T15:23:25.672Z] iter=203 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T15:23:25.781Z] iter=203 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T15:23:25.781Z] iter=203 turn=1 INFO: Turn 1/25
+[2026-04-05T15:23:30.338Z] iter=203 turn=1 INFO: Agent: 
+
+I'll start by assessing the current state of the system — what's been happening, whether we're productive, and what needs tuning.
+[2026-04-05T15:23:30.340Z] iter=203 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-05T15:23:30.345Z] iter=203 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -80
+[2026-04-05T15:23:30.349Z] iter=203 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .expert-rotation.json
+[2026-04-05T15:23:30.356Z] iter=203 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat agentlog.md | tail -100
+[2026-04-05T15:23:30.363Z] iter=203 turn=1 INFO:   -> exit=0 (1679 chars)
+[2026-04-05T15:23:30.363Z] iter=203 turn=1 INFO:   -> exit=0 (1224 chars)
+[2026-04-05T15:23:30.364Z] iter=203 turn=1 INFO:   -> exit=0 (1310 chars)
+[2026-04-05T15:23:30.367Z] iter=203 turn=1 INFO:   -> exit=0 (7063 chars)
+[2026-04-05T15:23:30.368Z] iter=203 turn=2 INFO: Turn 2/25
+[2026-04-05T15:23:45.399Z] iter=203 turn=2 INFO: think: Let me assess quickly what I need to do as Meta expert:
+
+1. Check if the system is productive (shipping user-facing feat...
+[2026-04-05T15:23:45.399Z] iter=203 turn=3 INFO: Turn 3/25
+[2026-04-05T15:23:52.135Z] iter=203 turn=3 INFO: Agent: Good. My deliverables as Meta:
+1. Assess system health & productivity
+2. Compact memory if needed
+3. Write goals.md for iteration 204 (Engineer) with PageRank spec
+4. Refresh the gaps/roadmap since we're running low on items
+
+Let me check the current memory size and tree-sitter-map.ts (needed to write a good spec):
+[2026-04-05T15:23:52.135Z] iter=203 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && wc -l memory.md
+[2026-04-05T15:23:52.137Z] iter=203 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && head -60 src/tree-sitter-map.ts
+[2026-04-05T15:23:52.140Z] iter=203 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'export\|function\|interface\|type ' src/tree-sitter-map.ts | head -30
+[2026-04-05T15:23:52.145Z] iter=203 turn=3 INFO:   -> exit=0 (19 chars)
+[2026-04-05T15:23:52.147Z] iter=203 turn=3 INFO:   -> exit=0 (1772 chars)
+[2026-04-05T15:23:52.150Z] iter=203 turn=3 INFO:   -> exit=0 (1650 chars)
+[2026-04-05T15:23:52.150Z] iter=203 turn=4 INFO: Turn 4/25
+[2026-04-05T15:24:04.320Z] iter=203 turn=4 INFO: think: Status:
+- Assess system health: DONE - system is productive, 202 shipped VirtualMessageList, predictions accurate
+- Comp...
+[2026-04-05T15:24:04.321Z] iter=203 turn=5 INFO: Turn 5/25
+[2026-04-05T15:24:08.116Z] iter=203 turn=5 INFO: Agent: Goals: Assess=DONE, Memory compact=SKIP (81 lines, fine), Write goals.md=NOT STARTED, Update roadmap in memory=NOT STARTED. Finishing now.
+[2026-04-05T15:24:08.117Z] iter=203 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'buildRepoMap\|formatRepoMap\|export function' src/tree-sitter-map.ts | tail -20
+[2026-04-05T15:24:08.142Z] iter=203 turn=5 INFO:   -> exit=0 (256 chars)
+[2026-04-05T15:24:08.142Z] iter=203 turn=6 INFO: Turn 6/25
+[2026-04-05T15:24:26.134Z] iter=203 turn=6 INFO: Agent: 
+
+Right — Meta expert doesn't change src/. My deliverable is goals.md + memory. Writing both now.
+[2026-04-05T15:24:26.135Z] iter=203 turn=6 INFO: write_file: goals.md (write)
+[2026-04-05T15:24:26.136Z] iter=203 turn=6 INFO:   -> ok: Updated goals.md (2095 chars, +26 lines delta)
+[2026-04-05T15:24:26.138Z] iter=203 turn=7 INFO: Turn 7/25
+[2026-04-05T15:24:32.734Z] iter=203 turn=7 INFO: write_file: memory.md (patch)
+[2026-04-05T15:24:32.737Z] iter=203 turn=7 INFO:   -> ok: Patched memory.md: -4 +7 lines
+
+Context after patch:
+39 | 
+40 | **Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓
+41 | 
+42 | **Gaps (prioritized)**:
+43 | 1. **PageRank repo map** — Score symbols by reference frequency in tree-sitter-map.ts (specced for iter 204)
+44 | 2. **`/help` command** — List available TUI commands (specced for iter 204)
+45 | 3. **Auto-commit** — Aider-style git integration after successful edits
+46 | 4. **Fuzzy file/symbol search** — `/find` or `/search` command in TUI
+47 | 5. **LSP diagnostics integration** — Use language server for richer error context
+48 | 6. **Diff preview** — Show proposed changes before applying
+49 | 
+50 | ---
+51 | 
+[2026-04-05T15:24:32.738Z] iter=203 turn=8 INFO: Turn 8/25
+[2026-04-05T15:24:36.886Z] iter=203 turn=8 INFO: write_file: memory.md (patch)
+[2026-04-05T15:24:36.888Z] iter=203 turn=8 INFO:   -> ok: Patched memory.md: -1 +1 lines
+
+Context after patch:
+37 | - `src/project-memory.ts` — Discovers+injects CLAUDE.md hierarchy. Write-back via `saveToProjectMemory`.
+38 | - Model routing: keyword-based (CODE_CHANGE → sonnet, READ_ONLY → haiku).
+39 | 
+40 | **Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓ | VirtualMessageList ✓
+41 | 
+42 | **Gaps (prioritized)**:
+43 | 1. **PageRank repo map** — Score symbols by reference frequency in tree-sitter-map.ts (specced for iter 204)
+[2026-04-05T15:24:36.888Z] iter=203 turn=9 INFO: Turn 9/25
+[2026-04-05T15:24:41.960Z] iter=203 turn=9 INFO: save_memory: "[Meta] Iteration 203 Assessment"
+[2026-04-05T15:24:41.961Z] iter=203 turn=9 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T15:24:41.961Z] iter=203 turn=10 INFO: Turn 10/25
+[2026-04-05T15:24:44.197Z] iter=203 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "AUTOAGENT_RESTART"
+[2026-04-05T15:24:44.198Z] iter=203 turn=10 INFO: RESTART signal
+[2026-04-05T15:24:44.199Z] iter=203 turn=10 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T15:24:45.092Z] iter=203 turn=10 INFO: Compilation OK
+[2026-04-05T15:24:50.908Z] iter=203 turn=10 INFO: Cache persisted: 45 entries to .autoagent-cache.json
+[2026-04-05T15:24:50.908Z] iter=203 turn=10 INFO: Tool timing: bash: 9x, avg=14ms, total=127ms; write_file: 3x, avg=2ms, total=7ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T15:24:50.908Z] iter=203 turn=10 INFO: Tool timing stats
+[2026-04-05T15:24:55.773Z] iter=203 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 203: predicted 8 turns, actual 10 turns, ratio 1.25**
+[2026-04-05T15:24:55.793Z] iter=203 turn=10 INFO: Pre-commit review: no significant code changes to review

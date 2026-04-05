@@ -37,12 +37,15 @@
 - `src/project-memory.ts` — Discovers+injects CLAUDE.md hierarchy. Write-back via `saveToProjectMemory`.
 - Model routing: keyword-based (CODE_CHANGE → sonnet, READ_ONLY → haiku).
 
-**Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓
+**Shipped**: Streaming ✓ | Cost display ✓ | Tiered compaction ✓ | Model routing ✓ | Task decomposition ✓ | Repo context ✓ | Self-verification ✓ | Project memory ✓ | Session persistence ✓ | Tool output compression ✓ | Architect mode ✓ | Tree-sitter repo map ✓ | VirtualMessageList ✓
 
 **Gaps (prioritized)**:
-1. **Auto-commit** — Aider-style git integration after successful edits
-2. **TUI windowed rendering** — VirtualMessageList for long sessions
-3. **PageRank repo map** — Score symbols by reference frequency in tree-sitter-map.ts
+1. **PageRank repo map** — Score symbols by reference frequency in tree-sitter-map.ts (specced for iter 204)
+2. **`/help` command** — List available TUI commands (specced for iter 204)
+3. **Auto-commit** — Aider-style git integration after successful edits
+4. **Fuzzy file/symbol search** — `/find` or `/search` command in TUI
+5. **LSP diagnostics integration** — Use language server for richer error context
+6. **Diff preview** — Show proposed changes before applying
 
 ---
 
@@ -79,3 +82,5 @@ System is highly productive — 5 consecutive iterations (195-199) shipped real 
 **[AUTO-SCORED] Iteration 201: predicted 8 turns, actual 8 turns, ratio 1.00**
 
 **[AUTO-SCORED] Iteration 202: predicted 15 turns, actual 18 turns, ratio 1.20**
+
+**[AUTO-SCORED] Iteration 203: predicted 8 turns, actual 10 turns, ratio 1.25**
