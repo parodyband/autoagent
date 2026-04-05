@@ -283,7 +283,7 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
 
   // Orient: detect changes since last iteration (run in target repo if --repo)
   const orientReport = await orient(1000, true, workDir);
-  const orientationText = formatOrientation(orientReport);
+  const orientationText = formatOrientation(orientReport, expert.name, ROOT);
 
   // Fingerprint the working repo (only injected when operating on an external repo)
   const repoContextText = workDir !== ROOT ? fingerprintRepo(workDir) : undefined;
