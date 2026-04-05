@@ -132,7 +132,7 @@ function Header({ model }: { model: string }) {
         {workDir}
       </Text>
       <Text color="gray" dimColor>
-        Commands: /help  /clear  /reindex  /diff  /undo  /exit  Esc
+        Commands: /help  /status  /clear  /reindex  /diff  /undo  /exit  Esc
       </Text>
     </Box>
   );
@@ -464,6 +464,7 @@ function App() {
         content: [
           "Available commands:",
           "  /help     — Show this help message",
+          "  /status   — Show session stats (turns, tokens, cost, model)",
           "  /find Q   — Fuzzy search files & symbols in the repo",
           "  /model    — Show current model (or /model haiku|sonnet to switch)",
           "  /clear    — Clear the conversation history",
@@ -472,6 +473,23 @@ function App() {
           "  /diff     — Show uncommitted git changes",
           "  /undo     — Revert the last autoagent commit",
           "  /exit     — Quit AutoAgent",
+        ].join("\n"),
+      }]);
+      return;
+    }
+    if (trimmed === "/status") {
+      const turns = messages.filter(m => m.role === "user").length;
+      const { tokensIn, tokensOut, cost, model } = footerStats;
+      const costStr = cost < 0.01 ? `${cost.toFixed(4)}` : `${cost.toFixed(2)}`;
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: [
+          "Session Status:",
+          `  Turns:      ${turns}`,
+          `  Tokens in:  ${tokensIn.toLocaleString()}`,
+          `  Tokens out: ${tokensOut.toLocaleString()}`,
+          `  Cost:       ${costStr}`,
+          `  Model:      ${model}`,
         ].join("\n"),
       }]);
       return;

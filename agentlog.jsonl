@@ -1,112 +1,3 @@
-{"timestamp":"2026-04-05T16:47:45.888Z","iteration":249,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 249: predicted 8 turns, actual 9 turns, ratio 1.13**","turn":9}
-{"timestamp":"2026-04-05T16:47:45.909Z","iteration":249,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":9}
-{"timestamp":"2026-04-05T16:47:45.941Z","iteration":249,"level":"info","message":"Committed: 7fb2e99d (19 in / 2385 out, cache: 11432 created, 67214 read)","turn":9}
-{"timestamp":"2026-04-05T16:47:45.941Z","iteration":249,"level":"info","message":"Restarting as iteration 250...","turn":9}
-{"timestamp":"2026-04-05T16:47:46.133Z","iteration":250,"level":"info","message":"Cache restored: 51/51 entries (0 stale)"}
-{"timestamp":"2026-04-05T16:47:46.135Z","iteration":250,"level":"info","message":"Turn budget: 16/25 (calibration=1.00x, predicted=20)"}
-{"timestamp":"2026-04-05T16:47:46.135Z","iteration":250,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
-{"timestamp":"2026-04-05T16:47:46.256Z","iteration":250,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-05T16:47:49.206Z","iteration":250,"level":"info","message":"Agent: I'll start by reading the current state of the relevant files to understand what needs to be implemented.","turn":1}
-{"timestamp":"2026-04-05T16:47:49.208Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat src/tui.tsx | head -100","turn":1}
-{"timestamp":"2026-04-05T16:47:49.213Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"routeModel\\|onContextWarning\\|lastInputTokens\\|contextWarning\" src/orchestrator.ts | head -40","turn":1}
-{"timestamp":"2026-04-05T16:47:49.225Z","iteration":250,"level":"info","message":"  -> exit=0 (3156 chars)","turn":1}
-{"timestamp":"2026-04-05T16:47:49.230Z","iteration":250,"level":"info","message":"  -> exit=0 (1051 chars)","turn":1}
-{"timestamp":"2026-04-05T16:47:49.230Z","iteration":250,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-05T16:47:51.554Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"onContextWarning\\|contextWarning\\|setContext\\|contextWarn\" src/tui.tsx | head -20","turn":2}
-{"timestamp":"2026-04-05T16:47:51.559Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"routeModel\" src/orchestrator.ts","turn":2}
-{"timestamp":"2026-04-05T16:47:51.575Z","iteration":250,"level":"info","message":"  -> exit=0 (191 chars)","turn":2}
-{"timestamp":"2026-04-05T16:47:51.576Z","iteration":250,"level":"info","message":"  -> exit=0 (113 chars)","turn":2}
-{"timestamp":"2026-04-05T16:47:51.577Z","iteration":250,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-05T16:47:53.902Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '144,175p' src/orchestrator.ts","turn":3}
-{"timestamp":"2026-04-05T16:47:53.908Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '290,320p' src/tui.tsx","turn":3}
-{"timestamp":"2026-04-05T16:47:53.922Z","iteration":250,"level":"info","message":"  -> exit=0 (1191 chars)","turn":3}
-{"timestamp":"2026-04-05T16:47:53.924Z","iteration":250,"level":"info","message":"  -> exit=0 (1281 chars)","turn":3}
-{"timestamp":"2026-04-05T16:47:53.924Z","iteration":250,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-05T16:47:57.153Z","iteration":250,"level":"info","message":"think: I have enough context. Let me start implementing both goals now:\n\n1. Goal 1: Wire onContextWarning into TUI - add `conte...","turn":4}
-{"timestamp":"2026-04-05T16:47:57.153Z","iteration":250,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-05T16:47:59.227Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '320,400p' src/tui.tsx","turn":5}
-{"timestamp":"2026-04-05T16:47:59.229Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '760,800p' src/orchestrator.ts","turn":5}
-{"timestamp":"2026-04-05T16:47:59.237Z","iteration":250,"level":"info","message":"  -> exit=0 (2751 chars)","turn":5}
-{"timestamp":"2026-04-05T16:47:59.238Z","iteration":250,"level":"info","message":"  -> exit=0 (1819 chars)","turn":5}
-{"timestamp":"2026-04-05T16:47:59.238Z","iteration":250,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-05T16:48:02.901Z","iteration":250,"level":"info","message":"Agent: Now I have enough context. Let me implement both goals simultaneously:","turn":6}
-{"timestamp":"2026-04-05T16:48:02.902Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"handleSubmit\\|/clear\\|setMessages\\(\\[\\]\\)\" src/tui.tsx | head -20","turn":6}
-{"timestamp":"2026-04-05T16:48:02.911Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"this\\.messages\\|apiMessages\\|tool_use\\|hasCode\" src/orchestrator.ts | head -30","turn":6}
-{"timestamp":"2026-04-05T16:48:02.931Z","iteration":250,"level":"info","message":"  -> exit=0 (276 chars)","turn":6}
-{"timestamp":"2026-04-05T16:48:02.934Z","iteration":250,"level":"info","message":"  -> exit=0 (2043 chars)","turn":6}
-{"timestamp":"2026-04-05T16:48:02.934Z","iteration":250,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-05T16:48:05.982Z","iteration":250,"level":"info","message":"Agent: **Goal 1 (onContextWarning TUI banner): NOT STARTED**\n**Goal 2 (smarter model routing): NOT STARTED**\n\nI've been reading. Time to write. Both goals now:","turn":7}
-{"timestamp":"2026-04-05T16:48:05.983Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '424,445p' src/tui.tsx","turn":7}
-{"timestamp":"2026-04-05T16:48:05.992Z","iteration":250,"level":"info","message":"  -> exit=0 (876 chars)","turn":7}
-{"timestamp":"2026-04-05T16:48:05.993Z","iteration":250,"level":"info","message":"Turn 8/25","turn":8}
-{"timestamp":"2026-04-05T16:48:08.970Z","iteration":250,"level":"info","message":"Agent: Now I'll make both changes:\n\n**Goal 1: Add `contextWarning` state to TUI**","turn":8}
-{"timestamp":"2026-04-05T16:48:08.971Z","iteration":250,"level":"info","message":"write_file: src/tui.tsx (patch)","turn":8}
-{"timestamp":"2026-04-05T16:48:08.974Z","iteration":250,"level":"info","message":"  -> ok: Patched src/tui.tsx: -1 +2 lines\n\nContext after patch:\n299 |   const [showResume, setShowResume] = useState(false);\n300 |   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);\n301 |   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);\n302 |   const [contextBudgetRatio, setContextBudgetRatio] = useState(0);\n303 |   const [contextWarning, setContextWarning] = useState(false);\n304 |   const [fileSuggestions, setFileSuggestions] = useState<string[]>([]);\n305 |   const [fileSuggestionIdx, setFileSuggestionIdx] = useState(0);\n306 |   const repoMapRef = useRef<import(\"./tree-sitter-map.js\").RepoMap | null>(null);","turn":8}
-{"timestamp":"2026-04-05T16:48:08.975Z","iteration":250,"level":"info","message":"Turn 9/25","turn":9}
-{"timestamp":"2026-04-05T16:48:12.082Z","iteration":250,"level":"info","message":"Agent: Now add `onContextWarning` to orchestrator options and reset on new messages:","turn":9}
-{"timestamp":"2026-04-05T16:48:12.082Z","iteration":250,"level":"info","message":"write_file: src/tui.tsx (patch)","turn":9}
-{"timestamp":"2026-04-05T16:48:12.083Z","iteration":250,"level":"info","message":"  -> ok: Patched src/tui.tsx: -3 +6 lines\n\nContext after patch:\n337 |           setPendingDiff({ diff, filePath, resolve });\n338 |         });\n339 |       },\n340 |       onContextBudget: (ratio) => {\n341 |         setContextBudgetRatio(ratio);\n342 |       },\n343 |       onContextWarning: () => {\n344 |         setContextWarning(true);\n345 |       },\n346 |     });\n347 |     orchestratorRef.current = orch;\n348 |     orch.init().then(() => {","turn":9}
-{"timestamp":"2026-04-05T16:48:12.083Z","iteration":250,"level":"info","message":"Turn 10/25","turn":10}
-{"timestamp":"2026-04-05T16:48:15.712Z","iteration":250,"level":"info","message":"Agent: Reset `contextWarning` when new message is sent and on `/clear`:","turn":10}
-{"timestamp":"2026-04-05T16:48:15.712Z","iteration":250,"level":"info","message":"write_file: src/tui.tsx (patch)","turn":10}
-{"timestamp":"2026-04-05T16:48:15.713Z","iteration":250,"level":"info","message":"  -> ok: Patched src/tui.tsx: -5 +6 lines\n\nContext after patch:\n431 |     setInput(\"\");\n432 | \n433 |     // Built-in commands\n434 |     if (trimmed === \"/clear\") {\n435 |       orchestratorRef.current?.clearHistory();\n436 |       setMessages([]);\n437 |       setContextWarning(false);\n438 |       setFooterStats({ tokensIn: 0, tokensOut: 0, cost: 0, model: currentModel, contextTokens: 0, contextLimit: 200_000 });\n439 |       setStatus(\"Cleared\");\n440 |       setTimeout(() => setStatus(\"\"), 1000);\n441 |       return;\n442 |     }","turn":10}
-{"timestamp":"2026-04-05T16:48:15.713Z","iteration":250,"level":"info","message":"Turn 11/25","turn":11}
-{"timestamp":"2026-04-05T16:48:18.169Z","iteration":250,"level":"info","message":"Agent: Now find where the orchestrator `send()` is called and reset contextWarning before sending:","turn":11}
-{"timestamp":"2026-04-05T16:48:18.170Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"orchestratorRef.current.send\\|orch.*send\\|\\.send(\" src/tui.tsx | head -10","turn":11}
-{"timestamp":"2026-04-05T16:48:18.180Z","iteration":250,"level":"info","message":"  -> exit=0 (71 chars)","turn":11}
-{"timestamp":"2026-04-05T16:48:18.181Z","iteration":250,"level":"info","message":"Turn 12/25","turn":12}
-{"timestamp":"2026-04-05T16:48:19.935Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '610,630p' src/tui.tsx","turn":12}
-{"timestamp":"2026-04-05T16:48:19.944Z","iteration":250,"level":"info","message":"  -> exit=0 (528 chars)","turn":12}
-{"timestamp":"2026-04-05T16:48:19.945Z","iteration":250,"level":"info","message":"Turn 13/25","turn":13}
-{"timestamp":"2026-04-05T16:48:23.700Z","iteration":250,"level":"info","message":"Agent: I've made 3 patches to `src/tui.tsx` so far. Let me finish both goals now — fast.","turn":13}
-{"timestamp":"2026-04-05T16:48:23.700Z","iteration":250,"level":"info","message":"write_file: src/tui.tsx (patch)","turn":13}
-{"timestamp":"2026-04-05T16:48:23.701Z","iteration":250,"level":"info","message":"  -> ok: Patched src/tui.tsx: -3 +4 lines\n\nContext after patch:\n613 |     const userMsg: Message = { role: \"user\", content: trimmed };\n614 |     setMessages(prev => [...prev, userMsg]);\n615 | \n616 |     setContextWarning(false); // reset warning on new message\n617 |     setLoading(true);\n618 |     setStatus(\"Thinking...\");\n619 |     setStreamBuffer(\"\"); // clear any leftover\n620 | \n621 |     try {\n622 |       const result = await orchestratorRef.current!.send(trimmed);","turn":13}
-{"timestamp":"2026-04-05T16:48:23.701Z","iteration":250,"level":"info","message":"Turn 14/25","turn":14}
-{"timestamp":"2026-04-05T16:48:26.157Z","iteration":250,"level":"info","message":"Agent: Now render the banner and implement Goal 2, then wrap up.","turn":14}
-{"timestamp":"2026-04-05T16:48:26.158Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"contextBudgetRatio\\|footer\\|Footer\\|<Box\\|</Box>\" src/tui.tsx | tail -40","turn":14}
-{"timestamp":"2026-04-05T16:48:26.173Z","iteration":250,"level":"info","message":"  -> exit=0 (1758 chars)","turn":14}
-{"timestamp":"2026-04-05T16:48:26.174Z","iteration":250,"level":"info","message":"Turn 15/25","turn":15}
-{"timestamp":"2026-04-05T16:48:28.100Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '705,730p' src/tui.tsx","turn":15}
-{"timestamp":"2026-04-05T16:48:28.109Z","iteration":250,"level":"info","message":"  -> exit=0 (906 chars)","turn":15}
-{"timestamp":"2026-04-05T16:48:28.109Z","iteration":250,"level":"info","message":"Turn 16/25","turn":16}
-{"timestamp":"2026-04-05T16:48:32.606Z","iteration":250,"level":"info","message":"Agent: All patches in one shot:","turn":16}
-{"timestamp":"2026-04-05T16:48:32.607Z","iteration":250,"level":"info","message":"write_file: src/tui.tsx (patch)","turn":16}
-{"timestamp":"2026-04-05T16:48:32.607Z","iteration":250,"level":"info","message":"  -> ok: Patched src/tui.tsx: -6 +13 lines\n\nContext after patch:\n703 |         </Box>\n704 |       )}\n705 | \n706 |       {/* Context budget warning */}\n707 |       {contextBudgetRatio >= 0.8 && (\n708 |         <Box marginTop={1}>\n709 |           <Text color=\"yellow\">⚠ Context {Math.round(contextBudgetRatio * 100)}% full — compaction will trigger soon</Text>\n710 |         </Box>\n711 |       )}\n712 | \n713 |       {/* Persistent context warning banner from onContextWarning callback */}\n714 |       {contextWarning && (\n715 |         <Box marginTop={1}>\n716 |           <Text color=\"yellow\">⚠ Context 80%+ full — consider /clear or start a new session</Text>\n717 |         </Box>\n718 |       )}\n719 | \n720 |       {/* #file suggestion overlay */}\n721 |       {fileSuggestions.length > 0 && (","turn":16}
-{"timestamp":"2026-04-05T16:48:32.608Z","iteration":250,"level":"info","message":"Turn 17/25","turn":17}
-{"timestamp":"2026-04-05T16:48:40.902Z","iteration":250,"level":"info","message":"Agent: Goal 2 (routeModel) and tests - doing it all now in parallel:","turn":17}
-{"timestamp":"2026-04-05T16:48:40.903Z","iteration":250,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":17}
-{"timestamp":"2026-04-05T16:48:40.905Z","iteration":250,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -13 +22 lines\n\nContext after patch:\n141 |  * Simple read/explain tasks → haiku (fast, cheap).\n142 |  * Code changes or complex queries → sonnet.\n143 |  */\n144 | export function routeModel(userMessage: string, opts?: {\n145 |   lastInputTokens?: number;\n146 |   hasCodeEditsInHistory?: boolean;\n147 | }): string {\n148 |   const lower = userMessage.toLowerCase();\n149 | \n150 |   const codeScore = CODE_CHANGE_KEYWORDS.filter(k => lower.includes(k)).length;\n151 |   const readScore = READ_ONLY_KEYWORDS.filter(k => lower.includes(k)).length;\n152 | \n153 |   // Long messages are usually complex\n154 |   const isLong = userMessage.length > 300;\n155 | \n156 |   // Large context implies complex ongoing work\n157 |   if (opts?.lastInputTokens && opts.lastInputTokens > 80_000) return MODEL_COMPLEX;\n158 | \n159 |   // Short follow-up after code edits — keep using capable model\n160 |   if (opts?.hasCodeEditsInHistory && userMessage.length < 100) return MODEL_COMPLEX;\n161 | \n162 |   if (codeScore > 0 || isLong) return MODEL_COMPLEX;\n163 |   if (readScore > 0 && codeScore === 0) return MODEL_SIMPLE;\n164 |   return MODEL_COMPLEX; // default to capable model\n165 | }\n166 | \n167 | // ─── Cost calculator ──────────────────────────────────────────\n168 | ","turn":17}
-{"timestamp":"2026-04-05T16:48:40.905Z","iteration":250,"level":"info","message":"Turn 18/25","turn":18}
-{"timestamp":"2026-04-05T16:48:44.793Z","iteration":250,"level":"info","message":"Agent: Now update the call site:","turn":18}
-{"timestamp":"2026-04-05T16:48:44.793Z","iteration":250,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":18}
-{"timestamp":"2026-04-05T16:48:44.795Z","iteration":250,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -2 +10 lines\n\nContext after patch:\n778 |   async send(userMessage: string): Promise<OrchestratorResult> {\n779 |     if (!this.initialized) await this.init();\n780 | \n781 |     // 1. Model routing\n782 |     const hasCodeEditsInHistory = this.apiMessages.some(m =>\n783 |       m.role === \"assistant\" &&\n784 |       Array.isArray(m.content) &&\n785 |       m.content.some((b: Anthropic.ContentBlock) => b.type === \"tool_use\")\n786 |     );\n787 |     const model = this.modelOverride ?? routeModel(userMessage, {\n788 |       lastInputTokens: this.lastInputTokens,\n789 |       hasCodeEditsInHistory,\n790 |     });\n791 |     this.opts.onStatus?.(`Using ${model === MODEL_COMPLEX ? \"Sonnet\" : \"Haiku\"}...`);\n792 | \n793 |     // 1b. Token budget warning — emit ratio before compaction so TUI can warn user","turn":18}
-{"timestamp":"2026-04-05T16:48:44.795Z","iteration":250,"level":"info","message":"Turn 19/25","turn":19}
-{"timestamp":"2026-04-05T16:48:52.574Z","iteration":250,"level":"info","message":"Agent: Now write both test files:","turn":19}
-{"timestamp":"2026-04-05T16:48:52.575Z","iteration":250,"level":"info","message":"write_file: src/__tests__/tui-context-warning.test.ts (write)","turn":19}
-{"timestamp":"2026-04-05T16:48:52.575Z","iteration":250,"level":"info","message":"  -> ok: Created src/__tests__/tui-context-warning.test.ts (1431 chars)","turn":19}
-{"timestamp":"2026-04-05T16:48:52.575Z","iteration":250,"level":"info","message":"Turn 20/25","turn":20}
-{"timestamp":"2026-04-05T16:48:54.581Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat src/__tests__/model-routing.test.ts 2>/dev/null | head -20 || echo \"NOT FOUND\"","turn":20}
-{"timestamp":"2026-04-05T16:48:54.591Z","iteration":250,"level":"info","message":"  -> exit=0 (11 chars)","turn":20}
-{"timestamp":"2026-04-05T16:48:54.591Z","iteration":250,"level":"info","message":"Turn 21/25","turn":21}
-{"timestamp":"2026-04-05T16:48:56.568Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && ls src/__tests__/model-routing* 2>/dev/null || echo \"none\"","turn":21}
-{"timestamp":"2026-04-05T16:48:56.579Z","iteration":250,"level":"info","message":"  -> exit=0 (5 chars)","turn":21}
-{"timestamp":"2026-04-05T16:48:56.579Z","iteration":250,"level":"info","message":"Turn 22/25","turn":22}
-{"timestamp":"2026-04-05T16:49:03.430Z","iteration":250,"level":"info","message":"write_file: src/__tests__/model-routing.test.ts (write)","turn":22}
-{"timestamp":"2026-04-05T16:49:03.431Z","iteration":250,"level":"info","message":"  -> ok: Created src/__tests__/model-routing.test.ts (1384 chars)","turn":22}
-{"timestamp":"2026-04-05T16:49:03.431Z","iteration":250,"level":"info","message":"Turn 23/25","turn":23}
-{"timestamp":"2026-04-05T16:49:06.305Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20 && npx vitest run src/__tests__/model-routing.test.ts src/__tests__/tui-context-warning.test.ts 2>&1 | tail -20","turn":23}
-{"timestamp":"2026-04-05T16:49:08.315Z","iteration":250,"level":"info","message":"  -> exit=0 (1112 chars)","turn":23}
-{"timestamp":"2026-04-05T16:49:08.315Z","iteration":250,"level":"info","message":"Turn 24/25","turn":24}
-{"timestamp":"2026-04-05T16:49:11.007Z","iteration":250,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":24}
-{"timestamp":"2026-04-05T16:49:11.008Z","iteration":250,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -1 +1 lines\n\nContext after patch:\n782 |     const hasCodeEditsInHistory = this.apiMessages.some(m =>\n783 |       m.role === \"assistant\" &&\n784 |       Array.isArray(m.content) &&\n785 |       m.content.some((b: { type: string }) => b.type === \"tool_use\")\n786 |     );\n787 |     const model = this.modelOverride ?? routeModel(userMessage, {\n788 |       lastInputTokens: this.lastInputTokens,","turn":24}
-{"timestamp":"2026-04-05T16:49:11.008Z","iteration":250,"level":"info","message":"Turn 25/25","turn":25}
-{"timestamp":"2026-04-05T16:49:13.492Z","iteration":250,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5 && echo \"TSC OK\"","turn":25}
-{"timestamp":"2026-04-05T16:49:14.435Z","iteration":250,"level":"info","message":"  -> exit=0 (7 chars)","turn":25}
-{"timestamp":"2026-04-05T16:49:14.435Z","iteration":250,"level":"info","message":"Hit max turns — committing and restarting","turn":25}
-{"timestamp":"2026-04-05T16:49:14.436Z","iteration":250,"level":"info","message":"Cache persisted: 51 entries to .autoagent-cache.json","turn":25}
-{"timestamp":"2026-04-05T16:49:14.436Z","iteration":250,"level":"info","message":"Tool timing: bash: 19x, avg=169ms, total=3210ms; write_file: 10x, avg=1ms, total=13ms; think: 1x, avg=0ms, total=0ms","turn":25}
-{"timestamp":"2026-04-05T16:49:14.436Z","iteration":250,"level":"info","message":"Tool timing stats","turn":25,"metadata":{"timing":{"tools":{"bash":{"calls":19,"totalMs":3210,"minMs":9,"maxMs":2010,"avgMs":169},"think":{"calls":1,"totalMs":0,"minMs":0,"maxMs":0,"avgMs":0},"write_file":{"calls":10,"totalMs":13,"minMs":0,"maxMs":3,"avgMs":1}},"totalCalls":30,"totalMs":3223}}}
-{"timestamp":"2026-04-05T16:49:19.913Z","iteration":250,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 250: predicted 20 turns, actual 25 turns, ratio 1.25**","turn":25}
 {"timestamp":"2026-04-05T16:49:29.032Z","iteration":250,"level":"info","message":"Pre-commit review (1955in/392out): **Issues found:**\n\n- **`hasCodeEditsInHistory` logic is too broad**: The check looks for any `tool_use` block in assistant messages, but tool use includes read-only tools (e.g., file reads, searches).","turn":25}
 {"timestamp":"2026-04-05T16:49:29.088Z","iteration":250,"level":"info","message":"Committed: 17536230 (41 in / 5105 out, cache: 18749 created, 331271 read)","turn":25}
 {"timestamp":"2026-04-05T16:49:29.088Z","iteration":250,"level":"info","message":"Restarting as iteration 251...","turn":25}
@@ -605,3 +496,101 @@
 {"timestamp":"2026-04-05T17:03:04.899Z","iteration":256,"level":"info","message":"Tool timing stats","turn":24,"metadata":{"timing":{"tools":{"bash":{"calls":26,"totalMs":1358,"minMs":0,"maxMs":962,"avgMs":52},"think":{"calls":2,"totalMs":0,"minMs":0,"maxMs":0,"avgMs":0},"write_file":{"calls":4,"totalMs":7,"minMs":1,"maxMs":3,"avgMs":2},"save_memory":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":33,"totalMs":1366}}}
 {"timestamp":"2026-04-05T17:03:10.690Z","iteration":256,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 256: predicted 20 turns, actual 24 turns, ratio 1.20**","turn":24}
 {"timestamp":"2026-04-05T17:03:14.187Z","iteration":256,"level":"info","message":"Pre-commit review (2921in/115out): **LGTM** — the code is well-structured, import uses `.js` extension, error handling is consistent with `readFileSafe`/`fileExists` wrappers, and the detection logic follows a clear single-responsibili","turn":24}
+{"timestamp":"2026-04-05T17:03:14.237Z","iteration":256,"level":"info","message":"Committed: 54cdd227 (40 in / 6005 out, cache: 22394 created, 382343 read)","turn":24}
+{"timestamp":"2026-04-05T17:03:14.238Z","iteration":256,"level":"info","message":"Restarting as iteration 257...","turn":24}
+{"timestamp":"2026-04-05T17:03:14.431Z","iteration":257,"level":"info","message":"Cache restored: 53/53 entries (0 stale)"}
+{"timestamp":"2026-04-05T17:03:14.433Z","iteration":257,"level":"info","message":"Turn budget: 20/25 (calibration=1.20x, predicted=20)"}
+{"timestamp":"2026-04-05T17:03:14.434Z","iteration":257,"level":"info","message":"Starting. Expert=Architect Model=claude-opus-4-6"}
+{"timestamp":"2026-04-05T17:03:14.568Z","iteration":257,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-05T17:03:18.501Z","iteration":257,"level":"info","message":"Agent: \n\nI'll start by understanding the current state of the codebase, then execute both goals.","turn":1}
+{"timestamp":"2026-04-05T17:03:18.503Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20","turn":1}
+{"timestamp":"2026-04-05T17:03:18.507Z","iteration":257,"level":"info","message":"read_file: src/project-detector.ts","turn":1}
+{"timestamp":"2026-04-05T17:03:18.508Z","iteration":257,"level":"info","message":"  -> ok (8208 chars)","turn":1}
+{"timestamp":"2026-04-05T17:03:18.508Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"projectSummaryInjected\\|detectProject\\|project-detector\" src/orchestrator.ts","turn":1}
+{"timestamp":"2026-04-05T17:03:18.523Z","iteration":257,"level":"info","message":"  -> exit=0 (104 chars)","turn":1}
+{"timestamp":"2026-04-05T17:03:19.453Z","iteration":257,"level":"info","message":"  -> exit=0 (11 chars)","turn":1}
+{"timestamp":"2026-04-05T17:03:19.454Z","iteration":257,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-05T17:03:24.162Z","iteration":257,"level":"info","message":"Agent: Good — TSC is clean, `project-detector.ts` exists, and it's imported but not yet called. Let me check the `send()` method and the TUI for where to add `/status`.","turn":2}
+{"timestamp":"2026-04-05T17:03:24.162Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"async send\\|systemPrompt\\|this\\.systemPrompt\\|private systemPrompt\" src/orchestrator.ts | head -20","turn":2}
+{"timestamp":"2026-04-05T17:03:24.165Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"/help\\|/diff\\|/undo\\|/clear\\|/find\\|/model\\|/reindex\\|/resume\\|slash.*command\\|handleSlash\\|Commands:\" src/tui.tsx | head -40","turn":2}
+{"timestamp":"2026-04-05T17:03:24.176Z","iteration":257,"level":"info","message":"  -> exit=0 (787 chars)","turn":2}
+{"timestamp":"2026-04-05T17:03:24.180Z","iteration":257,"level":"info","message":"  -> exit=0 (1267 chars)","turn":2}
+{"timestamp":"2026-04-05T17:03:24.180Z","iteration":257,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-05T17:03:27.356Z","iteration":257,"level":"info","message":"read_file: src/orchestrator.ts","turn":3}
+{"timestamp":"2026-04-05T17:03:27.356Z","iteration":257,"level":"info","message":"  -> ok (1372 chars)","turn":3}
+{"timestamp":"2026-04-05T17:03:27.357Z","iteration":257,"level":"info","message":"read_file: src/tui.tsx","turn":3}
+{"timestamp":"2026-04-05T17:03:27.357Z","iteration":257,"level":"info","message":"  -> ok (1623 chars)","turn":3}
+{"timestamp":"2026-04-05T17:03:27.357Z","iteration":257,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-05T17:03:46.477Z","iteration":257,"level":"info","message":"Agent: \n\nYou're right. I have all the context I need. Let me deliver both goals now.\n\n**Deliverables:**\n1. Wire `detectProject()` into `orchestrator.ts` `send()` method\n2. Write tests for `project-detector.ts`\n3. Add `/status` command to TUI\n4. Write tests for `/status`\n\nLet me start writing all of them:","turn":4}
+{"timestamp":"2026-04-05T17:03:46.478Z","iteration":257,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":4}
+{"timestamp":"2026-04-05T17:03:46.479Z","iteration":257,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -7 +18 lines\n\nContext after patch:\n840 |   async send(userMessage: string): Promise<OrchestratorResult> {\n841 |     if (!this.initialized) await this.init();\n842 | \n843 |     // 0. Project summary injection (once per session)\n844 |     if (!this.projectSummaryInjected) {\n845 |       try {\n846 |         const projectInfo = detectProject(this.opts.workDir);\n847 |         if (projectInfo.type !== \"unknown\") {\n848 |           this.systemPrompt += `\\n\\n## Project Context\\n${projectInfo.summary}`;\n849 |         }\n850 |       } catch { /* non-fatal — skip if detection fails */ }\n851 |       this.projectSummaryInjected = true;\n852 |     }\n853 | \n854 |     // 1. Model routing\n855 |     const hasCodeEditsInHistory = this.apiMessages.some(m =>\n856 |       m.role === \"assistant\" &&\n857 |       Array.isArray(m.content) &&\n858 |       m.content.some((b: { type: string }) => b.type === \"tool_use\")\n859 |     );\n860 |     const model = this.modelOverride ?? routeModel(userMessage, {\n861 |       lastInputTokens: this.lastInputTokens,\n862 |       hasCodeEditsInHistory,\n863 |     });","turn":4}
+{"timestamp":"2026-04-05T17:03:46.480Z","iteration":257,"level":"info","message":"write_file: src/__tests__/project-detector.test.ts (write)","turn":4}
+{"timestamp":"2026-04-05T17:03:46.480Z","iteration":257,"level":"info","message":"  -> ok: Created src/__tests__/project-detector.test.ts (3311 chars)","turn":4}
+{"timestamp":"2026-04-05T17:03:46.481Z","iteration":257,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-05T17:03:50.107Z","iteration":257,"level":"info","message":"Agent: Now add `/status` to the TUI and its tests:","turn":5}
+{"timestamp":"2026-04-05T17:03:50.108Z","iteration":257,"level":"info","message":"read_file: src/tui.tsx","turn":5}
+{"timestamp":"2026-04-05T17:03:50.108Z","iteration":257,"level":"info","message":"  -> ok (215 chars)","turn":5}
+{"timestamp":"2026-04-05T17:03:50.109Z","iteration":257,"level":"info","message":"read_file: src/tui.tsx","turn":5}
+{"timestamp":"2026-04-05T17:03:50.109Z","iteration":257,"level":"info","message":"  -> ok (819 chars)","turn":5}
+{"timestamp":"2026-04-05T17:03:50.110Z","iteration":257,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-05T17:03:59.039Z","iteration":257,"level":"info","message":"write_file: src/tui.tsx (patch)","turn":6}
+{"timestamp":"2026-04-05T17:03:59.041Z","iteration":257,"level":"info","message":"  -> ok: Patched src/tui.tsx: -1 +1 lines\n\nContext after patch:\n132 |         {workDir}\n133 |       </Text>\n134 |       <Text color=\"gray\" dimColor>\n135 |         Commands: /help  /status  /clear  /reindex  /diff  /undo  /exit  Esc\n136 |       </Text>\n137 |     </Box>\n138 |   );","turn":6}
+{"timestamp":"2026-04-05T17:03:59.041Z","iteration":257,"level":"info","message":"write_file: src/tui.tsx (patch)","turn":6}
+{"timestamp":"2026-04-05T17:03:59.042Z","iteration":257,"level":"info","message":"  -> ok: Patched src/tui.tsx: -18 +36 lines\n\nContext after patch:\n1 | /**\n2 |  * AutoAgent Interactive TUI — React-based terminal UI using Ink.\n3 |  *\n4 |  * Usage:\n5 |  *   npm run tui                          # work in current directory\n6 |  *   npm run tui -- --dir /path/to/repo   # work in a specific repo\n7 |  */\n8 | \n9 | import React, { useState, useCallback, useEffect, useRef } from \"react\";\n10 | import { render, Box, Text, useInput, useApp } from \"ink\";\n11 | import Spinner from \"ink-spinner\";\n12 | import TextInput from \"ink-text-input\";\n13 | import path from \"path\";\n14 | import \"dotenv/config\";\n15 | import { Orchestrator } from \"./orchestrator.js\";\n16 | import { listSessions, type SessionInfo } from \"./session-store.js\";\n17 | import type { EditPlan } from \"./architect-mode.js\";\n18 | import { VirtualMessageList } from \"./virtual-message-list.js\";\n19 | import { undoLastCommit } from \"./auto-commit.js\";\n20 | import { buildRepoMap, fuzzySearch } from \"./tree-sitter-map.js\";\n21 | import { execSync } from \"child_process\";\n22 | \n23 | // Parse args\n24 | let workDir = process.cwd();\n25 | const dirIdx = process.argv.indexOf(\"--dir\");\n26 | if (dirIdx !== -1 && process.argv[dirIdx + 1]) {\n27 |   workDir = path.resolve(process.argv[dirIdx + 1]);\n28 | }\n29 | \n30 | // --no-confirm flag: skip write_file diff confirmation\n31 | const noConfirm = process.argv.includes(\"--no-confirm\");\n32 | \n33 | // --continue / -c flag: auto-resume most recent session\n34 | const continueFlag =\n35 |   process.argv.includes(\"--continue\") || process.argv.includes(\"-c\");\n36 | let initialResumeSessionPath: string | undefined;\n37 | if (continueFlag) {\n38 |   const recentSessions = listSessions(workDir);\n39 |   if (recentSessions.length > 0) {","turn":6}
+{"timestamp":"2026-04-05T17:03:59.043Z","iteration":257,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-05T17:04:04.550Z","iteration":257,"level":"info","message":"Agent: \n\n**Goal Status:**\n- **Goal 1 (Wire project-detector):** IN PROGRESS — orchestrator wired ✅, tests written ✅, need to verify they pass\n- **Goal 2 (/status command):** IN PROGRESS — TUI code written ✅, need to write tests and verify\n\nLet me run tests and write the `/status` tests now:","turn":7}
+{"timestamp":"2026-04-05T17:04:04.550Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20","turn":7}
+{"timestamp":"2026-04-05T17:04:04.552Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/project-detector.test.ts 2>&1 | tail -30","turn":7}
+{"timestamp":"2026-04-05T17:04:05.572Z","iteration":257,"level":"info","message":"  -> exit=0 (284 chars)","turn":7}
+{"timestamp":"2026-04-05T17:04:05.574Z","iteration":257,"level":"info","message":"  -> exit=0 (11 chars)","turn":7}
+{"timestamp":"2026-04-05T17:04:05.574Z","iteration":257,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-05T17:04:08.520Z","iteration":257,"level":"info","message":"Agent: TSC clean, all 8 project-detector tests pass. Now write `/status` tests:","turn":8}
+{"timestamp":"2026-04-05T17:04:08.520Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"handleSubmit\\|export.*handleSlash\\|parseSlashCommand\" src/tui.tsx | head -10","turn":8}
+{"timestamp":"2026-04-05T17:04:08.530Z","iteration":257,"level":"info","message":"  -> exit=0 (106 chars)","turn":8}
+{"timestamp":"2026-04-05T17:04:08.531Z","iteration":257,"level":"info","message":"Turn 9/25","turn":9}
+{"timestamp":"2026-04-05T17:04:12.404Z","iteration":257,"level":"info","message":"think: The /status command is inside the handleSubmit callback in the TUI component. Testing React/Ink components directly is c...","turn":9}
+{"timestamp":"2026-04-05T17:04:12.405Z","iteration":257,"level":"info","message":"Turn 10/25","turn":10}
+{"timestamp":"2026-04-05T17:04:15.422Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && ls src/__tests__/tui* 2>/dev/null; grep -l \"tui\\|slash\\|/status\\|/help\\|handleSubmit\" src/__tests__/*.test.ts 2>/dev/null","turn":10}
+{"timestamp":"2026-04-05T17:04:15.452Z","iteration":257,"level":"info","message":"  -> exit=0 (362 chars)","turn":10}
+{"timestamp":"2026-04-05T17:04:15.452Z","iteration":257,"level":"info","message":"Turn 11/25","turn":11}
+{"timestamp":"2026-04-05T17:04:17.755Z","iteration":257,"level":"info","message":"read_file: src/__tests__/tui-commands.test.ts","turn":11}
+{"timestamp":"2026-04-05T17:04:17.755Z","iteration":257,"level":"info","message":"  -> ok (5141 chars)","turn":11}
+{"timestamp":"2026-04-05T17:04:17.755Z","iteration":257,"level":"info","message":"Turn 12/25","turn":12}
+{"timestamp":"2026-04-05T17:04:31.091Z","iteration":257,"level":"info","message":"Agent: Good — the pattern is to extract the pure logic into testable functions. Let me add `/status` tests following this pattern:","turn":12}
+{"timestamp":"2026-04-05T17:04:31.091Z","iteration":257,"level":"info","message":"write_file: src/__tests__/tui-status.test.ts (write)","turn":12}
+{"timestamp":"2026-04-05T17:04:31.092Z","iteration":257,"level":"info","message":"  -> ok: Created src/__tests__/tui-status.test.ts (2868 chars)","turn":12}
+{"timestamp":"2026-04-05T17:04:31.092Z","iteration":257,"level":"info","message":"Turn 13/25","turn":13}
+{"timestamp":"2026-04-05T17:04:37.439Z","iteration":257,"level":"info","message":"Agent: \n\n**Changes made in src/ this iteration:**\n1. `src/orchestrator.ts` — Wired `detectProject()` into `send()` (project summary injection)\n2. `src/__tests__/project-detector.test.ts` — 8 tests for project detector\n3. `src/tui.tsx` — Added `/status` command + added to `/help` output + header Commands line\n4. `src/__tests__/tui-status.test.ts` — 7 tests for /status command\n\nBoth goals are DONE. Let me ...","turn":13}
+{"timestamp":"2026-04-05T17:04:37.440Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -10","turn":13}
+{"timestamp":"2026-04-05T17:04:37.441Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/project-detector.test.ts src/__tests__/tui-status.test.ts 2>&1 | tail -15","turn":13}
+{"timestamp":"2026-04-05T17:04:38.433Z","iteration":257,"level":"info","message":"  -> exit=0 (338 chars)","turn":13}
+{"timestamp":"2026-04-05T17:04:38.483Z","iteration":257,"level":"info","message":"  -> exit=0 (11 chars)","turn":13}
+{"timestamp":"2026-04-05T17:04:38.483Z","iteration":257,"level":"info","message":"Turn 14/25","turn":14}
+{"timestamp":"2026-04-05T17:04:41.024Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -10","turn":14}
+{"timestamp":"2026-04-05T17:04:50.282Z","iteration":257,"level":"info","message":"  -> exit=0 (458 chars)","turn":14}
+{"timestamp":"2026-04-05T17:04:50.282Z","iteration":257,"level":"info","message":"Turn 15/25","turn":15}
+{"timestamp":"2026-04-05T17:04:53.209Z","iteration":257,"level":"info","message":"Agent: All 733 tests pass (up from 718), TSC clean. Now update memory and goals:","turn":15}
+{"timestamp":"2026-04-05T17:04:53.209Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git add -A && git status","turn":15}
+{"timestamp":"2026-04-05T17:04:53.244Z","iteration":257,"level":"info","message":"  -> exit=0 (374 chars)","turn":15}
+{"timestamp":"2026-04-05T17:04:53.244Z","iteration":257,"level":"info","message":"Turn 16/25","turn":16}
+{"timestamp":"2026-04-05T17:04:57.101Z","iteration":257,"level":"info","message":"save_memory: \"[Architect] Iteration 257 shipped\"","turn":16}
+{"timestamp":"2026-04-05T17:04:57.102Z","iteration":257,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":16}
+{"timestamp":"2026-04-05T17:04:57.102Z","iteration":257,"level":"info","message":"Turn 17/25","turn":17}
+{"timestamp":"2026-04-05T17:05:08.895Z","iteration":257,"level":"info","message":"write_file: goals.md (write)","turn":17}
+{"timestamp":"2026-04-05T17:05:08.897Z","iteration":257,"level":"info","message":"  -> ok: Updated goals.md (1389 chars, -9 lines delta)","turn":17}
+{"timestamp":"2026-04-05T17:05:08.897Z","iteration":257,"level":"info","message":"Turn 18/25","turn":18}
+{"timestamp":"2026-04-05T17:05:11.139Z","iteration":257,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5","turn":18}
+{"timestamp":"2026-04-05T17:05:12.096Z","iteration":257,"level":"info","message":"  -> exit=0 (11 chars)","turn":18}
+{"timestamp":"2026-04-05T17:05:12.096Z","iteration":257,"level":"info","message":"Turn 19/25","turn":19}
+{"timestamp":"2026-04-05T17:05:15.122Z","iteration":257,"level":"info","message":"Agent: TSC clean. All done.\n\n```\necho \"AUTOAGENT_RESTART\"\n```","turn":19}
+{"timestamp":"2026-04-05T17:05:15.123Z","iteration":257,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":19}
+{"timestamp":"2026-04-05T17:05:15.123Z","iteration":257,"level":"info","message":"RESTART signal","turn":19}
+{"timestamp":"2026-04-05T17:05:15.124Z","iteration":257,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":19}
+{"timestamp":"2026-04-05T17:05:16.078Z","iteration":257,"level":"info","message":"Compilation OK","turn":19}
+{"timestamp":"2026-04-05T17:05:22.414Z","iteration":257,"level":"info","message":"Cache persisted: 55 entries to .autoagent-cache.json","turn":19}
+{"timestamp":"2026-04-05T17:05:22.414Z","iteration":257,"level":"info","message":"Cache stats: 0 hits, 6 misses, 55 entries, 6 invalidations (4 entries removed)","turn":19}
+{"timestamp":"2026-04-05T17:05:22.414Z","iteration":257,"level":"info","message":"Tool cache stats","turn":19,"metadata":{"cacheHits":0,"cacheMisses":6,"cacheEntries":55,"invalidations":6,"invalidatedEntries":4,"toolStats":{"read_file":{"hits":0,"misses":6}}}}
+{"timestamp":"2026-04-05T17:05:22.414Z","iteration":257,"level":"info","message":"Tool timing: bash: 14x, avg=1098ms, total=15367ms; write_file: 6x, avg=2ms, total=10ms; read_file: 6x, avg=1ms, total=8ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms","turn":19}
+{"timestamp":"2026-04-05T17:05:22.414Z","iteration":257,"level":"info","message":"Tool timing stats","turn":19,"metadata":{"timing":{"tools":{"read_file":{"calls":6,"totalMs":8,"minMs":0,"maxMs":5,"avgMs":1},"bash":{"calls":14,"totalMs":15367,"minMs":1,"maxMs":9258,"avgMs":1098},"write_file":{"calls":6,"totalMs":10,"minMs":1,"maxMs":3,"avgMs":2},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"save_memory":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2}},"totalCalls":28,"totalMs":15388}}}
+{"timestamp":"2026-04-05T17:05:28.509Z","iteration":257,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 257: predicted 20 turns, actual 19 turns, ratio 0.95**","turn":19}
+{"timestamp":"2026-04-05T17:05:37.722Z","iteration":257,"level":"info","message":"Pre-commit review (2909in/338out): - **`projectSummaryInjected` flag not declared**: The diff adds `this.projectSummaryInjected` but there's no corresponding property declaration visible in the class. If it's missing from the class def","turn":19}

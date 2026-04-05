@@ -840,6 +840,17 @@ export class Orchestrator {
   async send(userMessage: string): Promise<OrchestratorResult> {
     if (!this.initialized) await this.init();
 
+    // 0. Project summary injection (once per session)
+    if (!this.projectSummaryInjected) {
+      try {
+        const projectInfo = detectProject(this.opts.workDir);
+        if (projectInfo.type !== "unknown") {
+          this.systemPrompt += `\n\n## Project Context\n${projectInfo.summary}`;
+        }
+      } catch { /* non-fatal — skip if detection fails */ }
+      this.projectSummaryInjected = true;
+    }
+
     // 1. Model routing
     const hasCodeEditsInHistory = this.apiMessages.some(m =>
       m.role === "assistant" &&

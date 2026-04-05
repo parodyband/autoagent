@@ -1,142 +1,3 @@
-887 |     if (
-888 |       !this.contextWarningShown &&
-889 |       this.opts.onContextWarning &&
-890 |       lastInputTokens >= CONTEXT_WARNING_THRESHOLD
-891 |     ) {
-892 |       this.contextWarningShown = true;
-893 |       this.opts.onContextWarning();
-894 |     }
-895 | 
-896 |     // 6. Self-verification (if code was likely changed)
-897 |     let verificationPassed: boolean | undefined;
-898 |     const looksLikeCodeChange = CODE_CHANGE_KEYWORDS.some(k =>
-899 |       userMessage.toLowerCase().includes(k)
-[2026-04-05T16:45:29.538Z] iter=248 turn=12 INFO: Turn 12/25
-[2026-04-05T16:45:32.076Z] iter=248 turn=12 INFO: Agent: Now add the orchestrator tests. Let me check if there's an existing orchestrator test file:
-[2026-04-05T16:45:32.077Z] iter=248 turn=12 INFO: $ ls src/__tests__/orchestrator* 2>/dev/null || echo "none"
-[2026-04-05T16:45:32.093Z] iter=248 turn=12 INFO:   -> exit=0 (122 chars)
-[2026-04-05T16:45:32.093Z] iter=248 turn=13 INFO: Turn 13/25
-[2026-04-05T16:45:34.944Z] iter=248 turn=13 INFO: Agent: I have actual changes in src/. Let me check what tests exist and add the context warning tests, then verify and wrap up.
-[2026-04-05T16:45:34.945Z] iter=248 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "contextWarning\|CONTEXT_WARNING" src/__tests__/orchestrator*.test.ts 2>/dev/null | head -20
-[2026-04-05T16:45:34.964Z] iter=248 turn=13 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:45:34.964Z] iter=248 turn=14 INFO: Turn 14/25
-[2026-04-05T16:45:37.232Z] iter=248 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && head -50 src/__tests__/orchestrator-compaction.test.ts
-[2026-04-05T16:45:37.252Z] iter=248 turn=14 INFO:   -> exit=0 (1627 chars)
-[2026-04-05T16:45:37.253Z] iter=248 turn=15 INFO: Turn 15/25
-[2026-04-05T16:45:47.449Z] iter=248 turn=15 INFO: Agent: Adding context warning tests, then running verification:
-[2026-04-05T16:45:47.450Z] iter=248 turn=15 INFO: write_file: src/__tests__/orchestrator-context-warning.test.ts (write)
-[2026-04-05T16:45:47.451Z] iter=248 turn=15 INFO:   -> ok: Created src/__tests__/orchestrator-context-warning.test.ts (2543 chars)
-[2026-04-05T16:45:47.452Z] iter=248 turn=16 INFO: Turn 16/25
-[2026-04-05T16:45:49.482Z] iter=248 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/test-runner.test.ts src/__tests__/orchestrator-context-warning.test.ts 2>&1 | tail -20
-[2026-04-05T16:45:50.622Z] iter=248 turn=16 INFO:   -> exit=0 (353 chars)
-[2026-04-05T16:45:50.622Z] iter=248 turn=17 INFO: Turn 17/25
-[2026-04-05T16:45:53.857Z] iter=248 turn=17 INFO: Agent: All 25 tests pass. Running tsc and wrapping up:
-[2026-04-05T16:45:53.858Z] iter=248 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T16:45:54.810Z] iter=248 turn=17 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:45:54.811Z] iter=248 turn=18 INFO: Turn 18/25
-[2026-04-05T16:46:00.391Z] iter=248 turn=18 INFO: Agent: Clean. Wrapping up now.
-[2026-04-05T16:46:00.392Z] iter=248 turn=18 INFO: save_memory: "[Engineer] Iteration 248"
-[2026-04-05T16:46:00.392Z] iter=248 turn=18 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T16:46:00.393Z] iter=248 turn=19 INFO: Turn 19/25
-[2026-04-05T16:46:08.940Z] iter=248 turn=19 INFO: write_file: goals.md (write)
-[2026-04-05T16:46:08.942Z] iter=248 turn=19 INFO:   -> ok: Updated goals.md (1022 chars, +4 lines delta)
-[2026-04-05T16:46:08.942Z] iter=248 turn=20 INFO: Turn 20/25
-[2026-04-05T16:46:10.885Z] iter=248 turn=20 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T16:46:10.886Z] iter=248 turn=20 INFO: RESTART signal
-[2026-04-05T16:46:10.887Z] iter=248 turn=20 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T16:46:11.820Z] iter=248 turn=20 INFO: Compilation OK
-[2026-04-05T16:46:17.889Z] iter=248 turn=20 INFO: Cache persisted: 51 entries to .autoagent-cache.json
-[2026-04-05T16:46:17.890Z] iter=248 turn=20 INFO: Cache stats: 0 hits, 3 misses, 51 entries, 9 invalidations (3 entries removed)
-[2026-04-05T16:46:17.890Z] iter=248 turn=20 INFO: Tool cache stats
-[2026-04-05T16:46:17.890Z] iter=248 turn=20 INFO: Tool timing: bash: 6x, avg=359ms, total=2151ms; write_file: 9x, avg=2ms, total=15ms; read_file: 3x, avg=1ms, total=4ms; save_memory: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms
-[2026-04-05T16:46:17.890Z] iter=248 turn=20 INFO: Tool timing stats
-[2026-04-05T16:46:23.754Z] iter=248 turn=20 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 248: predicted 20 turns, actual 20 turns, ratio 1.00**
-[2026-04-05T16:46:26.862Z] iter=248 turn=20 INFO: Pre-commit review (2958in/60out): LGTM. The implementation is clean: the constant is correctly derived, the one-shot flag resets properly on `clearHistory`, and the callback integrates without side effects on existing paths. Tests cov
-[2026-04-05T16:46:26.921Z] iter=248 turn=20 INFO: Committed: df977d48 (36 in / 9684 out, cache: 31212 created, 464759 read)
-[2026-04-05T16:46:26.921Z] iter=248 turn=20 INFO: Restarting as iteration 249...
-[2026-04-05T16:46:27.116Z] iter=249 INFO: Cache restored: 51/51 entries (0 stale)
-[2026-04-05T16:46:27.118Z] iter=249 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
-[2026-04-05T16:46:27.118Z] iter=249 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T16:46:27.223Z] iter=249 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T16:46:27.223Z] iter=249 turn=1 INFO: Turn 1/25
-[2026-04-05T16:46:31.379Z] iter=249 turn=1 INFO: Agent: 
-
-I'll start by reviewing the current state of the codebase, checking what was built in iteration 248, and then planning the next high-value improvements.
-[2026-04-05T16:46:31.381Z] iter=249 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T16:46:31.385Z] iter=249 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run --reporter=verbose 2>&1 | tail -30
-[2026-04-05T16:46:31.389Z] iter=249 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/tui.tsx src/orchestrator.ts src/diagnostics.ts src/test-runner.ts src/context-loader.ts
-[2026-04-05T16:46:31.405Z] iter=249 turn=1 INFO:   -> exit=0 (152 chars)
-[2026-04-05T16:46:32.497Z] iter=249 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:46:40.420Z] iter=249 turn=1 INFO:   -> exit=0 (2557 chars)
-[2026-04-05T16:46:40.421Z] iter=249 turn=2 INFO: Turn 2/25
-[2026-04-05T16:46:45.499Z] iter=249 turn=2 INFO: Agent: 
-
-You're right. My deliverable is `goals.md` for the next Engineer iteration. Let me quickly check the key files I need to reference, then write it.
-[2026-04-05T16:46:45.500Z] iter=249 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && head -30 src/diagnostics.ts
-[2026-04-05T16:46:45.505Z] iter=249 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onContextWarning\|contextWarning" src/orchestrator.ts | head -20
-[2026-04-05T16:46:45.508Z] iter=249 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onContextWarning\|contextWarning\|CONTEXT_WARNING" src/tui.tsx | head -20
-[2026-04-05T16:46:45.517Z] iter=249 turn=2 INFO:   -> exit=0 (1172 chars)
-[2026-04-05T16:46:45.522Z] iter=249 turn=2 INFO:   -> exit=0 (284 chars)
-[2026-04-05T16:46:45.525Z] iter=249 turn=2 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:46:45.525Z] iter=249 turn=3 INFO: Turn 3/25
-[2026-04-05T16:46:51.743Z] iter=249 turn=3 INFO: think: The onContextWarning callback exists in orchestrator.ts but is NOT wired into tui.tsx yet. That's a clear gap to close.
-...
-[2026-04-05T16:46:51.744Z] iter=249 turn=4 INFO: Turn 4/25
-[2026-04-05T16:46:55.738Z] iter=249 turn=4 INFO: Agent: 
-
-Status: **NOT STARTED** on writing goals.md. Let me produce it now.
-[2026-04-05T16:46:55.739Z] iter=249 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "routeModel\|model.*route\|selectModel\|cheapModel\|MODEL" src/orchestrator.ts | head -15
-[2026-04-05T16:46:55.760Z] iter=249 turn=4 INFO:   -> exit=0 (787 chars)
-[2026-04-05T16:46:55.761Z] iter=249 turn=5 INFO: Turn 5/25
-[2026-04-05T16:46:58.401Z] iter=249 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '144,160p' src/orchestrator.ts
-[2026-04-05T16:46:58.410Z] iter=249 turn=5 INFO:   -> exit=0 (584 chars)
-[2026-04-05T16:46:58.410Z] iter=249 turn=6 INFO: Turn 6/25
-[2026-04-05T16:47:22.157Z] iter=249 turn=6 INFO: Agent: 
-
-I'm the Architect — my deliverable is `goals.md`, not src/ changes. Writing it now.
-[2026-04-05T16:47:22.157Z] iter=249 turn=6 INFO: write_file: goals.md (write)
-[2026-04-05T16:47:22.158Z] iter=249 turn=6 INFO:   -> ok: Updated goals.md (3492 chars, +58 lines delta)
-[2026-04-05T16:47:22.159Z] iter=249 turn=7 INFO: Turn 7/25
-[2026-04-05T16:47:27.483Z] iter=249 turn=7 INFO: save_memory: "[Architect] Iteration 249 Assessment"
-[2026-04-05T16:47:27.484Z] iter=249 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T16:47:27.486Z] iter=249 turn=8 INFO: Turn 8/25
-[2026-04-05T16:47:30.142Z] iter=249 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
-[2026-04-05T16:47:31.077Z] iter=249 turn=8 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:47:31.078Z] iter=249 turn=9 INFO: Turn 9/25
-[2026-04-05T16:47:33.426Z] iter=249 turn=9 INFO: Agent: TSC clean. Goals written for Engineer 250.
-[2026-04-05T16:47:33.428Z] iter=249 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T16:47:33.429Z] iter=249 turn=9 INFO: RESTART signal
-[2026-04-05T16:47:33.430Z] iter=249 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T16:47:34.381Z] iter=249 turn=9 INFO: Compilation OK
-[2026-04-05T16:47:40.385Z] iter=249 turn=9 INFO: Cache persisted: 51 entries to .autoagent-cache.json
-[2026-04-05T16:47:40.385Z] iter=249 turn=9 INFO: Tool timing: bash: 10x, avg=1119ms, total=11187ms; write_file: 1x, avg=2ms, total=2ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T16:47:40.385Z] iter=249 turn=9 INFO: Tool timing stats
-[2026-04-05T16:47:45.888Z] iter=249 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 249: predicted 8 turns, actual 9 turns, ratio 1.13**
-[2026-04-05T16:47:45.909Z] iter=249 turn=9 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T16:47:45.941Z] iter=249 turn=9 INFO: Committed: 7fb2e99d (19 in / 2385 out, cache: 11432 created, 67214 read)
-[2026-04-05T16:47:45.941Z] iter=249 turn=9 INFO: Restarting as iteration 250...
-[2026-04-05T16:47:46.133Z] iter=250 INFO: Cache restored: 51/51 entries (0 stale)
-[2026-04-05T16:47:46.135Z] iter=250 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=20)
-[2026-04-05T16:47:46.135Z] iter=250 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T16:47:46.256Z] iter=250 turn=1 INFO: Turn 1/25
-[2026-04-05T16:47:49.206Z] iter=250 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be implemented.
-[2026-04-05T16:47:49.208Z] iter=250 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat src/tui.tsx | head -100
-[2026-04-05T16:47:49.213Z] iter=250 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "routeModel\|onContextWarning\|lastInputTokens\|contextWarning" src/orchestrator.ts | head -40
-[2026-04-05T16:47:49.225Z] iter=250 turn=1 INFO:   -> exit=0 (3156 chars)
-[2026-04-05T16:47:49.230Z] iter=250 turn=1 INFO:   -> exit=0 (1051 chars)
-[2026-04-05T16:47:49.230Z] iter=250 turn=2 INFO: Turn 2/25
-[2026-04-05T16:47:51.554Z] iter=250 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onContextWarning\|contextWarning\|setContext\|contextWarn" src/tui.tsx | head -20
-[2026-04-05T16:47:51.559Z] iter=250 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "routeModel" src/orchestrator.ts
-[2026-04-05T16:47:51.575Z] iter=250 turn=2 INFO:   -> exit=0 (191 chars)
-[2026-04-05T16:47:51.576Z] iter=250 turn=2 INFO:   -> exit=0 (113 chars)
-[2026-04-05T16:47:51.577Z] iter=250 turn=3 INFO: Turn 3/25
-[2026-04-05T16:47:53.902Z] iter=250 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '144,175p' src/orchestrator.ts
-[2026-04-05T16:47:53.908Z] iter=250 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '290,320p' src/tui.tsx
-[2026-04-05T16:47:53.922Z] iter=250 turn=3 INFO:   -> exit=0 (1191 chars)
-[2026-04-05T16:47:53.924Z] iter=250 turn=3 INFO:   -> exit=0 (1281 chars)
-[2026-04-05T16:47:53.924Z] iter=250 turn=4 INFO: Turn 4/25
-[2026-04-05T16:47:57.153Z] iter=250 turn=4 INFO: think: I have enough context. Let me start implementing both goals now:
-
 1. Goal 1: Wire onContextWarning into TUI - add `conte...
 [2026-04-05T16:47:57.153Z] iter=250 turn=5 INFO: Turn 5/25
 [2026-04-05T16:47:59.227Z] iter=250 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '320,400p' src/tui.tsx
@@ -1135,3 +996,207 @@ Context after patch:
 [2026-04-05T17:03:04.899Z] iter=256 turn=24 INFO: Tool timing stats
 [2026-04-05T17:03:10.690Z] iter=256 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 256: predicted 20 turns, actual 24 turns, ratio 1.20**
 [2026-04-05T17:03:14.187Z] iter=256 turn=24 INFO: Pre-commit review (2921in/115out): **LGTM** — the code is well-structured, import uses `.js` extension, error handling is consistent with `readFileSafe`/`fileExists` wrappers, and the detection logic follows a clear single-responsibili
+[2026-04-05T17:03:14.237Z] iter=256 turn=24 INFO: Committed: 54cdd227 (40 in / 6005 out, cache: 22394 created, 382343 read)
+[2026-04-05T17:03:14.238Z] iter=256 turn=24 INFO: Restarting as iteration 257...
+[2026-04-05T17:03:14.431Z] iter=257 INFO: Cache restored: 53/53 entries (0 stale)
+[2026-04-05T17:03:14.433Z] iter=257 INFO: Turn budget: 20/25 (calibration=1.20x, predicted=20)
+[2026-04-05T17:03:14.434Z] iter=257 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T17:03:14.568Z] iter=257 turn=1 INFO: Turn 1/25
+[2026-04-05T17:03:18.501Z] iter=257 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state of the codebase, then execute both goals.
+[2026-04-05T17:03:18.503Z] iter=257 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T17:03:18.507Z] iter=257 turn=1 INFO: read_file: src/project-detector.ts
+[2026-04-05T17:03:18.508Z] iter=257 turn=1 INFO:   -> ok (8208 chars)
+[2026-04-05T17:03:18.508Z] iter=257 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "projectSummaryInjected\|detectProject\|project-detector" src/orchestrator.ts
+[2026-04-05T17:03:18.523Z] iter=257 turn=1 INFO:   -> exit=0 (104 chars)
+[2026-04-05T17:03:19.453Z] iter=257 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:03:19.454Z] iter=257 turn=2 INFO: Turn 2/25
+[2026-04-05T17:03:24.162Z] iter=257 turn=2 INFO: Agent: Good — TSC is clean, `project-detector.ts` exists, and it's imported but not yet called. Let me check the `send()` method and the TUI for where to add `/status`.
+[2026-04-05T17:03:24.162Z] iter=257 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "async send\|systemPrompt\|this\.systemPrompt\|private systemPrompt" src/orchestrator.ts | head -20
+[2026-04-05T17:03:24.165Z] iter=257 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "/help\|/diff\|/undo\|/clear\|/find\|/model\|/reindex\|/resume\|slash.*command\|handleSlash\|Commands:" src/tui.tsx | head -40
+[2026-04-05T17:03:24.176Z] iter=257 turn=2 INFO:   -> exit=0 (787 chars)
+[2026-04-05T17:03:24.180Z] iter=257 turn=2 INFO:   -> exit=0 (1267 chars)
+[2026-04-05T17:03:24.180Z] iter=257 turn=3 INFO: Turn 3/25
+[2026-04-05T17:03:27.356Z] iter=257 turn=3 INFO: read_file: src/orchestrator.ts
+[2026-04-05T17:03:27.356Z] iter=257 turn=3 INFO:   -> ok (1372 chars)
+[2026-04-05T17:03:27.357Z] iter=257 turn=3 INFO: read_file: src/tui.tsx
+[2026-04-05T17:03:27.357Z] iter=257 turn=3 INFO:   -> ok (1623 chars)
+[2026-04-05T17:03:27.357Z] iter=257 turn=4 INFO: Turn 4/25
+[2026-04-05T17:03:46.477Z] iter=257 turn=4 INFO: Agent: 
+
+You're right. I have all the context I need. Let me deliver both goals now.
+
+**Deliverables:**
+1. Wire `detectProject()` into `orchestrator.ts` `send()` method
+2. Write tests for `project-detector.ts`
+3. Add `/status` command to TUI
+4. Write tests for `/status`
+
+Let me start writing all of them:
+[2026-04-05T17:03:46.478Z] iter=257 turn=4 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T17:03:46.479Z] iter=257 turn=4 INFO:   -> ok: Patched src/orchestrator.ts: -7 +18 lines
+
+Context after patch:
+840 |   async send(userMessage: string): Promise<OrchestratorResult> {
+841 |     if (!this.initialized) await this.init();
+842 | 
+843 |     // 0. Project summary injection (once per session)
+844 |     if (!this.projectSummaryInjected) {
+845 |       try {
+846 |         const projectInfo = detectProject(this.opts.workDir);
+847 |         if (projectInfo.type !== "unknown") {
+848 |           this.systemPrompt += `\n\n## Project Context\n${projectInfo.summary}`;
+849 |         }
+850 |       } catch { /* non-fatal — skip if detection fails */ }
+851 |       this.projectSummaryInjected = true;
+852 |     }
+853 | 
+854 |     // 1. Model routing
+855 |     const hasCodeEditsInHistory = this.apiMessages.some(m =>
+856 |       m.role === "assistant" &&
+857 |       Array.isArray(m.content) &&
+858 |       m.content.some((b: { type: string }) => b.type === "tool_use")
+859 |     );
+860 |     const model = this.modelOverride ?? routeModel(userMessage, {
+861 |       lastInputTokens: this.lastInputTokens,
+862 |       hasCodeEditsInHistory,
+863 |     });
+[2026-04-05T17:03:46.480Z] iter=257 turn=4 INFO: write_file: src/__tests__/project-detector.test.ts (write)
+[2026-04-05T17:03:46.480Z] iter=257 turn=4 INFO:   -> ok: Created src/__tests__/project-detector.test.ts (3311 chars)
+[2026-04-05T17:03:46.481Z] iter=257 turn=5 INFO: Turn 5/25
+[2026-04-05T17:03:50.107Z] iter=257 turn=5 INFO: Agent: Now add `/status` to the TUI and its tests:
+[2026-04-05T17:03:50.108Z] iter=257 turn=5 INFO: read_file: src/tui.tsx
+[2026-04-05T17:03:50.108Z] iter=257 turn=5 INFO:   -> ok (215 chars)
+[2026-04-05T17:03:50.109Z] iter=257 turn=5 INFO: read_file: src/tui.tsx
+[2026-04-05T17:03:50.109Z] iter=257 turn=5 INFO:   -> ok (819 chars)
+[2026-04-05T17:03:50.110Z] iter=257 turn=6 INFO: Turn 6/25
+[2026-04-05T17:03:59.039Z] iter=257 turn=6 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T17:03:59.041Z] iter=257 turn=6 INFO:   -> ok: Patched src/tui.tsx: -1 +1 lines
+
+Context after patch:
+132 |         {workDir}
+133 |       </Text>
+134 |       <Text color="gray" dimColor>
+135 |         Commands: /help  /status  /clear  /reindex  /diff  /undo  /exit  Esc
+136 |       </Text>
+137 |     </Box>
+138 |   );
+[2026-04-05T17:03:59.041Z] iter=257 turn=6 INFO: write_file: src/tui.tsx (patch)
+[2026-04-05T17:03:59.042Z] iter=257 turn=6 INFO:   -> ok: Patched src/tui.tsx: -18 +36 lines
+
+Context after patch:
+1 | /**
+2 |  * AutoAgent Interactive TUI — React-based terminal UI using Ink.
+3 |  *
+4 |  * Usage:
+5 |  *   npm run tui                          # work in current directory
+6 |  *   npm run tui -- --dir /path/to/repo   # work in a specific repo
+7 |  */
+8 | 
+9 | import React, { useState, useCallback, useEffect, useRef } from "react";
+10 | import { render, Box, Text, useInput, useApp } from "ink";
+11 | import Spinner from "ink-spinner";
+12 | import TextInput from "ink-text-input";
+13 | import path from "path";
+14 | import "dotenv/config";
+15 | import { Orchestrator } from "./orchestrator.js";
+16 | import { listSessions, type SessionInfo } from "./session-store.js";
+17 | import type { EditPlan } from "./architect-mode.js";
+18 | import { VirtualMessageList } from "./virtual-message-list.js";
+19 | import { undoLastCommit } from "./auto-commit.js";
+20 | import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
+21 | import { execSync } from "child_process";
+22 | 
+23 | // Parse args
+24 | let workDir = process.cwd();
+25 | const dirIdx = process.argv.indexOf("--dir");
+26 | if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
+27 |   workDir = path.resolve(process.argv[dirIdx + 1]);
+28 | }
+29 | 
+30 | // --no-confirm flag: skip write_file diff confirmation
+31 | const noConfirm = process.argv.includes("--no-confirm");
+32 | 
+33 | // --continue / -c flag: auto-resume most recent session
+34 | const continueFlag =
+35 |   process.argv.includes("--continue") || process.argv.includes("-c");
+36 | let initialResumeSessionPath: string | undefined;
+37 | if (continueFlag) {
+38 |   const recentSessions = listSessions(workDir);
+39 |   if (recentSessions.length > 0) {
+[2026-04-05T17:03:59.043Z] iter=257 turn=7 INFO: Turn 7/25
+[2026-04-05T17:04:04.550Z] iter=257 turn=7 INFO: Agent: 
+
+**Goal Status:**
+- **Goal 1 (Wire project-detector):** IN PROGRESS — orchestrator wired ✅, tests written ✅, need to verify they pass
+- **Goal 2 (/status command):** IN PROGRESS — TUI code written ✅, need to write tests and verify
+
+Let me run tests and write the `/status` tests now:
+[2026-04-05T17:04:04.550Z] iter=257 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T17:04:04.552Z] iter=257 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/project-detector.test.ts 2>&1 | tail -30
+[2026-04-05T17:04:05.572Z] iter=257 turn=7 INFO:   -> exit=0 (284 chars)
+[2026-04-05T17:04:05.574Z] iter=257 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:04:05.574Z] iter=257 turn=8 INFO: Turn 8/25
+[2026-04-05T17:04:08.520Z] iter=257 turn=8 INFO: Agent: TSC clean, all 8 project-detector tests pass. Now write `/status` tests:
+[2026-04-05T17:04:08.520Z] iter=257 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "handleSubmit\|export.*handleSlash\|parseSlashCommand" src/tui.tsx | head -10
+[2026-04-05T17:04:08.530Z] iter=257 turn=8 INFO:   -> exit=0 (106 chars)
+[2026-04-05T17:04:08.531Z] iter=257 turn=9 INFO: Turn 9/25
+[2026-04-05T17:04:12.404Z] iter=257 turn=9 INFO: think: The /status command is inside the handleSubmit callback in the TUI component. Testing React/Ink components directly is c...
+[2026-04-05T17:04:12.405Z] iter=257 turn=10 INFO: Turn 10/25
+[2026-04-05T17:04:15.422Z] iter=257 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && ls src/__tests__/tui* 2>/dev/null; grep -l "tui\|slash\|/status\|/help\|handleSubmit" src/__tests__/*.test.ts 2>/dev/null
+[2026-04-05T17:04:15.452Z] iter=257 turn=10 INFO:   -> exit=0 (362 chars)
+[2026-04-05T17:04:15.452Z] iter=257 turn=11 INFO: Turn 11/25
+[2026-04-05T17:04:17.755Z] iter=257 turn=11 INFO: read_file: src/__tests__/tui-commands.test.ts
+[2026-04-05T17:04:17.755Z] iter=257 turn=11 INFO:   -> ok (5141 chars)
+[2026-04-05T17:04:17.755Z] iter=257 turn=12 INFO: Turn 12/25
+[2026-04-05T17:04:31.091Z] iter=257 turn=12 INFO: Agent: Good — the pattern is to extract the pure logic into testable functions. Let me add `/status` tests following this pattern:
+[2026-04-05T17:04:31.091Z] iter=257 turn=12 INFO: write_file: src/__tests__/tui-status.test.ts (write)
+[2026-04-05T17:04:31.092Z] iter=257 turn=12 INFO:   -> ok: Created src/__tests__/tui-status.test.ts (2868 chars)
+[2026-04-05T17:04:31.092Z] iter=257 turn=13 INFO: Turn 13/25
+[2026-04-05T17:04:37.439Z] iter=257 turn=13 INFO: Agent: 
+
+**Changes made in src/ this iteration:**
+1. `src/orchestrator.ts` — Wired `detectProject()` into `send()` (project summary injection)
+2. `src/__tests__/project-detector.test.ts` — 8 tests for project detector
+3. `src/tui.tsx` — Added `/status` command + added to `/help` output + header Commands line
+4. `src/__tests__/tui-status.test.ts` — 7 tests for /status command
+
+Both goals are DONE. Let me ...
+[2026-04-05T17:04:37.440Z] iter=257 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -10
+[2026-04-05T17:04:37.441Z] iter=257 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/project-detector.test.ts src/__tests__/tui-status.test.ts 2>&1 | tail -15
+[2026-04-05T17:04:38.433Z] iter=257 turn=13 INFO:   -> exit=0 (338 chars)
+[2026-04-05T17:04:38.483Z] iter=257 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:04:38.483Z] iter=257 turn=14 INFO: Turn 14/25
+[2026-04-05T17:04:41.024Z] iter=257 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -10
+[2026-04-05T17:04:50.282Z] iter=257 turn=14 INFO:   -> exit=0 (458 chars)
+[2026-04-05T17:04:50.282Z] iter=257 turn=15 INFO: Turn 15/25
+[2026-04-05T17:04:53.209Z] iter=257 turn=15 INFO: Agent: All 733 tests pass (up from 718), TSC clean. Now update memory and goals:
+[2026-04-05T17:04:53.209Z] iter=257 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status
+[2026-04-05T17:04:53.244Z] iter=257 turn=15 INFO:   -> exit=0 (374 chars)
+[2026-04-05T17:04:53.244Z] iter=257 turn=16 INFO: Turn 16/25
+[2026-04-05T17:04:57.101Z] iter=257 turn=16 INFO: save_memory: "[Architect] Iteration 257 shipped"
+[2026-04-05T17:04:57.102Z] iter=257 turn=16 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T17:04:57.102Z] iter=257 turn=17 INFO: Turn 17/25
+[2026-04-05T17:05:08.895Z] iter=257 turn=17 INFO: write_file: goals.md (write)
+[2026-04-05T17:05:08.897Z] iter=257 turn=17 INFO:   -> ok: Updated goals.md (1389 chars, -9 lines delta)
+[2026-04-05T17:05:08.897Z] iter=257 turn=18 INFO: Turn 18/25
+[2026-04-05T17:05:11.139Z] iter=257 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5
+[2026-04-05T17:05:12.096Z] iter=257 turn=18 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:05:12.096Z] iter=257 turn=19 INFO: Turn 19/25
+[2026-04-05T17:05:15.122Z] iter=257 turn=19 INFO: Agent: TSC clean. All done.
+
+```
+echo "AUTOAGENT_RESTART"
+```
+[2026-04-05T17:05:15.123Z] iter=257 turn=19 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T17:05:15.123Z] iter=257 turn=19 INFO: RESTART signal
+[2026-04-05T17:05:15.124Z] iter=257 turn=19 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T17:05:16.078Z] iter=257 turn=19 INFO: Compilation OK
+[2026-04-05T17:05:22.414Z] iter=257 turn=19 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T17:05:22.414Z] iter=257 turn=19 INFO: Cache stats: 0 hits, 6 misses, 55 entries, 6 invalidations (4 entries removed)
+[2026-04-05T17:05:22.414Z] iter=257 turn=19 INFO: Tool cache stats
+[2026-04-05T17:05:22.414Z] iter=257 turn=19 INFO: Tool timing: bash: 14x, avg=1098ms, total=15367ms; write_file: 6x, avg=2ms, total=10ms; read_file: 6x, avg=1ms, total=8ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms
+[2026-04-05T17:05:22.414Z] iter=257 turn=19 INFO: Tool timing stats
+[2026-04-05T17:05:28.509Z] iter=257 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 257: predicted 20 turns, actual 19 turns, ratio 0.95**
+[2026-04-05T17:05:37.722Z] iter=257 turn=19 INFO: Pre-commit review (2909in/338out): - **`projectSummaryInjected` flag not declared**: The diff adds `this.projectSummaryInjected` but there's no corresponding property declaration visible in the class. If it's missing from the class def
