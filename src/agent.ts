@@ -40,6 +40,7 @@ import {
 
 const ROOT = process.cwd();
 const GOALS_FILE = path.join(ROOT, "goals.md");
+const TASK_FILE = path.join(ROOT, "TASK.md");
 const MEMORY_FILE = path.join(ROOT, "memory.md");
 const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");
 const AGENT_LOG_FILE = path.join(ROOT, "agentlog.md");
@@ -64,6 +65,27 @@ function log(iter: number, msg: string): void {
 // ─── File readers ───────────────────────────────────────────
 
 function readGoals(): string {
+  // Task mode: if TASK.md exists, use it as the goal for this iteration.
+  // Create TASK.md with a plain-text description of what you want done.
+  // The agent will execute it and delete TASK.md when complete.
+  if (existsSync(TASK_FILE)) {
+    const taskContent = readFileSync(TASK_FILE, "utf-8").trim();
+    log(0, `[TASK MODE] Running user task from TASK.md`);
+    return [
+      `# AutoAgent Task Mode — Iteration ${Date.now()}`,
+      ``,
+      `PREDICTION_TURNS: 11`,
+      ``,
+      `## Goal: User Task`,
+      ``,
+      taskContent,
+      ``,
+      `---`,
+      ``,
+      `When this task is complete, delete TASK.md and write a short summary`,
+      `of what was done to memory.md under "## Session Log".`,
+    ].join("\n");
+  }
   if (!existsSync(GOALS_FILE)) return "(no goals.md found)";
   return readFileSync(GOALS_FILE, "utf-8");
 }

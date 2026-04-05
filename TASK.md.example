@@ -1,0 +1,13 @@
+# AutoAgent Task Mode
+
+Drop a `TASK.md` in the project root with your task description.
+AutoAgent will pick it up on the next iteration and execute it.
+
+## Example contents of TASK.md:
+
+```
+Add a --dry-run flag to the CLI that prints what would be committed
+without actually committing. Update README with usage.
+```
+
+When the task is complete, the agent will delete TASK.md automatically.

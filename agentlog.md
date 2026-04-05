@@ -1,108 +1,3 @@
-
-Context after patch:
-142 |   const nested = executeWriteFile(nestedPath, "nested content", "write", ROOT);
-143 |   assert(nested.success && existsSync(path.join(ROOT, nestedPath)), "write_file: creates nested directories");
-144 | 
-145 |   // Append-only enforcement for protected files (memory.md, agentlog.md)
-146 |   // Use TEMP_DIR as workDir so "memory.md" resolves to TEMP_DIR/memory.md (root-relative path matches)
-147 |   const memFile = path.join(TEMP_DIR, "memory.md");
-148 |   writeFileSync(memFile, "# Memory\n\nExisting content.\n", "utf-8");
-149 | 
-150 |   // Non-append write to memory.md should be rejected (path relative to TEMP_DIR is just "memory.md")
-151 |   const rewrite = executeWriteFile("memory.md", "Completely new content", "write", TEMP_DIR);
-152 |   assert(!rewrite.success && rewrite.message.includes("append-only"), "write_file: rejects non-append write to memory.md");
-153 |   // Verify file unchanged
-154 |   assert(readFileSync(memFile, "utf-8") === "# Memory\n\nExisting content.\n", "write_file: memory.md unchanged after rejected write");
-155 | 
-156 |   // Append mode to memory.md should succeed
-157 |   const memAppend = executeWriteFile("memory.md", "\nNew entry.", "append", TEMP_DIR);
-158 |   assert(memAppend.success, "write_file: append to memory.md succeeds");
-159 |   assert(readFileSync(memFile, "utf-8").endsWith("\nNew entry."), "write_file: memory.md has appended content");
-160 | 
-161 |   // Write mode that starts with existing content (effective append) should succeed
-162 |   const currentMem = readFileSync(memFile, "utf-8");
-163 |   const extendedWrite = executeWriteFile("memory.md", currentMem + "\nMore content.", "write", TEMP_DIR);
-164 |   assert(extendedWrite.success, "write_file: write that extends memory.md succeeds");
-165 | 
-166 |   // Same enforcement for agentlog.md
-167 |   const logFile = path.join(TEMP_DIR, "agentlog.md");
-168 |   writeFileSync(logFile, "# Log\n\nEntry 1.\n", "utf-8");
-169 |   const logRewrite = executeWriteFile("agentlog.md", "Rewritten log", "write", TEMP_DIR);
-170 |   assert(!logRewrite.success && logRewrite.message.includes("append-only"), "write_file: rejects non-append write to agentlog.md");
-171 | 
-172 |   // Verify subpath/memory.md is NOT protected (basename check is gone)
-173 |   mkdirSync(path.join(TEMP_DIR, "subdir"), { recursive: true });
-174 |   writeFileSync(path.join(TEMP_DIR, "subdir", "memory.md"), "sub content", "utf-8");
-175 |   const subRewrite = executeWriteFile("subdir/memory.md", "New content", "write", TEMP_DIR);
-176 |   assert(subRewrite.success, "write_file: subdir/memory.md is not append-only protected");
-177 | }
-178 | 
-179 | // ─── Grep Tests ─────────────────────────────────────────────
-[2026-04-05T10:34:19.380Z] iter=74 turn=16 INFO: Turn 16/25
-[2026-04-05T10:34:21.323Z] iter=74 turn=16 INFO: Agent: Already have changes. Run tests and commit.
-[2026-04-05T10:34:21.323Z] iter=74 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -5
-[2026-04-05T10:34:24.902Z] iter=74 turn=16 INFO:   -> exit=0 (100 chars)
-[2026-04-05T10:34:24.902Z] iter=74 turn=17 INFO: Turn 17/25
-[2026-04-05T10:34:26.066Z] iter=74 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T10:34:26.701Z] iter=74 turn=17 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:34:26.701Z] iter=74 turn=18 INFO: Turn 18/25
-[2026-04-05T10:34:30.878Z] iter=74 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && git add src/tools/write_file.ts scripts/self-test.ts && git commit -m "fix: isAppendOnly checks root-relative path, not just basename
-
-Previously path.basename(...
-[2026-04-05T10:34:30.917Z] iter=74 turn=18 INFO:   -> exit=0 (132 chars)
-[2026-04-05T10:34:30.917Z] iter=74 turn=19 INFO: Turn 19/25
-[2026-04-05T10:34:34.764Z] iter=74 turn=19 INFO: Agent: Now update memory and goals:
-[2026-04-05T10:34:34.764Z] iter=74 turn=19 INFO: write_file: memory.md (append)
-[2026-04-05T10:34:34.765Z] iter=74 turn=19 INFO:   -> ok: Appended 330 chars to memory.md
-[2026-04-05T10:34:34.765Z] iter=74 turn=20 INFO: Turn 20/25
-[2026-04-05T10:34:38.651Z] iter=74 turn=20 INFO: write_file: goals.md (write)
-[2026-04-05T10:34:38.652Z] iter=74 turn=20 INFO:   -> ok: Updated goals.md (261 chars, -8 lines delta)
-[2026-04-05T10:34:38.652Z] iter=74 turn=21 INFO: Turn 21/25
-[2026-04-05T10:34:41.601Z] iter=74 turn=21 INFO: Agent: Already done. Committed, memory written, goals updated.
-[2026-04-05T10:34:41.602Z] iter=74 turn=21 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T10:34:41.602Z] iter=74 turn=21 INFO: RESTART signal
-[2026-04-05T10:34:41.602Z] iter=74 turn=21 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T10:34:42.319Z] iter=74 turn=21 INFO: Compilation OK
-[2026-04-05T10:34:47.289Z] iter=74 turn=21 INFO: Cache persisted: 25 entries to .autoagent-cache.json
-[2026-04-05T10:34:47.289Z] iter=74 turn=21 INFO: Cache stats: 0 hits, 1 misses, 25 entries, 5 invalidations (1 entries removed)
-[2026-04-05T10:34:47.289Z] iter=74 turn=21 INFO: Tool cache stats
-[2026-04-05T10:34:47.289Z] iter=74 turn=21 INFO: Tool timing: bash: 12x, avg=1007ms, total=12080ms; write_file: 5x, avg=3ms, total=13ms; read_file: 1x, avg=2ms, total=2ms; think: 3x, avg=1ms, total=2ms
-[2026-04-05T10:34:47.290Z] iter=74 turn=21 INFO: Tool timing stats
-[2026-04-05T10:34:50.638Z] iter=74 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 74: predicted 8 turns, actual 21 turns, ratio 2.63**
-[2026-04-05T10:34:50.658Z] iter=74 turn=21 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T10:34:50.688Z] iter=74 turn=21 INFO: Committed: 049e95be (31 in / 5243 out, cache: 22898 created, 217378 read)
-[2026-04-05T10:34:50.689Z] iter=74 turn=21 INFO: Restarting as iteration 75...
-[2026-04-05T10:34:50.856Z] iter=75 INFO: Cache restored: 25/25 entries (0 stale)
-[2026-04-05T10:34:50.857Z] iter=75 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T10:34:50.884Z] iter=75 turn=1 INFO: Turn 1/25
-[2026-04-05T10:34:55.747Z] iter=75 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the system — what's been happening, what the metrics look like, and whether the system is actually improving.
-[2026-04-05T10:34:55.749Z] iter=75 turn=1 INFO: $ cat .autoagent-metrics.json | tail -80
-[2026-04-05T10:34:55.758Z] iter=75 turn=1 INFO: $ cat .autoagent-state.json
-[2026-04-05T10:34:55.764Z] iter=75 turn=1 INFO: $ cat .expert-rotation.json
-[2026-04-05T10:34:55.772Z] iter=75 turn=1 INFO:   -> exit=0 (111 chars)
-[2026-04-05T10:34:55.774Z] iter=75 turn=1 INFO:   -> exit=0 (231 chars)
-[2026-04-05T10:34:55.774Z] iter=75 turn=1 INFO:   -> exit=0 (1613 chars)
-[2026-04-05T10:34:55.775Z] iter=75 turn=2 INFO: Turn 2/25
-[2026-04-05T10:34:58.437Z] iter=75 turn=2 INFO: $ cat goals.md
-[2026-04-05T10:34:58.439Z] iter=75 turn=2 INFO: read_file: memory.md
-[2026-04-05T10:34:58.440Z] iter=75 turn=2 INFO:   -> ok (43905 chars)
-[2026-04-05T10:34:58.440Z] iter=75 turn=2 INFO: $ cat agentlog.md | tail -100
-[2026-04-05T10:34:58.446Z] iter=75 turn=2 INFO:   -> exit=0 (261 chars)
-[2026-04-05T10:34:58.450Z] iter=75 turn=2 INFO:   -> exit=0 (7827 chars)
-[2026-04-05T10:34:58.451Z] iter=75 turn=3 INFO: Turn 3/25
-[2026-04-05T10:35:09.153Z] iter=75 turn=3 INFO: think: Let me assess what's going on:
-
-1. **Memory.md is 43905 chars** — that's enormous. The compact-memory threshold is 6000 ...
-[2026-04-05T10:35:09.154Z] iter=75 turn=4 INFO: Turn 4/25
-[2026-04-05T10:35:13.511Z] iter=75 turn=4 INFO: $ wc -c memory.md
-[2026-04-05T10:35:13.515Z] iter=75 turn=4 INFO: $ cat scripts/compact-memory.ts
-[2026-04-05T10:35:13.519Z] iter=75 turn=4 INFO: $ cat src/experts.ts
-[2026-04-05T10:35:13.527Z] iter=75 turn=4 INFO:   -> exit=0 (19 chars)
-[2026-04-05T10:35:13.529Z] iter=75 turn=4 INFO:   -> exit=0 (14069 chars)
-[2026-04-05T10:35:13.531Z] iter=75 turn=4 INFO:   -> exit=0 (9423 chars)
-[2026-04-05T10:35:13.531Z] iter=75 turn=5 INFO: Turn 5/25
 [2026-04-05T10:35:27.783Z] iter=75 turn=5 INFO: Agent: 
 
 Good checkpoint. Let me crystallize what I've found and what I'm going to do.
@@ -1101,3 +996,107 @@ Let me verify and restart:
 [2026-04-05T10:50:08.720Z] iter=83 turn=10 INFO: Tool timing stats
 [2026-04-05T10:50:12.313Z] iter=83 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 83: predicted 12 turns, actual 10 turns, ratio 0.83**
 [2026-04-05T10:50:12.330Z] iter=83 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T10:50:12.358Z] iter=83 turn=10 INFO: Committed: f27bd572 (16 in / 4445 out, cache: 54112 created, 362809 read)
+[2026-04-05T10:50:12.358Z] iter=83 turn=10 INFO: Restarting as iteration 84...
+[2026-04-05T10:50:12.537Z] iter=84 INFO: Cache restored: 25/25 entries (0 stale)
+[2026-04-05T10:50:12.538Z] iter=84 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T10:50:12.564Z] iter=84 INFO: Hard turn cap: 11 (1.5x prediction of 7)
+[2026-04-05T10:50:12.565Z] iter=84 turn=1 INFO: Turn 1/25
+[2026-04-05T10:50:14.098Z] iter=84 turn=1 INFO: think: Let me read the current goals.md to understand what I need to do this iteration....
+[2026-04-05T10:50:14.100Z] iter=84 turn=2 INFO: Turn 2/25
+[2026-04-05T10:50:16.227Z] iter=84 turn=2 INFO: read_file: goals.md
+[2026-04-05T10:50:16.228Z] iter=84 turn=2 INFO:   -> ok (476 chars)
+[2026-04-05T10:50:16.228Z] iter=84 turn=2 INFO: read_file: memory.md
+[2026-04-05T10:50:16.229Z] iter=84 turn=2 INFO:   -> ok (4835 chars)
+[2026-04-05T10:50:16.229Z] iter=84 turn=3 INFO: Turn 3/25
+[2026-04-05T10:50:30.581Z] iter=84 turn=3 INFO: think: The goals.md says "Iteration 83" with status COMPLETE - that was the previous iteration. Looking at the expert rotation:...
+[2026-04-05T10:50:30.581Z] iter=84 turn=4 INFO: Turn 4/25
+[2026-04-05T10:50:32.317Z] iter=84 turn=4 INFO: list_files: src (depth=3)
+[2026-04-05T10:50:32.331Z] iter=84 turn=4 INFO:   -> ok (2 dirs, 36 files)
+[2026-04-05T10:50:32.331Z] iter=84 turn=4 INFO: $ cat .expert-rotation.json
+[2026-04-05T10:50:32.340Z] iter=84 turn=4 INFO:   -> exit=0 (796 chars)
+[2026-04-05T10:50:32.340Z] iter=84 turn=5 INFO: Turn 5/25
+[2026-04-05T10:50:45.529Z] iter=84 turn=5 INFO: think: I'm Engineer for iter 84. The last Architect (iter 81) directed wiring parallelResearch (iter 82 did it). The Meta (iter...
+[2026-04-05T10:50:45.531Z] iter=84 turn=6 INFO: Turn 6/25
+[2026-04-05T10:50:48.101Z] iter=84 turn=6 INFO: Agent: I'm Engineer for iter 84. My deliverable: **Task mode** — if `TASK.md` exists, agent uses it as the goal instead of normal goal selection. Small, concrete, and useful (external users can direct the agent).
+
+Let me read agent.ts to understand goal loading, then build it.
+[2026-04-05T10:50:48.103Z] iter=84 turn=6 INFO: read_file: src/agent.ts
+[2026-04-05T10:50:48.103Z] iter=84 turn=6 INFO:   -> ok (8974 chars)
+[2026-04-05T10:50:48.103Z] iter=84 turn=7 INFO: Turn 7/25
+[2026-04-05T10:51:05.599Z] iter=84 turn=7 INFO: think: I see the structure. The agent reads `goals.md` via `readGoals()`, and then uses that as the goal content. The `buildIni...
+[2026-04-05T10:51:05.600Z] iter=84 turn=8 INFO: Turn 8/25
+[2026-04-05T10:51:11.329Z] iter=84 turn=8 INFO: Agent: Now I'll implement task mode. The change is in `agent.ts` — check for `TASK.md` before `goals.md`, and add a TASK.md.example for documentation.
+[2026-04-05T10:51:11.331Z] iter=84 turn=8 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T10:51:11.332Z] iter=84 turn=8 INFO:   -> ok: Patched src/agent.ts: -8 +9 lines
+
+Context after patch:
+38 |   type ResuscitationConfig,
+39 | } from "./resuscitation.js";
+40 | 
+41 | const ROOT = process.cwd();
+42 | const GOALS_FILE = path.join(ROOT, "goals.md");
+43 | const TASK_FILE = path.join(ROOT, "TASK.md");
+44 | const MEMORY_FILE = path.join(ROOT, "memory.md");
+45 | const METRICS_FILE = path.join(ROOT, ".autoagent-metrics.json");
+46 | const AGENT_LOG_FILE = path.join(ROOT, "agentlog.md");
+47 | const CACHE_FILE = path.join(ROOT, ".autoagent-cache.json");
+48 | const MAX_TURNS = 25;
+49 | const MAX_CONSECUTIVE_FAILURES = 3;
+50 | 
+51 | // ─── Logging ────────────────────────────────────────────────
+52 | 
+[2026-04-05T10:51:11.333Z] iter=84 turn=9 INFO: Turn 9/25
+[2026-04-05T10:51:18.985Z] iter=84 turn=9 INFO: Agent: My goal is task mode. Status: **IN PROGRESS** — I've added `TASK_FILE` constant. Need to: patch `readGoals()` + add task mode logging + write docs + goals.md + tsc + commit.
+[2026-04-05T10:51:18.986Z] iter=84 turn=9 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T10:51:18.988Z] iter=84 turn=9 INFO:   -> ok: Patched src/agent.ts: -4 +25 lines
+
+Context after patch:
+64 | 
+65 | // ─── File readers ───────────────────────────────────────────
+66 | 
+67 | function readGoals(): string {
+68 |   // Task mode: if TASK.md exists, use it as the goal for this iteration.
+69 |   // Create TASK.md with a plain-text description of what you want done.
+70 |   // The agent will execute it and delete TASK.md when complete.
+71 |   if (existsSync(TASK_FILE)) {
+72 |     const taskContent = readFileSync(TASK_FILE, "utf-8").trim();
+73 |     log(0, `[TASK MODE] Running user task from TASK.md`);
+74 |     return [
+75 |       `# AutoAgent Task Mode — Iteration ${Date.now()}`,
+76 |       ``,
+77 |       `PREDICTION_TURNS: 11`,
+78 |       ``,
+79 |       `## Goal: User Task`,
+80 |       ``,
+81 |       taskContent,
+82 |       ``,
+83 |       `---`,
+84 |       ``,
+85 |       `When this task is complete, delete TASK.md and write a short summary`,
+86 |       `of what was done to memory.md under "## Session Log".`,
+87 |     ].join("\n");
+88 |   }
+89 |   if (!existsSync(GOALS_FILE)) return "(no goals.md found)";
+90 |   return readFileSync(GOALS_FILE, "utf-8");
+91 | }
+92 | 
+93 | function readMemory(): string {
+94 |   if (!existsSync(MEMORY_FILE)) return "(no memory.md found)";
+[2026-04-05T10:51:18.989Z] iter=84 turn=10 INFO: Turn 10/25
+[2026-04-05T10:51:23.007Z] iter=84 turn=10 INFO: Agent: Now write the example file, then goals.md and tsc:
+[2026-04-05T10:51:23.008Z] iter=84 turn=10 INFO: write_file: TASK.md.example (write)
+[2026-04-05T10:51:23.008Z] iter=84 turn=10 INFO:   -> ok: Created TASK.md.example (390 chars)
+[2026-04-05T10:51:23.009Z] iter=84 turn=11 INFO: Turn 11/25
+[2026-04-05T10:51:24.221Z] iter=84 turn=11 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T10:51:24.947Z] iter=84 turn=11 INFO:   -> exit=0 (11 chars)
+[2026-04-05T10:51:24.948Z] iter=84 turn=11 INFO: HARD TURN CAP REACHED: 11 turns (predicted 7, cap 11). Forcing commit.
+[2026-04-05T10:51:24.949Z] iter=84 turn=11 INFO: Cache persisted: 26 entries to .autoagent-cache.json
+[2026-04-05T10:51:24.949Z] iter=84 turn=11 INFO: Cache stats: 0 hits, 4 misses, 26 entries, 3 invalidations (3 entries removed)
+[2026-04-05T10:51:24.949Z] iter=84 turn=11 INFO: Tool cache stats
+[2026-04-05T10:51:24.949Z] iter=84 turn=11 INFO: Tool timing: bash: 2x, avg=368ms, total=736ms; list_files: 1x, avg=17ms, total=17ms; write_file: 3x, avg=2ms, total=7ms; think: 4x, avg=1ms, total=3ms; read_file: 3x, avg=1ms, total=3ms
+[2026-04-05T10:51:24.949Z] iter=84 turn=11 INFO: Tool timing stats
+[2026-04-05T10:51:28.606Z] iter=84 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 84: predicted 7 turns, actual 11 turns, ratio 1.57**
+[2026-04-05T10:51:35.395Z] iter=84 turn=11 INFO: Pre-commit review (695in/244out): ## Issues
+
+- **`log(0, ...)` hardcoded iteration**: `readGoals()` is called before the iteration counter is known, so passing `0` is misleading/incorrect. The real `iter` value isn't available here si
