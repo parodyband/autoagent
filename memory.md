@@ -73,3 +73,5 @@ System is productive — 4/5 recent iterations shipped real features. Iter 194 l
 System is highly productive — 5 consecutive iterations (195-199) shipped real features. Tree-sitter repo map completed. Prediction accuracy strong (0.75-0.80 range). Turn usage trending down. No issues detected. Next priority: auto-commit (high user value, well-scoped). Memory compacted — gaps list updated.
 
 **[AUTO-SCORED] Iteration 199: predicted 8 turns, actual 6 turns, ratio 0.75**
+
+**[AUTO-SCORED] Iteration 200: predicted 15 turns, actual 18 turns, ratio 1.20**

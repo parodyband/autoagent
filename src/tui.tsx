@@ -334,6 +334,15 @@ function App() {
         setMessages(prev => [...prev, assistantMsg]);
       }
 
+      // Show commit info if auto-commit fired
+      if (result.commitResult?.committed) {
+        const { hash, message } = result.commitResult;
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          content: `✓ Committed ${hash}: ${message}`,
+        }]);
+      }
+
       // Update footer stats from orchestrator
       const costInfo = orchestratorRef.current?.getCost();
       if (costInfo) {

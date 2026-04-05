@@ -32,6 +32,7 @@ import {
   runArchitectMode,
   type EditPlan,
 } from "./architect-mode.js";
+import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
 
 // ─── Constants ────────────────────────────────────────────────
 
@@ -86,6 +87,7 @@ export interface OrchestratorResult {
   tokensOut: number;
   model: string;
   verificationPassed?: boolean;
+  commitResult?: AutoCommitResult;
 }
 
 export interface CostInfo {
@@ -605,7 +607,16 @@ export class Orchestrator {
       }
     }
 
+    // 7. Auto-commit if code was likely changed
+    let commitResult: AutoCommitResult | undefined;
+    if (looksLikeCodeChange) {
+      commitResult = await autoCommit(this.opts.workDir, userMessage);
+      if (commitResult.committed) {
+        this.opts.onStatus?.(`✓ Committed ${commitResult.hash}: ${commitResult.message}`);
+      }
+    }
+
     this.opts.onStatus?.("");
-    return { text, tokensIn, tokensOut, model, verificationPassed };
+    return { text, tokensIn, tokensOut, model, verificationPassed, commitResult };
   }
 }

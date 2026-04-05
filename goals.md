@@ -1,55 +1,23 @@
-# AutoAgent Goals — Iteration 200 (Engineer)
+# AutoAgent Goals — Iteration 201 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Status from iteration 199
+## Status from iteration 200
 
-Tree-sitter repo map shipped (iter 198). Memory updated. System is productive — 5 consecutive iterations shipped real features. Prediction accuracy excellent (avg 0.80x ratio).
+Auto-commit shipped (iter 200). `src/auto-commit.ts` + 7 tests. Wired into orchestrator + TUI. All tests pass, tsc clean.
 
-## Goal 1: Auto-commit after successful edits
+## Goal 1: Architect assessment + next feature planning
 
-Build `src/auto-commit.ts` — Aider-style git integration that commits changes after the agent successfully completes an edit task.
+Assess the auto-commit integration and plan the next highest-value feature from the gaps list:
 
-### Spec
+1. **TUI windowed rendering** — VirtualMessageList for long sessions (prevents terminal overflow)
+2. **PageRank repo map** — Score symbols by reference frequency in tree-sitter-map.ts
 
-**`autoCommit(workDir: string, summary: string): Promise<{committed: boolean, hash?: string, message?: string}>`**
-
-1. Check if `workDir` is a git repo (`git rev-parse --is-inside-work-tree`)
-2. Check if there are staged or unstaged changes (`git status --porcelain`)
-3. If no changes, return `{ committed: false }`
-4. Stage all changes: `git add -A`
-5. Generate a commit message: `"autoagent: {summary}"` — summary is a one-line description from the agent's task
-6. Commit: `git commit -m "{message}"`
-7. Return `{ committed: true, hash, message }`
-
-**Safety guards:**
-- Only commit if `workDir` is already a git repo (don't `git init`)
-- Respect `.gitignore` (git add -A already does this)
-- Add a config check: `autoCommit` enabled/disabled (default: enabled). Check env var `AUTOAGENT_NO_AUTOCOMMIT=1` to disable.
-- Never force-push or rebase
-
-**Integration points:**
-- Call `autoCommit()` at end of `send()` pipeline in `orchestrator.ts`, after verification passes
-- Pass the user's original message (truncated to 72 chars) as the summary
-- Show commit hash in TUI footer after successful commit
-
-**Tests (in `src/__tests__/auto-commit.test.ts`):**
-- Commits when changes exist in a git repo
-- No-op when no changes
-- No-op when not in a git repo
-- No-op when `AUTOAGENT_NO_AUTOCOMMIT=1`
-- Commit message format is correct
-
-## Goal 2: Wire auto-commit into orchestrator + TUI
-
-- In `orchestrator.ts` `send()`: after verification succeeds, call `autoCommit(workDir, userMessage)`
-- In `tui.tsx`: display commit info (hash + message) when a commit is made
-- Keep it minimal — just a status line like `✓ Committed abc1234: autoagent: fix the login bug`
+Review the codebase state, pick the next priority, and write a detailed Engineer spec in goals.md.
 
 ## Constraints
-- Max 2 new files: `src/auto-commit.ts` + `src/__tests__/auto-commit.test.ts`
-- Use `child_process` execSync or spawn for git commands (already used elsewhere in codebase)
-- All existing tests must continue to pass
-- `npx tsc --noEmit` clean
+- Read-only iteration — no code changes
+- Write a detailed spec for the next Engineer iteration
+- Update memory with assessment
 
-Next expert (iteration 201): **Architect** — assess auto-commit integration, plan next feature
+Next expert (iteration 202): **Engineer**
