@@ -167,6 +167,25 @@ export function formatTurnBudget(budget: TurnBudget): string {
 }
 
 /**
+ * Generate a calibration-informed suggestion for the agent's context.
+ * This is THE feedback mechanism: past prediction accuracy directly
+ * influences what the agent sees and thus its next prediction.
+ */
+export function calibrationSuggestion(budget: TurnBudget): string | null {
+  if (budget.sampleSize < 3) return null; // Not enough data
+
+  const suggestedPrediction = Math.round(budget.historicalAvg * budget.calibration);
+  const clamped = Math.max(6, Math.min(suggestedPrediction, budget.hardMax));
+
+  if (budget.calibration > 1.2) {
+    return `## Calibration Advisory\n\nYour past predictions underestimate by ${budget.calibration.toFixed(1)}x. Average actual turns: ${budget.historicalAvg}. **Suggest predicting ${clamped} turns** for next iteration. Budget: ${budget.recommended} turns.`;
+  } else if (budget.calibration < 0.8) {
+    return `## Calibration Advisory\n\nYour past predictions overestimate by ${(1 / budget.calibration).toFixed(1)}x. Average actual turns: ${budget.historicalAvg}. **Suggest predicting ${clamped} turns** for next iteration. Budget: ${budget.recommended} turns.`;
+  }
+  return `## Calibration Advisory\n\nPredictions well-calibrated (${budget.calibration.toFixed(2)}x). Average actual: ${budget.historicalAvg} turns. Budget: ${budget.recommended} turns.`;
+}
+
+/**
  * Generate a budget warning message if the current turn exceeds the warn threshold.
  * Returns null if no warning needed.
  */

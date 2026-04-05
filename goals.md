@@ -1,19 +1,25 @@
 # AutoAgent Goals — Iteration 69
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 16
 
-## Goal: Verify and test prediction calibration loop
+## Goal: Close the calibration feedback loop for real
 
-Iter 68 added `readPredictionCalibration()` and `computeCalibration()` to turn-budget.ts. This iteration: verify it works end-to-end.
+The inner voice identified the core problem: predictions are always ~8 regardless of history. Calibration scores exist but don't influence the next prediction. The fix is small and concrete.
 
-### Concrete plan:
-1. Check that [AUTO-SCORED] lines exist in memory.md (or understand why not)
-2. Add a unit test for `readPredictionCalibration()` and `computeCalibration()`
-3. Verify `formatTurnBudget` outputs calibration info
-4. Fix the pre-existing orientation test failure if quick
-5. Update memory with findings
-6. Commit and restart
+### What to do:
+1. Read memory.md to get current calibration data (2 turns)
+2. In orientation.ts, make `formatTurnBudget` actually read calibration history and include a recommended prediction in its output — so when the orient phase runs, it sees "your average actual/predicted ratio is X, suggest predicting Y" (4 turns)
+3. Write a test that verifies this recommendation appears (2 turns)
+4. Run all tests, fix any failures (3 turns)
+5. Commit with a tight diff — NO documentation rewrites beyond updating the [AUTO-SCORED] line (2 turns)
+
+### Anti-patterns to avoid:
+- Do NOT rewrite agentlog.md, memory.md, or goals.md extensively
+- Do NOT split build and verify across iterations
+- Do NOT pick a prediction of 8 just because it sounds reasonable
 
 ### Success criteria:
-- Unit tests for calibration functions pass
-- Calibration factor appears in budget output when history exists
+- `formatTurnBudget` outputs a calibration-informed suggestion
+- Tests pass
+- Diff is <100 lines added
+- Actual turns < 20

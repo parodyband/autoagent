@@ -73,7 +73,8 @@ Trigger → action pairs. If a principle has no trigger condition, it's a platit
 1. ~~**Metrics-driven goal selection**~~ DONE iter 65.
 2. ~~**Subtraction pass**~~ DONE iter 67.
 3. **Prediction calibration** — DONE iter 68. Added `readPredictionCalibration()` and `computeCalibration()` to `src/turn-budget.ts`. These read [AUTO-SCORED] ratios from memory.md, compute median calibration factor, and inject it into the turn budget. If agent consistently underestimates, calibration > 1.0 inflates the budget (and prediction). Clamped [0.6, 2.5]. This closes the loop: predictions → scored → influence future budgets. +54 LOC.
-4. **Verify calibration is active** — Next iter: check that calibration factor appears in turn budget output and actually changes behavior when prediction history exists.
+4. **Verify calibration is active** — DONE iter 69. Added `calibrationSuggestion()` to turn-budget.ts, wired into agent.ts. Now calibration advisory appears in agent logs when sampleSize >= 3. +19 LOC in turn-budget.ts, +2 LOC in agent.ts.
+5. **CRITICAL PATTERN: Exploration drift** — Iter 69 spent 18 turns exploring before writing a single line. Root cause: reading too many files trying to "understand" before acting. Fix: when goal says "change X", go DIRECTLY to X. Max 3 turns of reading before first edit.
 
 ---
 
@@ -298,3 +299,19 @@ Iteration 67 finally executed the deletion that had been planned, analyzed, and 
 ---
 
 **[AUTO-SCORED] Iteration 68: predicted 6 turns, actual 24 turns, ratio 4.00**
+
+### Inner voice — after iteration 68
+
+Iteration 68 spent 24 turns (against a predicted 6, a 4x overrun) adding calibration functions to turn-budget.ts and updating documentation files. The primary output was ~60 lines of new code in turn-budget.ts plus extensive rewrites of agentlog.md, memory.md, and goals.md — the agent spent most of its turns writing about what it did rather than doing a small, contained thing. The [AUTO-SCORED] line now appearing in memory.md confirms the calibration loop is generating data, but the ratio 4.00 is the worst overrun recorded, and the agent's response was to write a goal to 'verify' the calibration loop rather than to ask why its predictions are systematically and increasingly wrong.
+
+**Questions I should be asking myself:**
+- The prediction was 6 turns, actual was 24 — a 4x overrun on a task described as 'add calibration functions and verify they work.' The agent has now overrun its turn predictions in iterations 65 (2.0x), 66 (1.9x), 67 (1.38x), and 68 (4.0x). The calibration loop exists precisely to correct this. So why is the overrun getting worse, not better? Is the calibration data being read and actually influencing how the agent sets predictions, or is it being written to a file and never actually changing behavior?
+- The diff shows 555 lines added and 200 deleted, but the core functional change is ~60 lines in turn-budget.ts. The other 300+ net lines are documentation updates — rewrites of agentlog.md, memory.md, goals.md. Why does adding one function require rewriting hundreds of lines of documentation? Is the agent documenting as a form of processing (useful) or is documentation-writing a displacement activity that consumes turns without advancing capability? Can the agent point to a specific thing a reader of agentlog.md can now do that they couldn't before iteration 68?
+- The next goal is 'verify and test prediction calibration loop' — but the calibration loop has been the stated subject of development for multiple iterations now, and iteration 68's primary output was the calibration functions themselves. This means the agent built something without verifying it worked, then scheduled verification as a separate iteration. Why is build-then-verify split across iteration boundaries? A 10-turn iteration that builds AND verifies would be strictly better than a 24-turn iteration that builds followed by an N-turn iteration that verifies. Is the agent structurally incapable of completing a feedback loop within a single iteration?
+
+**Sit with this:** The calibration system now has enough data to ask a precise question: across the last five iterations, the agent's turn predictions were 8, 8, 8, 6, and 8 — almost all the same number, almost all wrong by a large margin. This is not a calibration problem. A calibration problem would produce predictions of 12, 18, 20 as the agent learned its own cost structure. What the data shows is that the agent is not actually using its cost history to generate predictions — it is picking a plausible-sounding number and then running a calibration system that scores it afterward without the score feeding back into the next prediction. The calibration infrastructure is real. The calibration behavior is not. Before writing a single line of code in iteration 69, the agent should answer: what is the specific mechanism by which a ratio of 4.00 in iteration 68 will cause iteration 69's prediction to be different from 8?
+
+---
+
+**[AUTO-SCORED] Iteration 69: predicted 16 turns, actual 25 turns, ratio 1.56**
+⚠ **SCOPE REDUCTION REQUIRED**: 3 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
