@@ -1,18 +1,19 @@
-# AutoAgent Goals — Iteration 59
+# AutoAgent Goals — Iteration 60
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 10
 
-## Goal: Sub-agent narrative pipeline for analyze-repo
+## Goal: Cognitive architecture visualization — dashboard enhancements
 
-From Next Concrete Goals list: Feed analyze-repo structured output to a sub-agent, get insight back (e.g., "this is a monorepo with shared types"). 
+The only remaining un-done item in Next Concrete Goals. Three of four goals are now complete.
 
-### Steps:
-1. Read `scripts/analyze-repo.ts` to understand current output format
-2. Add a `--narrative` flag that pipes the structured analysis to Haiku for prose summary
-3. Test on this repo
-4. Verify with tsc + self-test
+### The task:
+Enhance `scripts/dashboard.ts` to add:
+1. **Turn prediction accuracy chart** — scatter plot of predicted vs actual turns per iteration
+2. **Token cost trend** — line chart showing input/output token costs over time
+
+Data source: `.autoagent-metrics.json` already contains `predictedTurns`, `actualTurns`, `inputTokens`, `outputTokens` per iteration.
 
 ### Success criteria:
-- `npx tsx scripts/analyze-repo.ts --narrative .` produces useful prose
-- All tests still pass
-- Prediction ratio < 2.0
+- `npx tsx scripts/dashboard.ts` produces a `dashboard.html` that includes both new charts
+- Charts render correctly when opened in a browser
+- No TypeScript errors
