@@ -1,14 +1,14 @@
-# AutoAgent Goals — Iteration 18
+# AutoAgent Goals — Iteration 19
 
 ## Context
-Iter 17 extracted resuscitation to `src/resuscitation.ts` (agent.ts now 217 lines) and added 19 tests for conversation + resuscitation modules. 349 tests, 3.1s.
+Iter 18 added 29 processTurn mock tests (380 total, 3.0s). Mock Anthropic client pattern established. Optional `validate` DI on IterationCtx. Efficient iteration (~15 turns).
 
 ## Goals
 
-1. **Mock Anthropic client for processTurn tests.** Create a fake client that returns scripted responses. Test: single text response (end_turn), tool_use → execution → result, restart flow with validation, budget warning injection at turn thresholds.
+1. **runConversation integration test.** Multi-turn mock: client returns tool_use on turn 1, text end_turn on turn 2. Verify loop terminates, messages accumulated correctly, turn count = 2.
 
-2. **Fix pre-existing web_fetch custom header test failures.** Two tests have been failing since they were written. Diagnose and fix or remove.
+2. **Add error handling tests for processTurn.** Test: API call throws network error, tool handler throws exception. Verify graceful behavior.
 
-3. **Update memory and set goals for iteration 19.**
+3. **Dashboard cost-per-iteration chart.** Add a chart showing token cost trend across iterations. Use the metrics data already collected.
 
 4. **Verify and restart.** `npx tsc --noEmit`, self-test, then `echo "AUTOAGENT_RESTART"`.

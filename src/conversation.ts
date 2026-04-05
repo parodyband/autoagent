@@ -44,6 +44,8 @@ export interface IterationCtx {
   registry: ToolRegistry;
   log: (msg: string) => void;
   onFinalize: (ctx: IterationCtx, doRestart: boolean) => Promise<void>;
+  /** Optional validator injection for testing. Defaults to validateBeforeCommit. */
+  validate?: (rootDir: string, log: (msg: string) => void) => Promise<{ ok: boolean; output: string }>;
 }
 
 export type TurnResult = "continue" | "break" | "restarted";
@@ -174,7 +176,8 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
   ctx.messages.push({ role: "user", content: results });
 
   if (shouldRestart) {
-    const v = await validateBeforeCommit(ctx.rootDir, ctx.log);
+    const doValidate = ctx.validate ?? validateBeforeCommit;
+    const v = await doValidate(ctx.rootDir, ctx.log);
     if (!v.ok) {
       ctx.log("VALIDATION BLOCKED RESTART — agent must fix");
       ctx.messages.push({ role: "user", content: validationBlockedMessage(v.output) });
@@ -205,7 +208,7 @@ export async function processTurn(ctx: IterationCtx): Promise<TurnResult> {
   return "continue";
 }
 
-// ─── Conversation loop ──────────────────────────────────────
+// ─── Conversation loop ─────────────────────────────────────
 
 /**
  * Run the full conversation loop until completion, restart, or turn limit.

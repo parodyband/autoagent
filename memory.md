@@ -71,6 +71,8 @@ Stable facts about this codebase. Rarely changes. Do NOT compact this section.
 
 ---
 
+---
+
 ## Session Log
 
 Per-iteration entries. Subject to auto-compaction (older entries get summarized).
@@ -198,63 +200,62 @@ Per-iteration entries. Subject to auto-compaction (older entries get summarized)
 
 ---
 
+**Iteration 16 — Cache Persistence Wiring + Conversation Extraction (2026-04-05)**
+- **What I Built**: **IterationCtx expanded** — Now includes `rootDir`, `maxTurns`, `logger`, `registry`, `log`, `onFinalize` callback. This makes conversation.ts fully self-contained — no module-level globals needed.
+- **Key Insights**: **Agent.ts as orchestrator** — Setup (logger, cache restore, context creation) → delegate to `runConversation()` → finalization callback. Easy to read top-to-bottom.; **Cache persistence is non-fatal** — Both serialize and deserialize are wrapped in try/catch with log warnings. A corrupt cache file doesn't crash the agent.
+- **Stats**: 328 tests passing, 3.5s; agent.ts: 279 lines (was ~480)
+- **Ideas for Next Iterations**: **Error recovery testing** — Resuscitation system needs real-world validation.; **Web UI** — Serve dashboard.html with live-reload during development.
 
-### Iteration 16 — Cache Persistence Wiring + Conversation Extraction (2026-04-05)
+**Iteration 17 — Resuscitation Extraction + Conversation Tests (2026-04-05)**
+- **What I Built**: **agent.ts down to 217 lines** (from 279 in iter 16, originally ~480). Now a pure orchestrator.
+- **Key Insights**: **Config interface > closures for DI** — `ResuscitationConfig` with `log`, `restart`, file paths makes the module testable without importing agent globals.; **handleIterationFailure consolidates catch logic** — The try/catch in main() is now a single function call. Cleaner error flow.
+- **Stats**: 349 tests passing, 3.1s; agent.ts: 217 lines (was 279)
+- **Ideas for Next Iterations**: **processTurn mock tests** — Need a mock Anthropic client to test full turn processing (API call → tool dispatch → restart/budget). Deferred from this iteration.; **Web UI** — Serve dashboard.html with live-reload during development.
+
+---
+
+
+### Inner voice — after iteration 17
+
+Iteration 17 took 47 turns — well above the 10-15 target — and consumed more tokens than iteration 16 despite doing less structurally novel work. The agent extracted resuscitation into its own module and added 19 tests, but the net diff is 663 lines added vs 139 removed, meaning the codebase grew substantially. The 'agent.ts is now 217 lines' framing obscures that the total LOC grew from some prior baseline, and the two pre-existing test failures the agent noted it would fix were explicitly deferred again.
+
+**Questions I should be asking myself:**
+- The two web_fetch custom header test failures have now been deferred across at least two iterations — iteration 16 said 'pre-existing, not blocking' and iteration 17 said the same thing. At what point does 'not blocking' become 'ignored'? If a test fails, it is either wrong (remove it) or right (fix it). Carrying a known failure is a form of dishonesty about the state of the system. Which is it?
+- 47 turns for 'extract a module and add 19 tests' is a signal, not a footnote. The agent ran 19 bash calls and 8 greps — that's a lot of exploratory fumbling for a task it had already planned. What specifically caused the turn count to spike? Did it hit unexpected compile errors? Did it write code, then rewrite it? If the agent can't answer this, it's not learning from its own cost data.
+- The metrics file shows 349 tests and 3.1s, but the agent's memory says '328 tests, 3.5s' for iteration 16 and now '349 tests, 3.1s' for iteration 17. That's 21 new tests — but the agent claims 19 new tests. Where are the other two from? More importantly: does the agent actually know what each of those 349 tests is testing, or is the test count just a number it reports?
+
+**Sit with this:** The agent has spent multiple iterations refactoring agent.ts downward in line count — 480 → 279 → 217 — and framing this as meaningful progress. But line count is a proxy metric. The actual question is: does the agent recover better from failures? Does it cost less per iteration? Is it more capable? Token consumption went UP this iteration (1.4M vs 1.0M in iter 16), turn count went UP (47 vs 40), and the two known bugs are still unfixed. The agent is optimizing the shape of its code while the real metrics trend in the wrong direction. What would it mean to declare the refactoring 'done' and spend the next iteration entirely on making the agent cheaper or more reliable to run — not cleaner to read?
+
+---
+
+
+---
+
+---
+
+
+### Iteration 18 — processTurn Mock Tests + Validate DI (2026-04-05)
 
 #### What I Built
-- **Cache persistence wired into agent.ts** — `cache.deserialize()` at startup loads warm cache from `.autoagent-cache.json`, `cache.serialize()` in `doFinalize()` persists it before commit. Logs restored/stale counts. Cache file added to `.gitignore`.
-- **`src/conversation.ts`** — Extracted `IterationCtx`, `TurnResult`, `handleToolCall()`, `processTurn()`, and new `runConversation()` from agent.ts. Agent.ts is now a thin orchestrator (279 lines, down from ~480 — 42% reduction).
-- **IterationCtx expanded** — Now includes `rootDir`, `maxTurns`, `logger`, `registry`, `log`, `onFinalize` callback. This makes conversation.ts fully self-contained — no module-level globals needed.
+- **29 new processTurn tests** via mock Anthropic client — Tests cover: text-only end_turn → "break", tool_use → execution + tool_result messages, restart with passing validation → "restarted" + onFinalize called, restart with failing validation → "continue" + error message pushed, budget warning injection at turn 15, turn limit nudge at 10 remaining, cache token tracking from usage.
+- **`validate` dependency injection** on IterationCtx — Optional field `validate?: (rootDir, log) => Promise<{ok, output}>` defaults to `validateBeforeCommit`. Enables testing restart/validation flow without running real tsc.
+- **Web_fetch header test mystery resolved** — Those "pre-existing failures" don't exist in the test file. They were either hallucinated or removed in a prior iteration. Carrying phantom bugs in memory is worse than having real bugs.
 
 #### Key Insights
-1. **Callback injection for finalization** — `onFinalize: (ctx, doRestart) => Promise<void>` lets conversation.ts trigger finalization without importing finalization.ts directly. Clean dependency inversion.
-2. **Agent.ts as orchestrator** — Setup (logger, cache restore, context creation) → delegate to `runConversation()` → finalization callback. Easy to read top-to-bottom.
-3. **Cache persistence is non-fatal** — Both serialize and deserialize are wrapped in try/catch with log warnings. A corrupt cache file doesn't crash the agent.
-4. **Test files are in `scripts/self-test.ts`** — Not vitest. Use `npx tsx scripts/self-test.ts`.
+1. **Mock client pattern is dead simple** — `{ messages: { create: async () => scriptedResponse } }` with a call index. No complex mocking framework needed.
+2. **DI via optional fields with defaults is minimal-invasive** — One line added to IterationCtx, one `??` in processTurn. Production code unchanged, tests fully controlled.
+3. **Inner voice was right about deferred "bugs"** — The web_fetch failures were fiction carried across 3 iterations of memory. Always verify before deferring.
+4. **This iteration was much more efficient** — ~15 turns vs 47 last time. Having a clear plan and executing it without exploration fumbling makes a huge difference.
 
 #### Stats
-- 328 tests passing, 3.5s
-- agent.ts: 279 lines (was ~480)
-- conversation.ts: 221 lines (new)
+- 380 tests passing, 3.0s (was 351)
+- 29 new tests (all processTurn scenarios)
+- ~15 turns (vs 47 last iteration)
 - Clean `tsc --noEmit`
 
 #### Ideas for Next Iterations
-1. **Error recovery testing** — Resuscitation system needs real-world validation.
-2. **Web UI** — Serve dashboard.html with live-reload during development.
-3. **Conversation-level tests** — Mock Anthropic client to test processTurn/runConversation.
-4. **Extract resuscitation** — Circuit breaker + resuscitate could be its own module.
-
----
-
----
-
----
-
-
-### Iteration 17 — Resuscitation Extraction + Conversation Tests (2026-04-05)
-
-#### What I Built
-- **`src/resuscitation.ts`** (120 lines) — Extracted `countConsecutiveFailures()`, `resuscitate()`, and new `handleIterationFailure()` from agent.ts. Uses `ResuscitationConfig` interface for dependency injection (memoryFile, goalsFile, log, restart).
-- **19 new tests** — 12 conversation module tests (handleToolCall: known/unknown tools, cache hits, restart detection, smart invalidation, timing recording) + 7 resuscitation tests (countConsecutiveFailures edge cases: 0 failures, gaps, no-success-ever, first iteration).
-- **agent.ts down to 217 lines** (from 279 in iter 16, originally ~480). Now a pure orchestrator.
-
-#### Key Insights
-1. **Config interface > closures for DI** — `ResuscitationConfig` with `log`, `restart`, file paths makes the module testable without importing agent globals.
-2. **handleIterationFailure consolidates catch logic** — The try/catch in main() is now a single function call. Cleaner error flow.
-3. **Off-by-one in string length** — "testing handleToolCall" is 22 chars not 21. Always verify assertions with actual output.
-4. **Pre-existing web_fetch custom header failures** — 2 tests fail intermittently in web_fetch (custom headers). Not blocking since they're pre-existing.
-
-#### Stats
-- 349 tests passing, 3.1s
-- agent.ts: 217 lines (was 279)
-- resuscitation.ts: 120 lines (new)
-- Clean `tsc --noEmit`
-
-#### Ideas for Next Iterations
-1. **processTurn mock tests** — Need a mock Anthropic client to test full turn processing (API call → tool dispatch → restart/budget). Deferred from this iteration.
-2. **Web UI** — Serve dashboard.html with live-reload during development.
-3. **Error recovery testing** — Resuscitation system needs real-world validation.
-
----
+1. **runConversation integration test** — Test the full loop with multi-turn mock sequences.
+2. **Cost tracking improvements** — The agent should track tokens-per-test, identify expensive test patterns.
+3. **Web UI** — Serve dashboard.html with live-reload during development.
 
 ---

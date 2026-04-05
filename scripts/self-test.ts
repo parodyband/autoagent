@@ -679,6 +679,7 @@ async function main(): Promise<void> {
     testFinalization();
     testCachePersistence();
     await testConversation();
+    await testProcessTurn();
     testResuscitation();
   } finally {
     // Cleanup
@@ -1314,6 +1315,163 @@ async function testConversation(): Promise<void> {
   const thinkStats = ctx6.timing.getToolStats("think");
   assert(thinkStats !== undefined, "conv: timing recorded for tool");
   assert(thinkStats!.calls === 1, "conv: timing shows 1 call");
+}
+
+// ─── processTurn Tests (mock Anthropic client) ─────────────
+
+function mockApiResponse(content: any[], stop_reason: string = "end_turn", usage?: any) {
+  return {
+    content,
+    stop_reason,
+    usage: usage ?? { input_tokens: 100, output_tokens: 50 },
+  };
+}
+
+function mockClient(responses: any[]) {
+  let callIdx = 0;
+  return {
+    messages: {
+      create: async () => {
+        const resp = responses[callIdx++];
+        if (!resp) throw new Error("No more mock responses");
+        return resp;
+      },
+    },
+  };
+}
+
+async function testProcessTurn(): Promise<void> {
+  console.log("\n🔄 processTurn Tests");
+
+  // 1. Text-only response (end_turn, no tool calls) → "break"
+  {
+    const client = mockClient([
+      mockApiResponse([{ type: "text", text: "I'm done." }], "end_turn"),
+    ]);
+    const ctx = makeMockCtx({ client: client as any });
+    const result = await processTurn(ctx);
+    assert(result === "break", "turn: text-only end_turn → break");
+    assert(ctx.turns === 1, "turn: turns incremented to 1");
+    assert(ctx.tokens.in === 100, "turn: input tokens tracked");
+    assert(ctx.tokens.out === 50, "turn: output tokens tracked");
+    // assistant message pushed
+    assert(ctx.messages.length === 1, "turn: assistant message pushed");
+    assert((ctx.messages[0] as any).role === "assistant", "turn: message is assistant role");
+  }
+
+  // 2. Tool use → execution → tool_result pushed, returns "continue"
+  {
+    const client = mockClient([
+      mockApiResponse([
+        { type: "text", text: "Let me think..." },
+        { type: "tool_use", id: "tu1", name: "think", input: { thought: "test thought" } },
+      ], "tool_use"),
+    ]);
+    const ctx = makeMockCtx({ client: client as any });
+    const result = await processTurn(ctx);
+    assert(result === "continue", "turn: tool_use → continue");
+    // messages: assistant + user (tool_result)
+    assert(ctx.messages.length === 2, "turn: 2 messages (assistant + tool_result)");
+    assert((ctx.messages[1] as any).role === "user", "turn: tool_result is user role");
+    const toolResults = (ctx.messages[1] as any).content;
+    assert(Array.isArray(toolResults), "turn: tool_result content is array");
+    assert(toolResults[0].type === "tool_result", "turn: has tool_result block");
+    assert(toolResults[0].tool_use_id === "tu1", "turn: tool_use_id matches");
+    assert(ctx.toolCounts["think"] === 1, "turn: think counted");
+  }
+
+  // 3. Restart flow — validation passes → "restarted"
+  {
+    let finalizeCalled = false;
+    let finalizeRestart = false;
+    const client = mockClient([
+      mockApiResponse([
+        { type: "tool_use", id: "tu2", name: "bash", input: { command: 'echo "AUTOAGENT_RESTART"' } },
+      ], "tool_use"),
+    ]);
+    const ctx = makeMockCtx({
+      client: client as any,
+      validate: async () => ({ ok: true, output: "" }),
+      onFinalize: async (_ctx, doRestart) => { finalizeCalled = true; finalizeRestart = doRestart; },
+    });
+    const result = await processTurn(ctx);
+    assert(result === "restarted", "turn: restart + valid → restarted");
+    assert(finalizeCalled, "turn: onFinalize called on restart");
+    assert(finalizeRestart === true, "turn: onFinalize called with doRestart=true");
+  }
+
+  // 4. Restart flow — validation fails → "continue" (agent must fix)
+  {
+    let finalizeCalled = false;
+    const client = mockClient([
+      mockApiResponse([
+        { type: "tool_use", id: "tu3", name: "bash", input: { command: 'echo "AUTOAGENT_RESTART"' } },
+      ], "tool_use"),
+    ]);
+    const ctx = makeMockCtx({
+      client: client as any,
+      validate: async () => ({ ok: false, output: "TS2304: Cannot find name 'foo'" }),
+      onFinalize: async () => { finalizeCalled = true; },
+    });
+    const result = await processTurn(ctx);
+    assert(result === "continue", "turn: restart + invalid → continue");
+    assert(!finalizeCalled, "turn: onFinalize NOT called when validation fails");
+    // Validation error message pushed to messages
+    const lastMsg = ctx.messages[ctx.messages.length - 1] as any;
+    assert(lastMsg.role === "user", "turn: validation error pushed as user message");
+    assert(typeof lastMsg.content === "string" && lastMsg.content.includes("Cannot find name"), "turn: validation output in message");
+  }
+
+  // 5. Budget warning injected at turn 15
+  {
+    const client = mockClient([
+      mockApiResponse([
+        { type: "tool_use", id: "tu4", name: "think", input: { thought: "budget test" } },
+      ], "tool_use"),
+    ]);
+    const ctx = makeMockCtx({ client: client as any, maxTurns: 50 });
+    ctx.turns = 14; // processTurn will increment to 15
+    const result = await processTurn(ctx);
+    assert(result === "continue", "turn: budget warning turn → continue");
+    assert(ctx.turns === 15, "turn: turns is 15 after increment");
+    // Check that a budget warning was injected
+    const userMsgs = ctx.messages.filter((m: any) => m.role === "user");
+    const hasBudget = userMsgs.some((m: any) => typeof m.content === "string" && m.content.includes("Token budget check"));
+    assert(hasBudget, "turn: budget warning injected at turn 15");
+  }
+
+  // 6. Turn limit nudge at 10 turns left
+  {
+    const client = mockClient([
+      mockApiResponse([
+        { type: "tool_use", id: "tu5", name: "think", input: { thought: "nudge test" } },
+      ], "tool_use"),
+    ]);
+    const ctx = makeMockCtx({ client: client as any, maxTurns: 50 });
+    ctx.turns = 39; // processTurn increments to 40, turnsLeft = 50-40 = 10
+    const result = await processTurn(ctx);
+    assert(result === "continue", "turn: nudge turn → continue");
+    const userMsgs = ctx.messages.filter((m: any) => m.role === "user");
+    const hasNudge = userMsgs.some((m: any) => typeof m.content === "string" && m.content.includes("10 turns left"));
+    assert(hasNudge, "turn: turn limit nudge injected at 10 remaining");
+  }
+
+  // 7. Token usage with cache fields
+  {
+    const client = mockClient([
+      mockApiResponse(
+        [{ type: "text", text: "done" }],
+        "end_turn",
+        { input_tokens: 200, output_tokens: 80, cache_creation_input_tokens: 50, cache_read_input_tokens: 30 },
+      ),
+    ]);
+    const ctx = makeMockCtx({ client: client as any });
+    await processTurn(ctx);
+    assert(ctx.tokens.in === 200, "turn: input tokens from usage");
+    assert(ctx.tokens.out === 80, "turn: output tokens from usage");
+    assert(ctx.tokens.cacheCreate === 50, "turn: cache create tokens tracked");
+    assert(ctx.tokens.cacheRead === 30, "turn: cache read tokens tracked");
+  }
 }
 
 // ─── Resuscitation Module Tests ─────────────────────────────
