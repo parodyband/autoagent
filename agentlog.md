@@ -1,94 +1,3 @@
-464 |     } else {
-465 |       // Single write_file (or no preview callback) — existing per-file flow
-[2026-04-05T17:20:35.438Z] iter=265 turn=15 INFO: Turn 15/25
-[2026-04-05T17:20:43.384Z] iter=265 turn=15 INFO: Agent: Now wire all 4 `runAgentLoop` call sites in `send()` to pass the `onFileWatch` callback. The primary call first:
-[2026-04-05T17:20:43.385Z] iter=265 turn=15 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T17:20:43.386Z] iter=265 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -14 +23 lines
-
-Context after patch:
-1036 |       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
-1037 |     };
-1038 | 
-1039 |     const fileWatchCallback = (event: "read" | "write", filePath: string) => {
-1040 |       if (event === "read") this.fileWatcher.watch(filePath);
-1041 |       if (event === "write") {
-1042 |         this.fileWatcher.watch(filePath);
-1043 |         this.fileWatcher.mute(filePath);
-1044 |       }
-1045 |     };
-1046 | 
-1047 |     const { text, tokensIn, tokensOut, lastInputTokens } = await runAgentLoop(
-1048 |       this.client,
-1049 |       model,
-1050 |       this.systemPrompt,
-1051 |       this.apiMessages,
-1052 |       this.registry,
-1053 |       this.opts.workDir,
-1054 |       this.opts.onToolCall,
-1055 |       this.opts.onStatus,
-1056 |       this.opts.onText,
-1057 |       this.opts.onDiffPreview,
-1058 |       onCompact,
-1059 |       this.opts.onContextBudget,
-1060 |       fileWatchCallback,
-1061 |     );
-1062 | 
-1063 |     // Persist assistant reply (last assistant message in history)
-1064 |     if (this.sessionPath && text) {
-[2026-04-05T17:20:43.386Z] iter=265 turn=16 INFO: Turn 16/25
-[2026-04-05T17:20:45.945Z] iter=265 turn=16 INFO: Agent: 
-
-Let me wire the remaining `runAgentLoop` call sites and finish up fast.
-[2026-04-05T17:20:45.946Z] iter=265 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "await runAgentLoop(" src/orchestrator.ts
-[2026-04-05T17:20:45.960Z] iter=265 turn=16 INFO:   -> exit=0 (225 chars)
-[2026-04-05T17:20:45.961Z] iter=265 turn=17 INFO: Turn 17/25
-[2026-04-05T17:20:50.145Z] iter=265 turn=17 INFO: Agent: 
-
-Let me wire the remaining 3 call sites, then tsc + wrap up.
-[2026-04-05T17:20:50.146Z] iter=265 turn=17 INFO: read_file: src/orchestrator.ts
-[2026-04-05T17:20:50.148Z] iter=265 turn=17 INFO:   -> ok (592 chars)
-[2026-04-05T17:20:50.149Z] iter=265 turn=17 INFO: read_file: src/orchestrator.ts
-[2026-04-05T17:20:50.151Z] iter=265 turn=17 INFO:   -> ok (617 chars)
-[2026-04-05T17:20:50.152Z] iter=265 turn=17 INFO: read_file: src/orchestrator.ts
-[2026-04-05T17:20:50.153Z] iter=265 turn=17 INFO:   -> ok (998 chars)
-[2026-04-05T17:20:50.153Z] iter=265 turn=18 INFO: Turn 18/25
-[2026-04-05T17:20:58.740Z] iter=265 turn=18 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T17:20:58.743Z] iter=265 turn=18 INFO:   -> ok: Patched src/orchestrator.ts: -15 +18 lines
-
-Context after patch:
-1100 |             content: `Verification results:\n${formatted}\n\nPlease fix any failures.`,
-1101 |           });
-1102 |           this.opts.onStatus?.("Fixing verification failures...");
-1103 |           await runAgentLoop(
-1104 |             this.client,
-1105 |             model,
-1106 |             this.systemPrompt,
-1107 |             this.apiMessages,
-1108 |             this.registry,
-1109 |             this.opts.workDir,
-1110 |             this.opts.onToolCall,
-1111 |             this.opts.onStatus,
-1112 |             this.opts.onText,
-1113 |             this.opts.onDiffPreview,
-1114 |             undefined,
-1115 |             undefined,
-1116 |             fileWatchCallback,
-1117 |           );
-1118 |         }
-1119 |       }
-1120 |     }
-1121 | 
-1122 |     // 7. Auto-commit if code was likely changed
-1123 |     let commitResult: AutoCommitResult | undefined;
-[2026-04-05T17:20:58.743Z] iter=265 turn=18 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T17:20:58.747Z] iter=265 turn=18 INFO:   -> ok: Patched src/orchestrator.ts: -15 +18 lines
-
-Context after patch:
-1141 |           content: `TypeScript errors after edit:\n\`\`\`\n${diagErrors}\n\`\`\`\nPlease fix these errors.`,
-1142 |         });
-1143 | 
-1144 |         const fixResult = await runAgentLoop(
-1145 |           this.client,
 1146 |           model,
 1147 |           this.systemPrompt,
 1148 |           this.apiMessages,
@@ -1087,3 +996,73 @@ Context after patch:
 [2026-04-05T17:34:32.460Z] iter=272 turn=18 INFO: Tool timing stats
 [2026-04-05T17:34:38.021Z] iter=272 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 272: predicted 12 turns, actual 18 turns, ratio 1.50**
 [2026-04-05T17:34:38.042Z] iter=272 turn=18 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T17:34:38.073Z] iter=272 turn=18 INFO: Committed: 8f8a2070 (34 in / 2632 out, cache: 16373 created, 205912 read)
+[2026-04-05T17:34:38.073Z] iter=272 turn=18 INFO: Restarting as iteration 273...
+[2026-04-05T17:34:38.256Z] iter=273 INFO: Cache restored: 57/57 entries (0 stale)
+[2026-04-05T17:34:38.258Z] iter=273 INFO: Turn budget: 16/25 (calibration=1.50x, predicted=8)
+[2026-04-05T17:34:38.259Z] iter=273 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-05T17:34:38.371Z] iter=273 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T17:34:38.371Z] iter=273 turn=1 INFO: Turn 1/25
+[2026-04-05T17:34:42.975Z] iter=273 turn=1 INFO: Agent: 
+
+I'll start by reviewing the current state of the codebase, goals, and memory to understand what's needed. Let me also do some research since it's been a while.
+[2026-04-05T17:34:42.975Z] iter=273 turn=1 INFO: $ cat goals.md
+[2026-04-05T17:34:42.978Z] iter=273 turn=1 INFO: $ cat .autoagent.md
+[2026-04-05T17:34:42.980Z] iter=273 turn=1 INFO: $ cat memory.md
+[2026-04-05T17:34:42.984Z] iter=273 turn=1 INFO:   -> exit=0 (1284 chars)
+[2026-04-05T17:34:42.986Z] iter=273 turn=1 INFO:   -> exit=0 (22553 chars)
+[2026-04-05T17:34:42.989Z] iter=273 turn=1 INFO:   -> exit=0 (5388 chars)
+[2026-04-05T17:34:42.990Z] iter=273 turn=2 INFO: Turn 2/25
+[2026-04-05T17:34:48.388Z] iter=273 turn=2 INFO: Agent: 
+
+You're right. My deliverables are clear:
+
+1. **Write a smart context pruning spec** in goals.md
+2. **Identify highest-value Engineer tasks** and write actionable goals with acceptance criteria
+
+Let me do focused research first, then write goals.md.
+[2026-04-05T17:34:48.390Z] iter=273 turn=2 INFO: $ grep -n 'microCompact\|MICRO_COMPACT\|compactTier\|selectCompactionTier\|tool_result\|compactMessages\|clearHistory' src/orchestrator.ts | head -40
+[2026-04-05T17:34:48.395Z] iter=273 turn=2 INFO: web_search: "coding agent context window management pruning stale tool results 2025 techniques"
+[2026-04-05T17:34:48.420Z] iter=273 turn=2 INFO:   -> exit=0 (2310 chars)
+[2026-04-05T17:34:49.430Z] iter=273 turn=2 INFO:   -> 8 results
+[2026-04-05T17:34:49.431Z] iter=273 turn=3 INFO: Turn 3/25
+[2026-04-05T17:34:52.393Z] iter=273 turn=3 INFO: web_fetch: https://platform.claude.com/cookbook/tool-use-context-engineering-context-engineering-tools
+[2026-04-05T17:34:52.397Z] iter=273 turn=3 INFO: web_fetch: https://www.atlassian.com/blog/developer/rovo-dev-keeps-long-sessions-useful
+[2026-04-05T17:34:52.634Z] iter=273 turn=3 INFO:   -> ok (68632 chars)
+[2026-04-05T17:34:52.681Z] iter=273 turn=3 INFO:   -> ok (13622 chars)
+[2026-04-05T17:34:52.681Z] iter=273 turn=4 INFO: Turn 4/25
+[2026-04-05T17:35:12.055Z] iter=273 turn=4 INFO: Agent: 
+
+**Goal status:**
+- Goal 1 (Smart context pruning spec): NOT STARTED
+- Goal 2 (Identify next high-value product gap): NOT STARTED
+
+Research is done. I have excellent material from Anthropic's cookbook and Rovo Dev's blog post. Let me write goals.md now.
+[2026-04-05T17:35:12.056Z] iter=273 turn=4 INFO: think: From my research, the key insights for smart context pruning are:
+
+1. **Rovo Dev's cascade approach**: Prune in stages f...
+[2026-04-05T17:35:12.056Z] iter=273 turn=5 INFO: Turn 5/25
+[2026-04-05T17:35:43.260Z] iter=273 turn=5 INFO: write_file: goals.md (write)
+[2026-04-05T17:35:43.263Z] iter=273 turn=5 INFO:   -> ok: Updated goals.md (5070 chars, +73 lines delta)
+[2026-04-05T17:35:43.264Z] iter=273 turn=6 INFO: Turn 6/25
+[2026-04-05T17:35:46.493Z] iter=273 turn=6 INFO: Agent: 
+
+This is an Architect iteration — no src/ changes expected. Goals.md is written. Let me wrap up now.
+[2026-04-05T17:35:46.493Z] iter=273 turn=6 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T17:35:47.411Z] iter=273 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:35:47.411Z] iter=273 turn=7 INFO: Turn 7/25
+[2026-04-05T17:35:57.006Z] iter=273 turn=7 INFO: Agent: 
+
+TSC is clean. Let me save memory and restart.
+[2026-04-05T17:35:57.007Z] iter=273 turn=7 INFO: save_memory: "[Architect] Iteration 273 — Smart context pruning + file cache"
+[2026-04-05T17:35:57.009Z] iter=273 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T17:35:57.009Z] iter=273 turn=8 INFO: Turn 8/25
+[2026-04-05T17:35:58.931Z] iter=273 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T17:35:58.932Z] iter=273 turn=8 INFO: RESTART signal
+[2026-04-05T17:35:58.932Z] iter=273 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T17:35:59.917Z] iter=273 turn=8 INFO: Compilation OK
+[2026-04-05T17:36:06.723Z] iter=273 turn=8 INFO: Cache persisted: 57 entries to .autoagent-cache.json
+[2026-04-05T17:36:06.723Z] iter=273 turn=8 INFO: Tool timing: web_search: 1x, avg=1036ms, total=1036ms; bash: 6x, avg=163ms, total=977ms; web_fetch: 2x, avg=263ms, total=526ms; write_file: 1x, avg=4ms, total=4ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T17:36:06.723Z] iter=273 turn=8 INFO: Tool timing stats
+[2026-04-05T17:36:12.743Z] iter=273 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 273: predicted 8 turns, actual 8 turns, ratio 1.00**
+[2026-04-05T17:36:12.764Z] iter=273 turn=8 INFO: Pre-commit review: no significant code changes to review
