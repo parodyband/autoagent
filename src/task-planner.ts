@@ -13,6 +13,8 @@ export interface Task {
   description: string;
   status: "pending" | "in-progress" | "done" | "failed";
   dependsOn: string[]; // Task IDs this task depends on
+  result?: string;     // Executor output on success
+  error?: string;      // Error message on failure
 }
 
 export interface TaskPlan {
@@ -20,6 +22,9 @@ export interface TaskPlan {
   tasks: Task[];
   createdAt: number;
 }
+
+/** Called with each task and updated plan after every status change */
+export type TaskExecutor = (task: Task) => Promise<string>;
 
 const STATUS_ICON: Record<Task["status"], string> = {
   pending: "○",
@@ -67,6 +72,55 @@ export function formatPlan(plan: TaskPlan): string {
   lines.push(`  Progress: ${done}/${plan.tasks.length} tasks done`);
 
   return lines.join("\n");
+}
+
+/**
+ * Executes a TaskPlan in dependency order using the provided executor.
+ * Runs tasks sequentially. Stops on first failure.
+ * Mutates task statuses and stores result/error on each task.
+ */
+export async function executePlan(
+  plan: TaskPlan,
+  executor: TaskExecutor,
+  onUpdate?: (task: Task, plan: TaskPlan) => void
+): Promise<TaskPlan> {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const ready = getNextTasks(plan);
+
+    if (ready.length === 0) {
+      // Check if we're done or stuck
+      const allDone = plan.tasks.every(
+        (t) => t.status === "done" || t.status === "failed"
+      );
+      if (!allDone) {
+        // Stuck — some pending tasks can't proceed (likely due to a failed dep)
+        break;
+      }
+      break;
+    }
+
+    for (const task of ready) {
+      // Mark in-progress
+      task.status = "in-progress";
+      onUpdate?.(task, plan);
+
+      try {
+        const result = await executor(task);
+        task.status = "done";
+        task.result = result;
+        onUpdate?.(task, plan);
+      } catch (err) {
+        task.status = "failed";
+        task.error = err instanceof Error ? err.message : String(err);
+        onUpdate?.(task, plan);
+        // Stop execution — dependent tasks can't run
+        return plan;
+      }
+    }
+  }
+
+  return plan;
 }
 
 /**

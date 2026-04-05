@@ -256,9 +256,36 @@ function prompt() {
       }
       console.log("Planning...");
       try {
-        const { createPlan, formatPlan } = await import("./task-planner.js");
+        const { createPlan, formatPlan, executePlan } = await import("./task-planner.js");
+        type TaskExecutor = import("./task-planner.js").TaskExecutor;
         const plan = await createPlan(description, workDir);
         console.log("\n" + formatPlan(plan) + "\n");
+
+        // Ask whether to execute the plan
+        const answer = await new Promise<string>((resolve) => {
+          rl.question("Execute this plan? (y/n) ", resolve);
+        });
+
+        if (answer.trim().toLowerCase() === "y") {
+          console.log("");
+          const executor: TaskExecutor = async (task) => {
+            console.log(`  Executing: ${task.title}`);
+            return "completed";
+          };
+
+          await executePlan(plan, executor, (task, updatedPlan) => {
+            if (task.status === "in-progress") {
+              process.stdout.write(`◑ [${task.id}] Starting: ${task.title}\n`);
+            } else if (task.status === "done") {
+              process.stdout.write(`✓ [${task.id}] Done: ${task.title}\n`);
+            } else if (task.status === "failed") {
+              process.stdout.write(`✗ [${task.id}] Failed: ${task.title} — ${task.error ?? ""}\n`);
+            }
+            void updatedPlan; // suppress unused warning
+          });
+
+          console.log("\n" + formatPlan(plan) + "\n");
+        }
       } catch (err) {
         console.error(`Plan error: ${err instanceof Error ? err.message : String(err)}\n`);
       }

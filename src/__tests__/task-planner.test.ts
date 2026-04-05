@@ -3,6 +3,7 @@ import {
   getNextTasks,
   formatPlan,
   createPlan,
+  executePlan,
   type Task,
   type TaskPlan,
 } from "../task-planner.js";
@@ -185,5 +186,97 @@ describe("createPlan", () => {
     const plan = await createPlan("Refactor module", "TS project");
     expect(plan.tasks).toHaveLength(3);
     expect(plan.goal).toBe("Refactor module");
+  });
+});
+
+// ─── executePlan ──────────────────────────────────────────────
+
+describe("executePlan", () => {
+  it("executes all tasks in dependency order", async () => {
+    const plan = makePlan([
+      { id: "t1", title: "First", dependsOn: [] },
+      { id: "t2", title: "Second", dependsOn: ["t1"] },
+      { id: "t3", title: "Third", dependsOn: ["t2"] },
+    ]);
+
+    const order: string[] = [];
+    const executor = vi.fn(async (task: Task) => {
+      order.push(task.id);
+      return `done ${task.id}`;
+    });
+
+    const result = await executePlan(plan, executor);
+
+    expect(order).toEqual(["t1", "t2", "t3"]);
+    expect(result.tasks.every((t) => t.status === "done")).toBe(true);
+    expect(result.tasks[0].result).toBe("done t1");
+    expect(result.tasks[1].result).toBe("done t2");
+    expect(result.tasks[2].result).toBe("done t3");
+  });
+
+  it("stops on failure and leaves dependent tasks pending", async () => {
+    const plan = makePlan([
+      { id: "t1", title: "First", dependsOn: [] },
+      { id: "t2", title: "Second", dependsOn: ["t1"] },
+      { id: "t3", title: "Third", dependsOn: ["t2"] },
+    ]);
+
+    const executor = vi.fn(async (task: Task) => {
+      if (task.id === "t2") throw new Error("t2 exploded");
+      return "ok";
+    });
+
+    const result = await executePlan(plan, executor);
+
+    expect(result.tasks[0].status).toBe("done");
+    expect(result.tasks[1].status).toBe("failed");
+    expect(result.tasks[1].error).toBe("t2 exploded");
+    expect(result.tasks[2].status).toBe("pending");
+    // executor was called for t1 and t2 only
+    expect(executor).toHaveBeenCalledTimes(2);
+  });
+
+  it("handles tasks with no dependencies (all execute)", async () => {
+    const plan = makePlan([
+      { id: "t1", title: "Independent A", dependsOn: [] },
+      { id: "t2", title: "Independent B", dependsOn: [] },
+    ]);
+
+    const executed: string[] = [];
+    const executor = vi.fn(async (task: Task) => {
+      executed.push(task.id);
+      return "ok";
+    });
+
+    const result = await executePlan(plan, executor);
+
+    expect(executed).toContain("t1");
+    expect(executed).toContain("t2");
+    expect(result.tasks.every((t) => t.status === "done")).toBe(true);
+  });
+
+  it("calls onUpdate for each status change", async () => {
+    const plan = makePlan([
+      { id: "t1", title: "Alpha", dependsOn: [] },
+      { id: "t2", title: "Beta", dependsOn: ["t1"] },
+    ]);
+
+    const updates: Array<{ id: string; status: string }> = [];
+    const onUpdate = vi.fn((task: Task) => {
+      updates.push({ id: task.id, status: task.status });
+    });
+
+    const executor = vi.fn(async () => "ok");
+
+    await executePlan(plan, executor, onUpdate);
+
+    // Should have: t1 in-progress, t1 done, t2 in-progress, t2 done
+    expect(updates).toEqual([
+      { id: "t1", status: "in-progress" },
+      { id: "t1", status: "done" },
+      { id: "t2", status: "in-progress" },
+      { id: "t2", status: "done" },
+    ]);
+    expect(onUpdate).toHaveBeenCalledTimes(4);
   });
 });
