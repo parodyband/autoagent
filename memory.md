@@ -70,3 +70,5 @@ Task mode is built and hardened. **What's the next highest-leverage user-facing 
 **Build `--repo /path` support.** Key concept: separate `AGENT_HOME` (AutoAgent's own dir, where state lives) from `WORK_DIR` (where tools operate, defaults to AGENT_HOME). Parse `--repo` in `main()`, thread `workDir`/`agentHome` through context, ensure tools operate in WORK_DIR while state files stay in AGENT_HOME. See goals.md for full spec. Main risk: `rootDir` is used everywhere — grep all uses to avoid writing state files to the target repo.
 
 **[AUTO-SCORED] Iteration 89: predicted 10 turns, actual 9 turns, ratio 0.90**
+
+**[AUTO-SCORED] Iteration 90: predicted 14 turns, actual 21 turns, ratio 1.50**

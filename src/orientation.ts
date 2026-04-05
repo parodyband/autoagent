@@ -59,12 +59,13 @@ function extractSrcFiles(statOutput: string): string[] {
 export async function orient(
   maxDiffChars: number = 1000,
   useSubagentSummaries: boolean = true,
+  cwd?: string,
 ): Promise<OrientationReport> {
   // Get the stat summary (which files changed)
   const statResult = await executeBash(
     "git diff HEAD~1 --stat 2>/dev/null",
     10,
-    undefined,
+    cwd,
     true
   );
 
@@ -84,7 +85,7 @@ export async function orient(
       try {
         const fileDiffs = await Promise.all(
           srcFiles.map(file =>
-            executeBash(`git diff HEAD~1 -- ${file} 2>/dev/null`, 10, undefined, true)
+            executeBash(`git diff HEAD~1 -- ${file} 2>/dev/null`, 10, cwd, true)
           )
         );
 
@@ -118,7 +119,7 @@ export async function orient(
   const diffResult = await executeBash(
     "git diff HEAD~1 -- 'src/**' ':!agentlog.*' 2>/dev/null",
     10,
-    undefined,
+    cwd,
     true
   );
 

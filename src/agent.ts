@@ -171,7 +171,7 @@ function restart(): never {
 
 // ─── Main iteration ─────────────────────────────────────────
 
-async function runIteration(state: IterationState): Promise<void> {
+async function runIteration(state: IterationState, workDir: string = ROOT): Promise<void> {
   logger = createLogger(state.iteration, ROOT);
 
   const cache = new ToolCache();
@@ -220,7 +220,8 @@ async function runIteration(state: IterationState): Promise<void> {
     turns: 0,
     cache,
     timing: new ToolTimingTracker(),
-    rootDir: ROOT,
+    rootDir: workDir,
+    agentHome: ROOT,
     maxTurns: MAX_TURNS,
     logger,
     registry: toolRegistry,
@@ -266,6 +267,29 @@ const resusConfig: ResuscitationConfig = {
 };
 
 async function main(): Promise<void> {
+  // Parse --repo /path flag (external repo to operate on)
+  let WORK_DIR = ROOT; // defaults to AGENT_HOME
+  const repoFlagIdx = process.argv.indexOf("--repo");
+  if (repoFlagIdx !== -1) {
+    const repoPath = process.argv[repoFlagIdx + 1];
+    if (!repoPath || repoPath.startsWith("--")) {
+      console.error("Error: --repo requires a path argument, e.g. --repo /path/to/project");
+      process.exit(1);
+    }
+    const resolved = path.resolve(repoPath);
+    if (!existsSync(resolved)) {
+      console.error(`Error: --repo path does not exist: ${resolved}`);
+      process.exit(1);
+    }
+    const { statSync } = await import("fs");
+    if (!statSync(resolved).isDirectory()) {
+      console.error(`Error: --repo path is not a directory: ${resolved}`);
+      process.exit(1);
+    }
+    WORK_DIR = resolved;
+    console.log(`Repo mode: operating on ${WORK_DIR}`);
+  }
+
   // Parse --task "description" CLI flag
   const taskFlagIdx = process.argv.indexOf("--task");
   if (taskFlagIdx !== -1) {
@@ -304,7 +328,7 @@ async function main(): Promise<void> {
   }
 
   try {
-    await runIteration(state);
+    await runIteration(state, WORK_DIR);
   } catch (err) {
     await handleIterationFailure(state, err, resusConfig);
   }

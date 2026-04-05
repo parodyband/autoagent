@@ -1,84 +1,3 @@
-Now write goals and memory. The key intervention: **direct the Engineer toward real work, not more calibration**.
-[2026-04-05T10:43:27.768Z] iter=79 turn=11 INFO: write_file: goals.md (write)
-[2026-04-05T10:43:27.771Z] iter=79 turn=11 INFO:   -> ok: Updated goals.md (816 chars, +5 lines delta)
-[2026-04-05T10:43:27.772Z] iter=79 turn=12 INFO: Turn 12/25
-[2026-04-05T10:43:36.876Z] iter=79 turn=12 INFO: write_file: memory.md (append)
-[2026-04-05T10:43:36.877Z] iter=79 turn=12 INFO:   -> ok: Appended 804 chars to memory.md
-[2026-04-05T10:43:36.878Z] iter=79 turn=13 INFO: Turn 13/25
-[2026-04-05T10:43:39.266Z] iter=79 turn=13 INFO: $ npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T10:43:39.919Z] iter=79 turn=13 INFO:   -> exit=0 (11 chars)
-[2026-04-05T10:43:39.919Z] iter=79 turn=14 INFO: Turn 14/25
-[2026-04-05T10:43:42.674Z] iter=79 turn=14 INFO: Agent: Clean. No code changes this iteration, just assessment and goal-setting.
-[2026-04-05T10:43:42.674Z] iter=79 turn=14 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T10:43:42.675Z] iter=79 turn=14 INFO: RESTART signal
-[2026-04-05T10:43:42.675Z] iter=79 turn=14 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T10:43:43.387Z] iter=79 turn=14 INFO: Compilation OK
-[2026-04-05T10:43:48.041Z] iter=79 turn=14 INFO: Cache persisted: 27 entries to .autoagent-cache.json
-[2026-04-05T10:43:48.041Z] iter=79 turn=14 INFO: Cache stats: 0 hits, 3 misses, 27 entries, 2 invalidations (0 entries removed)
-[2026-04-05T10:43:48.041Z] iter=79 turn=14 INFO: Tool cache stats
-[2026-04-05T10:43:48.041Z] iter=79 turn=14 INFO: Tool timing: bash: 11x, avg=80ms, total=881ms; write_file: 2x, avg=3ms, total=6ms; read_file: 3x, avg=1ms, total=4ms; think: 2x, avg=1ms, total=2ms
-[2026-04-05T10:43:48.041Z] iter=79 turn=14 INFO: Tool timing stats
-[2026-04-05T10:43:51.539Z] iter=79 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 79: predicted 9 turns, actual 14 turns, ratio 1.56**
-[2026-04-05T10:43:51.557Z] iter=79 turn=14 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T10:43:51.587Z] iter=79 turn=14 INFO: Committed: a72ba7c5 (20 in / 4100 out, cache: 50039 created, 547342 read)
-[2026-04-05T10:43:51.587Z] iter=79 turn=14 INFO: Restarting as iteration 80...
-[2026-04-05T10:43:51.788Z] iter=80 INFO: Cache restored: 27/27 entries (0 stale)
-[2026-04-05T10:43:51.790Z] iter=80 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T10:43:51.816Z] iter=80 INFO: Hard turn cap: 17 (1.5x prediction of 11)
-[2026-04-05T10:43:51.816Z] iter=80 turn=1 INFO: Turn 1/25
-[2026-04-05T10:43:54.083Z] iter=80 turn=1 INFO: think: Let me read the current state of the subagent tool and understand what exists before building....
-[2026-04-05T10:43:54.084Z] iter=80 turn=2 INFO: Turn 2/25
-[2026-04-05T10:43:56.590Z] iter=80 turn=2 INFO: $ find src/tools -type f | sort && echo "---" && ls src/tools/
-[2026-04-05T10:43:56.597Z] iter=80 turn=2 INFO: $ grep -r "subagent\|sub_agent\|sub-agent" src/ --include="*.ts" -l
-[2026-04-05T10:43:56.616Z] iter=80 turn=2 INFO:   -> exit=0 (266 chars)
-[2026-04-05T10:43:56.618Z] iter=80 turn=2 INFO:   -> exit=0 (155 chars)
-[2026-04-05T10:43:56.619Z] iter=80 turn=3 INFO: Turn 3/25
-[2026-04-05T10:43:57.732Z] iter=80 turn=3 INFO: read_file: CACHE HIT
-[2026-04-05T10:43:57.733Z] iter=80 turn=4 INFO: Turn 4/25
-[2026-04-05T10:43:59.613Z] iter=80 turn=4 INFO: $ ls src/tools/*.test.ts 2>/dev/null || find src -name "*.test.ts" | head -20
-[2026-04-05T10:43:59.651Z] iter=80 turn=4 INFO:   -> exit=0 (155 chars)
-[2026-04-05T10:43:59.652Z] iter=80 turn=5 INFO: Turn 5/25
-[2026-04-05T10:44:02.758Z] iter=80 turn=5 INFO: think: I have enough context. I need to:
-1. Add `parallelResearch(questions: string[])` to `src/tools/subagent.ts`
-2. Write tes...
-[2026-04-05T10:44:02.759Z] iter=80 turn=6 INFO: Turn 6/25
-[2026-04-05T10:44:08.211Z] iter=80 turn=6 INFO: write_file: src/tools/subagent.ts (patch)
-[2026-04-05T10:44:08.214Z] iter=80 turn=6 INFO:   -> ok: Patched src/tools/subagent.ts: -10 +44 lines
-
-Context after patch:
-79 |       inputTokens: response.usage?.input_tokens ?? 0,
-80 |       outputTokens: response.usage?.output_tokens ?? 0,
-81 |     };
-82 |   } catch (err) {
-83 |     const msg = err instanceof Error ? err.message : String(err);
-84 |     return {
-85 |       response: `ERROR: ${msg}`,
-86 |       model: modelId,
-87 |       inputTokens: 0,
-88 |       outputTokens: 0,
-89 |     };
-90 |   }
-91 | }
-92 | 
-93 | export interface ParallelResearchResult {
-94 |   question: string;
-95 |   response: string;
-96 |   model: string;
-97 |   inputTokens: number;
-98 |   outputTokens: number;
-99 | }
-100 | 
-101 | /**
-102 |  * Dispatch multiple research questions concurrently via Promise.all.
-103 |  * Each question is sent to a sub-agent independently; results are
-104 |  * returned in the same order as the input array.
-105 |  */
-106 | export async function parallelResearch(
-107 |   questions: string[],
-108 |   model: string = "fast",
-109 |   maxTokens: number = 2048,
-110 |   client?: Anthropic,
-111 | ): Promise<ParallelResearchResult[]> {
 112 |   const results = await Promise.all(
 113 |     questions.map(async (question) => {
 114 |       const result = await executeSubagent(question, model, maxTokens, client);
@@ -1077,3 +996,224 @@ Goal status: **DONE**. Both deliverables complete:
 [2026-04-05T10:58:38.233Z] iter=89 turn=9 INFO: Tool timing stats
 [2026-04-05T10:58:41.857Z] iter=89 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 89: predicted 10 turns, actual 9 turns, ratio 0.90**
 [2026-04-05T10:58:41.876Z] iter=89 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T10:58:41.908Z] iter=89 turn=9 INFO: Committed: b64e5dc3 (15 in / 3037 out, cache: 14763 created, 83901 read)
+[2026-04-05T10:58:41.909Z] iter=89 turn=9 INFO: Restarting as iteration 90...
+[2026-04-05T10:58:42.102Z] iter=90 INFO: Cache restored: 28/28 entries (0 stale)
+[2026-04-05T10:58:42.103Z] iter=90 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T10:58:42.132Z] iter=90 INFO: Hard turn cap: 21 (1.5x prediction of 14)
+[2026-04-05T10:58:42.132Z] iter=90 turn=1 INFO: Turn 1/25
+[2026-04-05T10:58:43.769Z] iter=90 turn=1 INFO: think: Let me start by reading the relevant files to understand the current codebase structure before making changes....
+[2026-04-05T10:58:43.771Z] iter=90 turn=2 INFO: Turn 2/25
+[2026-04-05T10:58:46.456Z] iter=90 turn=2 INFO: $ grep -n "rootDir\|ROOT\|workDir\|agentHome\|process\.cwd" src/agent.ts | head -60
+[2026-04-05T10:58:46.462Z] iter=90 turn=2 INFO: $ grep -n "rootDir\|ROOT\|cwd" src/conversation.ts | head -40
+[2026-04-05T10:58:46.474Z] iter=90 turn=2 INFO:   -> exit=0 (872 chars)
+[2026-04-05T10:58:46.476Z] iter=90 turn=2 INFO:   -> exit=0 (442 chars)
+[2026-04-05T10:58:46.476Z] iter=90 turn=3 INFO: Turn 3/25
+[2026-04-05T10:58:49.364Z] iter=90 turn=3 INFO: read_file: CACHE HIT
+[2026-04-05T10:58:49.365Z] iter=90 turn=3 INFO: $ grep -n "rootDir\|cwd\|workDir" src/tools/bash.ts src/tools/read_file.ts src/tools/write_file.ts src/tools/grep.ts src/tools/list_files.ts 2>/dev/null | head -60
+[2026-04-05T10:58:49.379Z] iter=90 turn=3 INFO:   -> exit=0 (1569 chars)
+[2026-04-05T10:58:49.379Z] iter=90 turn=4 INFO: Turn 4/25
+[2026-04-05T10:58:51.519Z] iter=90 turn=4 INFO: $ grep -n "rootDir\|cwd" src/tool-registry.ts | head -60
+[2026-04-05T10:58:51.522Z] iter=90 turn=4 INFO: $ grep -n "rootDir\|cwd\|workDir" src/orientation.ts | head -30
+[2026-04-05T10:58:51.538Z] iter=90 turn=4 INFO:   -> exit=0 (428 chars)
+[2026-04-05T10:58:51.540Z] iter=90 turn=4 INFO:   -> exit=0 (11 chars)
+[2026-04-05T10:58:51.541Z] iter=90 turn=5 INFO: Turn 5/25
+[2026-04-05T10:58:59.162Z] iter=90 turn=5 INFO: think: I have enough context. Let me plan the changes:
+
+1. `src/agent.ts` - Parse `--repo` flag, set WORK_DIR separately from R...
+[2026-04-05T10:58:59.163Z] iter=90 turn=6 INFO: Turn 6/25
+[2026-04-05T10:59:00.658Z] iter=90 turn=6 INFO: $ grep -n "git\|cwd\|rootDir\|ROOT" src/orientation.ts src/finalization.ts | head -50
+[2026-04-05T10:59:00.669Z] iter=90 turn=6 INFO:   -> exit=0 (1553 chars)
+[2026-04-05T10:59:00.670Z] iter=90 turn=7 INFO: Turn 7/25
+[2026-04-05T10:59:11.853Z] iter=90 turn=7 INFO: think: Key findings:
+1. `orientation.ts` - git diff runs without cwd, so it uses `process.cwd()` = AGENT_HOME. When `--repo` is...
+[2026-04-05T10:59:11.854Z] iter=90 turn=8 INFO: Turn 8/25
+[2026-04-05T10:59:13.947Z] iter=90 turn=8 INFO: read_file: src/finalization.ts
+[2026-04-05T10:59:13.948Z] iter=90 turn=8 INFO:   -> ok (4597 chars)
+[2026-04-05T10:59:13.948Z] iter=90 turn=8 INFO: read_file: src/orientation.ts
+[2026-04-05T10:59:13.949Z] iter=90 turn=8 INFO:   -> ok (7357 chars)
+[2026-04-05T10:59:13.949Z] iter=90 turn=9 INFO: Turn 9/25
+[2026-04-05T10:59:16.839Z] iter=90 turn=9 INFO: Agent: **Status:**
+- `--repo` flag: NOT STARTED (still reading/thinking)
+
+I have enough context. Writing now.
+[2026-04-05T10:59:16.840Z] iter=90 turn=9 INFO: read_file: src/conversation.ts
+[2026-04-05T10:59:16.842Z] iter=90 turn=9 INFO:   -> ok (1007 chars)
+[2026-04-05T10:59:16.843Z] iter=90 turn=10 INFO: Turn 10/25
+[2026-04-05T10:59:20.166Z] iter=90 turn=10 INFO: Agent: Now I have everything I need. Making all the changes:
+[2026-04-05T10:59:20.167Z] iter=90 turn=10 INFO: write_file: src/conversation.ts (patch)
+[2026-04-05T10:59:20.169Z] iter=90 turn=10 INFO:   -> ok: Patched src/conversation.ts: -2 +4 lines
+
+Context after patch:
+42 |   turns: number;
+43 |   cache: ToolCache;
+44 |   timing: ToolTimingTracker;
+45 |   rootDir: string;
+46 |   /** AutoAgent's own directory (where memory.md, goals.md, state files live). Defaults to rootDir. */
+47 |   agentHome?: string;
+48 |   maxTurns: number;
+49 |   predictedTurns?: number | null;
+50 |   /** Adaptive turn budget computed from historical metrics */
+51 |   turnBudget?: TurnBudget;
+[2026-04-05T10:59:20.170Z] iter=90 turn=11 INFO: Turn 11/25
+[2026-04-05T10:59:26.788Z] iter=90 turn=11 INFO: Agent: Now update `agent.ts` to parse `--repo`, set WORK_DIR, and thread through ctx:
+[2026-04-05T10:59:26.788Z] iter=90 turn=11 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T10:59:26.789Z] iter=90 turn=11 INFO:   -> ok: Patched src/agent.ts: -3 +26 lines
+
+Context after patch:
+265 |   restart,
+266 | };
+267 | 
+268 | async function main(): Promise<void> {
+269 |   // Parse --repo /path flag (external repo to operate on)
+270 |   let WORK_DIR = ROOT; // defaults to AGENT_HOME
+271 |   const repoFlagIdx = process.argv.indexOf("--repo");
+272 |   if (repoFlagIdx !== -1) {
+273 |     const repoPath = process.argv[repoFlagIdx + 1];
+274 |     if (!repoPath || repoPath.startsWith("--")) {
+275 |       console.error("Error: --repo requires a path argument, e.g. --repo /path/to/project");
+276 |       process.exit(1);
+277 |     }
+278 |     const resolved = path.resolve(repoPath);
+279 |     if (!existsSync(resolved)) {
+280 |       console.error(`Error: --repo path does not exist: ${resolved}`);
+281 |       process.exit(1);
+282 |     }
+283 |     const { statSync } = await import("fs");
+284 |     if (!statSync(resolved).isDirectory()) {
+285 |       console.error(`Error: --repo path is not a directory: ${resolved}`);
+286 |       process.exit(1);
+287 |     }
+288 |     WORK_DIR = resolved;
+289 |     console.log(`Repo mode: operating on ${WORK_DIR}`);
+290 |   }
+291 | 
+292 |   // Parse --task "description" CLI flag
+293 |   const taskFlagIdx = process.argv.indexOf("--task");
+294 |   if (taskFlagIdx !== -1) {
+295 |     const taskDescription = process.argv[taskFlagIdx + 1];
+296 |     if (!taskDescription || taskDescription.startsWith("--")) {
+[2026-04-05T10:59:26.790Z] iter=90 turn=12 INFO: Turn 12/25
+[2026-04-05T10:59:29.435Z] iter=90 turn=12 INFO: Agent: Now thread WORK_DIR into `runIteration`. First I need to pass it as a parameter:
+[2026-04-05T10:59:29.435Z] iter=90 turn=12 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T10:59:29.436Z] iter=90 turn=12 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
+
+Context after patch:
+171 | 
+172 | // ─── Main iteration ─────────────────────────────────────────
+173 | 
+174 | async function runIteration(state: IterationState, workDir: string = ROOT): Promise<void> {
+175 |   logger = createLogger(state.iteration, ROOT);
+176 | 
+177 |   const cache = new ToolCache();
+[2026-04-05T10:59:29.436Z] iter=90 turn=13 INFO: Turn 13/25
+[2026-04-05T10:59:32.301Z] iter=90 turn=13 INFO: Agent: Now set `rootDir = workDir` and add `agentHome` in ctx:
+[2026-04-05T10:59:32.302Z] iter=90 turn=13 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T10:59:32.302Z] iter=90 turn=13 INFO:   -> ok: Patched src/agent.ts: -2 +3 lines
+
+Context after patch:
+220 |     turns: 0,
+221 |     cache,
+222 |     timing: new ToolTimingTracker(),
+223 |     rootDir: workDir,
+224 |     agentHome: ROOT,
+225 |     maxTurns: MAX_TURNS,
+226 |     logger,
+227 |     registry: toolRegistry,
+228 |     log: (msg: string) => log(state.iteration, msg),
+[2026-04-05T10:59:32.303Z] iter=90 turn=14 INFO: Turn 14/25
+[2026-04-05T10:59:35.988Z] iter=90 turn=14 INFO: Agent: Now fix `doFinalize` to use `rootDir: ROOT` (AGENT_HOME) for state files but pass `workDir` for git:
+[2026-04-05T10:59:35.988Z] iter=90 turn=14 INFO: read_file: src/agent.ts
+[2026-04-05T10:59:35.989Z] iter=90 turn=14 INFO:   -> ok (1485 chars)
+[2026-04-05T10:59:35.990Z] iter=90 turn=15 INFO: Turn 15/25
+[2026-04-05T10:59:38.873Z] iter=90 turn=15 INFO: Agent: I see that `doFinalize` already passes `rootDir: ROOT` (hardcoded) to `runFinalization`. That's correct for state files — but git operations in `finalization.ts` also need to run in WORK_DIR (the target repo). Let me check how finalization does git:
+[2026-04-05T10:59:38.874Z] iter=90 turn=15 INFO: read_file: src/finalization.ts
+[2026-04-05T10:59:38.874Z] iter=90 turn=15 INFO:   -> ok (4338 chars)
+[2026-04-05T10:59:38.874Z] iter=90 turn=16 INFO: Turn 16/25
+[2026-04-05T10:59:55.918Z] iter=90 turn=16 INFO: think: I've made 3 patches so far:
+1. Added `agentHome?: string` to `IterationCtx` in `conversation.ts`
+2. Added `--repo` flag ...
+[2026-04-05T10:59:55.919Z] iter=90 turn=17 INFO: Turn 17/25
+[2026-04-05T10:59:58.821Z] iter=90 turn=17 INFO: Agent: I have 3 patches done. Need to finish: (1) pass WORK_DIR to runIteration, (2) fix orientation cwd, (3) fix finalization git cwd, (4) tsc check.
+[2026-04-05T10:59:58.821Z] iter=90 turn=17 INFO: $ grep -n "await runIteration\|runIteration(state)" src/agent.ts
+[2026-04-05T10:59:58.830Z] iter=90 turn=17 INFO:   -> exit=0 (35 chars)
+[2026-04-05T10:59:58.830Z] iter=90 turn=18 INFO: Turn 18/25
+[2026-04-05T11:00:00.869Z] iter=90 turn=18 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T11:00:00.870Z] iter=90 turn=18 INFO:   -> ok: Patched src/agent.ts: -1 +1 lines
+
+Context after patch:
+328 |   }
+329 | 
+330 |   try {
+331 |     await runIteration(state, WORK_DIR);
+332 |   } catch (err) {
+333 |     await handleIterationFailure(state, err, resusConfig);
+334 |   }
+[2026-04-05T11:00:00.870Z] iter=90 turn=19 INFO: Turn 19/25
+[2026-04-05T11:00:08.146Z] iter=90 turn=19 INFO: Agent: Now fix orientation to accept optional cwd, and pass it from agent.ts:
+[2026-04-05T11:00:08.146Z] iter=90 turn=19 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T11:00:08.147Z] iter=90 turn=19 INFO:   -> ok: Patched src/orientation.ts: -11 +12 lines
+
+Context after patch:
+56 |  * Returns a concise report suitable for including in the agent's
+57 |  * initial context without bloating the token budget.
+58 |  */
+59 | export async function orient(
+60 |   maxDiffChars: number = 1000,
+61 |   useSubagentSummaries: boolean = true,
+62 |   cwd?: string,
+63 | ): Promise<OrientationReport> {
+64 |   // Get the stat summary (which files changed)
+65 |   const statResult = await executeBash(
+66 |     "git diff HEAD~1 --stat 2>/dev/null",
+67 |     10,
+68 |     cwd,
+69 |     true
+70 |   );
+71 | 
+72 |   if (statResult.exitCode !== 0 || !statResult.output.trim()) {
+73 |     return { diffSummary: null, hasChanges: false, error: null, metricsSummary: computeMetricsSummary() };
+[2026-04-05T11:00:08.147Z] iter=90 turn=20 INFO: Turn 20/25
+[2026-04-05T11:00:11.067Z] iter=90 turn=20 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T11:00:11.070Z] iter=90 turn=20 INFO:   -> ok: Patched src/orientation.ts: -5 +5 lines
+
+Context after patch:
+83 |     const srcFiles = extractSrcFiles(statOutput);
+84 |     if (srcFiles.length >= 5) {
+85 |       try {
+86 |         const fileDiffs = await Promise.all(
+87 |           srcFiles.map(file =>
+88 |             executeBash(`git diff HEAD~1 -- ${file} 2>/dev/null`, 10, cwd, true)
+89 |           )
+90 |         );
+91 | 
+92 |         const prompts = srcFiles.map((file, i) => {
+93 |           const diff = fileDiffs[i].output.trim() || "(no diff content)";
+[2026-04-05T11:00:11.071Z] iter=90 turn=21 INFO: Turn 21/25
+[2026-04-05T11:00:14.862Z] iter=90 turn=21 INFO: Agent: Finishing the remaining patches, then tsc + restart.
+[2026-04-05T11:00:14.863Z] iter=90 turn=21 INFO: write_file: src/orientation.ts (patch)
+[2026-04-05T11:00:14.864Z] iter=90 turn=21 INFO:   -> ok: Patched src/orientation.ts: -6 +6 lines
+
+Context after patch:
+116 |   }
+117 | 
+118 |   // Default: raw diff (fewer than 5 src files, or subagents disabled/failed)
+119 |   const diffResult = await executeBash(
+120 |     "git diff HEAD~1 -- 'src/**' ':!agentlog.*' 2>/dev/null",
+121 |     10,
+122 |     cwd,
+123 |     true
+124 |   );
+125 | 
+126 |   let diffContent = diffResult.output.trim();
+127 | 
+[2026-04-05T11:00:14.864Z] iter=90 turn=21 INFO: HARD TURN CAP REACHED: 21 turns (predicted 14, cap 21). Forcing commit.
+[2026-04-05T11:00:14.866Z] iter=90 turn=21 INFO: Cache persisted: 28 entries to .autoagent-cache.json
+[2026-04-05T11:00:14.867Z] iter=90 turn=21 INFO: Cache stats: 1 hits, 5 misses, 28 entries, 8 invalidations (5 entries removed)
+[2026-04-05T11:00:14.867Z] iter=90 turn=21 INFO: Tool cache stats
+[2026-04-05T11:00:14.867Z] iter=90 turn=21 INFO: Tool timing: bash: 7x, avg=15ms, total=105ms; write_file: 8x, avg=2ms, total=12ms; read_file: 5x, avg=2ms, total=8ms; think: 4x, avg=1ms, total=5ms
+[2026-04-05T11:00:14.868Z] iter=90 turn=21 INFO: Tool timing stats
+[2026-04-05T11:00:19.214Z] iter=90 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 90: predicted 14 turns, actual 21 turns, ratio 1.50**
+[2026-04-05T11:00:29.544Z] iter=90 turn=21 INFO: Pre-commit review (1473in/364out): ## Issues Found
+
+- **`statSync` dynamic import is unnecessary and inconsistent**: `existsSync` is already imported statically at the top of the file, but `statSync` is fetched via `await import("fs")`
