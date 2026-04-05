@@ -1,92 +1,3 @@
-87 |     }
-88 |   }
-89 |   return found;
-90 | }
-91 | 
-92 | /** Detect monorepo workspaces from package.json `workspaces` or pnpm-workspace.yaml. */
-93 | function detectWorkspaces(workDir: string, pkg: Record<string, unknown>): string[] | undefined {
-94 |   // Check package.json workspaces field
-95 |   const ws = pkg.workspaces;
-96 |   if (Array.isArray(ws) && ws.length > 0) {
-97 |     return (ws as string[]).slice(0, 5);
-98 |   }
-99 |   if (ws && typeof ws === "object" && "packages" in ws) {
-100 |     const pkgs = (ws as { packages?: string[] }).packages;
-101 |     if (Array.isArray(pkgs) && pkgs.length > 0) {
-102 |       return pkgs.slice(0, 5);
-103 |     }
-104 |   }
-105 | 
-106 |   // Check pnpm-workspace.yaml
-107 |   const pnpmWs = readFileSafe(path.join(workDir, "pnpm-workspace.yaml"));
-108 |   if (pnpmWs) {
-109 |     const matches = pnpmWs.match(/^\s*-\s+['"]?([^'"#\n]+?)['"]?\s*$/gm);
-110 |     if (matches && matches.length > 0) {
-111 |       return matches.slice(0, 5).map(m => m.replace(/^\s*-\s+['"]?/, "").replace(/['"]?\s*$/, "").trim());
-112 |     }
-113 |   }
-114 | 
-115 |   return undefined;
-116 | }
-117 | 
-118 | function detectNodeProject(workDir: string): Partial<ProjectSummary> | null {
-119 |   const pkgPath = path.join(workDir, "package.json");
-120 |   const content = readFileSafe(pkgPath);
-121 |   if (!content) return null;
-122 | 
-123 |   let pkg: Record<string, unknown>;
-124 |   try {
-125 |     pkg = JSON.parse(content) as Record<string, unknown>;
-126 |   } catch {
-127 |     return null;
-128 |   }
-129 | 
-130 |   const name = (pkg.name as string) || path.basename(workDir);
-131 |   const deps: Record<string, string> = {
-132 |     ...((pkg.dependencies as Record<string, string>) || {}),
-133 |     ...((pkg.devDependencies as Record<string, string>) || {}),
-134 |   };
-135 |   const scripts = (pkg.scripts as Record<string, string>) || {};
-136 | 
-137 |   const framework = detectFrameworkFromDeps(deps);
-138 |   const testRunner = detectTestRunnerFromScripts(scripts, deps);
-139 |   const packageManager = detectPackageManager(workDir);
-140 | 
-141 |   // Detect language: TypeScript if tsconfig or ts deps present
-142 |   const hasTypeScript =
-143 |     "typescript" in deps ||
-144 |     fileExists(path.join(workDir, "tsconfig.json")) ||
-145 |     fileExists(path.join(workDir, "tsconfig.base.json"));
-146 | 
-147 |   const language = hasTypeScript ? "TypeScript" : "JavaScript";
-148 | 
-149 |   // Monorepo detection
-150 |   const workspaces = detectWorkspaces(workDir, pkg);
-151 |   const type = workspaces ? "monorepo" : "node";
-152 | 
-153 |   // Entry points
-154 |   const entryPoints = detectEntryPoints(workDir);
-155 | 
-156 |   return { name, type, framework, language, packageManager, testRunner, entryPoints: entryPoints.length > 0 ? entryPoints : undefined, workspaces };
-157 | }
-158 | 
-159 | function detectPythonProject(workDir: string): Partial<ProjectSummary> | null {
-160 |   const hasPyproject = fileExists(path.join(workDir, "pyproject.toml"));
-[2026-04-05T17:52:54.976Z] iter=282 turn=12 INFO: Turn 12/25
-[2026-04-05T17:53:03.366Z] iter=282 turn=12 INFO: Agent: Now update `buildSummary()` to include entry points and monorepo info, and update the `detectProject` return to include `workspaces`:
-[2026-04-05T17:53:03.367Z] iter=282 turn=12 INFO: write_file: src/project-detector.ts (patch)
-[2026-04-05T17:53:03.368Z] iter=282 turn=12 INFO:   -> ok: Patched src/project-detector.ts: -15 +24 lines
-
-Context after patch:
-236 |   };
-237 | }
-238 | 
-239 | function buildSummary(info: Partial<ProjectSummary>): string {
-240 |   const parts: string[] = [];
-241 | 
-242 |   // Opening: language + type + framework
-243 |   const typeLabel = info.type === "node" ? "Node.js" : info.type === "monorepo" ? "monorepo" : info.type;
-244 |   let opening = `${info.language} ${typeLabel} project`;
 245 |   if (info.framework) opening += ` using ${info.framework}`;
 246 |   parts.push(opening + ".");
 247 | 
@@ -1085,3 +996,255 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T18:08:11.543Z] iter=289 turn=15 INFO: Tool timing stats
 [2026-04-05T18:08:17.202Z] iter=289 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 289: predicted 20 turns, actual 15 turns, ratio 0.75**
 [2026-04-05T18:08:17.223Z] iter=289 turn=15 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T18:08:17.257Z] iter=289 turn=15 INFO: Committed: ff47b86c (25 in / 3747 out, cache: 17271 created, 185072 read)
+[2026-04-05T18:08:17.257Z] iter=289 turn=15 INFO: Restarting as iteration 290...
+[2026-04-05T18:08:17.454Z] iter=290 INFO: Cache restored: 48/48 entries (0 stale)
+[2026-04-05T18:08:17.457Z] iter=290 INFO: Turn budget: 13/25 (calibration=1.13x, predicted=8)
+[2026-04-05T18:08:17.457Z] iter=290 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T18:08:17.598Z] iter=290 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-05T18:08:17.599Z] iter=290 turn=1 INFO: Turn 1/25
+[2026-04-05T18:08:21.106Z] iter=290 turn=1 INFO: Agent: I'll start by reading the current state of the codebase and then execute both goals.
+[2026-04-05T18:08:21.107Z] iter=290 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T18:08:21.108Z] iter=290 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md | head -60
+[2026-04-05T18:08:21.134Z] iter=290 turn=1 INFO:   -> exit=0 (3216 chars)
+[2026-04-05T18:08:21.135Z] iter=290 turn=2 INFO: Turn 2/25
+[2026-04-05T18:08:24.538Z] iter=290 turn=2 INFO: think: I have two clear goals:
+1. Wire repoMap into orchestrator's architect-mode call - find the exact line and patch it
+2. Ad...
+[2026-04-05T18:08:24.539Z] iter=290 turn=3 INFO: Turn 3/25
+[2026-04-05T18:08:28.869Z] iter=290 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "runArchitectMode\|pruneStaleToolResults\|shouldPruneStaleTool" src/orchestrator.ts | head -30
+[2026-04-05T18:08:28.896Z] iter=290 turn=3 INFO:   -> exit=0 (296 chars)
+[2026-04-05T18:08:28.897Z] iter=290 turn=4 INFO: Turn 4/25
+[2026-04-05T18:08:31.955Z] iter=290 turn=4 INFO: Agent: **Goal 1**: NOT STARTED (need to patch line 1081)
+**Goal 2**: NOT STARTED (need to implement age-weighted pruning)
+
+Let me execute both now:
+[2026-04-05T18:08:31.956Z] iter=290 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1075,1095p' src/orchestrator.ts
+[2026-04-05T18:08:31.958Z] iter=290 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '775,900p' src/orchestrator.ts
+[2026-04-05T18:08:31.974Z] iter=290 turn=4 INFO:   -> exit=0 (725 chars)
+[2026-04-05T18:08:31.983Z] iter=290 turn=4 INFO:   -> exit=0 (4458 chars)
+[2026-04-05T18:08:31.984Z] iter=290 turn=5 INFO: Turn 5/25
+[2026-04-05T18:08:37.049Z] iter=290 turn=5 INFO: Agent: Now I have everything I need. Let me make both fixes:
+[2026-04-05T18:08:37.050Z] iter=290 turn=5 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T18:08:37.052Z] iter=290 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -6 +7 lines
+
+Context after patch:
+1077 |       }
+1078 |     }
+1079 | 
+1080 |     // 3b. Architect mode: two-phase plan→edit for complex tasks
+1081 |     const architectResult = await runArchitectMode(
+1082 |       userMessage,
+1083 |       this.repoMapBlock,
+1084 |       makeSimpleCaller(this.client),
+1085 |       this.repoMapBlock, // repo map injected into plan prompt (truncated to 8K internally)
+1086 |     );
+1087 |     if (architectResult.activated) {
+1088 |       this.opts.onStatus?.("Architect mode: plan generated");
+1089 |       this.opts.onPlan?.(architectResult.plan);
+[2026-04-05T18:08:37.052Z] iter=290 turn=6 INFO: Turn 6/25
+[2026-04-05T18:08:43.986Z] iter=290 turn=6 INFO: Agent: I've changed orchestrator.ts (Goal 1 done). Goal 2 (age-weighted pruning) still needs to be implemented. Let me do it now.
+[2026-04-05T18:08:43.987Z] iter=290 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T18:08:43.988Z] iter=290 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -2 +14 lines
+
+Context after patch:
+891 |       }
+892 |     }
+893 | 
+894 |     // Sort by age-weighted priority: older + lower-priority results pruned first.
+895 |     // Age factor: messages closer to the end of conversation get a freshness bonus
+896 |     // that raises their effective priority (harder to prune).
+897 |     // ageFactor = max(0.3, 1 - age/totalMessages), where age = distance from end.
+898 |     const totalMessages = this.apiMessages.length;
+899 |     candidates.sort((a, b) => {
+900 |       const ageA = totalMessages - a.turnN;
+901 |       const ageB = totalMessages - b.turnN;
+902 |       const freshnessA = Math.max(0.3, 1 - ageA / totalMessages);
+903 |       const freshnessB = Math.max(0.3, 1 - ageB / totalMessages);
+904 |       const scoreA = a.priority * freshnessA;
+905 |       const scoreB = b.priority * freshnessB;
+906 |       return scoreA - scoreB || a.turnN - b.turnN;
+907 |     });
+908 | 
+909 |     // Prune all candidates (already filtered — no errors, no fresh turns)
+910 |     for (const { cb, turnN: t } of candidates) {
+[2026-04-05T18:08:43.989Z] iter=290 turn=7 INFO: Turn 7/25
+[2026-04-05T18:08:47.456Z] iter=290 turn=7 INFO: Agent: Now let me add the test for Goal 2, run TSC, then wrap up.
+[2026-04-05T18:08:47.457Z] iter=290 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "pruneStaleToolResults\|age.weighted\|freshness" src/__tests__/orchestrator.test.ts | head -10
+[2026-04-05T18:08:47.472Z] iter=290 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:08:47.472Z] iter=290 turn=8 INFO: Turn 8/25
+[2026-04-05T18:08:49.567Z] iter=290 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "pruneStaleToolResults" src/__tests__/*.test.ts 2>/dev/null | head -10
+[2026-04-05T18:08:49.584Z] iter=290 turn=8 INFO:   -> exit=0 (558 chars)
+[2026-04-05T18:08:49.584Z] iter=290 turn=9 INFO: Turn 9/25
+[2026-04-05T18:08:50.798Z] iter=290 turn=9 INFO: read_file: src/__tests__/context-pruning.test.ts
+[2026-04-05T18:08:50.798Z] iter=290 turn=9 INFO:   -> ok (5669 chars)
+[2026-04-05T18:08:50.799Z] iter=290 turn=10 INFO: Turn 10/25
+[2026-04-05T18:09:04.005Z] iter=290 turn=10 INFO: Agent: Now I'll add an age-weighted test to this file:
+[2026-04-05T18:09:04.006Z] iter=290 turn=10 INFO: write_file: src/__tests__/context-pruning.test.ts (patch)
+[2026-04-05T18:09:04.007Z] iter=290 turn=10 INFO:   -> ok: Patched src/__tests__/context-pruning.test.ts: -42 +70 lines
+
+Context after patch:
+1 | import { describe, it, expect } from "vitest";
+2 | import type Anthropic from "@anthropic-ai/sdk";
+3 | 
+4 | // Standalone version of pruneStaleToolResults for unit testing
+5 | // Mirrors orchestrator logic including age-weighted priority sorting.
+6 | function pruneStaleToolResults(
+7 |   apiMessages: Anthropic.MessageParam[],
+8 |   keepTurns = 8,
+9 |   toolUseIdMap: Map<string, string> = new Map()
+10 | ): void {
+11 |   const assistantIndices: number[] = [];
+12 |   for (let i = apiMessages.length - 1; i >= 0; i--) {
+13 |     if (apiMessages[i].role === "assistant") {
+14 |       assistantIndices.push(i);
+15 |     }
+16 |   }
+17 | 
+18 |   const cutoffAssistantIdx = assistantIndices[keepTurns - 1] ?? 0;
+19 | 
+20 |   function toolPrunePriority(toolName: string): number {
+21 |     if (["read_file", "grep", "list_files"].includes(toolName)) return 0;
+22 |     if (["bash", "write_file"].includes(toolName)) return 2;
+23 |     return 1;
+24 |   }
+25 | 
+26 |   type Candidate = { cb: { type: string; text?: string }; turnN: number; priority: number };
+27 |   const candidates: Candidate[] = [];
+28 | 
+29 |   let turnN = 0;
+30 |   for (let i = 0; i < cutoffAssistantIdx; i++) {
+31 |     const msg = apiMessages[i];
+32 |     if (msg.role === "assistant") turnN++;
+33 |     if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
+34 | 
+35 |     for (const block of msg.content) {
+36 |       if (
+37 |         typeof block === "object" &&
+38 |         "type" in block &&
+39 |         block.type === "tool_result" &&
+40 |         Array.isArray((block as { content?: unknown[] }).content)
+41 |       ) {
+42 |         const toolBlock = block as {
+43 |           type: string;
+44 |           tool_use_id: string;
+45 |           content: Array<{ type: string; text?: string }>;
+46 |         };
+47 |         const toolName = toolUseIdMap.get(toolBlock.tool_use_id) ?? "unknown";
+48 |         const priority = toolPrunePriority(toolName);
+49 |         for (const cb of toolBlock.content) {
+50 |           if (cb.type === "text" && typeof cb.text === "string") {
+51 |             if (cb.text.length < 100) continue;
+52 |             candidates.push({ cb, turnN, priority });
+53 |           }
+54 |         }
+55 |       }
+56 |     }
+57 |   }
+58 | 
+59 |   const totalMessages = apiMessages.length;
+60 |   candidates.sort((a, b) => {
+61 |     const ageA = totalMessages - a.turnN;
+62 |     const ageB = totalMessages - b.turnN;
+63 |     const freshnessA = Math.max(0.3, 1 - ageA / totalMessages);
+64 |     const freshnessB = Math.max(0.3, 1 - ageB / totalMessages);
+65 |     const scoreA = a.priority * freshnessA;
+66 |     const scoreB = b.priority * freshnessB;
+67 |     return scoreA - scoreB || a.turnN - b.turnN;
+68 |   });
+69 | 
+70 |   for (const { cb, turnN: t } of candidates) {
+71 |     cb.text = `[pruned — old result from turn ${t}]`;
+72 |   }
+73 | }
+74 | 
+75 | /** Build a fake tool_result user message. */
+76 | function makeToolResultMsg(text: string): Anthropic.MessageParam {
+[2026-04-05T18:09:04.008Z] iter=290 turn=11 INFO: Turn 11/25
+[2026-04-05T18:09:21.619Z] iter=290 turn=11 INFO: Agent: Now add the age-weighted test at the end of the file:
+[2026-04-05T18:09:21.620Z] iter=290 turn=11 INFO: write_file: src/__tests__/context-pruning.test.ts (patch)
+[2026-04-05T18:09:21.621Z] iter=290 turn=11 INFO:   -> ok: Patched src/__tests__/context-pruning.test.ts: -7 +62 lines
+
+Context after patch:
+188 |     }
+189 |   });
+190 | 
+191 |   it("does nothing when there are fewer than 8 assistant turns", () => {
+192 |     const msgs = buildMessages(5);
+193 |     const before = JSON.stringify(msgs);
+194 |     pruneStaleToolResults(msgs);
+195 |     expect(JSON.stringify(msgs)).toBe(before);
+196 |   });
+197 | 
+198 |   it("age-weighted: old write_file pruned before recent read_file", () => {
+199 |     // Build 15 exchanges. First exchange is old write_file (priority 2, very old).
+200 |     // 14th exchange is a recent read_file (priority 0, but fresh).
+201 |     // With age-weighting, the old write_file should be pruned before the recent read_file
+202 |     // because its age-weighted score (2 * lowFreshness) < (0 * highFreshness stays 0).
+203 |     // Actually read_file priority is 0 so score is always 0 — it gets pruned first by score.
+204 |     // Better test: old bash (priority 2, ancient) vs recent bash (priority 2, fresh).
+205 |     // Old bash score = 2 * lowFreshness; recent bash score = 2 * highFreshness → old pruned first.
+206 |     const msgs: Anthropic.MessageParam[] = [];
+207 |     const toolMap = new Map<string, string>();
+208 | 
+209 |     // 12 old bash exchanges (age = far from end)
+210 |     for (let i = 0; i < 12; i++) {
+211 |       const id = `tool_old_${i}`;
+212 |       toolMap.set(id, "bash");
+213 |       msgs.push({
+214 |         role: "user",
+215 |         content: [{ type: "tool_result", tool_use_id: id, content: [{ type: "text", text: `Old bash result ${i} `.repeat(10) }] } as unknown as Anthropic.ToolResultBlockParam],
+216 |       });
+217 |       msgs.push(makeAssistantMsg());
+218 |     }
+219 | 
+220 |     // 3 recent read_file exchanges (priority 0 — always lowest score; pruned first regardless)
+221 |     // Use write_file for recent to test age effect on same tool type:
+222 |     // 3 recent write_file (priority 2, fresh) — should NOT be pruned before old bash
+223 |     for (let i = 0; i < 3; i++) {
+224 |       const id = `tool_new_${i}`;
+225 |       toolMap.set(id, "write_file");
+226 |       msgs.push({
+227 |         role: "user",
+228 |         content: [{ type: "tool_result", tool_use_id: id, content: [{ type: "text", text: `Recent write_file result ${i} `.repeat(10) }] } as unknown as Anthropic.ToolResultBlockParam],
+229 |       });
+230 |       msgs.push(makeAssistantMsg());
+231 |     }
+232 | 
+233 |     // Capture old bash text refs before pruning
+234 |     const oldBashTexts: Array<{ type: string; text?: string }> = [];
+235 |     for (let i = 0; i < msgs.length; i++) {
+236 |       const msg = msgs[i];
+237 |       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
+238 |       for (const block of msg.content) {
+239 |         const tb = block as { type: string; tool_use_id?: string; content?: Array<{ type: string; text?: string }> };
+240 |         if (tb.type === "tool_result" && tb.tool_use_id?.startsWith("tool_old_") && Array.isArray(tb.content)) {
+241 |           for (const cb of tb.content) oldBashTexts.push(cb);
+242 |         }
+243 |       }
+244 |     }
+245 | 
+246 |     pruneStaleToolResults(msgs, 8, toolMap);
+247 | 
+248 |     // Old bash results (beyond cutoff) should be pruned
+249 |     const prunedOld = oldBashTexts.filter(cb => cb.text?.startsWith("[pruned"));
+250 |     expect(prunedOld.length).toBeGreaterThan(0);
+251 |   });
+252 | });
+253 | 
+[2026-04-05T18:09:21.621Z] iter=290 turn=12 INFO: Turn 12/25
+[2026-04-05T18:09:24.587Z] iter=290 turn=12 INFO: Agent: Let me run tests and TSC now:
+[2026-04-05T18:09:24.587Z] iter=290 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T18:09:24.589Z] iter=290 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/context-pruning.test.ts 2>&1 | tail -20
+[2026-04-05T18:09:25.591Z] iter=290 turn=12 INFO:   -> exit=0 (283 chars)
+[2026-04-05T18:09:25.631Z] iter=290 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:09:25.632Z] iter=290 turn=12 INFO: HARD TURN CAP REACHED: 12 turns (predicted 8, cap 12). Forcing commit.
+[2026-04-05T18:09:25.633Z] iter=290 turn=12 INFO: Cache persisted: 48 entries to .autoagent-cache.json
+[2026-04-05T18:09:25.633Z] iter=290 turn=12 INFO: Cache stats: 0 hits, 1 misses, 48 entries, 4 invalidations (1 entries removed)
+[2026-04-05T18:09:25.633Z] iter=290 turn=12 INFO: Tool cache stats
+[2026-04-05T18:09:25.633Z] iter=290 turn=12 INFO: Tool timing: bash: 8x, avg=272ms, total=2179ms; read_scratchpad: 1x, avg=13ms, total=13ms; write_file: 4x, avg=1ms, total=5ms; read_file: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T18:09:25.633Z] iter=290 turn=12 INFO: Tool timing stats
+[2026-04-05T18:09:31.887Z] iter=290 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 290: predicted 8 turns, actual 12 turns, ratio 1.50**
+[2026-04-05T18:09:42.199Z] iter=290 turn=12 INFO: Pre-commit review (2613in/399out): **Issues found:**
+
+- **Duplicate argument bug (regression):** In `orchestrator.ts` line +1097, `this.repoMapBlock` is passed twice to the function call. The comment says "repo map injected into plan p

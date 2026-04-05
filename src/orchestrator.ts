@@ -891,8 +891,20 @@ export class Orchestrator {
       }
     }
 
-    // Sort by priority ascending (low-value first), then by turnN ascending (oldest first)
-    candidates.sort((a, b) => a.priority - b.priority || a.turnN - b.turnN);
+    // Sort by age-weighted priority: older + lower-priority results pruned first.
+    // Age factor: messages closer to the end of conversation get a freshness bonus
+    // that raises their effective priority (harder to prune).
+    // ageFactor = max(0.3, 1 - age/totalMessages), where age = distance from end.
+    const totalMessages = this.apiMessages.length;
+    candidates.sort((a, b) => {
+      const ageA = totalMessages - a.turnN;
+      const ageB = totalMessages - b.turnN;
+      const freshnessA = Math.max(0.3, 1 - ageA / totalMessages);
+      const freshnessB = Math.max(0.3, 1 - ageB / totalMessages);
+      const scoreA = a.priority * freshnessA;
+      const scoreB = b.priority * freshnessB;
+      return scoreA - scoreB || a.turnN - b.turnN;
+    });
 
     // Prune all candidates (already filtered — no errors, no fresh turns)
     for (const { cb, turnN: t } of candidates) {
@@ -1082,6 +1094,7 @@ export class Orchestrator {
       userMessage,
       this.repoMapBlock,
       makeSimpleCaller(this.client),
+      this.repoMapBlock, // repo map injected into plan prompt (truncated to 8K internally)
     );
     if (architectResult.activated) {
       this.opts.onStatus?.("Architect mode: plan generated");
