@@ -219,6 +219,8 @@ export async function emitOnceSummary(params: {
   turns: number;
   startTime: Date;
   exitCode: number;
+  tokensUsed?: { input: number; output: number; cacheRead: number; cacheCreation: number };
+  commitSha?: string;
 }): Promise<void> {
   let filesChanged: string[] = [];
   try {
@@ -226,12 +228,22 @@ export async function emitOnceSummary(params: {
     filesChanged = result.output.trim().split("\n").filter(Boolean);
   } catch { /* ignore — commit may not exist yet */ }
 
+  let commitSha = params.commitSha ?? "";
+  if (!commitSha) {
+    try {
+      const shaResult = await executeBash("git rev-parse HEAD", 30, undefined, true);
+      commitSha = shaResult.output.trim();
+    } catch { /* ignore — no commit yet */ }
+  }
+
   const summary = {
     success: params.success,
     iteration: params.iteration,
     turns: params.turns,
     durationMs: Date.now() - params.startTime.getTime(),
     filesChanged,
+    commitSha,
+    tokensUsed: params.tokensUsed ?? { input: 0, output: 0, cacheRead: 0, cacheCreation: 0 },
     exitCode: params.exitCode,
   };
 
@@ -319,6 +331,13 @@ export async function finalizeIteration(
       turns: ctx.turns,
       startTime: ctx.startTime,
       exitCode,
+      commitSha: sha,
+      tokensUsed: {
+        input: ctx.tokens.in,
+        output: ctx.tokens.out,
+        cacheRead: ctx.tokens.cacheRead,
+        cacheCreation: ctx.tokens.cacheCreate,
+      },
     });
   }
 

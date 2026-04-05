@@ -397,6 +397,8 @@ async function main(): Promise<void> {
         turns: 0,
         startTime: iterStartTime,
         exitCode: 1,
+        tokensUsed: { input: 0, output: 0, cacheRead: 0, cacheCreation: 0 },
+        commitSha: "",
       });
       process.exit(1);
     }
