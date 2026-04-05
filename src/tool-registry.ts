@@ -16,6 +16,7 @@ import { listFilesToolDefinition, executeListFiles } from "./tools/list_files.js
 import { subagentToolDefinition, executeSubagent } from "./tools/subagent.js";
 import { webSearchToolDefinition, executeWebSearch } from "./tools/web_search.js";
 import { autoSelectModel } from "./model-selection.js";
+import { saveToProjectMemory } from "./project-memory.js";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -207,6 +208,41 @@ export function createDefaultRegistry(): ToolRegistry {
     ctx.log(`  -> ${r.results.length} results`);
     return { result: r.content };
   }, { defaultTimeout: 15 });
+
+  // ── save_memory ──────────────────────────────────────
+  registry.register(
+    {
+      name: "save_memory",
+      description:
+        "Persist a piece of project knowledge to the project memory file (.autoagent.md). " +
+        "Use this when the user asks you to remember something, or when you discover important " +
+        "project facts (conventions, architecture decisions, recurring patterns) that should be " +
+        "recalled in future sessions.",
+      input_schema: {
+        type: "object" as const,
+        properties: {
+          key: {
+            type: "string",
+            description: "Short label for this memory entry (e.g. 'preferred test runner', 'API base URL')",
+          },
+          value: {
+            type: "string",
+            description: "The content to remember.",
+          },
+        },
+        required: ["key", "value"],
+      },
+    },
+    async (input, ctx) => {
+      const { key, value } = input as { key: string; value: string };
+      ctx.log(`save_memory: "${key}"`);
+      const note = `**${key}**: ${value}`;
+      const filePath = saveToProjectMemory(ctx.rootDir, note);
+      ctx.log(`  -> saved to ${filePath}`);
+      return { result: `Saved to project memory (${filePath}): ${key}` };
+    },
+    { defaultTimeout: 5 },
+  );
 
   return registry;
 }

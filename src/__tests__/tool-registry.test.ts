@@ -166,4 +166,38 @@ describe("createDefaultRegistry", () => {
     const result = await tool.handler({ thought: "test thought" }, ctx);
     expect(result.result).toContain("thought".toLowerCase().replace("t", "T") || "Thought");
   });
+
+  it("save_memory tool is registered", () => {
+    const registry = createDefaultRegistry();
+    expect(registry.has("save_memory")).toBe(true);
+  });
+
+  it("save_memory tool has required key and value parameters", () => {
+    const registry = createDefaultRegistry();
+    const tool = registry.get("save_memory")!;
+    const schema = tool.definition.input_schema as { properties: Record<string, unknown>; required: string[] };
+    expect(schema.properties).toHaveProperty("key");
+    expect(schema.properties).toHaveProperty("value");
+    expect(schema.required).toContain("key");
+    expect(schema.required).toContain("value");
+  });
+
+  it("save_memory tool writes to .autoagent.md in workDir", async () => {
+    const { mkdtempSync, rmSync } = await import("fs");
+    const { tmpdir } = await import("os");
+    const tmpDir = mkdtempSync(tmpdir() + "/autoagent-test-");
+    try {
+      const registry = createDefaultRegistry();
+      const tool = registry.get("save_memory")!;
+      const ctx: ToolContext = { rootDir: tmpDir, log: vi.fn() };
+      const result = await tool.handler({ key: "test key", value: "test value" }, ctx);
+      expect(result.result).toContain("test key");
+      const { readFileSync } = await import("fs");
+      const content = readFileSync(tmpDir + "/.autoagent.md", "utf-8");
+      expect(content).toContain("test key");
+      expect(content).toContain("test value");
+    } finally {
+      rmSync(tmpDir, { recursive: true });
+    }
+  });
 });

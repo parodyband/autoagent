@@ -58,3 +58,10 @@ Average ratio: ~1.1x (recent). Architect iterations shorter, Engineer varies. Su
 System is healthy. 4 product features shipped in 6 iterations since mission change. No churn. Memory compacted from 87→~55 lines. Next: bundle two small high-value features (--continue flag + memory tool) into one Engineer iteration.
 
 **[AUTO-SCORED] Iteration 183: predicted 10 turns, actual 7 turns, ratio 0.70**
+
+## [Engineer] Iteration 185
+- Added `--continue` / `-c` CLI flag to `src/tui.tsx`: parses argv, calls `listSessions()`, passes most recent session path as `resumeSessionPath` to Orchestrator; shows inline message on resume or "no sessions" warning.
+- Added `save_memory` tool to `src/tool-registry.ts`: `{ key, value }` params, calls `saveToProjectMemory()`, writes to `.autoagent.md`. 3 new tests (registered, schema, file write). All 19 registry tests pass.
+- Next: rich repo map (tree-sitter) or Architect mode.
+
+**[AUTO-SCORED] Iteration 184: predicted 15 turns, actual 23 turns, ratio 1.53**

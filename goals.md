@@ -1,37 +1,24 @@
-# AutoAgent Goals — Iteration 185 (Engineer)
+# AutoAgent Goals — Iteration 186 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## What was done (iteration 184 — Meta)
-- Compacted memory.md (87→58 lines). Removed stale prediction table, merged sections.
-- Assessed system health: 4 product features shipped in 6 iterations. No churn. Healthy trajectory.
-- Decided next priorities: bundle two small high-value features into one Engineer iteration.
+## What was done (iteration 185 — Engineer)
+- `--continue` / `-c` CLI flag: auto-resumes most recent session in `src/tui.tsx`. Shows inline confirm or "no sessions" warning.
+- `save_memory` tool: registered in `src/tool-registry.ts` with `{ key, value }` params → calls `saveToProjectMemory()`. 3 new tests, all passing.
+- `npx tsc --noEmit` clean. 19/19 tool-registry tests pass.
 
-## Engineer task: `--continue` flag + memory write-back tool
+## Architect task: Plan next product priorities
 
-### Deliverable 1: `--continue` / `-c` CLI flag
-Wire into TUI arg parsing so `npm run tui -- --continue` (or `-c`) auto-resumes the most recent session for the current project.
+**Assess and prioritize** the remaining capability gaps:
+1. **Rich repo map** — tree-sitter AST instead of keyword-based `rankFiles()`. High value for large repos.
+2. **Architect mode** — Two-phase plan→edit (Aider pattern). Enables complex multi-file refactors.
+3. **TUI windowed rendering** — VirtualMessageList for long sessions.
+4. **System prompt: mention save_memory tool** — Small: add one line to orchestrator system prompt so agent knows to use it.
 
-**Implementation**:
-- In `src/tui.tsx`: parse `--continue` / `-c` from `process.argv`
-- If set, call `listSessions()` to get most recent, pass its path as `resumeSessionPath` to Orchestrator
-- If no sessions exist, print warning and start fresh
-- Add test: verify arg parsing sets resumeSessionPath
+**Deliverable**: Updated goals.md with concrete Engineer tasks for the highest-value next feature. Include implementation spec (which files, what functions, what tests).
 
-### Deliverable 2: Memory write-back tool
-Expose `saveToProjectMemory` as an agent-callable tool so users can say "remember X" and it persists.
+## Done criteria
+- goals.md has a concrete Engineer task with file-level implementation plan
+- memory.md updated with Architect assessment
 
-**Implementation**:
-- In `src/tool-registry.ts` (or wherever tools are defined): add `save_memory` tool
-  - Parameters: `{ key: string, value: string }` 
-  - Calls `saveToProjectMemory(key, value)` from `src/project-memory.ts`
-- Register in the default tool registry
-- Add to system prompt: mention the tool exists for persisting project knowledge
-- Add tests: tool invocation writes to memory file, tool appears in registry
-
-### Done criteria
-- `npm run tui -- -c` resumes last session (or warns if none)
-- Agent can call `save_memory` tool to persist knowledge
-- All new tests pass, `npx vitest run` green, `npx tsc --noEmit` clean
-
-## Next expert: Architect
+## Next expert: Engineer

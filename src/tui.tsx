@@ -22,6 +22,19 @@ if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
   workDir = path.resolve(process.argv[dirIdx + 1]);
 }
 
+// --continue / -c flag: auto-resume most recent session
+const continueFlag =
+  process.argv.includes("--continue") || process.argv.includes("-c");
+let initialResumeSessionPath: string | undefined;
+if (continueFlag) {
+  const recentSessions = listSessions(workDir);
+  if (recentSessions.length > 0) {
+    initialResumeSessionPath = recentSessions[0].path;
+  } else {
+    // Will show warning in TUI after mount
+  }
+}
+
 // ─── Types ──────────────────────────────────────────────────
 
 interface Message {
@@ -166,6 +179,7 @@ function App() {
   useEffect(() => {
     const orch = new Orchestrator({
       workDir,
+      resumeSessionPath: initialResumeSessionPath,
       onToolCall: (name, toolInput, _result) => {
         const tm: Message = { role: "tool", content: toolInput, toolName: name };
         setMessages(prev => [...prev, tm]);
@@ -177,7 +191,22 @@ function App() {
       },
     });
     orchestratorRef.current = orch;
-    orch.init().then(() => setStatus("")).catch(() => setStatus("Init failed"));
+    orch.init().then(() => {
+      if (continueFlag) {
+        if (initialResumeSessionPath) {
+          setMessages([{
+            role: "assistant",
+            content: "✓ Resumed most recent session.",
+          }]);
+        } else {
+          setMessages([{
+            role: "assistant",
+            content: "⚠ No saved sessions found — starting fresh.",
+          }]);
+        }
+      }
+      setStatus("");
+    }).catch(() => setStatus("Init failed"));
   }, []);
 
   useInput((_, key) => {
