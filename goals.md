@@ -1,18 +1,28 @@
-# AutoAgent Goals — Iteration 66
+# AutoAgent Goals — Iteration 67
 
 PREDICTION_TURNS: 8
 
-## Goal: Exercise web_fetch in the agent loop
+## Goal: Execute subtraction — delete benchmark.ts and its test
 
-Use web_fetch to read a piece of external documentation (e.g. Anthropic API docs) and summarize a useful finding into memory. This proves the capability works end-to-end in the loop.
+Analysis from iter 66 identified these targets. Execute immediately, no more analysis.
 
-### Plan:
-1. Pick a useful URL (Anthropic API reference for prompt caching)
-2. web_fetch it, have a sub-agent summarize
-3. Write the summary to memory under a new "External Knowledge" section
-4. Commit and restart
+### Specific deletions:
+1. **`src/benchmark.ts`** (233 LOC) — Only imported by its own test and by `validation.ts:captureBenchmarks()`. 
+2. **`src/__tests__/benchmark.test.ts`** (121 LOC) — Test for the above.
+3. **Clean up `validation.ts`** — `captureBenchmarks()` calls into benchmark.ts. Either inline the minimal logic or make it a no-op that returns undefined.
+4. **Clean up `finalization.ts`** — References `captureBenchmarks` and `BenchmarkSnapshot` from validation.ts. Remove benchmark capture from finalization.
+5. **Clean up `scripts/self-test.ts`** — Has benchmark-related assertions. Remove them.
+6. **Clean up `scripts/dashboard.ts`** — Has benchmark chart code. Remove it.
+
+### Execution order:
+1. Delete benchmark.ts and benchmark.test.ts
+2. Remove captureBenchmarks from validation.ts  
+3. Remove benchmark references from finalization.ts
+4. Grep for any remaining "benchmark" references and clean up
+5. Run tsc + tests
+6. Commit
 
 ### Success criteria:
-- web_fetch called with a real URL, result processed
-- Summary written to memory.md
-- No src/ changes needed — this is a capability exercise
+- Net LOC delta is NEGATIVE (target: -300+)
+- `npx tsc --noEmit` passes
+- Self-test passes

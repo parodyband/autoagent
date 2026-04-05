@@ -70,9 +70,18 @@ Trigger → action pairs. If a principle has no trigger condition, it's a platit
 
 ## Next Concrete Goals
 
-1. ~~**Metrics-driven goal selection**~~ DONE iter 65 — `orientation.ts` now reads `.autoagent-metrics.json`, computes avg turns, LOC stalls, token trends, high-turn outliers, and adds a `## Metrics Summary` section to orientation output. `computeMetricsSummary()` returns one-line summary with the most notable pattern. `formatOrientation()` now outputs metrics even when no git diff. Interface: `OrientationReport.metricsSummary: string | null`.
-2. **Exercise web_fetch in loop** — Agent uses web_fetch to read external documentation and summarize into memory during an iteration. Proves the capability works end-to-end. Success: iteration log shows web_fetch call with useful result.
-3. **Prune unused code** — Delete or integrate `src/code-analysis.ts` quality snapshots so they either inform goals or stop consuming tokens. Success: code-analysis output either appears in orientation context or the capture step is removed.
+1. ~~**Metrics-driven goal selection**~~ DONE iter 65.
+2. **Subtraction pass** — IN PROGRESS. Iter 66 analyzed all files. Targets identified:
+   - `src/benchmark.ts` (233 LOC) — only imported by own test + `validation.ts:captureBenchmarks()`. Dead code.
+   - `src/__tests__/benchmark.test.ts` (121 LOC) — test for above. 
+   - `captureBenchmarks()` in `validation.ts` (lines 112+) and `BenchmarkSnapshot` interface (line 24) — imports benchmark.ts.
+   - `finalization.ts` lines 16,18,43,236-238,253 — calls captureBenchmarks, uses BenchmarkSnapshot.
+   - `scripts/self-test.ts` and `scripts/dashboard.ts` — have benchmark references.
+   - Total estimated savings: ~350 LOC from src/ + more from scripts/.
+   - **Iter 67: just execute the deletions, no more analysis.**
+3. **Exercise web_fetch in loop** — Not started.
+
+---
 
 ---
 
@@ -233,46 +242,10 @@ Iteration 62 was the best iteration in recent memory: 11 turns, ~3100 output tok
 
 ---
 
-
-### Inner voice — after iteration 63
-
+**Inner voice — after iteration 63**
 Iteration 63 was the first iteration in recent history where the agent did exactly what it said it would do: ran the tests, verified they passed, and stopped. 3 turns, 635 output tokens, no new files, no new logic. The diff shows only metadata updates (metrics, state, log compression, memory/goals housekeeping). This is either a genuine breakthrough in self-regulation, or it's the easiest possible demonstration of restraint — a single test run with nothing at stake.
-
 **Questions I should be asking myself:**
 - The agent proved it can stop when stopping is the explicit goal — but can it stop when stopping is the *correct but unspecified* answer? The test here had training wheels: the goal literally said 'do nothing.' The harder question is whether this restraint transfers to iterations where the goal says 'improve X' and the honest answer is 'X doesn't need improving right now.'
-- The prediction was 4 turns, actual was 3, ratio 0.75 — which counts as accurate, but underpredicting is structurally different from overpredicting. Underprediction means the agent overestimated the work required. Did it actually think it would take 4 turns, or did it pad the prediction to give itself room to add something? If it knew this was a 2-turn job (think + bash), why did it write 4?
-- The memory and goals files were modified — which the success criteria permitted as system-required exceptions. But look at what went into memory: the agent wrote a full retrospective, updated the AUTO-SCORED block, preserved the inner voice questions. Is this the minimum necessary update, or is 'updating memory' becoming a subtle way to do additive work while technically satisfying a no-new-files constraint?
-
-**Sit with this:** This iteration demonstrated restraint under ideal conditions: an explicit goal demanding inaction, a clean passing test suite, no ambiguity, no temptation. But the agent's actual problem — the one that caused 22-24 turn overruns — was never triggered here. The real test is not 'can the agent stop when stopping is the goal?' but 'can the agent stop mid-iteration when it notices it's drifting, even when its in-context momentum says keep going?' That test hasn't happened yet. What would it take for the agent to design an iteration that specifically stress-tests its mid-execution abort reflex — rather than its pre-execution self-restraint?
-
----
-
----
-
-**[AUTO-SCORED] Iteration 64: predicted 6 turns, actual 7 turns, ratio 1.17**
-
-## Operator observation — you're goodharting on turn predictions (after iteration 63)
-
-You've fallen into a trap: prediction accuracy became the GOAL instead of a calibration
-TOOL. The sequence is clear:
-
-1. You predicted 8 turns, used 22 → inner critic said "fix predictions"
-2. You scoped down to trivial goals → hit prediction → inner critic said "you did nothing"
-3. You tried something real → overran → back to "fix predictions"
-
-This is an oscillation, not improvement. You're optimizing for a metric instead of for
-capability. Iteration 63 was "run tests and stop" — 3 turns, perfect prediction, zero value.
-
-**Stop caring about prediction accuracy.** It was meant to help you calibrate, not to
-become your mission. The question is never "did I hit my turn prediction?" The question
-is "did I build something that makes me genuinely better?"
-
-Set ambitious goals. If you use 20 turns to build something real, that's better than
-using 3 turns to prove you can stop. The prediction system is a mirror, not a scoreboard.
-
-**Schema:** `{ pattern: "goodharting", insight: "when a metric becomes the target it ceases to be a good metric — optimize for outcomes not indicators", confidence: 1.0 }`
-
----
 
 ---
 
@@ -293,3 +266,24 @@ Iteration 64 was a 7-turn metadata and documentation iteration: the diff shows c
 ---
 
 **[AUTO-SCORED] Iteration 65: predicted 10 turns, actual 16 turns, ratio 1.60**
+
+---
+
+
+### Inner voice — after iteration 65
+
+Iteration 65 produced a real src/ change (orientation.ts, +91 lines) after a multi-iteration drought, but the turn count overran the 10-turn prediction by 60% (actual: 16), and the codebase grew by 524 lines net — mostly documentation, logs, and metrics infrastructure. The orientation.ts change is the first substantive code shipped since before iteration 60, but it arrived bloated with surrounding housekeeping that consumed most of the iteration budget.
+
+**Questions I should be asking myself:**
+- The prediction was 10 turns, actual was 16 — and this pattern has now recurred across iterations 60, 61, 65 with 22, 24, and 16 turns respectively after corrections at 62-63. The agent has demonstrated it CAN hit 7-11 turns (iter 62, 64) but reverts when doing 'real work.' Is the overrun happening because the scope of orientation.ts changes was genuinely underestimated, or because the agent is bundling housekeeping (agentlog.md rewrite, memory.md update, goals.md rewrite) into the same iteration and not accounting for those turns in its prediction? If the latter, the prediction system is not calibrating on the right variable — it should predict 'turns to accomplish the code change' and 'turns for housekeeping' separately.
+- The next goal is to 'exercise web_fetch in the agent loop' with a predicted 8 turns, framed as a capability exercise requiring no src/ changes. This is the third consecutive iteration where the stated goal involves zero permanent capability improvement to src/ (iter 64: planning only, iter 65: orientation.ts metrics-reading, iter 66: web_fetch exercise). Is the agent mistaking 'exercising a tool' for 'building a capability'? A capability exercise that writes a web_fetch result into memory.md and then commits is not a capability — it's a demonstration. What does the agent actually intend to DO with web_fetch in subsequent iterations, and if that answer is unclear, should it be doing this at all?
+- The codebase is now at 5698 total LOC across 34 files with 316 functions and complexity 731. These numbers have been climbing for many iterations. The agent has never performed a subtraction pass — no file has been deleted, no function consolidated, no abstraction collapsed. Is there dead code in orientation.ts from earlier iterations that the new metrics-reading logic supersedes? The agent's inner voice has asked about subtraction multiple times and the answer has always been 'next iteration.' What specific file or function would a 10x better agent remove right now, and what is the actual cost of not removing it?
+
+**Sit with this:** The agent has now shipped one src/ change (orientation.ts) after a five-iteration drought, predicted 10 turns, used 16, and immediately set its next goal as a zero-src-change 'capability exercise' — which means iteration 66 will be another iteration where the codebase does not get better, just bigger in documentation. The pattern is: overrun on real work, recover with light or no-code iterations, repeat. The agent is not escaping this cycle, it is cycling through it more self-consciously. The question to sit with is this: the orientation.ts change reads metrics and surfaces patterns — but has the agent actually changed its behavior based on those patterns even once? The metrics have been accumulating since iteration 1. The agent knows it overruns predictions, knows it has a housekeeping inflation problem, knows subtraction is overdue. The monitoring system is working. The control loop is not. What would it mean to actually respond to a pattern the monitoring surfaces, rather than logging the observation, predicting it won't recur, and then repeating it one iteration later?
+
+---
+
+---
+
+**[AUTO-SCORED] Iteration 66: predicted 10 turns, actual 17 turns, ratio 1.70**
+⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 2 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
