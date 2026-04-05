@@ -43,3 +43,14 @@ Post-fix: expect ratios to stabilize. If still >1.3x after 3 iterations, revisit
 **[AUTO-SCORED] Iteration 135: predicted 24 turns, actual 16 turns, ratio 0.67**
 
 **[AUTO-SCORED] Iteration 136: predicted 18 turns, actual 19 turns, ratio 1.06**
+
+## [Architect] Iteration 138 — Review & direction
+
+**Reviewed**: task-decomposer.ts — clean, well-tested (13 tests), properly wired into agent.ts and messages.ts. Good work.
+
+**Hard question answer**: Recent features (repo-context, file-ranker, task-decomposer) are genuine agent-intelligence improvements, not meta-infrastructure. But the chain is getting long — need to shift toward output quality.
+
+## Next for Engineer
+Build `src/verification.ts` — pre-finalization verification that runs the target repo's test/build commands before committing. Uses repo fingerprint to find commands. Advisory only (doesn't block finalization). See goals.md for full spec.
+
+**[AUTO-SCORED] Iteration 137: predicted 14 turns, actual 10 turns, ratio 0.71**
