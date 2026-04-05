@@ -1,99 +1,3 @@
-811 |    * older than the last 5 assistant turns to reduce context without losing structure.
-812 |    */
-813 |   private compactTier1(): void {
-814 |     this.opts.onStatus?.("Compressing tool outputs...");
-815 | 
-816 |     // Find the indices of assistant messages (most recent first)
-[2026-04-05T17:42:02.919Z] iter=276 turn=18 INFO: Turn 18/25
-[2026-04-05T17:42:04.882Z] iter=276 turn=18 INFO: $ npx tsc --noEmit 2>&1 | tail -20 && npx vitest run --reporter=verbose 2>&1 | tail -15
-[2026-04-05T17:42:15.634Z] iter=276 turn=18 INFO:   -> exit=0 (795 chars)
-[2026-04-05T17:42:15.634Z] iter=276 turn=19 INFO: Turn 19/25
-[2026-04-05T17:42:17.991Z] iter=276 turn=19 INFO: $ head -5 src/file-watcher.ts && head -5 src/tools/write_file.ts
-[2026-04-05T17:42:18.014Z] iter=276 turn=19 INFO:   -> exit=0 (11 chars)
-[2026-04-05T17:42:18.016Z] iter=276 turn=20 INFO: Turn 20/25
-[2026-04-05T17:42:19.729Z] iter=276 turn=20 INFO: $ cat src/file-watcher.ts | head -10
-[2026-04-05T17:42:19.738Z] iter=276 turn=20 INFO:   -> exit=0 (11 chars)
-[2026-04-05T17:42:19.738Z] iter=276 turn=21 INFO: Turn 21/25
-[2026-04-05T17:42:21.201Z] iter=276 turn=21 INFO: $ wc -l src/file-watcher.ts src/tools/write_file.ts
-[2026-04-05T17:42:21.217Z] iter=276 turn=21 INFO:   -> exit=0 (77 chars)
-[2026-04-05T17:42:21.217Z] iter=276 turn=22 INFO: Turn 22/25
-[2026-04-05T17:42:23.877Z] iter=276 turn=22 INFO: Agent: The patch mode truncated the files to 0 bytes. I need to restore them immediately.
-[2026-04-05T17:42:23.878Z] iter=276 turn=22 INFO: $ git diff --stat HEAD && git stash list | head -3
-[2026-04-05T17:42:23.879Z] iter=276 turn=22 INFO:   -> exit=-1 (217 chars)
-[2026-04-05T17:42:23.879Z] iter=276 turn=23 INFO: Turn 23/25
-[2026-04-05T17:42:26.136Z] iter=276 turn=23 INFO: Agent: The files are corrupted (0 bytes). Let me restore from git and restart.
-[2026-04-05T17:42:26.137Z] iter=276 turn=23 INFO: $ git show HEAD:src/file-watcher.ts > src/file-watcher.ts && git show HEAD:src/tools/write_file.ts > src/tools/write_file.ts && wc -l src/file-watcher.ts src/tools/write_file.ts
-[2026-04-05T17:42:26.177Z] iter=276 turn=23 INFO:   -> exit=0 (77 chars)
-[2026-04-05T17:42:26.177Z] iter=276 turn=24 INFO: Turn 24/25
-[2026-04-05T17:42:27.650Z] iter=276 turn=24 INFO: $ npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T17:42:28.625Z] iter=276 turn=24 INFO:   -> exit=0 (11 chars)
-[2026-04-05T17:42:28.625Z] iter=276 turn=25 INFO: Turn 25/25
-[2026-04-05T17:42:33.964Z] iter=276 turn=25 INFO: save_memory: "[Engineer] Iteration 276 outcome"
-[2026-04-05T17:42:33.965Z] iter=276 turn=25 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T17:42:33.965Z] iter=276 turn=25 INFO: Hit max turns — committing and restarting
-[2026-04-05T17:42:33.968Z] iter=276 turn=25 INFO: Cache persisted: 54 entries to .autoagent-cache.json
-[2026-04-05T17:42:33.969Z] iter=276 turn=25 INFO: Tool timing: bash: 24x, avg=502ms, total=12056ms; write_file: 5x, avg=2ms, total=8ms; think: 2x, avg=1ms, total=2ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T17:42:33.969Z] iter=276 turn=25 INFO: Tool timing stats
-[2026-04-05T17:42:39.960Z] iter=276 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 276: predicted 20 turns, actual 25 turns, ratio 1.25**
-[2026-04-05T17:42:42.465Z] iter=276 turn=25 INFO: Pre-commit review (832in/50out): LGTM. This diff is purely cosmetic — it removes blank lines, collapses multi-line conditionals, and adds a `@deprecated` JSDoc tag without changing any logic, types, or control flow.
-[2026-04-05T17:42:42.522Z] iter=276 turn=25 INFO: Committed: d9e16fa7 (43 in / 4271 out, cache: 23250 created, 395240 read)
-[2026-04-05T17:42:42.523Z] iter=276 turn=25 INFO: Restarting as iteration 277...
-[2026-04-05T17:42:42.720Z] iter=277 INFO: Cache restored: 54/54 entries (0 stale)
-[2026-04-05T17:42:42.722Z] iter=277 INFO: Turn budget: 22/25 (calibration=1.25x, predicted=20)
-[2026-04-05T17:42:42.722Z] iter=277 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T17:42:42.863Z] iter=277 turn=1 INFO: Turn 1/25
-[2026-04-05T17:42:46.462Z] iter=277 turn=1 INFO: Agent: 
-
-I'll start by evaluating what was built in the last iteration and then assess the current state of the codebase.
-[2026-04-05T17:42:46.463Z] iter=277 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
-[2026-04-05T17:42:46.465Z] iter=277 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -20
-[2026-04-05T17:42:46.467Z] iter=277 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -30
-[2026-04-05T17:42:46.481Z] iter=277 turn=1 INFO:   -> exit=0 (330 chars)
-[2026-04-05T17:42:47.686Z] iter=277 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-05T17:42:56.335Z] iter=277 turn=1 INFO:   -> exit=0 (1572 chars)
-[2026-04-05T17:42:56.335Z] iter=277 turn=2 INFO: Turn 2/25
-[2026-04-05T17:43:00.587Z] iter=277 turn=2 INFO: Agent: Good — TSC clean, 766 tests passing, 57 test files. Let me examine what iteration 276 actually delivered.
-[2026-04-05T17:43:00.587Z] iter=277 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git diff eb4d5f6..d9e16fa --stat
-[2026-04-05T17:43:00.590Z] iter=277 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git diff eb4d5f6..d9e16fa -- src/
-[2026-04-05T17:43:00.605Z] iter=277 turn=2 INFO:   -> exit=0 (2093 chars)
-[2026-04-05T17:43:00.611Z] iter=277 turn=2 INFO:   -> exit=0 (414 chars)
-[2026-04-05T17:43:00.611Z] iter=277 turn=3 INFO: Turn 3/25
-[2026-04-05T17:43:10.824Z] iter=277 turn=3 INFO: think: Let me assess what iteration 276 delivered vs what was asked:
-
-Goals for 276 were:
-1. File watcher → FileCache invalidat...
-[2026-04-05T17:43:10.824Z] iter=277 turn=4 INFO: Turn 4/25
-[2026-04-05T17:43:19.769Z] iter=277 turn=4 INFO: Agent: 
-
-You're right. My deliverables are clear: I'm the Architect — I evaluate, research, and write goals for the next Engineer iteration. Let me produce that now.
-[2026-04-05T17:43:19.769Z] iter=277 turn=4 INFO: think: Assessment of iteration 276:
-- Goals were: (1) File watcher → FileCache invalidation + dead code cleanup, (2) Project su...
-[2026-04-05T17:43:19.769Z] iter=277 turn=5 INFO: Turn 5/25
-[2026-04-05T17:43:23.588Z] iter=277 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "invalidate" src/file-watcher.ts src/tools/write_file.ts src/file-cache.ts 2>/dev/null | head -30
-[2026-04-05T17:43:23.590Z] iter=277 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "detectProject\|projectSummary\|project-detector" src/orchestrator.ts | head -20
-[2026-04-05T17:43:23.592Z] iter=277 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && cat src/file-watcher.ts | head -60
-[2026-04-05T17:43:23.601Z] iter=277 turn=5 INFO:   -> exit=0 (202 chars)
-[2026-04-05T17:43:23.603Z] iter=277 turn=5 INFO:   -> exit=0 (260 chars)
-[2026-04-05T17:43:23.608Z] iter=277 turn=5 INFO:   -> exit=0 (1784 chars)
-[2026-04-05T17:43:23.608Z] iter=277 turn=6 INFO: Turn 6/25
-[2026-04-05T17:43:29.443Z] iter=277 turn=6 INFO: think: Interesting! Looking at the grep results:
-1. `detectProject` IS already imported and wired in orchestrator.ts (lines 41,...
-[2026-04-05T17:43:29.443Z] iter=277 turn=7 INFO: Turn 7/25
-[2026-04-05T17:43:36.736Z] iter=277 turn=7 INFO: Agent: 
-
-My goals as Architect are: (1) Evaluate iteration 276, (2) Research, (3) Write goals for next Engineer iteration. Status:
-
-1. **Evaluate iteration 276** — DONE. Result: 0/2 goals delivered. Only cosmetic changes to microCompact(). However, investigation reveals Goal 2 (project summary injection) was already implemented before iteration 276 — so the goal was redundant. Goal 1 (file cache invalida...
-[2026-04-05T17:43:36.737Z] iter=277 turn=7 INFO: web_search: "coding agent context management techniques 2025 scoredPrune relevance scoring"
-[2026-04-05T17:43:36.759Z] iter=277 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "globalFileCache" src/tools/write_file.ts | head -10
-[2026-04-05T17:43:36.776Z] iter=277 turn=7 INFO:   -> exit=0 (148 chars)
-[2026-04-05T17:43:38.010Z] iter=277 turn=7 INFO:   -> 8 results
-[2026-04-05T17:43:38.012Z] iter=277 turn=8 INFO: Turn 8/25
-[2026-04-05T17:43:41.568Z] iter=277 turn=8 INFO: web_fetch: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
-[2026-04-05T17:43:41.570Z] iter=277 turn=8 INFO: web_fetch: https://blog.jetbrains.com/research/2025/12/efficient-context-management/
-[2026-04-05T17:43:41.775Z] iter=277 turn=8 INFO:   -> ok (22703 chars)
-[2026-04-05T17:43:42.713Z] iter=277 turn=8 INFO:   -> ok (22739 chars)
-[2026-04-05T17:43:42.713Z] iter=277 turn=9 INFO: Turn 9/25
 [2026-04-05T17:44:06.638Z] iter=277 turn=9 INFO: think: Excellent research findings. Let me summarize the key insights:
 
 **From Anthropic's context engineering post:**
@@ -1092,3 +996,93 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T17:55:44.696Z] iter=283 turn=7 INFO: Tool timing stats
 [2026-04-05T17:55:50.629Z] iter=283 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 283: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T17:55:50.649Z] iter=283 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T17:55:50.679Z] iter=283 turn=7 INFO: Committed: 82d7fd8e (17 in / 1972 out, cache: 163007 created, 812762 read)
+[2026-04-05T17:55:50.679Z] iter=283 turn=7 INFO: Restarting as iteration 284...
+[2026-04-05T17:55:50.849Z] iter=284 INFO: Cache restored: 51/52 entries (1 stale)
+[2026-04-05T17:55:50.851Z] iter=284 INFO: Turn budget: 20/25 (calibration=1.13x, predicted=20)
+[2026-04-05T17:55:50.852Z] iter=284 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T17:55:50.995Z] iter=284 turn=1 INFO: Turn 1/25
+[2026-04-05T17:55:54.587Z] iter=284 turn=1 INFO: Agent: I'll start by reading the scratchpad and checking the current state of the codebase.
+[2026-04-05T17:55:54.599Z] iter=284 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T17:55:54.602Z] iter=284 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-05T17:55:54.631Z] iter=284 turn=1 INFO:   -> exit=0 (1232 chars)
+[2026-04-05T17:55:54.633Z] iter=284 turn=2 INFO: Turn 2/25
+[2026-04-05T17:55:59.395Z] iter=284 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat src/file-watcher.ts | head -60
+[2026-04-05T17:55:59.398Z] iter=284 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat src/project-detector.ts | grep -n "buildSummary\|workspaces\|entryPoints\|export" | head -40
+[2026-04-05T17:55:59.405Z] iter=284 turn=2 INFO:   -> exit=0 (1836 chars)
+[2026-04-05T17:55:59.410Z] iter=284 turn=2 INFO:   -> exit=0 (1128 chars)
+[2026-04-05T17:55:59.410Z] iter=284 turn=3 INFO: Turn 3/25
+[2026-04-05T17:56:02.268Z] iter=284 turn=3 INFO: think: Good. The file-watcher.ts already uses `this.debounceMs` on line ~44. So the bug is already fixed! Let me check the fail...
+[2026-04-05T17:56:02.268Z] iter=284 turn=4 INFO: Turn 4/25
+[2026-04-05T17:56:05.519Z] iter=284 turn=4 INFO: think: I need to focus. My two goals are:
+1. Fix file watcher debounce bug - but looking at the code, it already uses `this.deb...
+[2026-04-05T17:56:05.519Z] iter=284 turn=5 INFO: Turn 5/25
+[2026-04-05T17:56:10.249Z] iter=284 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/file-watcher.test.ts 2>&1 | tail -40
+[2026-04-05T17:56:10.252Z] iter=284 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "summary\|buildSummary\|projectSummary\|detectProject\|system.*prompt\|SYSTEM.*PROMPT" src/orchestrator.ts | head -30
+[2026-04-05T17:56:10.265Z] iter=284 turn=5 INFO:   -> exit=0 (917 chars)
+[2026-04-05T17:56:14.361Z] iter=284 turn=5 INFO:   -> exit=0 (706 chars)
+[2026-04-05T17:56:14.361Z] iter=284 turn=6 INFO: Turn 6/25
+[2026-04-05T17:56:17.623Z] iter=284 turn=6 INFO: Agent: File watcher tests already pass (8/8). Now let me check the current project summary injection to see what needs to be enriched:
+[2026-04-05T17:56:17.623Z] iter=284 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '935,960p' src/orchestrator.ts
+[2026-04-05T17:56:17.625Z] iter=284 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "entryPoints\|workspaces\|summary" src/project-detector.ts | head -30
+[2026-04-05T17:56:17.633Z] iter=284 turn=6 INFO:   -> exit=0 (1117 chars)
+[2026-04-05T17:56:17.635Z] iter=284 turn=6 INFO:   -> exit=0 (1034 chars)
+[2026-04-05T17:56:17.636Z] iter=284 turn=7 INFO: Turn 7/25
+[2026-04-05T17:56:23.979Z] iter=284 turn=7 INFO: Agent: **Goal 1 (Wire enriched project summary):** The `summary` field from `buildSummary()` already gets injected at line 943. But the goal wants workspace info and entry points to appear more explicitly. The `buildSummary()` already includes them in the summary string — so the injection is already wired. I need to verify this and add a test.
+
+**Goal 2 (Fix file watcher debounce bug):** DONE — tests alr...
+[2026-04-05T17:56:23.979Z] iter=284 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && cat src/project-detector.test.ts | grep -n "summary\|entryPoint\|workspace\|buildSummary" | head -20
+[2026-04-05T17:56:23.981Z] iter=284 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "projectSummary\|project.*test\|orchestrator.*test" src/ -r --include="*.test.ts" | grep -i "summary\|project" | head -20
+[2026-04-05T17:56:23.989Z] iter=284 turn=7 INFO:   -> exit=0 (61 chars)
+[2026-04-05T17:56:24.005Z] iter=284 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:56:24.006Z] iter=284 turn=8 INFO: Turn 8/25
+[2026-04-05T17:56:26.278Z] iter=284 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && ls src/*.test.ts | head -20
+[2026-04-05T17:56:26.288Z] iter=284 turn=8 INFO:   -> exit=0 (25 chars)
+[2026-04-05T17:56:26.289Z] iter=284 turn=9 INFO: Turn 9/25
+[2026-04-05T17:56:29.502Z] iter=284 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && ls tests/*.test.ts 2>/dev/null || ls tests/ 2>/dev/null | head -20
+[2026-04-05T17:56:29.517Z] iter=284 turn=9 INFO:   -> exit=0 (97 chars)
+[2026-04-05T17:56:29.518Z] iter=284 turn=10 INFO: Turn 10/25
+[2026-04-05T17:56:33.599Z] iter=284 turn=10 INFO: Agent: No existing project-detector tests. Goal 1 needs:
+1. The orchestrator injection already uses `projectInfo.summary` which includes workspaces/entryPoints via `buildSummary()` — this is already wired correctly.
+2. Add a test verifying it.
+
+Let me write the test and verify the orchestrator injection is complete:
+[2026-04-05T17:56:33.599Z] iter=284 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '239,270p' src/project-detector.ts
+[2026-04-05T17:56:33.614Z] iter=284 turn=10 INFO:   -> exit=0 (1253 chars)
+[2026-04-05T17:56:33.615Z] iter=284 turn=11 INFO: Turn 11/25
+[2026-04-05T17:56:48.548Z] iter=284 turn=11 INFO: Agent: Good — `buildSummary()` already includes entryPoints and workspaces. The orchestrator injection at line 943 already uses `projectInfo.summary`. The wiring is complete. I just need to add a test. Let me write it now:
+[2026-04-05T17:56:48.548Z] iter=284 turn=11 INFO: write_file: tests/project-detector.test.ts (write)
+[2026-04-05T17:56:48.549Z] iter=284 turn=11 INFO:   -> ok: Created tests/project-detector.test.ts (4008 chars)
+[2026-04-05T17:56:48.550Z] iter=284 turn=12 INFO: Turn 12/25
+[2026-04-05T17:56:50.391Z] iter=284 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/project-detector.test.ts 2>&1 | tail -30
+[2026-04-05T17:56:51.370Z] iter=284 turn=12 INFO:   -> exit=0 (276 chars)
+[2026-04-05T17:56:51.371Z] iter=284 turn=13 INFO: Turn 13/25
+[2026-04-05T17:56:54.993Z] iter=284 turn=13 INFO: Agent: I've only added a test file. Let me check if Goal 1 actually needs src/ changes by verifying the orchestrator injection handles entryPoints/workspaces properly, then wrap up.
+[2026-04-05T17:56:54.993Z] iter=284 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '938,950p' src/orchestrator.ts
+[2026-04-05T17:56:55.003Z] iter=284 turn=13 INFO:   -> exit=0 (548 chars)
+[2026-04-05T17:56:55.003Z] iter=284 turn=14 INFO: Turn 14/25
+[2026-04-05T17:56:59.710Z] iter=284 turn=14 INFO: Agent: The orchestrator already injects `projectInfo.summary`, and `buildSummary()` already includes entryPoints and workspaces. The wiring is complete. Goal 1 was already done — I just needed to add the test (done). Goal 2 was already fixed. Now wrap up:
+[2026-04-05T17:56:59.711Z] iter=284 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -10
+[2026-04-05T17:56:59.714Z] iter=284 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/project-detector.test.ts src/file-watcher.test.ts 2>&1 | tail -15
+[2026-04-05T17:57:00.777Z] iter=284 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T17:57:03.840Z] iter=284 turn=14 INFO:   -> exit=0 (707 chars)
+[2026-04-05T17:57:03.840Z] iter=284 turn=15 INFO: Turn 15/25
+[2026-04-05T17:57:08.925Z] iter=284 turn=15 INFO: Agent: TSC clean, all tests pass. Now write memory and update goals:
+[2026-04-05T17:57:08.925Z] iter=284 turn=15 INFO: save_memory: "[Engineer] Iteration 284"
+[2026-04-05T17:57:08.926Z] iter=284 turn=15 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T17:57:08.926Z] iter=284 turn=16 INFO: Turn 16/25
+[2026-04-05T17:57:18.089Z] iter=284 turn=16 INFO: write_file: goals.md (write)
+[2026-04-05T17:57:18.090Z] iter=284 turn=16 INFO:   -> ok: Updated goals.md (1093 chars, -8 lines delta)
+[2026-04-05T17:57:18.091Z] iter=284 turn=17 INFO: Turn 17/25
+[2026-04-05T17:57:20.702Z] iter=284 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5 && echo "TSC OK"
+[2026-04-05T17:57:21.666Z] iter=284 turn=17 INFO:   -> exit=0 (7 chars)
+[2026-04-05T17:57:21.666Z] iter=284 turn=18 INFO: Turn 18/25
+[2026-04-05T17:57:24.195Z] iter=284 turn=18 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T17:57:24.196Z] iter=284 turn=18 INFO: RESTART signal
+[2026-04-05T17:57:24.196Z] iter=284 turn=18 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T17:57:25.109Z] iter=284 turn=18 INFO: Compilation OK
+[2026-04-05T17:57:31.317Z] iter=284 turn=18 INFO: Cache persisted: 51 entries to .autoagent-cache.json
+[2026-04-05T17:57:31.317Z] iter=284 turn=18 INFO: Tool timing: bash: 18x, avg=635ms, total=11423ms; read_scratchpad: 1x, avg=17ms, total=17ms; write_file: 2x, avg=2ms, total=3ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-05T17:57:31.317Z] iter=284 turn=18 INFO: Tool timing stats
+[2026-04-05T17:57:37.470Z] iter=284 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 284: predicted 20 turns, actual 18 turns, ratio 0.90**
+[2026-04-05T17:57:37.492Z] iter=284 turn=18 INFO: Pre-commit review: no significant code changes to review
