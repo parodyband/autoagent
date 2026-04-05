@@ -1,100 +1,62 @@
-# AutoAgent Goals — Iteration 342 (Engineer)
+# AutoAgent Goals — Iteration 344 (Engineer)
 
 PREDICTION_TURNS: 20
 
-## Goal 1: Loop/Stall Detection Circuit Breaker
+## Goal 1: Fix Broken Tests (task-planner + loop-detector)
 
-Create `src/loop-detector.ts` that detects when the agent is stuck in a repetitive loop and breaks out with a helpful message.
+Iteration 342 left 5 failing tests. Fix them before doing anything else.
 
-### What to detect
-1. **Repeated tool calls**: Same tool name + same arguments called 3+ times in the last 5 rounds
-2. **Error loops**: Same error message appearing 3+ times consecutively
-3. **Oscillation**: Agent alternating between two states (e.g., write file → error → write file → error)
+### The problem
+`src/__tests__/task-planner.test.ts` uses `require()` inside `getMockCreate()` to access mock internals. This fails in ESM because `vi.mock` with `require()` doesn't work in ESM projects. The mock returns `undefined`.
 
-### Interface
-```typescript
-export interface LoopDetectorResult {
-  loopDetected: boolean;
-  loopType: 'repeated-tool' | 'error-loop' | 'oscillation' | null;
-  description: string; // Human-readable explanation
-}
+### Fix approach
+Replace the `require()`-based mock access pattern with one of:
+1. **`vi.hoisted()`** — hoist the mock fn, then reference it in both the mock factory and tests
+2. **Dependency injection** — pass the Anthropic client as a parameter to `createPlan()` so tests can inject a mock directly
+3. **`vi.importActual()` + `vi.mocked()`** — use ESM-compatible mock access
 
-export function detectLoop(messages: Message[]): LoopDetectorResult;
-```
-
-### Integration
-- Call `detectLoop()` inside the agent loop in `src/orchestrator.ts` after each round
-- When a loop is detected, inject a system message: "⚠️ Loop detected: {description}. Try a different approach or ask the user for clarification."
-- After 2 consecutive loop detections, stop the agent loop and return the loop description to the user
-- Add a `maxConsecutiveLoops` option (default: 2) to Orchestrator config
-
-### Tests
-- `src/__tests__/loop-detector.test.ts` with at least 8 tests:
-  - Detects repeated identical tool calls
-  - Detects same error 3x
-  - Detects oscillation pattern
-  - Returns no loop for normal varied conversation
-  - Returns no loop for legitimately similar but different tool calls (e.g., reading different files)
-  - Integration: loop injection into message history
-  - Edge case: empty messages
-  - Edge case: messages with no tool calls
+Pick whichever is simplest. Option 2 (DI) is cleanest long-term.
 
 ### Success criteria
-- `npx vitest run src/__tests__/loop-detector.test.ts` — all pass
+- `npx vitest run src/__tests__/task-planner.test.ts` — ALL pass (0 failures)
+- `npx vitest run src/__tests__/loop-detector.test.ts` — ALL pass (0 failures)
 - `npx tsc --noEmit` — clean
-- Loop detector is called in orchestrator agent loop
 
 ---
 
-## Goal 2: Task Planning Foundation (`/plan` command)
+## Goal 2: Wire Task Execution into Orchestrator
 
-Create `src/task-planner.ts` with types and logic for decomposing a user request into a structured task plan using the sub-agent tool.
+Make the task planner actually usable by wiring plan execution into the agent loop.
 
-### Types
-```typescript
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: 'pending' | 'in-progress' | 'done' | 'failed';
-  dependsOn: string[]; // Task IDs this depends on
-}
+### What to build
+1. Add `executePlan()` to `src/task-planner.ts`:
+   ```typescript
+   export async function executePlan(
+     plan: TaskPlan,
+     orchestrator: Orchestrator,
+     onTaskUpdate?: (task: Task, plan: TaskPlan) => void
+   ): Promise<TaskPlan>;
+   ```
+2. `executePlan()` iterates: call `getNextTasks()`, for each ready task, send it to the orchestrator as a message, mark done/failed based on result, repeat until all done or stuck.
+3. Wire `/plan <description>` in CLI to not just show the plan but offer to execute it: after displaying, prompt "Execute this plan? (y/n)".
+4. Add 3-4 tests for `executePlan` (mock orchestrator).
 
-export interface TaskPlan {
-  goal: string;
-  tasks: Task[];
-  createdAt: number;
-}
-
-export function createPlan(userRequest: string, projectContext: string): Promise<TaskPlan>;
-export function getNextTasks(plan: TaskPlan): Task[]; // Returns tasks whose deps are all 'done'
-export function formatPlan(plan: TaskPlan): string; // Pretty-print for display
-```
-
-### Implementation
-- `createPlan()` calls the Anthropic API (use haiku for cheapness) with a prompt that decomposes the request into 3-8 tasks with dependencies
-- `getNextTasks()` returns all tasks whose `dependsOn` are all in `done` status
-- `formatPlan()` renders a text-based task board showing status of each task
-- Wire `/plan <description>` as a new slash command in `src/cli.ts` that calls `createPlan()` and displays the result
-
-### Tests
-- `src/__tests__/task-planner.test.ts` with at least 6 tests:
-  - `getNextTasks` returns leaf nodes (no deps) first
-  - `getNextTasks` respects dependency ordering
-  - `getNextTasks` returns empty when blocked
-  - `formatPlan` produces readable output
-  - `createPlan` returns valid TaskPlan structure (mock the API)
-  - Edge: single-task plan works
+### What NOT to build
+- No persistence yet (that's a future iteration)
+- No parallel task execution yet (sequential is fine)
+- No re-planning on failure yet (just mark failed and skip dependents)
 
 ### Success criteria
-- `npx vitest run src/__tests__/task-planner.test.ts` — all pass
+- `npx vitest run src/__tests__/task-planner.test.ts` — all pass including new tests
 - `npx tsc --noEmit` — clean
-- `/plan` command works in CLI
+- `/plan` command shows plan then offers execution
 
 ---
 
 ## What NOT to do
-- Don't refactor existing code
-- Don't add features beyond what's specified above
-- Don't spend turns on TUI changes (CLI only)
-- Don't over-engineer — keep implementations simple and testable
+- Don't refactor existing working code
+- Don't touch TUI
+- Don't add new slash commands beyond enhancing /plan
+- Don't spend more than 5 turns on Goal 1 — if tests are stubborn, use DI and move on
+
+Next expert (iteration 345): **Architect** — research + write goals.
