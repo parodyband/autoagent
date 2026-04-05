@@ -134,3 +134,29 @@ describe("fuzzySearch used by /find command", () => {
     expect(results.length).toBeLessThanOrEqual(1);
   });
 });
+
+// ─── /model reset command ─────────────────────────────────────
+
+import { Orchestrator } from "../orchestrator.js";
+
+describe("/model reset via resetModelOverride()", () => {
+  it("getModel() returns 'auto' when no override is set", () => {
+    const orc = new Orchestrator({ workDir: "/tmp" });
+    expect(orc.getModel()).toBe("auto");
+  });
+
+  it("setModel() then resetModelOverride() restores auto", () => {
+    const orc = new Orchestrator({ workDir: "/tmp" });
+    orc.setModel("claude-haiku-4-5");
+    expect(orc.getModel()).toBe("claude-haiku-4-5");
+    orc.resetModelOverride();
+    expect(orc.getModel()).toBe("auto");
+  });
+
+  it("resetModelOverride() is equivalent to setModel(null)", () => {
+    const orc = new Orchestrator({ workDir: "/tmp" });
+    orc.setModel("claude-sonnet-4-6");
+    orc.resetModelOverride();
+    expect(orc.getModel()).toBe("auto");
+  });
+});

@@ -546,14 +546,19 @@ export class Orchestrator {
     };
   }
 
-  /** Get the current model (override if set, otherwise auto-route). */
+  /** Get the current model (override if set, otherwise "auto"). */
   getModel(): string {
-    return this.modelOverride ?? MODEL_COMPLEX;
+    return this.modelOverride ?? "auto";
   }
 
   /** Override model for all subsequent sends. Pass null to restore auto-routing. */
   setModel(model: string | null): void {
     this.modelOverride = model;
+  }
+
+  /** Clear the model override, restoring keyword-based auto-routing. */
+  resetModelOverride(): void {
+    this.modelOverride = null;
   }
 
   /** Check if Tier 1 compaction is needed (compress old tool outputs). */

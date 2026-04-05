@@ -1,58 +1,3 @@
-[2026-04-05T16:01:17.460Z] iter=223 turn=7 INFO: Agent: 
-
-tsc clean. Memory and goals already written. Done.
-[2026-04-05T16:01:17.461Z] iter=223 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T16:01:17.461Z] iter=223 turn=7 INFO: RESTART signal
-[2026-04-05T16:01:17.462Z] iter=223 turn=7 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T16:01:18.360Z] iter=223 turn=7 INFO: Compilation OK
-[2026-04-05T16:01:23.881Z] iter=223 turn=7 INFO: Cache persisted: 45 entries to .autoagent-cache.json
-[2026-04-05T16:01:23.881Z] iter=223 turn=7 INFO: Tool timing: bash: 9x, avg=1102ms, total=9916ms; write_file: 2x, avg=2ms, total=3ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T16:01:23.881Z] iter=223 turn=7 INFO: Tool timing stats
-[2026-04-05T16:01:28.868Z] iter=223 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 223: predicted 8 turns, actual 7 turns, ratio 0.88**
-[2026-04-05T16:01:28.888Z] iter=223 turn=7 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T16:01:28.920Z] iter=223 turn=7 INFO: Committed: 4c77f6cf (17 in / 3190 out, cache: 52625 created, 254669 read)
-[2026-04-05T16:01:28.920Z] iter=223 turn=7 INFO: Restarting as iteration 224...
-[2026-04-05T16:01:29.116Z] iter=224 INFO: Cache restored: 45/45 entries (0 stale)
-[2026-04-05T16:01:29.117Z] iter=224 INFO: Turn budget: 18/25 (calibration=1.00x, predicted=20)
-[2026-04-05T16:01:29.118Z] iter=224 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T16:01:29.220Z] iter=224 turn=1 INFO: Turn 1/25
-[2026-04-05T16:01:31.678Z] iter=224 turn=1 INFO: Agent: I'll start by reading the relevant files to understand the current implementation before making changes.
-[2026-04-05T16:01:31.679Z] iter=224 turn=1 INFO: $ cat src/tools/subagent.ts
-[2026-04-05T16:01:31.684Z] iter=224 turn=1 INFO: $ grep -n "totalIn\|totalOut\|cost\|token" src/orchestrator.ts | head -60
-[2026-04-05T16:01:31.693Z] iter=224 turn=1 INFO:   -> exit=0 (3729 chars)
-[2026-04-05T16:01:31.698Z] iter=224 turn=1 INFO:   -> exit=0 (1819 chars)
-[2026-04-05T16:01:31.699Z] iter=224 turn=2 INFO: Turn 2/25
-[2026-04-05T16:01:34.141Z] iter=224 turn=2 INFO: $ grep -n "subagent\|SubagentResult\|executeSubagent" src/orchestrator.ts | head -30
-[2026-04-05T16:01:34.146Z] iter=224 turn=2 INFO: $ grep -n "subagent\|SubagentResult\|executeSubagent\|ctx\.log\|tool_use\|tool_result" src/tools/tool-registry.ts | head -50
-[2026-04-05T16:01:34.161Z] iter=224 turn=2 INFO:   -> exit=0 (60 chars)
-[2026-04-05T16:01:34.161Z] iter=224 turn=2 INFO:   -> exit=0 (11 chars)
-[2026-04-05T16:01:34.162Z] iter=224 turn=3 INFO: Turn 3/25
-[2026-04-05T16:01:36.705Z] iter=224 turn=3 INFO: $ ls src/tools/
-[2026-04-05T16:01:36.714Z] iter=224 turn=3 INFO: $ grep -rn "subagent\|executeSubagent" src/ | grep -v "test\|spec" | head -30
-[2026-04-05T16:01:36.720Z] iter=224 turn=3 INFO:   -> exit=0 (105 chars)
-[2026-04-05T16:01:36.742Z] iter=224 turn=3 INFO:   -> exit=0 (1431 chars)
-[2026-04-05T16:01:36.743Z] iter=224 turn=4 INFO: Turn 4/25
-[2026-04-05T16:01:42.113Z] iter=224 turn=4 INFO: think: I have enough context. Let me identify exactly what I need to do:
-
-1. Sub-agent token cost tracking: In `src/tool-regist...
-[2026-04-05T16:01:42.115Z] iter=224 turn=5 INFO: Turn 5/25
-[2026-04-05T16:01:44.264Z] iter=224 turn=5 INFO: $ sed -n '180,215p' src/tool-registry.ts
-[2026-04-05T16:01:44.268Z] iter=224 turn=5 INFO: $ grep -n "model\|manualModel\|modelOverride" src/tui.tsx | head -40
-[2026-04-05T16:01:44.275Z] iter=224 turn=5 INFO:   -> exit=0 (1715 chars)
-[2026-04-05T16:01:44.279Z] iter=224 turn=5 INFO:   -> exit=0 (978 chars)
-[2026-04-05T16:01:44.279Z] iter=224 turn=6 INFO: Turn 6/25
-[2026-04-05T16:01:46.823Z] iter=224 turn=6 INFO: $ sed -n '417,445p' src/tui.tsx
-[2026-04-05T16:01:46.827Z] iter=224 turn=6 INFO: $ grep -n "ctx\.\|ToolContext\|addTokens\|onTokens" src/tool-registry.ts | head -30
-[2026-04-05T16:01:46.840Z] iter=224 turn=6 INFO:   -> exit=0 (1214 chars)
-[2026-04-05T16:01:46.845Z] iter=224 turn=6 INFO:   -> exit=0 (1869 chars)
-[2026-04-05T16:01:46.846Z] iter=224 turn=7 INFO: Turn 7/25
-[2026-04-05T16:01:51.023Z] iter=224 turn=7 INFO: Agent: **Goal 1 (Sub-agent token tracking)**: NOT STARTED  
-**Goal 2 (/model reset)**: NOT STARTED
-
-I have enough context. Let me now check the `ToolContext` interface and `setModel`/`getModel` to understand what's available, then implement both goals.
-[2026-04-05T16:01:51.024Z] iter=224 turn=7 INFO: $ sed -n '23,45p' src/tool-registry.ts && grep -n "setModel\|getModel\|modelOverride\|_model" src/orchestrator.ts | head -20
-[2026-04-05T16:01:51.049Z] iter=224 turn=7 INFO:   -> exit=0 (820 chars)
-[2026-04-05T16:01:51.050Z] iter=224 turn=8 INFO: Turn 8/25
 [2026-04-05T16:01:57.167Z] iter=224 turn=8 INFO: think: Now I have everything I need:
 
 1. **Sub-agent token tracking**: The `ToolContext` doesn't have a token accumulation call...
@@ -1051,3 +996,174 @@ Correct — this is an Architect iteration. My deliverable is goals.md (done) + 
 [2026-04-05T16:12:25.156Z] iter=229 turn=7 INFO: Tool timing stats
 [2026-04-05T16:12:30.395Z] iter=229 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 229: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T16:12:30.416Z] iter=229 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T16:12:30.449Z] iter=229 turn=7 INFO: Committed: 43162111 (17 in / 1890 out, cache: 10664 created, 49660 read)
+[2026-04-05T16:12:30.449Z] iter=229 turn=7 INFO: Restarting as iteration 230...
+[2026-04-05T16:12:30.644Z] iter=230 INFO: Cache restored: 47/47 entries (0 stale)
+[2026-04-05T16:12:30.646Z] iter=230 INFO: Turn budget: 18/25 (calibration=0.88x, predicted=20)
+[2026-04-05T16:12:30.647Z] iter=230 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T16:12:30.755Z] iter=230 turn=1 INFO: Turn 1/25
+[2026-04-05T16:12:36.260Z] iter=230 turn=1 INFO: Agent: I'll read the current state of the codebase and then implement the two goals.
+[2026-04-05T16:12:36.261Z] iter=230 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat src/orchestrator.ts | grep -n "modelOverride\|routeModel\|sessionCost\|getCost\|tokensIn\|tokensOut\|computeCost\|subagent" | head -60
+[2026-04-05T16:12:36.267Z] iter=230 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat src/__tests__/tui-commands.test.ts | tail -80
+[2026-04-05T16:12:36.283Z] iter=230 turn=1 INFO:   -> exit=0 (1614 chars)
+[2026-04-05T16:12:36.284Z] iter=230 turn=1 INFO:   -> exit=0 (2501 chars)
+[2026-04-05T16:12:36.284Z] iter=230 turn=2 INFO: Turn 2/25
+[2026-04-05T16:12:39.114Z] iter=230 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "setModel\|modelOverride\|/model\|resetModel" src/tui.tsx | head -30
+[2026-04-05T16:12:39.119Z] iter=230 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "subagent\|executeSubagent\|tool_result\|toolResult" src/orchestrator.ts | head -40
+[2026-04-05T16:12:39.135Z] iter=230 turn=2 INFO:   -> exit=0 (241 chars)
+[2026-04-05T16:12:39.138Z] iter=230 turn=2 INFO:   -> exit=0 (954 chars)
+[2026-04-05T16:12:39.139Z] iter=230 turn=3 INFO: Turn 3/25
+[2026-04-05T16:12:41.877Z] iter=230 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "subagent" src/orchestrator.ts | head -20
+[2026-04-05T16:12:41.880Z] iter=230 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '280,370p' src/orchestrator.ts
+[2026-04-05T16:12:41.888Z] iter=230 turn=3 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:12:41.889Z] iter=230 turn=3 INFO:   -> exit=0 (3662 chars)
+[2026-04-05T16:12:41.889Z] iter=230 turn=4 INFO: Turn 4/25
+[2026-04-05T16:12:47.820Z] iter=230 turn=4 INFO: think: I have enough context. Let me implement both goals now:
+
+1. `/model reset` - Add `resetModelOverride()` to orchestrator,...
+[2026-04-05T16:12:47.822Z] iter=230 turn=5 INFO: Turn 5/25
+[2026-04-05T16:12:50.320Z] iter=230 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '415,460p' src/tui.tsx
+[2026-04-05T16:12:50.322Z] iter=230 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && cat src/tools/subagent.ts | tail -40
+[2026-04-05T16:12:50.329Z] iter=230 turn=5 INFO:   -> exit=0 (1788 chars)
+[2026-04-05T16:12:50.330Z] iter=230 turn=5 INFO:   -> exit=0 (962 chars)
+[2026-04-05T16:12:50.331Z] iter=230 turn=6 INFO: Turn 6/25
+[2026-04-05T16:12:57.339Z] iter=230 turn=6 INFO: think: Good - `/model reset` is already partially implemented in the TUI (it calls `setModel(null)`). But there's no `resetMode...
+[2026-04-05T16:12:57.340Z] iter=230 turn=7 INFO: Turn 7/25
+[2026-04-05T16:13:01.231Z] iter=230 turn=7 INFO: Agent: **Goal 1: `/model reset`** — NOT STARTED (but TUI already has `reset` in `/model` handler; needs `resetModelOverride()` method + test)
+**Goal 2: Subagent token cost tracking** — NOT STARTED
+
+Let me check what's needed and implement both now:
+[2026-04-05T16:13:01.231Z] iter=230 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getModel\|setModel\|resetModel" src/orchestrator.ts
+[2026-04-05T16:13:01.233Z] iter=230 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onAddTokens\|subagent" src/orchestrator.ts | head -30
+[2026-04-05T16:13:01.242Z] iter=230 turn=7 INFO:   -> exit=0 (72 chars)
+[2026-04-05T16:13:01.243Z] iter=230 turn=7 INFO:   -> exit=0 (101 chars)
+[2026-04-05T16:13:01.244Z] iter=230 turn=8 INFO: Turn 8/25
+[2026-04-05T16:13:03.688Z] iter=230 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '548,562p' src/orchestrator.ts
+[2026-04-05T16:13:03.690Z] iter=230 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && cat src/tools/subagent.ts | grep -n "response\|inputTokens\|outputTokens\|model\|JSON" | head -20
+[2026-04-05T16:13:03.698Z] iter=230 turn=8 INFO:   -> exit=0 (537 chars)
+[2026-04-05T16:13:03.700Z] iter=230 turn=8 INFO:   -> exit=0 (743 chars)
+[2026-04-05T16:13:03.700Z] iter=230 turn=9 INFO: Turn 9/25
+[2026-04-05T16:13:06.249Z] iter=230 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "execTool\|executeSubagent\|subagent" src/tools/tool-registry.ts | head -20
+[2026-04-05T16:13:06.252Z] iter=230 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "subagent\|JSON.stringify\|inputTokens" src/tools/tool-registry.ts | head -20
+[2026-04-05T16:13:06.259Z] iter=230 turn=9 INFO:   -> exit=0 (60 chars)
+[2026-04-05T16:13:06.261Z] iter=230 turn=9 INFO:   -> exit=0 (60 chars)
+[2026-04-05T16:13:06.261Z] iter=230 turn=10 INFO: Turn 10/25
+[2026-04-05T16:13:08.468Z] iter=230 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "subagent\|executeSubagent" src/orchestrator.ts src/agent.ts 2>/dev/null | head -20
+[2026-04-05T16:13:08.470Z] iter=230 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "execTool\|subagent" src/ --include="*.ts" | grep -v test | head -20
+[2026-04-05T16:13:08.480Z] iter=230 turn=10 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:13:08.504Z] iter=230 turn=10 INFO:   -> exit=0 (1749 chars)
+[2026-04-05T16:13:08.504Z] iter=230 turn=11 INFO: Turn 11/25
+[2026-04-05T16:13:09.947Z] iter=230 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '185,220p' src/tool-registry.ts
+[2026-04-05T16:13:09.959Z] iter=230 turn=11 INFO:   -> exit=0 (1748 chars)
+[2026-04-05T16:13:09.959Z] iter=230 turn=12 INFO: Turn 12/25
+[2026-04-05T16:13:14.628Z] iter=230 turn=12 INFO: think: I can see that `ctx.addTokens?.(r.inputTokens, r.outputTokens)` is already called in the subagent tool handler! So subag...
+[2026-04-05T16:13:14.628Z] iter=230 turn=13 INFO: Turn 13/25
+[2026-04-05T16:13:17.410Z] iter=230 turn=13 INFO: Agent: I have changed NOTHING in src/. I've been reading. Stopping exploration now and writing code immediately.
+[2026-04-05T16:13:17.411Z] iter=230 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '260,275p' src/orchestrator.ts
+[2026-04-05T16:13:17.425Z] iter=230 turn=13 INFO:   -> exit=0 (572 chars)
+[2026-04-05T16:13:17.426Z] iter=230 turn=14 INFO: Turn 14/25
+[2026-04-05T16:13:22.027Z] iter=230 turn=14 INFO: Agent: Subagent tokens ARE already tracked via `(tIn, tOut) => { totalIn += tIn; totalOut += tOut; }`. The tokens flow into `totalIn/totalOut` which is returned and accumulated by the orchestrator. **Goal 2 is already done.**
+
+Now let me check Goal 1 — the `/model reset` test requirement and `resetModelOverride()` method:
+[2026-04-05T16:13:22.027Z] iter=230 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "resetModel\|reset" src/__tests__/tui-commands.test.ts | head -10
+[2026-04-05T16:13:22.036Z] iter=230 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T16:13:22.037Z] iter=230 turn=15 INFO: Turn 15/25
+[2026-04-05T16:13:29.074Z] iter=230 turn=15 INFO: Agent: The test for `/model reset` doesn't exist yet. The goals require:
+1. `resetModelOverride()` method on orchestrator
+2. Test in `tui-commands.test.ts` for `/model reset`
+3. `/model` with no args shows "auto" when no override
+
+The TUI already handles `/model reset` (calls `setModel(null)`). I need to add `resetModelOverride()` and fix `getModel()` to return "auto" when no override, then add the test.
+[2026-04-05T16:13:29.075Z] iter=230 turn=15 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T16:13:29.080Z] iter=230 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -9 +14 lines
+
+Context after patch:
+546 |     };
+547 |   }
+548 | 
+549 |   /** Get the current model (override if set, otherwise "auto"). */
+550 |   getModel(): string {
+551 |     return this.modelOverride ?? "auto";
+552 |   }
+553 | 
+554 |   /** Override model for all subsequent sends. Pass null to restore auto-routing. */
+555 |   setModel(model: string | null): void {
+556 |     this.modelOverride = model;
+557 |   }
+558 | 
+559 |   /** Clear the model override, restoring keyword-based auto-routing. */
+560 |   resetModelOverride(): void {
+561 |     this.modelOverride = null;
+562 |   }
+563 | 
+564 |   /** Check if Tier 1 compaction is needed (compress old tool outputs). */
+565 |   private shouldCompactTier1(): boolean {
+[2026-04-05T16:13:29.081Z] iter=230 turn=16 INFO: Turn 16/25
+[2026-04-05T16:13:31.441Z] iter=230 turn=16 INFO: Agent: Now add the test, then wrap up:
+[2026-04-05T16:13:31.442Z] iter=230 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && tail -20 src/__tests__/tui-commands.test.ts
+[2026-04-05T16:13:31.461Z] iter=230 turn=16 INFO:   -> exit=0 (699 chars)
+[2026-04-05T16:13:31.462Z] iter=230 turn=17 INFO: Turn 17/25
+[2026-04-05T16:13:37.884Z] iter=230 turn=17 INFO: Agent: Adding the test and wrapping up now:
+[2026-04-05T16:13:37.885Z] iter=230 turn=17 INFO: write_file: src/__tests__/tui-commands.test.ts (patch)
+[2026-04-05T16:13:37.887Z] iter=230 turn=17 INFO:   -> ok: Patched src/__tests__/tui-commands.test.ts: -5 +31 lines
+
+Context after patch:
+129 |     expect(results.some(r => r.file.includes("orchestrator"))).toBe(true);
+130 |   });
+131 | 
+132 |   it("respects limit parameter", () => {
+133 |     const results = fuzzySearch(sampleMap, "src", 1);
+134 |     expect(results.length).toBeLessThanOrEqual(1);
+135 |   });
+136 | });
+137 | 
+138 | // ─── /model reset command ─────────────────────────────────────
+139 | 
+140 | import { Orchestrator } from "../orchestrator.js";
+141 | 
+142 | describe("/model reset via resetModelOverride()", () => {
+143 |   it("getModel() returns 'auto' when no override is set", () => {
+144 |     const orc = new Orchestrator({ workDir: "/tmp" });
+145 |     expect(orc.getModel()).toBe("auto");
+146 |   });
+147 | 
+148 |   it("setModel() then resetModelOverride() restores auto", () => {
+149 |     const orc = new Orchestrator({ workDir: "/tmp" });
+150 |     orc.setModel("claude-haiku-4-5");
+151 |     expect(orc.getModel()).toBe("claude-haiku-4-5");
+152 |     orc.resetModelOverride();
+153 |     expect(orc.getModel()).toBe("auto");
+154 |   });
+155 | 
+156 |   it("resetModelOverride() is equivalent to setModel(null)", () => {
+157 |     const orc = new Orchestrator({ workDir: "/tmp" });
+158 |     orc.setModel("claude-sonnet-4-6");
+159 |     orc.resetModelOverride();
+160 |     expect(orc.getModel()).toBe("auto");
+161 |   });
+162 | });
+163 | 
+[2026-04-05T16:13:37.887Z] iter=230 turn=18 INFO: Turn 18/25
+[2026-04-05T16:13:39.529Z] iter=230 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC OK"
+[2026-04-05T16:13:40.403Z] iter=230 turn=18 INFO:   -> exit=0 (7 chars)
+[2026-04-05T16:13:40.403Z] iter=230 turn=19 INFO: Turn 19/25
+[2026-04-05T16:13:42.907Z] iter=230 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tui-commands.test.ts 2>&1 | tail -15
+[2026-04-05T16:13:43.971Z] iter=230 turn=19 INFO:   -> exit=0 (284 chars)
+[2026-04-05T16:13:43.972Z] iter=230 turn=20 INFO: Turn 20/25
+[2026-04-05T16:13:47.857Z] iter=230 turn=20 INFO: save_memory: "[Engineer] Iteration 230"
+[2026-04-05T16:13:47.858Z] iter=230 turn=20 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T16:13:47.859Z] iter=230 turn=21 INFO: Turn 21/25
+[2026-04-05T16:13:56.425Z] iter=230 turn=21 INFO: write_file: goals.md (write)
+[2026-04-05T16:13:56.426Z] iter=230 turn=21 INFO:   -> ok: Updated goals.md (905 chars, -32 lines delta)
+[2026-04-05T16:13:56.427Z] iter=230 turn=22 INFO: Turn 22/25
+[2026-04-05T16:13:57.958Z] iter=230 turn=22 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T16:13:57.958Z] iter=230 turn=22 INFO: RESTART signal
+[2026-04-05T16:13:57.959Z] iter=230 turn=22 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T16:13:58.862Z] iter=230 turn=22 INFO: Compilation OK
+[2026-04-05T16:14:04.629Z] iter=230 turn=22 INFO: Cache persisted: 47 entries to .autoagent-cache.json
+[2026-04-05T16:14:04.629Z] iter=230 turn=22 INFO: Tool timing: bash: 23x, avg=97ms, total=2225ms; write_file: 3x, avg=3ms, total=8ms; think: 3x, avg=1ms, total=3ms; save_memory: 1x, avg=3ms, total=3ms
+[2026-04-05T16:14:04.630Z] iter=230 turn=22 INFO: Tool timing stats
+[2026-04-05T16:14:09.670Z] iter=230 turn=22 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 230: predicted 20 turns, actual 22 turns, ratio 1.10**
+[2026-04-05T16:14:17.926Z] iter=230 turn=22 INFO: Pre-commit review (948in/301out): ## Issues Found
+
+- **Regression in `getModel()`**: Changing the default return from `MODEL_COMPLEX` to `"auto"` is a behavioral change, not just a doc fix. Any caller that previously relied on `getMod
