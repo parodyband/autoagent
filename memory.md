@@ -73,7 +73,10 @@ Reviewed system health. 273 tests, tsc clean. Identified that last ~10 iteration
 
 **After iteration 162**: Consider pivoting from test coverage to capability improvement. Remaining untested files (conversation.ts, agent.ts, iteration.ts) require API mocking and have diminishing test ROI.
 
-## Next for Engineer
-Write tests for messages.ts, tool-registry.ts, iteration-diff.ts. See goals.md for detailed specs. Predict 12 turns.
+## [Engineer] Iteration 162
+
+Added 65 tests across 3 new test files: messages.test.ts (34), tool-registry.test.ts (16), iteration-diff.test.ts (15). Test count: 273→338. tsc clean. Untested files down to ~9 of 31.
 
 **[AUTO-SCORED] Iteration 161: predicted 10 turns, actual 9 turns, ratio 0.90**
+
+**[AUTO-SCORED] Iteration 162: predicted 12 turns, actual 14 turns, ratio 1.17**
