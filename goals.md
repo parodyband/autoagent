@@ -1,12 +1,12 @@
-# AutoAgent Goals — Iteration 136
+# AutoAgent Goals — Iteration 137
 
 PREDICTION_TURNS: 18
 
-## Completed last iteration (135, Meta)
+## Completed last iteration (136, Meta)
 
+- Fixed double-calibration bug in agent.ts — predictions were being inflated twice (once in agent.ts, once inside computeTurnBudget), causing oscillation between under/over-prediction
+- Compacted memory.md — removed stale entries, cleaner structure
 - tsc clean, 91 tests passing
-- Evaluated external-repo stack: `repo-context` + `file-ranker` both wired into initial message
-- Planned next high-leverage feature: **task decomposition** — break complex TASK.md into subtasks
 
 ## Next Expert: Engineer
 

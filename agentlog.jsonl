@@ -1,46 +1,3 @@
-{"timestamp":"2026-04-05T12:09:28.352Z","iteration":128,"level":"info","message":"Turn 15/25","turn":15}
-{"timestamp":"2026-04-05T12:09:30.908Z","iteration":128,"level":"info","message":"read_file: scripts/self-test.ts","turn":15}
-{"timestamp":"2026-04-05T12:09:30.909Z","iteration":128,"level":"info","message":"  -> ok (894 chars)","turn":15}
-{"timestamp":"2026-04-05T12:09:30.909Z","iteration":128,"level":"info","message":"Turn 16/25","turn":16}
-{"timestamp":"2026-04-05T12:09:34.490Z","iteration":128,"level":"info","message":"Agent: I've been reading too much. Let me write the self-test now and wrap up.","turn":16}
-{"timestamp":"2026-04-05T12:09:34.491Z","iteration":128,"level":"info","message":"write_file: scripts/self-test.ts (patch)","turn":16}
-{"timestamp":"2026-04-05T12:09:34.493Z","iteration":128,"level":"info","message":"  -> ok: Patched scripts/self-test.ts: -2 +3 lines\n\nContext after patch:\n723 |     await testResuscitationE2E();\n724 |     await testSubagent();\n725 |     await testApiRetry();\n726 |     testTaskMdLifecycle();\n727 |     testTurnBudgetWiring();\n728 |     testExpertStateWiring();\n729 |     // Inline model-selection smoke test (avoids vitest import in tsx context)\n730 |     console.log(\"  model-selection smoke test...\");\n731 |     assert(selectModel({ description: \"test\", forceModel: \"fast\" }) === \"fast\", \"force fast\");","turn":16}
-{"timestamp":"2026-04-05T12:09:34.494Z","iteration":128,"level":"info","message":"Turn 17/25","turn":17}
-{"timestamp":"2026-04-05T12:09:44.335Z","iteration":128,"level":"info","message":"write_file: scripts/self-test.ts (patch)","turn":17}
-{"timestamp":"2026-04-05T12:09:44.336Z","iteration":128,"level":"info","message":"  -> ok: Patched scripts/self-test.ts: -4 +45 lines\n\nContext after patch:\n2230 |   );\n2231 | }\n2232 | \n2233 | function testExpertStateWiring(): void {\n2234 |   console.log(\"\\n🔄 Expert State Wiring\");\n2235 | \n2236 |   // Verify saveExpertState is imported and called in agent.ts\n2237 |   const agentSrc = readFileSync(path.join(ROOT, \"src/agent.ts\"), \"utf8\");\n2238 |   assert(\n2239 |     agentSrc.includes(\"saveExpertState\"),\n2240 |     \"expert-state-wiring: saveExpertState is referenced in agent.ts\",\n2241 |   );\n2242 |   assert(\n2243 |     agentSrc.includes(\"saveExpertState(ROOT,\"),\n2244 |     \"expert-state-wiring: saveExpertState is called with ROOT (not workDir)\",\n2245 |   );\n2246 | \n2247 |   // Verify saveExpertState actually writes to the rotation file\n2248 |   const tmpDir = mkdtempSync(path.join(TEMP_DIR, \"expert-state-\"));\n2249 |   const { saveExpertState, loadExpertState } = require(path.join(ROOT, \"dist/experts.js\"));\n2250 | \n2251 |   saveExpertState(tmpDir, \"Engineer\", 999);\n2252 |   const state = loadExpertState(tmpDir);\n2253 |   assert(state.lastExpert === \"Engineer\", \"expert-state: lastExpert set correctly\");\n2254 |   assert(state.history.length === 1, \"expert-state: history has one entry\");\n2255 |   assert(state.history[0].iteration === 999, \"expert-state: iteration saved correctly\");\n2256 |   assert(state.history[0].expert === \"Engineer\", \"expert-state: expert name saved correctly\");\n2257 | \n2258 |   // Verify keep-last-20 trimming\n2259 |   for (let i = 0; i < 25; i++) {\n2260 |     saveExpertState(tmpDir, \"Architect\", 1000 + i);\n2261 |   }\n2262 |   const trimmedState = loadExpertState(tmpDir);\n2263 |   assert(trimmedState.history.length === 20, \"expert-state: history trimmed to 20 entries\");\n2264 | \n2265 |   // Verify ROOT in agent.ts points to process.cwd() (autoagent repo, not --repo target)\n2266 |   assert(\n2267 |     agentSrc.includes(\"const ROOT = process.cwd()\"),\n2268 |     \"expert-state-wiring: ROOT is process.cwd() so rotation file always writes to autoagent dir\",\n2269 |   );\n2270 | \n2271 |   console.log(\"  ✓ expert-state: 7 assertions passed\");\n2272 | }\n2273 | \n2274 | main().catch((err) => {\n2275 |   console.error(\"Self-test crashed:\", err);\n2276 |   process.exit(1);\n2277 | });\n2278 | ","turn":17}
-{"timestamp":"2026-04-05T12:09:44.337Z","iteration":128,"level":"info","message":"Turn 18/25","turn":18}
-{"timestamp":"2026-04-05T12:09:46.985Z","iteration":128,"level":"info","message":"Agent: I also need to fix the duplicate history issue in the rotation file. But first let me check if the test works and run tsc.","turn":18}
-{"timestamp":"2026-04-05T12:09:46.986Z","iteration":128,"level":"info","message":"$ npx tsc --noEmit 2>&1 | head -20","turn":18}
-{"timestamp":"2026-04-05T12:09:47.694Z","iteration":128,"level":"info","message":"  -> exit=0 (11 chars)","turn":18}
-{"timestamp":"2026-04-05T12:09:47.694Z","iteration":128,"level":"info","message":"HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.","turn":18}
-{"timestamp":"2026-04-05T12:09:47.696Z","iteration":128,"level":"info","message":"Cache persisted: 45 entries to .autoagent-cache.json","turn":18}
-{"timestamp":"2026-04-05T12:09:47.696Z","iteration":128,"level":"info","message":"Cache stats: 0 hits, 10 misses, 45 entries, 2 invalidations (3 entries removed)","turn":18}
-{"timestamp":"2026-04-05T12:09:47.696Z","iteration":128,"level":"info","message":"Tool cache stats","turn":18,"metadata":{"cacheHits":0,"cacheMisses":10,"cacheEntries":45,"invalidations":2,"invalidatedEntries":3,"toolStats":{"grep":{"hits":0,"misses":2},"read_file":{"hits":0,"misses":8}}}}
-{"timestamp":"2026-04-05T12:09:47.696Z","iteration":128,"level":"info","message":"Tool timing: bash: 8x, avg=106ms, total=851ms; grep: 2x, avg=37ms, total=74ms; read_file: 8x, avg=2ms, total=19ms; write_file: 2x, avg=3ms, total=5ms; think: 3x, avg=1ms, total=2ms","turn":18}
-{"timestamp":"2026-04-05T12:09:47.696Z","iteration":128,"level":"info","message":"Tool timing stats","turn":18,"metadata":{"timing":{"tools":{"think":{"calls":3,"totalMs":2,"minMs":0,"maxMs":1,"avgMs":1},"grep":{"calls":2,"totalMs":74,"minMs":29,"maxMs":45,"avgMs":37},"bash":{"calls":8,"totalMs":851,"minMs":11,"maxMs":708,"avgMs":106},"read_file":{"calls":8,"totalMs":19,"minMs":1,"maxMs":7,"avgMs":2},"write_file":{"calls":2,"totalMs":5,"minMs":2,"maxMs":3,"avgMs":3}},"totalCalls":23,"totalMs":951}}}
-{"timestamp":"2026-04-05T12:09:52.084Z","iteration":128,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 128: predicted 12 turns, actual 18 turns, ratio 1.50**","turn":18}
-{"timestamp":"2026-04-05T12:10:00.299Z","iteration":128,"level":"info","message":"Pre-commit review (1016in/345out): ## Issues Found\n\n- **ESM violation**: `require(path.join(ROOT, \"dist/experts.js\"))` uses CommonJS `require()` in a TypeScript ESM project. This will throw `ReferenceError: require is not defined` at r","turn":18}
-{"timestamp":"2026-04-05T12:10:00.354Z","iteration":128,"level":"info","message":"Committed: f9aaaf33 (30 in / 4353 out, cache: 13519 created, 153155 read)","turn":18}
-{"timestamp":"2026-04-05T12:10:00.354Z","iteration":128,"level":"info","message":"Restarting as iteration 129...","turn":18}
-{"timestamp":"2026-04-05T12:10:00.550Z","iteration":129,"level":"info","message":"Cache restored: 45/45 entries (0 stale)"}
-{"timestamp":"2026-04-05T12:10:00.552Z","iteration":129,"level":"info","message":"Turn budget: 17/25 (calibration=1.08x, predicted=12)"}
-{"timestamp":"2026-04-05T12:10:00.552Z","iteration":129,"level":"info","message":"Starting. Expert=Architect Model=claude-opus-4-6"}
-{"timestamp":"2026-04-05T12:10:00.582Z","iteration":129,"level":"info","message":"Hard turn cap: 18 (1.5x prediction of 12)"}
-{"timestamp":"2026-04-05T12:10:00.582Z","iteration":129,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-05T12:10:04.711Z","iteration":129,"level":"info","message":"Agent: \n\nI'll start by understanding the current state - what happened in iteration 128 (which had a 1.50 ratio, suggesting it took more turns than expected), and then figure out the highest-leverage next step.","turn":1}
-{"timestamp":"2026-04-05T12:10:04.713Z","iteration":129,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git log --oneline -10","turn":1}
-{"timestamp":"2026-04-05T12:10:04.716Z","iteration":129,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -80","turn":1}
-{"timestamp":"2026-04-05T12:10:04.719Z","iteration":129,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat .expert-rotation.json","turn":1}
-{"timestamp":"2026-04-05T12:10:04.730Z","iteration":129,"level":"info","message":"  -> exit=0 (1679 chars)","turn":1}
-{"timestamp":"2026-04-05T12:10:04.733Z","iteration":129,"level":"info","message":"  -> exit=0 (1315 chars)","turn":1}
-{"timestamp":"2026-04-05T12:10:04.734Z","iteration":129,"level":"info","message":"  -> exit=0 (443 chars)","turn":1}
-{"timestamp":"2026-04-05T12:10:04.734Z","iteration":129,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-05T12:10:09.208Z","iteration":129,"level":"info","message":"Agent: Good — the rotation file IS updating now (has entries through 129). Let me see what iteration 128 actually did and check the current state of the codebase.","turn":2}
-{"timestamp":"2026-04-05T12:10:09.209Z","iteration":129,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git diff --stat HEAD~1 HEAD","turn":2}
-{"timestamp":"2026-04-05T12:10:09.212Z","iteration":129,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git diff HEAD~1 HEAD -- src/ scripts/","turn":2}
-{"timestamp":"2026-04-05T12:10:09.216Z","iteration":129,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat scripts/self-test.ts | head -100","turn":2}
-{"timestamp":"2026-04-05T12:10:09.232Z","iteration":129,"level":"info","message":"  -> exit=0 (4750 chars)","turn":2}
-{"timestamp":"2026-04-05T12:10:09.237Z","iteration":129,"level":"info","message":"  -> exit=0 (2477 chars)","turn":2}
 {"timestamp":"2026-04-05T12:10:09.238Z","iteration":129,"level":"info","message":"  -> exit=0 (380 chars)","turn":2}
 {"timestamp":"2026-04-05T12:10:09.239Z","iteration":129,"level":"info","message":"Turn 3/25","turn":3}
 {"timestamp":"2026-04-05T12:10:18.973Z","iteration":129,"level":"info","message":"think: Let me understand the current state:\n\n1. Iteration 128 (Engineer) was assigned to investigate expert rotation state pers...","turn":3}
@@ -539,3 +496,81 @@
 {"timestamp":"2026-04-05T12:23:14.570Z","iteration":134,"level":"info","message":"Tool timing stats","turn":9,"metadata":{"timing":{"tools":{"think":{"calls":3,"totalMs":2,"minMs":0,"maxMs":1,"avgMs":1},"read_file":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"bash":{"calls":4,"totalMs":3377,"minMs":1,"maxMs":1951,"avgMs":844},"write_file":{"calls":2,"totalMs":4,"minMs":1,"maxMs":3,"avgMs":2}},"totalCalls":11,"totalMs":3385}}}
 {"timestamp":"2026-04-05T12:23:18.638Z","iteration":134,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 134: predicted 24 turns, actual 9 turns, ratio 0.38**","turn":9}
 {"timestamp":"2026-04-05T12:23:18.658Z","iteration":134,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":9}
+{"timestamp":"2026-04-05T12:23:18.689Z","iteration":134,"level":"info","message":"Committed: 498701af (15 in / 2007 out, cache: 8225 created, 60600 read)","turn":9}
+{"timestamp":"2026-04-05T12:23:18.689Z","iteration":134,"level":"info","message":"Restarting as iteration 135...","turn":9}
+{"timestamp":"2026-04-05T12:23:18.883Z","iteration":135,"level":"info","message":"Cache restored: 41/41 entries (0 stale)"}
+{"timestamp":"2026-04-05T12:23:18.884Z","iteration":135,"level":"info","message":"Turn budget: 22/25 (calibration=1.28x, raw=18, effective=24)"}
+{"timestamp":"2026-04-05T12:23:18.884Z","iteration":135,"level":"info","message":"Starting. Expert=Meta Model=claude-opus-4-6"}
+{"timestamp":"2026-04-05T12:23:18.915Z","iteration":135,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-05T12:23:27.424Z","iteration":135,"level":"info","message":"Agent: \n\nI'm the Meta expert, not the Engineer. Let me first assess the current state of the system before deciding what to do.","turn":1}
+{"timestamp":"2026-04-05T12:23:27.425Z","iteration":135,"level":"info","message":"think: Let me assess the situation:\n\n1. The goals say \"Next Expert: Engineer\" but I'm the Meta expert (iteration 136). Let me c...","turn":1}
+{"timestamp":"2026-04-05T12:23:27.425Z","iteration":135,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-05T12:23:30.311Z","iteration":135,"level":"info","message":"$ cat .expert-rotation.json","turn":2}
+{"timestamp":"2026-04-05T12:23:30.315Z","iteration":135,"level":"info","message":"$ cat .autoagent-state.json","turn":2}
+{"timestamp":"2026-04-05T12:23:30.318Z","iteration":135,"level":"info","message":"$ cat .autoagent-metrics.json | head -80","turn":2}
+{"timestamp":"2026-04-05T12:23:30.323Z","iteration":135,"level":"info","message":"  -> exit=0 (1310 chars)","turn":2}
+{"timestamp":"2026-04-05T12:23:30.325Z","iteration":135,"level":"info","message":"  -> exit=0 (113 chars)","turn":2}
+{"timestamp":"2026-04-05T12:23:30.327Z","iteration":135,"level":"info","message":"  -> exit=0 (1679 chars)","turn":2}
+{"timestamp":"2026-04-05T12:23:30.328Z","iteration":135,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-05T12:23:35.531Z","iteration":135,"level":"info","message":"$ cat .autoagent-metrics.json | python3 -c \"\nimport json, sys\ndata = json.load(sys.stdin)\n# Show last 10 iterations\nfor m in data[-10:]:\n    print(f'iter {m[\\\"iteration\\\"]:3d} | turns: {m[\\\"turns\\\"]:2d}...","turn":3}
+{"timestamp":"2026-04-05T12:23:35.533Z","iteration":135,"level":"info","message":"$ npx tsc --noEmit 2>&1 | tail -5","turn":3}
+{"timestamp":"2026-04-05T12:23:35.536Z","iteration":135,"level":"info","message":"$ npx vitest run 2>&1 | tail -15","turn":3}
+{"timestamp":"2026-04-05T12:23:35.573Z","iteration":135,"level":"info","message":"  -> exit=0 (810 chars)","turn":3}
+{"timestamp":"2026-04-05T12:23:36.273Z","iteration":135,"level":"info","message":"  -> exit=0 (11 chars)","turn":3}
+{"timestamp":"2026-04-05T12:23:37.523Z","iteration":135,"level":"info","message":"  -> exit=0 (671 chars)","turn":3}
+{"timestamp":"2026-04-05T12:23:37.524Z","iteration":135,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-05T12:23:39.831Z","iteration":135,"level":"info","message":"$ cat src/experts.ts","turn":4}
+{"timestamp":"2026-04-05T12:23:39.840Z","iteration":135,"level":"info","message":"  -> exit=0 (9999 chars)","turn":4}
+{"timestamp":"2026-04-05T12:23:39.841Z","iteration":135,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-05T12:23:52.325Z","iteration":135,"level":"info","message":"Agent: \n\nGood checkpoint. Let me assess what I should actually deliver.","turn":5}
+{"timestamp":"2026-04-05T12:23:52.326Z","iteration":135,"level":"info","message":"think: I'm the Meta expert. My job is to evaluate the system and make surgical improvements. Let me assess what I've learned:\n\n...","turn":5}
+{"timestamp":"2026-04-05T12:23:52.326Z","iteration":135,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-05T12:23:57.036Z","iteration":135,"level":"info","message":"Agent: My deliverables as Meta:\n1. **Fix prediction calibration** — it swung from 1.50x under to 0.38x over. The auto-correct is overcorrecting.\n2. **Compact memory** — stale entries from 130+ iterations ago.\n3. **Set goals.md** for Engineer.\n\nLet me fix the calibration first — it's the biggest systemic issue.","turn":6}
+{"timestamp":"2026-04-05T12:23:57.037Z","iteration":135,"level":"info","message":"$ grep -n \"calibration\" src/agent.ts | head -20","turn":6}
+{"timestamp":"2026-04-05T12:23:57.041Z","iteration":135,"level":"info","message":"$ grep -n \"predictedTurns\\|PREDICTION_TURNS\\|calibration\\|turnBudget\" src/agent.ts | head -30","turn":6}
+{"timestamp":"2026-04-05T12:23:57.056Z","iteration":135,"level":"info","message":"  -> exit=0 (495 chars)","turn":6}
+{"timestamp":"2026-04-05T12:23:57.060Z","iteration":135,"level":"info","message":"  -> exit=0 (875 chars)","turn":6}
+{"timestamp":"2026-04-05T12:23:57.061Z","iteration":135,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-05T12:23:59.989Z","iteration":135,"level":"info","message":"read_file: src/agent.ts","turn":7}
+{"timestamp":"2026-04-05T12:23:59.990Z","iteration":135,"level":"info","message":"  -> ok (2139 chars)","turn":7}
+{"timestamp":"2026-04-05T12:23:59.990Z","iteration":135,"level":"info","message":"$ grep -n \"computeCalibration\\|calibration\" src/turn-budget.ts | head -20","turn":7}
+{"timestamp":"2026-04-05T12:24:00.006Z","iteration":135,"level":"info","message":"  -> exit=0 (1486 chars)","turn":7}
+{"timestamp":"2026-04-05T12:24:00.006Z","iteration":135,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-05T12:24:02.874Z","iteration":135,"level":"info","message":"read_file: src/turn-budget.ts","turn":8}
+{"timestamp":"2026-04-05T12:24:02.875Z","iteration":135,"level":"info","message":"  -> ok (1625 chars)","turn":8}
+{"timestamp":"2026-04-05T12:24:02.875Z","iteration":135,"level":"info","message":"Turn 9/25","turn":9}
+{"timestamp":"2026-04-05T12:24:10.248Z","iteration":135,"level":"info","message":"Agent: \n\nStatus: All 3 goals IN PROGRESS. Let me execute now.\n\nThe key problem: calibration uses median of recent ratios, but the data includes the over-corrected iterations (where the inflated prediction caused low ratios like 0.38). This creates a feedback loop — over-correct → low ratio → calibration drops → under-correct → high ratio → repeat. The fix: **compute calibration from raw predictions only,...","turn":9}
+{"timestamp":"2026-04-05T12:24:10.249Z","iteration":135,"level":"info","message":"read_file: src/turn-budget.ts","turn":9}
+{"timestamp":"2026-04-05T12:24:10.249Z","iteration":135,"level":"info","message":"  -> ok (2652 chars)","turn":9}
+{"timestamp":"2026-04-05T12:24:10.250Z","iteration":135,"level":"info","message":"Turn 10/25","turn":10}
+{"timestamp":"2026-04-05T12:24:22.737Z","iteration":135,"level":"info","message":"think: I see the problem clearly now. There's a double-calibration:\n\n1. In `computeTurnBudget()` (turn-budget.ts line ~127): `c...","turn":10}
+{"timestamp":"2026-04-05T12:24:22.739Z","iteration":135,"level":"info","message":"Turn 11/25","turn":11}
+{"timestamp":"2026-04-05T12:24:35.131Z","iteration":135,"level":"info","message":"Agent: Found it — **double calibration bug**. `computeTurnBudget()` already multiplies prediction × calibration internally (line 127). Then `agent.ts` does it AGAIN (line 235). This inflated prediction (24) becomes the baseline for next calibration, creating oscillation. Fix: remove the duplicate from agent.ts.","turn":11}
+{"timestamp":"2026-04-05T12:24:35.132Z","iteration":135,"level":"info","message":"write_file: src/agent.ts (patch)","turn":11}
+{"timestamp":"2026-04-05T12:24:35.135Z","iteration":135,"level":"info","message":"  -> ok: Patched src/agent.ts: -7 +7 lines\n\nContext after patch:\n229 |   // Compute adaptive turn budget from historical metrics + calibration\n230 |   const turnBudget = computeTurnBudget(METRICS_FILE, rawPrediction, MAX_TURNS, 10, workDir);\n231 | \n232 |   // Don't double-calibrate: computeTurnBudget already applies calibration to the\n233 |   // budget internally. ctx.predictedTurns stays as the raw expert prediction so that\n234 |   // future calibration ratios compare actual vs. what the expert wrote, not vs. an\n235 |   // already-inflated number. (The old code multiplied raw * calibration here AND inside\n236 |   // computeTurnBudget, causing oscillation: over-correct → low ratio → under-correct → repeat.)\n237 |   const predictedTurns = rawPrediction;\n238 |   log(state.iteration, `Turn budget: ${turnBudget.recommended}/${turnBudget.hardMax} (calibration=${turnBudget.calibration.toFixed(2)}x, predicted=${predictedTurns})`);\n239 | \n240 |   // Compute next expert so current expert can write properly-targeted goals\n241 |   const nextExpert = pickExpert(state.iteration + 1, experts);","turn":11}
+{"timestamp":"2026-04-05T12:24:35.136Z","iteration":135,"level":"info","message":"Turn 12/25","turn":12}
+{"timestamp":"2026-04-05T12:24:52.615Z","iteration":135,"level":"info","message":"Agent: Now compact memory and update goals:","turn":12}
+{"timestamp":"2026-04-05T12:24:52.615Z","iteration":135,"level":"info","message":"write_file: memory.md (write)","turn":12}
+{"timestamp":"2026-04-05T12:24:52.616Z","iteration":135,"level":"info","message":"  -> ok: Updated memory.md (2268 chars, -23 lines delta)","turn":12}
+{"timestamp":"2026-04-05T12:24:52.617Z","iteration":135,"level":"info","message":"Turn 13/25","turn":13}
+{"timestamp":"2026-04-05T12:25:11.379Z","iteration":135,"level":"info","message":"write_file: goals.md (write)","turn":13}
+{"timestamp":"2026-04-05T12:25:11.380Z","iteration":135,"level":"info","message":"  -> ok: Updated goals.md (2874 chars, 0 lines delta)","turn":13}
+{"timestamp":"2026-04-05T12:25:11.381Z","iteration":135,"level":"info","message":"Turn 14/25","turn":14}
+{"timestamp":"2026-04-05T12:25:13.518Z","iteration":135,"level":"info","message":"$ npx tsc --noEmit 2>&1","turn":14}
+{"timestamp":"2026-04-05T12:25:14.232Z","iteration":135,"level":"info","message":"  -> exit=0 (11 chars)","turn":14}
+{"timestamp":"2026-04-05T12:25:14.232Z","iteration":135,"level":"info","message":"Turn 15/25","turn":15}
+{"timestamp":"2026-04-05T12:25:16.192Z","iteration":135,"level":"info","message":"$ npx vitest run 2>&1 | tail -10","turn":15}
+{"timestamp":"2026-04-05T12:25:18.191Z","iteration":135,"level":"info","message":"  -> exit=0 (402 chars)","turn":15}
+{"timestamp":"2026-04-05T12:25:18.191Z","iteration":135,"level":"info","message":"Turn 16/25","turn":16}
+{"timestamp":"2026-04-05T12:25:21.633Z","iteration":135,"level":"info","message":"Agent: \n\nAll done. I changed `src/agent.ts` (fixed double-calibration bug), updated memory.md and goals.md, tsc clean, 91 tests pass. Wrapping up.","turn":16}
+{"timestamp":"2026-04-05T12:25:21.634Z","iteration":135,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":16}
+{"timestamp":"2026-04-05T12:25:21.634Z","iteration":135,"level":"info","message":"RESTART signal","turn":16}
+{"timestamp":"2026-04-05T12:25:21.635Z","iteration":135,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":16}
+{"timestamp":"2026-04-05T12:25:22.341Z","iteration":135,"level":"info","message":"Compilation OK","turn":16}
+{"timestamp":"2026-04-05T12:25:27.308Z","iteration":135,"level":"info","message":"Cache persisted: 43 entries to .autoagent-cache.json","turn":16}
+{"timestamp":"2026-04-05T12:25:27.309Z","iteration":135,"level":"info","message":"Cache stats: 0 hits, 3 misses, 43 entries, 3 invalidations (1 entries removed)","turn":16}
+{"timestamp":"2026-04-05T12:25:27.309Z","iteration":135,"level":"info","message":"Tool cache stats","turn":16,"metadata":{"cacheHits":0,"cacheMisses":3,"cacheEntries":43,"invalidations":3,"invalidatedEntries":1,"toolStats":{"read_file":{"hits":0,"misses":3}}}}
+{"timestamp":"2026-04-05T12:25:27.309Z","iteration":135,"level":"info","message":"Tool timing: bash: 13x, avg=429ms, total=5581ms; read_file: 3x, avg=2ms, total=7ms; write_file: 3x, avg=2ms, total=7ms; think: 3x, avg=1ms, total=2ms","turn":16}
+{"timestamp":"2026-04-05T12:25:27.309Z","iteration":135,"level":"info","message":"Tool timing stats","turn":16,"metadata":{"timing":{"tools":{"think":{"calls":3,"totalMs":2,"minMs":0,"maxMs":2,"avgMs":1},"bash":{"calls":13,"totalMs":5581,"minMs":0,"maxMs":1999,"avgMs":429},"read_file":{"calls":3,"totalMs":7,"minMs":1,"maxMs":5,"avgMs":2},"write_file":{"calls":3,"totalMs":7,"minMs":2,"maxMs":3,"avgMs":2}},"totalCalls":22,"totalMs":5597}}}
+{"timestamp":"2026-04-05T12:25:31.290Z","iteration":135,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 135: predicted 24 turns, actual 16 turns, ratio 0.67**","turn":16}
+{"timestamp":"2026-04-05T12:25:34.623Z","iteration":135,"level":"info","message":"Pre-commit review (718in/83out): LGTM. The change correctly removes a double-calibration bug where `rawPrediction * calibration` was applied both here and inside `computeTurnBudget`, which would have caused the oscillating over/under","turn":16}

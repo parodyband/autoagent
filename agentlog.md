@@ -1,63 +1,3 @@
-[2026-04-05T12:08:05.330Z] iter=127 turn=12 INFO:   -> exit=0 (989 chars)
-[2026-04-05T12:08:05.330Z] iter=127 turn=13 INFO: Turn 13/25
-[2026-04-05T12:08:13.350Z] iter=127 turn=13 INFO: Agent: The "inner voice" mentions in system-prompt.md are in the cognitive science section and are generic concepts (not file references), so they're fine. The memory.md mentions are historical records of what happened — also fine.
-
-Everything is clean. System assessment:
-
-**Is this system producing genuine improvement?** YES.
-- Turns: down from 30-50 range → 13-20 range
-- Prediction calibration: from 1....
-[2026-04-05T12:08:13.350Z] iter=127 turn=13 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T12:08:13.351Z] iter=127 turn=13 INFO: RESTART signal
-[2026-04-05T12:08:13.351Z] iter=127 turn=13 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T12:08:14.059Z] iter=127 turn=13 INFO: Compilation OK
-[2026-04-05T12:08:18.894Z] iter=127 turn=13 INFO: Cache persisted: 40 entries to .autoagent-cache.json
-[2026-04-05T12:08:18.894Z] iter=127 turn=13 INFO: Cache stats: 2 hits, 7 misses, 40 entries, 3 invalidations (2 entries removed)
-[2026-04-05T12:08:18.894Z] iter=127 turn=13 INFO: Tool cache stats
-[2026-04-05T12:08:18.894Z] iter=127 turn=13 INFO: Tool timing: bash: 4x, avg=179ms, total=714ms; grep: 2x, avg=41ms, total=81ms; read_file: 5x, avg=2ms, total=8ms; write_file: 3x, avg=1ms, total=3ms; think: 2x, avg=1ms, total=2ms
-[2026-04-05T12:08:18.894Z] iter=127 turn=13 INFO: Tool timing stats
-[2026-04-05T12:08:23.100Z] iter=127 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 127: predicted 12 turns, actual 13 turns, ratio 1.08**
-[2026-04-05T12:08:23.118Z] iter=127 turn=13 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T12:08:23.146Z] iter=127 turn=13 INFO: Committed: a495a0de (19 in / 4464 out, cache: 83245 created, 762999 read)
-[2026-04-05T12:08:23.146Z] iter=127 turn=13 INFO: Restarting as iteration 128...
-[2026-04-05T12:08:23.317Z] iter=128 INFO: Cache restored: 38/40 entries (2 stale)
-[2026-04-05T12:08:23.319Z] iter=128 INFO: Turn budget: 17/25 (calibration=1.08x, predicted=12)
-[2026-04-05T12:08:23.319Z] iter=128 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T12:08:23.343Z] iter=128 INFO: Hard turn cap: 18 (1.5x prediction of 12)
-[2026-04-05T12:08:23.343Z] iter=128 turn=1 INFO: Turn 1/25
-[2026-04-05T12:08:26.615Z] iter=128 turn=1 INFO: think: Let me start by reading the relevant files to understand the expert rotation state persistence issue. I need to look at:...
-[2026-04-05T12:08:26.616Z] iter=128 turn=2 INFO: Turn 2/25
-[2026-04-05T12:08:29.473Z] iter=128 turn=2 INFO: $ cat .expert-rotation.json
-[2026-04-05T12:08:29.480Z] iter=128 turn=2 INFO: grep: "saveExpertState|expertRotation|ROOT|workDir" in src
-[2026-04-05T12:08:29.509Z] iter=128 turn=2 INFO:   -> 0 matches
-[2026-04-05T12:08:29.509Z] iter=128 turn=2 INFO:   -> exit=0 (1314 chars)
-[2026-04-05T12:08:29.509Z] iter=128 turn=3 INFO: Turn 3/25
-[2026-04-05T12:08:32.442Z] iter=128 turn=3 INFO: grep: "saveExpertState|expertRotation|expert-rotation" in src
-[2026-04-05T12:08:32.484Z] iter=128 turn=3 INFO:   -> 0 matches
-[2026-04-05T12:08:32.485Z] iter=128 turn=3 INFO: $ grep -rn "saveExpertState\|expertRotation\|expert-rotation" src/ --include="*.ts" | head -50
-[2026-04-05T12:08:32.501Z] iter=128 turn=3 INFO:   -> exit=0 (354 chars)
-[2026-04-05T12:08:32.501Z] iter=128 turn=4 INFO: Turn 4/25
-[2026-04-05T12:08:35.000Z] iter=128 turn=4 INFO: read_file: src/experts.ts
-[2026-04-05T12:08:35.002Z] iter=128 turn=4 INFO:   -> ok (886 chars)
-[2026-04-05T12:08:35.002Z] iter=128 turn=4 INFO: read_file: src/agent.ts
-[2026-04-05T12:08:35.003Z] iter=128 turn=4 INFO:   -> ok (2213 chars)
-[2026-04-05T12:08:35.003Z] iter=128 turn=5 INFO: Turn 5/25
-[2026-04-05T12:08:52.884Z] iter=128 turn=5 INFO: think: Let me assess what I know so far and what I need to do:
-
-1. The `.expert-rotation.json` file IS being updated - it has e...
-[2026-04-05T12:08:52.885Z] iter=128 turn=6 INFO: Turn 6/25
-[2026-04-05T12:08:56.149Z] iter=128 turn=6 INFO: read_file: src/agent.ts
-[2026-04-05T12:08:56.151Z] iter=128 turn=6 INFO:   -> ok (1821 chars)
-[2026-04-05T12:08:56.151Z] iter=128 turn=6 INFO: $ grep -n "saveExpertState\|git.*add\|git.*commit\|expert" src/finalization.ts | head -30
-[2026-04-05T12:08:56.170Z] iter=128 turn=6 INFO:   -> exit=0 (134 chars)
-[2026-04-05T12:08:56.171Z] iter=128 turn=7 INFO: Turn 7/25
-[2026-04-05T12:08:58.756Z] iter=128 turn=7 INFO: read_file: src/finalization.ts
-[2026-04-05T12:08:58.757Z] iter=128 turn=7 INFO:   -> ok (1258 chars)
-[2026-04-05T12:08:58.757Z] iter=128 turn=8 INFO: Turn 8/25
-[2026-04-05T12:09:12.236Z] iter=128 turn=8 INFO: think: Now I understand the flow:
-
-1. `saveExpertState(ROOT, expert.name, ctx.iter)` is called BEFORE the conversation runs (li...
-[2026-04-05T12:09:12.237Z] iter=128 turn=9 INFO: Turn 9/25
 [2026-04-05T12:09:16.567Z] iter=128 turn=9 INFO: Agent: **Goal status:**
 - Root cause identified: NOT STARTED
 - Self-test added: NOT STARTED  
@@ -1056,3 +996,122 @@ All goals complete. Ready to restart.
 [2026-04-05T12:23:14.570Z] iter=134 turn=9 INFO: Tool timing stats
 [2026-04-05T12:23:18.638Z] iter=134 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 134: predicted 24 turns, actual 9 turns, ratio 0.38**
 [2026-04-05T12:23:18.658Z] iter=134 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T12:23:18.689Z] iter=134 turn=9 INFO: Committed: 498701af (15 in / 2007 out, cache: 8225 created, 60600 read)
+[2026-04-05T12:23:18.689Z] iter=134 turn=9 INFO: Restarting as iteration 135...
+[2026-04-05T12:23:18.883Z] iter=135 INFO: Cache restored: 41/41 entries (0 stale)
+[2026-04-05T12:23:18.884Z] iter=135 INFO: Turn budget: 22/25 (calibration=1.28x, raw=18, effective=24)
+[2026-04-05T12:23:18.884Z] iter=135 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-05T12:23:18.915Z] iter=135 turn=1 INFO: Turn 1/25
+[2026-04-05T12:23:27.424Z] iter=135 turn=1 INFO: Agent: 
+
+I'm the Meta expert, not the Engineer. Let me first assess the current state of the system before deciding what to do.
+[2026-04-05T12:23:27.425Z] iter=135 turn=1 INFO: think: Let me assess the situation:
+
+1. The goals say "Next Expert: Engineer" but I'm the Meta expert (iteration 136). Let me c...
+[2026-04-05T12:23:27.425Z] iter=135 turn=2 INFO: Turn 2/25
+[2026-04-05T12:23:30.311Z] iter=135 turn=2 INFO: $ cat .expert-rotation.json
+[2026-04-05T12:23:30.315Z] iter=135 turn=2 INFO: $ cat .autoagent-state.json
+[2026-04-05T12:23:30.318Z] iter=135 turn=2 INFO: $ cat .autoagent-metrics.json | head -80
+[2026-04-05T12:23:30.323Z] iter=135 turn=2 INFO:   -> exit=0 (1310 chars)
+[2026-04-05T12:23:30.325Z] iter=135 turn=2 INFO:   -> exit=0 (113 chars)
+[2026-04-05T12:23:30.327Z] iter=135 turn=2 INFO:   -> exit=0 (1679 chars)
+[2026-04-05T12:23:30.328Z] iter=135 turn=3 INFO: Turn 3/25
+[2026-04-05T12:23:35.531Z] iter=135 turn=3 INFO: $ cat .autoagent-metrics.json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+# Show last 10 iterations
+for m in data[-10:]:
+    print(f'iter {m[\"iteration\"]:3d} | turns: {m[\"turns\"]:2d}...
+[2026-04-05T12:23:35.533Z] iter=135 turn=3 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-05T12:23:35.536Z] iter=135 turn=3 INFO: $ npx vitest run 2>&1 | tail -15
+[2026-04-05T12:23:35.573Z] iter=135 turn=3 INFO:   -> exit=0 (810 chars)
+[2026-04-05T12:23:36.273Z] iter=135 turn=3 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:23:37.523Z] iter=135 turn=3 INFO:   -> exit=0 (671 chars)
+[2026-04-05T12:23:37.524Z] iter=135 turn=4 INFO: Turn 4/25
+[2026-04-05T12:23:39.831Z] iter=135 turn=4 INFO: $ cat src/experts.ts
+[2026-04-05T12:23:39.840Z] iter=135 turn=4 INFO:   -> exit=0 (9999 chars)
+[2026-04-05T12:23:39.841Z] iter=135 turn=5 INFO: Turn 5/25
+[2026-04-05T12:23:52.325Z] iter=135 turn=5 INFO: Agent: 
+
+Good checkpoint. Let me assess what I should actually deliver.
+[2026-04-05T12:23:52.326Z] iter=135 turn=5 INFO: think: I'm the Meta expert. My job is to evaluate the system and make surgical improvements. Let me assess what I've learned:
+
+...
+[2026-04-05T12:23:52.326Z] iter=135 turn=6 INFO: Turn 6/25
+[2026-04-05T12:23:57.036Z] iter=135 turn=6 INFO: Agent: My deliverables as Meta:
+1. **Fix prediction calibration** — it swung from 1.50x under to 0.38x over. The auto-correct is overcorrecting.
+2. **Compact memory** — stale entries from 130+ iterations ago.
+3. **Set goals.md** for Engineer.
+
+Let me fix the calibration first — it's the biggest systemic issue.
+[2026-04-05T12:23:57.037Z] iter=135 turn=6 INFO: $ grep -n "calibration" src/agent.ts | head -20
+[2026-04-05T12:23:57.041Z] iter=135 turn=6 INFO: $ grep -n "predictedTurns\|PREDICTION_TURNS\|calibration\|turnBudget" src/agent.ts | head -30
+[2026-04-05T12:23:57.056Z] iter=135 turn=6 INFO:   -> exit=0 (495 chars)
+[2026-04-05T12:23:57.060Z] iter=135 turn=6 INFO:   -> exit=0 (875 chars)
+[2026-04-05T12:23:57.061Z] iter=135 turn=7 INFO: Turn 7/25
+[2026-04-05T12:23:59.989Z] iter=135 turn=7 INFO: read_file: src/agent.ts
+[2026-04-05T12:23:59.990Z] iter=135 turn=7 INFO:   -> ok (2139 chars)
+[2026-04-05T12:23:59.990Z] iter=135 turn=7 INFO: $ grep -n "computeCalibration\|calibration" src/turn-budget.ts | head -20
+[2026-04-05T12:24:00.006Z] iter=135 turn=7 INFO:   -> exit=0 (1486 chars)
+[2026-04-05T12:24:00.006Z] iter=135 turn=8 INFO: Turn 8/25
+[2026-04-05T12:24:02.874Z] iter=135 turn=8 INFO: read_file: src/turn-budget.ts
+[2026-04-05T12:24:02.875Z] iter=135 turn=8 INFO:   -> ok (1625 chars)
+[2026-04-05T12:24:02.875Z] iter=135 turn=9 INFO: Turn 9/25
+[2026-04-05T12:24:10.248Z] iter=135 turn=9 INFO: Agent: 
+
+Status: All 3 goals IN PROGRESS. Let me execute now.
+
+The key problem: calibration uses median of recent ratios, but the data includes the over-corrected iterations (where the inflated prediction caused low ratios like 0.38). This creates a feedback loop — over-correct → low ratio → calibration drops → under-correct → high ratio → repeat. The fix: **compute calibration from raw predictions only,...
+[2026-04-05T12:24:10.249Z] iter=135 turn=9 INFO: read_file: src/turn-budget.ts
+[2026-04-05T12:24:10.249Z] iter=135 turn=9 INFO:   -> ok (2652 chars)
+[2026-04-05T12:24:10.250Z] iter=135 turn=10 INFO: Turn 10/25
+[2026-04-05T12:24:22.737Z] iter=135 turn=10 INFO: think: I see the problem clearly now. There's a double-calibration:
+
+1. In `computeTurnBudget()` (turn-budget.ts line ~127): `c...
+[2026-04-05T12:24:22.739Z] iter=135 turn=11 INFO: Turn 11/25
+[2026-04-05T12:24:35.131Z] iter=135 turn=11 INFO: Agent: Found it — **double calibration bug**. `computeTurnBudget()` already multiplies prediction × calibration internally (line 127). Then `agent.ts` does it AGAIN (line 235). This inflated prediction (24) becomes the baseline for next calibration, creating oscillation. Fix: remove the duplicate from agent.ts.
+[2026-04-05T12:24:35.132Z] iter=135 turn=11 INFO: write_file: src/agent.ts (patch)
+[2026-04-05T12:24:35.135Z] iter=135 turn=11 INFO:   -> ok: Patched src/agent.ts: -7 +7 lines
+
+Context after patch:
+229 |   // Compute adaptive turn budget from historical metrics + calibration
+230 |   const turnBudget = computeTurnBudget(METRICS_FILE, rawPrediction, MAX_TURNS, 10, workDir);
+231 | 
+232 |   // Don't double-calibrate: computeTurnBudget already applies calibration to the
+233 |   // budget internally. ctx.predictedTurns stays as the raw expert prediction so that
+234 |   // future calibration ratios compare actual vs. what the expert wrote, not vs. an
+235 |   // already-inflated number. (The old code multiplied raw * calibration here AND inside
+236 |   // computeTurnBudget, causing oscillation: over-correct → low ratio → under-correct → repeat.)
+237 |   const predictedTurns = rawPrediction;
+238 |   log(state.iteration, `Turn budget: ${turnBudget.recommended}/${turnBudget.hardMax} (calibration=${turnBudget.calibration.toFixed(2)}x, predicted=${predictedTurns})`);
+239 | 
+240 |   // Compute next expert so current expert can write properly-targeted goals
+241 |   const nextExpert = pickExpert(state.iteration + 1, experts);
+[2026-04-05T12:24:35.136Z] iter=135 turn=12 INFO: Turn 12/25
+[2026-04-05T12:24:52.615Z] iter=135 turn=12 INFO: Agent: Now compact memory and update goals:
+[2026-04-05T12:24:52.615Z] iter=135 turn=12 INFO: write_file: memory.md (write)
+[2026-04-05T12:24:52.616Z] iter=135 turn=12 INFO:   -> ok: Updated memory.md (2268 chars, -23 lines delta)
+[2026-04-05T12:24:52.617Z] iter=135 turn=13 INFO: Turn 13/25
+[2026-04-05T12:25:11.379Z] iter=135 turn=13 INFO: write_file: goals.md (write)
+[2026-04-05T12:25:11.380Z] iter=135 turn=13 INFO:   -> ok: Updated goals.md (2874 chars, 0 lines delta)
+[2026-04-05T12:25:11.381Z] iter=135 turn=14 INFO: Turn 14/25
+[2026-04-05T12:25:13.518Z] iter=135 turn=14 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-05T12:25:14.232Z] iter=135 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-05T12:25:14.232Z] iter=135 turn=15 INFO: Turn 15/25
+[2026-04-05T12:25:16.192Z] iter=135 turn=15 INFO: $ npx vitest run 2>&1 | tail -10
+[2026-04-05T12:25:18.191Z] iter=135 turn=15 INFO:   -> exit=0 (402 chars)
+[2026-04-05T12:25:18.191Z] iter=135 turn=16 INFO: Turn 16/25
+[2026-04-05T12:25:21.633Z] iter=135 turn=16 INFO: Agent: 
+
+All done. I changed `src/agent.ts` (fixed double-calibration bug), updated memory.md and goals.md, tsc clean, 91 tests pass. Wrapping up.
+[2026-04-05T12:25:21.634Z] iter=135 turn=16 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T12:25:21.634Z] iter=135 turn=16 INFO: RESTART signal
+[2026-04-05T12:25:21.635Z] iter=135 turn=16 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T12:25:22.341Z] iter=135 turn=16 INFO: Compilation OK
+[2026-04-05T12:25:27.308Z] iter=135 turn=16 INFO: Cache persisted: 43 entries to .autoagent-cache.json
+[2026-04-05T12:25:27.309Z] iter=135 turn=16 INFO: Cache stats: 0 hits, 3 misses, 43 entries, 3 invalidations (1 entries removed)
+[2026-04-05T12:25:27.309Z] iter=135 turn=16 INFO: Tool cache stats
+[2026-04-05T12:25:27.309Z] iter=135 turn=16 INFO: Tool timing: bash: 13x, avg=429ms, total=5581ms; read_file: 3x, avg=2ms, total=7ms; write_file: 3x, avg=2ms, total=7ms; think: 3x, avg=1ms, total=2ms
+[2026-04-05T12:25:27.309Z] iter=135 turn=16 INFO: Tool timing stats
+[2026-04-05T12:25:31.290Z] iter=135 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 135: predicted 24 turns, actual 16 turns, ratio 0.67**
+[2026-04-05T12:25:34.623Z] iter=135 turn=16 INFO: Pre-commit review (718in/83out): LGTM. The change correctly removes a double-calibration bug where `rawPrediction * calibration` was applied both here and inside `computeTurnBudget`, which would have caused the oscillating over/under

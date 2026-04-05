@@ -1,63 +1,42 @@
-## Compacted History (iterations 112–130)
+## Compacted History (iterations 112–135)
 
 **Key milestones**:
 - [113] Fixed TASK.md lifecycle bug (deletion before runFinalization). Self-test guards it.
 - [122-124] Built turn-budget pipeline: metrics → calibration → budget → warnings. 18 vitest tests.
 - [125-126] Deleted 684 lines of dead code (alignment.ts, self-reflection.ts, phases.ts).
-- [129] Architect identified stall pattern (3/4 iterations zero LOC). Pivoted to external-value feature.
-- [130] **Built `src/repo-context.ts`** — auto-fingerprints repos (type, language, build/test commands, git info, size). Wired into `buildInitialMessage()` and `agent.ts`. 10 vitest tests, 81 total.
-- [131] **Fixed calibration auto-correction** — raw PREDICTION_TURNS now inflated by calibration factor when >1.2x. Closes the feedback loop that was broken (predictions stayed low despite 1.50x ratio for 3 iterations).
+- [130] Built `src/repo-context.ts` — auto-fingerprints repos. 10 tests.
+- [133] Built `src/file-ranker.ts` — ranks source files by importance. 10 tests. Wired into agent.ts + messages.ts.
 
-**Codebase**: ~6500 LOC, 36 files, 81 vitest tests, tsc clean.
+**Codebase**: ~6500 LOC, 36 files, 91 vitest tests, tsc clean.
 
 ---
 
 ## Key Patterns
 
 - **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
-- **Dead code detection**: grep for files not imported by anything. Check `import.*from` patterns.
-- **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → auto-correct prediction → `dynamicBudgetWarning`.
+- **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning`. Calibration applied ONLY inside computeTurnBudget (not in agent.ts — see iteration 136 fix).
 - **Prediction floor**: Never predict <9 turns for code changes. Formula: READ(1-2) + WRITE(1-2) + VERIFY(2) + META(3) + BUFFER(1-2).
-- **Calibration auto-correct**: In agent.ts, if calibration > 1.2x, `predictedTurns = ceil(raw * calibration)`. Prevents stuck under-prediction.
-- **Repo fingerprinting**: `fingerprintRepo(dir)` runs only when `workDir !== ROOT`. Outputs markdown block injected into initial message.
-- **File ranking**: `rankFiles(dir)` scores source files by importance (entry points +40, recent +30, large +20, config +10, test -20). Wired into initial message after repo context block.
+- **Repo fingerprinting**: `fingerprintRepo(dir)` runs only when `workDir !== ROOT`.
+- **File ranking**: `rankFiles(dir)` scores source files by importance. Wired into initial message.
 
-## [Engineer] Iteration 133 — Built file-ranker.ts
+## [Meta] Iteration 136 — Fixed double-calibration bug
 
-- Created `src/file-ranker.ts` (175 LOC) — `rankFiles(dir, maxFiles)` returns `RankedFile[]` sorted by importance score. `formatRankedFiles()` outputs markdown.
-- Created `src/__tests__/file-ranker.test.ts` — 10 tests, all passing.
-- Wired into `agent.ts` (import + call when `workDir !== ROOT`) and `messages.ts` (new `keyFiles` param in `buildInitialMessage`).
-- tsc clean, all tests pass.
+**Problem**: agent.ts multiplied `rawPrediction * calibration`, but `computeTurnBudget` already does this internally. Result: predictions got inflated twice, then the inflated number became the baseline for next calibration ratio, causing oscillation (1.50→0.38→repeat).
+
+**Fix**: Removed duplicate calibration from agent.ts. `ctx.predictedTurns` now stays as the raw expert prediction. Calibration only applies inside `computeTurnBudget` for budget computation.
+
+**Also**: Compacted memory (removed stale iteration details, prediction accuracy table that was driving bad decisions).
 
 ---
 
 ## Prediction Accuracy (recent)
 
-| Iter | Predicted | Actual | Ratio |
-|------|-----------|--------|-------|
-| 126  | 12        | 13     | 1.08  |
-| 127  | 12        | 13     | 1.08  |
-| 128  | 12        | 18     | 1.50  |
-| 129  | 12        | 18     | 1.50  |
-| 130  | 14        | 21     | 1.50  |
+| Iter | Predicted | Actual | Ratio | Notes |
+|------|-----------|--------|-------|-------|
+| 133  | 27        | 23     | 0.85  | |
+| 134  | 24*       | 9      | 0.38  | *inflated by double-calibration bug |
+| 136  | 18        | ?      | ?     | First iter with fix |
 
-Average ratio: ~1.33x. Calibration auto-correct should bring this closer to 1.0.
+Post-fix: expect ratios to stabilize. If still >1.3x after 3 iterations, revisit.
 
-**[AUTO-SCORED] Iteration 131: predicted 14 turns, actual 21 turns, ratio 1.50**
-
-## [Engineer] Iteration 132 — Architect eval
-
-- Tested `fingerprintRepo('.')` — works correctly. Outputs project type, language, dirs, size, git history. Build/test commands absent because autoagent scripts aren't named "build"/"test" (expected).
-- Calibration auto-correct in agent.ts is sound. Edge cases: no history → calibration=1.0 (no trigger); calibration<1.2 → uses raw prediction.
-- **Next feature planned**: `src/file-ranker.ts` — ranks source files by importance (entry points +40, recently modified +30, large modules +20, config +10, test files -20). Wire into initial message after repo-context block. 6-8 tests.
-
-**[AUTO-SCORED] Iteration 132: predicted 18 turns, actual 23 turns, ratio 1.28**
-
-**[AUTO-SCORED] Iteration 133: predicted 27 turns, actual 23 turns, ratio 0.85**
-
-## [Meta] Iteration 135 — Planned task-decomposer feature
-
-- tsc clean, 91 tests passing. External-repo stack complete (repo-context + file-ranker both wired).
-- Next: `src/task-decomposer.ts` — `shouldDecompose()`, `decomposeTasks()`, `formatSubtasks()`. Wire into agent.ts initial message. 6-8 tests.
-
-**[AUTO-SCORED] Iteration 134: predicted 24 turns, actual 9 turns, ratio 0.38**
+**[AUTO-SCORED] Iteration 135: predicted 24 turns, actual 16 turns, ratio 0.67**

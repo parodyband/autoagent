@@ -229,13 +229,13 @@ async function runIteration(state: IterationState, workDir: string = ROOT, onceM
   // Compute adaptive turn budget from historical metrics + calibration
   const turnBudget = computeTurnBudget(METRICS_FILE, rawPrediction, MAX_TURNS, 10, workDir);
 
-  // Auto-correct under-predictions: if calibration says we underestimate by >20%,
-  // use the calibrated prediction instead of the raw one. This closes the loop —
-  // without this, the agent sees "predict higher" but ctx.predictedTurns stays low.
-  const predictedTurns = (rawPrediction && turnBudget.calibration > 1.2)
-    ? Math.ceil(rawPrediction * turnBudget.calibration)
-    : rawPrediction;
-  log(state.iteration, `Turn budget: ${turnBudget.recommended}/${turnBudget.hardMax} (calibration=${turnBudget.calibration.toFixed(2)}x, raw=${rawPrediction}, effective=${predictedTurns})`);
+  // Don't double-calibrate: computeTurnBudget already applies calibration to the
+  // budget internally. ctx.predictedTurns stays as the raw expert prediction so that
+  // future calibration ratios compare actual vs. what the expert wrote, not vs. an
+  // already-inflated number. (The old code multiplied raw * calibration here AND inside
+  // computeTurnBudget, causing oscillation: over-correct → low ratio → under-correct → repeat.)
+  const predictedTurns = rawPrediction;
+  log(state.iteration, `Turn budget: ${turnBudget.recommended}/${turnBudget.hardMax} (calibration=${turnBudget.calibration.toFixed(2)}x, predicted=${predictedTurns})`);
 
   // Compute next expert so current expert can write properly-targeted goals
   const nextExpert = pickExpert(state.iteration + 1, experts);
