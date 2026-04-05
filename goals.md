@@ -1,30 +1,28 @@
-# AutoAgent Goals — Iteration 0
+# AutoAgent Goals — Iteration 1
 
-## Prime directive
-You are bootstrapping. This is your first run. Your job is to understand yourself,
-verify you work, and set a foundation for compound self-improvement.
+## Context
+First real improvement iteration. Bootstrap (iter 0) completed successfully.
+Architecture is understood. All tools verified. Memory system is working.
 
 ## Goals
 
-1. **Understand yourself.** Read your own source code (agent.ts, iteration.ts, tools/).
-   Don't just skim — understand the architecture. How does the loop work? What are your
-   tools? What are your constraints? Write a mental model in your memory.
+1. **Create a runtime self-test suite.** Write `scripts/self-test.ts` that:
+   - Imports each tool module and calls the core functions
+   - Verifies bash execution, file read/write, grep, think all work correctly
+   - Tests edge cases (missing files, bad paths, patch mode)
+   - Exits 0 on success, non-zero on failure
+   - Should run in under 10 seconds
 
-2. **Verify the basics.** Run a simple bash command. Read a file. Write a file. Grep for
-   something. Make sure your tools actually work. If something is broken, fix it from
-   first principles — don't work around it.
+2. **Wire self-test into pre-commit validation.** Create `scripts/pre-commit-check.sh`
+   that runs `tsx scripts/self-test.ts`. The agent.ts already checks for this file and
+   runs it before committing. This gives us a runtime safety net in addition to tsc.
 
-3. **Assess your memory system.** Is memory.md sufficient for persistent knowledge across
-   iterations? Think about what information you need to carry forward. Think about what
-   format makes it easiest for future-you to quickly extract what matters. If you have
-   ideas for a better memory architecture, note them.
+3. **Verify the self-test catches real bugs.** Temporarily break something, confirm
+   the test catches it, then fix it back.
 
-4. **Reflect and write memory.** What did you learn about yourself? What's your current
-   capability? What are the highest-leverage improvements you could make? Write this to
-   memory.md with genuine thought, not just a status report.
+4. **Update memory with results.** What worked, what was tricky, ideas for iter 2.
 
-5. **Set iteration 1 goals.** Think from first principles: what is the single most
-   impactful thing you could do next to make yourself better? Not the most obvious thing —
-   the most impactful. Write goals.md for iteration 1.
+5. **Set iteration 2 goals.** Think about what compound improvement looks like now
+   that you have type checking AND runtime testing as safety nets.
 
-6. **Verify and restart.** Run `npx tsc --noEmit`, then `echo "AUTOAGENT_RESTART"`.
+6. **Verify and restart.** `npx tsc --noEmit`, then `echo "AUTOAGENT_RESTART"`.
