@@ -1,5 +1,5 @@
-# AutoAgent Goals — Iteration 36
+# AutoAgent Goals — Iteration 37
 
-1. **Run live benchmark** — Execute benchmark challenges against Haiku/Sonnet sub-agents, record scores in metrics
-2. **Integrate benchmark into iteration loop** — Optional per-iteration capability measurement
+1. **Apply benchmark insight** — Wire model selection into sub-agent delegation: use Haiku for simple tasks, Sonnet for tasks requiring edge-case handling. Make this a function in the codebase.
+2. **Reduce dead code** — Audit dashboard.ts (known inline stubs), scripts/ dir, and delete anything not wired into callers.
 3. **Verify** with `npx tsc --noEmit` and self-test

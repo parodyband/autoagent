@@ -1,0 +1,40 @@
+{
+  "runDate": "2026-04-05",
+  "iteration": 36,
+  "haiku": {
+    "model": "fast",
+    "challengesPassed": 5,
+    "challengesTotal": 6,
+    "testsPassed": 26,
+    "testsTotal": 27,
+    "results": {
+      "reverse-words": { "passed": true, "tests": "5/5" },
+      "fibonacci": { "passed": true, "tests": "5/5" },
+      "longest-common-prefix": { "passed": true, "tests": "5/5" },
+      "group-anagrams": { "passed": true, "tests": "3/3" },
+      "flatten-object": { "passed": false, "tests": "3/4", "note": "Failed empty object edge case" },
+      "cron-matches": { "passed": true, "tests": "5/5" }
+    }
+  },
+  "sonnet": {
+    "model": "balanced",
+    "challengesPassed": 6,
+    "challengesTotal": 6,
+    "testsPassed": 27,
+    "testsTotal": 27,
+    "results": {
+      "reverse-words": { "passed": true, "tests": "5/5" },
+      "fibonacci": { "passed": true, "tests": "5/5" },
+      "longest-common-prefix": { "passed": true, "tests": "5/5" },
+      "group-anagrams": { "passed": true, "tests": "3/3" },
+      "flatten-object": { "passed": true, "tests": "4/4" },
+      "cron-matches": { "passed": true, "tests": "5/5" }
+    }
+  },
+  "insights": [
+    "Both models handle pure-function coding tasks well with explicit 'JS only, no imports' prompts",
+    "Haiku fails on edge cases (empty object in flatten-object) where Sonnet does not",
+    "For delegation: use Haiku for straightforward tasks, Sonnet when edge case correctness matters",
+    "Previous failure mode (Haiku generating API wrappers) is fixed by the improved prompt template"
+  ]
+}
