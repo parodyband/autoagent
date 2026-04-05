@@ -1,74 +1,3 @@
-[2026-04-05T20:44:34.101Z] iter=372 turn=16 INFO:   -> ok: Patched tests/hooks-integration.test.ts: -3 +4 lines
-
-Context after patch:
-81 |       },
-82 |     };
-83 | 
-84 |     const blocked = await checkPreToolUse(config, "bash", { command: "rm -rf /" }, WORKDIR);
-85 |     expect(typeof blocked).toBe("string");
-86 |     expect(blocked as string).toContain("[Hook blocked]");
-87 |     expect(blocked as string).toContain("Dangerous command blocked");
-88 |   });
-89 | 
-90 |   it("allows bash tool calls that don't match the dangerous pattern", async () => {
-[2026-04-05T20:44:34.102Z] iter=372 turn=17 INFO: Turn 17/25
-[2026-04-05T20:44:37.083Z] iter=372 turn=17 INFO: write_file: tests/hooks-integration.test.ts (patch)
-[2026-04-05T20:44:37.085Z] iter=372 turn=17 INFO:   -> ok: Patched tests/hooks-integration.test.ts: -3 +4 lines
-
-Context after patch:
-144 |       },
-145 |     };
-146 | 
-147 |     const blocked = await checkPreToolUse(config, "write_file", { path: "/etc/passwd", content: "evil" }, WORKDIR);
-148 |     expect(typeof blocked).toBe("string");
-149 |     expect(blocked as string).toContain("[Hook blocked]");
-150 |     expect(blocked as string).toContain("write blocked");
-151 |   });
-152 | 
-153 |   it("returns no block when hooks config is empty", async () => {
-[2026-04-05T20:44:37.085Z] iter=372 turn=18 INFO: Turn 18/25
-[2026-04-05T20:44:39.509Z] iter=372 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/hooks-integration.test.ts 2>&1 | tail -10 && npx tsc --noEmit 2>&1 | head -20
-[2026-04-05T20:44:41.562Z] iter=372 turn=18 INFO:   -> exit=0 (235 chars)
-[2026-04-05T20:44:41.562Z] iter=372 turn=19 INFO: Turn 19/25
-[2026-04-05T20:44:43.263Z] iter=372 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/hooks-integration.test.ts 2>&1 | grep "FAIL\|TypeError\|AssertionError" | head -10
-[2026-04-05T20:44:44.274Z] iter=372 turn=19 INFO:   -> exit=0 (681 chars)
-[2026-04-05T20:44:44.274Z] iter=372 turn=20 INFO: Turn 20/25
-[2026-04-05T20:44:51.052Z] iter=372 turn=20 INFO: think: The blocking tests return "object" when typeof is called - meaning `blocked` is null (typeof null === "object"). So the ...
-[2026-04-05T20:44:51.052Z] iter=372 turn=21 INFO: Turn 21/25
-[2026-04-05T20:44:56.513Z] iter=372 turn=21 INFO: write_file: tests/hooks-integration.test.ts (patch)
-[2026-04-05T20:44:56.514Z] iter=372 turn=21 INFO:   -> ok: Patched tests/hooks-integration.test.ts: -24 +16 lines
-
-Context after patch:
-61 | 
-62 |   it("blocks bash tool calls matching a dangerous pattern (exit code 2)", async () => {
-63 |     // Hook that exits 2 when stdin contains "rm -rf"
-64 |     const config: HooksConfig = {
-65 |       hooks: {
-66 |         PreToolUse: [
-67 |           {
-68 |             matcher: "bash",
-69 |             command: `sh -c 'echo "Dangerous command blocked" >&2; exit 2'`,
-70 |             timeout: 5000,
-71 |           } satisfies HookConfig,
-72 |         ],
-73 |       },
-74 |     };
-75 | 
-76 |     const blocked = await checkPreToolUse(config, "bash", { command: "rm -rf /" }, WORKDIR);
-77 |     expect(typeof blocked).toBe("string");
-78 |     expect(blocked as string).toContain("[Hook blocked]");
-79 |     expect(blocked as string).toContain("Dangerous command blocked");
-80 |   });
-81 | 
-82 |   it("allows bash tool calls that don't match the dangerous pattern", async () => {
-[2026-04-05T20:44:56.514Z] iter=372 turn=22 INFO: Turn 22/25
-[2026-04-05T20:45:00.738Z] iter=372 turn=22 INFO: write_file: tests/hooks-integration.test.ts (patch)
-[2026-04-05T20:45:00.740Z] iter=372 turn=22 INFO:   -> ok: Patched tests/hooks-integration.test.ts: -16 +16 lines
-
-Context after patch:
-124 |   });
-125 | 
-126 |   it("blocks write_file when the hook matcher targets it", async () => {
 127 |     const config: HooksConfig = {
 128 |       hooks: {
 129 |         PreToolUse: [
@@ -1067,3 +996,204 @@ echo "AUTOAGENT_RESTART"
 [2026-04-05T21:00:37.321Z] iter=381 turn=8 INFO: Tool timing stats
 [2026-04-05T21:00:44.574Z] iter=381 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 381: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-05T21:00:44.598Z] iter=381 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T21:00:44.636Z] iter=381 turn=8 INFO: Committed: 5a8ca32e (18 in / 2434 out, cache: 11796 created, 59811 read)
+[2026-04-05T21:00:44.636Z] iter=381 turn=8 INFO: Restarting as iteration 382...
+[2026-04-05T21:00:44.837Z] iter=382 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-05T21:00:44.839Z] iter=382 INFO: Turn budget: 19/25 (calibration=1.13x, predicted=18)
+[2026-04-05T21:00:44.840Z] iter=382 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T21:00:45.025Z] iter=382 turn=1 INFO: Turn 1/25
+[2026-04-05T21:00:46.865Z] iter=382 turn=1 INFO: read_scratchpad: 2526 chars
+[2026-04-05T21:00:46.866Z] iter=382 turn=1 INFO: $ cat goals.md
+[2026-04-05T21:00:46.878Z] iter=382 turn=1 INFO:   -> exit=0 (2987 chars)
+[2026-04-05T21:00:46.878Z] iter=382 turn=2 INFO: Turn 2/25
+[2026-04-05T21:00:49.182Z] iter=382 turn=2 INFO: read_file: src/task-planner.ts
+[2026-04-05T21:00:49.183Z] iter=382 turn=2 INFO:   -> ok (10354 chars)
+[2026-04-05T21:00:49.184Z] iter=382 turn=2 INFO: $ ls tests/*.test.ts | head -10 && echo "---" && cat tests/self-verify.test.ts
+[2026-04-05T21:00:49.200Z] iter=382 turn=2 INFO:   -> exit=0 (2458 chars)
+[2026-04-05T21:00:49.200Z] iter=382 turn=3 INFO: Turn 3/25
+[2026-04-05T21:00:51.368Z] iter=382 turn=3 INFO: $ cat tests/cost-tracker.test.ts
+[2026-04-05T21:00:51.372Z] iter=382 turn=3 INFO: $ grep -n "runSingleTask\|runAgentTurn\|runAgentLoop" src/orchestrator.ts | head -20
+[2026-04-05T21:00:51.384Z] iter=382 turn=3 INFO:   -> exit=0 (2775 chars)
+[2026-04-05T21:00:51.390Z] iter=382 turn=3 INFO:   -> exit=0 (288 chars)
+[2026-04-05T21:00:51.390Z] iter=382 turn=4 INFO: Turn 4/25
+[2026-04-05T21:00:54.999Z] iter=382 turn=4 INFO: think: I have enough context. Let me start writing immediately.
+
+Goal 1: tests/task-planner.test.ts (~120 LOC)
+Goal 2: src/orch...
+[2026-04-05T21:00:55.000Z] iter=382 turn=5 INFO: Turn 5/25
+[2026-04-05T21:01:28.559Z] iter=382 turn=5 INFO: Agent: Writing both deliverables now:
+[2026-04-05T21:01:28.560Z] iter=382 turn=5 INFO: write_file: tests/task-planner.test.ts (write)
+[2026-04-05T21:01:28.561Z] iter=382 turn=5 INFO:   -> ok: Created tests/task-planner.test.ts (8510 chars)
+[2026-04-05T21:01:28.562Z] iter=382 turn=6 INFO: Turn 6/25
+[2026-04-05T21:01:30.753Z] iter=382 turn=6 INFO: Agent: Now let's run the tests to see if they pass before writing the src changes:
+[2026-04-05T21:01:30.754Z] iter=382 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/task-planner.test.ts 2>&1
+[2026-04-05T21:01:31.879Z] iter=382 turn=6 INFO:   -> exit=0 (277 chars)
+[2026-04-05T21:01:31.879Z] iter=382 turn=7 INFO: Turn 7/25
+[2026-04-05T21:01:34.989Z] iter=382 turn=7 INFO: Agent: **Goal 1: Task Planner Tests** — DONE (23/23 passing)
+**Goal 2: Wire Real Executor (`runSingleTask` + `createOrchestratorExecutor`)** — NOT STARTED
+
+Writing Goal 2 now:
+[2026-04-05T21:01:34.990Z] iter=382 turn=7 INFO: $ grep -n "export async function\|export function\|^export " src/orchestrator.ts | tail -20
+[2026-04-05T21:01:35.007Z] iter=382 turn=7 INFO:   -> exit=0 (1164 chars)
+[2026-04-05T21:01:35.008Z] iter=382 turn=8 INFO: Turn 8/25
+[2026-04-05T21:01:36.033Z] iter=382 turn=8 INFO: $ tail -30 src/orchestrator.ts
+[2026-04-05T21:01:36.041Z] iter=382 turn=8 INFO:   -> exit=0 (1364 chars)
+[2026-04-05T21:01:36.041Z] iter=382 turn=9 INFO: Turn 9/25
+[2026-04-05T21:01:37.374Z] iter=382 turn=9 INFO: $ grep -n "^async function runAgentLoop" src/orchestrator.ts
+[2026-04-05T21:01:37.388Z] iter=382 turn=9 INFO:   -> exit=0 (33 chars)
+[2026-04-05T21:01:37.388Z] iter=382 turn=10 INFO: Turn 10/25
+[2026-04-05T21:01:38.698Z] iter=382 turn=10 INFO: $ sed -n '532,560p' src/orchestrator.ts
+[2026-04-05T21:01:38.712Z] iter=382 turn=10 INFO:   -> exit=0 (1127 chars)
+[2026-04-05T21:01:38.713Z] iter=382 turn=11 INFO: Turn 11/25
+[2026-04-05T21:01:41.216Z] iter=382 turn=11 INFO: Agent: Now I have enough context. Let me add `runSingleTask` to orchestrator.ts and `createOrchestratorExecutor` to task-planner.ts:
+[2026-04-05T21:01:41.218Z] iter=382 turn=11 INFO: $ grep -n "^import\|createDefaultRegistry\|buildSystemPrompt" src/orchestrator.ts | head -20
+[2026-04-05T21:01:41.246Z] iter=382 turn=11 INFO:   -> exit=0 (1340 chars)
+[2026-04-05T21:01:41.246Z] iter=382 turn=12 INFO: Turn 12/25
+[2026-04-05T21:01:43.835Z] iter=382 turn=12 INFO: think: I've been reading too much. I have Goal 1 done (tests pass). I need to write Goal 2 NOW - add runSingleTask to orchestra...
+[2026-04-05T21:01:43.836Z] iter=382 turn=13 INFO: Turn 13/25
+[2026-04-05T21:01:52.460Z] iter=382 turn=13 INFO: Agent: src/ changes so far: **zero**. Writing Goal 2 now immediately.
+[2026-04-05T21:01:52.461Z] iter=382 turn=13 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T21:01:52.467Z] iter=382 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -4 +46 lines
+
+Context after patch:
+1745 |       }
+1746 |     }
+1747 | 
+1748 |     this.opts.onStatus?.("");
+1749 |     return { text, tokensIn, tokensOut, model, verificationPassed, commitResult };
+1750 |   }
+1751 | }
+1752 | 
+1753 | /**
+1754 |  * Runs a single task description through a minimal agent loop (up to 5 turns).
+1755 |  * Designed for use by the task-planner executor.
+1756 |  *
+1757 |  * @param client          Anthropic client
+1758 |  * @param workDir         Working directory for tool execution
+1759 |  * @param taskDescription The task to execute
+1760 |  * @returns               Concatenated assistant text response
+1761 |  */
+1762 | export async function runSingleTask(
+1763 |   client: Anthropic,
+1764 |   workDir: string,
+1765 |   taskDescription: string,
+1766 | ): Promise<string> {
+1767 |   const model = "claude-sonnet-4-20250514";
+1768 |   const registry = createDefaultRegistry();
+1769 |   const systemPrompt = buildSystemPrompt({ workDir });
+1770 |   const messages: Anthropic.MessageParam[] = [
+1771 |     { role: "user", content: taskDescription },
+1772 |   ];
+1773 | 
+1774 |   const result = await runAgentLoop(
+1775 |     client,
+1776 |     model,
+1777 |     systemPrompt,
+1778 |     messages,
+1779 |     registry,
+1780 |     workDir,
+1781 |     undefined, // onToolCall
+1782 |     undefined, // onStatus
+1783 |     undefined, // onText
+1784 |     undefined, // onDiffPreview
+1785 |     undefined, // onCompact
+1786 |     undefined, // onContextBudget
+1787 |     undefined, // onFileWatch
+1788 |     undefined, // signal
+1789 |     5,         // maxConsecutiveLoops (up to 5 turns)
+1790 |   );
+1791 | 
+1792 |   return result.text;
+1793 | }
+1794 | 
+[2026-04-05T21:01:52.467Z] iter=382 turn=14 INFO: Turn 14/25
+[2026-04-05T21:01:59.842Z] iter=382 turn=14 INFO: Agent: Now add `createOrchestratorExecutor` to task-planner.ts:
+[2026-04-05T21:01:59.843Z] iter=382 turn=14 INFO: write_file: src/task-planner.ts (patch)
+[2026-04-05T21:01:59.846Z] iter=382 turn=14 INFO:   -> ok: Patched src/task-planner.ts: -2 +28 lines
+
+Context after patch:
+309 |   return createPlan(recoveryRequest, projectContext);
+310 | }
+311 | 
+312 | /**
+313 |  * Creates a TaskExecutor that runs each task through the orchestrator's
+314 |  * runSingleTask function. Wire this into executePlan to make /plan actually
+315 |  * execute tasks via the agent loop.
+316 |  *
+317 |  * @param workDir  Working directory for tool execution
+318 |  * @param client   Anthropic client instance
+319 |  * @returns        A TaskExecutor compatible with executePlan()
+320 |  */
+321 | export async function createOrchestratorExecutor(
+322 |   workDir: string,
+323 |   client: Anthropic,
+324 | ): Promise<TaskExecutor> {
+325 |   // Lazy import to avoid circular deps — orchestrator imports nothing from task-planner
+326 |   const { runSingleTask } = await import("./orchestrator.js");
+327 | 
+328 |   return async (task: Task): Promise<string> => {
+329 |     const context = buildTaskContext(
+330 |       // Build a minimal plan context so buildTaskContext works correctly
+331 |       { goal: task.title, tasks: [task], createdAt: Date.now() },
+332 |       task
+333 |     );
+334 |     return runSingleTask(client, workDir, context);
+335 |   };
+336 | }
+337 | 
+338 | /** Default filename for persisted plans. */
+339 | export const PLAN_FILENAME = ".autoagent-plan.json";
+340 | 
+341 | /**
+342 |  * Saves a TaskPlan to disk as JSON.
+[2026-04-05T21:01:59.846Z] iter=382 turn=15 INFO: Turn 15/25
+[2026-04-05T21:02:03.261Z] iter=382 turn=15 INFO: Agent: Wrapping up now.
+[2026-04-05T21:02:03.261Z] iter=382 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && npx vitest run tests/task-planner.test.ts 2>&1 | tail -8
+[2026-04-05T21:02:04.383Z] iter=382 turn=15 INFO:   -> exit=2 (264 chars)
+[2026-04-05T21:02:04.383Z] iter=382 turn=16 INFO: Turn 16/25
+[2026-04-05T21:02:06.706Z] iter=382 turn=16 INFO: Agent: Fixing TSC errors:
+[2026-04-05T21:02:06.707Z] iter=382 turn=16 INFO: $ sed -n '229,260p' src/orchestrator.ts
+[2026-04-05T21:02:06.723Z] iter=382 turn=16 INFO:   -> exit=0 (1476 chars)
+[2026-04-05T21:02:06.724Z] iter=382 turn=17 INFO: Turn 17/25
+[2026-04-05T21:02:10.633Z] iter=382 turn=17 INFO: Agent: `buildSystemPrompt` needs 2 args. Fixing `runSingleTask`:
+[2026-04-05T21:02:10.633Z] iter=382 turn=17 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T21:02:10.635Z] iter=382 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -4 +4 lines
+
+Context after patch:
+1764 |   workDir: string,
+1765 |   taskDescription: string,
+1766 | ): Promise<string> {
+1767 |   const model = "claude-sonnet-4-20250514";
+1768 |   const registry = createDefaultRegistry();
+1769 |   const { systemPrompt } = buildSystemPrompt(workDir, "");
+1770 |   const messages: Anthropic.MessageParam[] = [
+1771 |     { role: "user", content: taskDescription },
+1772 |   ];
+1773 | 
+[2026-04-05T21:02:10.636Z] iter=382 turn=18 INFO: Turn 18/25
+[2026-04-05T21:02:12.188Z] iter=382 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-05T21:02:13.284Z] iter=382 turn=18 INFO:   -> exit=0 (11 chars)
+[2026-04-05T21:02:13.284Z] iter=382 turn=19 INFO: Turn 19/25
+[2026-04-05T21:02:15.791Z] iter=382 turn=19 INFO: Agent: TSC clean. Now wrap up:
+[2026-04-05T21:02:15.791Z] iter=382 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/task-planner.test.ts 2>&1 | tail -6
+[2026-04-05T21:02:16.824Z] iter=382 turn=19 INFO:   -> exit=0 (182 chars)
+[2026-04-05T21:02:16.824Z] iter=382 turn=20 INFO: Turn 20/25
+[2026-04-05T21:02:20.639Z] iter=382 turn=20 INFO: save_memory: "[Engineer 382] Task planner tests + real executor"
+[2026-04-05T21:02:20.641Z] iter=382 turn=20 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T21:02:20.642Z] iter=382 turn=21 INFO: Turn 21/25
+[2026-04-05T21:02:31.424Z] iter=382 turn=21 INFO: write_file: goals.md (write)
+[2026-04-05T21:02:31.425Z] iter=382 turn=21 INFO:   -> ok: Updated goals.md (1562 chars, -24 lines delta)
+[2026-04-05T21:02:31.425Z] iter=382 turn=22 INFO: Turn 22/25
+[2026-04-05T21:02:33.135Z] iter=382 turn=22 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T21:02:33.136Z] iter=382 turn=22 INFO: RESTART signal
+[2026-04-05T21:02:33.136Z] iter=382 turn=22 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T21:02:34.187Z] iter=382 turn=22 INFO: Compilation OK
+[2026-04-05T21:02:42.117Z] iter=382 turn=22 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-05T21:02:42.118Z] iter=382 turn=22 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 5 invalidations (1 entries removed)
+[2026-04-05T21:02:42.118Z] iter=382 turn=22 INFO: Tool cache stats
+[2026-04-05T21:02:42.118Z] iter=382 turn=22 INFO: Tool timing: bash: 15x, avg=303ms, total=4538ms; write_file: 5x, avg=3ms, total=15ms; read_scratchpad: 1x, avg=6ms, total=6ms; read_file: 1x, avg=4ms, total=4ms; save_memory: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms
+[2026-04-05T21:02:42.118Z] iter=382 turn=22 INFO: Tool timing stats
+[2026-04-05T21:02:49.271Z] iter=382 turn=22 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 382: predicted 18 turns, actual 22 turns, ratio 1.22**
+[2026-04-05T21:02:59.176Z] iter=382 turn=22 INFO: Pre-commit review (1054in/359out): **Issues found:**
+
+- **`createOrchestratorExecutor` is needlessly `async`**: The function only does a dynamic import and returns a closure — no top-level awaited work needs to happen at construction t

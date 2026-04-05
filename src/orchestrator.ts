@@ -1749,3 +1749,45 @@ export class Orchestrator {
     return { text, tokensIn, tokensOut, model, verificationPassed, commitResult };
   }
 }
+
+/**
+ * Runs a single task description through a minimal agent loop (up to 5 turns).
+ * Designed for use by the task-planner executor.
+ *
+ * @param client          Anthropic client
+ * @param workDir         Working directory for tool execution
+ * @param taskDescription The task to execute
+ * @returns               Concatenated assistant text response
+ */
+export async function runSingleTask(
+  client: Anthropic,
+  workDir: string,
+  taskDescription: string,
+): Promise<string> {
+  const model = "claude-sonnet-4-20250514";
+  const registry = createDefaultRegistry();
+  const { systemPrompt } = buildSystemPrompt(workDir, "");
+  const messages: Anthropic.MessageParam[] = [
+    { role: "user", content: taskDescription },
+  ];
+
+  const result = await runAgentLoop(
+    client,
+    model,
+    systemPrompt,
+    messages,
+    registry,
+    workDir,
+    undefined, // onToolCall
+    undefined, // onStatus
+    undefined, // onText
+    undefined, // onDiffPreview
+    undefined, // onCompact
+    undefined, // onContextBudget
+    undefined, // onFileWatch
+    undefined, // signal
+    5,         // maxConsecutiveLoops (up to 5 turns)
+  );
+
+  return result.text;
+}

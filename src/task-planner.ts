@@ -309,6 +309,32 @@ export async function replanOnFailure(
   return createPlan(recoveryRequest, projectContext);
 }
 
+/**
+ * Creates a TaskExecutor that runs each task through the orchestrator's
+ * runSingleTask function. Wire this into executePlan to make /plan actually
+ * execute tasks via the agent loop.
+ *
+ * @param workDir  Working directory for tool execution
+ * @param client   Anthropic client instance
+ * @returns        A TaskExecutor compatible with executePlan()
+ */
+export async function createOrchestratorExecutor(
+  workDir: string,
+  client: Anthropic,
+): Promise<TaskExecutor> {
+  // Lazy import to avoid circular deps — orchestrator imports nothing from task-planner
+  const { runSingleTask } = await import("./orchestrator.js");
+
+  return async (task: Task): Promise<string> => {
+    const context = buildTaskContext(
+      // Build a minimal plan context so buildTaskContext works correctly
+      { goal: task.title, tasks: [task], createdAt: Date.now() },
+      task
+    );
+    return runSingleTask(client, workDir, context);
+  };
+}
+
 /** Default filename for persisted plans. */
 export const PLAN_FILENAME = ".autoagent-plan.json";
 
