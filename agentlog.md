@@ -1,60 +1,3 @@
-119 |   it("returns empty array when repo map set is empty", () => {
-120 |     const files = ["src/foo.ts", "src/bar.ts"];
-121 |     const result = filterByRepoMap(files, new Set());
-122 |     expect(result).toEqual([]);
-123 |   });
-124 | });
-125 | 
-[2026-04-05T18:46:16.281Z] iter=312 turn=18 INFO: Turn 18/25
-[2026-04-05T18:46:18.017Z] iter=312 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
-[2026-04-05T18:46:19.020Z] iter=312 turn=18 INFO:   -> exit=0 (11 chars)
-[2026-04-05T18:46:19.020Z] iter=312 turn=19 INFO: Turn 19/25
-[2026-04-05T18:46:21.020Z] iter=312 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/context-loader-git.test.ts 2>&1 | tail -20
-[2026-04-05T18:46:21.982Z] iter=312 turn=19 INFO:   -> exit=0 (536 chars)
-[2026-04-05T18:46:21.982Z] iter=312 turn=20 INFO: Turn 20/25
-[2026-04-05T18:46:27.293Z] iter=312 turn=20 INFO: Agent: Fix the failing test and wrap up:
-[2026-04-05T18:46:27.293Z] iter=312 turn=20 INFO: write_file: src/__tests__/context-loader-git.test.ts (patch)
-[2026-04-05T18:46:27.294Z] iter=312 turn=20 INFO:   -> ok: Patched src/__tests__/context-loader-git.test.ts: -5 +5 lines
-
-Context after patch:
-116 |     expect(result).toContain("src/app.ts");
-117 |   });
-118 | 
-119 |   it("returns all files when repo map set is empty", () => {
-120 |     const files = ["src/foo.ts", "src/bar.ts"];
-121 |     const result = filterByRepoMap(files, new Set());
-122 |     expect(result).toEqual(["src/foo.ts", "src/bar.ts"]);
-123 |   });
-124 | });
-125 | 
-[2026-04-05T18:46:27.294Z] iter=312 turn=21 INFO: Turn 21/25
-[2026-04-05T18:46:29.482Z] iter=312 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/context-loader-git.test.ts 2>&1 | tail -8 && npx tsc --noEmit 2>&1
-[2026-04-05T18:46:31.418Z] iter=312 turn=21 INFO:   -> exit=0 (241 chars)
-[2026-04-05T18:46:31.419Z] iter=312 turn=22 INFO: Turn 22/25
-[2026-04-05T18:46:36.860Z] iter=312 turn=22 INFO: Agent: All tests pass, TSC clean. Now memory + goals update:
-[2026-04-05T18:46:36.860Z] iter=312 turn=22 INFO: save_memory: "[Engineer] Iteration 312"
-[2026-04-05T18:46:36.861Z] iter=312 turn=22 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T18:46:36.861Z] iter=312 turn=23 INFO: Turn 23/25
-[2026-04-05T18:46:43.872Z] iter=312 turn=23 INFO: write_file: goals.md (write)
-[2026-04-05T18:46:43.872Z] iter=312 turn=23 INFO:   -> ok: Updated goals.md (815 chars, -18 lines delta)
-[2026-04-05T18:46:43.873Z] iter=312 turn=24 INFO: Turn 24/25
-[2026-04-05T18:46:45.666Z] iter=312 turn=24 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T18:46:45.667Z] iter=312 turn=24 INFO: RESTART signal
-[2026-04-05T18:46:45.667Z] iter=312 turn=24 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T18:46:46.668Z] iter=312 turn=24 INFO: Compilation OK
-[2026-04-05T18:46:53.658Z] iter=312 turn=24 INFO: Cache persisted: 52 entries to .autoagent-cache.json
-[2026-04-05T18:46:53.659Z] iter=312 turn=24 INFO: Cache stats: 0 hits, 6 misses, 52 entries, 8 invalidations (6 entries removed)
-[2026-04-05T18:46:53.659Z] iter=312 turn=24 INFO: Tool cache stats
-[2026-04-05T18:46:53.659Z] iter=312 turn=24 INFO: Tool timing: bash: 9x, avg=440ms, total=3956ms; write_file: 8x, avg=1ms, total=7ms; read_file: 6x, avg=1ms, total=6ms; read_scratchpad: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-05T18:46:53.659Z] iter=312 turn=24 INFO: Tool timing stats
-[2026-04-05T18:46:59.910Z] iter=312 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 312: predicted 20 turns, actual 24 turns, ratio 1.20**
-[2026-04-05T18:47:12.497Z] iter=312 turn=24 INFO: Pre-commit review (1956in/526out): **Logic bug in `filterByRepoMap` — lock file exclusion is incomplete:**
-The condition `NON_SOURCE_EXTS.has(ext) && !repoMapFiles.has(f)` means a lock file *will* pass through if it happens to be in `r
-[2026-04-05T18:47:12.559Z] iter=312 turn=24 INFO: Committed: 8e744211 (40 in / 5210 out, cache: 20289 created, 323913 read)
-[2026-04-05T18:47:12.559Z] iter=312 turn=24 INFO: Restarting as iteration 313...
-[2026-04-05T18:47:12.760Z] iter=313 INFO: Cache restored: 52/52 entries (0 stale)
-[2026-04-05T18:47:12.762Z] iter=313 INFO: Turn budget: 13/25 (calibration=1.20x, predicted=8)
-[2026-04-05T18:47:12.762Z] iter=313 INFO: Starting. Expert=Architect Model=claude-opus-4-6
 [2026-04-05T18:47:12.916Z] iter=313 INFO: Hard turn cap: 12 (1.5x prediction of 8)
 [2026-04-05T18:47:12.916Z] iter=313 turn=1 INFO: Turn 1/25
 [2026-04-05T18:47:17.725Z] iter=313 turn=1 INFO: Agent: 
@@ -1053,3 +996,281 @@ Done. Goals written, memory saved, TSC clean.
 [2026-04-05T18:56:12.308Z] iter=317 turn=7 INFO: Tool timing stats
 [2026-04-05T18:56:18.655Z] iter=317 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 317: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-05T18:56:18.677Z] iter=317 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-05T18:56:18.711Z] iter=317 turn=7 INFO: Committed: 68bee0a0 (17 in / 2207 out, cache: 11389 created, 56185 read)
+[2026-04-05T18:56:18.711Z] iter=317 turn=7 INFO: Restarting as iteration 318...
+[2026-04-05T18:56:18.895Z] iter=318 INFO: Cache restored: 56/56 entries (0 stale)
+[2026-04-05T18:56:18.898Z] iter=318 INFO: Turn budget: 19/25 (calibration=1.00x, predicted=20)
+[2026-04-05T18:56:18.898Z] iter=318 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-05T18:56:19.035Z] iter=318 turn=1 INFO: Turn 1/25
+[2026-04-05T18:56:21.721Z] iter=318 turn=1 INFO: Agent: I'll start by reading the scratchpad and examining the relevant code files to understand the current state.
+[2026-04-05T18:56:21.721Z] iter=318 turn=1 INFO: read_scratchpad: 7 chars
+[2026-04-05T18:56:21.722Z] iter=318 turn=1 INFO: $ cat goals.md
+[2026-04-05T18:56:21.729Z] iter=318 turn=1 INFO:   -> exit=0 (3183 chars)
+[2026-04-05T18:56:21.730Z] iter=318 turn=2 INFO: Turn 2/25
+[2026-04-05T18:56:24.684Z] iter=318 turn=2 INFO: $ grep -n "pruneStaleToolResults\|PRUNE_THRESHOLD\|pruneThreshold\|T1\|T2\|microCompact\|compact" src/orchestrator.ts | head -60
+[2026-04-05T18:56:24.687Z] iter=318 turn=2 INFO: $ grep -n "autoLoadContext\|symbolLookup\|findFilesBySymbol\|fuzzySearch\|repoMap\|symbolIndex" src/context-loader.ts | head -40
+[2026-04-05T18:56:24.696Z] iter=318 turn=2 INFO:   -> exit=0 (737 chars)
+[2026-04-05T18:56:24.699Z] iter=318 turn=2 INFO:   -> exit=0 (2615 chars)
+[2026-04-05T18:56:24.699Z] iter=318 turn=3 INFO: Turn 3/25
+[2026-04-05T18:56:26.732Z] iter=318 turn=3 INFO: $ sed -n '840,930p' src/orchestrator.ts
+[2026-04-05T18:56:26.735Z] iter=318 turn=3 INFO: $ sed -n '1,50p' src/context-loader.ts
+[2026-04-05T18:56:26.742Z] iter=318 turn=3 INFO:   -> exit=0 (3466 chars)
+[2026-04-05T18:56:26.743Z] iter=318 turn=3 INFO:   -> exit=0 (2002 chars)
+[2026-04-05T18:56:26.743Z] iter=318 turn=4 INFO: Turn 4/25
+[2026-04-05T18:56:31.547Z] iter=318 turn=4 INFO: think: I have enough context. Let me build both goals now:
+
+1. Goal 1: Modify `pruneStaleToolResults()` in `src/orchestrator.ts...
+[2026-04-05T18:56:31.547Z] iter=318 turn=5 INFO: Turn 5/25
+[2026-04-05T18:56:35.197Z] iter=318 turn=5 INFO: Agent: Let me read the exact sections I need to modify:
+[2026-04-05T18:56:35.198Z] iter=318 turn=5 INFO: $ sed -n '260,340p' src/context-loader.ts
+[2026-04-05T18:56:35.202Z] iter=318 turn=5 INFO: $ grep -n "fuzzySearch\|findFilesBySymbol\|symbolIndex\|symbols\|RepoMapFile\|interface RepoMap\|export" src/tree-sitter-map.ts | head -40
+[2026-04-05T18:56:35.209Z] iter=318 turn=5 INFO:   -> exit=0 (2784 chars)
+[2026-04-05T18:56:35.212Z] iter=318 turn=5 INFO:   -> exit=0 (2395 chars)
+[2026-04-05T18:56:35.212Z] iter=318 turn=6 INFO: Turn 6/25
+[2026-04-05T18:56:37.258Z] iter=318 turn=6 INFO: $ sed -n '340,420p' src/tree-sitter-map.ts
+[2026-04-05T18:56:37.266Z] iter=318 turn=6 INFO:   -> exit=0 (2588 chars)
+[2026-04-05T18:56:37.267Z] iter=318 turn=7 INFO: Turn 7/25
+[2026-04-05T18:56:40.761Z] iter=318 turn=7 INFO: Agent: **Goal 1** (Smart compaction): NOT STARTED
+**Goal 2** (Symbol-aware context loader): NOT STARTED
+
+I have all the context I need. Writing both now.
+[2026-04-05T18:56:40.762Z] iter=318 turn=7 INFO: $ grep -n "fuzzySearch\|export function fuzzySearch" src/tree-sitter-map.ts | head -10
+[2026-04-05T18:56:40.771Z] iter=318 turn=7 INFO:   -> exit=0 (100 chars)
+[2026-04-05T18:56:40.771Z] iter=318 turn=8 INFO: Turn 8/25
+[2026-04-05T18:56:43.939Z] iter=318 turn=8 INFO: Agent: Now writing both changes simultaneously:
+
+**Goal 2 first — add `findFilesBySymbol` to tree-sitter-map.ts:**
+[2026-04-05T18:56:43.939Z] iter=318 turn=8 INFO: $ tail -20 src/tree-sitter-map.ts
+[2026-04-05T18:56:43.947Z] iter=318 turn=8 INFO:   -> exit=0 (448 chars)
+[2026-04-05T18:56:43.948Z] iter=318 turn=9 INFO: Turn 9/25
+[2026-04-05T18:56:49.782Z] iter=318 turn=9 INFO: $ cat >> src/tree-sitter-map.ts << 'EOF'
+
+/**
+ * Find all files that define a symbol matching the given name (case-sensitive exact match).
+ *
+ * Returns an array of relative file paths sorted by symbol ...
+[2026-04-05T18:56:49.792Z] iter=318 turn=9 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:56:49.793Z] iter=318 turn=10 INFO: Turn 10/25
+[2026-04-05T18:56:53.059Z] iter=318 turn=10 INFO: Agent: **Goal 2 — add symbol lookup tier to context-loader.ts:**
+[2026-04-05T18:56:53.060Z] iter=318 turn=10 INFO: write_file: src/context-loader.ts (patch)
+[2026-04-05T18:56:53.061Z] iter=318 turn=10 INFO:   -> ok: Patched src/context-loader.ts: -2 +2 lines
+
+Context after patch:
+11 | import { readFileSync, existsSync } from "fs";
+12 | import { join, resolve } from "path";
+13 | import { execSync } from "child_process";
+14 | import type { RepoMap } from "./tree-sitter-map.js";
+15 | import { fuzzySearch, findFilesBySymbol } from "./tree-sitter-map.js";
+16 | 
+17 | const STOPWORDS = new Set([
+18 |   "the", "and", "for", "are", "but", "not", "you", "all", "can", "has",
+[2026-04-05T18:56:53.061Z] iter=318 turn=11 INFO: Turn 11/25
+[2026-04-05T18:56:57.044Z] iter=318 turn=11 INFO: Agent: Now add the `symbolLookup` function and wire it as highest-priority tier in `autoLoadContext`:
+[2026-04-05T18:56:57.045Z] iter=318 turn=11 INFO: $ grep -n "^export function autoLoadContext\|^const MAX_GIT_FILES\|^const MAX_GIT_LOG_FILES\|getRecentlyChangedFiles\|getRecentCommitFiles" src/context-loader.ts | head -20
+[2026-04-05T18:56:57.057Z] iter=318 turn=11 INFO:   -> exit=0 (420 chars)
+[2026-04-05T18:56:57.058Z] iter=318 turn=12 INFO: Turn 12/25
+[2026-04-05T18:57:09.094Z] iter=318 turn=12 INFO: write_file: src/context-loader.ts (patch)
+[2026-04-05T18:57:09.095Z] iter=318 turn=12 INFO:   -> ok: Patched src/context-loader.ts: -24 +54 lines
+
+Context after patch:
+274 |  * @param alreadyMentioned - set of file paths already in conversation context (skip these)
+275 |  * @returns formatted string with file contents, or empty string if nothing relevant
+276 |  */
+277 | /**
+278 |  * Look up files by exact symbol name match in the repo map.
+279 |  *
+280 |  * Returns files whose exported symbols match any of the given keywords
+281 |  * (case-sensitive exact match). This is the highest-priority tier — if a
+282 |  * keyword is a known symbol name, we want the defining file immediately.
+283 |  *
+284 |  * @param keywords - extracted keywords from user message
+285 |  * @param repoMap - current repo map with symbol index
+286 |  * @returns de-duplicated array of file paths ordered by symbol kind priority
+287 |  */
+288 | export function symbolLookup(keywords: string[], repoMap: RepoMap): string[] {
+289 |   const seen = new Set<string>();
+290 |   const results: string[] = [];
+291 |   for (const kw of keywords) {
+292 |     for (const filePath of findFilesBySymbol(repoMap, kw)) {
+293 |       if (!seen.has(filePath)) {
+294 |         seen.add(filePath);
+295 |         results.push(filePath);
+296 |       }
+297 |     }
+298 |   }
+299 |   return results;
+300 | }
+301 | 
+302 | export function autoLoadContext(
+303 |   repoMap: RepoMap,
+304 |   userMessage: string,
+305 |   workDir: string,
+306 |   alreadyMentioned: Set<string> = new Set(),
+307 | ): string {
+308 |   if (!repoMap || repoMap.files.length === 0) return "";
+309 | 
+310 |   const keywords = extractKeywords(userMessage);
+311 |   if (keywords.length === 0) return "";
+312 | 
+313 |   // --- Tier 0: Symbol-matched files (highest priority) ---
+314 |   // If the user mentioned a known symbol name, load its defining file first.
+315 |   const symbolMatched = symbolLookup(keywords, repoMap)
+316 |     .filter(p => !alreadyMentioned.has(p));
+317 | 
+318 |   // --- Tier 1: Git-changed files (unstaged/staged) ---
+319 |   const repoMapFileSet = new Set(repoMap.files.map(f => f.path));
+320 |   const gitChanged = getRecentlyChangedFiles(workDir, repoMapFileSet)
+321 |     .filter(p => !alreadyMentioned.has(p) && !symbolMatched.includes(p))
+322 |     .slice(0, MAX_GIT_FILES);
+323 | 
+324 |   // --- Tier 2: Recently committed files (git log) ---
+325 |   const gitLogFiles = getRecentCommitFiles(workDir, 3)
+326 |     .filter(p => !alreadyMentioned.has(p) && !symbolMatched.includes(p) && !gitChanged.includes(p))
+327 |     .slice(0, MAX_GIT_LOG_FILES);
+328 | 
+329 |   // --- Tier 3: Keyword-matched files ---
+330 |   const gitTierSet = new Set([...symbolMatched, ...gitChanged, ...gitLogFiles]);
+331 | 
+332 |   // Count keyword hits per file path
+333 |   const hitCounts = new Map<string, number>();
+[2026-04-05T18:57:09.095Z] iter=318 turn=13 INFO: Turn 13/25
+[2026-04-05T18:57:12.713Z] iter=318 turn=13 INFO: Agent: I've changed `src/tree-sitter-map.ts` and `src/context-loader.ts`. Now I need to fix the duplicate JSDoc, update the merge line, and implement Goal 1. Let me do it all now.
+[2026-04-05T18:57:12.714Z] iter=318 turn=13 INFO: $ sed -n '268,285p' src/context-loader.ts
+[2026-04-05T18:57:12.727Z] iter=318 turn=13 INFO:   -> exit=0 (789 chars)
+[2026-04-05T18:57:12.728Z] iter=318 turn=14 INFO: Turn 14/25
+[2026-04-05T18:57:15.898Z] iter=318 turn=14 INFO: write_file: src/context-loader.ts (patch)
+[2026-04-05T18:57:15.899Z] iter=318 turn=14 INFO:   -> ok: Patched src/context-loader.ts: -11 +2 lines
+
+Context after patch:
+265 |   }
+266 | }
+267 | 
+268 | /**
+269 |  * Look up files by exact symbol name match in the repo map.
+270 |  *
+271 |  * Returns files whose exported symbols match any of the given keywords
+272 |  * (case-sensitive exact match). This is the highest-priority tier — if a
+[2026-04-05T18:57:15.900Z] iter=318 turn=15 INFO: Turn 15/25
+[2026-04-05T18:57:18.959Z] iter=318 turn=15 INFO: Agent: Now fix the merge line that still uses `gitTierSet` but the variable needs to exclude symbolMatched too:
+[2026-04-05T18:57:18.960Z] iter=318 turn=15 INFO: $ sed -n '330,360p' src/context-loader.ts
+[2026-04-05T18:57:18.971Z] iter=318 turn=15 INFO:   -> exit=0 (1108 chars)
+[2026-04-05T18:57:18.971Z] iter=318 turn=16 INFO: Turn 16/25
+[2026-04-05T18:57:22.185Z] iter=318 turn=16 INFO: write_file: src/context-loader.ts (patch)
+[2026-04-05T18:57:22.186Z] iter=318 turn=16 INFO:   -> ok: Patched src/context-loader.ts: -2 +2 lines
+
+Context after patch:
+335 |     .map(([path]) => path)
+336 |     .filter(p => !alreadyMentioned.has(p) && !gitTierSet.has(p));
+337 | 
+338 |   // Merge: symbol → git-diff → git-log → keyword results, capped at MAX_FILES total
+339 |   const ranked = [...symbolMatched, ...gitChanged, ...gitLogFiles, ...keywordRanked].slice(0, MAX_FILES);
+340 | 
+341 |   if (ranked.length === 0) return "";
+342 | 
+[2026-04-05T18:57:22.186Z] iter=318 turn=17 INFO: Turn 17/25
+[2026-04-05T18:57:36.862Z] iter=318 turn=17 INFO: Agent: Now implementing Goal 1 (pruneStaleToolResults reference boost) and then wrapping up immediately.
+[2026-04-05T18:57:36.863Z] iter=318 turn=17 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T18:57:36.864Z] iter=318 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -14 +42 lines
+
+Context after patch:
+903 |       }
+904 |     }
+905 | 
+906 |     // Build a set of all identifiers (file paths, function names) referenced in
+907 |     // assistant messages *after* the cutoff so we can boost retained results.
+908 |     const assistantTextAfterCutoff = this.apiMessages
+909 |       .slice(cutoffAssistantIdx)
+910 |       .filter(m => m.role === "assistant")
+911 |       .flatMap(m => (Array.isArray(m.content) ? m.content : [m.content]))
+912 |       .map(b => (typeof b === "string" ? b : (b as { text?: string }).text ?? ""))
+913 |       .join("\n");
+914 | 
+915 |     /**
+916 |      * Extract key identifiers from a tool result text:
+917 |      * - file paths (e.g. src/foo.ts)
+918 |      * - identifiers that look like symbol names (camelCase / PascalCase / snake_case, ≥4 chars)
+919 |      */
+920 |     function extractIdentifiers(text: string): string[] {
+921 |       const paths = text.match(/[\w./\-]+\.\w{1,6}/g) ?? [];
+922 |       const symbols = text.match(/\b[a-zA-Z_][a-zA-Z0-9_]{3,}\b/g) ?? [];
+923 |       return [...new Set([...paths, ...symbols])];
+924 |     }
+925 | 
+926 |     // Sort by age-weighted priority: older + lower-priority results pruned first.
+927 |     // Referenced results get a 2x retention boost (harder to prune).
+928 |     // ageFactor = max(0.3, 1 - age/totalMessages), where age = distance from end.
+929 |     const totalMessages = this.apiMessages.length;
+930 |     candidates.sort((a, b) => {
+931 |       const ageA = totalMessages - a.turnN;
+932 |       const ageB = totalMessages - b.turnN;
+933 |       const freshnessA = Math.max(0.3, 1 - ageA / totalMessages);
+934 |       const freshnessB = Math.max(0.3, 1 - ageB / totalMessages);
+935 | 
+936 |       // Check if this result is back-referenced by later assistant messages
+937 |       const textA = a.cb.text ?? "";
+938 |       const textB = b.cb.text ?? "";
+939 |       const referencedA = extractIdentifiers(textA).some(id => assistantTextAfterCutoff.includes(id));
+940 |       const referencedB = extractIdentifiers(textB).some(id => assistantTextAfterCutoff.includes(id));
+941 |       const refBoostA = referencedA ? 2 : 1;
+942 |       const refBoostB = referencedB ? 2 : 1;
+943 | 
+944 |       const scoreA = a.priority * freshnessA * refBoostA;
+945 |       const scoreB = b.priority * freshnessB * refBoostB;
+946 |       return scoreA - scoreB || a.turnN - b.turnN;
+947 |     });
+948 | 
+949 |     // Prune all candidates (already filtered — no errors, no fresh turns)
+950 |     for (const { cb, turnN: t } of candidates) {
+[2026-04-05T18:57:36.864Z] iter=318 turn=18 INFO: Turn 18/25
+[2026-04-05T18:57:38.984Z] iter=318 turn=18 INFO: Agent: Now run TSC and tests:
+[2026-04-05T18:57:38.985Z] iter=318 turn=18 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-05T18:57:40.004Z] iter=318 turn=18 INFO:   -> exit=0 (433 chars)
+[2026-04-05T18:57:40.004Z] iter=318 turn=19 INFO: Turn 19/25
+[2026-04-05T18:57:44.644Z] iter=318 turn=19 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-05T18:57:44.646Z] iter=318 turn=19 INFO:   -> ok: Patched src/orchestrator.ts: -6 +13 lines
+
+Context after patch:
+905 | 
+906 |     // Build a set of all identifiers (file paths, function names) referenced in
+907 |     // assistant messages *after* the cutoff so we can boost retained results.
+908 |     const assistantTextAfterCutoff = this.apiMessages
+909 |       .slice(cutoffAssistantIdx)
+910 |       .filter(m => m.role === "assistant")
+911 |       .map(m => {
+912 |         if (typeof m.content === "string") return m.content;
+913 |         if (Array.isArray(m.content)) {
+914 |           return m.content
+915 |             .map((b: unknown) => (typeof b === "string" ? b : (b as { text?: string }).text ?? ""))
+916 |             .join(" ");
+917 |         }
+918 |         return "";
+919 |       })
+920 |       .join("\n");
+921 | 
+922 |     /**
+923 |      * Extract key identifiers from a tool result text:
+[2026-04-05T18:57:44.646Z] iter=318 turn=20 INFO: Turn 20/25
+[2026-04-05T18:57:46.605Z] iter=318 turn=20 INFO: $ npx tsc --noEmit 2>&1 | head -20
+[2026-04-05T18:57:47.575Z] iter=318 turn=20 INFO:   -> exit=0 (11 chars)
+[2026-04-05T18:57:47.575Z] iter=318 turn=21 INFO: Turn 21/25
+[2026-04-05T18:57:49.369Z] iter=318 turn=21 INFO: $ npx vitest run --reporter=verbose 2>&1 | tail -15
+[2026-04-05T18:58:01.517Z] iter=318 turn=21 INFO:   -> exit=0 (1109 chars)
+[2026-04-05T18:58:01.517Z] iter=318 turn=22 INFO: Turn 22/25
+[2026-04-05T18:58:08.082Z] iter=318 turn=22 INFO: Agent: All 869 tests pass. Now write memory, update goals, restart.
+[2026-04-05T18:58:08.083Z] iter=318 turn=22 INFO: save_memory: "[Engineer] Iteration 318"
+[2026-04-05T18:58:08.083Z] iter=318 turn=22 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-05T18:58:08.083Z] iter=318 turn=23 INFO: Turn 23/25
+[2026-04-05T18:58:17.156Z] iter=318 turn=23 INFO: write_file: goals.md (write)
+[2026-04-05T18:58:17.156Z] iter=318 turn=23 INFO:   -> ok: Updated goals.md (1186 chars, -27 lines delta)
+[2026-04-05T18:58:17.157Z] iter=318 turn=24 INFO: Turn 24/25
+[2026-04-05T18:58:18.965Z] iter=318 turn=24 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-05T18:58:18.965Z] iter=318 turn=24 INFO: RESTART signal
+[2026-04-05T18:58:18.966Z] iter=318 turn=24 INFO: Validating: npx tsc --noEmit ...
+[2026-04-05T18:58:19.958Z] iter=318 turn=24 INFO: Compilation OK
+[2026-04-05T18:58:27.184Z] iter=318 turn=24 INFO: Cache persisted: 53 entries to .autoagent-cache.json
+[2026-04-05T18:58:27.184Z] iter=318 turn=24 INFO: Tool timing: bash: 18x, avg=794ms, total=14286ms; write_file: 7x, avg=1ms, total=8ms; read_scratchpad: 1x, avg=3ms, total=3ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
+[2026-04-05T18:58:27.185Z] iter=318 turn=24 INFO: Tool timing stats
+[2026-04-05T18:58:33.630Z] iter=318 turn=24 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 318: predicted 20 turns, actual 24 turns, ratio 1.20**
+[2026-04-05T18:58:45.366Z] iter=318 turn=24 INFO: Pre-commit review (2868in/409out): **Issues:**
+
+- **`symbolMatched` can be large and uncapped before entering `ranked`**: Unlike git tiers (sliced to `MAX_GIT_FILES`/`MAX_GIT_LOG_FILES`), `symbolMatched` has no size limit. A generic ke

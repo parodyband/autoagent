@@ -633,3 +633,40 @@ export function fuzzySearch(repoMap: RepoMap, query: string, maxResults = 20): S
 
   return results.slice(0, maxResults);
 }
+
+/**
+ * Find all files that define a symbol matching the given name (case-sensitive exact match).
+ *
+ * Returns an array of relative file paths sorted by symbol kind priority:
+ * class/function/interface > type/enum > const.
+ *
+ * @param repoMap - the repo map to search
+ * @param symbolName - exact symbol name to look up
+ * @returns array of file paths containing that symbol definition
+ */
+export function findFilesBySymbol(repoMap: RepoMap, symbolName: string): string[] {
+  const KIND_PRIORITY: Record<string, number> = {
+    class: 3,
+    function: 3,
+    interface: 2,
+    type: 2,
+    enum: 2,
+    const: 1,
+  };
+
+  const matches: { file: string; priority: number }[] = [];
+  for (const file of repoMap.files) {
+    for (const sym of file.exports) {
+      if (sym.name === symbolName) {
+        matches.push({
+          file: file.path,
+          priority: KIND_PRIORITY[sym.kind] ?? 1,
+        });
+        break; // only one entry per file
+      }
+    }
+  }
+
+  matches.sort((a, b) => b.priority - a.priority || a.file.localeCompare(b.file));
+  return matches.map(m => m.file);
+}

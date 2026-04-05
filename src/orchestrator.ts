@@ -903,9 +903,35 @@ export class Orchestrator {
       }
     }
 
+    // Build a set of all identifiers (file paths, function names) referenced in
+    // assistant messages *after* the cutoff so we can boost retained results.
+    const assistantTextAfterCutoff = this.apiMessages
+      .slice(cutoffAssistantIdx)
+      .filter(m => m.role === "assistant")
+      .map(m => {
+        if (typeof m.content === "string") return m.content;
+        if (Array.isArray(m.content)) {
+          return m.content
+            .map((b: unknown) => (typeof b === "string" ? b : (b as { text?: string }).text ?? ""))
+            .join(" ");
+        }
+        return "";
+      })
+      .join("\n");
+
+    /**
+     * Extract key identifiers from a tool result text:
+     * - file paths (e.g. src/foo.ts)
+     * - identifiers that look like symbol names (camelCase / PascalCase / snake_case, ≥4 chars)
+     */
+    function extractIdentifiers(text: string): string[] {
+      const paths = text.match(/[\w./\-]+\.\w{1,6}/g) ?? [];
+      const symbols = text.match(/\b[a-zA-Z_][a-zA-Z0-9_]{3,}\b/g) ?? [];
+      return [...new Set([...paths, ...symbols])];
+    }
+
     // Sort by age-weighted priority: older + lower-priority results pruned first.
-    // Age factor: messages closer to the end of conversation get a freshness bonus
-    // that raises their effective priority (harder to prune).
+    // Referenced results get a 2x retention boost (harder to prune).
     // ageFactor = max(0.3, 1 - age/totalMessages), where age = distance from end.
     const totalMessages = this.apiMessages.length;
     candidates.sort((a, b) => {
@@ -913,8 +939,17 @@ export class Orchestrator {
       const ageB = totalMessages - b.turnN;
       const freshnessA = Math.max(0.3, 1 - ageA / totalMessages);
       const freshnessB = Math.max(0.3, 1 - ageB / totalMessages);
-      const scoreA = a.priority * freshnessA;
-      const scoreB = b.priority * freshnessB;
+
+      // Check if this result is back-referenced by later assistant messages
+      const textA = a.cb.text ?? "";
+      const textB = b.cb.text ?? "";
+      const referencedA = extractIdentifiers(textA).some(id => assistantTextAfterCutoff.includes(id));
+      const referencedB = extractIdentifiers(textB).some(id => assistantTextAfterCutoff.includes(id));
+      const refBoostA = referencedA ? 2 : 1;
+      const refBoostB = referencedB ? 2 : 1;
+
+      const scoreA = a.priority * freshnessA * refBoostA;
+      const scoreB = b.priority * freshnessB * refBoostB;
       return scoreA - scoreB || a.turnN - b.turnN;
     });
 

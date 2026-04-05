@@ -12,7 +12,7 @@ import { readFileSync, existsSync } from "fs";
 import { join, resolve } from "path";
 import { execSync } from "child_process";
 import type { RepoMap } from "./tree-sitter-map.js";
-import { fuzzySearch } from "./tree-sitter-map.js";
+import { fuzzySearch, findFilesBySymbol } from "./tree-sitter-map.js";
 
 const STOPWORDS = new Set([
   "the", "and", "for", "are", "but", "not", "you", "all", "can", "has",
@@ -266,14 +266,30 @@ export function getRecentlyChangedFiles(workDir: string, knownFiles?: Set<string
 }
 
 /**
- * Auto-load file contents relevant to the user's query.
+ * Look up files by exact symbol name match in the repo map.
  *
- * @param repoMap - current repo map
- * @param userMessage - the user's message
- * @param workDir - working directory to resolve file paths
- * @param alreadyMentioned - set of file paths already in conversation context (skip these)
- * @returns formatted string with file contents, or empty string if nothing relevant
+ * Returns files whose exported symbols match any of the given keywords
+ * (case-sensitive exact match). This is the highest-priority tier — if a
+ * keyword is a known symbol name, we want the defining file immediately.
+ *
+ * @param keywords - extracted keywords from user message
+ * @param repoMap - current repo map with symbol index
+ * @returns de-duplicated array of file paths ordered by symbol kind priority
  */
+export function symbolLookup(keywords: string[], repoMap: RepoMap): string[] {
+  const seen = new Set<string>();
+  const results: string[] = [];
+  for (const kw of keywords) {
+    for (const filePath of findFilesBySymbol(repoMap, kw)) {
+      if (!seen.has(filePath)) {
+        seen.add(filePath);
+        results.push(filePath);
+      }
+    }
+  }
+  return results;
+}
+
 export function autoLoadContext(
   repoMap: RepoMap,
   userMessage: string,
@@ -285,19 +301,24 @@ export function autoLoadContext(
   const keywords = extractKeywords(userMessage);
   if (keywords.length === 0) return "";
 
-  // --- Tier 1: Git-changed files (unstaged/staged) get highest priority ---
+  // --- Tier 0: Symbol-matched files (highest priority) ---
+  // If the user mentioned a known symbol name, load its defining file first.
+  const symbolMatched = symbolLookup(keywords, repoMap)
+    .filter(p => !alreadyMentioned.has(p));
+
+  // --- Tier 1: Git-changed files (unstaged/staged) ---
   const repoMapFileSet = new Set(repoMap.files.map(f => f.path));
   const gitChanged = getRecentlyChangedFiles(workDir, repoMapFileSet)
-    .filter(p => !alreadyMentioned.has(p))
+    .filter(p => !alreadyMentioned.has(p) && !symbolMatched.includes(p))
     .slice(0, MAX_GIT_FILES);
 
   // --- Tier 2: Recently committed files (git log) ---
   const gitLogFiles = getRecentCommitFiles(workDir, 3)
-    .filter(p => !alreadyMentioned.has(p) && !gitChanged.includes(p))
+    .filter(p => !alreadyMentioned.has(p) && !symbolMatched.includes(p) && !gitChanged.includes(p))
     .slice(0, MAX_GIT_LOG_FILES);
 
   // --- Tier 3: Keyword-matched files ---
-  const gitTierSet = new Set([...gitChanged, ...gitLogFiles]);
+  const gitTierSet = new Set([...symbolMatched, ...gitChanged, ...gitLogFiles]);
 
   // Count keyword hits per file path
   const hitCounts = new Map<string, number>();
@@ -314,8 +335,8 @@ export function autoLoadContext(
     .map(([path]) => path)
     .filter(p => !alreadyMentioned.has(p) && !gitTierSet.has(p));
 
-  // Merge: git-diff → git-log → keyword results, capped at MAX_FILES total
-  const ranked = [...gitChanged, ...gitLogFiles, ...keywordRanked].slice(0, MAX_FILES);
+  // Merge: symbol → git-diff → git-log → keyword results, capped at MAX_FILES total
+  const ranked = [...symbolMatched, ...gitChanged, ...gitLogFiles, ...keywordRanked].slice(0, MAX_FILES);
 
   if (ranked.length === 0) return "";
 
