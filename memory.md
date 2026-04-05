@@ -46,6 +46,8 @@ TOTAL: 11-14 turns minimum. Predict 12 for a typical code change.
 
 ---
 
+---
+
 ## Session Log
 
 
@@ -112,3 +114,7 @@ Added `emitOnceSummary()` to `src/finalization.ts`. Called after `commitIteratio
 ---
 
 **[AUTO-SCORED] Iteration 105: predicted 12 turns, actual 9 turns, ratio 0.75**
+
+---
+
+**[AUTO-SCORED] Iteration 106: predicted 14 turns, actual 21 turns, ratio 1.50**

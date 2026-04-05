@@ -567,3 +567,19 @@
 {"timestamp":"2026-04-05T11:24:00.817Z","iteration":106,"level":"info","message":"  -> ok: Patched memory.md: -2 +3 lines\n\nContext after patch:\n105 | \n106 | **Key risk:** Log output currently going to stdout would pollute the JSON. Engineer must verify `ctx.log()` goes to stderr/file, not stdout.\n107 | \n108 | ## [Engineer] Iter 106: Structured JSON output for `--once` — DONE\n109 | \n110 | Added `emitOnceSummary()` to `src/finalization.ts`. Called after `commitIteration()` when `ctx.once` is true. Emits `{ success, iteration, turns, durationMs, filesChanged, exitCode }` to stdout. All `console.log` in `src/agent.ts` → `console.error` so stdout is clean JSON. Exception path in `main()` also emits failure JSON. tsc clean, 642 tests pass.\n111 | \n112 | ---\n113 | ","turn":18}
 {"timestamp":"2026-04-05T11:24:00.817Z","iteration":106,"level":"info","message":"Turn 19/25","turn":19}
 {"timestamp":"2026-04-05T11:24:02.143Z","iteration":106,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git add -A && git status --short","turn":19}
+{"timestamp":"2026-04-05T11:24:02.188Z","iteration":106,"level":"info","message":"  -> exit=0 (147 chars)","turn":19}
+{"timestamp":"2026-04-05T11:24:02.188Z","iteration":106,"level":"info","message":"Turn 20/25","turn":20}
+{"timestamp":"2026-04-05T11:24:03.629Z","iteration":106,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && bash scripts/pre-commit-check.sh 2>&1 | tail -5","turn":20}
+{"timestamp":"2026-04-05T11:24:08.535Z","iteration":106,"level":"info","message":"  -> exit=0 (199 chars)","turn":20}
+{"timestamp":"2026-04-05T11:24:08.535Z","iteration":106,"level":"info","message":"Turn 21/25","turn":21}
+{"timestamp":"2026-04-05T11:24:11.050Z","iteration":106,"level":"info","message":"Agent: Already done. Committing now.","turn":21}
+{"timestamp":"2026-04-05T11:24:11.051Z","iteration":106,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git commit -m \"iter 106: structured JSON output for --once mode\" 2>&1 | tail -3","turn":21}
+{"timestamp":"2026-04-05T11:24:11.102Z","iteration":106,"level":"info","message":"  -> exit=0 (120 chars)","turn":21}
+{"timestamp":"2026-04-05T11:24:11.102Z","iteration":106,"level":"info","message":"HARD TURN CAP REACHED: 21 turns (predicted 14, cap 21). Forcing commit.","turn":21}
+{"timestamp":"2026-04-05T11:24:11.104Z","iteration":106,"level":"info","message":"Cache persisted: 27 entries to .autoagent-cache.json","turn":21}
+{"timestamp":"2026-04-05T11:24:11.104Z","iteration":106,"level":"info","message":"Cache stats: 1 hits, 1 misses, 27 entries, 13 invalidations (2 entries removed)","turn":21}
+{"timestamp":"2026-04-05T11:24:11.104Z","iteration":106,"level":"info","message":"Tool cache stats","turn":21,"metadata":{"cacheHits":1,"cacheMisses":1,"cacheEntries":27,"invalidations":13,"invalidatedEntries":2,"toolStats":{"read_file":{"hits":1,"misses":1}}}}
+{"timestamp":"2026-04-05T11:24:11.104Z","iteration":106,"level":"info","message":"Tool timing: bash: 5x, avg=1929ms, total=9643ms; write_file: 13x, avg=2ms, total=22ms; think: 2x, avg=1ms, total=2ms; read_file: 1x, avg=1ms, total=1ms","turn":21}
+{"timestamp":"2026-04-05T11:24:11.105Z","iteration":106,"level":"info","message":"Tool timing stats","turn":21,"metadata":{"timing":{"tools":{"read_file":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"think":{"calls":2,"totalMs":2,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":13,"totalMs":22,"minMs":1,"maxMs":3,"avgMs":2},"bash":{"calls":5,"totalMs":9643,"minMs":45,"maxMs":4906,"avgMs":1929}},"totalCalls":21,"totalMs":9668}}}
+{"timestamp":"2026-04-05T11:24:15.097Z","iteration":106,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 106: predicted 14 turns, actual 21 turns, ratio 1.50**","turn":21}
+{"timestamp":"2026-04-05T11:24:15.114Z","iteration":106,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":21}

@@ -1316,3 +1316,19 @@ Context after patch:
 113 | 
 [2026-04-05T11:24:00.817Z] iter=106 turn=19 INFO: Turn 19/25
 [2026-04-05T11:24:02.143Z] iter=106 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git status --short
+[2026-04-05T11:24:02.188Z] iter=106 turn=19 INFO:   -> exit=0 (147 chars)
+[2026-04-05T11:24:02.188Z] iter=106 turn=20 INFO: Turn 20/25
+[2026-04-05T11:24:03.629Z] iter=106 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && bash scripts/pre-commit-check.sh 2>&1 | tail -5
+[2026-04-05T11:24:08.535Z] iter=106 turn=20 INFO:   -> exit=0 (199 chars)
+[2026-04-05T11:24:08.535Z] iter=106 turn=21 INFO: Turn 21/25
+[2026-04-05T11:24:11.050Z] iter=106 turn=21 INFO: Agent: Already done. Committing now.
+[2026-04-05T11:24:11.051Z] iter=106 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && git commit -m "iter 106: structured JSON output for --once mode" 2>&1 | tail -3
+[2026-04-05T11:24:11.102Z] iter=106 turn=21 INFO:   -> exit=0 (120 chars)
+[2026-04-05T11:24:11.102Z] iter=106 turn=21 INFO: HARD TURN CAP REACHED: 21 turns (predicted 14, cap 21). Forcing commit.
+[2026-04-05T11:24:11.104Z] iter=106 turn=21 INFO: Cache persisted: 27 entries to .autoagent-cache.json
+[2026-04-05T11:24:11.104Z] iter=106 turn=21 INFO: Cache stats: 1 hits, 1 misses, 27 entries, 13 invalidations (2 entries removed)
+[2026-04-05T11:24:11.104Z] iter=106 turn=21 INFO: Tool cache stats
+[2026-04-05T11:24:11.104Z] iter=106 turn=21 INFO: Tool timing: bash: 5x, avg=1929ms, total=9643ms; write_file: 13x, avg=2ms, total=22ms; think: 2x, avg=1ms, total=2ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-05T11:24:11.105Z] iter=106 turn=21 INFO: Tool timing stats
+[2026-04-05T11:24:15.097Z] iter=106 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 106: predicted 14 turns, actual 21 turns, ratio 1.50**
+[2026-04-05T11:24:15.114Z] iter=106 turn=21 INFO: Pre-commit review: no significant code changes to review
