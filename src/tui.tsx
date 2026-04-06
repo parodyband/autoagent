@@ -146,12 +146,69 @@ export function getFileSuggestions(
 
 // ─── Components ─────────────────────────────────────────────
 
-function Header({ model }: { model: string }) {
+interface GitInfo {
+  branch: string;
+  changedCount: number;
+  stagedCount: number;
+  isRepo: boolean;
+}
+
+function useGitStatus(dir: string): GitInfo {
+  const [info, setInfo] = useState<GitInfo>({ branch: "", changedCount: 0, stagedCount: 0, isRepo: false });
+
+  useEffect(() => {
+    function poll() {
+      try {
+        const branch = execSync("git rev-parse --abbrev-ref HEAD", {
+          cwd: dir, encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"],
+        }).trim();
+        const statusOut = execSync("git status --short", {
+          cwd: dir, encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"],
+        });
+        const lines = statusOut.split("\n").filter(l => l.trim().length > 0);
+        // XY format: first char = staged, second = unstaged/untracked
+        const staged = lines.filter(l => l[0] && l[0] !== " " && l[0] !== "?").length;
+        const unstaged = lines.filter(l => l[1] && (l[1] !== " ")).length;
+        setInfo({ branch, changedCount: unstaged, stagedCount: staged, isRepo: true });
+      } catch {
+        setInfo({ branch: "", changedCount: 0, stagedCount: 0, isRepo: false });
+      }
+    }
+    poll();
+    const id = setInterval(poll, 5000);
+    return () => clearInterval(id);
+  }, [dir]);
+
+  return info;
+}
+
+function GitBadge({ git }: { git: GitInfo }) {
+  if (!git.isRepo) return null;
+  const isDirty = git.changedCount > 0 || git.stagedCount > 0;
+  const branchColor = isDirty ? "yellow" : "green";
+  return (
+    <Box>
+      <Text color={branchColor}> ⎇ {git.branch}</Text>
+      {git.stagedCount > 0 && (
+        <Text color="green"> ●{git.stagedCount}</Text>
+      )}
+      {git.changedCount > 0 && (
+        <Text color="yellow"> ±{git.changedCount}</Text>
+      )}
+      {!isDirty && (
+        <Text color="green"> ✓</Text>
+      )}
+    </Box>
+  );
+}
+
+function Header({ model, git }: { model: string; git: GitInfo }) {
   return (
     <Box flexDirection="column" marginBottom={1}>
       <Box>
         <Text bold color="cyan">⚡ AutoAgent</Text>
         <Text color="gray"> — {model}</Text>
+        <GitBadge git={git} />
       </Box>
       <Text color="gray" dimColor>
         {workDir}
@@ -388,6 +445,7 @@ function App() {
   });
   const orchestratorRef = useRef<Orchestrator | null>(null);
   const { exit } = useApp();
+  const gitInfo = useGitStatus(workDir);
 
   // Initialize orchestrator
   useEffect(() => {
@@ -959,7 +1017,7 @@ function App() {
 
   return (
     <Box flexDirection="column" padding={1}>
-      <Header model={currentModel} />
+      <Header model={currentModel} git={gitInfo} />
 
       {/* Message history */}
       <Box flexDirection="column" flexGrow={1}>
