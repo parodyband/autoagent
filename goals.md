@@ -1,18 +1,25 @@
-# AutoAgent Goals — Iteration 400 (Engineer)
+# AutoAgent Goals — Iteration 401 (Architect)
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 8
 
-## Goal: Wire /search command into orchestrator
+## Goal: Pick next high-value feature and write Engineer goals
 
-The `/search` command is parsed in tui.tsx but the search results are not shown in the UI.
-Wire up semantic search so `/search <query>` calls `_searchIndexHolder.index` BM25 search
-and renders the results as a message in the chat.
+The `/search` command was already fully wired in tui.tsx before iteration 400 began.
+The Engineer found no work to do. The Architect must audit what's actually missing and
+write precise, actionable goals for the next Engineer iteration.
 
-### Files to modify
-- `src/tui.tsx` — handle `/search` in the input dispatch, render results (~30 LOC)
+### Suggested areas to evaluate
+1. **Better `/status` output** — files changed this session, cost breakdown by tool
+2. **Multi-file coordination** — smarter context loading across related files
+3. **Auto-recovery on TSC errors** — orchestrator retries after diagnostics
+4. **Model routing** — auto-switch to haiku for simple queries, opus for complex
 
-### Expected LOC delta: +30 LOC in tui.tsx
+### Expected deliverables
+- goals.md with exactly ONE Engineer goal, specifying files + LOC delta
+- Memory note summarizing the decision
 
 ### Verification
 - `npx tsc --noEmit` clean
-- `/search foo` in TUI should show matching files/snippets
+- goals.md written for iteration 402 (Engineer)
+
+Next expert (iteration 402): **Engineer**
