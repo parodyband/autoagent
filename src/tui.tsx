@@ -203,18 +203,20 @@ function GitBadge({ git }: { git: GitInfo }) {
 }
 
 function Header({ model, git }: { model: string; git: GitInfo }) {
+  const modelLabel = model.includes("haiku") ? "⚡ haiku" : model.includes("opus") ? "◆ opus" : "◈ sonnet";
   return (
-    <Box flexDirection="column" marginBottom={1}>
-      <Box>
-        <Text bold color="cyan">⚡ AutoAgent</Text>
-        <Text color="gray"> — {model}</Text>
-        <GitBadge git={git} />
+    <Box flexDirection="column" marginBottom={1} borderStyle="round" borderColor="cyan" paddingX={1}>
+      <Box justifyContent="space-between">
+        <Box>
+          <Text bold color="cyan">⚡ AutoAgent</Text>
+          <Text color="gray">  </Text>
+          <Text color="blueBright">{modelLabel}</Text>
+          <GitBadge git={git} />
+        </Box>
+        <Text color="gray" dimColor>{path.basename(workDir)}</Text>
       </Box>
       <Text color="gray" dimColor>
-        {workDir}
-      </Text>
-      <Text color="gray" dimColor>
-        Commands: /help  /status  /clear  /reindex  /diff  /undo  /exit  Esc
+        /help  /status  /clear  /diff  /undo  /plan  /search  /export  /exit
       </Text>
     </Box>
   );
@@ -222,11 +224,11 @@ function Header({ model, git }: { model: string; git: GitInfo }) {
 
 function ToolCallDisplay({ name, input }: { name: string; input: string }) {
   return (
-    <Box flexDirection="column" marginLeft={2}>
+    <Box flexDirection="column" marginLeft={2} marginTop={0}>
       <Text>
-        <Text color="yellow" dimColor>▸ </Text>
-        <Text color="yellow">{name}</Text>
-        <Text color="gray"> {input.slice(0, 90)}{input.length > 90 ? "…" : ""}</Text>
+        <Text color="yellow" dimColor>  ▸ </Text>
+        <Text color="yellow" bold>{name}</Text>
+        <Text color="gray" dimColor> {input.slice(0, 80)}{input.length > 80 ? "…" : ""}</Text>
       </Text>
     </Box>
   );
@@ -235,8 +237,8 @@ function ToolCallDisplay({ name, input }: { name: string; input: string }) {
 function MessageDisplay({ msg }: { msg: Message }) {
   if (msg.role === "user") {
     return (
-      <Box marginTop={1}>
-        <Text color="cyan" bold>❯ </Text>
+      <Box marginTop={1} borderStyle="single" borderColor="cyan" borderLeft={true} borderRight={false} borderTop={false} borderBottom={false} paddingLeft={1}>
+        <Text color="cyan" bold>You  </Text>
         <Text>{msg.content}</Text>
       </Box>
     );
@@ -250,27 +252,23 @@ function MessageDisplay({ msg }: { msg: Message }) {
     );
   }
   // assistant
+  const modelLabel = msg.model
+    ? (msg.model.includes("haiku") ? "⚡ haiku" : msg.model.includes("opus") ? "◆ opus" : "◈ sonnet")
+    : "";
   return (
-    <Box flexDirection="column" marginTop={1}>
-      <Markdown>{msg.content}</Markdown>
-      <Box>
-        {msg.tokens && (
-          <Text color="gray" dimColor>
-            ({msg.tokens.in.toLocaleString()} in / {msg.tokens.out.toLocaleString()} out)
-          </Text>
-        )}
-        {msg.model && (
-          <Text color="gray" dimColor>
-            {msg.tokens ? "  " : ""}{msg.model.includes("haiku") ? "⚡ haiku" : "◈ sonnet"}
-          </Text>
-        )}
-        {msg.verificationPassed === true && (
-          <Text color="green" dimColor>  ✓ verified</Text>
-        )}
-        {msg.verificationPassed === false && (
-          <Text color="red" dimColor>  ✗ verify failed</Text>
-        )}
+    <Box flexDirection="column" marginTop={1} borderStyle="single" borderColor="gray" borderLeft={true} borderRight={false} borderTop={false} borderBottom={false} paddingLeft={1}>
+      <Box marginBottom={0}>
+        <Text color="magenta" bold>Agent</Text>
+        {modelLabel ? <Text color="gray" dimColor>  {modelLabel}</Text> : null}
+        {msg.verificationPassed === true && <Text color="green" dimColor>  ✓</Text>}
+        {msg.verificationPassed === false && <Text color="red" dimColor>  ✗</Text>}
       </Box>
+      <Markdown>{msg.content}</Markdown>
+      {msg.tokens && (
+        <Text color="gray" dimColor>
+          {msg.tokens.in.toLocaleString()} in / {msg.tokens.out.toLocaleString()} out
+        </Text>
+      )}
     </Box>
   );
 }
@@ -384,24 +382,26 @@ function Footer({ stats }: { stats: FooterStats }) {
   const formatK = (n: number) =>
     n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
 
-  const modelLabel = stats.model.includes("haiku") ? "haiku" : "sonnet";
-  const costStr = stats.cost < 0.001 ? "<$0.001" : `~${stats.cost.toFixed(3)}`;
+  const modelLabel = stats.model.includes("haiku") ? "⚡ haiku" : stats.model.includes("opus") ? "◆ opus" : "◈ sonnet";
+  const costStr = stats.cost < 0.001 ? "<$0.001" : `${stats.cost.toFixed(3)}`;
 
   // Context budget: color shifts yellow at 70%, red at 90%
   const ctxRatio = stats.contextLimit > 0 ? stats.contextTokens / stats.contextLimit : 0;
   const ctxColor = getContextColor(ctxRatio);
+  const ctxPct = Math.round(ctxRatio * 100);
 
   return (
-    <Box marginTop={1} borderStyle="single" borderColor="gray" paddingX={1}>
-      <Text color="gray" dimColor>
-        Tokens: {formatK(stats.tokensIn)} in / {formatK(stats.tokensOut)} out
-        {"  |  "}Cost: {costStr}
-        {"  |  "}Model: {modelLabel}
-        {"  |  "}
-      </Text>
-      <Text color={ctxColor} dimColor={ctxColor === "gray"}>
-        ctx: {formatK(stats.contextTokens)}/{formatK(stats.contextLimit)}
-      </Text>
+    <Box borderStyle="single" borderColor="gray" paddingX={1} justifyContent="space-between">
+      <Box gap={2}>
+        <Text color="gray" dimColor>↑{formatK(stats.tokensIn)} ↓{formatK(stats.tokensOut)}</Text>
+        <Text color="green" dimColor>{costStr}</Text>
+        <Text color="blueBright" dimColor>{modelLabel}</Text>
+      </Box>
+      <Box>
+        <Text color={ctxColor} dimColor={ctxColor === "gray"}>
+          ctx {ctxPct}%  {formatK(stats.contextTokens)}/{formatK(stats.contextLimit)}
+        </Text>
+      </Box>
     </Box>
   );
 }

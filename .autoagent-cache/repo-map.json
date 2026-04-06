@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775460210156,
+  "generatedAt": 1775460453833,
   "files": [
     {
       "path": "src/context-loader.ts",
@@ -2015,7 +2015,7 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775427260333.6067
+      "lastModified": 1775460413583.777
     }
   ]
 }

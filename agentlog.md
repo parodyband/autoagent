@@ -1,17 +1,6 @@
 27 | import * as fs from "fs";
 28 | import { glob } from "glob";
 29 | 
-30 | // ─── Types ──────────────────────────────────────────────────
-31 | 
-[2026-04-05T21:18:22.521Z] iter=392 turn=12 INFO: Turn 12/25
-[2026-04-05T21:18:32.895Z] iter=392 turn=12 INFO: Agent: Now add a module-level index and a `buildSearchIndex` function, plus the tool registration:
-[2026-04-05T21:18:32.895Z] iter=392 turn=12 INFO: write_file: src/tool-registry.ts (patch)
-[2026-04-05T21:18:32.896Z] iter=392 turn=12 INFO:   -> ok: Patched src/tool-registry.ts: -1 +41 lines
-
-Context after patch:
-27 | import * as fs from "fs";
-28 | import { glob } from "glob";
-29 | 
 30 | // ─── Semantic search index (shared across registry instances) ─
 31 | 
 32 | /** Lazily populated BM25 index — rebuilt by buildSearchIndex() */
@@ -1009,3 +998,192 @@ I'll start by understanding the current state, scoring iteration 398, and then d
 [2026-04-05T22:15:11.252Z] iter=399 turn=1 INFO: $ cat .autoagent-metrics.json | head -100
 [2026-04-05T22:15:11.254Z] iter=399 turn=1 INFO: $ cat .autoagent-state.json
 [2026-04-05T22:15:11.255Z] iter=399 turn=1 INFO: $ cat .expert-rotation.json
+[2026-04-06T07:28:44.035Z] iter=399 INFO: Cache restored: 56/57 entries (1 stale)
+[2026-04-06T07:28:44.036Z] iter=399 INFO: [TASK MODE] Expert overridden to Engineer
+[2026-04-06T07:28:44.036Z] iter=399 INFO: [TASK MODE] Running user task from TASK.md
+[2026-04-06T07:28:44.038Z] iter=399 INFO: Turn budget: 18/25 (calibration=1.33x, predicted=11)
+[2026-04-06T07:28:44.038Z] iter=399 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-06T07:28:44.196Z] iter=399 INFO: Hard turn cap: 17 (1.5x prediction of 11)
+[2026-04-06T07:28:44.196Z] iter=399 turn=1 INFO: Turn 1/25
+[2026-04-06T07:28:46.139Z] iter=399 turn=1 INFO: read_scratchpad: 2852 chars
+[2026-04-06T07:28:46.140Z] iter=399 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md 2>/dev/null || echo "No goals.md"
+[2026-04-06T07:28:46.147Z] iter=399 turn=1 INFO:   -> exit=0 (1270 chars)
+[2026-04-06T07:28:46.147Z] iter=399 turn=2 INFO: Turn 2/25
+[2026-04-06T07:28:48.357Z] iter=399 turn=2 INFO: read_file: src/tui.tsx
+[2026-04-06T07:28:48.358Z] iter=399 turn=2 INFO:   -> ok (3402 chars)
+[2026-04-06T07:28:48.359Z] iter=399 turn=3 INFO: Turn 3/25
+[2026-04-06T07:28:50.327Z] iter=399 turn=3 INFO: read_file: src/tui.tsx
+[2026-04-06T07:28:50.328Z] iter=399 turn=3 INFO:   -> ok (4538 chars)
+[2026-04-06T07:28:50.328Z] iter=399 turn=4 INFO: Turn 4/25
+[2026-04-06T07:28:52.644Z] iter=399 turn=4 INFO: read_file: src/tui.tsx
+[2026-04-06T07:28:52.645Z] iter=399 turn=4 INFO:   -> ok (7771 chars)
+[2026-04-06T07:28:52.645Z] iter=399 turn=5 INFO: Turn 5/25
+[2026-04-06T07:29:02.415Z] iter=399 turn=5 INFO: think: Goal: Make the interface more appealing in the TUI.
+
+Status: NOT STARTED - I've been reading but not writing yet.
+
+Looki...
+[2026-04-06T07:29:02.416Z] iter=399 turn=6 INFO: Turn 6/25
+[2026-04-06T07:29:07.123Z] iter=399 turn=6 INFO: Agent: Goal status: **NOT STARTED** (was reading code). Starting writing now.
+
+Key improvements I'll make to tui.tsx:
+1. Better `Header` — styled banner with box border
+2. `MessageDisplay` — user msg with left-accent box, assistant with styled container  
+3. `Footer` — cleaner layout with visual separators
+4. `StatusBar` — distinct styled status area
+[2026-04-06T07:29:07.124Z] iter=399 turn=6 INFO: read_file: src/tui.tsx
+[2026-04-06T07:29:07.125Z] iter=399 turn=6 INFO:   -> ok (2052 chars)
+[2026-04-06T07:29:07.126Z] iter=399 turn=7 INFO: Turn 7/25
+[2026-04-06T07:29:14.391Z] iter=399 turn=7 INFO: Agent: Now I have enough context. Let me make the targeted improvements:
+[2026-04-06T07:29:14.391Z] iter=399 turn=7 INFO: write_file: src/tui.tsx (patch)
+[2026-04-06T07:29:14.392Z] iter=399 turn=7 INFO:   -> ok: Patched src/tui.tsx: -17 +19 lines
+
+Context after patch:
+202 |   );
+203 | }
+204 | 
+205 | function Header({ model, git }: { model: string; git: GitInfo }) {
+206 |   const modelLabel = model.includes("haiku") ? "⚡ haiku" : model.includes("opus") ? "◆ opus" : "◈ sonnet";
+207 |   return (
+208 |     <Box flexDirection="column" marginBottom={1} borderStyle="round" borderColor="cyan" paddingX={1}>
+209 |       <Box justifyContent="space-between">
+210 |         <Box>
+211 |           <Text bold color="cyan">⚡ AutoAgent</Text>
+212 |           <Text color="gray">  </Text>
+213 |           <Text color="blueBright">{modelLabel}</Text>
+214 |           <GitBadge git={git} />
+215 |         </Box>
+216 |         <Text color="gray" dimColor>{path.basename(workDir)}</Text>
+217 |       </Box>
+218 |       <Text color="gray" dimColor>
+219 |         /help  /status  /clear  /diff  /undo  /plan  /search  /export  /exit
+220 |       </Text>
+221 |     </Box>
+222 |   );
+223 | }
+224 | 
+225 | function ToolCallDisplay({ name, input }: { name: string; input: string }) {
+226 |   return (
+[2026-04-06T07:29:14.393Z] iter=399 turn=8 INFO: Turn 8/25
+[2026-04-06T07:29:31.351Z] iter=399 turn=8 INFO: Agent: I've made 1 change so far (Header component). Let me finish the remaining improvements quickly.
+[2026-04-06T07:29:31.352Z] iter=399 turn=8 INFO: write_file: src/tui.tsx (patch)
+[2026-04-06T07:29:31.353Z] iter=399 turn=8 INFO:   -> ok: Patched src/tui.tsx: -54 +50 lines
+
+Context after patch:
+222 |   );
+223 | }
+224 | 
+225 | function ToolCallDisplay({ name, input }: { name: string; input: string }) {
+226 |   return (
+227 |     <Box flexDirection="column" marginLeft={2} marginTop={0}>
+228 |       <Text>
+229 |         <Text color="yellow" dimColor>  ▸ </Text>
+230 |         <Text color="yellow" bold>{name}</Text>
+231 |         <Text color="gray" dimColor> {input.slice(0, 80)}{input.length > 80 ? "…" : ""}</Text>
+232 |       </Text>
+233 |     </Box>
+234 |   );
+235 | }
+236 | 
+237 | function MessageDisplay({ msg }: { msg: Message }) {
+238 |   if (msg.role === "user") {
+239 |     return (
+240 |       <Box marginTop={1} borderStyle="single" borderColor="cyan" borderLeft={true} borderRight={false} borderTop={false} borderBottom={false} paddingLeft={1}>
+241 |         <Text color="cyan" bold>You  </Text>
+242 |         <Text>{msg.content}</Text>
+243 |       </Box>
+244 |     );
+245 |   }
+246 |   if (msg.role === "tool") {
+247 |     return (
+248 |       <ToolCallDisplay
+249 |         name={msg.toolName || "tool"}
+250 |         input={msg.content}
+251 |       />
+252 |     );
+253 |   }
+254 |   // assistant
+255 |   const modelLabel = msg.model
+256 |     ? (msg.model.includes("haiku") ? "⚡ haiku" : msg.model.includes("opus") ? "◆ opus" : "◈ sonnet")
+257 |     : "";
+258 |   return (
+259 |     <Box flexDirection="column" marginTop={1} borderStyle="single" borderColor="gray" borderLeft={true} borderRight={false} borderTop={false} borderBottom={false} paddingLeft={1}>
+260 |       <Box marginBottom={0}>
+261 |         <Text color="magenta" bold>Agent</Text>
+262 |         {modelLabel ? <Text color="gray" dimColor>  {modelLabel}</Text> : null}
+263 |         {msg.verificationPassed === true && <Text color="green" dimColor>  ✓</Text>}
+264 |         {msg.verificationPassed === false && <Text color="red" dimColor>  ✗</Text>}
+265 |       </Box>
+266 |       <Markdown>{msg.content}</Markdown>
+267 |       {msg.tokens && (
+268 |         <Text color="gray" dimColor>
+269 |           {msg.tokens.in.toLocaleString()} in / {msg.tokens.out.toLocaleString()} out
+270 |         </Text>
+271 |       )}
+272 |     </Box>
+273 |   );
+274 | }
+275 | 
+276 | /** Diff preview display — shown when agent proposes a file edit (or batch of edits). */
+277 | function DiffPreviewDisplay({ diff, filePath }: { diff: string; filePath: string }) {
+[2026-04-06T07:29:31.355Z] iter=399 turn=9 INFO: Turn 9/25
+[2026-04-06T07:29:43.685Z] iter=399 turn=9 INFO: Agent: Now improve the Footer:
+[2026-04-06T07:29:43.687Z] iter=399 turn=9 INFO: write_file: src/tui.tsx (patch)
+[2026-04-06T07:29:43.690Z] iter=399 turn=9 INFO:   -> ok: Patched src/tui.tsx: -26 +28 lines
+
+Context after patch:
+1 | /**
+2 |  * AutoAgent Interactive TUI — React-based terminal UI using Ink.
+3 |  *
+4 |  * Usage:
+5 |  *   npm run tui                          # work in current directory
+6 |  *   npm run tui -- --dir /path/to/repo   # work in a specific repo
+7 |  */
+8 | 
+9 | import React, { useState, useCallback, useEffect, useRef } from "react";
+10 | import { render, Box, Text, useInput, useApp } from "ink";
+11 | import Spinner from "ink-spinner";
+12 | import TextInput from "ink-text-input";
+13 | import path from "path";
+14 | import fs from "fs";
+15 | import "dotenv/config";
+16 | import { Orchestrator } from "./orchestrator.js";
+17 | import { listSessions, type SessionInfo } from "./session-store.js";
+18 | import type { EditPlan } from "./architect-mode.js";
+19 | import { VirtualMessageList } from "./virtual-message-list.js";
+20 | import { undoLastCommit } from "./auto-commit.js";
+21 | import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
+22 | import { execSync } from "child_process";
+23 | import { runInit } from "./init-command.js";
+24 | import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
+25 | import { shouldShowWelcome } from "./welcome.js";
+26 | import type { Task, TaskPlan } from "./task-planner.js";
+27 | import { handlePlanCommand } from "./plan-commands.js";
+28 | import { runDream } from "./dream.js";
+29 | import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
+30 | import Anthropic from "@anthropic-ai/sdk";
+31 | import { Markdown } from "./markdown-renderer.js";
+[2026-04-06T07:29:43.691Z] iter=399 turn=10 INFO: Turn 10/25
+[2026-04-06T07:29:46.361Z] iter=399 turn=10 INFO: Agent: Good - changes made. Let me now check if TypeScript is happy with the `borderLeft` props I used.
+[2026-04-06T07:29:46.361Z] iter=399 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-06T07:29:47.515Z] iter=399 turn=10 INFO:   -> exit=0 (11 chars)
+[2026-04-06T07:29:47.516Z] iter=399 turn=11 INFO: Turn 11/25
+[2026-04-06T07:29:53.822Z] iter=399 turn=11 INFO: Agent: TSC clean. Now write memory and wrap up.
+[2026-04-06T07:29:53.823Z] iter=399 turn=11 INFO: save_memory: "[Engineer] Iteration 399 — TUI visual improvements"
+[2026-04-06T07:29:53.825Z] iter=399 turn=11 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-06T07:29:53.825Z] iter=399 turn=12 INFO: Turn 12/25
+[2026-04-06T07:29:59.570Z] iter=399 turn=12 INFO: write_file: goals.md (write)
+[2026-04-06T07:29:59.571Z] iter=399 turn=12 INFO:   -> ok: Updated goals.md (600 chars, -6 lines delta)
+[2026-04-06T07:29:59.571Z] iter=399 turn=13 INFO: Turn 13/25
+[2026-04-06T07:30:01.498Z] iter=399 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && rm -f TASK.md && echo "AUTOAGENT_RESTART"
+[2026-04-06T07:30:01.499Z] iter=399 turn=13 INFO: RESTART signal
+[2026-04-06T07:30:01.499Z] iter=399 turn=13 INFO: Validating: npx tsc --noEmit ...
+[2026-04-06T07:30:02.654Z] iter=399 turn=13 INFO: Compilation OK
+[2026-04-06T07:30:13.771Z] iter=399 turn=13 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-06T07:30:13.771Z] iter=399 turn=13 INFO: [TASK MODE] TASK.md deleted after successful iteration
+[2026-04-06T07:30:13.771Z] iter=399 turn=13 INFO: Cache stats: 0 hits, 4 misses, 56 entries, 4 invalidations (4 entries removed)
+[2026-04-06T07:30:13.771Z] iter=399 turn=13 INFO: Tool cache stats
+[2026-04-06T07:30:13.772Z] iter=399 turn=13 INFO: Tool timing: bash: 3x, avg=388ms, total=1163ms; write_file: 4x, avg=2ms, total=9ms; read_scratchpad: 1x, avg=4ms, total=4ms; read_file: 4x, avg=1ms, total=4ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms
+[2026-04-06T07:30:13.772Z] iter=399 turn=13 INFO: Tool timing stats
+[2026-04-06T07:30:21.508Z] iter=399 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 399: predicted 11 turns, actual 13 turns, ratio 1.18**
+[2026-04-06T07:30:21.534Z] iter=399 turn=13 INFO: Pre-commit review: no significant code changes to review
