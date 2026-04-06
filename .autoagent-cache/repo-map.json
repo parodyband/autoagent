@@ -1,88 +1,6 @@
 {
-  "generatedAt": 1775460792402,
+  "generatedAt": 1775467349973,
   "files": [
-    {
-      "path": "src/context-loader.ts",
-      "exports": [
-        {
-          "name": "extractFileReferences",
-          "kind": "function",
-          "line": 44,
-          "exported": true
-        },
-        {
-          "name": "stripFileReferences",
-          "kind": "function",
-          "line": 74,
-          "exported": true
-        },
-        {
-          "name": "loadFileReferences",
-          "kind": "function",
-          "line": 85,
-          "exported": true
-        },
-        {
-          "name": "extractKeywords",
-          "kind": "function",
-          "line": 127,
-          "exported": true
-        },
-        {
-          "name": "filterByRepoMap",
-          "kind": "function",
-          "line": 162,
-          "exported": true
-        },
-        {
-          "name": "getRecentCommitFiles",
-          "kind": "function",
-          "line": 180,
-          "exported": true
-        },
-        {
-          "name": "getRecentlyChangedFiles",
-          "kind": "function",
-          "line": 225,
-          "exported": true
-        },
-        {
-          "name": "symbolLookup",
-          "kind": "function",
-          "line": 279,
-          "exported": true
-        },
-        {
-          "name": "autoLoadContext",
-          "kind": "function",
-          "line": 293,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "child_process"
-        },
-        {
-          "names": [],
-          "from": "./tree-sitter-map.js"
-        },
-        {
-          "names": [],
-          "from": "./tree-sitter-map.js"
-        }
-      ],
-      "lastModified": 1775415442185.9863
-    },
     {
       "path": "src/file-cache.ts",
       "exports": [
@@ -1129,7 +1047,7 @@
           "from": "ink"
         }
       ],
-      "lastModified": 1775421320933.3784
+      "lastModified": 1775462050511.5168
     },
     {
       "path": "src/dream.ts",
@@ -1319,58 +1237,6 @@
       "lastModified": 1775423143164.422
     },
     {
-      "path": "src/cli.ts",
-      "exports": [
-        {
-          "name": "resolveModelAlias",
-          "kind": "function",
-          "line": 33,
-          "exported": true
-        },
-        {
-          "name": "printHelp",
-          "kind": "function",
-          "line": 64,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "readline"
-        },
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "url"
-        },
-        {
-          "names": [],
-          "from": "child_process"
-        },
-        {
-          "names": [],
-          "from": "dotenv/config"
-        },
-        {
-          "names": [],
-          "from": "./orchestrator.js"
-        },
-        {
-          "names": [],
-          "from": "./init-command.js"
-        }
-      ],
-      "lastModified": 1775423493746.9644
-    },
-    {
       "path": "src/semantic-search.ts",
       "exports": [
         {
@@ -1543,138 +1409,468 @@
       "lastModified": 1775423924274.961
     },
     {
+      "path": "src/cli.ts",
+      "exports": [
+        {
+          "name": "resolveModelAlias",
+          "kind": "function",
+          "line": 33,
+          "exported": true
+        },
+        {
+          "name": "printHelp",
+          "kind": "function",
+          "line": 64,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "readline"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "url"
+        },
+        {
+          "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
+          "from": "dotenv/config"
+        },
+        {
+          "names": [],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [],
+          "from": "./init-command.js"
+        }
+      ],
+      "lastModified": 1775461376802.478
+    },
+    {
+      "path": "src/context-loader.ts",
+      "exports": [
+        {
+          "name": "extractFileReferences",
+          "kind": "function",
+          "line": 44,
+          "exported": true
+        },
+        {
+          "name": "stripFileReferences",
+          "kind": "function",
+          "line": 74,
+          "exported": true
+        },
+        {
+          "name": "loadFileReferences",
+          "kind": "function",
+          "line": 85,
+          "exported": true
+        },
+        {
+          "name": "extractKeywords",
+          "kind": "function",
+          "line": 127,
+          "exported": true
+        },
+        {
+          "name": "filterByRepoMap",
+          "kind": "function",
+          "line": 162,
+          "exported": true
+        },
+        {
+          "name": "getRecentCommitFiles",
+          "kind": "function",
+          "line": 180,
+          "exported": true
+        },
+        {
+          "name": "getRecentlyChangedFiles",
+          "kind": "function",
+          "line": 225,
+          "exported": true
+        },
+        {
+          "name": "symbolLookup",
+          "kind": "function",
+          "line": 279,
+          "exported": true
+        },
+        {
+          "name": "autoLoadContext",
+          "kind": "function",
+          "line": 293,
+          "exported": true
+        },
+        {
+          "name": "resolveImportGraph",
+          "kind": "function",
+          "line": 390,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [],
+          "from": "./tree-sitter-map.js"
+        }
+      ],
+      "lastModified": 1775461095647.401
+    },
+    {
+      "path": "src/tui.tsx",
+      "exports": [
+        {
+          "name": "Message",
+          "kind": "interface",
+          "line": 72,
+          "exported": true
+        },
+        {
+          "name": "getContextColor",
+          "kind": "function",
+          "line": 92,
+          "exported": true
+        },
+        {
+          "name": "extractFileQuery",
+          "kind": "function",
+          "line": 106,
+          "exported": true
+        },
+        {
+          "name": "getFileSuggestions",
+          "kind": "function",
+          "line": 119,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "react"
+        },
+        {
+          "names": [],
+          "from": "ink"
+        },
+        {
+          "names": [],
+          "from": "ink-spinner"
+        },
+        {
+          "names": [],
+          "from": "ink-text-input"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "dotenv/config"
+        },
+        {
+          "names": [],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [],
+          "from": "./session-store.js"
+        },
+        {
+          "names": [],
+          "from": "./architect-mode.js"
+        },
+        {
+          "names": [],
+          "from": "./virtual-message-list.js"
+        },
+        {
+          "names": [],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
+          "from": "util"
+        },
+        {
+          "names": [],
+          "from": "./init-command.js"
+        },
+        {
+          "names": [],
+          "from": "./hooks/index.js"
+        },
+        {
+          "names": [],
+          "from": "./error-boundary.js"
+        },
+        {
+          "names": [],
+          "from": "./welcome.js"
+        },
+        {
+          "names": [],
+          "from": "./task-planner.js"
+        },
+        {
+          "names": [],
+          "from": "./markdown-renderer.js"
+        },
+        {
+          "names": [],
+          "from": "./tui-commands.js"
+        }
+      ],
+      "lastModified": 1775463027356.0693
+    },
+    {
+      "path": "src/virtual-message-list.tsx",
+      "exports": [
+        {
+          "name": "VirtualMessageList",
+          "kind": "function",
+          "line": 46,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "react"
+        },
+        {
+          "names": [],
+          "from": "ink"
+        },
+        {
+          "names": [],
+          "from": "./tui.js"
+        }
+      ],
+      "lastModified": 1775462153407.2554
+    },
+    {
+      "path": "src/error-boundary.tsx",
+      "exports": [
+        {
+          "name": "TuiErrorBoundary",
+          "kind": "class",
+          "line": 12,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "react"
+        },
+        {
+          "names": [],
+          "from": "ink"
+        }
+      ],
+      "lastModified": 1775461988155.2737
+    },
+    {
+      "path": "src/hooks/use-context-budget.ts",
+      "exports": [
+        {
+          "name": "useContextBudget",
+          "kind": "function",
+          "line": 3,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "react"
+        }
+      ],
+      "lastModified": 1775461972751.2568
+    },
+    {
       "path": "src/orchestrator.ts",
       "exports": [
         {
           "name": "PARALLEL_SAFE_TOOLS",
           "kind": "const",
-          "line": 56,
+          "line": 57,
           "exported": true
         },
         {
           "name": "MICRO_COMPACT_THRESHOLD",
           "kind": "const",
-          "line": 71,
+          "line": 72,
           "exported": true
         },
         {
           "name": "COMPACT_TIER1_THRESHOLD",
           "kind": "const",
-          "line": 73,
+          "line": 74,
           "exported": true
         },
         {
           "name": "COMPACT_THRESHOLD",
           "kind": "const",
-          "line": 75,
+          "line": 76,
           "exported": true
         },
         {
           "name": "CONTEXT_WARNING_THRESHOLD",
           "kind": "const",
-          "line": 77,
+          "line": 78,
           "exported": true
         },
         {
           "name": "PRUNE_THRESHOLD",
           "kind": "const",
-          "line": 78,
+          "line": 79,
           "exported": true
         },
         {
           "name": "selectCompactionTier",
           "kind": "function",
-          "line": 84,
+          "line": 85,
           "exported": true
         },
         {
           "name": "MODEL_PRICING",
           "kind": "const",
-          "line": 92,
+          "line": 93,
+          "exported": true
+        },
+        {
+          "name": "MODEL_CONTEXT_WINDOW",
+          "kind": "const",
+          "line": 99,
           "exported": true
         },
         {
           "name": "ConversationCheckpoint",
           "kind": "interface",
-          "line": 115,
+          "line": 122,
           "exported": true
         },
         {
           "name": "MAX_CHECKPOINTS",
           "kind": "const",
-          "line": 123,
+          "line": 130,
           "exported": true
         },
         {
           "name": "OrchestratorOptions",
           "kind": "interface",
-          "line": 125,
+          "line": 132,
           "exported": true
         },
         {
           "name": "OrchestratorResult",
           "kind": "interface",
-          "line": 170,
+          "line": 177,
           "exported": true
         },
         {
           "name": "CostInfo",
           "kind": "interface",
-          "line": 179,
+          "line": 186,
+          "exported": true
+        },
+        {
+          "name": "TaskReflection",
+          "kind": "interface",
+          "line": 201,
           "exported": true
         },
         {
           "name": "routeModel",
           "kind": "function",
-          "line": 194,
+          "line": 242,
           "exported": true
         },
         {
           "name": "computeCost",
           "kind": "function",
-          "line": 222,
+          "line": 270,
           "exported": true
         },
         {
           "name": "buildSystemPrompt",
           "kind": "function",
-          "line": 234,
+          "line": 282,
           "exported": true
         },
         {
           "name": "buildCachedSystem",
           "kind": "function",
-          "line": 307,
+          "line": 355,
           "exported": true
         },
         {
           "name": "injectMessageCacheBreakpoints",
           "kind": "function",
-          "line": 318,
+          "line": 366,
           "exported": true
         },
         {
           "name": "isToolError",
           "kind": "function",
-          "line": 414,
+          "line": 462,
           "exported": true
         },
         {
           "name": "pruneStaleToolResults",
           "kind": "function",
-          "line": 475,
+          "line": 523,
           "exported": true
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 882,
+          "line": 980,
           "exported": true
         },
         {
           "name": "runSingleTask",
           "kind": "function",
-          "line": 1820,
+          "line": 2176,
           "exported": true
         }
       ],
@@ -1741,7 +1937,8 @@
         },
         {
           "names": [
-            "getProjectMemoryBlock"
+            "getProjectMemoryBlock",
+            "saveToLocalMemory"
           ],
           "from": "./project-memory.js"
         },
@@ -1782,7 +1979,8 @@
             "autoLoadContext",
             "extractFileReferences",
             "loadFileReferences",
-            "stripFileReferences"
+            "stripFileReferences",
+            "resolveImportGraph"
           ],
           "from": "./context-loader.js"
         },
@@ -1814,6 +2012,13 @@
         },
         {
           "names": [
+            "ReflectionStore",
+            "type ToolCallRecord"
+          ],
+          "from": "./reflection.js"
+        },
+        {
+          "names": [
             "selfVerify"
           ],
           "from": "./self-verify.js"
@@ -1838,184 +2043,7 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775460791455.9868
-    },
-    {
-      "path": "src/tui.tsx",
-      "exports": [
-        {
-          "name": "Message",
-          "kind": "interface",
-          "line": 73,
-          "exported": true
-        },
-        {
-          "name": "getContextColor",
-          "kind": "function",
-          "line": 100,
-          "exported": true
-        },
-        {
-          "name": "extractFileQuery",
-          "kind": "function",
-          "line": 114,
-          "exported": true
-        },
-        {
-          "name": "getFileSuggestions",
-          "kind": "function",
-          "line": 127,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [
-            "React",
-            "useState",
-            "useCallback",
-            "useEffect",
-            "useRef"
-          ],
-          "from": "react"
-        },
-        {
-          "names": [
-            "render",
-            "Box",
-            "Text",
-            "useInput",
-            "useApp"
-          ],
-          "from": "ink"
-        },
-        {
-          "names": [
-            "Spinner"
-          ],
-          "from": "ink-spinner"
-        },
-        {
-          "names": [
-            "TextInput"
-          ],
-          "from": "ink-text-input"
-        },
-        {
-          "names": [
-            "path"
-          ],
-          "from": "path"
-        },
-        {
-          "names": [
-            "fs"
-          ],
-          "from": "fs"
-        },
-        {
-          "names": [
-            "Orchestrator"
-          ],
-          "from": "./orchestrator.js"
-        },
-        {
-          "names": [
-            "listSessions",
-            "type SessionInfo"
-          ],
-          "from": "./session-store.js"
-        },
-        {
-          "names": [
-            "EditPlan"
-          ],
-          "from": "./architect-mode.js"
-        },
-        {
-          "names": [
-            "VirtualMessageList"
-          ],
-          "from": "./virtual-message-list.js"
-        },
-        {
-          "names": [
-            "undoLastCommit"
-          ],
-          "from": "./auto-commit.js"
-        },
-        {
-          "names": [
-            "buildRepoMap",
-            "fuzzySearch"
-          ],
-          "from": "./tree-sitter-map.js"
-        },
-        {
-          "names": [
-            "execSync"
-          ],
-          "from": "child_process"
-        },
-        {
-          "names": [
-            "runInit"
-          ],
-          "from": "./init-command.js"
-        },
-        {
-          "names": [
-            "buildExportContent"
-          ],
-          "from": "./export-helper.js"
-        },
-        {
-          "names": [
-            "shouldShowWelcome"
-          ],
-          "from": "./welcome.js"
-        },
-        {
-          "names": [
-            "Task",
-            "TaskPlan"
-          ],
-          "from": "./task-planner.js"
-        },
-        {
-          "names": [
-            "handlePlanCommand"
-          ],
-          "from": "./plan-commands.js"
-        },
-        {
-          "names": [
-            "runDream"
-          ],
-          "from": "./dream.js"
-        },
-        {
-          "names": [
-            "_searchIndexHolder",
-            "buildSearchIndex"
-          ],
-          "from": "./tool-registry.js"
-        },
-        {
-          "names": [
-            "Anthropic"
-          ],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [
-            "Markdown"
-          ],
-          "from": "./markdown-renderer.js"
-        }
-      ],
-      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775460583689.6611
+      "lastModified": 1775466589671.3687
     }
   ]
 }

@@ -1,0 +1,67 @@
+{
+  "goal": "Design and implement a self-reflection system that enables autoagent to analyze its own loop behavior, identify failure patterns, and systematically improve task completion quality.",
+  "tasks": [
+    {
+      "id": "t1",
+      "title": "Audit current loop metrics and failure modes",
+      "description": "Analyze orchestrator loop logs, cost-tracker data, and test failures from recent iterations (405–406) to identify where tasks stall, retry patterns, and decision quality degradation.",
+      "status": "pending",
+      "dependsOn": []
+    },
+    {
+      "id": "t2",
+      "title": "Design reflection checkpoint structure",
+      "description": "Define a `ReflectionCheckpoint` schema (task inputs, outputs, tool calls, cost, duration, success/failure reason) and wire hooks into orchestrator to capture data at task boundaries.",
+      "status": "pending",
+      "dependsOn": [
+        "t1"
+      ]
+    },
+    {
+      "id": "t3",
+      "title": "Implement post-task reflection logic in orchestrator",
+      "description": "Add a `reflectOnCompletion()` method (~200 LOC) that invokes Claude with task checkpoint data to extract lessons (what worked, what failed, next strategy) and store in session memory.",
+      "status": "pending",
+      "dependsOn": [
+        "t2"
+      ]
+    },
+    {
+      "id": "t4",
+      "title": "Create reflection aggregator module",
+      "description": "Build `src/reflection-aggregator.ts` (~250 LOC) to batch reflection outputs, detect recurring failure patterns, and generate actionable system prompts for future tool use.",
+      "status": "pending",
+      "dependsOn": [
+        "t3"
+      ]
+    },
+    {
+      "id": "t5",
+      "title": "Wire reflection insights into tool-recovery and prompt cache",
+      "description": "Modify `tool-recovery.ts` and orchestrator prompt construction to inject pattern-based retry strategies and reflection-derived context into extended thinking.",
+      "status": "pending",
+      "dependsOn": [
+        "t4"
+      ]
+    },
+    {
+      "id": "t6",
+      "title": "Add /reflect TUI command and reflection export",
+      "description": "Implement `/reflect` command to display current session reflections and export reflection history as JSON for cross-session learning.",
+      "status": "pending",
+      "dependsOn": [
+        "t5"
+      ]
+    },
+    {
+      "id": "t7",
+      "title": "Test reflection loop end-to-end with cost/quality metrics",
+      "description": "Run 3 test scenarios (simple task, multi-file edit, complex reasoning) and measure if reflection insights reduce retry count and improve final output quality.",
+      "status": "pending",
+      "dependsOn": [
+        "t6"
+      ]
+    }
+  ],
+  "createdAt": 1775463338739
+}
