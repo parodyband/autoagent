@@ -741,6 +741,14 @@ function App() {
         if (stats.filesModified?.length) {
           sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(", ")}`);
         }
+        if (stats.toolUsage && Object.keys(stats.toolUsage).length > 0) {
+          const topTools = Object.entries(stats.toolUsage)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([name, count]) => `${name}:${count}`)
+            .join("  ");
+          sessionLines.push(`  Tool usage:     ${topTools}`);
+        }
       }
       setMessages(prev => [...prev, {
         role: "assistant",

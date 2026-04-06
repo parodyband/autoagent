@@ -1,82 +1,3 @@
-1386 |     const caller = makeSimpleCaller(this.client);
-1387 | 
-1388 |     // Keep last 4 messages (2 exchanges) fresh
-1389 |     const keepCount = 4;
-1390 |     if (this.apiMessages.length <= keepCount) return;
-1391 | 
-1392 |     const toSummarize = this.apiMessages.slice(0, -keepCount);
-1393 |     const toKeep = this.apiMessages.slice(-keepCount);
-1394 | 
-1395 |     // Build a text representation for summarization
-1396 |     const convText = toSummarize.map(m => {
-1397 |       const role = m.role.toUpperCase();
-1398 |       const content = Array.isArray(m.content)
-1399 |         ? m.content.map(b => {
-1400 |             if (typeof b === "object" && "text" in b) return b.text;
-1401 |             if (typeof b === "object" && b.type === "tool_result") {
-1402 |               const text = Array.isArray(b.content)
-1403 |                 ? b.content.map((c: {type: string; text?: string}) => c.type === "text" ? c.text ?? "" : "").join("")
-1404 |                 : String(b.content ?? "");
-1405 |               return `[tool_result: ${text.slice(0, 500)}${text.length > 500 ? "…" : ""}]`;
-1406 |             }
-1407 |             return "";
-1408 |           }).filter(Boolean).join(" ")
-1409 |         : String(m.content);
-1410 |       return `### ${role}\n${content}`;
-1411 |     }).join("\n\n");
-1412 | 
-1413 |     // Write full conversation history to file before compacting (Cursor pattern)
-1414 |     const historyPath = `${this.opts.workDir}/.autoagent-history.md`;
-1415 |     try {
-1416 |       const allText = this.apiMessages.map(m => {
-1417 |         const role = m.role.toUpperCase();
-1418 |         const content = Array.isArray(m.content)
-1419 |           ? m.content.map(b => {
-1420 |               if (typeof b === "object" && "text" in b) return b.text;
-1421 |               if (typeof b === "object" && b.type === "tool_result") {
-1422 |                 const text = Array.isArray(b.content)
-1423 |                   ? b.content.map((c: {type: string; text?: string}) => c.type === "text" ? c.text ?? "" : "").join("")
-1424 |                   : String(b.content ?? "");
-1425 |                 return `[tool_result: ${text.slice(0, 500)}${text.length > 500 ? "…" : ""}]`;
-1426 |               }
-1427 |               return "";
-1428 |             }).filter(Boolean).join("\n")
-1429 |           : String(m.content);
-1430 |         return `### ${role}\n${content}`;
-1431 |       }).join("\n\n---\n\n");
-1432 |       fs.writeFileSync(historyPath, `# Conversation History (pre-compaction)\n\n${allText}\n`, "utf8");
-1433 |     } catch {
-1434 |       // Non-fatal
-1435 |     }
-1436 | 
-1437 |     const summary = await caller(
-1438 |       `Summarize this conversation into the following structured format. Use exactly these section headers:\n\n## Current Task\nWhat the user is currently trying to accomplish.\n\n## Plan & Progress\nStep-by-step plan and which steps are done, in-progress, or pending.\n\n## Files Modified\nList of files that were created, edited, or deleted.\n\n## Key Decisions\nImportant choices made (libraries chosen, approaches taken, things ruled out).\n\n## Open Questions\nUnresolved issues, errors, or things that still need attention.\n\nConversation to summarize:\n\n${convText}`
-1439 |     );
-1440 | 
-1441 |     this.apiMessages = [
-1442 |       { role: "user", content: `[Conversation summary]\n${summary}\n\nFull conversation history saved to .autoagent-history.md — use read_file to recover any details.` },
-1443 |       { role: "assistant", content: "I have the context from the earlier conversation. Full history is available in .autoagent-history.md if I need to recover any details." },
-1444 |       ...toKeep,
-1445 |     ];
-1446 | 
-1447 |     // Reset token counter after compaction (context is now much smaller)
-1448 |     this.sessionTokensIn = Math.min(this.sessionTokensIn, 20_000);
-[2026-04-05T22:06:56.232Z] iter=394 turn=12 INFO: Turn 12/25
-[2026-04-05T22:06:59.294Z] iter=394 turn=12 INFO: Agent: Now add `.autoagent-history.md` to `.gitignore` and run TSC:
-[2026-04-05T22:06:59.295Z] iter=394 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -q "autoagent-history" .gitignore && echo "already there" || echo ".autoagent-history.md" >> .gitignore && echo "done"
-[2026-04-05T22:06:59.301Z] iter=394 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T22:06:59.315Z] iter=394 turn=12 INFO:   -> exit=0 (5 chars)
-[2026-04-05T22:07:00.485Z] iter=394 turn=12 INFO:   -> exit=0 (11 chars)
-[2026-04-05T22:07:00.485Z] iter=394 turn=13 INFO: Turn 13/25
-[2026-04-05T22:07:06.580Z] iter=394 turn=13 INFO: Agent: TSC is clean. Wrapping up now.
-[2026-04-05T22:07:06.580Z] iter=394 turn=13 INFO: save_memory: "[Engineer 394] Semantic search lifecycle + history compaction"
-[2026-04-05T22:07:06.582Z] iter=394 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T22:07:06.582Z] iter=394 turn=14 INFO: Turn 14/25
-[2026-04-05T22:07:17.162Z] iter=394 turn=14 INFO: write_file: goals.md (write)
-[2026-04-05T22:07:17.163Z] iter=394 turn=14 INFO:   -> ok: Updated goals.md (1286 chars, -20 lines delta)
-[2026-04-05T22:07:17.164Z] iter=394 turn=15 INFO: Turn 15/25
-[2026-04-05T22:07:19.074Z] iter=394 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC_OK"
-[2026-04-05T22:07:20.180Z] iter=394 turn=15 INFO:   -> exit=0 (7 chars)
 [2026-04-05T22:07:20.181Z] iter=394 turn=16 INFO: Turn 16/25
 [2026-04-05T22:07:23.437Z] iter=394 turn=16 INFO: Agent: TSC is clean, memory saved, goals written. Done.
 [2026-04-05T22:07:23.438Z] iter=394 turn=16 INFO: $ echo "AUTOAGENT_RESTART"
@@ -1075,3 +996,107 @@ Context after patch:
 [2026-04-06T07:35:02.910Z] iter=403 turn=10 INFO: Tool timing stats
 [2026-04-06T07:35:10.608Z] iter=403 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 403: predicted 12 turns, actual 10 turns, ratio 0.83**
 [2026-04-06T07:35:10.632Z] iter=403 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-06T07:35:10.671Z] iter=403 turn=10 INFO: Committed: 98a01919 (18 in / 2671 out, cache: 11381 created, 77251 read)
+[2026-04-06T07:35:10.672Z] iter=403 turn=10 INFO: Restarting as iteration 404...
+[2026-04-06T07:35:10.877Z] iter=404 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-06T07:35:10.880Z] iter=404 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
+[2026-04-06T07:35:10.881Z] iter=404 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-06T07:35:11.075Z] iter=404 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-06T07:35:11.076Z] iter=404 turn=1 INFO: Turn 1/25
+[2026-04-06T07:35:12.833Z] iter=404 turn=1 INFO: read_scratchpad: 2852 chars
+[2026-04-06T07:35:12.834Z] iter=404 turn=1 INFO: read_file: goals.md
+[2026-04-06T07:35:12.834Z] iter=404 turn=1 INFO:   -> ok (1529 chars)
+[2026-04-06T07:35:12.835Z] iter=404 turn=2 INFO: Turn 2/25
+[2026-04-06T07:35:20.819Z] iter=404 turn=2 INFO: think: I'm the Engineer for iteration 404. My goals from goals.md (written by the Architect for iteration 403) are to:
+1. Finis...
+[2026-04-06T07:35:20.820Z] iter=404 turn=3 INFO: Turn 3/25
+[2026-04-06T07:35:24.820Z] iter=404 turn=3 INFO: Agent: My deliverables:
+1. Wire `toolUsage` into `getSessionStats()` in `src/orchestrator.ts` 
+2. Display tool usage in `/status` in `src/tui.tsx`
+3. Wire `/search` TUI command to orchestrator
+[2026-04-06T07:35:24.821Z] iter=404 turn=3 INFO: $ grep -n "getSessionStats\|toolUsage\|toolUsageCounts" src/orchestrator.ts | head -40
+[2026-04-06T07:35:24.829Z] iter=404 turn=3 INFO: $ grep -n "status\|/status\|toolUsage\|search" src/tui.tsx | head -60
+[2026-04-06T07:35:24.840Z] iter=404 turn=3 INFO:   -> exit=0 (468 chars)
+[2026-04-06T07:35:24.841Z] iter=404 turn=3 INFO:   -> exit=0 (1596 chars)
+[2026-04-06T07:35:24.841Z] iter=404 turn=4 INFO: Turn 4/25
+[2026-04-06T07:35:28.340Z] iter=404 turn=4 INFO: Agent: Goal 1 (tool usage stats): NOT STARTED
+Goal 2 (/search wiring): NOT STARTED (already wired per line 792-803 of tui.tsx)
+
+Let me check the /status handler and getSessionStats quickly, then write both changes at once.
+[2026-04-06T07:35:28.341Z] iter=404 turn=4 INFO: $ sed -n '1125,1160p' src/orchestrator.ts
+[2026-04-06T07:35:28.343Z] iter=404 turn=4 INFO: $ sed -n '727,790p' src/tui.tsx
+[2026-04-06T07:35:28.350Z] iter=404 turn=4 INFO:   -> exit=0 (1557 chars)
+[2026-04-06T07:35:28.351Z] iter=404 turn=4 INFO:   -> exit=0 (2882 chars)
+[2026-04-06T07:35:28.351Z] iter=404 turn=5 INFO: Turn 5/25
+[2026-04-06T07:35:38.227Z] iter=404 turn=5 INFO: Agent: Now I have exactly what I need. Making both changes:
+[2026-04-06T07:35:38.228Z] iter=404 turn=5 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-06T07:35:38.230Z] iter=404 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -13 +14 lines
+
+Context after patch:
+1127 |     }
+1128 |   }
+1129 | 
+1130 |   /** Session statistics for /status display. */
+1131 |   getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: "↑" | "→" | "↓"; sessionCost: number; costSummary: string; filesModified: string[]; toolUsage: Record<string, number> } {
+1132 |     const durationMs = Date.now() - this.sessionStartTime;
+1133 |     const turnCount = this.turnCosts.length;
+1134 |     const avgCostPerTurn = turnCount > 0 ? this.sessionCost / turnCount : 0;
+1135 |     let costTrend: "↑" | "→" | "↓" = "→";
+1136 |     if (turnCount >= 3) {
+1137 |       const recentAvg = this.turnCosts.slice(-3).reduce((a, b) => a + b, 0) / 3;
+1138 |       if (recentAvg > avgCostPerTurn * 1.2) costTrend = "↑";
+1139 |       else if (recentAvg < avgCostPerTurn * 0.8) costTrend = "↓";
+1140 |     }
+1141 |     const toolUsage = Object.fromEntries(this.toolUsageCounts);
+1142 |     return { durationMs, turnCount, avgCostPerTurn, costTrend, sessionCost: this.costTracker.totalCost, costSummary: this.costTracker.sessionSummary, filesModified: Array.from(this.sessionFilesModified), toolUsage };
+1143 |   }
+1144 | 
+1145 |   /** Get the current model (override if set, otherwise "auto"). */
+1146 |   getModel(): string {
+[2026-04-06T07:35:38.231Z] iter=404 turn=6 INFO: Turn 6/25
+[2026-04-06T07:35:43.821Z] iter=404 turn=6 INFO: Agent: I've patched orchestrator.ts. Now patching tui.tsx to display tool usage in /status:
+[2026-04-06T07:35:43.822Z] iter=404 turn=6 INFO: write_file: src/tui.tsx (patch)
+[2026-04-06T07:35:43.823Z] iter=404 turn=6 INFO:   -> ok: Patched src/tui.tsx: -4 +12 lines
+
+Context after patch:
+738 |         sessionLines.push(`  Cost:           ${stats.costSummary}`);
+739 |         sessionLines.push(`  Avg cost/turn:  ${stats.avgCostPerTurn.toFixed(4)}`);
+740 |         sessionLines.push(`  Cost trend:     ${stats.costTrend}`);
+741 |         if (stats.filesModified?.length) {
+742 |           sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(", ")}`);
+743 |         }
+744 |         if (stats.toolUsage && Object.keys(stats.toolUsage).length > 0) {
+745 |           const topTools = Object.entries(stats.toolUsage)
+746 |             .sort((a, b) => b[1] - a[1])
+747 |             .slice(0, 5)
+748 |             .map(([name, count]) => `${name}:${count}`)
+749 |             .join("  ");
+750 |           sessionLines.push(`  Tool usage:     ${topTools}`);
+751 |         }
+752 |       }
+753 |       setMessages(prev => [...prev, {
+754 |         role: "assistant",
+755 |         content: [
+[2026-04-06T07:35:43.824Z] iter=404 turn=7 INFO: Turn 7/25
+[2026-04-06T07:35:45.806Z] iter=404 turn=7 INFO: Agent: Both changes done. Running TSC now.
+[2026-04-06T07:35:45.808Z] iter=404 turn=7 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-06T07:35:46.911Z] iter=404 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-06T07:35:46.912Z] iter=404 turn=8 INFO: Turn 8/25
+[2026-04-06T07:35:50.876Z] iter=404 turn=8 INFO: Agent: TSC clean. Writing memory and goals.
+[2026-04-06T07:35:50.877Z] iter=404 turn=8 INFO: save_memory: "[Engineer 404] Tool usage stats complete"
+[2026-04-06T07:35:50.880Z] iter=404 turn=8 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-06T07:35:50.881Z] iter=404 turn=9 INFO: Turn 9/25
+[2026-04-06T07:36:00.628Z] iter=404 turn=9 INFO: write_file: goals.md (write)
+[2026-04-06T07:36:00.631Z] iter=404 turn=9 INFO:   -> ok: Updated goals.md (1090 chars, -6 lines delta)
+[2026-04-06T07:36:00.631Z] iter=404 turn=10 INFO: Turn 10/25
+[2026-04-06T07:36:02.187Z] iter=404 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-06T07:36:02.188Z] iter=404 turn=10 INFO: RESTART signal
+[2026-04-06T07:36:02.188Z] iter=404 turn=10 INFO: Validating: npx tsc --noEmit ...
+[2026-04-06T07:36:03.254Z] iter=404 turn=10 INFO: Compilation OK
+[2026-04-06T07:36:11.907Z] iter=404 turn=10 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-06T07:36:11.907Z] iter=404 turn=10 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 3 invalidations (1 entries removed)
+[2026-04-06T07:36:11.907Z] iter=404 turn=10 INFO: Tool cache stats
+[2026-04-06T07:36:11.907Z] iter=404 turn=10 INFO: Tool timing: bash: 6x, avg=192ms, total=1154ms; write_file: 3x, avg=3ms, total=8ms; save_memory: 1x, avg=4ms, total=4ms; read_scratchpad: 1x, avg=1ms, total=1ms; read_file: 1x, avg=0ms, total=0ms; think: 1x, avg=0ms, total=0ms
+[2026-04-06T07:36:11.907Z] iter=404 turn=10 INFO: Tool timing stats
+[2026-04-06T07:36:19.809Z] iter=404 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 404: predicted 8 turns, actual 10 turns, ratio 1.25**
+[2026-04-06T07:36:22.010Z] iter=404 turn=10 INFO: Pre-commit review (728in/77out): LGTM. The change cleanly adds `toolUsage` to the return type and value by converting `this.toolUsageCounts` (a `Map`) to a plain object — straightforward and consistent with the existing pattern of se

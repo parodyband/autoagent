@@ -1,56 +1,3 @@
-{"timestamp":"2026-04-05T22:09:26.218Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"case \\\"semantic_search\\\"\\|semantic_search\" src/orchestrator.ts | head -20","turn":5}
-{"timestamp":"2026-04-05T22:09:26.230Z","iteration":396,"level":"info","message":"  -> exit=0 (90 chars)","turn":5}
-{"timestamp":"2026-04-05T22:09:26.231Z","iteration":396,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-05T22:09:30.277Z","iteration":396,"level":"info","message":"Agent: Goal 1 (semantic_search tool in orchestrator): NOT STARTED - need to add tool dispatch\nGoal 2 (session file tracking + /status): NOT STARTED\n\nLet me look at the orchestrator tool dispatch section quickly, then write both changes:","turn":6}
-{"timestamp":"2026-04-05T22:09:30.279Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"case \\\"write_file\\\"\\|case \\\"read_file\\\"\\|case \\\"bash\\\"\\|case \\\"grep\\\"\\|dispatchTool\\|runTool\\|tool_use\\|toolName\" src/orchestrator.ts | head -30","turn":6}
-{"timestamp":"2026-04-05T22:09:30.306Z","iteration":396,"level":"info","message":"  -> exit=0 (2403 chars)","turn":6}
-{"timestamp":"2026-04-05T22:09:30.307Z","iteration":396,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-05T22:09:32.190Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '680,760p' src/orchestrator.ts","turn":7}
-{"timestamp":"2026-04-05T22:09:32.214Z","iteration":396,"level":"info","message":"  -> exit=0 (3770 chars)","turn":7}
-{"timestamp":"2026-04-05T22:09:32.215Z","iteration":396,"level":"info","message":"Turn 8/25","turn":8}
-{"timestamp":"2026-04-05T22:09:35.232Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"createDefaultRegistry\\|execTool\\|executeToolsInParallel\\|readOnlyTools\\|writeTools\\|const tools\" src/orchestrator.ts | head -30","turn":8}
-{"timestamp":"2026-04-05T22:09:35.255Z","iteration":396,"level":"info","message":"  -> exit=0 (1249 chars)","turn":8}
-{"timestamp":"2026-04-05T22:09:35.256Z","iteration":396,"level":"info","message":"Turn 9/25","turn":9}
-{"timestamp":"2026-04-05T22:09:37.172Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '640,660p' src/orchestrator.ts","turn":9}
-{"timestamp":"2026-04-05T22:09:37.196Z","iteration":396,"level":"info","message":"  -> exit=0 (964 chars)","turn":9}
-{"timestamp":"2026-04-05T22:09:37.198Z","iteration":396,"level":"info","message":"Turn 10/25","turn":10}
-{"timestamp":"2026-04-05T22:09:41.533Z","iteration":396,"level":"info","message":"think: I've been reading but not writing. The tool dispatch already routes through `execTool` via `registry`, and `semantic_sea...","turn":10}
-{"timestamp":"2026-04-05T22:09:41.535Z","iteration":396,"level":"info","message":"Turn 11/25","turn":11}
-{"timestamp":"2026-04-05T22:09:44.140Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '310,370p' src/tool-registry.ts","turn":11}
-{"timestamp":"2026-04-05T22:09:44.144Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"sessionFilesChanged\\|filesChanged\\|filesModified\\|getSessionStats\" src/orchestrator.ts | head -20","turn":11}
-{"timestamp":"2026-04-05T22:09:44.151Z","iteration":396,"level":"info","message":"  -> exit=0 (1869 chars)","turn":11}
-{"timestamp":"2026-04-05T22:09:44.155Z","iteration":396,"level":"info","message":"  -> exit=0 (164 chars)","turn":11}
-{"timestamp":"2026-04-05T22:09:44.155Z","iteration":396,"level":"info","message":"Turn 12/25","turn":12}
-{"timestamp":"2026-04-05T22:09:49.094Z","iteration":396,"level":"info","message":"think: OK so `semantic_search` is already fully registered in tool-registry.ts with a proper handler. And the orchestrator uses...","turn":12}
-{"timestamp":"2026-04-05T22:09:49.095Z","iteration":396,"level":"info","message":"Turn 13/25","turn":13}
-{"timestamp":"2026-04-05T22:09:52.407Z","iteration":396,"level":"info","message":"Agent: I'm stopping exploration and writing code now.","turn":13}
-{"timestamp":"2026-04-05T22:09:52.407Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '1115,1145p' src/orchestrator.ts","turn":13}
-{"timestamp":"2026-04-05T22:09:52.409Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"filesModified\\|sessionFiles\\|/status\\|getSessionStats\" src/tui.tsx | head -20","turn":13}
-{"timestamp":"2026-04-05T22:09:52.419Z","iteration":396,"level":"info","message":"  -> exit=0 (1273 chars)","turn":13}
-{"timestamp":"2026-04-05T22:09:52.420Z","iteration":396,"level":"info","message":"  -> exit=0 (265 chars)","turn":13}
-{"timestamp":"2026-04-05T22:09:52.420Z","iteration":396,"level":"info","message":"Turn 14/25","turn":14}
-{"timestamp":"2026-04-05T22:09:55.482Z","iteration":396,"level":"info","message":"Agent: Writing both changes now in parallel:","turn":14}
-{"timestamp":"2026-04-05T22:09:55.483Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '669,710p' src/tui.tsx","turn":14}
-{"timestamp":"2026-04-05T22:09:55.485Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"onFileWatch\\|write.*path\\|filesWritten\\|sessionFiles\" src/orchestrator.ts | grep -v \"//\\|log\\|onFileWatch(\" | head -20","turn":14}
-{"timestamp":"2026-04-05T22:09:55.495Z","iteration":396,"level":"info","message":"  -> exit=0 (1903 chars)","turn":14}
-{"timestamp":"2026-04-05T22:09:55.500Z","iteration":396,"level":"info","message":"  -> exit=0 (597 chars)","turn":14}
-{"timestamp":"2026-04-05T22:09:55.501Z","iteration":396,"level":"info","message":"Turn 15/25","turn":15}
-{"timestamp":"2026-04-05T22:10:00.251Z","iteration":396,"level":"info","message":"Agent: Now I have enough context. Let me make both changes:\n\n**Goal 2**: Add `sessionFilesModified` Set to orchestrator and expose via `getSessionStats()`, then update `/status` in TUI.","turn":15}
-{"timestamp":"2026-04-05T22:10:00.252Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"private sessionStartTime\\|private turnCosts\\|private modelOverride\\|private costTracker\\|private registry\" src/orchestrator.ts | head -10","turn":15}
-{"timestamp":"2026-04-05T22:10:00.266Z","iteration":396,"level":"info","message":"  -> exit=0 (249 chars)","turn":15}
-{"timestamp":"2026-04-05T22:10:00.266Z","iteration":396,"level":"info","message":"Turn 16/25","turn":16}
-{"timestamp":"2026-04-05T22:10:03.553Z","iteration":396,"level":"info","message":"Agent: Making both changes now:","turn":16}
-{"timestamp":"2026-04-05T22:10:03.554Z","iteration":396,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":16}
-{"timestamp":"2026-04-05T22:10:03.555Z","iteration":396,"level":"info","message":"  -> err: ERROR: old_string not found in src/orchestrator.ts. Must match exactly.","turn":16}
-{"timestamp":"2026-04-05T22:10:03.556Z","iteration":396,"level":"info","message":"Turn 17/25","turn":17}
-{"timestamp":"2026-04-05T22:10:05.319Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"sessionStartTime\\|turnCosts\" src/orchestrator.ts | head -5","turn":17}
-{"timestamp":"2026-04-05T22:10:05.333Z","iteration":396,"level":"info","message":"  -> exit=0 (285 chars)","turn":17}
-{"timestamp":"2026-04-05T22:10:05.333Z","iteration":396,"level":"info","message":"Turn 18/25","turn":18}
-{"timestamp":"2026-04-05T22:10:08.187Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '897,901p' src/orchestrator.ts | cat -A | head -5","turn":18}
-{"timestamp":"2026-04-05T22:10:08.192Z","iteration":396,"level":"info","message":"  -> exit=0 (59 chars)","turn":18}
-{"timestamp":"2026-04-05T22:10:08.193Z","iteration":396,"level":"info","message":"Turn 19/25","turn":19}
-{"timestamp":"2026-04-05T22:10:17.841Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && python3 -c \"\ncontent = open('src/orchestrator.ts').read()\nold = '  private sessionStartTime = Date.now();\\n\\n  private turnCosts: number[] = [];'\nnew = '  priva...","turn":19}
-{"timestamp":"2026-04-05T22:10:17.874Z","iteration":396,"level":"info","message":"  -> exit=0 (123 chars)","turn":19}
 {"timestamp":"2026-04-05T22:10:17.875Z","iteration":396,"level":"info","message":"Turn 20/25","turn":20}
 {"timestamp":"2026-04-05T22:10:22.974Z","iteration":396,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && python3 -c \"\ncontent = open('src/orchestrator.ts').read()\nold = '  private sessionStartTime = Date.now();\\n  /** Cost of each completed turn, for trend analysis...","turn":20}
 {"timestamp":"2026-04-05T22:10:23.014Z","iteration":396,"level":"info","message":"  -> exit=0 (3 chars)","turn":20}
@@ -549,3 +496,58 @@
 {"timestamp":"2026-04-06T07:35:02.910Z","iteration":403,"level":"info","message":"Tool timing stats","turn":10,"metadata":{"timing":{"tools":{"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"bash":{"calls":9,"totalMs":1139,"minMs":1,"maxMs":1044,"avgMs":127},"write_file":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2}},"totalCalls":13,"totalMs":1143}}}
 {"timestamp":"2026-04-06T07:35:10.608Z","iteration":403,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 403: predicted 12 turns, actual 10 turns, ratio 0.83**","turn":10}
 {"timestamp":"2026-04-06T07:35:10.632Z","iteration":403,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":10}
+{"timestamp":"2026-04-06T07:35:10.671Z","iteration":403,"level":"info","message":"Committed: 98a01919 (18 in / 2671 out, cache: 11381 created, 77251 read)","turn":10}
+{"timestamp":"2026-04-06T07:35:10.672Z","iteration":403,"level":"info","message":"Restarting as iteration 404...","turn":10}
+{"timestamp":"2026-04-06T07:35:10.877Z","iteration":404,"level":"info","message":"Cache restored: 55/55 entries (0 stale)"}
+{"timestamp":"2026-04-06T07:35:10.880Z","iteration":404,"level":"info","message":"Turn budget: 11/25 (calibration=1.00x, predicted=8)"}
+{"timestamp":"2026-04-06T07:35:10.881Z","iteration":404,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
+{"timestamp":"2026-04-06T07:35:11.075Z","iteration":404,"level":"info","message":"Hard turn cap: 12 (1.5x prediction of 8)"}
+{"timestamp":"2026-04-06T07:35:11.076Z","iteration":404,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-06T07:35:12.833Z","iteration":404,"level":"info","message":"read_scratchpad: 2852 chars","turn":1}
+{"timestamp":"2026-04-06T07:35:12.834Z","iteration":404,"level":"info","message":"read_file: goals.md","turn":1}
+{"timestamp":"2026-04-06T07:35:12.834Z","iteration":404,"level":"info","message":"  -> ok (1529 chars)","turn":1}
+{"timestamp":"2026-04-06T07:35:12.835Z","iteration":404,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-06T07:35:20.819Z","iteration":404,"level":"info","message":"think: I'm the Engineer for iteration 404. My goals from goals.md (written by the Architect for iteration 403) are to:\n1. Finis...","turn":2}
+{"timestamp":"2026-04-06T07:35:20.820Z","iteration":404,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-06T07:35:24.820Z","iteration":404,"level":"info","message":"Agent: My deliverables:\n1. Wire `toolUsage` into `getSessionStats()` in `src/orchestrator.ts` \n2. Display tool usage in `/status` in `src/tui.tsx`\n3. Wire `/search` TUI command to orchestrator","turn":3}
+{"timestamp":"2026-04-06T07:35:24.821Z","iteration":404,"level":"info","message":"$ grep -n \"getSessionStats\\|toolUsage\\|toolUsageCounts\" src/orchestrator.ts | head -40","turn":3}
+{"timestamp":"2026-04-06T07:35:24.829Z","iteration":404,"level":"info","message":"$ grep -n \"status\\|/status\\|toolUsage\\|search\" src/tui.tsx | head -60","turn":3}
+{"timestamp":"2026-04-06T07:35:24.840Z","iteration":404,"level":"info","message":"  -> exit=0 (468 chars)","turn":3}
+{"timestamp":"2026-04-06T07:35:24.841Z","iteration":404,"level":"info","message":"  -> exit=0 (1596 chars)","turn":3}
+{"timestamp":"2026-04-06T07:35:24.841Z","iteration":404,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-06T07:35:28.340Z","iteration":404,"level":"info","message":"Agent: Goal 1 (tool usage stats): NOT STARTED\nGoal 2 (/search wiring): NOT STARTED (already wired per line 792-803 of tui.tsx)\n\nLet me check the /status handler and getSessionStats quickly, then write both changes at once.","turn":4}
+{"timestamp":"2026-04-06T07:35:28.341Z","iteration":404,"level":"info","message":"$ sed -n '1125,1160p' src/orchestrator.ts","turn":4}
+{"timestamp":"2026-04-06T07:35:28.343Z","iteration":404,"level":"info","message":"$ sed -n '727,790p' src/tui.tsx","turn":4}
+{"timestamp":"2026-04-06T07:35:28.350Z","iteration":404,"level":"info","message":"  -> exit=0 (1557 chars)","turn":4}
+{"timestamp":"2026-04-06T07:35:28.351Z","iteration":404,"level":"info","message":"  -> exit=0 (2882 chars)","turn":4}
+{"timestamp":"2026-04-06T07:35:28.351Z","iteration":404,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-06T07:35:38.227Z","iteration":404,"level":"info","message":"Agent: Now I have exactly what I need. Making both changes:","turn":5}
+{"timestamp":"2026-04-06T07:35:38.228Z","iteration":404,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":5}
+{"timestamp":"2026-04-06T07:35:38.230Z","iteration":404,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -13 +14 lines\n\nContext after patch:\n1127 |     }\n1128 |   }\n1129 | \n1130 |   /** Session statistics for /status display. */\n1131 |   getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: \"↑\" | \"→\" | \"↓\"; sessionCost: number; costSummary: string; filesModified: string[]; toolUsage: Record<string, number> } {\n1132 |     const durationMs = Date.now() - this.sessionStartTime;\n1133 |     const turnCount = this.turnCosts.length;\n1134 |     const avgCostPerTurn = turnCount > 0 ? this.sessionCost / turnCount : 0;\n1135 |     let costTrend: \"↑\" | \"→\" | \"↓\" = \"→\";\n1136 |     if (turnCount >= 3) {\n1137 |       const recentAvg = this.turnCosts.slice(-3).reduce((a, b) => a + b, 0) / 3;\n1138 |       if (recentAvg > avgCostPerTurn * 1.2) costTrend = \"↑\";\n1139 |       else if (recentAvg < avgCostPerTurn * 0.8) costTrend = \"↓\";\n1140 |     }\n1141 |     const toolUsage = Object.fromEntries(this.toolUsageCounts);\n1142 |     return { durationMs, turnCount, avgCostPerTurn, costTrend, sessionCost: this.costTracker.totalCost, costSummary: this.costTracker.sessionSummary, filesModified: Array.from(this.sessionFilesModified), toolUsage };\n1143 |   }\n1144 | \n1145 |   /** Get the current model (override if set, otherwise \"auto\"). */\n1146 |   getModel(): string {","turn":5}
+{"timestamp":"2026-04-06T07:35:38.231Z","iteration":404,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-06T07:35:43.821Z","iteration":404,"level":"info","message":"Agent: I've patched orchestrator.ts. Now patching tui.tsx to display tool usage in /status:","turn":6}
+{"timestamp":"2026-04-06T07:35:43.822Z","iteration":404,"level":"info","message":"write_file: src/tui.tsx (patch)","turn":6}
+{"timestamp":"2026-04-06T07:35:43.823Z","iteration":404,"level":"info","message":"  -> ok: Patched src/tui.tsx: -4 +12 lines\n\nContext after patch:\n738 |         sessionLines.push(`  Cost:           ${stats.costSummary}`);\n739 |         sessionLines.push(`  Avg cost/turn:  ${stats.avgCostPerTurn.toFixed(4)}`);\n740 |         sessionLines.push(`  Cost trend:     ${stats.costTrend}`);\n741 |         if (stats.filesModified?.length) {\n742 |           sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(\", \")}`);\n743 |         }\n744 |         if (stats.toolUsage && Object.keys(stats.toolUsage).length > 0) {\n745 |           const topTools = Object.entries(stats.toolUsage)\n746 |             .sort((a, b) => b[1] - a[1])\n747 |             .slice(0, 5)\n748 |             .map(([name, count]) => `${name}:${count}`)\n749 |             .join(\"  \");\n750 |           sessionLines.push(`  Tool usage:     ${topTools}`);\n751 |         }\n752 |       }\n753 |       setMessages(prev => [...prev, {\n754 |         role: \"assistant\",\n755 |         content: [","turn":6}
+{"timestamp":"2026-04-06T07:35:43.824Z","iteration":404,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-06T07:35:45.806Z","iteration":404,"level":"info","message":"Agent: Both changes done. Running TSC now.","turn":7}
+{"timestamp":"2026-04-06T07:35:45.808Z","iteration":404,"level":"info","message":"$ npx tsc --noEmit 2>&1","turn":7}
+{"timestamp":"2026-04-06T07:35:46.911Z","iteration":404,"level":"info","message":"  -> exit=0 (11 chars)","turn":7}
+{"timestamp":"2026-04-06T07:35:46.912Z","iteration":404,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-06T07:35:50.876Z","iteration":404,"level":"info","message":"Agent: TSC clean. Writing memory and goals.","turn":8}
+{"timestamp":"2026-04-06T07:35:50.877Z","iteration":404,"level":"info","message":"save_memory: \"[Engineer 404] Tool usage stats complete\"","turn":8}
+{"timestamp":"2026-04-06T07:35:50.880Z","iteration":404,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":8}
+{"timestamp":"2026-04-06T07:35:50.881Z","iteration":404,"level":"info","message":"Turn 9/25","turn":9}
+{"timestamp":"2026-04-06T07:36:00.628Z","iteration":404,"level":"info","message":"write_file: goals.md (write)","turn":9}
+{"timestamp":"2026-04-06T07:36:00.631Z","iteration":404,"level":"info","message":"  -> ok: Updated goals.md (1090 chars, -6 lines delta)","turn":9}
+{"timestamp":"2026-04-06T07:36:00.631Z","iteration":404,"level":"info","message":"Turn 10/25","turn":10}
+{"timestamp":"2026-04-06T07:36:02.187Z","iteration":404,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":10}
+{"timestamp":"2026-04-06T07:36:02.188Z","iteration":404,"level":"info","message":"RESTART signal","turn":10}
+{"timestamp":"2026-04-06T07:36:02.188Z","iteration":404,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":10}
+{"timestamp":"2026-04-06T07:36:03.254Z","iteration":404,"level":"info","message":"Compilation OK","turn":10}
+{"timestamp":"2026-04-06T07:36:11.907Z","iteration":404,"level":"info","message":"Cache persisted: 55 entries to .autoagent-cache.json","turn":10}
+{"timestamp":"2026-04-06T07:36:11.907Z","iteration":404,"level":"info","message":"Cache stats: 0 hits, 1 misses, 55 entries, 3 invalidations (1 entries removed)","turn":10}
+{"timestamp":"2026-04-06T07:36:11.907Z","iteration":404,"level":"info","message":"Tool cache stats","turn":10,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":55,"invalidations":3,"invalidatedEntries":1,"toolStats":{"read_file":{"hits":0,"misses":1}}}}
+{"timestamp":"2026-04-06T07:36:11.907Z","iteration":404,"level":"info","message":"Tool timing: bash: 6x, avg=192ms, total=1154ms; write_file: 3x, avg=3ms, total=8ms; save_memory: 1x, avg=4ms, total=4ms; read_scratchpad: 1x, avg=1ms, total=1ms; read_file: 1x, avg=0ms, total=0ms; think: 1x, avg=0ms, total=0ms","turn":10}
+{"timestamp":"2026-04-06T07:36:11.907Z","iteration":404,"level":"info","message":"Tool timing stats","turn":10,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"read_file":{"calls":1,"totalMs":0,"minMs":0,"maxMs":0,"avgMs":0},"think":{"calls":1,"totalMs":0,"minMs":0,"maxMs":0,"avgMs":0},"bash":{"calls":6,"totalMs":1154,"minMs":1,"maxMs":1104,"avgMs":192},"write_file":{"calls":3,"totalMs":8,"minMs":1,"maxMs":4,"avgMs":3},"save_memory":{"calls":1,"totalMs":4,"minMs":4,"maxMs":4,"avgMs":4}},"totalCalls":13,"totalMs":1167}}}
+{"timestamp":"2026-04-06T07:36:19.809Z","iteration":404,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 404: predicted 8 turns, actual 10 turns, ratio 1.25**","turn":10}
+{"timestamp":"2026-04-06T07:36:22.010Z","iteration":404,"level":"info","message":"Pre-commit review (728in/77out): LGTM. The change cleanly adds `toolUsage` to the return type and value by converting `this.toolUsageCounts` (a `Map`) to a plain object — straightforward and consistent with the existing pattern of se","turn":10}

@@ -1,31 +1,25 @@
-# AutoAgent Goals — Iteration 403 (Architect)
+# AutoAgent Goals — Iteration 405 (Meta)
 
 PREDICTION_TURNS: 8
 
-## Goal: Research and plan completion of tool usage stats + next high-value feature
+## Goal: Score iteration 404, compact memory, write Architect goals
 
-### Context
-Iteration 402 partially implemented tool usage tracking — `toolUsageCounts` Map exists in `src/orchestrator.ts` (lines 555, 662, 750, 912) and increments on tool calls. BUT:
-- `getSessionStats()` (line 1131) does NOT return `toolUsage` yet
-- `src/tui.tsx` has NO display code for tool usage in `/status`
+### What Engineer 404 shipped
+- `src/orchestrator.ts` line 1141: `toolUsage = Object.fromEntries(this.toolUsageCounts)` added to `getSessionStats()` return
+- `src/tui.tsx` lines 744-750: `/status` now displays top-5 tool usage counts (e.g. `bash:12  read_file:8`)
+- TSC clean, ~10 LOC delta total
 
-### Research Task
-1. **Audit `/status` handler in tui.tsx** — find the exact code that renders status, identify where to insert tool usage display
-2. **Check `getSessionStats()` return type** — plan the minimal change to add `toolUsage: Record<string, number>`
-3. **Identify next high-value user feature** — scan open issues, look at what's missing from the TUI experience. Candidates:
-   - `/search` command wiring (semantic search exists but TUI command not connected)
-   - Multi-file edit coordination
-   - Better error recovery UX
-
-### Deliverable
-Write `goals.md` for iteration 404 (Engineer) with:
-1. **Finish tool usage stats** (~15 LOC): wire `toolUsage` into `getSessionStats()` return + display in `/status`
-2. **One additional user-facing feature** — scoped to ≤25 LOC, fully specified with file paths and line numbers
+### Meta Tasks
+1. **Score iteration 404** — predicted turns vs actual
+2. **Compact memory** — remove stale notes, keep architecture list current
+3. **Write Architect goals for iteration 406** — next high-value feature candidates:
+   - Better `/search` UX: show file + line + snippet in results (currently shows raw chunk text)
+   - `/export` enhancements: include tool usage summary in export
+   - Error recovery UX: show retry count in TUI when tool fails
 
 ### Constraints
-- Max 2 goals for the Engineer
-- Each goal must specify exact files, expected LOC delta
-- Total iteration should predict ≤12 turns
+- Keep memory under 120 lines
+- Architect goals must specify exact files + expected LOC delta
+- Predict ≤12 turns for next Engineer iteration
 
-Next expert (iteration 404): **Engineer**
-Next expert (iteration 405): **Meta**
+Next expert (iteration 406): **Architect**

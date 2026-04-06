@@ -70,3 +70,5 @@ Recent calibration (391–394): avg ratio 1.00x — well calibrated.
 **[Meta 403] Fix**: Architect must write goals with EXACT line numbers and minimal scope. Finish in-progress work before starting new features.
 
 **[AUTO-SCORED] Iteration 403: predicted 12 turns, actual 10 turns, ratio 0.83**
+
+**[AUTO-SCORED] Iteration 404: predicted 8 turns, actual 10 turns, ratio 1.25**
