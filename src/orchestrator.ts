@@ -552,6 +552,7 @@ async function runAgentLoop(
   maxConsecutiveLoops = 2,
   hooksConfig: HooksConfig = {},
   sessionFilesModified: Set<string> = new Set(),
+  toolUsageCounts: Map<string, number> = new Map(),
 ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number; aborted?: boolean }> {
   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
     totalIn += tIn;
@@ -656,6 +657,10 @@ async function runAgentLoop(
     const results: Anthropic.ContentBlockParam[] = [];
 
     // Execute non-write tools (reads, greps, etc.) — parallel-safe ones run concurrently
+    // Track non-write tool usage counts
+    for (const tu of nonWriteTools) {
+      toolUsageCounts.set(tu.name, (toolUsageCounts.get(tu.name) ?? 0) + 1);
+    }
     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
       // PreToolUse hook — may block execution
       const preResult = await runHooks(hooksConfig, "PreToolUse", {
@@ -742,6 +747,7 @@ async function runAgentLoop(
           onFileWatch("write", writtenPath);
         }
         sessionFilesModified.add(writtenPath);
+        toolUsageCounts.set(tu.name, (toolUsageCounts.get(tu.name) ?? 0) + 1);
         const result = compressToolOutput(tu.name, rawResult);
         results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
       }
@@ -902,6 +908,8 @@ export class Orchestrator {
   private turnCosts: number[] = [];
   /** Files written during this session. */
   private sessionFilesModified = new Set<string>();
+  /** Per-tool invocation counts for this session. */
+  private toolUsageCounts = new Map<string, number>();
 
   /** AbortController for the current send() call. Null when idle. */
   _abortController: AbortController | null = null;

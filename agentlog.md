@@ -1,78 +1,3 @@
-
-I'll start by understanding the current state of the codebase after iteration 392, then evaluate what was built and plan the next iteration.
-[2026-04-05T22:03:30.494Z] iter=393 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
-[2026-04-05T22:03:30.506Z] iter=393 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git diff HEAD~1 --stat
-[2026-04-05T22:03:30.513Z] iter=393 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
-[2026-04-05T22:03:30.527Z] iter=393 turn=1 INFO:   -> exit=0 (391 chars)
-[2026-04-05T22:03:30.529Z] iter=393 turn=1 INFO:   -> exit=0 (245 chars)
-[2026-04-05T22:03:31.604Z] iter=393 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-05T22:03:31.605Z] iter=393 turn=2 INFO: Turn 2/25
-[2026-04-05T22:03:36.164Z] iter=393 turn=2 INFO: think: Iteration 392 had 0 src/ LOC changes. It was predicted at 15 turns but took 23 turns (ratio 1.53). The goal was to wire ...
-[2026-04-05T22:03:36.165Z] iter=393 turn=3 INFO: Turn 3/25
-[2026-04-05T22:03:40.166Z] iter=393 turn=3 INFO: Agent: 
-
-You're right. My deliverable is clear: write goals.md for the next Engineer iteration. Let me quickly check what iteration 392 actually shipped (or didn't), then write the goals.
-[2026-04-05T22:03:40.167Z] iter=393 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && git diff 356772e..HEAD -- src/ | head -5
-[2026-04-05T22:03:40.173Z] iter=393 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && git diff e60f0ae..356772e --stat -- src/
-[2026-04-05T22:03:40.202Z] iter=393 turn=3 INFO:   -> exit=0 (11 chars)
-[2026-04-05T22:03:40.206Z] iter=393 turn=3 INFO:   -> exit=0 (207 chars)
-[2026-04-05T22:03:40.206Z] iter=393 turn=4 INFO: Turn 4/25
-[2026-04-05T22:03:43.297Z] iter=393 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && git diff e60f0ae..356772e -- src/tool-registry.ts
-[2026-04-05T22:03:43.305Z] iter=393 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && git diff e60f0ae..356772e -- src/tui.tsx
-[2026-04-05T22:03:43.312Z] iter=393 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && git diff e60f0ae..356772e -- src/orchestrator.ts
-[2026-04-05T22:03:43.333Z] iter=393 turn=4 INFO:   -> exit=0 (3997 chars)
-[2026-04-05T22:03:43.334Z] iter=393 turn=4 INFO:   -> exit=0 (2455 chars)
-[2026-04-05T22:03:43.340Z] iter=393 turn=4 INFO:   -> exit=0 (460 chars)
-[2026-04-05T22:03:43.340Z] iter=393 turn=5 INFO: Turn 5/25
-[2026-04-05T22:03:57.579Z] iter=393 turn=5 INFO: think: Good - iteration 392 DID ship code (120 LOC across 3 files), but the diff showing "0 src/ changes" in the orientation wa...
-[2026-04-05T22:03:57.580Z] iter=393 turn=6 INFO: Turn 6/25
-[2026-04-05T22:04:01.743Z] iter=393 turn=6 INFO: Agent: 
-
-My deliverable is writing goals.md for the next Engineer iteration (394). Let me check tests pass, do quick research, then write the goals.
-[2026-04-05T22:04:01.743Z] iter=393 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -10
-[2026-04-05T22:04:01.746Z] iter=393 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "reindex" src/orchestrator.ts | head -5
-[2026-04-05T22:04:01.751Z] iter=393 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "file-watcher\|fileWatcher\|watchFiles" src/orchestrator.ts | head -10
-[2026-04-05T22:04:01.766Z] iter=393 turn=6 INFO:   -> exit=0 (313 chars)
-[2026-04-05T22:04:01.775Z] iter=393 turn=6 INFO:   -> exit=0 (359 chars)
-[2026-04-05T22:04:18.352Z] iter=393 turn=6 INFO:   -> exit=0 (462 chars)
-[2026-04-05T22:04:18.352Z] iter=393 turn=7 INFO: Turn 7/25
-[2026-04-05T22:04:21.555Z] iter=393 turn=7 INFO: read_file: src/orchestrator.ts
-[2026-04-05T22:04:21.557Z] iter=393 turn=7 INFO:   -> ok (1035 chars)
-[2026-04-05T22:04:21.557Z] iter=393 turn=7 INFO: read_file: src/orchestrator.ts
-[2026-04-05T22:04:21.558Z] iter=393 turn=7 INFO:   -> ok (1257 chars)
-[2026-04-05T22:04:21.559Z] iter=393 turn=8 INFO: Turn 8/25
-[2026-04-05T22:04:39.874Z] iter=393 turn=8 INFO: think: Good. Now I have a clear picture:
-
-**Iteration 392 assessment:**
-- Shipped 120 LOC: semantic_search tool in tool-registr...
-[2026-04-05T22:04:39.878Z] iter=393 turn=9 INFO: Turn 9/25
-[2026-04-05T22:04:43.034Z] iter=393 turn=9 INFO: Agent: Now let me do the required research check before writing goals:
-[2026-04-05T22:04:43.035Z] iter=393 turn=9 INFO: web_search: "coding agent auto context retrieval RAG architecture 2024 cursor aider"
-[2026-04-05T22:04:44.390Z] iter=393 turn=9 INFO:   -> 8 results
-[2026-04-05T22:04:44.390Z] iter=393 turn=10 INFO: Turn 10/25
-[2026-04-05T22:04:47.829Z] iter=393 turn=10 INFO: Agent: 
-
-I'm the Architect — my deliverable is goals.md, not src/ changes. Let me write it now and wrap up.
-[2026-04-05T22:04:47.830Z] iter=393 turn=10 INFO: web_fetch: https://cursor.com/blog/dynamic-context-discovery
-[2026-04-05T22:04:48.039Z] iter=393 turn=10 INFO:   -> ok (16680 chars)
-[2026-04-05T22:04:48.042Z] iter=393 turn=11 INFO: Turn 11/25
-[2026-04-05T22:05:09.633Z] iter=393 turn=11 INFO: Agent: Excellent research. Cursor's key insight: **dynamic context discovery** — provide fewer details up front, let the agent pull context on its own via tools. Our semantic_search tool already enables this pattern. Now let me write the goals and save research notes.
-[2026-04-05T22:05:09.633Z] iter=393 turn=11 INFO: write_file: goals.md (write)
-[2026-04-05T22:05:09.634Z] iter=393 turn=11 INFO:   -> ok: Updated goals.md (2801 chars, +6 lines delta)
-[2026-04-05T22:05:09.635Z] iter=393 turn=12 INFO: Turn 12/25
-[2026-04-05T22:05:15.727Z] iter=393 turn=12 INFO: save_memory: "[Research] Cursor dynamic context discovery"
-[2026-04-05T22:05:15.728Z] iter=393 turn=12 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T22:05:15.728Z] iter=393 turn=13 INFO: Turn 13/25
-[2026-04-05T22:05:24.392Z] iter=393 turn=13 INFO: Agent: 
-
-Goals are written. Let me save memory and restart.
-[2026-04-05T22:05:24.392Z] iter=393 turn=13 INFO: save_memory: "[Architect] Iteration 393 summary"
-[2026-04-05T22:05:24.393Z] iter=393 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T22:05:24.393Z] iter=393 turn=14 INFO: Turn 14/25
-[2026-04-05T22:05:27.035Z] iter=393 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
-[2026-04-05T22:05:28.134Z] iter=393 turn=14 INFO:   -> exit=0 (11 chars)
-[2026-04-05T22:05:28.134Z] iter=393 turn=15 INFO: Turn 15/25
-[2026-04-05T22:05:30.135Z] iter=393 turn=15 INFO: Agent: TSC clean. 
 [2026-04-05T22:05:30.135Z] iter=393 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
 [2026-04-05T22:05:30.136Z] iter=393 turn=15 INFO: RESTART signal
 [2026-04-05T22:05:30.136Z] iter=393 turn=15 INFO: Validating: npx tsc --noEmit ...
@@ -1071,3 +996,137 @@ Wrapping up now.
 [2026-04-06T07:32:12.326Z] iter=401 turn=8 INFO: Tool timing stats
 [2026-04-06T07:32:19.949Z] iter=401 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 401: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-06T07:32:19.973Z] iter=401 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-06T07:32:20.014Z] iter=401 turn=8 INFO: Committed: 14f5df4d (18 in / 2235 out, cache: 10960 created, 57479 read)
+[2026-04-06T07:32:20.014Z] iter=401 turn=8 INFO: Restarting as iteration 402...
+[2026-04-06T07:32:20.222Z] iter=402 INFO: Cache restored: 56/56 entries (0 stale)
+[2026-04-06T07:32:20.224Z] iter=402 INFO: Turn budget: 19/25 (calibration=1.18x, predicted=12)
+[2026-04-06T07:32:20.225Z] iter=402 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-06T07:32:20.412Z] iter=402 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-06T07:32:20.413Z] iter=402 turn=1 INFO: Turn 1/25
+[2026-04-06T07:32:22.744Z] iter=402 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be modified.
+[2026-04-06T07:32:22.745Z] iter=402 turn=1 INFO: read_scratchpad: 2852 chars
+[2026-04-06T07:32:22.745Z] iter=402 turn=1 INFO: $ grep -n "getSessionStats\|toolUsage\|toolUsageCounts" src/orchestrator.ts | head -40
+[2026-04-06T07:32:22.754Z] iter=402 turn=1 INFO:   -> exit=0 (189 chars)
+[2026-04-06T07:32:22.754Z] iter=402 turn=2 INFO: Turn 2/25
+[2026-04-06T07:32:24.956Z] iter=402 turn=2 INFO: $ grep -n "getSessionStats\|dispatchTool\|tool_use\|toolCall\|executeTool\|private.*Map\|private.*count" src/orchestrator.ts | head -60
+[2026-04-06T07:32:24.970Z] iter=402 turn=2 INFO:   -> exit=0 (3058 chars)
+[2026-04-06T07:32:24.970Z] iter=402 turn=3 INFO: Turn 3/25
+[2026-04-06T07:32:29.230Z] iter=402 turn=3 INFO: think: I have enough context. I need to:
+1. Add `private toolUsageCounts: Map<string, number>` to Orchestrator class
+2. Increme...
+[2026-04-06T07:32:29.232Z] iter=402 turn=4 INFO: Turn 4/25
+[2026-04-06T07:32:32.334Z] iter=402 turn=4 INFO: Agent: I have enough context. Let me look at the two key areas and make changes immediately.
+[2026-04-06T07:32:32.336Z] iter=402 turn=4 INFO: read_file: src/orchestrator.ts
+[2026-04-06T07:32:32.337Z] iter=402 turn=4 INFO:   -> ok (2398 chars)
+[2026-04-06T07:32:32.338Z] iter=402 turn=4 INFO: read_file: src/orchestrator.ts
+[2026-04-06T07:32:32.339Z] iter=402 turn=4 INFO:   -> ok (1592 chars)
+[2026-04-06T07:32:32.340Z] iter=402 turn=5 INFO: Turn 5/25
+[2026-04-06T07:32:35.772Z] iter=402 turn=5 INFO: Agent: **Goal status: NOT STARTED** (only read context so far)
+
+Making both changes now:
+[2026-04-06T07:32:35.772Z] iter=402 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-06T07:32:35.773Z] iter=402 turn=5 INFO:   -> ok (5406 chars)
+[2026-04-06T07:32:35.774Z] iter=402 turn=6 INFO: Turn 6/25
+[2026-04-06T07:32:49.201Z] iter=402 turn=6 INFO: think: Now I understand the structure. The tool execution happens in a function call that takes `toolUses`, `hooksConfig`, etc....
+[2026-04-06T07:32:49.202Z] iter=402 turn=7 INFO: Turn 7/25
+[2026-04-06T07:32:51.637Z] iter=402 turn=7 INFO: $ grep -n "sessionFilesModified\|toolUsageCounts\|async send\|private send\|send(" src/orchestrator.ts | head -30
+[2026-04-06T07:32:51.651Z] iter=402 turn=7 INFO:   -> exit=0 (771 chars)
+[2026-04-06T07:32:51.651Z] iter=402 turn=8 INFO: Turn 8/25
+[2026-04-06T07:32:53.839Z] iter=402 turn=8 INFO: Agent: I have not written any code yet. Making the changes now.
+[2026-04-06T07:32:53.840Z] iter=402 turn=8 INFO: $ grep -n "sessionFilesModified" src/orchestrator.ts
+[2026-04-06T07:32:53.858Z] iter=402 turn=8 INFO:   -> exit=0 (371 chars)
+[2026-04-06T07:32:53.858Z] iter=402 turn=9 INFO: Turn 9/25
+[2026-04-06T07:33:00.597Z] iter=402 turn=9 INFO: read_file: src/orchestrator.ts
+[2026-04-06T07:33:00.598Z] iter=402 turn=9 INFO:   -> ok (976 chars)
+[2026-04-06T07:33:00.599Z] iter=402 turn=10 INFO: Turn 10/25
+[2026-04-06T07:33:05.925Z] iter=402 turn=10 INFO: think: Now I understand the full picture. The `runAgentLoop` function (or whatever it's called) takes `sessionFilesModified` as...
+[2026-04-06T07:33:05.926Z] iter=402 turn=11 INFO: Turn 11/25
+[2026-04-06T07:33:07.895Z] iter=402 turn=11 INFO: Agent: Making changes now. No more reading.
+[2026-04-06T07:33:07.896Z] iter=402 turn=11 INFO: $ grep -n "^async function\|^function\|runAgentLoop\|sessionFilesModified" src/orchestrator.ts | head -20
+[2026-04-06T07:33:07.907Z] iter=402 turn=11 INFO:   -> exit=0 (893 chars)
+[2026-04-06T07:33:07.908Z] iter=402 turn=12 INFO: Turn 12/25
+[2026-04-06T07:33:11.452Z] iter=402 turn=12 INFO: Agent: Now I have everything I need. Making all changes:
+[2026-04-06T07:33:11.454Z] iter=402 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-06T07:33:11.456Z] iter=402 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
+
+Context after patch:
+551 |   signal?: AbortSignal,
+552 |   maxConsecutiveLoops = 2,
+553 |   hooksConfig: HooksConfig = {},
+554 |   sessionFilesModified: Set<string> = new Set(),
+555 |   toolUsageCounts: Map<string, number> = new Map(),
+556 | ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number; aborted?: boolean }> {
+557 |   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
+558 |     totalIn += tIn;
+559 |     totalOut += tOut;
+[2026-04-06T07:33:11.457Z] iter=402 turn=13 INFO: Turn 13/25
+[2026-04-06T07:33:16.350Z] iter=402 turn=13 INFO: Agent: Now I need to increment `toolUsageCounts` in the two tool execution paths. First, in `executeToolsParallel` for non-write tools (I'll increment before/after calling), and for write tools directly. The simplest approach: increment right after executing each tool use block.
+[2026-04-06T07:33:16.351Z] iter=402 turn=13 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-06T07:33:16.352Z] iter=402 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -1 +5 lines
+
+Context after patch:
+657 |     const results: Anthropic.ContentBlockParam[] = [];
+658 | 
+659 |     // Execute non-write tools (reads, greps, etc.) — parallel-safe ones run concurrently
+660 |     // Track non-write tool usage counts
+661 |     for (const tu of nonWriteTools) {
+662 |       toolUsageCounts.set(tu.name, (toolUsageCounts.get(tu.name) ?? 0) + 1);
+663 |     }
+664 |     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
+665 |       // PreToolUse hook — may block execution
+666 |       const preResult = await runHooks(hooksConfig, "PreToolUse", {
+667 |         cwd: workDir, tool_name: tu.name, tool_input: tu.input,
+[2026-04-06T07:33:16.353Z] iter=402 turn=14 INFO: Turn 14/25
+[2026-04-06T07:33:20.991Z] iter=402 turn=14 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-06T07:33:20.992Z] iter=402 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -5 +6 lines
+
+Context after patch:
+742 |         if (postWriteResult.additionalContext) {
+743 |           rawResult += "\n\n[Hook context]: " + postWriteResult.additionalContext;
+744 |         }
+745 |         const writtenPath = (tu.input as { path?: string }).path ?? "";
+746 |         if (onFileWatch) {
+747 |           onFileWatch("write", writtenPath);
+748 |         }
+749 |         sessionFilesModified.add(writtenPath);
+750 |         toolUsageCounts.set(tu.name, (toolUsageCounts.get(tu.name) ?? 0) + 1);
+751 |         const result = compressToolOutput(tu.name, rawResult);
+752 |         results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
+753 |       }
+[2026-04-06T07:33:20.993Z] iter=402 turn=15 INFO: Turn 15/25
+[2026-04-06T07:33:24.222Z] iter=402 turn=15 INFO: Agent: Now add `private toolUsageCounts` to Orchestrator class and pass it to all `runAgentLoop` calls:
+[2026-04-06T07:33:24.223Z] iter=402 turn=15 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-06T07:33:24.225Z] iter=402 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -2 +4 lines
+
+Context after patch:
+906 |   private sessionStartTime = Date.now();
+907 |   /** Cost of each completed turn, for trend analysis. */
+908 |   private turnCosts: number[] = [];
+909 |   /** Files written during this session. */
+910 |   private sessionFilesModified = new Set<string>();
+911 |   /** Per-tool invocation counts for this session. */
+912 |   private toolUsageCounts = new Map<string, number>();
+913 | 
+914 |   /** AbortController for the current send() call. Null when idle. */
+915 |   _abortController: AbortController | null = null;
+[2026-04-06T07:33:24.226Z] iter=402 turn=16 INFO: Turn 16/25
+[2026-04-06T07:33:27.015Z] iter=402 turn=16 INFO: Agent: Now pass `this.toolUsageCounts` to all `runAgentLoop` calls and update `getSessionStats()`:
+[2026-04-06T07:33:27.017Z] iter=402 turn=16 INFO: $ grep -n "runAgentLoop(" src/orchestrator.ts
+[2026-04-06T07:33:27.034Z] iter=402 turn=16 INFO:   -> exit=0 (264 chars)
+[2026-04-06T07:33:27.034Z] iter=402 turn=17 INFO: Turn 17/25
+[2026-04-06T07:33:30.420Z] iter=402 turn=17 INFO: Agent: Let me get the context around each runAgentLoop call and patch them all, plus update getSessionStats, in one shot:
+[2026-04-06T07:33:30.421Z] iter=402 turn=17 INFO: $ sed -n '1625,1650p' src/orchestrator.ts; echo "---"; sed -n '1694,1710p' src/orchestrator.ts; echo "---"; sed -n '1738,1750p' src/orchestrator.ts; echo "---"; sed -n '1790,1802p' src/orchestrator.ts; ...
+[2026-04-06T07:33:30.442Z] iter=402 turn=17 INFO:   -> exit=0 (2739 chars)
+[2026-04-06T07:33:30.442Z] iter=402 turn=18 INFO: Turn 18/25
+[2026-04-06T07:33:32.839Z] iter=402 turn=18 INFO: $ sed -n '1644,1648p' src/orchestrator.ts; echo "---"; sed -n '1708,1715p' src/orchestrator.ts; echo "---"; sed -n '1750,1760p' src/orchestrator.ts; echo "---"; sed -n '1848,1860p' src/orchestrator.ts
+[2026-04-06T07:33:32.855Z] iter=402 turn=18 INFO:   -> exit=0 (877 chars)
+[2026-04-06T07:33:32.855Z] iter=402 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
+[2026-04-06T07:33:32.857Z] iter=402 turn=18 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-06T07:33:32.857Z] iter=402 turn=18 INFO: Cache stats: 0 hits, 4 misses, 55 entries, 4 invalidations (5 entries removed)
+[2026-04-06T07:33:32.857Z] iter=402 turn=18 INFO: Tool cache stats
+[2026-04-06T07:33:32.858Z] iter=402 turn=18 INFO: Tool timing: bash: 8x, avg=15ms, total=121ms; write_file: 4x, avg=3ms, total=11ms; read_file: 4x, avg=2ms, total=9ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 3x, avg=1ms, total=3ms
+[2026-04-06T07:33:32.858Z] iter=402 turn=18 INFO: Tool timing stats
+[2026-04-06T07:33:40.406Z] iter=402 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 402: predicted 12 turns, actual 18 turns, ratio 1.50**
+[2026-04-06T07:33:47.514Z] iter=402 turn=18 INFO: Pre-commit review (811in/269out): **Logic bug: Counting before execution**
+
+The non-write tools are counted *before* `executeToolsParallel` runs them. If a tool is blocked by the `PreToolUse` hook or otherwise fails/skips, it still ge

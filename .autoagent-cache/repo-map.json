@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775460453833,
+  "generatedAt": 1775460792402,
   "files": [
     {
       "path": "src/context-loader.ts",
@@ -1668,13 +1668,13 @@
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 881,
+          "line": 882,
           "exported": true
         },
         {
           "name": "runSingleTask",
           "kind": "function",
-          "line": 1819,
+          "line": 1820,
           "exported": true
         }
       ],
@@ -1838,7 +1838,7 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775427207190.6543
+      "lastModified": 1775460791455.9868
     },
     {
       "path": "src/tui.tsx",
@@ -2015,7 +2015,7 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775460413583.777
+      "lastModified": 1775460583689.6611
     }
   ]
 }
