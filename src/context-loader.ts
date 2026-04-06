@@ -375,3 +375,76 @@ export function autoLoadContext(
   if (sections.length === 0) return "";
   return `[Auto-loaded context]\n\n${sections.join("\n")}`;
 }
+
+/**
+ * Resolve the import graph for a given file up to `depth` levels deep.
+ *
+ * Parses `import ... from "./foo.js"` and `require("./bar")` patterns.
+ * Only follows relative imports (skips node_modules).
+ * Returns a deduplicated list of resolved absolute file paths.
+ *
+ * @param filePath - absolute or relative path of the entry file
+ * @param depth    - how many levels of imports to follow (default: 2)
+ * @param workDir  - working directory for resolving relative paths (default: process.cwd())
+ */
+export function resolveImportGraph(
+  filePath: string,
+  depth: number = 2,
+  workDir: string = process.cwd(),
+): string[] {
+  const absEntry = filePath.startsWith("/") ? filePath : join(workDir, filePath);
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  function visit(absPath: string, remaining: number): void {
+    if (seen.has(absPath) || remaining <= 0) return;
+    seen.add(absPath);
+
+    let src: string;
+    try {
+      src = readFileSync(absPath, "utf-8");
+    } catch {
+      return;
+    }
+
+    // Match: import ... from "./foo.js"  OR  require("./bar")
+    const importRe = /(?:import\s+[\s\S]*?from\s+|require\s*\(\s*)["'](\.[^"']+)["']/g;
+    let m: RegExpExecArray | null;
+    while ((m = importRe.exec(src)) !== null) {
+      const rawSpecifier = m[1];
+      // Resolve candidate — try exact path, then common TS/JS extensions
+      const resolved = resolveSpecifier(rawSpecifier, absPath);
+      if (!resolved) continue;
+      if (!seen.has(resolved)) {
+        result.push(resolved);
+      }
+      visit(resolved, remaining - 1);
+    }
+  }
+
+  visit(absEntry, depth);
+  return result;
+}
+
+/** Attempt to resolve an import specifier to an existing file on disk. */
+function resolveSpecifier(specifier: string, fromFile: string): string | null {
+  const dir = fromFile.replace(/\/[^/]+$/, ""); // dirname
+  const base = join(dir, specifier);
+
+  // Try: exact path, strip .js → .ts, add .ts, add /index.ts
+  const candidates = [
+    base,
+    base.replace(/\.js$/, ".ts"),
+    base.replace(/\.js$/, ".tsx"),
+    base + ".ts",
+    base + ".tsx",
+    base + ".js",
+    join(base, "index.ts"),
+    join(base, "index.js"),
+  ];
+
+  for (const c of candidates) {
+    if (existsSync(c)) return c;
+  }
+  return null;
+}

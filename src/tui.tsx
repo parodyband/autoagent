@@ -810,14 +810,15 @@ function App() {
         }
         const results = _searchIndexHolder.index.search(query, 5);
         if (results.length === 0) {
-          setMessages(prev => [...prev, { role: "assistant", content: `No results for "${query}"` }]);
+          setMessages(prev => [...prev, { role: "assistant", content: `🔍 No results found for "${query}"` }]);
         } else {
-          const lines = results.map((r, i) =>
-            `${i + 1}. ${r.file}:${r.lineStart}-${r.lineEnd}  score=${r.score.toFixed(2)}\n   ${r.snippet.replace(/\n/g, " ").slice(0, 120)}`
-          );
+          const lines = results.map((r, i) => {
+            const snippet = r.snippet.replace(/\n/g, " ").trim().slice(0, 80);
+            return `${i + 1}. 📄 ${r.file}:L${r.lineStart}  — ${snippet}`;
+          });
           setMessages(prev => [...prev, {
             role: "assistant",
-            content: `🔍 Semantic results for "${query}":\n\n${lines.join("\n\n")}`,
+            content: `🔍 Semantic results for "${query}":\n\n${lines.join("\n")}`,
           }]);
         }
       } catch (err) {

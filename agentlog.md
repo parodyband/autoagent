@@ -1,76 +1,3 @@
-[2026-04-05T22:09:26.218Z] iter=396 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "case \"semantic_search\"\|semantic_search" src/orchestrator.ts | head -20
-[2026-04-05T22:09:26.230Z] iter=396 turn=5 INFO:   -> exit=0 (90 chars)
-[2026-04-05T22:09:26.231Z] iter=396 turn=6 INFO: Turn 6/25
-[2026-04-05T22:09:30.277Z] iter=396 turn=6 INFO: Agent: Goal 1 (semantic_search tool in orchestrator): NOT STARTED - need to add tool dispatch
-Goal 2 (session file tracking + /status): NOT STARTED
-
-Let me look at the orchestrator tool dispatch section quickly, then write both changes:
-[2026-04-05T22:09:30.279Z] iter=396 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "case \"write_file\"\|case \"read_file\"\|case \"bash\"\|case \"grep\"\|dispatchTool\|runTool\|tool_use\|toolName" src/orchestrator.ts | head -30
-[2026-04-05T22:09:30.306Z] iter=396 turn=6 INFO:   -> exit=0 (2403 chars)
-[2026-04-05T22:09:30.307Z] iter=396 turn=7 INFO: Turn 7/25
-[2026-04-05T22:09:32.190Z] iter=396 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '680,760p' src/orchestrator.ts
-[2026-04-05T22:09:32.214Z] iter=396 turn=7 INFO:   -> exit=0 (3770 chars)
-[2026-04-05T22:09:32.215Z] iter=396 turn=8 INFO: Turn 8/25
-[2026-04-05T22:09:35.232Z] iter=396 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "createDefaultRegistry\|execTool\|executeToolsInParallel\|readOnlyTools\|writeTools\|const tools" src/orchestrator.ts | head -30
-[2026-04-05T22:09:35.255Z] iter=396 turn=8 INFO:   -> exit=0 (1249 chars)
-[2026-04-05T22:09:35.256Z] iter=396 turn=9 INFO: Turn 9/25
-[2026-04-05T22:09:37.172Z] iter=396 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '640,660p' src/orchestrator.ts
-[2026-04-05T22:09:37.196Z] iter=396 turn=9 INFO:   -> exit=0 (964 chars)
-[2026-04-05T22:09:37.198Z] iter=396 turn=10 INFO: Turn 10/25
-[2026-04-05T22:09:41.533Z] iter=396 turn=10 INFO: think: I've been reading but not writing. The tool dispatch already routes through `execTool` via `registry`, and `semantic_sea...
-[2026-04-05T22:09:41.535Z] iter=396 turn=11 INFO: Turn 11/25
-[2026-04-05T22:09:44.140Z] iter=396 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '310,370p' src/tool-registry.ts
-[2026-04-05T22:09:44.144Z] iter=396 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "sessionFilesChanged\|filesChanged\|filesModified\|getSessionStats" src/orchestrator.ts | head -20
-[2026-04-05T22:09:44.151Z] iter=396 turn=11 INFO:   -> exit=0 (1869 chars)
-[2026-04-05T22:09:44.155Z] iter=396 turn=11 INFO:   -> exit=0 (164 chars)
-[2026-04-05T22:09:44.155Z] iter=396 turn=12 INFO: Turn 12/25
-[2026-04-05T22:09:49.094Z] iter=396 turn=12 INFO: think: OK so `semantic_search` is already fully registered in tool-registry.ts with a proper handler. And the orchestrator uses...
-[2026-04-05T22:09:49.095Z] iter=396 turn=13 INFO: Turn 13/25
-[2026-04-05T22:09:52.407Z] iter=396 turn=13 INFO: Agent: I'm stopping exploration and writing code now.
-[2026-04-05T22:09:52.407Z] iter=396 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1115,1145p' src/orchestrator.ts
-[2026-04-05T22:09:52.409Z] iter=396 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "filesModified\|sessionFiles\|/status\|getSessionStats" src/tui.tsx | head -20
-[2026-04-05T22:09:52.419Z] iter=396 turn=13 INFO:   -> exit=0 (1273 chars)
-[2026-04-05T22:09:52.420Z] iter=396 turn=13 INFO:   -> exit=0 (265 chars)
-[2026-04-05T22:09:52.420Z] iter=396 turn=14 INFO: Turn 14/25
-[2026-04-05T22:09:55.482Z] iter=396 turn=14 INFO: Agent: Writing both changes now in parallel:
-[2026-04-05T22:09:55.483Z] iter=396 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '669,710p' src/tui.tsx
-[2026-04-05T22:09:55.485Z] iter=396 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onFileWatch\|write.*path\|filesWritten\|sessionFiles" src/orchestrator.ts | grep -v "//\|log\|onFileWatch(" | head -20
-[2026-04-05T22:09:55.495Z] iter=396 turn=14 INFO:   -> exit=0 (1903 chars)
-[2026-04-05T22:09:55.500Z] iter=396 turn=14 INFO:   -> exit=0 (597 chars)
-[2026-04-05T22:09:55.501Z] iter=396 turn=15 INFO: Turn 15/25
-[2026-04-05T22:10:00.251Z] iter=396 turn=15 INFO: Agent: Now I have enough context. Let me make both changes:
-
-**Goal 2**: Add `sessionFilesModified` Set to orchestrator and expose via `getSessionStats()`, then update `/status` in TUI.
-[2026-04-05T22:10:00.252Z] iter=396 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "private sessionStartTime\|private turnCosts\|private modelOverride\|private costTracker\|private registry" src/orchestrator.ts | head -10
-[2026-04-05T22:10:00.266Z] iter=396 turn=15 INFO:   -> exit=0 (249 chars)
-[2026-04-05T22:10:00.266Z] iter=396 turn=16 INFO: Turn 16/25
-[2026-04-05T22:10:03.553Z] iter=396 turn=16 INFO: Agent: Making both changes now:
-[2026-04-05T22:10:03.554Z] iter=396 turn=16 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-05T22:10:03.555Z] iter=396 turn=16 INFO:   -> err: ERROR: old_string not found in src/orchestrator.ts. Must match exactly.
-[2026-04-05T22:10:03.556Z] iter=396 turn=17 INFO: Turn 17/25
-[2026-04-05T22:10:05.319Z] iter=396 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "sessionStartTime\|turnCosts" src/orchestrator.ts | head -5
-[2026-04-05T22:10:05.333Z] iter=396 turn=17 INFO:   -> exit=0 (285 chars)
-[2026-04-05T22:10:05.333Z] iter=396 turn=18 INFO: Turn 18/25
-[2026-04-05T22:10:08.187Z] iter=396 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '897,901p' src/orchestrator.ts | cat -A | head -5
-[2026-04-05T22:10:08.192Z] iter=396 turn=18 INFO:   -> exit=0 (59 chars)
-[2026-04-05T22:10:08.193Z] iter=396 turn=19 INFO: Turn 19/25
-[2026-04-05T22:10:17.841Z] iter=396 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && python3 -c "
-content = open('src/orchestrator.ts').read()
-old = '  private sessionStartTime = Date.now();\n\n  private turnCosts: number[] = [];'
-new = '  priva...
-[2026-04-05T22:10:17.874Z] iter=396 turn=19 INFO:   -> exit=0 (123 chars)
-[2026-04-05T22:10:17.875Z] iter=396 turn=20 INFO: Turn 20/25
-[2026-04-05T22:10:22.974Z] iter=396 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && python3 -c "
-content = open('src/orchestrator.ts').read()
-old = '  private sessionStartTime = Date.now();\n  /** Cost of each completed turn, for trend analysis...
-[2026-04-05T22:10:23.014Z] iter=396 turn=20 INFO:   -> exit=0 (3 chars)
-[2026-04-05T22:10:23.014Z] iter=396 turn=21 INFO: Turn 21/25
-[2026-04-05T22:10:26.413Z] iter=396 turn=21 INFO: Agent: Now track files on write and patch the TUI `/status` display:
-[2026-04-05T22:10:26.415Z] iter=396 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onFileWatch.*write\|sessionFilesModified" src/orchestrator.ts | head -10
-[2026-04-05T22:10:26.437Z] iter=396 turn=21 INFO:   -> exit=0 (541 chars)
-[2026-04-05T22:10:26.438Z] iter=396 turn=22 INFO: Turn 22/25
-[2026-04-05T22:10:29.019Z] iter=396 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '735,745p' src/orchestrator.ts
-[2026-04-05T22:10:29.034Z] iter=396 turn=22 INFO:   -> exit=0 (437 chars)
 [2026-04-05T22:10:29.035Z] iter=396 turn=23 INFO: Turn 23/25
 [2026-04-05T22:10:38.606Z] iter=396 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && python3 -c "
 content = open('src/orchestrator.ts').read()
@@ -1069,3 +996,133 @@ TSC clean, memory at 65 lines (under 120 limit), goals.md written for Engineer i
 [2026-04-06T07:37:39.188Z] iter=405 turn=7 INFO: Tool timing stats
 [2026-04-06T07:37:46.487Z] iter=405 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 405: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-06T07:37:46.510Z] iter=405 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-06T07:37:46.551Z] iter=405 turn=7 INFO: Committed: 6b3fe023 (17 in / 3552 out, cache: 14055 created, 53233 read)
+[2026-04-06T07:37:46.551Z] iter=405 turn=7 INFO: Restarting as iteration 406...
+[2026-04-06T07:37:46.764Z] iter=406 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-06T07:37:46.767Z] iter=406 INFO: Turn budget: 17/25 (calibration=1.00x, predicted=15)
+[2026-04-06T07:37:46.767Z] iter=406 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-06T07:37:46.931Z] iter=406 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-06T07:37:46.932Z] iter=406 turn=1 INFO: Turn 1/25
+[2026-04-06T07:37:49.205Z] iter=406 turn=1 INFO: read_scratchpad: 2852 chars
+[2026-04-06T07:37:49.206Z] iter=406 turn=1 INFO: $ cat goals.md
+[2026-04-06T07:37:49.215Z] iter=406 turn=1 INFO:   -> exit=0 (2285 chars)
+[2026-04-06T07:37:49.215Z] iter=406 turn=2 INFO: Turn 2/25
+[2026-04-06T07:37:51.222Z] iter=406 turn=2 INFO: $ cat src/context-loader.ts
+[2026-04-06T07:37:51.226Z] iter=406 turn=2 INFO: $ grep -n "search\|searchResults\|SearchResult\|/search" src/tui.tsx | head -50
+[2026-04-06T07:37:51.236Z] iter=406 turn=2 INFO:   -> exit=0 (12819 chars)
+[2026-04-06T07:37:51.243Z] iter=406 turn=2 INFO:   -> exit=0 (686 chars)
+[2026-04-06T07:37:51.243Z] iter=406 turn=3 INFO: Turn 3/25
+[2026-04-06T07:37:55.038Z] iter=406 turn=3 INFO: think: I have enough context. Let me start building immediately:
+
+1. Goal 1: Add `resolveImportGraph` to `src/context-loader.ts...
+[2026-04-06T07:37:55.038Z] iter=406 turn=4 INFO: Turn 4/25
+[2026-04-06T07:37:57.680Z] iter=406 turn=4 INFO: Agent: Let me read just what I need and start writing immediately.
+[2026-04-06T07:37:57.680Z] iter=406 turn=4 INFO: $ sed -n '800,840p' src/tui.tsx
+[2026-04-06T07:37:57.683Z] iter=406 turn=4 INFO: $ grep -n "processToolResult\|postToolUse\|tool_result\|read_file\|write_file\|bash\|toolResult" src/orchestrator.ts | head -30
+[2026-04-06T07:37:57.690Z] iter=406 turn=4 INFO:   -> exit=0 (1994 chars)
+[2026-04-06T07:37:57.698Z] iter=406 turn=4 INFO:   -> exit=0 (2272 chars)
+[2026-04-06T07:37:57.698Z] iter=406 turn=5 INFO: Turn 5/25
+[2026-04-06T07:37:59.747Z] iter=406 turn=5 INFO: $ sed -n '680,760p' src/orchestrator.ts
+[2026-04-06T07:37:59.763Z] iter=406 turn=5 INFO:   -> exit=0 (4164 chars)
+[2026-04-06T07:37:59.763Z] iter=406 turn=6 INFO: Turn 6/25
+[2026-04-06T07:38:03.030Z] iter=406 turn=6 INFO: Agent: Goal 1: NOT STARTED (still reading context)
+Goal 2: NOT STARTED
+
+I have enough context now. Writing immediately.
+[2026-04-06T07:38:03.031Z] iter=406 turn=6 INFO: $ tail -20 src/context-loader.ts | cat
+[2026-04-06T07:38:03.046Z] iter=406 turn=6 INFO:   -> exit=0 (572 chars)
+[2026-04-06T07:38:03.047Z] iter=406 turn=7 INFO: Turn 7/25
+[2026-04-06T07:38:15.645Z] iter=406 turn=7 INFO: Agent: Now writing all three deliverables simultaneously:
+[2026-04-06T07:38:15.646Z] iter=406 turn=7 INFO: write_file: src/context-loader.ts (append)
+[2026-04-06T07:38:15.647Z] iter=406 turn=7 INFO:   -> ok: Appended 2251 chars to src/context-loader.ts
+[2026-04-06T07:38:15.648Z] iter=406 turn=8 INFO: Turn 8/25
+[2026-04-06T07:38:18.486Z] iter=406 turn=8 INFO: Agent: Now wire `resolveImportGraph` into orchestrator — inject related file summaries after a `read_file` or `write_file` tool call:
+[2026-04-06T07:38:18.487Z] iter=406 turn=8 INFO: $ grep -n "resolveImportGraph\|context-loader\|autoLoadContext\|extractFileReferences" src/orchestrator.ts | head -20
+[2026-04-06T07:38:18.501Z] iter=406 turn=8 INFO:   -> exit=0 (203 chars)
+[2026-04-06T07:38:18.502Z] iter=406 turn=9 INFO: Turn 9/25
+[2026-04-06T07:38:21.365Z] iter=406 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-06T07:38:21.368Z] iter=406 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+37 | import { runDiagnostics } from "./diagnostics.js";
+38 | import { findRelatedTests, runRelatedTests } from "./test-runner.js";
+39 | import { computeUnifiedDiff } from "./diff-preview.js";
+40 | import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences, resolveImportGraph } from "./context-loader.js";
+41 | import { enhanceToolError } from "./tool-recovery.js";
+42 | import { detectProject } from "./project-detector.js";
+43 | import { detectLoop } from "./loop-detector.js";
+[2026-04-06T07:38:21.369Z] iter=406 turn=10 INFO: Turn 10/25
+[2026-04-06T07:38:25.647Z] iter=406 turn=10 INFO: think: I've made progress:
+1. Added `resolveImportGraph` function to `src/context-loader.ts` ✅
+2. Updated the import in `src/or...
+[2026-04-06T07:38:25.647Z] iter=406 turn=11 INFO: Turn 11/25
+[2026-04-06T07:38:28.709Z] iter=406 turn=11 INFO: Agent: I've made changes: added `resolveImportGraph` to context-loader.ts and updated the import in orchestrator.ts. Now finishing the remaining 3 pieces quickly.
+[2026-04-06T07:38:28.709Z] iter=406 turn=11 INFO: $ grep -n "onFileWatch\|read_file.*onFileWatch\|compressToolOutput.*enhanced" src/orchestrator.ts | head -20
+[2026-04-06T07:38:28.728Z] iter=406 turn=11 INFO:   -> exit=0 (993 chars)
+[2026-04-06T07:38:28.729Z] iter=406 turn=12 INFO: Turn 12/25
+[2026-04-06T07:38:30.603Z] iter=406 turn=12 INFO: $ sed -n '545,570p' src/orchestrator.ts
+[2026-04-06T07:38:30.618Z] iter=406 turn=12 INFO:   -> exit=0 (1081 chars)
+[2026-04-06T07:38:30.618Z] iter=406 turn=13 INFO: Turn 13/25
+[2026-04-06T07:38:33.825Z] iter=406 turn=13 INFO: think: I need to stop exploring and just finish the work. Let me do everything in parallel:
+1. Wire resolveImportGraph into orc...
+[2026-04-06T07:38:33.826Z] iter=406 turn=14 INFO: Turn 14/25
+[2026-04-06T07:38:35.486Z] iter=406 turn=14 INFO: Agent: Executing all remaining work now:
+[2026-04-06T07:38:35.487Z] iter=406 turn=14 INFO: $ sed -n '648,665p' src/orchestrator.ts
+[2026-04-06T07:38:35.507Z] iter=406 turn=14 INFO:   -> exit=0 (897 chars)
+[2026-04-06T07:38:35.508Z] iter=406 turn=15 INFO: Turn 15/25
+[2026-04-06T07:38:49.513Z] iter=406 turn=15 INFO: Agent: Wrapping up now. Writing all remaining pieces in parallel.
+[2026-04-06T07:38:49.514Z] iter=406 turn=15 INFO: write_file: tests/context-loader-imports.test.ts (write)
+[2026-04-06T07:38:49.515Z] iter=406 turn=15 INFO:   -> ok: Created tests/context-loader-imports.test.ts (2994 chars)
+[2026-04-06T07:38:49.516Z] iter=406 turn=16 INFO: Turn 16/25
+[2026-04-06T07:38:57.561Z] iter=406 turn=16 INFO: Agent: Running TSC and tests now:
+[2026-04-06T07:38:57.561Z] iter=406 turn=16 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-06T07:38:57.563Z] iter=406 turn=16 INFO: write_file: src/tui.tsx (patch)
+[2026-04-06T07:38:57.565Z] iter=406 turn=16 INFO:   -> ok: Patched src/tui.tsx: -12 +13 lines
+
+Context after patch:
+808 |           setMessages(prev => [...prev, { role: "assistant", content: "Building search index…" }]);
+809 |           await buildSearchIndex(workDir);
+810 |         }
+811 |         const results = _searchIndexHolder.index.search(query, 5);
+812 |         if (results.length === 0) {
+813 |           setMessages(prev => [...prev, { role: "assistant", content: `🔍 No results found for "${query}"` }]);
+814 |         } else {
+815 |           const lines = results.map((r, i) => {
+816 |             const snippet = r.snippet.replace(/\n/g, " ").trim().slice(0, 80);
+817 |             return `${i + 1}. 📄 ${r.file}:L${r.lineStart}  — ${snippet}`;
+818 |           });
+819 |           setMessages(prev => [...prev, {
+820 |             role: "assistant",
+821 |             content: `🔍 Semantic results for "${query}":\n\n${lines.join("\n")}`,
+822 |           }]);
+823 |         }
+824 |       } catch (err) {
+825 |         setMessages(prev => [...prev, { role: "assistant", content: `Search failed: ${String(err)}` }]);
+826 |       }
+[2026-04-06T07:38:58.698Z] iter=406 turn=16 INFO:   -> exit=0 (11 chars)
+[2026-04-06T07:38:58.698Z] iter=406 turn=17 INFO: Turn 17/25
+[2026-04-06T07:39:00.839Z] iter=406 turn=17 INFO: Agent: TSC is clean. Now run the new tests:
+[2026-04-06T07:39:00.839Z] iter=406 turn=17 INFO: $ npx vitest run tests/context-loader-imports.test.ts --reporter=verbose 2>&1 | tail -25
+[2026-04-06T07:39:01.911Z] iter=406 turn=17 INFO:   -> exit=0 (1017 chars)
+[2026-04-06T07:39:01.911Z] iter=406 turn=18 INFO: Turn 18/25
+[2026-04-06T07:39:07.646Z] iter=406 turn=18 INFO: Agent: All 7 tests pass, TSC clean. Writing memory and goals now.
+[2026-04-06T07:39:07.647Z] iter=406 turn=18 INFO: save_memory: "[Engineer 406] Import graph + search formatting"
+[2026-04-06T07:39:07.648Z] iter=406 turn=18 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-06T07:39:07.648Z] iter=406 turn=19 INFO: Turn 19/25
+[2026-04-06T07:39:17.592Z] iter=406 turn=19 INFO: write_file: goals.md (write)
+[2026-04-06T07:39:17.593Z] iter=406 turn=19 INFO:   -> ok: Updated goals.md (1364 chars, -11 lines delta)
+[2026-04-06T07:39:17.594Z] iter=406 turn=20 INFO: Turn 20/25
+[2026-04-06T07:39:19.311Z] iter=406 turn=20 INFO: $ npx tsc --noEmit 2>&1 && echo "TSC_CLEAN"
+[2026-04-06T07:39:20.377Z] iter=406 turn=20 INFO:   -> exit=0 (10 chars)
+[2026-04-06T07:39:20.377Z] iter=406 turn=21 INFO: Turn 21/25
+[2026-04-06T07:39:22.487Z] iter=406 turn=21 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-06T07:39:22.489Z] iter=406 turn=21 INFO: RESTART signal
+[2026-04-06T07:39:22.491Z] iter=406 turn=21 INFO: Validating: npx tsc --noEmit ...
+[2026-04-06T07:39:23.595Z] iter=406 turn=21 INFO: Compilation OK
+[2026-04-06T07:39:31.665Z] iter=406 turn=21 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-06T07:39:31.665Z] iter=406 turn=21 INFO: Tool timing: bash: 15x, avg=230ms, total=3449ms; write_file: 5x, avg=2ms, total=10ms; read_scratchpad: 1x, avg=4ms, total=4ms; think: 3x, avg=0ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-06T07:39:31.665Z] iter=406 turn=21 INFO: Tool timing stats
+[2026-04-06T07:39:39.208Z] iter=406 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 406: predicted 15 turns, actual 21 turns, ratio 1.40**
+[2026-04-06T07:39:48.630Z] iter=406 turn=21 INFO: Pre-commit review (1343in/313out): **Issues found:**
+
+- **`visit()` doesn't add to `result` for the entry file itself** — `absEntry` is added to `seen` and traversed, but never pushed to `result`. If the caller expects the entry file i

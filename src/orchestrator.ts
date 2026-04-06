@@ -37,7 +37,7 @@ import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
 import { runDiagnostics } from "./diagnostics.js";
 import { findRelatedTests, runRelatedTests } from "./test-runner.js";
 import { computeUnifiedDiff } from "./diff-preview.js";
-import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences } from "./context-loader.js";
+import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences, resolveImportGraph } from "./context-loader.js";
 import { enhanceToolError } from "./tool-recovery.js";
 import { detectProject } from "./project-detector.js";
 import { detectLoop } from "./loop-detector.js";
