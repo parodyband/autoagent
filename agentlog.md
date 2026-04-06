@@ -1,41 +1,3 @@
-751 |             content: `🔍 Semantic results for "${query}":\n\n${lines.join("\n\n")}`,
-752 |           }]);
-753 |         }
-754 |       } catch (err) {
-755 |         setMessages(prev => [...prev, { role: "assistant", content: `Search failed: ${String(err)}` }]);
-756 |       }
-757 |       return;
-758 |     }
-759 |     if (trimmed === "/diff") {
-760 |       try {
-761 |         const isRepo = execSync("git rev-parse --is-inside-work-tree", {
-762 |           cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"],
-[2026-04-05T21:19:07.797Z] iter=392 turn=21 INFO: Turn 21/25
-[2026-04-05T21:19:10.187Z] iter=392 turn=21 INFO: Agent: Now run TSC:
-[2026-04-05T21:19:10.189Z] iter=392 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T21:19:11.303Z] iter=392 turn=21 INFO:   -> exit=2 (109 chars)
-[2026-04-05T21:19:11.303Z] iter=392 turn=22 INFO: Turn 22/25
-[2026-04-05T21:19:12.880Z] iter=392 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && grep -r "glob" src/ --include="*.ts" | grep "import.*glob" | head -5
-[2026-04-05T21:19:12.912Z] iter=392 turn=22 INFO:   -> exit=0 (388 chars)
-[2026-04-05T21:19:12.912Z] iter=392 turn=23 INFO: Turn 23/25
-[2026-04-05T21:19:14.472Z] iter=392 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && grep -r "glob\|fast-glob\|globby" package.json
-[2026-04-05T21:19:14.489Z] iter=392 turn=23 INFO:   -> exit=1 (11 chars)
-[2026-04-05T21:19:14.490Z] iter=392 turn=23 INFO: HARD TURN CAP REACHED: 23 turns (predicted 15, cap 23). Forcing commit.
-[2026-04-05T21:19:14.494Z] iter=392 turn=23 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-05T21:19:14.496Z] iter=392 turn=23 INFO: Tool timing: bash: 21x, avg=70ms, total=1478ms; write_file: 7x, avg=2ms, total=17ms; read_scratchpad: 1x, avg=5ms, total=5ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T21:19:14.496Z] iter=392 turn=23 INFO: Tool timing stats
-[2026-04-05T21:19:14.864Z] iter=392 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 392: predicted 15 turns, actual 23 turns, ratio 1.53**
-[2026-04-05T21:19:24.217Z] iter=392 turn=23 INFO: Pre-commit review (1607in/353out): **Issues:**
-
-- **Stale shared index on rebuild**: `codeSearchIndex` is exported as `const` and initialized once, but `buildSearchIndex()` swaps `_searchIndexHolder.index` to a `freshIndex` — any code 
-[2026-04-05T21:19:24.280Z] iter=392 turn=23 INFO: Committed: 356772ea (37 in / 4941 out, cache: 24689 created, 405845 read)
-[2026-04-05T21:19:24.280Z] iter=392 turn=23 INFO: Restarting as iteration 393...
-[2026-04-05T22:03:26.503Z] iter=393 INFO: Cache restored: 56/56 entries (0 stale)
-[2026-04-05T22:03:26.505Z] iter=393 INFO: Turn budget: 15/25 (calibration=1.53x, predicted=15)
-[2026-04-05T22:03:26.505Z] iter=393 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-05T22:03:26.684Z] iter=393 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-05T22:03:26.685Z] iter=393 turn=1 INFO: Turn 1/25
-[2026-04-05T22:03:30.492Z] iter=393 turn=1 INFO: Agent: 
 
 I'll start by understanding the current state of the codebase after iteration 392, then evaluate what was built and plan the next iteration.
 [2026-04-05T22:03:30.494Z] iter=393 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
@@ -1034,3 +996,78 @@ Context after patch:
 [2026-04-06T07:30:59.490Z] iter=400 turn=7 INFO: Tool timing stats
 [2026-04-06T07:31:06.617Z] iter=400 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 400: predicted 12 turns, actual 7 turns, ratio 0.58**
 [2026-04-06T07:31:06.641Z] iter=400 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-06T07:31:06.682Z] iter=400 turn=7 INFO: Committed: 5dc9d175 (13 in / 1050 out, cache: 6062 created, 48696 read)
+[2026-04-06T07:31:06.682Z] iter=400 turn=7 INFO: Restarting as iteration 401...
+[2026-04-06T07:31:06.895Z] iter=401 INFO: Cache restored: 56/56 entries (0 stale)
+[2026-04-06T07:31:06.897Z] iter=401 INFO: Turn budget: 15/25 (calibration=1.33x, predicted=8)
+[2026-04-06T07:31:06.898Z] iter=401 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-06T07:31:07.087Z] iter=401 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-06T07:31:07.087Z] iter=401 turn=1 INFO: Turn 1/25
+[2026-04-06T07:31:11.357Z] iter=401 turn=1 INFO: Agent: 
+
+I'll start by auditing the current state of the codebase to understand what's actually implemented and what gaps exist, then research what other agents are doing, and finally write precise Engineer goals.
+[2026-04-06T07:31:11.358Z] iter=401 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-06T07:31:11.361Z] iter=401 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/*.ts src/**/*.ts 2>/dev/null | tail -5
+[2026-04-06T07:31:11.363Z] iter=401 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
+[2026-04-06T07:31:11.370Z] iter=401 turn=1 INFO:   -> exit=0 (995 chars)
+[2026-04-06T07:31:11.380Z] iter=401 turn=1 INFO:   -> exit=0 (141 chars)
+[2026-04-06T07:31:11.383Z] iter=401 turn=1 INFO:   -> exit=0 (440 chars)
+[2026-04-06T07:31:11.383Z] iter=401 turn=2 INFO: Turn 2/25
+[2026-04-06T07:31:16.268Z] iter=401 turn=2 INFO: Agent: 
+
+You're right. My deliverables are:
+1. goals.md with ONE Engineer goal for iteration 402
+2. Memory note summarizing the decision
+
+Let me quickly audit the highest-impact gap, then write goals.md immediately.
+[2026-04-06T07:31:16.269Z] iter=401 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "model" src/orchestrator.ts | head -20
+[2026-04-06T07:31:16.272Z] iter=401 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "subagent\|routing\|haiku\|cheap\|model.*select" src/orchestrator.ts | head -15
+[2026-04-06T07:31:16.274Z] iter=401 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "status" src/tui.tsx | head -20
+[2026-04-06T07:31:16.283Z] iter=401 turn=2 INFO:   -> exit=0 (1151 chars)
+[2026-04-06T07:31:16.289Z] iter=401 turn=2 INFO:   -> exit=0 (650 chars)
+[2026-04-06T07:31:16.290Z] iter=401 turn=2 INFO:   -> exit=0 (991 chars)
+[2026-04-06T07:31:16.290Z] iter=401 turn=3 INFO: Turn 3/25
+[2026-04-06T07:31:27.616Z] iter=401 turn=3 INFO: think: Let me evaluate the suggested areas:
+
+1. **Better `/status` output** — Currently shows basic stats. Adding files changed...
+[2026-04-06T07:31:27.616Z] iter=401 turn=4 INFO: Turn 4/25
+[2026-04-06T07:31:32.637Z] iter=401 turn=4 INFO: Agent: 
+
+**Goal status:** Write goals.md for iteration 402 — **IN PROGRESS**
+
+I need to pick the right feature. Let me quickly check self-verify integration (highest leverage candidate), then write goals.md immediately.
+[2026-04-06T07:31:32.638Z] iter=401 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "self-verify\|selfVerify\|runDiagnostics\|diagnostics" src/orchestrator.ts | head -15
+[2026-04-06T07:31:32.662Z] iter=401 turn=4 INFO:   -> exit=0 (466 chars)
+[2026-04-06T07:31:32.662Z] iter=401 turn=5 INFO: Turn 5/25
+[2026-04-06T07:31:37.252Z] iter=401 turn=5 INFO: Agent: Good — self-verify is wired. `/status` enhancement is the right pick: concrete, visible, well-scoped.
+[2026-04-06T07:31:37.253Z] iter=401 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '727,760p' src/tui.tsx
+[2026-04-06T07:31:37.257Z] iter=401 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getSessionStats\|sessionStats\|costTracker\|getCost\|totalCost" src/orchestrator.ts | head -15
+[2026-04-06T07:31:37.274Z] iter=401 turn=5 INFO:   -> exit=0 (1466 chars)
+[2026-04-06T07:31:37.282Z] iter=401 turn=5 INFO:   -> exit=0 (580 chars)
+[2026-04-06T07:31:37.283Z] iter=401 turn=6 INFO: Turn 6/25
+[2026-04-06T07:31:53.525Z] iter=401 turn=6 INFO: Agent: 
+
+Right — this is an Architect iteration. My deliverable is goals.md, not src/ changes. I now have enough context. `/status` already shows good info. Let me pick the highest-leverage feature and write goals.md NOW.
+
+The biggest gap: **model routing is keyword-based only**. The `selectModel` function just pattern-matches keywords. Real agents (Cursor, Claude Code) route based on task complexity. Bu...
+[2026-04-06T07:31:53.526Z] iter=401 turn=6 INFO: write_file: goals.md (write)
+[2026-04-06T07:31:53.529Z] iter=401 turn=6 INFO:   -> ok: Updated goals.md (1462 chars, +10 lines delta)
+[2026-04-06T07:31:53.531Z] iter=401 turn=7 INFO: Turn 7/25
+[2026-04-06T07:31:59.566Z] iter=401 turn=7 INFO: Agent: 
+
+Wrapping up now.
+[2026-04-06T07:31:59.567Z] iter=401 turn=7 INFO: save_memory: "[Architect] Iteration 401 decision"
+[2026-04-06T07:31:59.569Z] iter=401 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-06T07:31:59.569Z] iter=401 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-06T07:32:00.728Z] iter=401 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-06T07:32:00.729Z] iter=401 turn=8 INFO: Turn 8/25
+[2026-04-06T07:32:03.149Z] iter=401 turn=8 INFO: Agent: TSC clean. Goals written. Memory saved.
+[2026-04-06T07:32:03.149Z] iter=401 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-06T07:32:03.150Z] iter=401 turn=8 INFO: RESTART signal
+[2026-04-06T07:32:03.150Z] iter=401 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-06T07:32:04.210Z] iter=401 turn=8 INFO: Compilation OK
+[2026-04-06T07:32:12.326Z] iter=401 turn=8 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-06T07:32:12.326Z] iter=401 turn=8 INFO: Tool timing: bash: 11x, avg=121ms, total=1330ms; save_memory: 1x, avg=8ms, total=8ms; write_file: 1x, avg=4ms, total=4ms; think: 1x, avg=0ms, total=0ms
+[2026-04-06T07:32:12.326Z] iter=401 turn=8 INFO: Tool timing stats
+[2026-04-06T07:32:19.949Z] iter=401 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 401: predicted 8 turns, actual 8 turns, ratio 1.00**
+[2026-04-06T07:32:19.973Z] iter=401 turn=8 INFO: Pre-commit review: no significant code changes to review
