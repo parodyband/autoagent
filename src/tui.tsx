@@ -11,24 +11,23 @@ import { render, Box, Text, useInput, useApp } from "ink";
 import Spinner from "ink-spinner";
 import TextInput from "ink-text-input";
 import path from "path";
-import fs from "fs";
 import "dotenv/config";
 import { Orchestrator } from "./orchestrator.js";
 import { listSessions, type SessionInfo } from "./session-store.js";
 import type { EditPlan } from "./architect-mode.js";
 import { VirtualMessageList } from "./virtual-message-list.js";
-import { undoLastCommit } from "./auto-commit.js";
 import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
-import { execSync } from "child_process";
+import { execSync, exec } from "child_process";
+import { promisify } from "util";
 import { runInit } from "./init-command.js";
-import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
+import { useContextBudget, useStreaming, useFileSuggestions } from "./hooks/index.js";
+import { TuiErrorBoundary } from "./error-boundary.js";
+
+const execAsync = promisify(exec);
 import { shouldShowWelcome } from "./welcome.js";
 import type { Task, TaskPlan } from "./task-planner.js";
-import { handlePlanCommand } from "./plan-commands.js";
-import { runDream } from "./dream.js";
-import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
-import Anthropic from "@anthropic-ai/sdk";
 import { Markdown } from "./markdown-renderer.js";
+import { routeCommand, type FooterStats } from "./tui-commands.js";
 
 // Parse args
 let workDir = process.cwd();
@@ -85,14 +84,7 @@ interface PendingDiff {
   resolve: (accepted: boolean) => void;
 }
 
-interface FooterStats {
-  tokensIn: number;
-  tokensOut: number;
-  cost: number;
-  model: string;
-  contextTokens: number;
-  contextLimit: number;
-}
+// FooterStats imported from tui-commands.ts
 
 // ─── Context budget color helper ────────────────────────────
 
@@ -157,26 +149,24 @@ function useGitStatus(dir: string): GitInfo {
   const [info, setInfo] = useState<GitInfo>({ branch: "", changedCount: 0, stagedCount: 0, isRepo: false });
 
   useEffect(() => {
-    function poll() {
+    let active = true;
+    async function poll() {
       try {
-        const branch = execSync("git rev-parse --abbrev-ref HEAD", {
-          cwd: dir, encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"],
-        }).trim();
-        const statusOut = execSync("git status --short", {
-          cwd: dir, encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"],
-        });
+        const { stdout: branchOut } = await execAsync("git rev-parse --abbrev-ref HEAD", { cwd: dir });
+        const branch = branchOut.trim();
+        const { stdout: statusOut } = await execAsync("git status --short", { cwd: dir });
         const lines = statusOut.split("\n").filter(l => l.trim().length > 0);
         // XY format: first char = staged, second = unstaged/untracked
         const staged = lines.filter(l => l[0] && l[0] !== " " && l[0] !== "?").length;
         const unstaged = lines.filter(l => l[1] && (l[1] !== " ")).length;
-        setInfo({ branch, changedCount: unstaged, stagedCount: staged, isRepo: true });
+        if (active) setInfo({ branch, changedCount: unstaged, stagedCount: staged, isRepo: true });
       } catch {
-        setInfo({ branch: "", changedCount: 0, stagedCount: 0, isRepo: false });
+        if (active) setInfo({ branch: "", changedCount: 0, stagedCount: 0, isRepo: false });
       }
     }
     poll();
     const id = setInterval(poll, 5000);
-    return () => clearInterval(id);
+    return () => { active = false; clearInterval(id); };
   }, [dir]);
 
   return info;
@@ -202,34 +192,32 @@ function GitBadge({ git }: { git: GitInfo }) {
   );
 }
 
-function Header({ model, git }: { model: string; git: GitInfo }) {
-  const modelLabel = model.includes("haiku") ? "⚡ haiku" : model.includes("opus") ? "◆ opus" : "◈ sonnet";
+function Header({ model, git, cost }: { model: string; git: GitInfo; cost?: number }) {
+  const modelLabel = model.includes("haiku") ? "haiku" : model.includes("opus") ? "opus" : "sonnet";
+  const costStr = cost != null ? (cost < 0.01 ? "<$0.01" : `$${cost.toFixed(2)}`) : "";
   return (
-    <Box flexDirection="column" marginBottom={1} borderStyle="round" borderColor="cyan" paddingX={1}>
-      <Box justifyContent="space-between">
-        <Box>
-          <Text bold color="cyan">⚡ AutoAgent</Text>
-          <Text color="gray">  </Text>
-          <Text color="blueBright">{modelLabel}</Text>
-          <GitBadge git={git} />
-        </Box>
-        <Text color="gray" dimColor>{path.basename(workDir)}</Text>
+    <Box marginBottom={1} justifyContent="space-between">
+      <Box>
+        <Text bold color="white">autoagent</Text>
+        <Text color="gray"> / </Text>
+        <Text color="cyan">{path.basename(workDir)}</Text>
+        <Text color="gray"> / </Text>
+        <Text color="blueBright">{modelLabel}</Text>
+        <GitBadge git={git} />
       </Box>
-      <Text color="gray" dimColor>
-        /help  /status  /clear  /diff  /undo  /plan  /search  /export  /exit
-      </Text>
+      <Box gap={2}>
+        {costStr ? <Text color="gray" dimColor>{costStr}</Text> : null}
+        <Text color="gray" dimColor>/help</Text>
+      </Box>
     </Box>
   );
 }
 
 function ToolCallDisplay({ name, input }: { name: string; input: string }) {
   return (
-    <Box flexDirection="column" marginLeft={2} marginTop={0}>
-      <Text>
-        <Text color="yellow" dimColor>  ▸ </Text>
-        <Text color="yellow" bold>{name}</Text>
-        <Text color="gray" dimColor> {input.slice(0, 80)}{input.length > 80 ? "…" : ""}</Text>
-      </Text>
+    <Box marginLeft={4}>
+      <Text color="gray" dimColor>{"  "}▸ {name} </Text>
+      <Text color="gray" dimColor>{input.slice(0, 60)}{input.length > 60 ? "…" : ""}</Text>
     </Box>
   );
 }
@@ -237,9 +225,9 @@ function ToolCallDisplay({ name, input }: { name: string; input: string }) {
 function MessageDisplay({ msg }: { msg: Message }) {
   if (msg.role === "user") {
     return (
-      <Box marginTop={1} borderStyle="single" borderColor="cyan" borderLeft={true} borderRight={false} borderTop={false} borderBottom={false} paddingLeft={1}>
-        <Text color="cyan" bold>You  </Text>
-        <Text>{msg.content}</Text>
+      <Box marginTop={1}>
+        <Text color="cyan" bold>{">"} </Text>
+        <Text bold>{msg.content}</Text>
       </Box>
     );
   }
@@ -252,23 +240,11 @@ function MessageDisplay({ msg }: { msg: Message }) {
     );
   }
   // assistant
-  const modelLabel = msg.model
-    ? (msg.model.includes("haiku") ? "⚡ haiku" : msg.model.includes("opus") ? "◆ opus" : "◈ sonnet")
-    : "";
   return (
-    <Box flexDirection="column" marginTop={1} borderStyle="single" borderColor="gray" borderLeft={true} borderRight={false} borderTop={false} borderBottom={false} paddingLeft={1}>
-      <Box marginBottom={0}>
-        <Text color="magenta" bold>Agent</Text>
-        {modelLabel ? <Text color="gray" dimColor>  {modelLabel}</Text> : null}
-        {msg.verificationPassed === true && <Text color="green" dimColor>  ✓</Text>}
-        {msg.verificationPassed === false && <Text color="red" dimColor>  ✗</Text>}
-      </Box>
+    <Box flexDirection="column" marginTop={1} paddingLeft={2}>
       <Markdown>{msg.content}</Markdown>
-      {msg.tokens && (
-        <Text color="gray" dimColor>
-          {msg.tokens.in.toLocaleString()} in / {msg.tokens.out.toLocaleString()} out
-        </Text>
-      )}
+      {msg.verificationPassed === true && <Text color="green"> ✓ tests passed</Text>}
+      {msg.verificationPassed === false && <Text color="red"> ✗ tests failed</Text>}
     </Box>
   );
 }
@@ -370,71 +346,24 @@ function TaskPlanDisplay({ plan }: { plan: TaskPlan }) {
 function StreamingMessage({ buffer }: { buffer: string }) {
   if (!buffer) return null;
   return (
-    <Box flexDirection="column" marginTop={1}>
+    <Box flexDirection="column" marginTop={1} paddingLeft={2}>
       <Markdown>{buffer}</Markdown>
-      <Text color="magenta" dimColor>▌</Text>
+      <Text color="gray">▌</Text>
     </Box>
   );
 }
 
-/** Footer bar showing cumulative token usage and cost. */
-function Footer({ stats }: { stats: FooterStats }) {
-  const formatK = (n: number) =>
-    n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
-
-  const modelLabel = stats.model.includes("haiku") ? "⚡ haiku" : stats.model.includes("opus") ? "◆ opus" : "◈ sonnet";
-  const costStr = stats.cost < 0.001 ? "<$0.001" : `${stats.cost.toFixed(3)}`;
-
-  // Context budget: color shifts yellow at 70%, red at 90%
-  const ctxRatio = stats.contextLimit > 0 ? stats.contextTokens / stats.contextLimit : 0;
-  const ctxColor = getContextColor(ctxRatio);
-  const ctxPct = Math.round(ctxRatio * 100);
-
-  return (
-    <Box borderStyle="single" borderColor="gray" paddingX={1} justifyContent="space-between">
-      <Box gap={2}>
-        <Text color="gray" dimColor>↑{formatK(stats.tokensIn)} ↓{formatK(stats.tokensOut)}</Text>
-        <Text color="green" dimColor>{costStr}</Text>
-        <Text color="blueBright" dimColor>{modelLabel}</Text>
-      </Box>
-      <Box>
-        <Text color={ctxColor} dimColor={ctxColor === "gray"}>
-          ctx {ctxPct}%  {formatK(stats.contextTokens)}/{formatK(stats.contextLimit)}
-        </Text>
-      </Box>
-    </Box>
-  );
-}
-
-// ─── Export Helper ───────────────────────────────────────────
-function buildExportContent(
-  messages: Message[],
-  model: string,
-  stats: FooterStats,
-  workDir: string,
-  filePath: string,
-): void {
-  const exportMsgs = messages.filter(m => m.role === "user" || m.role === "assistant") as import("./export-helper.js").ExportMessage[];
-  buildExportContentHelper(exportMsgs, model, { tokensIn: stats.tokensIn, tokensOut: stats.tokensOut, cost: stats.cost }, workDir, filePath);
-}
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("Initializing...");
   const [currentModel, setCurrentModel] = useState("sonnet");
-  const [streamBuffer, setStreamBuffer] = useState("");
   const [sessionList, setSessionList] = useState<SessionInfo[]>([]);
-  const [showResume, setShowResume] = useState(false);
   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
+  const [confirmExit, setConfirmExit] = useState(false);
   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
-  const [contextBudgetRatio, setContextBudgetRatio] = useState(0);
-  const [contextWarning, setContextWarning] = useState(false);
   const [externalChanges, setExternalChanges] = useState<string[]>([]);
-  const [fileSuggestions, setFileSuggestions] = useState<string[]>([]);
-  const [fileSuggestionIdx, setFileSuggestionIdx] = useState(0);
-  const repoMapRef = useRef<import("./tree-sitter-map.js").RepoMap | null>(null);
+  const [scrollOffset, setScrollOffset] = useState(0);
   const [footerStats, setFooterStats] = useState<FooterStats>({
     tokensIn: 0,
     tokensOut: 0,
@@ -446,6 +375,14 @@ function App() {
   const orchestratorRef = useRef<Orchestrator | null>(null);
   const { exit } = useApp();
   const gitInfo = useGitStatus(workDir);
+
+  // Extracted hooks
+  const { streamBuffer, setStreamBuffer, loading, setLoading, status, setStatus } = useStreaming();
+  const { contextBudgetRatio, setContextBudgetRatio, contextWarning, setContextWarning } = useContextBudget();
+  const {
+    fileSuggestions, fileSuggestionIdx, setFileSuggestionIdx,
+    repoMapRef, handleInputChange: onFileInput, acceptFileSuggestion, dismissSuggestions,
+  } = useFileSuggestions({ workDir, setInput: (fn) => setInput(fn) });
 
   // Initialize orchestrator
   useEffect(() => {
@@ -501,39 +438,13 @@ function App() {
         }
       }
       setStatus("");
-      // Build initial repoMap for #file suggestions
-      try {
-        const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf8" });
-        const allFiles = out.split("\n").filter(Boolean);
-        repoMapRef.current = buildRepoMap(workDir, allFiles);
-      } catch { /* non-git repo — suggestions unavailable */ }
     }).catch(() => setStatus("Init failed"));
   }, []);
 
-  // Update file suggestions whenever input changes
+  // Wrap file suggestion handler to also set input
   const handleInputChange = useCallback((val: string) => {
-    setInput(val);
-    const partial = extractFileQuery(val);
-    if (partial !== null && repoMapRef.current) {
-      const suggs = getFileSuggestions(repoMapRef.current, partial, 5);
-      setFileSuggestions(suggs);
-      setFileSuggestionIdx(0);
-    } else {
-      setFileSuggestions([]);
-      setFileSuggestionIdx(0);
-    }
-  }, []);
-
-  // Accept suggestion: replace #partial with the selected file path
-  const acceptFileSuggestion = useCallback((path: string) => {
-    setInput(prev => {
-      const idx = prev.lastIndexOf("#");
-      if (idx === -1) return prev;
-      return prev.slice(0, idx) + "#" + path + " ";
-    });
-    setFileSuggestions([]);
-    setFileSuggestionIdx(0);
-  }, []);
+    onFileInput(val, setInput);
+  }, [onFileInput]);
 
   useInput((ch, key) => {
     if (pendingDiff) {
@@ -544,6 +455,15 @@ function App() {
         pendingDiff.resolve(false);
         setPendingDiff(null);
       }
+      return;
+    }
+    // Scroll-back: Up/Down arrow when input is empty and not loading
+    if (key.upArrow && !loading && input === "") {
+      setScrollOffset(prev => Math.min(prev + 3, Math.max(0, messages.length - 1)));
+      return;
+    }
+    if (key.downArrow && !loading && input === "") {
+      setScrollOffset(prev => Math.max(prev - 3, 0));
       return;
     }
     // Tab: cycle through / accept file suggestions
@@ -563,14 +483,20 @@ function App() {
     }
     if (key.escape) {
       if (fileSuggestions.length > 0) {
-        setFileSuggestions([]);
+        dismissSuggestions();
         return;
       }
       if (loading) {
         orchestratorRef.current?.abort();
         return;
       }
-      exit();
+      if (confirmExit) {
+        exit();
+      } else {
+        setConfirmExit(true);
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => setConfirmExit(false), 3000);
+      }
     }
   });
 
@@ -578,384 +504,31 @@ function App() {
     const trimmed = value.trim();
     if (!trimmed) return;
     setInput("");
+    setConfirmExit(false); // dismiss exit prompt on any input
 
-    // Built-in commands
-    if (trimmed === "/clear") {
-      orchestratorRef.current?.clearHistory();
-      setMessages([]);
-      setContextWarning(false);
-      setFooterStats({ tokensIn: 0, tokensOut: 0, cost: 0, model: currentModel, contextTokens: 0, contextLimit: 200_000 });
-      setStatus("Cleared");
-      setTimeout(() => setStatus(""), 1000);
-      return;
-    }
-    if (trimmed === "/compact") {
-      setStatus("Compacting context...");
-      await orchestratorRef.current?.compactNow();
-      setMessages(prev => [...prev, { role: "assistant", content: "Context compacted." }]);
-      setStatus("");
-      return;
-    }
-    if (trimmed === "/dream") {
-      setMessages(prev => [...prev, { role: "assistant", content: "🌙 Running memory consolidation..." }]);
-      try {
-        const result = await runDream(process.cwd(), new Anthropic());
-        setMessages(prev => [...prev, { role: "assistant", content: `🌙 Dream complete: +${result.added} entries, -${result.removed} entries removed.` }]);
-      } catch (err: any) {
-        setMessages(prev => [...prev, { role: "assistant", content: `Dream failed: ${err.message}` }]);
-      }
-      return;
-    }
-    if (trimmed === "/reindex") {
-      setStatus("Re-indexing repo...");
-      orchestratorRef.current?.reindex();
-      // Rebuild repoMap for #file suggestions
-      try {
-        const { execSync } = await import("child_process");
-        const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf8" });
-        const allFiles = out.split("\n").filter(Boolean);
-        repoMapRef.current = buildRepoMap(workDir, allFiles);
-      } catch { /* ignore */ }
-      setStatus("Re-indexed");
-      setTimeout(() => setStatus(""), 1000);
-      return;
-    }
-    if (trimmed === "/exit") {
-      if (messages.length > 2) {
-        try {
-          const now = new Date();
-          const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
-          const filePath = path.join(workDir, ".autoagent", "exports", `session-${timestamp}.md`);
-          const model = orchestratorRef.current?.getModel() ?? footerStats.model;
-          buildExportContent(messages, model, footerStats, workDir, filePath);
-        } catch { /* never block exit */ }
-      }
-      exit();
-      return;
-    }
-    if (trimmed === "/init") {
-      setStatus("Analyzing project...");
-      try {
-        const { content, updated } = await runInit(workDir, (msg) => setStatus(msg));
-        setStatus("");
-        const preview = content.split("\n").slice(0, 20).join("\n");
-        const truncated = content.split("\n").length > 20 ? "\n...(truncated)" : "";
-        setMessages(prev => [...prev, {
-          role: "assistant",
-          content: `${updated ? "Updated" : "Created"} .autoagent.md:\n\n\`\`\`markdown\n${preview}${truncated}\n\`\`\``,
-        }]);
-      } catch (err) {
-        setStatus("");
-        setMessages(prev => [...prev, {
-          role: "assistant",
-          content: `Failed to initialize: ${err instanceof Error ? err.message : String(err)}`,
-        }]);
-      }
-      return;
-    }
-    if (trimmed === "/help") {
-      setMessages(prev => [...prev, {
-        role: "assistant",
-        content: [
-          `Current model: ${currentModel}`,
-          "",
-          "Available commands:",
-          "  /help     — Show this help message",
-          "  /init     — Analyze repo and generate/update .autoagent.md",
-          "  /status   — Show session stats (turns, tokens, cost, model)",
-          "  /find Q   — Fuzzy search files & symbols in the repo",
-          "  /search Q — BM25 semantic code search (concept-based)",
-          "  /model    — Show current model (or /model haiku|sonnet to switch)",
-          "  /clear    — Clear the conversation history",
-          "  /reindex  — Re-index the repository files",
-          "  /resume   — List and restore a previous session",
-          "  /rewind   — Restore conversation to a prior checkpoint",
-          "  /compact  — Manually compact conversation context",
-          "  /dream    — Consolidate session memory",
-          "  /diff     — Show uncommitted git changes",
-          "  /undo     — Revert the last autoagent commit",
-          "  /plan Q   — Create and execute a task plan for Q",
-          "  /plan list — Show saved plans",
-          "  /plan resume — Resume the most recent incomplete plan",
-          "  /export   — Export conversation to markdown (optional filename arg)",
-          "  /exit     — Quit AutoAgent",
-        ].join("\n"),
-      }]);
-      return;
-    }
-    if (trimmed === "/rewind") {
-      const checkpoints = orchestratorRef.current?.getCheckpoints() ?? [];
-      if (checkpoints.length === 0) {
-        setMessages(prev => [...prev, { role: "assistant", content: "No checkpoints yet. Send a message first." }]);
-        return;
-      }
-      const lines = ["Conversation checkpoints (select with /rewind <number>):"];
-      lines.push("  [0] now (current state)");
-      checkpoints.slice().reverse().forEach((cp, i) => {
-        const t = new Date(cp.timestamp).toLocaleTimeString();
-        lines.push(`  [${i + 1}] "${cp.label}" (${t})`);
-      });
-      lines.push("\nType /rewind <number> to restore that checkpoint.");
-      setMessages(prev => [...prev, { role: "assistant", content: lines.join("\n") }]);
-      return;
-    }
-    const rewindMatch = trimmed.match(/^\/rewind\s+(\d+)$/);
-    if (rewindMatch) {
-      const idx = parseInt(rewindMatch[1], 10);
-      if (idx === 0) {
-        setMessages(prev => [...prev, { role: "assistant", content: "Already at current state." }]);
-        return;
-      }
-      const checkpoints = orchestratorRef.current?.getCheckpoints() ?? [];
-      const reversed = checkpoints.slice().reverse();
-      const cp = reversed[idx - 1];
-      if (!cp) {
-        setMessages(prev => [...prev, { role: "assistant", content: "Invalid checkpoint number." }]);
-        return;
-      }
-      const result = orchestratorRef.current?.rewindTo(cp.id);
-      if (result) {
-        setMessages(prev => [...prev, {
-          role: "assistant",
-          content: `↩ Rewound to: "${result.label}"`,
-        }]);
-      } else {
-        setMessages(prev => [...prev, { role: "assistant", content: "Could not rewind to that checkpoint." }]);
-      }
-      return;
-    }
-    if (trimmed === "/status") {
-      const turns = messages.filter(m => m.role === "user").length;
-      const { tokensIn, tokensOut, cost, model } = footerStats;
-      const costStr = cost < 0.01 ? `${cost.toFixed(4)}` : `${cost.toFixed(2)}`;
-      const stats = orchestratorRef.current?.getSessionStats();
-      const sessionLines: string[] = [];
-      if (stats) {
-        const totalSec = Math.floor(stats.durationMs / 1000);
-        const m = Math.floor(totalSec / 60);
-        const s = totalSec % 60;
-        sessionLines.push(`  Session:        ${m}m ${s}s`);
-        sessionLines.push(`  Cost:           ${stats.costSummary}`);
-        sessionLines.push(`  Avg cost/turn:  ${stats.avgCostPerTurn.toFixed(4)}`);
-        sessionLines.push(`  Cost trend:     ${stats.costTrend}`);
-        if (stats.filesModified?.length) {
-          sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(", ")}`);
-        }
-        if (stats.toolUsage && Object.keys(stats.toolUsage).length > 0) {
-          const topTools = Object.entries(stats.toolUsage)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5)
-            .map(([name, count]) => `${name}:${count}`)
-            .join("  ");
-          sessionLines.push(`  Tool usage:     ${topTools}`);
-        }
-      }
-      setMessages(prev => [...prev, {
-        role: "assistant",
-        content: [
-          "Session Status:",
-          `  Turns:      ${turns}`,
-          `  Tokens in:  ${tokensIn.toLocaleString()}`,
-          `  Tokens out: ${tokensOut.toLocaleString()}`,
-          `  Cost:       ${costStr}`,
-          `  Model:      ${model}`,
-          ...sessionLines,
-        ].join("\n"),
-      }]);
-      return;
-    }
-    if (trimmed.startsWith("/find")) {
-      const query = trimmed.slice(5).trim();
-      if (!query) {
-        setMessages(prev => [...prev, { role: "assistant", content: "Usage: /find <query>" }]);
-        return;
-      }
-      try {
-        // Get source files for the repo map
-        const allFiles = execSync(
-          "git ls-files --cached --others --exclude-standard 2>/dev/null || find . -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' -o -name '*.py' | head -200",
-          { cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] }
-        ).trim().split("\n").filter(Boolean).slice(0, 200);
-        const repoMap = buildRepoMap(workDir, allFiles);
-        const results = fuzzySearch(repoMap, query, 15);
-        if (results.length === 0) {
-          setMessages(prev => [...prev, { role: "assistant", content: `No matches for "${query}"` }]);
-        } else {
-          const lines = results.map(r => {
-            if (r.symbol) {
-              return `  ${r.file}:${r.line}  ${r.symbol} (${r.kind})  [${(r.score * 100).toFixed(0)}%]`;
-            }
-            return `  ${r.file}  [${(r.score * 100).toFixed(0)}%]`;
-          });
-          setMessages(prev => [...prev, {
-            role: "assistant",
-            content: `🔍 Results for "${query}":\n${lines.join("\n")}`,
-          }]);
-        }
-      } catch {
-        setMessages(prev => [...prev, { role: "assistant", content: "Search failed — could not build repo map." }]);
-      }
-      return;
-    }
-    if (trimmed.startsWith("/search")) {
-      const query = trimmed.slice(7).trim();
-      if (!query) {
-        setMessages(prev => [...prev, { role: "assistant", content: "Usage: /search <query>" }]);
-        return;
-      }
-      try {
-        if (_searchIndexHolder.index.fileCount === 0) {
-          setMessages(prev => [...prev, { role: "assistant", content: "Building search index…" }]);
-          await buildSearchIndex(workDir);
-        }
-        const results = _searchIndexHolder.index.search(query, 5);
-        if (results.length === 0) {
-          setMessages(prev => [...prev, { role: "assistant", content: `🔍 No results found for "${query}"` }]);
-        } else {
-          const lines = results.map((r, i) => {
-            const snippet = r.snippet.replace(/\n/g, " ").trim().slice(0, 80);
-            return `${i + 1}. 📄 ${r.file}:L${r.lineStart}  — ${snippet}`;
-          });
-          setMessages(prev => [...prev, {
-            role: "assistant",
-            content: `🔍 Semantic results for "${query}":\n\n${lines.join("\n")}`,
-          }]);
-        }
-      } catch (err) {
-        setMessages(prev => [...prev, { role: "assistant", content: `Search failed: ${String(err)}` }]);
-      }
-      return;
-    }
-    if (trimmed === "/diff") {
-      try {
-        const isRepo = execSync("git rev-parse --is-inside-work-tree", {
-          cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"],
-        }).trim();
-        if (isRepo !== "true") throw new Error("not a repo");
-        const stat = execSync("git diff --stat", { cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] }).trim();
-        const diff = execSync("git diff", { cwd: workDir, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] }).trim();
-        const combined = [stat, diff].filter(Boolean).join("\n\n");
-        if (!combined) {
-          setMessages(prev => [...prev, { role: "assistant", content: "No uncommitted changes." }]);
-        } else {
-          const lines = combined.split("\n");
-          const truncated = lines.length > 200 ? lines.slice(0, 200).join("\n") + "\n(truncated)" : combined;
-          setMessages(prev => [...prev, { role: "assistant", content: truncated }]);
-        }
-      } catch {
-        setMessages(prev => [...prev, { role: "assistant", content: "No uncommitted changes." }]);
-      }
-      return;
-    }
-    if (trimmed === "/undo") {
-      const result = await undoLastCommit(workDir);
-      if (result.undone) {
-        setMessages(prev => [...prev, {
-          role: "assistant",
-          content: `✓ Undid commit ${result.hash}: ${result.message}`,
-        }]);
-      } else {
-        setMessages(prev => [...prev, {
-          role: "assistant",
-          content: `Cannot undo: ${result.error}`,
-        }]);
-      }
-      return;
-    }
-    if (trimmed.startsWith("/model")) {
-      const arg = trimmed.slice(6).trim();
-      const MODEL_ALIASES: Record<string, string> = {
-        haiku: "claude-haiku-4-5",
-        sonnet: "claude-sonnet-4-6",
-        opus: "claude-opus-4-5",
-      };
-      if (!arg) {
-        const current = orchestratorRef.current?.getModel() ?? "auto";
-        setMessages(prev => [...prev, { role: "assistant", content: `Current model: ${current}` }]);
-      } else if (arg === "reset" || arg === "auto") {
-        orchestratorRef.current?.setModel(null);
-        setCurrentModel("auto");
-        setMessages(prev => [...prev, { role: "assistant", content: "Model reset to auto-routing (keyword-based)." }]);
-      } else {
-        const resolved = MODEL_ALIASES[arg] ?? (arg.startsWith("claude-") ? arg : null);
-        if (!resolved) {
-          setMessages(prev => [...prev, {
-            role: "assistant",
-            content: `Unknown model "${arg}". Use: haiku, sonnet, opus, reset, or a full model ID.`,
-          }]);
-        } else {
-          orchestratorRef.current?.setModel(resolved);
-          setCurrentModel(resolved);
-          setMessages(prev => [...prev, { role: "assistant", content: `Switched to ${resolved}` }]);
-        }
-      }
-      return;
-    }
-    if (trimmed === "/resume") {
-      const sessions = listSessions(workDir);
-      if (sessions.length === 0) {
-        setMessages(prev => [...prev, { role: "assistant", content: "No saved sessions found." }]);
-      } else {
-        setSessionList(sessions);
-        setShowResume(true);
-        const listing = sessions
-          .slice(0, 10)
-          .map((s, i) => `  [${i + 1}] ${s.summary} (${s.messageCount} msgs, ${s.updatedAt.toLocaleDateString()})`)
-          .join("\n");
-        setMessages(prev => [...prev, {
-          role: "assistant",
-          content: `Recent sessions:\n${listing}\n\nType /resume <number> to load a session.`,
-        }]);
-      }
-      return;
-    }
-    const resumeMatch = trimmed.match(/^\/resume\s+(\d+)$/);
-    if (resumeMatch) {
-      const idx = parseInt(resumeMatch[1], 10) - 1;
-      if (idx >= 0 && idx < sessionList.length) {
-        const session = sessionList[idx];
-        orchestratorRef.current?.resumeSession(session.path);
-        setShowResume(false);
-        setMessages(prev => [...prev, {
-          role: "assistant",
-          content: `✓ Resumed session: "${session.summary}" (${session.messageCount} messages loaded)`,
-        }]);
-      } else {
-        setMessages(prev => [...prev, { role: "assistant", content: "Invalid session number." }]);
-      }
-      return;
-    }
-
-    // /plan commands
-    if (trimmed === "/plan" || trimmed === "/plan help" || trimmed === "/plan list" || trimmed === "/plan resume" || trimmed.startsWith("/plan ")) {
-      const args = trimmed.slice(5).trim(); // everything after "/plan"
-      await handlePlanCommand(args, {
+    // Route slash commands to extracted handlers
+    if (trimmed.startsWith("/")) {
+      const ctx = {
         workDir,
-        addMessage: (text) => setMessages(prev => [...prev, { role: "assistant", content: text }]),
-        execute: async (description) => {
-          const res = await orchestratorRef.current!.send(description);
-          return res.text ?? "done";
-        },
-        setLoading,
+        orchestratorRef,
+        messages,
+        addMessage: (msg: Message) => setMessages(prev => [...prev, msg]),
+        setMessages,
         setStatus,
-      });
-      return;
-    }
-
-    if (trimmed === "/export" || trimmed.startsWith("/export ")) {
-      const arg = trimmed.slice(7).trim();
-      const now = new Date();
-      const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
-      const filename = arg || `session-export-${timestamp}.md`;
-      const filePath = path.isAbsolute(filename) ? filename : path.join(workDir, filename);
-      try {
-        const model = orchestratorRef.current?.getModel() ?? footerStats.model;
-        buildExportContent(messages, model, footerStats, workDir, filePath);
-        setMessages(prev => [...prev, { role: "assistant", content: `Exported to ${filename}` }]);
-      } catch (err) {
-        setMessages(prev => [...prev, { role: "assistant", content: `Export failed: ${err instanceof Error ? err.message : err}` }]);
-      }
-      return;
+        setLoading,
+        currentModel,
+        setCurrentModel,
+        footerStats,
+        setFooterStats,
+        setContextWarning,
+        repoMapRef,
+        sessionList,
+        setSessionList,
+        exit,
+      };
+      const handled = await routeCommand(trimmed, ctx);
+      if (handled) return;
+      // Unknown command — fall through to send as regular message
     }
 
     // Add user message
@@ -963,6 +536,7 @@ function App() {
     setMessages(prev => [...prev, userMsg]);
 
     setContextWarning(false); // reset warning on new message
+    setScrollOffset(0); // snap to bottom on new message
     setLoading(true);
     setStatus("Thinking...");
     setStreamBuffer(""); // clear any leftover
@@ -1009,7 +583,7 @@ function App() {
           cost: costInfo.cost,
           model: result.model,
           contextTokens: costInfo.lastInputTokens,
-          contextLimit: 200_000,
+          contextLimit: costInfo.contextLimit,
         });
       }
 
@@ -1024,90 +598,104 @@ function App() {
     setLoading(false);
   }, [exit, currentModel]);
 
-  return (
-    <Box flexDirection="column" padding={1}>
-      <Header model={currentModel} git={gitInfo} />
+  // Only show the last assistant exchange + current, auto-clear old noise
+  const displayMessages = React.useMemo(() => {
+    // Keep only the last few meaningful messages for a clean view
+    // When not scrolled: show last user message + its response + tool calls
+    if (scrollOffset > 0) return messages; // show all when scrolling
+    // Find the last user message index
+    let lastUserIdx = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === "user") { lastUserIdx = i; break; }
+    }
+    if (lastUserIdx === -1) return messages;
+    // Show everything from last user message onward, plus one prior assistant for context
+    let startIdx = lastUserIdx;
+    for (let i = lastUserIdx - 1; i >= 0; i--) {
+      if (messages[i].role === "assistant") { startIdx = i; break; }
+    }
+    return messages.slice(startIdx);
+  }, [messages, scrollOffset]);
 
-      {/* Message history */}
+  // Context budget as a compact string for the status line
+  const ctxRatio = footerStats.contextLimit > 0 ? footerStats.contextTokens / footerStats.contextLimit : 0;
+  const ctxWarningText = ctxRatio >= 0.8
+    ? ` · ctx ${Math.round(ctxRatio * 100)}%`
+    : "";
+
+  return (
+    <Box flexDirection="column" paddingX={1}>
+      <Header model={currentModel} git={gitInfo} cost={footerStats.cost} />
+
+      {/* Messages — clean, auto-cleared view */}
       <Box flexDirection="column" flexGrow={1}>
         <VirtualMessageList
-          messages={messages}
-          windowSize={20}
+          messages={displayMessages}
+          windowSize={30}
+          scrollOffset={scrollOffset}
           renderMessage={(msg, i) => <MessageDisplay key={`${msg.role}-${i}`} msg={msg} />}
         />
       </Box>
 
-      {/* Diff preview — shown when agent proposes a file edit */}
+      {/* Architect plan */}
+      {activePlan && <PlanDisplay plan={activePlan} />}
+
+      {/* Diff preview */}
       {pendingDiff && (
         <DiffPreviewDisplay diff={pendingDiff.diff} filePath={pendingDiff.filePath} />
       )}
 
-      {/* Live streaming text */}
+      {/* Streaming */}
       {!pendingDiff && streamBuffer && <StreamingMessage buffer={streamBuffer} />}
 
-      {/* Status / spinner */}
+      {/* Status line — single compact line for spinner + context warning */}
       {(loading || status) && (
-        <Box marginTop={1}>
-          {loading && (
-            <Text color="magenta">
-              <Spinner type="dots" />
-            </Text>
-          )}
-          <Text color="gray"> {status}</Text>
+        <Box marginTop={1} paddingLeft={2}>
+          {loading && <Text color="gray"><Spinner type="dots" /> </Text>}
+          <Text color="gray" dimColor>{status}{ctxWarningText}</Text>
         </Box>
       )}
 
-      {/* Context budget warning */}
-      {contextBudgetRatio >= 0.8 && (
-        <Box marginTop={1}>
-          <Text color="yellow">⚠ Context {Math.round(contextBudgetRatio * 100)}% full — compaction will trigger soon</Text>
-        </Box>
-      )}
-
-      {/* Persistent context warning banner from onContextWarning callback */}
-      {contextWarning && (
-        <Box marginTop={1}>
-          <Text color="yellow">⚠ Context 80%+ full — consider /clear or start a new session</Text>
-        </Box>
-      )}
-
-      {/* #file suggestion overlay */}
+      {/* File suggestions — minimal */}
       {fileSuggestions.length > 0 && (
-        <Box flexDirection="column" marginTop={1} borderStyle="single" borderColor="cyan">
-          <Text color="cyan" bold> File suggestions (Tab=cycle, Enter=accept, Esc=dismiss):</Text>
+        <Box flexDirection="column" paddingLeft={2}>
           {fileSuggestions.map((f, i) => (
-            <Text key={f} color={i === fileSuggestionIdx ? "green" : "gray"}>
+            <Text key={f} color={i === fileSuggestionIdx ? "cyan" : "gray"} dimColor={i !== fileSuggestionIdx}>
               {i === fileSuggestionIdx ? "▸ " : "  "}{f}
             </Text>
           ))}
         </Box>
       )}
 
-      {externalChanges.length > 0 && (
-        <Box marginTop={1}>
-          <Text color="yellow">⚠ External changes: {externalChanges.map(p => path.basename(p)).join(", ")}  [C to clear]</Text>
-        </Box>
-      )}
-
-      {/* Footer: token + cost stats */}
-      <Footer stats={footerStats} />
+      {/* Inline warnings — only one at a time, prioritized */}
+      {confirmExit ? (
+        <Box paddingLeft={2}><Text color="yellow">Press Esc again to exit</Text></Box>
+      ) : externalChanges.length > 0 ? (
+        <Box paddingLeft={2}><Text color="gray" dimColor>Files changed externally: {externalChanges.map(p => path.basename(p)).join(", ")}</Text></Box>
+      ) : scrollOffset > 0 ? (
+        <Box paddingLeft={2}><Text color="gray" dimColor>↑{scrollOffset} — ↓ to return</Text></Box>
+      ) : contextWarning ? (
+        <Box paddingLeft={2}><Text color="yellow" dimColor>Context 80%+ — /clear or start new session</Text></Box>
+      ) : null}
 
       {/* Input */}
-      {!loading && (
-        <Box marginTop={1}>
-          <Text color="cyan" bold>❯ </Text>
+      <Box marginTop={1}>
+        <Text color={loading ? "gray" : "cyan"} bold dimColor={loading}>{">"} </Text>
+        {loading ? (
+          <Text color="gray" dimColor></Text>
+        ) : (
           <TextInput
             value={input}
             onChange={handleInputChange}
             onSubmit={handleSubmit}
-            placeholder="Ask anything..."
+            placeholder=""
           />
-        </Box>
-      )}
+        )}
+      </Box>
     </Box>
   );
 }
 
 // ─── Entry ──────────────────────────────────────────────────
 
-render(<App />);
+render(<TuiErrorBoundary><App /></TuiErrorBoundary>);

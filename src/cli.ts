@@ -34,7 +34,7 @@ export function resolveModelAlias(alias: string): string {
   const modelMap: Record<string, string> = {
     haiku: "claude-haiku-4-5",
     sonnet: "claude-sonnet-4-6",
-    opus: "claude-opus-4-5",
+    opus: "claude-opus-4-6",
   };
   return modelMap[alias.toLowerCase()] ?? alias;
 }

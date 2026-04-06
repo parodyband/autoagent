@@ -12,7 +12,7 @@ import { describe, it, expect } from "vitest";
 const MODEL_ALIASES: Record<string, string> = {
   haiku: "claude-haiku-4-5",
   sonnet: "claude-sonnet-4-6",
-  opus: "claude-opus-4-5",
+  opus: "claude-opus-4-6",
 };
 
 function parseModelArg(arg: string): { resolved: string | null; error?: string } {
@@ -45,8 +45,8 @@ describe("/model command parsing", () => {
   });
 
   it("/model with full model ID passes through", () => {
-    const r = parseModelArg("claude-opus-4-5");
-    expect(r.resolved).toBe("claude-opus-4-5");
+    const r = parseModelArg("claude-opus-4-6");
+    expect(r.resolved).toBe("claude-opus-4-6");
   });
 
   it("/model with unknown alias returns error", () => {

@@ -11,7 +11,7 @@ describe("resolveModelAlias", () => {
   });
 
   it("resolves 'opus' to full model ID", () => {
-    expect(resolveModelAlias("opus")).toBe("claude-opus-4-5");
+    expect(resolveModelAlias("opus")).toBe("claude-opus-4-6");
   });
 
   it("is case-insensitive", () => {

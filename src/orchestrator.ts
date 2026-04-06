@@ -94,6 +94,12 @@ export const MODEL_PRICING: Record<string, [number, number]> = {
   [MODEL_SIMPLE]: [0.8, 4.0],
 };
 
+/** Context window size per model. */
+export const MODEL_CONTEXT_WINDOW: Record<string, number> = {
+  [MODEL_COMPLEX]: 200_000,
+  [MODEL_SIMPLE]: 200_000,
+};
+
 // Keywords that indicate code-changing intent (use sonnet)
 const CODE_CHANGE_KEYWORDS = [
   "create", "write", "add", "implement", "build", "fix", "refactor",
@@ -182,6 +188,8 @@ export interface CostInfo {
   tokensOut: number;
   /** Token count of the most recent API call's input window (actual context size). */
   lastInputTokens: number;
+  /** Context window size for the current model. */
+  contextLimit: number;
 }
 
 // ─── Model routing ────────────────────────────────────────────
@@ -1111,11 +1119,13 @@ export class Orchestrator {
 
   /** Get current session cost info. */
   getCost(): CostInfo {
+    const model = this.modelOverride ?? MODEL_COMPLEX;
     return {
       cost: this.sessionCost,
       tokensIn: this.sessionTokensIn,
       tokensOut: this.sessionTokensOut,
       lastInputTokens: this.lastInputTokens,
+      contextLimit: MODEL_CONTEXT_WINDOW[model] ?? 200_000,
     };
   }
 
