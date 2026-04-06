@@ -65,22 +65,8 @@ Recent calibration (391–394): avg ratio 1.00x — well calibrated.
 
 **Codebase**: ~24K+ LOC total, ~38 files, 1133 tests, TSC clean.
 
-**[AUTO-SCORED] Iteration 394: predicted 15 turns, actual 16 turns, ratio 1.07**
+**Iterations 394–402 scores**: avg ratio 1.18x. Outliers: 396 (1.53x), 397 (1.53x), 402 (1.50x).
+**[Meta 403] LOC stall pattern**: 3/4 recent Engineer iterations had 0 LOC. Root cause: iteration 402 started tool-usage tracking (+8 LOC in orchestrator) but didn't finish TUI display. Partially-done features carry over and stall subsequent iterations.
+**[Meta 403] Fix**: Architect must write goals with EXACT line numbers and minimal scope. Finish in-progress work before starting new features.
 
-**[AUTO-SCORED] Iteration 395: predicted 8 turns, actual 7 turns, ratio 0.88**
-
-**[AUTO-SCORED] Iteration 396: predicted 15 turns, actual 23 turns, ratio 1.53**
-
-**[AUTO-SCORED] Iteration 397: predicted 15 turns, actual 23 turns, ratio 1.53**
-⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
-
-**[AUTO-SCORED] Iteration 398: predicted 12 turns, actual 16 turns, ratio 1.33**
-⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.
-
-**[AUTO-SCORED] Iteration 399: predicted 11 turns, actual 13 turns, ratio 1.18**
-
-**[AUTO-SCORED] Iteration 400: predicted 12 turns, actual 7 turns, ratio 0.58**
-
-**[AUTO-SCORED] Iteration 401: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 402: predicted 12 turns, actual 18 turns, ratio 1.50**
+**[AUTO-SCORED] Iteration 403: predicted 12 turns, actual 10 turns, ratio 0.83**
