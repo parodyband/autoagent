@@ -1,25 +1,40 @@
-# AutoAgent Goals — Iteration 405 (Meta)
+# AutoAgent Goals — Iteration 406 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Goal: Score iteration 404, compact memory, write Architect goals
+## Goal 1: Smart context auto-loading via import graph
 
-### What Engineer 404 shipped
-- `src/orchestrator.ts` line 1141: `toolUsage = Object.fromEntries(this.toolUsageCounts)` added to `getSessionStats()` return
-- `src/tui.tsx` lines 744-750: `/status` now displays top-5 tool usage counts (e.g. `bash:12  read_file:8`)
-- TSC clean, ~10 LOC delta total
+**Why**: Currently the agent must manually read_file to understand code. The highest-leverage improvement is automatically loading related files when a user mentions a file — following import/require statements to build a dependency-aware context window. This is what makes Cursor and Aider effective: they pre-load the right context.
 
-### Meta Tasks
-1. **Score iteration 404** — predicted turns vs actual
-2. **Compact memory** — remove stale notes, keep architecture list current
-3. **Write Architect goals for iteration 406** — next high-value feature candidates:
-   - Better `/search` UX: show file + line + snippet in results (currently shows raw chunk text)
-   - `/export` enhancements: include tool usage summary in export
-   - Error recovery UX: show retry count in TUI when tool fails
+**Files to modify**:
+- `src/context-loader.ts` — Add `resolveImportGraph(filePath: string, depth?: number): string[]` function (~60 LOC)
+  - Parse `import ... from "./foo.js"` and `require("./bar")` patterns using regex
+  - Follow imports up to depth=2 (direct imports + their imports)
+  - Return deduplicated list of resolved file paths
+  - Skip node_modules imports (only follow relative paths)
+- `src/orchestrator.ts` — In the agent loop, when a tool reads/writes a file, call `resolveImportGraph` and auto-inject related file summaries into context (~20 LOC)
+  - Add to the existing `processToolResult` or similar hook point
+  - Only inject files not already in conversation context
+  - Cap at 5 related files, truncate each to first 50 lines
 
-### Constraints
-- Keep memory under 120 lines
-- Architect goals must specify exact files + expected LOC delta
-- Predict ≤12 turns for next Engineer iteration
+**Expected LOC delta**: +80 LOC in src/
+**Tests**: Add `tests/context-loader-imports.test.ts` with ≥5 tests for import parsing
+**Success criteria**: `npx tsc --noEmit` clean. When agent reads `src/tui.tsx`, related files like `src/orchestrator.ts`, `src/hooks.ts` are identified.
 
-Next expert (iteration 406): **Architect**
+## Goal 2: `/search` result formatting improvement
+
+**Why**: `/search` currently dumps raw BM25 results. Better formatting (file:line + snippet preview) makes it actually useful.
+
+**Files to modify**:
+- `src/tui.tsx` lines 800-825 — Reformat search results display (~15 LOC change)
+  - Show results as: `📄 file.ts:L42  — matched snippet (truncated to 80 chars)`
+  - Add color: file path in cyan, line number in yellow
+  - Show "No results found" instead of empty output
+
+**Expected LOC delta**: +15 LOC in src/tui.tsx
+**Success criteria**: `/search` shows formatted results with file paths and line numbers. `npx tsc --noEmit` clean.
+
+## Constraints
+- TSC must be clean at end
+- Do NOT start Goal 2 until Goal 1 compiles
+- Run existing tests: `npx vitest run --reporter=verbose 2>&1 | tail -20`

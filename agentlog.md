@@ -1,107 +1,3 @@
-[2026-04-05T22:07:20.181Z] iter=394 turn=16 INFO: Turn 16/25
-[2026-04-05T22:07:23.437Z] iter=394 turn=16 INFO: Agent: TSC is clean, memory saved, goals written. Done.
-[2026-04-05T22:07:23.438Z] iter=394 turn=16 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T22:07:23.439Z] iter=394 turn=16 INFO: RESTART signal
-[2026-04-05T22:07:23.439Z] iter=394 turn=16 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T22:07:24.561Z] iter=394 turn=16 INFO: Compilation OK
-[2026-04-05T22:07:32.787Z] iter=394 turn=16 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-05T22:07:32.787Z] iter=394 turn=16 INFO: Tool timing: bash: 13x, avg=187ms, total=2434ms; write_file: 6x, avg=2ms, total=12ms; read_scratchpad: 1x, avg=4ms, total=4ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T22:07:32.788Z] iter=394 turn=16 INFO: Tool timing stats
-[2026-04-05T22:07:40.132Z] iter=394 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 394: predicted 15 turns, actual 16 turns, ratio 1.07**
-[2026-04-05T22:07:49.421Z] iter=394 turn=16 INFO: Pre-commit review (1972in/343out): ## Issues Found
-
-- **Duplicated content extraction logic**: The `tool_result` content mapping block is copy-pasted twice (once for `convText`, once for `historyPath`). Extract it into a helper functio
-[2026-04-05T22:07:49.467Z] iter=394 turn=16 INFO: Committed: 2ad9fb1e (30 in / 4453 out, cache: 20502 created, 193031 read)
-[2026-04-05T22:07:49.468Z] iter=394 turn=16 INFO: Restarting as iteration 395...
-[2026-04-05T22:07:49.675Z] iter=395 INFO: Cache restored: 56/56 entries (0 stale)
-[2026-04-05T22:07:49.678Z] iter=395 INFO: Turn budget: 12/25 (calibration=1.07x, predicted=8)
-[2026-04-05T22:07:49.678Z] iter=395 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T22:07:49.868Z] iter=395 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T22:07:49.868Z] iter=395 turn=1 INFO: Turn 1/25
-[2026-04-05T22:07:56.702Z] iter=395 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state, scoring iteration 394, and then compact memory and write goals for iteration 396.
-[2026-04-05T22:07:56.703Z] iter=395 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat agentlog.jsonl | python3 -c "
-import json, sys
-lines = [json.loads(l) for l in sys.stdin if l.strip()]
-# Find iter 394 entries
-iter_lines = [l for l in line...
-[2026-04-05T22:07:56.705Z] iter=395 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l memory.md && echo "---" && wc -l goals.md
-[2026-04-05T22:07:56.706Z] iter=395 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | python3 -c "
-import json, sys
-data = json.load(sys.stdin)
-print(json.dumps(data, indent=2)[:2000])
-" 2>/dev/null || cat .autoagent...
-[2026-04-05T22:07:56.711Z] iter=395 turn=1 INFO:   -> exit=0 (41 chars)
-[2026-04-05T22:07:56.728Z] iter=395 turn=1 INFO:   -> exit=0 (536 chars)
-[2026-04-05T22:07:56.734Z] iter=395 turn=1 INFO:   -> exit=0 (2001 chars)
-[2026-04-05T22:07:56.734Z] iter=395 turn=2 INFO: Turn 2/25
-[2026-04-05T22:08:06.021Z] iter=395 turn=2 INFO: Agent: 
-
-You're right. My deliverables are:
-1. Score iter 394, compact memory.md to <120 lines
-2. Write goals.md for iteration 396 (Engineer)
-
-Let me produce both now.
-[2026-04-05T22:08:06.023Z] iter=395 turn=2 INFO: think: Iter 394: predicted 15 turns, actual 16 turns (from the log entry I saw). Ratio = 16/15 = 1.07. Already scored in memory...
-[2026-04-05T22:08:06.024Z] iter=395 turn=3 INFO: Turn 3/25
-[2026-04-05T22:08:08.512Z] iter=395 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "/search\|/export\|/status" src/tui.tsx | head -20
-[2026-04-05T22:08:08.530Z] iter=395 turn=3 INFO:   -> exit=0 (803 chars)
-[2026-04-05T22:08:08.531Z] iter=395 turn=4 INFO: Turn 4/25
-[2026-04-05T22:08:34.649Z] iter=395 turn=4 INFO: Agent: 
-
-Goals status:
-- **Goal 1** (Score iter 394 + compact memory): NOT STARTED writing yet
-- **Goal 2** (Write goals for iter 396): NOT STARTED writing yet
-
-Let me produce both files now.
-[2026-04-05T22:08:34.651Z] iter=395 turn=4 INFO: write_file: memory.md (write)
-[2026-04-05T22:08:34.653Z] iter=395 turn=4 INFO:   -> ok: Updated memory.md (4432 chars, -14 lines delta)
-[2026-04-05T22:08:34.654Z] iter=395 turn=5 INFO: Turn 5/25
-[2026-04-05T22:08:46.896Z] iter=395 turn=5 INFO: write_file: goals.md (write)
-[2026-04-05T22:08:46.897Z] iter=395 turn=5 INFO:   -> ok: Updated goals.md (1571 chars, +5 lines delta)
-[2026-04-05T22:08:46.898Z] iter=395 turn=6 INFO: Turn 6/25
-[2026-04-05T22:08:50.562Z] iter=395 turn=6 INFO: Agent: 
-
-This is a Meta iteration — no src/ changes expected. My deliverables are memory.md compaction and goals.md for next iteration, both DONE. Let me verify TSC and wrap up.
-[2026-04-05T22:08:50.563Z] iter=395 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-05T22:08:51.678Z] iter=395 turn=6 INFO:   -> exit=0 (11 chars)
-[2026-04-05T22:08:51.678Z] iter=395 turn=7 INFO: Turn 7/25
-[2026-04-05T22:08:54.270Z] iter=395 turn=7 INFO: Agent: 
-
-TSC clean. Memory and goals already written. Done.
-[2026-04-05T22:08:54.271Z] iter=395 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-05T22:08:54.271Z] iter=395 turn=7 INFO: RESTART signal
-[2026-04-05T22:08:54.272Z] iter=395 turn=7 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T22:08:55.391Z] iter=395 turn=7 INFO: Compilation OK
-[2026-04-05T22:09:03.683Z] iter=395 turn=7 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-05T22:09:03.683Z] iter=395 turn=7 INFO: Tool timing: bash: 6x, avg=199ms, total=1192ms; write_file: 2x, avg=3ms, total=5ms; think: 1x, avg=1ms, total=1ms
-[2026-04-05T22:09:03.684Z] iter=395 turn=7 INFO: Tool timing stats
-[2026-04-05T22:09:11.500Z] iter=395 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 395: predicted 8 turns, actual 7 turns, ratio 0.88**
-[2026-04-05T22:09:11.526Z] iter=395 turn=7 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T22:09:11.568Z] iter=395 turn=7 INFO: Committed: 63d07f5f (17 in / 3260 out, cache: 11707 created, 51494 read)
-[2026-04-05T22:09:11.568Z] iter=395 turn=7 INFO: Restarting as iteration 396...
-[2026-04-05T22:09:11.752Z] iter=396 INFO: Cache restored: 56/56 entries (0 stale)
-[2026-04-05T22:09:11.754Z] iter=396 INFO: Turn budget: 16/25 (calibration=1.07x, predicted=15)
-[2026-04-05T22:09:11.754Z] iter=396 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-05T22:09:11.926Z] iter=396 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-05T22:09:11.927Z] iter=396 turn=1 INFO: Turn 1/25
-[2026-04-05T22:09:14.218Z] iter=396 turn=1 INFO: read_scratchpad: 2526 chars
-[2026-04-05T22:09:14.219Z] iter=396 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
-[2026-04-05T22:09:14.238Z] iter=396 turn=1 INFO:   -> exit=0 (1571 chars)
-[2026-04-05T22:09:14.239Z] iter=396 turn=2 INFO: Turn 2/25
-[2026-04-05T22:09:16.927Z] iter=396 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "semantic_search\|searchIndex\|CodeSearchIndex\|buildSearchIndex" src/orchestrator.ts | head -40
-[2026-04-05T22:09:16.930Z] iter=396 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "/search\|searchIndex\|semantic" src/tui.tsx | head -40
-[2026-04-05T22:09:16.942Z] iter=396 turn=2 INFO:   -> exit=0 (429 chars)
-[2026-04-05T22:09:16.943Z] iter=396 turn=2 INFO:   -> exit=0 (404 chars)
-[2026-04-05T22:09:16.943Z] iter=396 turn=3 INFO: Turn 3/25
-[2026-04-05T22:09:22.221Z] iter=396 turn=3 INFO: think: Let me quickly assess what I need to do:
-
-1. Goal 1: Wire `/search` into orchestrator as a tool - the agent itself can c...
-[2026-04-05T22:09:22.222Z] iter=396 turn=4 INFO: Turn 4/25
-[2026-04-05T22:09:24.241Z] iter=396 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "semantic_search\|_searchIndexHolder" src/orchestrator.ts src/tool-registry.ts | head -50
-[2026-04-05T22:09:24.264Z] iter=396 turn=4 INFO:   -> exit=0 (687 chars)
-[2026-04-05T22:09:24.265Z] iter=396 turn=5 INFO: Turn 5/25
 [2026-04-05T22:09:26.218Z] iter=396 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "case \"semantic_search\"\|semantic_search" src/orchestrator.ts | head -20
 [2026-04-05T22:09:26.230Z] iter=396 turn=5 INFO:   -> exit=0 (90 chars)
 [2026-04-05T22:09:26.231Z] iter=396 turn=6 INFO: Turn 6/25
@@ -1100,3 +996,76 @@ Context after patch:
 [2026-04-06T07:36:11.907Z] iter=404 turn=10 INFO: Tool timing stats
 [2026-04-06T07:36:19.809Z] iter=404 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 404: predicted 8 turns, actual 10 turns, ratio 1.25**
 [2026-04-06T07:36:22.010Z] iter=404 turn=10 INFO: Pre-commit review (728in/77out): LGTM. The change cleanly adds `toolUsage` to the return type and value by converting `this.toolUsageCounts` (a `Map`) to a plain object — straightforward and consistent with the existing pattern of se
+[2026-04-06T07:36:22.066Z] iter=404 turn=10 INFO: Committed: b02a9864 (22 in / 2732 out, cache: 13321 created, 89786 read)
+[2026-04-06T07:36:22.066Z] iter=404 turn=10 INFO: Restarting as iteration 405...
+[2026-04-06T07:36:22.284Z] iter=405 INFO: Cache restored: 55/55 entries (0 stale)
+[2026-04-06T07:36:22.287Z] iter=405 INFO: Turn budget: 13/25 (calibration=1.25x, predicted=8)
+[2026-04-06T07:36:22.287Z] iter=405 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-06T07:36:22.472Z] iter=405 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-06T07:36:22.472Z] iter=405 turn=1 INFO: Turn 1/25
+[2026-04-06T07:36:27.181Z] iter=405 turn=1 INFO: Agent: 
+
+I'll start by evaluating the current state, scoring iteration 404, then doing research and planning the next high-value goals.
+[2026-04-06T07:36:27.182Z] iter=405 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-06T07:36:27.185Z] iter=405 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/*.ts src/*.tsx src/**/*.ts 2>/dev/null | tail -5
+[2026-04-06T07:36:27.189Z] iter=405 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null | head -80
+[2026-04-06T07:36:27.209Z] iter=405 turn=1 INFO:   -> exit=0 (141 chars)
+[2026-04-06T07:36:27.211Z] iter=405 turn=1 INFO:   -> exit=0 (1679 chars)
+[2026-04-06T07:36:28.278Z] iter=405 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-06T07:36:28.279Z] iter=405 turn=2 INFO: Turn 2/25
+[2026-04-06T07:36:41.206Z] iter=405 turn=2 INFO: Agent: 
+
+You're right. My deliverables are:
+1. Score iteration 404 (update memory)
+2. Compact memory
+3. Write goals.md for iteration 406 (Architect goals)
+
+Let me do the research and writing in parallel.
+[2026-04-06T07:36:41.208Z] iter=405 turn=2 INFO: think: Deliverables:
+1. Score iteration 404: predicted 8 turns, actual 10 turns, ratio 1.25 — already noted in memory
+2. Compac...
+[2026-04-06T07:36:41.209Z] iter=405 turn=3 INFO: Turn 3/25
+[2026-04-06T07:36:44.989Z] iter=405 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "search" src/tui.tsx | head -20
+[2026-04-06T07:36:44.991Z] iter=405 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "search\|Search" src/orchestrator.ts | head -20
+[2026-04-06T07:36:45.002Z] iter=405 turn=3 INFO:   -> exit=0 (686 chars)
+[2026-04-06T07:36:45.012Z] iter=405 turn=3 INFO:   -> exit=0 (967 chars)
+[2026-04-06T07:36:45.013Z] iter=405 turn=4 INFO: Turn 4/25
+[2026-04-06T07:36:48.637Z] iter=405 turn=4 INFO: Agent: 
+
+Status:
+1. **Score iteration 404** — DONE (already in memory: predicted 8, actual 10, ratio 1.25)
+2. **Compact memory** — NOT STARTED
+3. **Write goals.md for iteration 406** — NOT STARTED
+
+Let me finish both now.
+[2026-04-06T07:36:48.638Z] iter=405 turn=4 INFO: read_file: memory.md
+[2026-04-06T07:36:48.638Z] iter=405 turn=4 INFO:   -> ok (5009 chars)
+[2026-04-06T07:36:48.638Z] iter=405 turn=5 INFO: Turn 5/25
+[2026-04-06T07:37:20.628Z] iter=405 turn=5 INFO: Agent: Now I'll write the compacted memory and goals.md simultaneously:
+[2026-04-06T07:37:20.629Z] iter=405 turn=5 INFO: write_file: memory.md (write)
+[2026-04-06T07:37:20.630Z] iter=405 turn=5 INFO:   -> ok: Updated memory.md (4290 chars, -9 lines delta)
+[2026-04-06T07:37:20.630Z] iter=405 turn=5 INFO: write_file: goals.md (write)
+[2026-04-06T07:37:20.630Z] iter=405 turn=5 INFO:   -> ok: Updated goals.md (2285 chars, +15 lines delta)
+[2026-04-06T07:37:20.631Z] iter=405 turn=6 INFO: Turn 6/25
+[2026-04-06T07:37:25.133Z] iter=405 turn=6 INFO: Agent: 
+
+This is a Meta iteration — no src/ changes expected. Deliverables are memory compaction + goals.md, both done. Let me verify and wrap up.
+[2026-04-06T07:37:25.133Z] iter=405 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -3
+[2026-04-06T07:37:25.136Z] iter=405 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && wc -l memory.md goals.md
+[2026-04-06T07:37:25.143Z] iter=405 turn=6 INFO:   -> exit=0 (52 chars)
+[2026-04-06T07:37:26.161Z] iter=405 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-06T07:37:26.161Z] iter=405 turn=7 INFO: Turn 7/25
+[2026-04-06T07:37:29.579Z] iter=405 turn=7 INFO: Agent: 
+
+TSC clean, memory at 65 lines (under 120 limit), goals.md written for Engineer iteration 406. All 3 deliverables complete.
+[2026-04-06T07:37:29.580Z] iter=405 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-06T07:37:29.580Z] iter=405 turn=7 INFO: RESTART signal
+[2026-04-06T07:37:29.580Z] iter=405 turn=7 INFO: Validating: npx tsc --noEmit ...
+[2026-04-06T07:37:30.629Z] iter=405 turn=7 INFO: Compilation OK
+[2026-04-06T07:37:39.188Z] iter=405 turn=7 INFO: Cache persisted: 55 entries to .autoagent-cache.json
+[2026-04-06T07:37:39.188Z] iter=405 turn=7 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 2 invalidations (1 entries removed)
+[2026-04-06T07:37:39.188Z] iter=405 turn=7 INFO: Tool cache stats
+[2026-04-06T07:37:39.188Z] iter=405 turn=7 INFO: Tool timing: bash: 8x, avg=277ms, total=2213ms; write_file: 2x, avg=1ms, total=2ms; think: 1x, avg=1ms, total=1ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-06T07:37:39.188Z] iter=405 turn=7 INFO: Tool timing stats
+[2026-04-06T07:37:46.487Z] iter=405 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 405: predicted 8 turns, actual 7 turns, ratio 0.88**
+[2026-04-06T07:37:46.510Z] iter=405 turn=7 INFO: Pre-commit review: no significant code changes to review
