@@ -394,6 +394,11 @@ function App() {
   const [inputHistory, setInputHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [savedInput, setSavedInput] = useState("");
+  // Reverse-search state (Ctrl+R)
+  const [searchMode, setSearchMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchMatchIdx, setSearchMatchIdx] = useState(-1); // index into inputHistory
+  const [searchPreInput, setSearchPreInput] = useState(""); // input to restore on cancel
   const [bashStream, setBashStream] = useState<string[]>([]);
   const [footerStats, setFooterStats] = useState<FooterStats>({
     tokensIn: 0,
@@ -516,6 +521,57 @@ function App() {
     onFileInput(val, setInput);
   }, [onFileInput, historyIndex]);
 
+  // ─── Reverse-search helpers ───────────────────────────────
+  /** Find most recent inputHistory index at or before `startIdx` matching `query`. */
+  const findPrevMatch = useCallback((query: string, startIdx: number): number => {
+    if (!query) {
+      // No query — return the most recent entry
+      return startIdx >= 0 && startIdx < inputHistory.length ? startIdx : inputHistory.length - 1;
+    }
+    for (let i = startIdx; i >= 0; i--) {
+      if (inputHistory[i].includes(query)) return i;
+    }
+    return -1;
+  }, [inputHistory]);
+
+  const enterSearchMode = useCallback(() => {
+    setSearchPreInput(input);
+    setSearchQuery("");
+    const idx = findPrevMatch("", inputHistory.length - 1);
+    setSearchMatchIdx(idx);
+    setSearchMode(true);
+    if (idx >= 0) setInput(inputHistory[idx]);
+  }, [input, inputHistory, findPrevMatch]);
+
+  const exitSearchMode = useCallback((accept: boolean) => {
+    setSearchMode(false);
+    if (!accept) {
+      setInput(searchPreInput);
+    }
+    setSearchQuery("");
+    setSearchMatchIdx(-1);
+    setHistoryIndex(-1);
+  }, [searchPreInput]);
+
+  const updateSearchQuery = useCallback((newQuery: string) => {
+    setSearchQuery(newQuery);
+    const idx = findPrevMatch(newQuery, inputHistory.length - 1);
+    setSearchMatchIdx(idx);
+    if (idx >= 0) setInput(inputHistory[idx]);
+    else setInput(newQuery); // show query itself if no match
+  }, [inputHistory, findPrevMatch]);
+
+  const cycleSearchMatch = useCallback(() => {
+    // Go to next older match from current position
+    const startFrom = searchMatchIdx > 0 ? searchMatchIdx - 1 : -1;
+    const idx = findPrevMatch(searchQuery, startFrom);
+    if (idx >= 0) {
+      setSearchMatchIdx(idx);
+      setInput(inputHistory[idx]);
+    }
+    // If no older match, keep current
+  }, [searchMatchIdx, searchQuery, inputHistory, findPrevMatch]);
+
   useInput((ch, key) => {
     if (pendingDiff) {
       if (ch === "y" || ch === "Y" || key.return) {
@@ -527,6 +583,38 @@ function App() {
       }
       return;
     }
+
+    // ─── Reverse-search mode (Ctrl+R) ───────────────────────
+    if (searchMode) {
+      if (key.ctrl && ch === "r") {
+        cycleSearchMatch();
+        return;
+      }
+      if (key.return) {
+        exitSearchMode(true);
+        return;
+      }
+      if (key.escape || (key.ctrl && ch === "c")) {
+        exitSearchMode(false);
+        return;
+      }
+      if (key.backspace || key.delete) {
+        updateSearchQuery(searchQuery.slice(0, -1));
+        return;
+      }
+      if (ch && !key.ctrl && !key.meta) {
+        updateSearchQuery(searchQuery + ch);
+        return;
+      }
+      return;
+    }
+
+    // Enter reverse-search mode on Ctrl+R (when not loading)
+    if (key.ctrl && ch === "r" && !loading) {
+      if (inputHistory.length > 0) enterSearchMode();
+      return;
+    }
+
     // Shift+Up/Down: scroll message view
     if (key.upArrow && key.shift) {
       setScrollOffset(prev => Math.min(prev + 15, Math.max(0, messages.length)));
@@ -798,16 +886,29 @@ function App() {
 
       {/* Input */}
       <Box marginTop={1}>
-        <Text color={loading ? "gray" : "cyan"} bold dimColor={loading}>{">"} </Text>
-        {loading ? (
-          <Text color="gray" dimColor></Text>
+        {searchMode ? (
+          <Box>
+            <Text color="magenta">(reverse-search)`</Text>
+            <Text color="white">{searchQuery}</Text>
+            <Text color="magenta">`: </Text>
+            <Text color={searchMatchIdx >= 0 ? "cyan" : "gray"} dimColor={searchMatchIdx < 0}>
+              {searchMatchIdx >= 0 ? inputHistory[searchMatchIdx] : ""}
+            </Text>
+          </Box>
         ) : (
-          <TextInput
-            value={input}
-            onChange={handleInputChange}
-            onSubmit={handleSubmit}
-            placeholder=""
-          />
+          <>
+            <Text color={loading ? "gray" : "cyan"} bold dimColor={loading}>{">"} </Text>
+            {loading ? (
+              <Text color="gray" dimColor></Text>
+            ) : (
+              <TextInput
+                value={input}
+                onChange={handleInputChange}
+                onSubmit={handleSubmit}
+                placeholder=""
+              />
+            )}
+          </>
         )}
       </Box>
     </Box>

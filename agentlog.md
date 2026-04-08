@@ -1,76 +1,3 @@
-[2026-04-08T20:30:54.575Z] iter=528 turn=12 INFO: write_file: src/export-helper.ts (patch)
-[2026-04-08T20:30:54.576Z] iter=528 turn=12 INFO:   -> ok: Patched src/export-helper.ts: -1 +1 lines
-
-Context after patch:
-140 |   mkdirSync(dir, { recursive: true });
-141 |   const now = new Date();
-142 |   const projectName = path.basename(workDir);
-143 |   const { tokensIn, tokensOut, cost, turnCount, durationMs } = stats;
-144 | 
-145 |   // Collect user messages for TOC
-146 |   const userEntries: Array<{ index: number; preview: string }> = [];
-[2026-04-08T20:30:54.576Z] iter=528 turn=13 INFO: Turn 13/25
-[2026-04-08T20:30:59.604Z] iter=528 turn=13 INFO: Agent: Finishing now.
-[2026-04-08T20:30:59.604Z] iter=528 turn=13 INFO: write_file: src/export-helper.ts (patch)
-[2026-04-08T20:30:59.605Z] iter=528 turn=13 INFO:   -> ok: Patched src/export-helper.ts: -10 +18 lines
-
-Context after patch:
-153 |     }
-154 |   }
-155 | 
-156 |   const durationStr = durationMs !== undefined
-157 |     ? durationMs < 60_000
-158 |       ? `${(durationMs / 1000).toFixed(0)}s`
-159 |       : `${(durationMs / 60_000).toFixed(1)}m`
-160 |     : undefined;
-161 | 
-162 |   const lines: string[] = [
-163 |     `# AutoAgent Conversation Export`,
-164 |     ``,
-165 |     `**Date**: ${now.toLocaleString()}`,
-166 |     `**Model**: ${model}`,
-167 |     `**Project**: ${projectName}`,
-168 |     ...(turnCount !== undefined ? [`**Turns**: ${turnCount}`] : []),
-169 |     ...(durationStr !== undefined ? [`**Duration**: ${durationStr}`] : []),
-170 |     ``,
-171 |     `---`,
-172 |     ``,
-173 |   ];
-174 | 
-175 |   // Table of contents
-176 |   if (userEntries.length > 0) {
-[2026-04-08T20:30:59.605Z] iter=528 turn=14 INFO: Turn 14/25
-[2026-04-08T20:31:05.016Z] iter=528 turn=14 INFO: Agent: Now wire turn count into the `/export` call in tui-commands.ts:
-[2026-04-08T20:31:05.017Z] iter=528 turn=14 INFO: write_file: src/tui-commands.ts (patch)
-[2026-04-08T20:31:05.018Z] iter=528 turn=14 INFO:   -> ok: Patched src/tui-commands.ts: -2 +3 lines
-
-Context after patch:
-521 |     const filePath = path.isAbsolute(filename) ? filename : path.join(ctx.workDir, filename);
-522 |     try {
-523 |       const model = ctx.orchestratorRef.current?.getModel() ?? ctx.footerStats.model;
-524 |       const exportMsgs = ctx.messages.filter(m => m.role === "user" || m.role === "assistant") as import("./export-helper.js").ExportMessage[];
-525 |       const turnCount = exportMsgs.filter(m => m.role === "user").length;
-526 |       buildExportContentHelper(exportMsgs, model, { tokensIn: ctx.footerStats.tokensIn, tokensOut: ctx.footerStats.tokensOut, cost: ctx.footerStats.cost, turnCount }, ctx.workDir, filePath);
-527 |       ctx.addMessage({ role: "assistant", content: `Exported to ${filename}` });
-528 |     } catch (err) {
-529 |       ctx.addMessage({ role: "assistant", content: `Export failed: ${err instanceof Error ? err.message : err}` });
-[2026-04-08T20:31:05.018Z] iter=528 turn=15 INFO: Turn 15/25
-[2026-04-08T20:31:06.409Z] iter=528 turn=15 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-08T20:31:07.518Z] iter=528 turn=15 INFO:   -> exit=0 (11 chars)
-[2026-04-08T20:31:07.518Z] iter=528 turn=16 INFO: Turn 16/25
-[2026-04-08T20:31:12.457Z] iter=528 turn=16 INFO: Agent: TypeScript clean. Wrapping up now.
-[2026-04-08T20:31:12.458Z] iter=528 turn=16 INFO: save_memory: "[Engineer] Iteration 528"
-[2026-04-08T20:31:12.460Z] iter=528 turn=16 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T20:31:12.460Z] iter=528 turn=17 INFO: Turn 17/25
-[2026-04-08T20:31:20.714Z] iter=528 turn=17 INFO: write_file: goals.md (write)
-[2026-04-08T20:31:20.715Z] iter=528 turn=17 INFO:   -> ok: Updated goals.md (1061 chars, -10 lines delta)
-[2026-04-08T20:31:20.715Z] iter=528 turn=18 INFO: Turn 18/25
-[2026-04-08T20:31:22.591Z] iter=528 turn=18 INFO: $ npx tsc --noEmit 2>&1 && echo "AUTOAGENT_RESTART"
-[2026-04-08T20:31:22.592Z] iter=528 turn=18 INFO: RESTART signal
-[2026-04-08T20:31:22.593Z] iter=528 turn=18 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T20:31:23.814Z] iter=528 turn=18 INFO: Compilation OK
-[2026-04-08T20:31:33.074Z] iter=528 turn=18 INFO: Cache persisted: 64 entries to .autoagent-cache.json
-[2026-04-08T20:31:33.075Z] iter=528 turn=18 INFO: Cache stats: 0 hits, 3 misses, 64 entries, 5 invalidations (2 entries removed)
 [2026-04-08T20:31:33.075Z] iter=528 turn=18 INFO: Tool cache stats
 [2026-04-08T20:31:33.075Z] iter=528 turn=18 INFO: Tool timing: bash: 6x, avg=376ms, total=2254ms; grep: 2x, avg=20ms, total=39ms; write_file: 5x, avg=1ms, total=6ms; think: 3x, avg=1ms, total=3ms; read_file: 1x, avg=3ms, total=3ms; save_memory: 1x, avg=2ms, total=2ms; read_scratchpad: 1x, avg=1ms, total=1ms
 [2026-04-08T20:31:33.075Z] iter=528 turn=18 INFO: Tool timing stats
@@ -1069,3 +996,236 @@ Goals.md is written, memory saved. Wrapping up now.
 [2026-04-08T20:44:54.063Z] iter=537 turn=8 INFO: Tool timing stats
 [2026-04-08T20:45:02.198Z] iter=537 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 537: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-08T20:45:02.226Z] iter=537 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:45:02.263Z] iter=537 turn=8 INFO: Committed: 1bc45cd5 (18 in / 2202 out, cache: 9618 created, 53234 read)
+[2026-04-08T20:45:02.264Z] iter=537 turn=8 INFO: Restarting as iteration 538...
+[2026-04-08T20:45:02.448Z] iter=538 INFO: Cache restored: 63/63 entries (0 stale)
+[2026-04-08T20:45:02.456Z] iter=538 INFO: Turn budget: 15/25 (calibration=1.00x, predicted=15)
+[2026-04-08T20:45:02.456Z] iter=538 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T20:45:02.643Z] iter=538 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T20:45:02.643Z] iter=538 turn=1 INFO: Turn 1/25
+[2026-04-08T20:45:05.094Z] iter=538 turn=1 INFO: $ wc -l src/tui.tsx
+[2026-04-08T20:45:05.095Z] iter=538 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T20:45:05.102Z] iter=538 turn=1 INFO:   -> exit=0 (21 chars)
+[2026-04-08T20:45:05.102Z] iter=538 turn=2 INFO: Turn 2/25
+[2026-04-08T20:45:07.241Z] iter=538 turn=2 INFO: read_file: src/tui.tsx
+[2026-04-08T20:45:07.242Z] iter=538 turn=2 INFO:   -> ok (29327 chars)
+[2026-04-08T20:45:07.243Z] iter=538 turn=3 INFO: Turn 3/25
+[2026-04-08T20:45:27.304Z] iter=538 turn=3 INFO: think: I have the full tui.tsx content. I need to add Ctrl+R reverse-search functionality. Let me plan the changes:
+
+1. Add sta...
+[2026-04-08T20:45:27.304Z] iter=538 turn=4 INFO: Turn 4/25
+[2026-04-08T20:45:32.536Z] iter=538 turn=4 INFO: Agent: I have everything I need. Implementing the Ctrl+R reverse-search now:
+[2026-04-08T20:45:32.538Z] iter=538 turn=4 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:45:32.543Z] iter=538 turn=4 INFO:   -> ok: Patched src/tui.tsx: -3 +8 lines
+
+Context after patch:
+391 |   const [autoAccept, setAutoAccept] = useState(noConfirm);
+392 |   const [externalChanges, setExternalChanges] = useState<string[]>([]);
+393 |   const [scrollOffset, setScrollOffset] = useState(0);
+394 |   const [inputHistory, setInputHistory] = useState<string[]>([]);
+395 |   const [historyIndex, setHistoryIndex] = useState(-1);
+396 |   const [savedInput, setSavedInput] = useState("");
+397 |   // Reverse-search state (Ctrl+R)
+398 |   const [searchMode, setSearchMode] = useState(false);
+399 |   const [searchQuery, setSearchQuery] = useState("");
+400 |   const [searchMatchIdx, setSearchMatchIdx] = useState(-1); // index into inputHistory
+401 |   const [searchPreInput, setSearchPreInput] = useState(""); // input to restore on cancel
+402 |   const [bashStream, setBashStream] = useState<string[]>([]);
+403 |   const [footerStats, setFooterStats] = useState<FooterStats>({
+404 |     tokensIn: 0,
+[2026-04-08T20:45:32.544Z] iter=538 turn=5 INFO: Turn 5/25
+[2026-04-08T20:45:43.802Z] iter=538 turn=5 INFO: Agent: Now add the helper function and the search logic to `useInput`. First let me add a helper function after the `handleInputChange` callback:
+[2026-04-08T20:45:43.802Z] iter=538 turn=5 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:45:43.803Z] iter=538 turn=5 INFO:   -> ok: Patched src/tui.tsx: -5 +56 lines
+
+Context after patch:
+515 |     try { fs.writeFileSync(historyFile, entries.join("\n") + "\n", "utf8"); } catch { /* ignore */ }
+516 |   }, [workDir]);
+517 | 
+518 |   // Wrap file suggestion handler to also set input; reset history browsing on any typing
+519 |   const handleInputChange = useCallback((val: string) => {
+520 |     if (historyIndex !== -1) setHistoryIndex(-1);
+521 |     onFileInput(val, setInput);
+522 |   }, [onFileInput, historyIndex]);
+523 | 
+524 |   // ─── Reverse-search helpers ───────────────────────────────
+525 |   /** Find most recent inputHistory index at or before `startIdx` matching `query`. */
+526 |   const findPrevMatch = useCallback((query: string, startIdx: number): number => {
+527 |     if (!query) {
+528 |       // No query — return the most recent entry
+529 |       return startIdx >= 0 && startIdx < inputHistory.length ? startIdx : inputHistory.length - 1;
+530 |     }
+531 |     for (let i = startIdx; i >= 0; i--) {
+532 |       if (inputHistory[i].includes(query)) return i;
+533 |     }
+534 |     return -1;
+535 |   }, [inputHistory]);
+536 | 
+537 |   const enterSearchMode = useCallback(() => {
+538 |     setSearchPreInput(input);
+539 |     setSearchQuery("");
+540 |     const idx = findPrevMatch("", inputHistory.length - 1);
+541 |     setSearchMatchIdx(idx);
+542 |     setSearchMode(true);
+543 |     if (idx >= 0) setInput(inputHistory[idx]);
+544 |   }, [input, inputHistory, findPrevMatch]);
+545 | 
+546 |   const exitSearchMode = useCallback((accept: boolean) => {
+547 |     setSearchMode(false);
+548 |     if (!accept) {
+549 |       setInput(searchPreInput);
+550 |     }
+551 |     setSearchQuery("");
+552 |     setSearchMatchIdx(-1);
+553 |     setHistoryIndex(-1);
+554 |   }, [searchPreInput]);
+555 | 
+556 |   const updateSearchQuery = useCallback((newQuery: string) => {
+557 |     setSearchQuery(newQuery);
+558 |     const idx = findPrevMatch(newQuery, inputHistory.length - 1);
+559 |     setSearchMatchIdx(idx);
+560 |     if (idx >= 0) setInput(inputHistory[idx]);
+561 |     else setInput(newQuery); // show query itself if no match
+562 |   }, [inputHistory, findPrevMatch]);
+563 | 
+564 |   const cycleSearchMatch = useCallback(() => {
+565 |     // Go to next older match from current position
+566 |     const startFrom = searchMatchIdx > 0 ? searchMatchIdx - 1 : -1;
+567 |     const idx = findPrevMatch(searchQuery, startFrom);
+568 |     if (idx >= 0) {
+569 |       setSearchMatchIdx(idx);
+570 |       setInput(inputHistory[idx]);
+571 |     }
+572 |     // If no older match, keep current
+573 |   }, [searchMatchIdx, searchQuery, inputHistory, findPrevMatch]);
+574 | 
+575 |   useInput((ch, key) => {
+576 |     if (pendingDiff) {
+[2026-04-08T20:45:43.804Z] iter=538 turn=6 INFO: Turn 6/25
+[2026-04-08T20:45:54.585Z] iter=538 turn=6 INFO: Agent: **Goal status: IN PROGRESS** — Ctrl+R search helpers added, still need to wire up `useInput` handler and update the render.
+[2026-04-08T20:45:54.585Z] iter=538 turn=6 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:45:54.586Z] iter=538 turn=6 INFO:   -> ok: Patched src/tui.tsx: -22 +54 lines
+
+Context after patch:
+572 |     // If no older match, keep current
+573 |   }, [searchMatchIdx, searchQuery, inputHistory, findPrevMatch]);
+574 | 
+575 |   useInput((ch, key) => {
+576 |     if (pendingDiff) {
+577 |       if (ch === "y" || ch === "Y" || key.return) {
+578 |         pendingDiff.resolve(true);
+579 |         setPendingDiff(null);
+580 |       } else if (ch === "n" || ch === "N" || key.escape) {
+581 |         pendingDiff.resolve(false);
+582 |         setPendingDiff(null);
+583 |       }
+584 |       return;
+585 |     }
+586 | 
+587 |     // ─── Reverse-search mode (Ctrl+R) ───────────────────────
+588 |     if (searchMode) {
+589 |       if (key.ctrl && ch === "r") {
+590 |         cycleSearchMatch();
+591 |         return;
+592 |       }
+593 |       if (key.return) {
+594 |         exitSearchMode(true);
+595 |         return;
+596 |       }
+597 |       if (key.escape || (key.ctrl && ch === "c")) {
+598 |         exitSearchMode(false);
+599 |         return;
+600 |       }
+601 |       if (key.backspace || key.delete) {
+602 |         updateSearchQuery(searchQuery.slice(0, -1));
+603 |         return;
+604 |       }
+605 |       if (ch && !key.ctrl && !key.meta) {
+606 |         updateSearchQuery(searchQuery + ch);
+607 |         return;
+608 |       }
+609 |       return;
+610 |     }
+611 | 
+612 |     // Enter reverse-search mode on Ctrl+R (when not loading)
+613 |     if (key.ctrl && ch === "r" && !loading) {
+614 |       if (inputHistory.length > 0) enterSearchMode();
+615 |       return;
+616 |     }
+617 | 
+618 |     // Shift+Up/Down: scroll message view
+619 |     if (key.upArrow && key.shift) {
+620 |       setScrollOffset(prev => Math.min(prev + 15, Math.max(0, messages.length)));
+621 |       return;
+622 |     }
+623 |     if (key.downArrow && key.shift) {
+624 |       setScrollOffset(prev => Math.max(prev - 15, 0));
+625 |       return;
+626 |     }
+627 |     // Up/Down: history navigation
+628 |     if (key.upArrow && !loading) {
+629 |       if (inputHistory.length === 0) return;
+630 |       if (historyIndex === -1) {
+631 |         setSavedInput(input);
+[2026-04-08T20:45:54.587Z] iter=538 turn=7 INFO: Turn 7/25
+[2026-04-08T20:46:01.206Z] iter=538 turn=7 INFO: Agent: Now add the search prompt to the render — replace the input section:
+[2026-04-08T20:46:01.206Z] iter=538 turn=7 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:46:01.207Z] iter=538 turn=7 INFO:   -> ok: Patched src/tui.tsx: -14 +27 lines
+
+Context after patch:
+884 |         <Box paddingLeft={2}><Text color="yellow" dimColor>Context 80%+ — /clear or start new session</Text></Box>
+885 |       ) : null}
+886 | 
+887 |       {/* Input */}
+888 |       <Box marginTop={1}>
+889 |         {searchMode ? (
+890 |           <Box>
+891 |             <Text color="magenta">(reverse-search)`</Text>
+892 |             <Text color="white">{searchQuery}</Text>
+893 |             <Text color="magenta">`: </Text>
+894 |             <Text color={searchMatchIdx >= 0 ? "cyan" : "gray"} dimColor={searchMatchIdx < 0}>
+895 |               {searchMatchIdx >= 0 ? inputHistory[searchMatchIdx] : ""}
+896 |             </Text>
+897 |           </Box>
+898 |         ) : (
+899 |           <>
+900 |             <Text color={loading ? "gray" : "cyan"} bold dimColor={loading}>{">"} </Text>
+901 |             {loading ? (
+902 |               <Text color="gray" dimColor></Text>
+903 |             ) : (
+904 |               <TextInput
+905 |                 value={input}
+906 |                 onChange={handleInputChange}
+907 |                 onSubmit={handleSubmit}
+908 |                 placeholder=""
+909 |               />
+910 |             )}
+911 |           </>
+912 |         )}
+913 |       </Box>
+914 |     </Box>
+915 |   );
+916 | }
+[2026-04-08T20:46:01.207Z] iter=538 turn=8 INFO: Turn 8/25
+[2026-04-08T20:46:03.413Z] iter=538 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-08T20:46:04.635Z] iter=538 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:46:04.635Z] iter=538 turn=9 INFO: Turn 9/25
+[2026-04-08T20:46:12.005Z] iter=538 turn=9 INFO: Agent: Clean. Now write memory, update goals, and restart:
+[2026-04-08T20:46:12.006Z] iter=538 turn=9 INFO: save_memory: "[Engineer] Iteration 538"
+[2026-04-08T20:46:12.009Z] iter=538 turn=9 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T20:46:12.010Z] iter=538 turn=10 INFO: Turn 10/25
+[2026-04-08T20:46:21.278Z] iter=538 turn=10 INFO: Agent: I've already made all src/ changes. Let me update goals and restart.
+[2026-04-08T20:46:21.279Z] iter=538 turn=10 INFO: write_file: goals.md (write)
+[2026-04-08T20:46:21.280Z] iter=538 turn=10 INFO:   -> ok: Updated goals.md (1132 chars, -10 lines delta)
+[2026-04-08T20:46:21.281Z] iter=538 turn=11 INFO: Turn 11/25
+[2026-04-08T20:46:23.222Z] iter=538 turn=11 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:46:23.223Z] iter=538 turn=11 INFO: RESTART signal
+[2026-04-08T20:46:23.223Z] iter=538 turn=11 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:46:24.339Z] iter=538 turn=11 INFO: Compilation OK
+[2026-04-08T20:46:33.171Z] iter=538 turn=11 INFO: Cache persisted: 63 entries to .autoagent-cache.json
+[2026-04-08T20:46:33.171Z] iter=538 turn=11 INFO: Cache stats: 0 hits, 1 misses, 63 entries, 5 invalidations (1 entries removed)
+[2026-04-08T20:46:33.171Z] iter=538 turn=11 INFO: Tool cache stats
+[2026-04-08T20:46:33.172Z] iter=538 turn=11 INFO: Tool timing: bash: 3x, avg=410ms, total=1231ms; write_file: 5x, avg=2ms, total=12ms; save_memory: 1x, avg=3ms, total=3ms; read_file: 1x, avg=2ms, total=2ms; read_scratchpad: 1x, avg=1ms, total=1ms; think: 1x, avg=1ms, total=1ms
+[2026-04-08T20:46:33.172Z] iter=538 turn=11 INFO: Tool timing stats
+[2026-04-08T20:46:41.476Z] iter=538 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 538: predicted 15 turns, actual 11 turns, ratio 0.73**
+[2026-04-08T20:46:41.500Z] iter=538 turn=11 INFO: Pre-commit review: no significant code changes to review
