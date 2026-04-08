@@ -6,23 +6,40 @@
  */
 
 import type Anthropic from "@anthropic-ai/sdk";
-import { bashToolDefinition, executeBash } from "./tools/bash.js";
-import { readFileToolDefinition, executeReadFile } from "./tools/read_file.js";
-import { writeFileToolDefinition, executeWriteFile } from "./tools/write_file.js";
-import { grepToolDefinition, executeGrep } from "./tools/grep.js";
-import { webFetchToolDefinition, executeWebFetch } from "./tools/web_fetch.js";
-import { thinkToolDefinition, executeThink } from "./tools/think.js";
-import { listFilesToolDefinition, executeListFiles } from "./tools/list_files.js";
-import { subagentToolDefinition, executeSubagent } from "./tools/subagent.js";
-import { webSearchToolDefinition, executeWebSearch } from "./tools/web_search.js";
+import { bashToolDefinition } from "./tools/bash.js";
+import { readFileToolDefinition } from "./tools/read_file.js";
+import { writeFileToolDefinition } from "./tools/write_file.js";
+import { grepToolDefinition } from "./tools/grep.js";
+import { webFetchToolDefinition } from "./tools/web_fetch.js";
+import { thinkToolDefinition } from "./tools/think.js";
+import { listFilesToolDefinition } from "./tools/list_files.js";
+import { subagentToolDefinition } from "./tools/subagent.js";
+import { webSearchToolDefinition } from "./tools/web_search.js";
 import { autoSelectModel } from "./model-selection.js";
 import { saveToProjectMemory } from "./project-memory.js";
 import {
   saveScratchpadToolDefinition,
   readScratchpadToolDefinition,
-  executeSaveScratchpad,
-  executeReadScratchpad,
 } from "./tools/scratchpad.js";
+
+// ─── Lazy executor loader ────────────────────────────────────
+
+/**
+ * Defers import of a tool executor module until first invocation.
+ * Keeps definition/schema imports eager (needed for API) while
+ * deferring heavy executor imports for faster startup.
+ */
+function lazyExecutor(modulePath: string, exportName: string): (...args: unknown[]) => Promise<unknown> {
+  let cached: ((...args: unknown[]) => unknown) | null = null;
+  return async (...args: unknown[]) => {
+    if (!cached) {
+      const mod = await import(modulePath);
+      cached = mod[exportName] as (...args: unknown[]) => unknown;
+    }
+    return cached!(...args);
+  };
+}
+
 import { CodeSearchIndex } from "./semantic-search.js";
 import * as fs from "fs";
 import { glob } from "glob";
@@ -144,6 +161,7 @@ export function createDefaultRegistry(): ToolRegistry {
   const registry = new ToolRegistry();
 
   // ── bash ──────────────────────────────────────────────
+  const lazyExecuteBash = lazyExecutor("./tools/bash.js", "executeBash");
   registry.register(bashToolDefinition, async (input, ctx) => {
     const { command, timeout } = input as { command: string; timeout?: number };
     ctx.log(`$ ${command.slice(0, 200)}${command.length > 200 ? "..." : ""}`);
@@ -157,23 +175,25 @@ export function createDefaultRegistry(): ToolRegistry {
     }
 
     const effectiveTimeout = timeout || ctx.defaultTimeout || 120;
-    const r = await executeBash(command, effectiveTimeout, ctx.rootDir);
+    const r = await lazyExecuteBash(command, effectiveTimeout, ctx.rootDir) as { exitCode: number; output: string };
     ctx.log(`  -> exit=${r.exitCode} (${r.output.length} chars)`);
     return { result: r.output };
   }, { defaultTimeout: 120 });
 
   // ── read_file ─────────────────────────────────────────
+  const lazyExecuteReadFile = lazyExecutor("./tools/read_file.js", "executeReadFile");
   registry.register(readFileToolDefinition, async (input, ctx) => {
     const { path: filePath, start_line, end_line } = input as {
       path: string; start_line?: number; end_line?: number;
     };
     ctx.log(`read_file: ${filePath}`);
-    const r = executeReadFile(filePath, start_line, end_line, ctx.rootDir);
+    const r = await lazyExecuteReadFile(filePath, start_line, end_line, ctx.rootDir) as { success: boolean; content: string };
     ctx.log(`  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
     return { result: r.content };
   }, { defaultTimeout: 10 });
 
   // ── write_file ────────────────────────────────────────
+  const lazyExecuteWriteFile = lazyExecutor("./tools/write_file.js", "executeWriteFile");
   registry.register(writeFileToolDefinition, async (input, ctx) => {
     const {
       path: filePath, content, mode, old_string, new_string,
@@ -183,15 +203,16 @@ export function createDefaultRegistry(): ToolRegistry {
     };
     const m = mode || "write";
     ctx.log(`write_file: ${filePath} (${m})`);
-    const r = executeWriteFile(filePath, content || "", m, ctx.rootDir, old_string, new_string);
+    const r = await lazyExecuteWriteFile(filePath, content || "", m, ctx.rootDir, old_string, new_string) as { success: boolean; message: string };
     ctx.log(`  -> ${r.success ? "ok" : "err"}: ${r.message}`);
     return { result: r.message };
   }, { defaultTimeout: 10 });
 
   // ── grep ──────────────────────────────────────────────
+  const lazyExecuteGrep = lazyExecutor("./tools/grep.js", "executeGrep");
   registry.register(grepToolDefinition, async (input, ctx) => {
     const {
-      pattern, path: searchPath, glob, type, output_mode,
+      pattern, path: searchPath, glob: globPattern, type, output_mode,
       context, case_insensitive, max_results, multiline,
     } = input as {
       pattern: string; path?: string; glob?: string; type?: string;
@@ -199,21 +220,22 @@ export function createDefaultRegistry(): ToolRegistry {
       case_insensitive?: boolean; max_results?: number; multiline?: boolean;
     };
     ctx.log(`grep: "${pattern}"${searchPath ? ` in ${searchPath}` : ""}`);
-    const r = executeGrep(
-      pattern, searchPath, glob, type, output_mode,
+    const r = await lazyExecuteGrep(
+      pattern, searchPath, globPattern, type, output_mode,
       context, case_insensitive, max_results, multiline, ctx.rootDir,
-    );
+    ) as { matchCount: number; content: string };
     ctx.log(`  -> ${r.matchCount} matches`);
     return { result: r.content };
   }, { defaultTimeout: 30 });
 
   // ── web_fetch ─────────────────────────────────────────
+  const lazyExecuteWebFetch = lazyExecutor("./tools/web_fetch.js", "executeWebFetch");
   registry.register(webFetchToolDefinition, async (input, ctx) => {
     const { url, extract_text, headers } = input as {
       url: string; extract_text?: boolean; headers?: Record<string, string>;
     };
     ctx.log(`web_fetch: ${url}`);
-    const r = await executeWebFetch(url, extract_text, headers);
+    const r = await lazyExecuteWebFetch(url, extract_text, headers) as { success: boolean; content: string };
     ctx.log(`  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
     return { result: r.content };
   }, { defaultTimeout: 30 });
@@ -226,17 +248,19 @@ export function createDefaultRegistry(): ToolRegistry {
   }, { defaultTimeout: 5 });
 
   // ── list_files ────────────────────────────────────────
+  const lazyExecuteListFiles = lazyExecutor("./tools/list_files.js", "executeListFiles");
   registry.register(listFilesToolDefinition, async (input, ctx) => {
     const { path: dirPath, depth, exclude } = input as {
       path?: string; depth?: number; exclude?: string[];
     };
     ctx.log(`list_files: ${dirPath || "."} (depth=${depth || 3})`);
-    const r = executeListFiles(dirPath, depth, exclude, ctx.rootDir);
+    const r = await lazyExecuteListFiles(dirPath, depth, exclude, ctx.rootDir) as { success: boolean; dirCount: number; fileCount: number; content: string };
     ctx.log(`  -> ${r.success ? "ok" : "err"} (${r.dirCount} dirs, ${r.fileCount} files)`);
     return { result: r.content };
   }, { defaultTimeout: 15 });
 
   // ── subagent ──────────────────────────────────────────
+  const lazyExecuteSubagent = lazyExecutor("./tools/subagent.js", "executeSubagent");
   registry.register(subagentToolDefinition, async (input, ctx) => {
     const { task, model, max_tokens } = input as {
       task: string; model?: string; max_tokens?: number;
@@ -244,7 +268,7 @@ export function createDefaultRegistry(): ToolRegistry {
     // If no model specified, use autoSelectModel to pick based on task description
     const selectedModel = model ?? autoSelectModel(task);
     ctx.log(`subagent [${selectedModel}${!model ? ' (auto)' : ''}]: ${task.slice(0, 100)}...`);
-    const r = await executeSubagent(task, selectedModel, max_tokens);
+    const r = await lazyExecuteSubagent(task, selectedModel, max_tokens) as { model: string; inputTokens: number; outputTokens: number; response: string };
     ctx.log(`  -> ${r.model} (${r.inputTokens}in/${r.outputTokens}out)`);
     ctx.addTokens?.(r.inputTokens, r.outputTokens);
     return {
@@ -253,10 +277,11 @@ export function createDefaultRegistry(): ToolRegistry {
   }, { defaultTimeout: 60 });
 
   // ── web_search ───────────────────────────────────────
+  const lazyExecuteWebSearch = lazyExecutor("./tools/web_search.js", "executeWebSearch");
   registry.register(webSearchToolDefinition, async (input, ctx) => {
     const { query, max_results } = input as { query: string; max_results?: number };
     ctx.log(`web_search: "${query}"`);
-    const r = await executeWebSearch(query, max_results);
+    const r = await lazyExecuteWebSearch(query, max_results) as { results: unknown[]; content: string };
     ctx.log(`  -> ${r.results.length} results`);
     return { result: r.content };
   }, { defaultTimeout: 15 });
@@ -297,16 +322,18 @@ export function createDefaultRegistry(): ToolRegistry {
   );
 
   // ── save_scratchpad ──────────────────────────────────
+  const lazyExecuteSaveScratchpad = lazyExecutor("./tools/scratchpad.js", "executeSaveScratchpad");
   registry.register(saveScratchpadToolDefinition, async (input, ctx) => {
     const { note } = input as { note: string };
-    const result = executeSaveScratchpad(note, ctx.rootDir);
+    const result = await lazyExecuteSaveScratchpad(note, ctx.rootDir) as string;
     ctx.log(`save_scratchpad: ${note.slice(0, 60)}`);
     return { result };
   }, { defaultTimeout: 5 });
 
   // ── read_scratchpad ──────────────────────────────────
+  const lazyExecuteReadScratchpad = lazyExecutor("./tools/scratchpad.js", "executeReadScratchpad");
   registry.register(readScratchpadToolDefinition, async (_input, ctx) => {
-    const result = executeReadScratchpad(ctx.rootDir);
+    const result = await lazyExecuteReadScratchpad(ctx.rootDir) as string;
     ctx.log(`read_scratchpad: ${result.length} chars`);
     return { result };
   }, { defaultTimeout: 5 });

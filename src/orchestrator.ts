@@ -1919,8 +1919,16 @@ export class Orchestrator {
       `Summarize this conversation into the following structured format. Use exactly these section headers:\n\n## Current Task\nWhat the user is currently trying to accomplish.\n\n## Plan & Progress\nStep-by-step plan and which steps are done, in-progress, or pending.\n\n## Files Modified\nList of files that were created, edited, or deleted.\n\n## Key Decisions\nImportant choices made (libraries chosen, approaches taken, things ruled out).\n\n## Open Questions\nUnresolved issues, errors, or things that still need attention.\n\nConversation to summarize:\n\n${convText}`
     );
 
+    // Inject recently accessed files after compaction
+    const recentFiles = this.getRecentFiles(this.apiMessages);
+    let fileContextMsg = "";
+    if (recentFiles.length > 0) {
+      const sections = recentFiles.map(f => `--- file: ${f.path} ---\n${f.content}`).join("\n\n");
+      fileContextMsg = `\n\n[Post-compaction context: recently accessed files]\n\n${sections}`;
+    }
+
     this.apiMessages = [
-      { role: "user", content: `[Conversation summary]\n${summary}\n\nFull conversation history saved to .autoagent-history.md — use read_file to recover any details.` },
+      { role: "user", content: `[Conversation summary]\n${summary}\n\nFull conversation history saved to .autoagent-history.md — use read_file to recover any details.${fileContextMsg}` },
       { role: "assistant", content: "I have the context from the earlier conversation. Full history is available in .autoagent-history.md if I need to recover any details." },
       ...toKeep,
     ];
@@ -1928,6 +1936,69 @@ export class Orchestrator {
     // Reset token counter after compaction (context is now much smaller)
     this.sessionTokensIn = Math.min(this.sessionTokensIn, 20_000);
     this.opts.onStatus?.("");
+  }
+
+  /**
+   * Scan recent messages for read_file/write_file tool_use blocks,
+   * extract paths, deduplicate, then read up to maxFiles files
+   * capped at maxTokens (approx 4 chars/token).
+   */
+  private getRecentFiles(
+    messages: Array<{ role: string; content: unknown }>,
+    maxFiles = 5,
+    maxTokens = 30000,
+  ): { path: string; content: string }[] {
+    const seenPaths: string[] = [];
+    // Scan backwards to find most recently accessed files
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (!Array.isArray(msg.content)) continue;
+      for (const block of msg.content as Array<Record<string, unknown>>) {
+        if (
+          block.type === "tool_use" &&
+          (block.name === "read_file" || block.name === "write_file") &&
+          block.input &&
+          typeof (block.input as Record<string, unknown>).path === "string"
+        ) {
+          const p = (block.input as Record<string, unknown>).path as string;
+          if (!seenPaths.includes(p)) {
+            seenPaths.push(p);
+            if (seenPaths.length >= maxFiles) break;
+          }
+        }
+      }
+      if (seenPaths.length >= maxFiles) break;
+    }
+
+    const result: { path: string; content: string }[] = [];
+    let totalChars = 0;
+    const charLimit = maxTokens * 4;
+
+    for (const filePath of seenPaths) {
+      try {
+        const absPath = filePath.startsWith("/")
+          ? filePath
+          : `${this.opts.workDir}/${filePath}`;
+        const stat = fs.statSync(absPath);
+        if (stat.size > charLimit) continue; // skip huge files
+        const content = fs.readFileSync(absPath, "utf-8");
+        if (totalChars + content.length > charLimit) {
+          // Partial include if it fits the remaining budget
+          const remaining = charLimit - totalChars;
+          if (remaining > 200) {
+            result.push({ path: filePath, content: content.slice(0, remaining) + "\n…(truncated)" });
+            totalChars += remaining;
+          }
+          break;
+        }
+        result.push({ path: filePath, content });
+        totalChars += content.length;
+      } catch {
+        // skip missing/unreadable files
+      }
+    }
+
+    return result;
   }
 
   /** Manually trigger context compaction (called from /compact TUI command). */
