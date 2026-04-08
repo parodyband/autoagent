@@ -16,6 +16,7 @@
 import * as path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
 import { compressToolOutput } from "./tool-output-compressor.js";
+import { scoreToolOutput } from "./compaction-scorer.js";
 import { fingerprintRepo } from "./repo-context.js";
 import { rankFiles } from "./file-ranker.js";
 import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap, saveRepoMapCache, loadRepoMapCache, getStaleFiles, updateRepoMapIncremental, cacheToRepoMap } from "./tree-sitter-map.js";
@@ -1949,6 +1950,26 @@ export class Orchestrator {
     // Keep the last 5 assistant turns fresh — compress everything older
     const cutoffAssistantIdx = assistantIndices[4] ?? 0; // 5th most recent assistant turn
 
+    // Build a map from tool_use_id -> tool name by scanning assistant messages
+    const toolUseIdToName = new Map<string, string>();
+    for (const msg of this.apiMessages) {
+      if (msg.role !== "assistant" || !Array.isArray(msg.content)) continue;
+      for (const block of msg.content) {
+        if (
+          typeof block === "object" &&
+          "type" in block &&
+          block.type === "tool_use" &&
+          "id" in block &&
+          "name" in block
+        ) {
+          toolUseIdToName.set(
+            (block as { id: string; name: string }).id,
+            (block as { id: string; name: string }).name,
+          );
+        }
+      }
+    }
+
     for (let i = 0; i < cutoffAssistantIdx; i++) {
       const msg = this.apiMessages[i];
       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
@@ -1965,11 +1986,11 @@ export class Orchestrator {
             tool_use_id: string;
             content: Array<{ type: string; text?: string }>;
           };
+          const toolName = toolUseIdToName.get(toolBlock.tool_use_id) ?? "bash";
           for (const cb of toolBlock.content) {
             if (cb.type === "text" && typeof cb.text === "string") {
-              // Derive tool name from the tool_use_id prefix if possible
-              const toolName = cb.text.startsWith("Error") ? "error" : "bash";
-              cb.text = compressToolOutput(toolName, cb.text, 1500);
+              const { maxChars } = scoreToolOutput(toolName, cb.text);
+              cb.text = compressToolOutput(toolName, cb.text, maxChars);
             }
           }
         }

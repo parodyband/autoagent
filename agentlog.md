@@ -1,72 +1,3 @@
-180 |         };
-181 |       });
-182 |   }
-183 | 
-184 |   /**
-185 |    * Returns the full schema for a single tool by name.
-[2026-04-08T19:44:52.024Z] iter=506 turn=4 INFO: Turn 4/25
-[2026-04-08T19:44:58.418Z] iter=506 turn=4 INFO: Agent: Now add the `schemaToSignature` helper function before the `ToolRegistry` class:
-[2026-04-08T19:44:58.419Z] iter=506 turn=4 INFO: write_file: src/tool-registry.ts (patch)
-[2026-04-08T19:44:58.420Z] iter=506 turn=4 INFO:   -> ok: Patched src/tool-registry.ts: -1 +21 lines
-
-Context after patch:
-85 | /** Mutable holder so orchestrator and TUI can share the latest index */
-86 | export const _searchIndexHolder: { index: CodeSearchIndex } = { index: codeSearchIndex };
-87 | 
-88 | // ─── Schema helpers ─────────────────────────────────────────
-89 | 
-90 | /**
-91 |  * Converts a JSON Schema object into a compact parameter signature string.
-92 |  * Example: "Params: url (string, required), extract_text (boolean), headers (object)"
-93 |  * Returns empty string for schemas with no properties.
-94 |  */
-95 | function schemaToSignature(schema: Anthropic.Tool["input_schema"]): string {
-96 |   const props = (schema as { properties?: Record<string, { type?: string }> }).properties;
-97 |   if (!props || Object.keys(props).length === 0) return "";
-98 |   const required = new Set<string>(
-99 |     (schema as { required?: string[] }).required ?? []
-100 |   );
-101 |   const parts = Object.entries(props).map(([name, def]) => {
-102 |     const type = (def as { type?: string }).type ?? "any";
-103 |     return required.has(name) ? `${name} (${type}, required)` : `${name} (${type})`;
-104 |   });
-105 |   return `Params: ${parts.join(", ")}`;
-106 | }
-107 | 
-108 | // ─── Types ──────────────────────────────────────────────────
-109 | 
-110 | export interface ToolContext {
-111 |   rootDir: string;
-[2026-04-08T19:44:58.420Z] iter=506 turn=5 INFO: Turn 5/25
-[2026-04-08T19:45:01.896Z] iter=506 turn=5 INFO: Agent: Goals status:
-- **Harden `getMinimalDefinitions()` with auto-generated parameter signatures**: DONE ✅
-
-Both the helper function and the updated method are in place. Let me verify with TypeScript and run a quick sanity check.
-[2026-04-08T19:45:01.898Z] iter=506 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-08T19:45:03.077Z] iter=506 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-08T19:45:03.077Z] iter=506 turn=6 INFO: Turn 6/25
-[2026-04-08T19:45:06.879Z] iter=506 turn=6 INFO: Agent: Clean. Now update memory and goals:
-[2026-04-08T19:45:06.879Z] iter=506 turn=6 INFO: save_memory: "[Engineer] Iteration 506"
-[2026-04-08T19:45:06.880Z] iter=506 turn=6 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T19:45:06.880Z] iter=506 turn=7 INFO: Turn 7/25
-[2026-04-08T19:45:18.257Z] iter=506 turn=7 INFO: write_file: goals.md (write)
-[2026-04-08T19:45:18.258Z] iter=506 turn=7 INFO:   -> ok: Updated goals.md (1469 chars, -7 lines delta)
-[2026-04-08T19:45:18.259Z] iter=506 turn=8 INFO: Turn 8/25
-[2026-04-08T19:45:21.113Z] iter=506 turn=8 INFO: Agent: src/ changes this iteration: `src/tool-registry.ts` — added `schemaToSignature()` helper (+20 LOC) and updated `getMinimalDefinitions()` to use it. Done. Wrapping up.
-[2026-04-08T19:45:21.115Z] iter=506 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T19:45:21.116Z] iter=506 turn=8 INFO: RESTART signal
-[2026-04-08T19:45:21.117Z] iter=506 turn=8 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T19:45:22.284Z] iter=506 turn=8 INFO: Compilation OK
-[2026-04-08T19:45:31.451Z] iter=506 turn=8 INFO: Cache persisted: 64 entries to .autoagent-cache.json
-[2026-04-08T19:45:31.451Z] iter=506 turn=8 INFO: Cache stats: 0 hits, 1 misses, 64 entries, 3 invalidations (1 entries removed)
-[2026-04-08T19:45:31.451Z] iter=506 turn=8 INFO: Tool cache stats
-[2026-04-08T19:45:31.451Z] iter=506 turn=8 INFO: Tool timing: bash: 2x, avg=590ms, total=1180ms; write_file: 3x, avg=3ms, total=8ms; read_file: 1x, avg=5ms, total=5ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-08T19:45:31.452Z] iter=506 turn=8 INFO: Tool timing stats
-[2026-04-08T19:45:39.698Z] iter=506 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 506: predicted 12 turns, actual 8 turns, ratio 0.67**
-[2026-04-08T19:45:44.315Z] iter=506 turn=8 INFO: Pre-commit review (904in/107out): **LGTM** — the logic is sound, the helper is straightforward, and the signature-prepending approach correctly preserves parameter info while still saving tokens; no regressions, import issues, or mean
-[2026-04-08T19:45:44.369Z] iter=506 turn=8 INFO: Committed: f2997eae (16 in / 2198 out, cache: 12671 created, 92237 read)
-[2026-04-08T19:45:44.369Z] iter=506 turn=8 INFO: Restarting as iteration 507...
-[2026-04-08T19:45:44.567Z] iter=507 INFO: Cache restored: 64/64 entries (0 stale)
 [2026-04-08T19:45:44.570Z] iter=507 INFO: Turn budget: 8/25 (calibration=0.75x, predicted=8)
 [2026-04-08T19:45:44.570Z] iter=507 INFO: Starting. Expert=Meta Model=claude-opus-4-6
 [2026-04-08T19:45:44.793Z] iter=507 INFO: Hard turn cap: 12 (1.5x prediction of 8)
@@ -1065,3 +996,167 @@ Writing goals.md now and finishing up.
 [2026-04-08T20:12:20.000Z] iter=517 turn=10 INFO: Tool timing stats
 [2026-04-08T20:12:28.241Z] iter=517 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 517: predicted 8 turns, actual 10 turns, ratio 1.25**
 [2026-04-08T20:12:28.265Z] iter=517 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:12:28.308Z] iter=517 turn=10 INFO: Committed: bcd72e1c (20 in / 2309 out, cache: 15009 created, 105976 read)
+[2026-04-08T20:12:28.308Z] iter=517 turn=10 INFO: Restarting as iteration 518...
+[2026-04-08T20:12:28.504Z] iter=518 INFO: Cache restored: 68/68 entries (0 stale)
+[2026-04-08T20:12:28.507Z] iter=518 INFO: Turn budget: 13/25 (calibration=1.25x, predicted=13)
+[2026-04-08T20:12:28.507Z] iter=518 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T20:12:28.726Z] iter=518 INFO: Hard turn cap: 20 (1.5x prediction of 13)
+[2026-04-08T20:12:28.727Z] iter=518 turn=1 INFO: Turn 1/25
+[2026-04-08T20:12:31.203Z] iter=518 turn=1 INFO: $ grep -n "compactTier1\|toolName" src/orchestrator.ts | head -50
+[2026-04-08T20:12:31.203Z] iter=518 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T20:12:31.213Z] iter=518 turn=1 INFO:   -> exit=0 (1637 chars)
+[2026-04-08T20:12:31.214Z] iter=518 turn=2 INFO: Turn 2/25
+[2026-04-08T20:12:33.301Z] iter=518 turn=2 INFO: read_file: src/orchestrator.ts
+[2026-04-08T20:12:33.303Z] iter=518 turn=2 INFO:   -> ok (2247 chars)
+[2026-04-08T20:12:33.303Z] iter=518 turn=3 INFO: Turn 3/25
+[2026-04-08T20:12:37.668Z] iter=518 turn=3 INFO: think: I have enough context. Let me build the three deliverables:
+1. Create src/compaction-scorer.ts
+2. Modify compactTier1() ...
+[2026-04-08T20:12:37.669Z] iter=518 turn=4 INFO: Turn 4/25
+[2026-04-08T20:12:52.882Z] iter=518 turn=4 INFO: Agent: Now building all three deliverables:
+[2026-04-08T20:12:52.883Z] iter=518 turn=4 INFO: write_file: src/compaction-scorer.ts (write)
+[2026-04-08T20:12:52.886Z] iter=518 turn=4 INFO:   -> ok: Created src/compaction-scorer.ts (2725 chars)
+[2026-04-08T20:12:52.888Z] iter=518 turn=5 INFO: Turn 5/25
+[2026-04-08T20:12:56.541Z] iter=518 turn=5 INFO: Agent: **Goal status:**
+1. `src/compaction-scorer.ts` — ✅ DONE
+2. Modify `compactTier1()` in `src/orchestrator.ts` — IN PROGRESS
+3. `src/__tests__/compaction-scorer.test.ts` — NOT STARTED
+
+Continuing with the orchestrator modification now:
+[2026-04-08T20:12:56.541Z] iter=518 turn=5 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:12:56.542Z] iter=518 turn=5 INFO:   -> err: ERROR: old_string not found in src/orchestrator.ts. Must match exactly.
+[2026-04-08T20:12:56.543Z] iter=518 turn=6 INFO: Turn 6/25
+[2026-04-08T20:12:59.414Z] iter=518 turn=6 INFO: grep: "compressToolOutput|context-loader" in src/orchestrator.ts
+[2026-04-08T20:12:59.430Z] iter=518 turn=6 INFO:   -> 0 matches
+[2026-04-08T20:12:59.430Z] iter=518 turn=7 INFO: Turn 7/25
+[2026-04-08T20:13:01.596Z] iter=518 turn=7 INFO: grep: "compressToolOutput" in src
+[2026-04-08T20:13:01.623Z] iter=518 turn=7 INFO:   -> 23 matches
+[2026-04-08T20:13:01.624Z] iter=518 turn=8 INFO: Turn 8/25
+[2026-04-08T20:13:04.431Z] iter=518 turn=8 INFO: Agent: Now I have the right import. Let me patch the orchestrator:
+[2026-04-08T20:13:04.431Z] iter=518 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:13:04.432Z] iter=518 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
+
+Context after patch:
+15 | 
+16 | import * as path from "node:path";
+17 | import Anthropic from "@anthropic-ai/sdk";
+18 | import { compressToolOutput } from "./tool-output-compressor.js";
+19 | import { scoreToolOutput } from "./compaction-scorer.js";
+20 | import { fingerprintRepo } from "./repo-context.js";
+21 | import { rankFiles } from "./file-ranker.js";
+22 | import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap, saveRepoMapCache, loadRepoMapCache, getStaleFiles, updateRepoMapIncremental, cacheToRepoMap } from "./tree-sitter-map.js";
+[2026-04-08T20:13:04.433Z] iter=518 turn=9 INFO: Turn 9/25
+[2026-04-08T20:13:16.250Z] iter=518 turn=9 INFO: Agent: **What I've changed in src/ so far:**
+1. ✅ `src/compaction-scorer.ts` — created (new file, ~90 LOC)
+2. ✅ `src/orchestrator.ts` — added import for `scoreToolOutput`
+3. ❌ `compactTier1()` body not yet updated to use the scorer
+4. ❌ `src/__tests__/compaction-scorer.test.ts` — not created
+
+Finishing now — patching compactTier1() and writing the test file:
+[2026-04-08T20:13:16.251Z] iter=518 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:13:16.252Z] iter=518 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -26 +46 lines
+
+Context after patch:
+1950 |     // Keep the last 5 assistant turns fresh — compress everything older
+1951 |     const cutoffAssistantIdx = assistantIndices[4] ?? 0; // 5th most recent assistant turn
+1952 | 
+1953 |     // Build a map from tool_use_id -> tool name by scanning assistant messages
+1954 |     const toolUseIdToName = new Map<string, string>();
+1955 |     for (const msg of this.apiMessages) {
+1956 |       if (msg.role !== "assistant" || !Array.isArray(msg.content)) continue;
+1957 |       for (const block of msg.content) {
+1958 |         if (
+1959 |           typeof block === "object" &&
+1960 |           "type" in block &&
+1961 |           block.type === "tool_use" &&
+1962 |           "id" in block &&
+1963 |           "name" in block
+1964 |         ) {
+1965 |           toolUseIdToName.set(
+1966 |             (block as { id: string; name: string }).id,
+1967 |             (block as { id: string; name: string }).name,
+1968 |           );
+1969 |         }
+1970 |       }
+1971 |     }
+1972 | 
+1973 |     for (let i = 0; i < cutoffAssistantIdx; i++) {
+1974 |       const msg = this.apiMessages[i];
+1975 |       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
+1976 | 
+1977 |       for (const block of msg.content) {
+1978 |         if (
+1979 |           typeof block === "object" &&
+1980 |           "type" in block &&
+1981 |           block.type === "tool_result" &&
+1982 |           Array.isArray((block as { content?: unknown[] }).content)
+1983 |         ) {
+1984 |           const toolBlock = block as {
+1985 |             type: string;
+1986 |             tool_use_id: string;
+1987 |             content: Array<{ type: string; text?: string }>;
+1988 |           };
+1989 |           const toolName = toolUseIdToName.get(toolBlock.tool_use_id) ?? "bash";
+1990 |           for (const cb of toolBlock.content) {
+1991 |             if (cb.type === "text" && typeof cb.text === "string") {
+1992 |               const { maxChars } = scoreToolOutput(toolName, cb.text);
+1993 |               cb.text = compressToolOutput(toolName, cb.text, maxChars);
+1994 |             }
+1995 |           }
+1996 |         }
+1997 |       }
+1998 |     }
+1999 | 
+2000 |     this.opts.onStatus?.("");
+2001 |   }
+[2026-04-08T20:13:16.253Z] iter=518 turn=10 INFO: Turn 10/25
+[2026-04-08T20:13:33.062Z] iter=518 turn=10 INFO: Agent: Now the test file:
+[2026-04-08T20:13:33.062Z] iter=518 turn=10 INFO: write_file: src/__tests__/compaction-scorer.test.ts (write)
+[2026-04-08T20:13:33.063Z] iter=518 turn=10 INFO:   -> ok: Created src/__tests__/compaction-scorer.test.ts (4173 chars)
+[2026-04-08T20:13:33.063Z] iter=518 turn=11 INFO: Turn 11/25
+[2026-04-08T20:13:36.035Z] iter=518 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30 && echo "TSC_DONE"
+[2026-04-08T20:13:37.153Z] iter=518 turn=11 INFO:   -> exit=0 (9 chars)
+[2026-04-08T20:13:37.154Z] iter=518 turn=12 INFO: Turn 12/25
+[2026-04-08T20:13:39.964Z] iter=518 turn=12 INFO: Agent: TSC clean. Running tests:
+[2026-04-08T20:13:39.965Z] iter=518 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/compaction-scorer.test.ts 2>&1 | tail -20
+[2026-04-08T20:13:40.967Z] iter=518 turn=12 INFO:   -> exit=0 (622 chars)
+[2026-04-08T20:13:40.967Z] iter=518 turn=13 INFO: Turn 13/25
+[2026-04-08T20:13:44.060Z] iter=518 turn=13 INFO: think: The stack trace pattern `/at \S+:\d+:\d+/` doesn't match `"  at Object.<anonymous> (src/foo.ts:42:10)"` because `\S+` wo...
+[2026-04-08T20:13:44.060Z] iter=518 turn=14 INFO: Turn 14/25
+[2026-04-08T20:13:47.411Z] iter=518 turn=14 INFO: Agent: Fixing the test failure and wrapping up:
+[2026-04-08T20:13:47.412Z] iter=518 turn=14 INFO: write_file: src/compaction-scorer.ts (patch)
+[2026-04-08T20:13:47.414Z] iter=518 turn=14 INFO:   -> ok: Patched src/compaction-scorer.ts: -1 +1 lines
+
+Context after patch:
+29 |   /\bTypeError\b/,
+30 |   /\bCannot find\b/,
+31 |   /\bnot found\b/i,
+32 |   /^\s+at .+:\d+:\d+/m, // stack trace lines
+33 |   /AssertionError/,
+34 |   /\bthrown\b/i,
+35 |   /\bfailed\b/i,
+[2026-04-08T20:13:47.414Z] iter=518 turn=15 INFO: Turn 15/25
+[2026-04-08T20:13:49.524Z] iter=518 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/compaction-scorer.test.ts 2>&1 | tail -8 && npx tsc --noEmit && echo "TSC_OK"
+[2026-04-08T20:13:51.701Z] iter=518 turn=15 INFO:   -> exit=0 (247 chars)
+[2026-04-08T20:13:51.701Z] iter=518 turn=16 INFO: Turn 16/25
+[2026-04-08T20:13:57.575Z] iter=518 turn=16 INFO: Agent: All tests pass, TSC clean. Writing memory and goals now:
+[2026-04-08T20:13:57.576Z] iter=518 turn=16 INFO: save_memory: "[Engineer] Iteration 518 — compaction scorer"
+[2026-04-08T20:13:57.577Z] iter=518 turn=16 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T20:13:57.577Z] iter=518 turn=17 INFO: Turn 17/25
+[2026-04-08T20:14:06.076Z] iter=518 turn=17 INFO: write_file: goals.md (write)
+[2026-04-08T20:14:06.077Z] iter=518 turn=17 INFO:   -> ok: Updated goals.md (1199 chars, -28 lines delta)
+[2026-04-08T20:14:06.077Z] iter=518 turn=18 INFO: Turn 18/25
+[2026-04-08T20:14:07.816Z] iter=518 turn=18 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:14:07.816Z] iter=518 turn=18 INFO: RESTART signal
+[2026-04-08T20:14:07.817Z] iter=518 turn=18 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:14:09.043Z] iter=518 turn=18 INFO: Compilation OK
+[2026-04-08T20:14:17.958Z] iter=518 turn=18 INFO: Cache persisted: 68 entries to .autoagent-cache.json
+[2026-04-08T20:14:17.958Z] iter=518 turn=18 INFO: Cache stats: 0 hits, 3 misses, 68 entries, 7 invalidations (3 entries removed)
+[2026-04-08T20:14:17.958Z] iter=518 turn=18 INFO: Tool cache stats
+[2026-04-08T20:14:17.958Z] iter=518 turn=18 INFO: Tool timing: bash: 5x, avg=862ms, total=4309ms; grep: 2x, avg=22ms, total=44ms; write_file: 7x, avg=2ms, total=13ms; read_scratchpad: 1x, avg=2ms, total=2ms; read_file: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T20:14:17.958Z] iter=518 turn=18 INFO: Tool timing stats
+[2026-04-08T20:14:26.154Z] iter=518 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 518: predicted 13 turns, actual 18 turns, ratio 1.38**
+[2026-04-08T20:14:28.887Z] iter=518 turn=18 INFO: Pre-commit review (2904in/83out): **LGTM** — the implementation is clean, well-structured, and the tests accurately cover the scoring logic with no import, async, or logic issues visible in this diff.
+
+One minor note: `MEDIUM_IMPORTAN
