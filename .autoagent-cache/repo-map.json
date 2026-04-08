@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775679919868,
+  "generatedAt": 1775681766447,
   "files": [
     {
       "path": "src/file-cache.ts",
@@ -36,54 +36,6 @@
         }
       ],
       "lastModified": 1775414971562.6633
-    },
-    {
-      "path": "src/tools/write_file.ts",
-      "exports": [
-        {
-          "name": "writeFileToolDefinition",
-          "kind": "const",
-          "line": 10,
-          "exported": true
-        },
-        {
-          "name": "WriteFileResult",
-          "kind": "interface",
-          "line": 46,
-          "exported": true
-        },
-        {
-          "name": "isAppendOnly",
-          "kind": "function",
-          "line": 60,
-          "exported": true
-        },
-        {
-          "name": "executeWriteFile",
-          "kind": "function",
-          "line": 67,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [],
-          "from": "../file-cache.js"
-        }
-      ],
-      "lastModified": 1775415173946.7727
     },
     {
       "path": "src/tree-sitter-map.ts",
@@ -562,7 +514,7 @@
           "from": "path"
         }
       ],
-      "lastModified": 1775416762488.8557
+      "lastModified": 1775680259604.9553
     },
     {
       "path": "src/agent.ts",
@@ -1732,92 +1684,6 @@
       "lastModified": 1775677692568.0413
     },
     {
-      "path": "src/tui-commands.ts",
-      "exports": [
-        {
-          "name": "FooterStats",
-          "kind": "interface",
-          "line": 23,
-          "exported": true
-        },
-        {
-          "name": "CommandContext",
-          "kind": "interface",
-          "line": 32,
-          "exported": true
-        },
-        {
-          "name": "routeCommand",
-          "kind": "function",
-          "line": 578,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "child_process"
-        },
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [],
-          "from": "./orchestrator.js"
-        },
-        {
-          "names": [],
-          "from": "./tui.js"
-        },
-        {
-          "names": [],
-          "from": "./session-store.js"
-        },
-        {
-          "names": [],
-          "from": "./session-store.js"
-        },
-        {
-          "names": [],
-          "from": "./auto-commit.js"
-        },
-        {
-          "names": [],
-          "from": "./tree-sitter-map.js"
-        },
-        {
-          "names": [],
-          "from": "./init-command.js"
-        },
-        {
-          "names": [],
-          "from": "./export-helper.js"
-        },
-        {
-          "names": [],
-          "from": "./plan-commands.js"
-        },
-        {
-          "names": [],
-          "from": "./dream.js"
-        },
-        {
-          "names": [],
-          "from": "./tool-registry.js"
-        },
-        {
-          "names": [],
-          "from": "./checkpoint.js"
-        }
-      ],
-      "lastModified": 1775679001037.9187
-    },
-    {
       "path": "src/compaction-scorer.ts",
       "exports": [
         {
@@ -1841,6 +1707,191 @@
       ],
       "imports": [],
       "lastModified": 1775679227414.012
+    },
+    {
+      "path": "src/tool-registry.ts",
+      "exports": [
+        {
+          "name": "codeSearchIndex",
+          "kind": "const",
+          "line": 51,
+          "exported": true
+        },
+        {
+          "name": "buildSearchIndex",
+          "kind": "function",
+          "line": 58,
+          "exported": true
+        },
+        {
+          "name": "_searchIndexHolder",
+          "kind": "const",
+          "line": 86,
+          "exported": true
+        },
+        {
+          "name": "ToolContext",
+          "kind": "interface",
+          "line": 110,
+          "exported": true
+        },
+        {
+          "name": "ToolResult",
+          "kind": "interface",
+          "line": 123,
+          "exported": true
+        },
+        {
+          "name": "ToolHandler",
+          "kind": "type",
+          "line": 128,
+          "exported": true
+        },
+        {
+          "name": "ToolOptions",
+          "kind": "interface",
+          "line": 133,
+          "exported": true
+        },
+        {
+          "name": "RegisteredTool",
+          "kind": "interface",
+          "line": 143,
+          "exported": true
+        },
+        {
+          "name": "ToolRegistry",
+          "kind": "class",
+          "line": 153,
+          "exported": true
+        },
+        {
+          "name": "createDefaultRegistry",
+          "kind": "function",
+          "line": 266,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "./skills.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/bash.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/read_file.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/write_file.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/grep.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/web_fetch.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/think.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/list_files.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/subagent.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/web_search.js"
+        },
+        {
+          "names": [],
+          "from": "./model-selection.js"
+        },
+        {
+          "names": [],
+          "from": "./project-memory.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/scratchpad.js"
+        },
+        {
+          "names": [],
+          "from": "./semantic-search.js"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "glob"
+        }
+      ],
+      "lastModified": 1775679635852.3481
+    },
+    {
+      "path": "src/tools/bash.ts",
+      "exports": [
+        {
+          "name": "bashToolDefinition",
+          "kind": "const",
+          "line": 20,
+          "exported": true
+        },
+        {
+          "name": "BashResult",
+          "kind": "interface",
+          "line": 46,
+          "exported": true
+        },
+        {
+          "name": "executeBash",
+          "kind": "function",
+          "line": 51,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        }
+      ],
+      "lastModified": 1775679604382.6482
+    },
+    {
+      "path": "src/__tests__/task-planner.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "../task-planner.js"
+        }
+      ],
+      "lastModified": 1775679429980.6096
     },
     {
       "path": "src/orchestrator.ts",
@@ -1882,111 +1933,117 @@
           "exported": true
         },
         {
+          "name": "compactionUrgency",
+          "kind": "function",
+          "line": 92,
+          "exported": true
+        },
+        {
           "name": "selectCompactionTier",
           "kind": "function",
-          "line": 90,
+          "line": 108,
           "exported": true
         },
         {
           "name": "MODEL_PRICING",
           "kind": "const",
-          "line": 98,
+          "line": 116,
           "exported": true
         },
         {
           "name": "MODEL_CONTEXT_WINDOW",
           "kind": "const",
-          "line": 104,
+          "line": 122,
           "exported": true
         },
         {
           "name": "ConversationCheckpoint",
           "kind": "interface",
-          "line": 127,
+          "line": 145,
           "exported": true
         },
         {
           "name": "MAX_CHECKPOINTS",
           "kind": "const",
-          "line": 135,
+          "line": 153,
           "exported": true
         },
         {
           "name": "OrchestratorOptions",
           "kind": "interface",
-          "line": 137,
+          "line": 155,
           "exported": true
         },
         {
           "name": "OrchestratorResult",
           "kind": "interface",
-          "line": 183,
+          "line": 201,
           "exported": true
         },
         {
           "name": "CostInfo",
           "kind": "interface",
-          "line": 192,
+          "line": 210,
           "exported": true
         },
         {
           "name": "TaskReflection",
           "kind": "interface",
-          "line": 207,
+          "line": 225,
           "exported": true
         },
         {
           "name": "routeModel",
           "kind": "function",
-          "line": 248,
+          "line": 266,
           "exported": true
         },
         {
           "name": "computeCost",
           "kind": "function",
-          "line": 276,
+          "line": 294,
           "exported": true
         },
         {
           "name": "buildSystemPrompt",
           "kind": "function",
-          "line": 288,
+          "line": 306,
           "exported": true
         },
         {
           "name": "buildCachedSystem",
           "kind": "function",
-          "line": 376,
+          "line": 394,
           "exported": true
         },
         {
           "name": "injectMessageCacheBreakpoints",
           "kind": "function",
-          "line": 387,
+          "line": 405,
           "exported": true
         },
         {
           "name": "isToolError",
           "kind": "function",
-          "line": 490,
+          "line": 508,
           "exported": true
         },
         {
           "name": "pruneStaleToolResults",
           "kind": "function",
-          "line": 551,
+          "line": 569,
           "exported": true
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 1115,
+          "line": 1133,
           "exported": true
         },
         {
           "name": "runSingleTask",
           "kind": "function",
-          "line": 2670,
+          "line": 2708,
           "exported": true
         }
       ],
@@ -2193,222 +2250,46 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775679866430.6685
+      "lastModified": 1775680980290.4873
     },
     {
-      "path": "src/tool-registry.ts",
+      "path": "src/tools/write_file.ts",
       "exports": [
         {
-          "name": "codeSearchIndex",
+          "name": "writeFileToolDefinition",
           "kind": "const",
-          "line": 51,
+          "line": 10,
           "exported": true
         },
         {
-          "name": "buildSearchIndex",
-          "kind": "function",
-          "line": 58,
-          "exported": true
-        },
-        {
-          "name": "_searchIndexHolder",
-          "kind": "const",
-          "line": 86,
-          "exported": true
-        },
-        {
-          "name": "ToolContext",
-          "kind": "interface",
-          "line": 110,
-          "exported": true
-        },
-        {
-          "name": "ToolResult",
-          "kind": "interface",
-          "line": 123,
-          "exported": true
-        },
-        {
-          "name": "ToolHandler",
-          "kind": "type",
-          "line": 128,
-          "exported": true
-        },
-        {
-          "name": "ToolOptions",
-          "kind": "interface",
-          "line": 133,
-          "exported": true
-        },
-        {
-          "name": "RegisteredTool",
-          "kind": "interface",
-          "line": 143,
-          "exported": true
-        },
-        {
-          "name": "ToolRegistry",
-          "kind": "class",
-          "line": 153,
-          "exported": true
-        },
-        {
-          "name": "createDefaultRegistry",
-          "kind": "function",
-          "line": 266,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [],
-          "from": "./skills.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/bash.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/read_file.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/write_file.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/grep.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/web_fetch.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/think.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/list_files.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/subagent.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/web_search.js"
-        },
-        {
-          "names": [],
-          "from": "./model-selection.js"
-        },
-        {
-          "names": [],
-          "from": "./project-memory.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/scratchpad.js"
-        },
-        {
-          "names": [],
-          "from": "./semantic-search.js"
-        },
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "glob"
-        }
-      ],
-      "lastModified": 1775679635852.3481
-    },
-    {
-      "path": "src/tools/bash.ts",
-      "exports": [
-        {
-          "name": "bashToolDefinition",
-          "kind": "const",
-          "line": 20,
-          "exported": true
-        },
-        {
-          "name": "BashResult",
+          "name": "WriteFileResult",
           "kind": "interface",
           "line": 46,
           "exported": true
         },
         {
-          "name": "executeBash",
+          "name": "fuzzyFindReplace",
           "kind": "function",
-          "line": 51,
+          "line": 73,
+          "exported": true
+        },
+        {
+          "name": "isAppendOnly",
+          "kind": "function",
+          "line": 151,
+          "exported": true
+        },
+        {
+          "name": "executeWriteFile",
+          "kind": "function",
+          "line": 158,
           "exported": true
         }
       ],
       "imports": [
         {
           "names": [],
-          "from": "child_process"
-        },
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        }
-      ],
-      "lastModified": 1775679604382.6482
-    },
-    {
-      "path": "src/tui.tsx",
-      "exports": [
-        {
-          "name": "Message",
-          "kind": "interface",
-          "line": 72,
-          "exported": true
-        },
-        {
-          "name": "getContextColor",
-          "kind": "function",
-          "line": 92,
-          "exported": true
-        },
-        {
-          "name": "extractFileQuery",
-          "kind": "function",
-          "line": 106,
-          "exported": true
-        },
-        {
-          "name": "getFileSuggestions",
-          "kind": "function",
-          "line": 119,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "react"
-        },
-        {
-          "names": [],
-          "from": "ink"
-        },
-        {
-          "names": [],
-          "from": "ink-spinner"
-        },
-        {
-          "names": [],
-          "from": "ink-text-input"
+          "from": "fs"
         },
         {
           "names": [],
@@ -2416,27 +2297,41 @@
         },
         {
           "names": [],
-          "from": "dotenv/config"
+          "from": "@anthropic-ai/sdk"
         },
         {
           "names": [],
-          "from": "./orchestrator.js"
+          "from": "../file-cache.js"
+        }
+      ],
+      "lastModified": 1775681672406.741
+    },
+    {
+      "path": "src/tui-commands.ts",
+      "exports": [
+        {
+          "name": "FooterStats",
+          "kind": "interface",
+          "line": 23,
+          "exported": true
         },
         {
-          "names": [],
-          "from": "./session-store.js"
+          "name": "CommandContext",
+          "kind": "interface",
+          "line": 32,
+          "exported": true
         },
         {
-          "names": [],
-          "from": "./architect-mode.js"
-        },
+          "name": "routeCommand",
+          "kind": "function",
+          "line": 610,
+          "exported": true
+        }
+      ],
+      "imports": [
         {
           "names": [],
-          "from": "./virtual-message-list.js"
-        },
-        {
-          "names": [],
-          "from": "./tree-sitter-map.js"
+          "from": "path"
         },
         {
           "names": [],
@@ -2444,7 +2339,31 @@
         },
         {
           "names": [],
-          "from": "util"
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [],
+          "from": "./tui.js"
+        },
+        {
+          "names": [],
+          "from": "./session-store.js"
+        },
+        {
+          "names": [],
+          "from": "./session-store.js"
+        },
+        {
+          "names": [],
+          "from": "./auto-commit.js"
+        },
+        {
+          "names": [],
+          "from": "./tree-sitter-map.js"
         },
         {
           "names": [],
@@ -2452,45 +2371,194 @@
         },
         {
           "names": [],
+          "from": "./export-helper.js"
+        },
+        {
+          "names": [],
+          "from": "./plan-commands.js"
+        },
+        {
+          "names": [],
+          "from": "./dream.js"
+        },
+        {
+          "names": [],
+          "from": "./tool-registry.js"
+        },
+        {
+          "names": [],
+          "from": "./checkpoint.js"
+        }
+      ],
+      "lastModified": 1775680967917.3306
+    },
+    {
+      "path": "src/tui.tsx",
+      "exports": [
+        {
+          "name": "Message",
+          "kind": "interface",
+          "line": 73,
+          "exported": true
+        },
+        {
+          "name": "getContextColor",
+          "kind": "function",
+          "line": 93,
+          "exported": true
+        },
+        {
+          "name": "extractFileQuery",
+          "kind": "function",
+          "line": 107,
+          "exported": true
+        },
+        {
+          "name": "getFileSuggestions",
+          "kind": "function",
+          "line": 120,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [
+            "React",
+            "useState",
+            "useCallback",
+            "useEffect",
+            "useRef"
+          ],
+          "from": "react"
+        },
+        {
+          "names": [
+            "render",
+            "Box",
+            "Text",
+            "useInput",
+            "useApp"
+          ],
+          "from": "ink"
+        },
+        {
+          "names": [
+            "Spinner"
+          ],
+          "from": "ink-spinner"
+        },
+        {
+          "names": [
+            "TextInput"
+          ],
+          "from": "ink-text-input"
+        },
+        {
+          "names": [
+            "path"
+          ],
+          "from": "path"
+        },
+        {
+          "names": [
+            "fs"
+          ],
+          "from": "fs"
+        },
+        {
+          "names": [
+            "Orchestrator"
+          ],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [
+            "listSessions",
+            "type SessionInfo"
+          ],
+          "from": "./session-store.js"
+        },
+        {
+          "names": [
+            "EditPlan"
+          ],
+          "from": "./architect-mode.js"
+        },
+        {
+          "names": [
+            "VirtualMessageList"
+          ],
+          "from": "./virtual-message-list.js"
+        },
+        {
+          "names": [
+            "buildRepoMap",
+            "fuzzySearch"
+          ],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [
+            "execSync",
+            "exec"
+          ],
+          "from": "child_process"
+        },
+        {
+          "names": [
+            "promisify"
+          ],
+          "from": "util"
+        },
+        {
+          "names": [
+            "runInit"
+          ],
+          "from": "./init-command.js"
+        },
+        {
+          "names": [
+            "useContextBudget",
+            "useStreaming",
+            "useFileSuggestions"
+          ],
           "from": "./hooks/index.js"
         },
         {
-          "names": [],
+          "names": [
+            "TuiErrorBoundary"
+          ],
           "from": "./error-boundary.js"
         },
         {
-          "names": [],
+          "names": [
+            "shouldShowWelcome"
+          ],
           "from": "./welcome.js"
         },
         {
-          "names": [],
+          "names": [
+            "Task",
+            "TaskPlan"
+          ],
           "from": "./task-planner.js"
         },
         {
-          "names": [],
+          "names": [
+            "Markdown"
+          ],
           "from": "./markdown-renderer.js"
         },
         {
-          "names": [],
+          "names": [
+            "routeCommand",
+            "type FooterStats"
+          ],
           "from": "./tui-commands.js"
         }
       ],
-      "lastModified": 1775679881611.346
-    },
-    {
-      "path": "src/__tests__/task-planner.test.ts",
-      "exports": [],
-      "imports": [
-        {
-          "names": [],
-          "from": "vitest"
-        },
-        {
-          "names": [],
-          "from": "../task-planner.js"
-        }
-      ],
-      "lastModified": 1775679429980.6096
+      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
+      "lastModified": 1775681705168.0298
     }
   ]
 }
