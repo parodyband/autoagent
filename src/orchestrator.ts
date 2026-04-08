@@ -84,13 +84,31 @@ export const CONTEXT_WARNING_THRESHOLD = COMPACT_THRESHOLD * 0.8; // 120_000
 export const PRUNE_THRESHOLD = 120_000; // Between Tier 1 (100K) and Tier 2 (150K)
 
 /**
+ * Compute a dynamic compaction threshold multiplier based on recent token efficiency.
+ * Returns a value between 0.7 and 1.0:
+ * - 0.7 = compact early (token usage accelerating — model is struggling)
+ * - 1.0 = compact at normal threshold (usage is steady/efficient)
+ */
+export function compactionUrgency(turnTokenHistory: number[]): number {
+  if (turnTokenHistory.length < 3) return 1.0;
+  const window = turnTokenHistory.slice(-5);
+  const first = window[0];
+  const last = window[window.length - 1];
+  if (first <= 0) return 1.0;
+  const growthRate = (last - first) / first;
+  if (growthRate > 0.5) return 0.7;
+  if (growthRate > 0.25) return 0.85;
+  return 1.0;
+}
+
+/**
  * Pure function: select which compaction tier to apply based on input token count.
  * Used for mid-loop compaction decisions inside runAgentLoop.
  */
-export function selectCompactionTier(inputTokens: number): 'none' | 'micro' | 'tier1' | 'tier2' {
-  if (inputTokens >= COMPACT_THRESHOLD) return 'tier2';
-  if (inputTokens >= COMPACT_TIER1_THRESHOLD) return 'tier1';
-  if (inputTokens >= MICRO_COMPACT_THRESHOLD) return 'micro';
+export function selectCompactionTier(inputTokens: number, urgencyMultiplier: number = 1.0): 'none' | 'micro' | 'tier1' | 'tier2' {
+  if (inputTokens >= COMPACT_THRESHOLD * urgencyMultiplier) return 'tier2';
+  if (inputTokens >= COMPACT_TIER1_THRESHOLD * urgencyMultiplier) return 'tier1';
+  if (inputTokens >= MICRO_COMPACT_THRESHOLD * urgencyMultiplier) return 'micro';
   return 'none';
 }
 
@@ -2336,7 +2354,8 @@ export class Orchestrator {
     // Build mid-loop compaction callback
     const onCompact = async (inputTokens: number, messages: Anthropic.MessageParam[]): Promise<void> => {
       taskCompacted = true;
-      const tier = selectCompactionTier(inputTokens);
+      const urgency = compactionUrgency(this.turnTokenHistory);
+      const tier = selectCompactionTier(inputTokens, urgency);
       if (tier === 'tier2') {
         await this.compact();
       } else if (tier === 'tier1') {

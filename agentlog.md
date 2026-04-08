@@ -1,72 +1,3 @@
-51 | export async function executeBash(
-52 |   command: string,
-53 |   timeout: number = 120,
-54 |   cwd?: string,
-55 |   skipGuards: boolean = false,
-56 |   onChunk?: (text: string) => void
-57 | ): Promise<BashResult> {
-58 |   // Block destructive commands (unless harness is calling internally)
-59 |   if (!skipGuards) {
-60 |     for (const pattern of BLOCKED_PATTERNS) {
-[2026-04-08T20:20:00.599Z] iter=522 turn=8 INFO: Turn 8/25
-[2026-04-08T20:20:04.381Z] iter=522 turn=8 INFO: write_file: src/tools/bash.ts (patch)
-[2026-04-08T20:20:04.383Z] iter=522 turn=8 INFO:   -> ok: Patched src/tools/bash.ts: -8 +12 lines
-
-Context after patch:
-88 |     // Close stdin to prevent interactive hangs
-89 |     proc.stdin.end();
-90 | 
-91 |     proc.stdout.on("data", (data: Buffer) => {
-92 |       const text = data.toString();
-93 |       stdout += text;
-94 |       lastDataTime = Date.now();
-95 |       onChunk?.(text);
-96 |     });
-97 |     proc.stderr.on("data", (data: Buffer) => {
-98 |       const text = data.toString();
-99 |       stderr += text;
-100 |       lastDataTime = Date.now();
-101 |       onChunk?.("[stderr] " + text);
-102 |     });
-103 | 
-104 |     // Hard timeout
-105 |     const timer = setTimeout(() => {
-[2026-04-08T20:20:04.383Z] iter=522 turn=9 INFO: Turn 9/25
-[2026-04-08T20:20:07.805Z] iter=522 turn=9 INFO: Agent: Now add `onToolOutput` to `OrchestratorOptions` and wire it through:
-[2026-04-08T20:20:07.806Z] iter=522 turn=9 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T20:20:07.808Z] iter=522 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
-
-Context after patch:
-137 | export interface OrchestratorOptions {
-138 |   workDir: string;
-139 |   /** Called when a tool is invoked */
-140 |   onToolCall?: (name: string, input: string, result: string) => void;
-141 |   onToolOutput?: (toolName: string, chunk: string) => void;
-142 |   /** Called with status updates (e.g. "Indexing repo...") */
-143 |   onStatus?: (status: string) => void;
-144 |   /** Called with streaming text deltas */
-[2026-04-08T20:20:07.808Z] iter=522 turn=10 INFO: Turn 10/25
-[2026-04-08T20:20:12.199Z] iter=522 turn=10 INFO: Agent: I've changed bash.ts (+5 LOC) and orchestrator.ts (+1 LOC). Still need: wire `onToolOutput` through `makeExecTool`, and update tui.tsx. Let me finish now.
-[2026-04-08T20:20:12.199Z] iter=522 turn=10 INFO: $ sed -n '447,460p' src/orchestrator.ts
-[2026-04-08T20:20:12.210Z] iter=522 turn=10 INFO:   -> exit=0 (478 chars)
-[2026-04-08T20:20:12.210Z] iter=522 turn=11 INFO: Turn 11/25
-[2026-04-08T20:20:13.802Z] iter=522 turn=11 INFO: $ sed -n '460,485p' src/orchestrator.ts
-[2026-04-08T20:20:13.813Z] iter=522 turn=11 INFO:   -> exit=0 (690 chars)
-[2026-04-08T20:20:13.813Z] iter=522 turn=12 INFO: Turn 12/25
-[2026-04-08T20:20:20.356Z] iter=522 turn=12 INFO: think: I need to finish quickly. The key remaining work:
-1. Wire onToolOutput through makeExecTool - need to add it as a param ...
-[2026-04-08T20:20:20.356Z] iter=522 turn=13 INFO: Turn 13/25
-[2026-04-08T20:20:23.686Z] iter=522 turn=13 INFO: Agent: Let me finish the implementation now in one shot.
-[2026-04-08T20:20:23.686Z] iter=522 turn=13 INFO: $ grep -n "onToolOutput\|onChunk\|ToolContext\|interface.*Ctx\|rootDir.*string" src/tool-registry.ts | head -20
-[2026-04-08T20:20:23.699Z] iter=522 turn=13 INFO:   -> exit=0 (890 chars)
-[2026-04-08T20:20:23.699Z] iter=522 turn=14 INFO: Turn 14/25
-[2026-04-08T20:20:27.805Z] iter=522 turn=14 INFO: Agent: I need to stop and wrap up. The implementation is partially done (bash.ts +5 LOC, orchestrator.ts +1 LOC). Let me finish the wiring quickly and wrap up.
-[2026-04-08T20:20:27.805Z] iter=522 turn=14 INFO: $ sed -n '110,130p' src/tool-registry.ts
-[2026-04-08T20:20:27.817Z] iter=522 turn=14 INFO:   -> exit=0 (610 chars)
-[2026-04-08T20:20:27.817Z] iter=522 turn=15 INFO: Turn 15/25
-[2026-04-08T20:20:31.100Z] iter=522 turn=15 INFO: write_file: src/tool-registry.ts (patch)
-[2026-04-08T20:20:31.102Z] iter=522 turn=15 INFO:   -> ok: Patched src/tool-registry.ts: -3 +5 lines
-
 Context after patch:
 114 |   defaultTimeout?: number;
 115 |   /** Callback to accumulate sub-agent token usage into session totals */
@@ -1065,3 +996,122 @@ echo "AUTOAGENT_RESTART"
 [2026-04-08T20:32:45.301Z] iter=529 turn=7 INFO: Tool timing stats
 [2026-04-08T20:32:53.354Z] iter=529 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 529: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-08T20:32:53.377Z] iter=529 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:32:53.417Z] iter=529 turn=7 INFO: Committed: de94572f (17 in / 2065 out, cache: 11588 created, 53814 read)
+[2026-04-08T20:32:53.417Z] iter=529 turn=7 INFO: Restarting as iteration 530...
+[2026-04-08T20:32:53.610Z] iter=530 INFO: Cache restored: 64/64 entries (0 stale)
+[2026-04-08T20:32:53.612Z] iter=530 INFO: Turn budget: 18/25 (calibration=1.20x, predicted=15)
+[2026-04-08T20:32:53.612Z] iter=530 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T20:32:53.798Z] iter=530 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T20:32:53.798Z] iter=530 turn=1 INFO: Turn 1/25
+[2026-04-08T20:32:56.708Z] iter=530 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be modified.
+[2026-04-08T20:32:56.709Z] iter=530 turn=1 INFO: $ grep -n "selectCompactionTier\|turnTokenHistory\|COMPACT_THRESHOLD\|compactionUrgency" src/orchestrator.ts | head -60
+[2026-04-08T20:32:56.709Z] iter=530 turn=1 INFO: $ grep -n "selectCompactionTier\|compactionUrgency" tests/orchestrator.test.ts | head -20
+[2026-04-08T20:32:56.718Z] iter=530 turn=1 INFO:   -> exit=0 (60 chars)
+[2026-04-08T20:32:56.719Z] iter=530 turn=1 INFO:   -> exit=0 (1122 chars)
+[2026-04-08T20:32:56.720Z] iter=530 turn=2 INFO: Turn 2/25
+[2026-04-08T20:32:59.722Z] iter=530 turn=2 INFO: $ ls tests/
+[2026-04-08T20:32:59.725Z] iter=530 turn=2 INFO: $ grep -n "selectCompactionTier" src/orchestrator.ts
+[2026-04-08T20:32:59.732Z] iter=530 turn=2 INFO:   -> exit=0 (766 chars)
+[2026-04-08T20:32:59.734Z] iter=530 turn=2 INFO:   -> exit=0 (160 chars)
+[2026-04-08T20:32:59.734Z] iter=530 turn=3 INFO: Turn 3/25
+[2026-04-08T20:33:09.335Z] iter=530 turn=3 INFO: think: I have enough context. Let me implement the changes:
+
+1. The `selectCompactionTier` function is at line 90 in orchestrat...
+[2026-04-08T20:33:09.336Z] iter=530 turn=4 INFO: Turn 4/25
+[2026-04-08T20:33:12.063Z] iter=530 turn=4 INFO: $ sed -n '85,100p' src/orchestrator.ts
+[2026-04-08T20:33:12.065Z] iter=530 turn=4 INFO: $ sed -n '2255,2270p' src/orchestrator.ts && echo "---" && sed -n '2330,2350p' src/orchestrator.ts
+[2026-04-08T20:33:12.072Z] iter=530 turn=4 INFO:   -> exit=0 (632 chars)
+[2026-04-08T20:33:12.076Z] iter=530 turn=4 INFO:   -> exit=0 (1525 chars)
+[2026-04-08T20:33:12.076Z] iter=530 turn=5 INFO: Turn 5/25
+[2026-04-08T20:33:21.521Z] iter=530 turn=5 INFO: Agent: Now I have everything I need. The `selectCompactionTier` is used in the `onCompact` callback (line 2339) which is inside a method of Orchestrator, so `this.turnTokenHistory` is accessible. The pre-turn compaction uses `this.shouldCompact()` / `this.shouldCompactTier1()` methods - so I need to check those too.
+
+Let me now implement the changes:
+[2026-04-08T20:33:21.522Z] iter=530 turn=5 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:33:21.524Z] iter=530 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -10 +28 lines
+
+Context after patch:
+83 | export const CONTEXT_WARNING_THRESHOLD = COMPACT_THRESHOLD * 0.8; // 120_000
+84 | export const PRUNE_THRESHOLD = 120_000; // Between Tier 1 (100K) and Tier 2 (150K)
+85 | 
+86 | /**
+87 |  * Compute a dynamic compaction threshold multiplier based on recent token efficiency.
+88 |  * Returns a value between 0.7 and 1.0:
+89 |  * - 0.7 = compact early (token usage accelerating — model is struggling)
+90 |  * - 1.0 = compact at normal threshold (usage is steady/efficient)
+91 |  */
+92 | export function compactionUrgency(turnTokenHistory: number[]): number {
+93 |   if (turnTokenHistory.length < 3) return 1.0;
+94 |   const window = turnTokenHistory.slice(-5);
+95 |   const first = window[0];
+96 |   const last = window[window.length - 1];
+97 |   if (first <= 0) return 1.0;
+98 |   const growthRate = (last - first) / first;
+99 |   if (growthRate > 0.5) return 0.7;
+100 |   if (growthRate > 0.25) return 0.85;
+101 |   return 1.0;
+102 | }
+103 | 
+104 | /**
+105 |  * Pure function: select which compaction tier to apply based on input token count.
+106 |  * Used for mid-loop compaction decisions inside runAgentLoop.
+107 |  */
+108 | export function selectCompactionTier(inputTokens: number, urgencyMultiplier: number = 1.0): 'none' | 'micro' | 'tier1' | 'tier2' {
+109 |   if (inputTokens >= COMPACT_THRESHOLD * urgencyMultiplier) return 'tier2';
+110 |   if (inputTokens >= COMPACT_TIER1_THRESHOLD * urgencyMultiplier) return 'tier1';
+111 |   if (inputTokens >= MICRO_COMPACT_THRESHOLD * urgencyMultiplier) return 'micro';
+112 |   return 'none';
+113 | }
+114 | 
+115 | /** Pricing per million tokens: [input, output] */
+116 | export const MODEL_PRICING: Record<string, [number, number]> = {
+[2026-04-08T20:33:21.525Z] iter=530 turn=6 INFO: Turn 6/25
+[2026-04-08T20:33:25.687Z] iter=530 turn=6 INFO: Agent: **Goal status:**
+- `compactionUrgency()` function: DONE
+- `selectCompactionTier()` with urgency multiplier: DONE  
+- Wire into call sites: NOT STARTED
+- Tests: NOT STARTED
+
+Now wire in the call site and add tests:
+[2026-04-08T20:33:25.688Z] iter=530 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:33:25.690Z] iter=530 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
+
+Context after patch:
+2354 |     // Build mid-loop compaction callback
+2355 |     const onCompact = async (inputTokens: number, messages: Anthropic.MessageParam[]): Promise<void> => {
+2356 |       taskCompacted = true;
+2357 |       const urgency = compactionUrgency(this.turnTokenHistory);
+2358 |       const tier = selectCompactionTier(inputTokens, urgency);
+2359 |       if (tier === 'tier2') {
+2360 |         await this.compact();
+2361 |       } else if (tier === 'tier1') {
+[2026-04-08T20:33:25.690Z] iter=530 turn=7 INFO: Turn 7/25
+[2026-04-08T20:33:27.705Z] iter=530 turn=7 INFO: Agent: Now write the tests:
+[2026-04-08T20:33:27.707Z] iter=530 turn=7 INFO: $ cat tests/compaction-structured.test.ts | head -20
+[2026-04-08T20:33:27.718Z] iter=530 turn=7 INFO:   -> exit=0 (601 chars)
+[2026-04-08T20:33:27.718Z] iter=530 turn=8 INFO: Turn 8/25
+[2026-04-08T20:33:38.790Z] iter=530 turn=8 INFO: write_file: tests/orchestrator.test.ts (write)
+[2026-04-08T20:33:38.791Z] iter=530 turn=8 INFO:   -> ok: Created tests/orchestrator.test.ts (2440 chars)
+[2026-04-08T20:33:38.791Z] iter=530 turn=9 INFO: Turn 9/25
+[2026-04-08T20:33:41.081Z] iter=530 turn=9 INFO: $ npx tsc --noEmit 2>&1 | head -20
+[2026-04-08T20:33:41.083Z] iter=530 turn=9 INFO: $ npx vitest run tests/orchestrator.test.ts 2>&1 | tail -30
+[2026-04-08T20:33:42.315Z] iter=530 turn=9 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:33:42.367Z] iter=530 turn=9 INFO:   -> exit=0 (277 chars)
+[2026-04-08T20:33:42.367Z] iter=530 turn=10 INFO: Turn 10/25
+[2026-04-08T20:33:47.802Z] iter=530 turn=10 INFO: Agent: All goals are DONE. TypeScript passes, tests pass. Wrapping up now.
+[2026-04-08T20:33:47.802Z] iter=530 turn=10 INFO: save_memory: "[Engineer] Iteration 530"
+[2026-04-08T20:33:47.803Z] iter=530 turn=10 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T20:33:47.804Z] iter=530 turn=11 INFO: Turn 11/25
+[2026-04-08T20:33:58.964Z] iter=530 turn=11 INFO: write_file: goals.md (write)
+[2026-04-08T20:33:58.965Z] iter=530 turn=11 INFO:   -> ok: Updated goals.md (1652 chars, -39 lines delta)
+[2026-04-08T20:33:58.965Z] iter=530 turn=12 INFO: Turn 12/25
+[2026-04-08T20:34:00.600Z] iter=530 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:34:00.600Z] iter=530 turn=12 INFO: RESTART signal
+[2026-04-08T20:34:00.601Z] iter=530 turn=12 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:34:01.783Z] iter=530 turn=12 INFO: Compilation OK
+[2026-04-08T20:34:11.138Z] iter=530 turn=12 INFO: Cache persisted: 64 entries to .autoagent-cache.json
+[2026-04-08T20:34:11.138Z] iter=530 turn=12 INFO: Tool timing: bash: 10x, avg=259ms, total=2588ms; write_file: 4x, avg=2ms, total=6ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms
+[2026-04-08T20:34:11.138Z] iter=530 turn=12 INFO: Tool timing stats
+[2026-04-08T20:34:19.382Z] iter=530 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 530: predicted 15 turns, actual 12 turns, ratio 0.80**
+[2026-04-08T20:34:27.473Z] iter=530 turn=12 INFO: Pre-commit review (1012in/277out): **Issues found:**
+
+- **`turnTokenHistory` likely undefined/missing**: `this.turnTokenHistory` is referenced but there's no evidence it's declared on the `Orchestrator` class or populated anywhere in t
