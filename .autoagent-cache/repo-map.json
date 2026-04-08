@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775629626129,
+  "generatedAt": 1775629987615,
   "files": [
     {
       "path": "src/file-cache.ts",
@@ -1767,6 +1767,78 @@
       "lastModified": 1775463849502.829
     },
     {
+      "path": "src/reflection-aggregator.ts",
+      "exports": [
+        {
+          "name": "FailureCategory",
+          "kind": "type",
+          "line": 26,
+          "exported": true
+        },
+        {
+          "name": "FailurePattern",
+          "kind": "interface",
+          "line": 33,
+          "exported": true
+        },
+        {
+          "name": "AggregateReport",
+          "kind": "interface",
+          "line": 56,
+          "exported": true
+        },
+        {
+          "name": "detectPatterns",
+          "kind": "function",
+          "line": 162,
+          "exported": true
+        },
+        {
+          "name": "generateGuidancePrompt",
+          "kind": "function",
+          "line": 316,
+          "exported": true
+        },
+        {
+          "name": "aggregate",
+          "kind": "function",
+          "line": 346,
+          "exported": true
+        },
+        {
+          "name": "savePatternCache",
+          "kind": "function",
+          "line": 396,
+          "exported": true
+        },
+        {
+          "name": "loadPatternCache",
+          "kind": "function",
+          "line": 405,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "./reflection.js"
+        },
+        {
+          "names": [],
+          "from": "./project-memory.js"
+        }
+      ],
+      "lastModified": 1775467654579.8484
+    },
+    {
       "path": "src/orchestrator.ts",
       "exports": [
         {
@@ -1904,13 +1976,13 @@
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 1004,
+          "line": 1007,
           "exported": true
         },
         {
           "name": "runSingleTask",
           "kind": "function",
-          "line": 2225,
+          "line": 2228,
           "exported": true
         }
       ],
@@ -2097,79 +2169,7 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775629477600.207
-    },
-    {
-      "path": "src/reflection-aggregator.ts",
-      "exports": [
-        {
-          "name": "FailureCategory",
-          "kind": "type",
-          "line": 26,
-          "exported": true
-        },
-        {
-          "name": "FailurePattern",
-          "kind": "interface",
-          "line": 33,
-          "exported": true
-        },
-        {
-          "name": "AggregateReport",
-          "kind": "interface",
-          "line": 56,
-          "exported": true
-        },
-        {
-          "name": "detectPatterns",
-          "kind": "function",
-          "line": 162,
-          "exported": true
-        },
-        {
-          "name": "generateGuidancePrompt",
-          "kind": "function",
-          "line": 316,
-          "exported": true
-        },
-        {
-          "name": "aggregate",
-          "kind": "function",
-          "line": 346,
-          "exported": true
-        },
-        {
-          "name": "savePatternCache",
-          "kind": "function",
-          "line": 396,
-          "exported": true
-        },
-        {
-          "name": "loadPatternCache",
-          "kind": "function",
-          "line": 405,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "./reflection.js"
-        },
-        {
-          "names": [],
-          "from": "./project-memory.js"
-        }
-      ],
-      "lastModified": 1775467654579.8484
+      "lastModified": 1775629978528.199
     }
   ]
 }

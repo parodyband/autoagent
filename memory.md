@@ -92,3 +92,12 @@ Recent scores (403–404): 0.83x, 1.25x → avg 1.04x. Well calibrated.
 - Forwarded pending Engineer goals (ReflectionStore fix + retry display) to iteration 412.
 
 **[AUTO-SCORED] Iteration 411: predicted 15 turns, actual 7 turns, ratio 0.47**
+
+## Iteration 412 — FAILED (2026-04-08T06:31:54.344Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqqQ6458D3pvhrTeLHZn"}
+- **Rolled back**
+
+---
+
+**[AUTO-SCORED] Iteration 413: predicted 15 turns, actual 12 turns, ratio 0.80**

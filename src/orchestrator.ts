@@ -744,10 +744,12 @@ async function runAgentLoop(
       const enhanced = enhanceToolError(tu.name, tuInput, rawResult, workDir);
       // Auto-retry once if the result looks like an error and enhancement added suggestions
       if (enhanced !== rawResult && isToolError(rawResult)) {
+        onStatus?.(`⟳ ${tu.name} failed — auto-retrying (attempt 2/2)…`);
         const retryResult = await execTool(tu.name, tuInput);
         const dur = Date.now() - t0;
         if (!isToolError(retryResult)) {
-          // Retry succeeded — return clean result transparently
+          // Retry succeeded
+          onStatus?.(`✓ ${tu.name} retry succeeded`);
           if (tu.name === "read_file" && onFileWatch) {
             onFileWatch("read", (tuInput as { path?: string }).path ?? "");
           }
@@ -756,9 +758,10 @@ async function runAgentLoop(
             resultSnippet: retryResult.slice(0, 300),
             durationMs: dur, isError: false, wasRetried: true, timestamp: callTs,
           });
-          return compressToolOutput(tu.name, retryResult);
+          return compressToolOutput(tu.name, `[⟳ Auto-retry succeeded]\n${retryResult}`);
         }
         // Both attempts failed — return enhanced error with suggestions
+        onStatus?.(`✗ ${tu.name} retry also failed`);
         const enhancedRetry = enhanceToolError(tu.name, tuInput, retryResult, workDir);
         if (tu.name === "read_file" && onFileWatch) {
           onFileWatch("read", (tuInput as { path?: string }).path ?? "");
@@ -768,7 +771,7 @@ async function runAgentLoop(
           resultSnippet: retryResult.slice(0, 300),
           durationMs: dur, isError: true, wasRetried: true, timestamp: callTs,
         });
-        return compressToolOutput(tu.name, `${enhanced}\n\n[Retry also failed]: ${enhancedRetry}`);
+        return compressToolOutput(tu.name, `[⟳ Retry 2/2 failed]\n${enhanced}\n\n[Retry also failed]: ${enhancedRetry}`);
       }
 
       const dur = Date.now() - t0;
@@ -1071,7 +1074,7 @@ export class Orchestrator {
     this.opts = opts;
     this.client = new Anthropic();
     this.registry = createDefaultRegistry();
-    this.reflectionStore = new ReflectionStore(opts.workDir);
+    this.reflectionStore = new ReflectionStore(opts.workDir ?? process.cwd());
 
     // Apply initial model override if provided
     if (opts.initialModel) {
