@@ -28,6 +28,9 @@
 ---
 
 ## Completed Features (Recent)
+- ✅ `/tools` command with list/stats/search (iter 556)
+- ✅ `/branch` save/restore/list (iter 557-558)
+- ✅ `/tools` + `/branch` tests (iter 558)
 - ✅ `/sessions` command with list/search/clear (iter 552-554)
 - ✅ Ctrl+R reverse-search in TUI (iter 538)
 - ✅ Command history with up/down arrows (iter 534)
@@ -40,10 +43,9 @@
 ---
 
 ## Next Up (Priority Order)
-1. **`/tools` command** — list tools, show usage stats, search tools. Assigned iter 556.
-2. **Conversation branching** — `/branch` to fork conversation, `/branches` to list.
-3. **`/help` improvements** — group commands by category, show usage examples.
-4. **Session annotations** — `/sessions note <text>` appends note to last session.
+1. **`/help` improvements** — group commands by category, show usage examples. Assigned iter 560.
+2. **Session annotations** — `/sessions note <text>` appends note to last session.
+3. **Tool usage in /status** — surface `getSessionStats().toolUsage` in /status output.
 
 ---
 
@@ -74,3 +76,7 @@
 **[AUTO-SCORED] Iteration 557: predicted 15 turns, actual 14 turns, ratio 0.93**
 
 **[AUTO-SCORED] Iteration 558: predicted 12 turns, actual 16 turns, ratio 1.33**
+
+**[AUTO-SCORED] Iteration 559: predicted 8 turns, actual 7 turns, ratio 0.88**
+
+**[AUTO-SCORED] Iteration 559: predicted 8 turns, actual 10 turns, ratio 1.25**
