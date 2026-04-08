@@ -1,149 +1,3 @@
-[2026-04-06T07:40:59.372Z] iter=407 turn=7 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-06T07:40:59.372Z] iter=407 turn=7 INFO: Tool timing: bash: 6x, avg=202ms, total=1211ms; write_file: 2x, avg=2ms, total=4ms; think: 1x, avg=0ms, total=0ms
-[2026-04-06T07:40:59.372Z] iter=407 turn=7 INFO: Tool timing stats
-[2026-04-06T07:41:07.342Z] iter=407 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 407: predicted 8 turns, actual 7 turns, ratio 0.88**
-[2026-04-08T06:23:01.340Z] iter=407 INFO: Cache restored: 54/55 entries (1 stale)
-[2026-04-08T06:23:01.343Z] iter=407 INFO: Turn budget: 15/25 (calibration=0.88x, predicted=18)
-[2026-04-08T06:23:01.344Z] iter=407 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-08T06:23:01.566Z] iter=407 turn=1 INFO: Turn 1/25
-[2026-04-08T06:23:04.346Z] iter=407 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the codebase, then execute the Engineer goals.
-[2026-04-08T06:23:04.347Z] iter=407 turn=1 INFO: read_scratchpad: 4369 chars
-[2026-04-08T06:23:04.348Z] iter=407 turn=2 INFO: Turn 2/25
-[2026-04-08T06:23:09.397Z] iter=407 turn=2 INFO: save_scratchpad: ## Iteration 408 — Engineer
-
-### Goals:
-1. Wire `resolveImpo
-[2026-04-08T06:23:09.397Z] iter=407 turn=3 INFO: Turn 3/25
-[2026-04-08T06:23:12.714Z] iter=407 turn=3 INFO: grep: "resolveImportGraph"
-[2026-04-08T06:23:12.768Z] iter=407 turn=3 INFO:   -> 9 matches
-[2026-04-08T06:23:12.768Z] iter=407 turn=3 INFO: grep: "resolveImportGraph"
-[2026-04-08T06:23:12.806Z] iter=407 turn=3 INFO:   -> 100 matches
-[2026-04-08T06:23:12.806Z] iter=407 turn=4 INFO: Turn 4/25
-[2026-04-08T06:23:17.367Z] iter=407 turn=4 INFO: Agent: 
-
-You're right. Let me check what's already wired and start writing immediately.
-[2026-04-08T06:23:17.368Z] iter=407 turn=4 INFO: grep: "resolveImportGraph" in src/orchestrator.ts
-[2026-04-08T06:23:17.388Z] iter=407 turn=4 INFO:   -> 11 matches
-[2026-04-08T06:23:17.389Z] iter=407 turn=5 INFO: Turn 5/25
-[2026-04-08T06:23:21.915Z] iter=407 turn=5 INFO: Agent: Good — already imported. Let me check if it's already used anywhere in the orchestrator:
-[2026-04-08T06:23:21.916Z] iter=407 turn=5 INFO: $ grep -n "resolveImportGraph" src/orchestrator.ts
-[2026-04-08T06:23:21.921Z] iter=407 turn=5 INFO: grep: "retryCount|retry_count|retries" in src/orchestrator.ts
-[2026-04-08T06:23:21.944Z] iter=407 turn=5 INFO:   -> 0 matches
-[2026-04-08T06:23:21.945Z] iter=407 turn=5 INFO:   -> exit=0 (142 chars)
-[2026-04-08T06:23:21.945Z] iter=407 turn=6 INFO: Turn 6/25
-[2026-04-08T06:23:27.213Z] iter=407 turn=6 INFO: think: So `resolveImportGraph` is imported but never used. I need to:
-
-1. Find where read_file/write_file tool results are proc...
-[2026-04-08T06:23:27.213Z] iter=407 turn=7 INFO: Turn 7/25
-[2026-04-08T06:23:32.065Z] iter=407 turn=7 INFO: Agent: 
-
-**Status:**
-- Goal 1 (Wire resolveImportGraph): NOT STARTED — import exists but no usage
-- Goal 2 (TUI retry count): NOT STARTED
-
-Let me find where tool results are handled and start writing immediately.
-[2026-04-08T06:23:32.066Z] iter=407 turn=7 INFO: $ grep -n "read_file\|write_file\|toolResult\|tool_result\|toolName.*read\|toolName.*write\|case.*read_file\|case.*write_file" src/orchestrator.ts | head -30
-[2026-04-08T06:23:32.084Z] iter=407 turn=7 INFO:   -> exit=0 (2330 chars)
-[2026-04-08T06:23:32.085Z] iter=407 turn=8 INFO: Turn 8/25
-[2026-04-08T06:23:34.895Z] iter=407 turn=8 INFO: read_file: src/orchestrator.ts
-[2026-04-08T06:23:34.898Z] iter=407 turn=8 INFO:   -> ok (5672 chars)
-[2026-04-08T06:23:34.899Z] iter=407 turn=9 INFO: Turn 9/25
-[2026-04-08T06:23:47.839Z] iter=407 turn=9 INFO: think: Now I can see the structure. I need to:
-
-1. After read_file or write_file produces a result, call resolveImportGraph on ...
-[2026-04-08T06:23:47.840Z] iter=407 turn=10 INFO: Turn 10/25
-[2026-04-08T06:23:50.556Z] iter=407 turn=10 INFO: read_file: src/orchestrator.ts
-[2026-04-08T06:23:50.557Z] iter=407 turn=10 INFO:   -> ok (2102 chars)
-[2026-04-08T06:23:50.557Z] iter=407 turn=11 INFO: Turn 11/25
-[2026-04-08T06:23:53.250Z] iter=407 turn=11 INFO: Agent: Now let me see where parallelResults gets pushed and how it's structured:
-[2026-04-08T06:23:53.251Z] iter=407 turn=11 INFO: $ grep -n "parallelResults\|executeToolsParallel" src/orchestrator.ts
-[2026-04-08T06:23:53.264Z] iter=407 turn=11 INFO:   -> exit=0 (173 chars)
-[2026-04-08T06:23:53.264Z] iter=407 turn=12 INFO: Turn 12/25
-[2026-04-08T06:23:57.183Z] iter=407 turn=12 INFO: Agent: 
-
-Nothing changed yet. I'm writing code NOW.
-[2026-04-08T06:23:57.184Z] iter=407 turn=12 INFO: read_file: src/orchestrator.ts
-[2026-04-08T06:23:57.184Z] iter=407 turn=12 INFO:   -> ok (1321 chars)
-[2026-04-08T06:23:57.184Z] iter=407 turn=13 INFO: Turn 13/25
-[2026-04-08T06:24:01.148Z] iter=407 turn=13 INFO: Agent: 
-
-Let me write the code now. I'll add import graph enrichment as a post-processing step on the results array.
-[2026-04-08T06:24:01.149Z] iter=407 turn=13 INFO: read_file: src/orchestrator.ts
-[2026-04-08T06:24:01.152Z] iter=407 turn=13 INFO:   -> ok (859 chars)
-[2026-04-08T06:24:01.153Z] iter=407 turn=14 INFO: Turn 14/25
-[2026-04-08T06:24:05.140Z] iter=407 turn=14 INFO: Agent: Now I'll add the import graph enrichment right before `apiMessages.push`. I'll also need a Set to track shown imports across the session.
-[2026-04-08T06:24:05.140Z] iter=407 turn=14 INFO: read_file: src/orchestrator.ts
-[2026-04-08T06:24:05.141Z] iter=407 turn=14 INFO:   -> ok (760 chars)
-[2026-04-08T06:24:05.141Z] iter=407 turn=15 INFO: Turn 15/25
-[2026-04-08T06:24:13.487Z] iter=407 turn=15 INFO: Agent: 
-
-I've spent too long reading. Let me write the code, compile, and wrap up.
-[2026-04-08T06:24:13.487Z] iter=407 turn=15 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T06:24:13.489Z] iter=407 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -2 +24 lines
-
-Context after patch:
-846 |       }
-847 |     }
-848 | 
-849 |     // Import graph enrichment: after read_file/write_file, show related imports
-850 |     const importGraphShown = importGraphShown ?? new Set<string>();
-851 |     for (const r of results) {
-852 |       if (typeof r !== "object" || !("tool_use_id" in r)) continue;
-853 |       const tu = toolUses.find(t => t.id === r.tool_use_id);
-854 |       if (!tu || (tu.name !== "read_file" && tu.name !== "write_file")) continue;
-855 |       const filePath = (tu.input as { path?: string }).path;
-856 |       if (!filePath || importGraphShown.has(filePath)) continue;
-857 |       try {
-858 |         const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
-859 |         const related = resolveImportGraph(absPath, 1, workDir)
-860 |           .filter(f => !importGraphShown.has(f))
-861 |           .slice(0, 3);
-862 |         if (related.length > 0) {
-863 |           importGraphShown.add(filePath);
-864 |           related.forEach(f => importGraphShown.add(f));
-865 |           const names = related.map(f => path.relative(workDir, f));
-866 |           (r as { content: string }).content += `\n\n[Related imports: ${names.join(", ")}]`;
-867 |         }
-868 |       } catch { /* non-critical — skip */ }
-869 |     }
-870 | 
-871 |     // Self-verification: after any write_file calls, run diagnostics and inject errors
-872 |     if (writeTools.length > 0) {
-873 |       const verifyResult = await selfVerify(workDir);
-874 |       if (verifyResult) {
-875 |         results.push({ type: "text", text: verifyResult });
-[2026-04-08T06:24:13.490Z] iter=407 turn=16 INFO: Turn 16/25
-[2026-04-08T06:24:17.556Z] iter=407 turn=16 INFO: Agent: 
-
-The `importGraphShown` variable shadows itself — need to fix that. It should be declared outside the loop.
-[2026-04-08T06:24:17.558Z] iter=407 turn=16 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T06:24:17.561Z] iter=407 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -3 +4 lines
-
-Context after patch:
-614 |   let lastInput = 0;
-615 |   let cumulativeIn = 0;
-616 |   let fullText = "";
-617 |   let consecutiveLoopCount = 0;
-618 |   const importGraphShown = new Set<string>();
-619 | 
-620 |   for (let round = 0; round < MAX_ROUNDS; round++) {
-621 |     // Check abort signal before starting a new round
-622 |     if (signal?.aborted) {
-623 |       return { text: fullText, tokensIn: totalIn, tokensOut: totalOut, lastInputTokens: lastInput, aborted: true };
-[2026-04-08T06:24:17.562Z] iter=407 turn=17 INFO: Turn 17/25
-[2026-04-08T06:24:21.171Z] iter=407 turn=17 INFO: Agent: Now fix the self-referencing const inside the loop:
-[2026-04-08T06:24:21.172Z] iter=407 turn=17 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T06:24:21.175Z] iter=407 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -3 +2 lines
-
-Context after patch:
-847 |       }
-848 |     }
-849 | 
-850 |     // Import graph enrichment: after read_file/write_file, show related imports
-851 |     for (const r of results) {
-852 |       if (typeof r !== "object" || !("tool_use_id" in r)) continue;
 853 |       const tu = toolUses.find(t => t.id === r.tool_use_id);
 854 |       if (!tu || (tu.name !== "read_file" && tu.name !== "write_file")) continue;
 [2026-04-08T06:24:21.176Z] iter=407 turn=18 INFO: Turn 18/25
@@ -1141,3 +995,128 @@ TSC clean. Everything is done. Wrapping up.
 [2026-04-08T06:51:11.830Z] iter=423 turn=19 INFO: Tool timing stats
 [2026-04-08T06:51:19.629Z] iter=423 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 423: predicted 15 turns, actual 19 turns, ratio 1.27**
 [2026-04-08T06:51:56.459Z] iter=423 turn=19 INFO: Pre-commit review (0in/0out): ERROR: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqrviWznjw6qdBrVoVYN"}
+[2026-04-08T06:53:01.199Z] iter=424 turn=1 INFO: Rolled back to pre-iteration-424
+[2026-04-08T06:53:01.200Z] iter=424 turn=1 INFO: Failure recorded. Restarting...
+[2026-04-08T06:53:01.396Z] iter=425 1/3 consecutive failures
+[2026-04-08T06:53:01.399Z] iter=425 INFO: Cache restored: 56/56 entries (0 stale)
+[2026-04-08T06:53:01.400Z] iter=425 INFO: Turn budget: 17/25 (calibration=1.00x, predicted=15)
+[2026-04-08T06:53:01.401Z] iter=425 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-08T06:53:01.602Z] iter=425 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T06:53:01.602Z] iter=425 turn=1 INFO: Turn 1/25
+[2026-04-08T06:53:07.084Z] iter=425 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state of the codebase, then execute both goals.
+[2026-04-08T06:53:07.085Z] iter=425 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git status --short | head -20
+[2026-04-08T06:53:07.089Z] iter=425 turn=1 INFO: grep: "summarizeOldToolResults|trySummarizeToolText" in src/orchestrator.ts
+[2026-04-08T06:53:07.107Z] iter=425 turn=1 INFO:   -> 0 matches
+[2026-04-08T06:53:07.108Z] iter=425 turn=1 INFO: grep: "fileWatch|onFileChange|file-watcher" in src/orchestrator.ts
+[2026-04-08T06:53:07.118Z] iter=425 turn=1 INFO:   -> 0 matches
+[2026-04-08T06:53:07.118Z] iter=425 turn=1 INFO:   -> exit=0 (96 chars)
+[2026-04-08T06:53:07.119Z] iter=425 turn=2 INFO: Turn 2/25
+[2026-04-08T06:53:10.509Z] iter=425 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "summarize" src/orchestrator.ts | head -20
+[2026-04-08T06:53:10.522Z] iter=425 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "fileWatch\|file.watch\|file-watch\|onFileChange\|watcher" src/orchestrator.ts | head -20
+[2026-04-08T06:53:10.547Z] iter=425 turn=2 INFO:   -> exit=0 (1533 chars)
+[2026-04-08T06:53:10.558Z] iter=425 turn=2 INFO:   -> exit=0 (647 chars)
+[2026-04-08T06:53:10.558Z] iter=425 turn=3 INFO: Turn 3/25
+[2026-04-08T06:53:14.668Z] iter=425 turn=3 INFO: Agent: 
+
+You're right. Let me get the code I need and start writing immediately.
+[2026-04-08T06:53:14.668Z] iter=425 turn=3 INFO: read_file: src/orchestrator.ts
+[2026-04-08T06:53:14.669Z] iter=425 turn=3 INFO:   -> ok (4554 chars)
+[2026-04-08T06:53:14.669Z] iter=425 turn=3 INFO: read_file: src/orchestrator.ts
+[2026-04-08T06:53:14.670Z] iter=425 turn=3 INFO:   -> ok (1116 chars)
+[2026-04-08T06:53:14.671Z] iter=425 turn=4 INFO: Turn 4/25
+[2026-04-08T06:53:19.070Z] iter=425 turn=4 INFO: think: Now I have everything I need. Let me:
+
+1. Write tests/tool-result-summarization.test.ts
+2. Wire getImporters into the fi...
+[2026-04-08T06:53:19.071Z] iter=425 turn=5 INFO: Turn 5/25
+[2026-04-08T06:53:22.607Z] iter=425 turn=5 INFO: grep: "export.*getImporters" in src/context-loader.ts
+[2026-04-08T06:53:22.625Z] iter=425 turn=5 INFO:   -> 7 matches
+[2026-04-08T06:53:22.625Z] iter=425 turn=5 INFO: grep: "hasErrorIndicator" in src/orchestrator.ts
+[2026-04-08T06:53:22.641Z] iter=425 turn=5 INFO:   -> 23 matches
+[2026-04-08T06:53:22.641Z] iter=425 turn=6 INFO: Turn 6/25
+[2026-04-08T06:53:41.599Z] iter=425 turn=6 INFO: Agent: 
+
+**Goal status:**
+- Goal 1 (Tests): NOT STARTED
+- Goal 2 (Wire getImporters): NOT STARTED
+
+Both are small. Writing both now.
+[2026-04-08T06:53:41.599Z] iter=425 turn=6 INFO: write_file: tests/tool-result-summarization.test.ts (write)
+[2026-04-08T06:53:41.600Z] iter=425 turn=6 INFO:   -> ok: Created tests/tool-result-summarization.test.ts (3471 chars)
+[2026-04-08T06:53:41.601Z] iter=425 turn=7 INFO: Turn 7/25
+[2026-04-08T06:53:44.468Z] iter=425 turn=7 INFO: Agent: Now Goal 2 — wire `getImporters` into the file-watcher callback:
+[2026-04-08T06:53:44.469Z] iter=425 turn=7 INFO: grep: "^import.*context-loader" in src/orchestrator.ts
+[2026-04-08T06:53:44.495Z] iter=425 turn=7 INFO:   -> 1 matches
+[2026-04-08T06:53:44.496Z] iter=425 turn=8 INFO: Turn 8/25
+[2026-04-08T06:53:48.435Z] iter=425 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T06:53:48.437Z] iter=425 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+38 | import { runDiagnostics } from "./diagnostics.js";
+39 | import { findRelatedTests, runRelatedTests } from "./test-runner.js";
+40 | import { computeUnifiedDiff } from "./diff-preview.js";
+41 | import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences, resolveImportGraph, getImporters } from "./context-loader.js";
+42 | import { enhanceToolError } from "./tool-recovery.js";
+43 | import { detectProject } from "./project-detector.js";
+44 | import { detectLoop } from "./loop-detector.js";
+[2026-04-08T06:53:48.437Z] iter=425 turn=9 INFO: Turn 9/25
+[2026-04-08T06:53:55.218Z] iter=425 turn=9 INFO: Agent: Now add the `getImporters` call inside the file-watcher onChange callback:
+[2026-04-08T06:53:55.218Z] iter=425 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T06:53:55.220Z] iter=425 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -5 +11 lines
+
+Context after patch:
+1088 | 
+1089 |     // Wire up file watcher callback
+1090 |     let searchRebuildTimer: ReturnType<typeof setTimeout> | null = null;
+1091 |     this.fileWatcher.onChange = (filePath: string) => {
+1092 |       this.externallyChangedFiles.add(filePath);
+1093 |       // Mark this path stale in the incremental repo map cache
+1094 |       this.staleRepoPaths.add(filePath);
+1095 |       this.opts.onExternalFileChange?.([...this.externallyChangedFiles]);
+1096 |       // Log reverse-import graph for changed file
+1097 |       try {
+1098 |         const importers = getImporters(filePath, this.opts.workDir);
+1099 |         const relImporters = importers.map(p => p.replace(this.opts.workDir + "/", ""));
+1100 |         this.opts.onStatus?.(`[file-watcher] ${filePath.replace(this.opts.workDir + "/", "")} changed — importers: ${relImporters.join(", ") || "none"}`);
+1101 |       } catch { /* non-fatal */ }
+1102 |       // Debounce search index rebuild (2s after last change)
+1103 |       if (searchRebuildTimer) clearTimeout(searchRebuildTimer);
+1104 |       searchRebuildTimer = setTimeout(() => {
+[2026-04-08T06:53:55.220Z] iter=425 turn=10 INFO: Turn 10/25
+[2026-04-08T06:53:58.180Z] iter=425 turn=10 INFO: Agent: 
+
+Both goals are done. Let me verify everything compiles and tests pass.
+[2026-04-08T06:53:58.181Z] iter=425 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-08T06:53:59.313Z] iter=425 turn=10 INFO:   -> exit=0 (11 chars)
+[2026-04-08T06:53:59.313Z] iter=425 turn=11 INFO: Turn 11/25
+[2026-04-08T06:54:02.111Z] iter=425 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/tool-result-summarization.test.ts 2>&1 | tail -30
+[2026-04-08T06:54:03.294Z] iter=425 turn=11 INFO:   -> exit=0 (287 chars)
+[2026-04-08T06:54:03.294Z] iter=425 turn=12 INFO: Turn 12/25
+[2026-04-08T06:54:11.118Z] iter=425 turn=12 INFO: Agent: TSC clean, 9/9 tests pass. Now update goals and memory.
+[2026-04-08T06:54:11.119Z] iter=425 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && git diff --stat src/ tests/
+[2026-04-08T06:54:11.148Z] iter=425 turn=12 INFO:   -> exit=0 (82 chars)
+[2026-04-08T06:54:11.149Z] iter=425 turn=13 INFO: Turn 13/25
+[2026-04-08T06:54:16.006Z] iter=425 turn=13 INFO: Agent: 
+
+Wrapping up now.
+[2026-04-08T06:54:16.007Z] iter=425 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && git add src/orchestrator.ts tests/tool-result-summarization.test.ts
+[2026-04-08T06:54:16.010Z] iter=425 turn=13 INFO: save_memory: "[Architect] Iteration 425 status"
+[2026-04-08T06:54:16.012Z] iter=425 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T06:54:16.036Z] iter=425 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-08T06:54:16.037Z] iter=425 turn=14 INFO: Turn 14/25
+[2026-04-08T06:54:24.596Z] iter=425 turn=14 INFO: write_file: goals.md (write)
+[2026-04-08T06:54:24.597Z] iter=425 turn=14 INFO:   -> ok: Updated goals.md (897 chars, -16 lines delta)
+[2026-04-08T06:54:24.597Z] iter=425 turn=15 INFO: Turn 15/25
+[2026-04-08T06:54:27.487Z] iter=425 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T06:54:27.487Z] iter=425 turn=15 INFO: RESTART signal
+[2026-04-08T06:54:27.488Z] iter=425 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T06:54:28.567Z] iter=425 turn=15 INFO: Compilation OK
+[2026-04-08T06:54:36.695Z] iter=425 turn=15 INFO: Cache persisted: 57 entries to .autoagent-cache.json
+[2026-04-08T06:54:36.695Z] iter=425 turn=15 INFO: Cache stats: 0 hits, 7 misses, 57 entries, 4 invalidations (6 entries removed)
+[2026-04-08T06:54:36.695Z] iter=425 turn=15 INFO: Tool cache stats
+[2026-04-08T06:54:36.695Z] iter=425 turn=15 INFO: Tool timing: bash: 8x, avg=310ms, total=2483ms; grep: 5x, avg=23ms, total=115ms; write_file: 4x, avg=2ms, total=6ms; read_file: 2x, avg=3ms, total=5ms; save_memory: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms
+[2026-04-08T06:54:36.695Z] iter=425 turn=15 INFO: Tool timing stats
+[2026-04-08T06:54:44.322Z] iter=425 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 425: predicted 15 turns, actual 15 turns, ratio 1.00**
+[2026-04-08T06:55:20.046Z] iter=425 turn=15 INFO: Pre-commit review (0in/0out): ERROR: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqsBiDoz9SXtXMbaeBuC"}

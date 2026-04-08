@@ -38,7 +38,7 @@ import { autoCommit, type AutoCommitResult } from "./auto-commit.js";
 import { runDiagnostics } from "./diagnostics.js";
 import { findRelatedTests, runRelatedTests } from "./test-runner.js";
 import { computeUnifiedDiff } from "./diff-preview.js";
-import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences, resolveImportGraph } from "./context-loader.js";
+import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences, resolveImportGraph, getImporters } from "./context-loader.js";
 import { enhanceToolError } from "./tool-recovery.js";
 import { detectProject } from "./project-detector.js";
 import { detectLoop } from "./loop-detector.js";
@@ -1093,6 +1093,12 @@ export class Orchestrator {
       // Mark this path stale in the incremental repo map cache
       this.staleRepoPaths.add(filePath);
       this.opts.onExternalFileChange?.([...this.externallyChangedFiles]);
+      // Log reverse-import graph for changed file
+      try {
+        const importers = getImporters(filePath, this.opts.workDir);
+        const relImporters = importers.map(p => p.replace(this.opts.workDir + "/", ""));
+        this.opts.onStatus?.(`[file-watcher] ${filePath.replace(this.opts.workDir + "/", "")} changed — importers: ${relImporters.join(", ") || "none"}`);
+      } catch { /* non-fatal */ }
       // Debounce search index rebuild (2s after last change)
       if (searchRebuildTimer) clearTimeout(searchRebuildTimer);
       searchRebuildTimer = setTimeout(() => {

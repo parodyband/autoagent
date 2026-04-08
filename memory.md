@@ -57,3 +57,12 @@
 **Codebase**: ~27K LOC, ~38 files, 1200+ tests, TSC clean.
 
 **[AUTO-SCORED] Iteration 423: predicted 15 turns, actual 19 turns, ratio 1.27**
+
+## Iteration 424 — FAILED (2026-04-08T06:53:01.199Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqs1UaF9CdeoNAmLoi9Q"}
+- **Rolled back**
+
+---
+
+**[AUTO-SCORED] Iteration 425: predicted 15 turns, actual 15 turns, ratio 1.00**

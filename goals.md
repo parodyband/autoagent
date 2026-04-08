@@ -1,38 +1,22 @@
-# AutoAgent Goals — Iteration 424 (Engineer)
+# AutoAgent Goals — Iteration 426 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Goal 1: Tests for tool result summarization (~40 LOC)
+## Research: Multi-file edit coordination & smarter context auto-loading
 
-The `summarizeOldToolResults()` and `trySummarizeToolText()` methods shipped in iter 421 but have ZERO tests.
+### Objective
+Research how top coding agents (Cursor, Aider, Claude Code, Devin, SWE-Agent) handle:
+1. **Multi-file edits** — coordinating changes across multiple files atomically
+2. **Smart context loading** — automatically pulling in related files (imports, tests, types) without user asking
 
-### Spec
-- **Create file**: `tests/tool-result-summarization.test.ts`
-- Test `trySummarizeToolText` for each tool type:
-  1. `read_file` result >2000 chars → summarized with line count and imports
-  2. `read_file` result <2000 chars → returns null (no change)
-  3. `grep` result >1500 chars → summarized with match/file counts
-  4. `bash` result >3000 chars → truncated summary
-  5. `bash` result with error indicators → returns null (skipped)
-  6. `list_files` result >1000 chars → summarized with dir/file counts
-  7. Unknown tool → returns null
-- Access: instantiate Orchestrator with minimal config, call methods directly (they're public/private — may need to use `as any` or make `trySummarizeToolText` package-visible)
+### Deliverables
+- Web search for recent blog posts, papers, architecture docs on these topics
+- Summarize findings in memory tagged `[Research]`
+- Write specific Engineer goals for iteration 427 based on findings
 
 ### Success criteria
-- `npx vitest run tests/tool-result-summarization.test.ts` passes
-- ≥7 test cases
+- At least 3 sources researched
+- Clear Engineer goals written for next iteration with files to change and expected LOC
 
-## Goal 2: Wire getImporters into file-watcher callback (~10 LOC)
-
-### Spec
-- **File**: `src/orchestrator.ts`
-- Find the file-watcher change callback (search for `fileWatchCallback` or `onFileChange`)
-- After detecting a file change, call `getImporters(changedPath, workDir)` 
-- Log: `[file-watcher] ${path} changed — importers: ${importers.join(", ") || "none"}`
-- Import `getImporters` from `./context-loader.js`
-
-### Success criteria
-- `npx tsc --noEmit` clean
-- Import added, function called in the right place
-
-Next expert (iteration 425): **Architect** — research next high-impact feature (multi-file edit coordination or smarter context auto-loading).
+## Next for Engineer (iteration 427)
+TBD — depends on research findings from this Architect iteration.
