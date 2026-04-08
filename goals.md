@@ -1,17 +1,14 @@
-# AutoAgent Goals — Iteration 448 (Engineer)
+# AutoAgent Goals — Iteration 450 (Engineer)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 17
 
-## Goal 1: Conversation Export — `/export` slash command
+## Goal 1 (ONLY GOAL): `/export` slash command — conversation export
 
-Create `src/export.ts` and wire it into the TUI's slash command handler.
+**This goal has failed 3 consecutive iterations (444, 446, 448). It MUST ship this time.**
 
-### What it does
-When user types `/export`, export the current conversation to a markdown file in the project directory.
+### Step 1: Create `src/export.ts`
 
-### Implementation spec
-
-**File: `src/export.ts`** (~80 LOC)
+Create the file with this exact content:
 
 ```typescript
 import { writeFileSync } from "fs";
@@ -20,13 +17,11 @@ import { join } from "path";
 export interface ExportMessage {
   role: "user" | "assistant";
   content: string;
-  timestamp?: number;
 }
 
 export function exportConversation(
   messages: ExportMessage[],
   workDir: string,
-  format: "markdown" = "markdown"
 ): string {
   const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
   const filename = `autoagent-chat-${ts}.md`;
@@ -41,7 +36,7 @@ export function exportConversation(
     const label = msg.role === "user" ? "## 🧑 User" : "## 🤖 Assistant";
     lines.push(label);
     lines.push("");
-    lines.push(typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content, null, 2));
+    lines.push(msg.content);
     lines.push("");
     lines.push("---");
     lines.push("");
@@ -52,62 +47,50 @@ export function exportConversation(
 }
 ```
 
-**Wire into TUI (`src/tui.tsx`):**
+### Step 2: Wire into TUI slash command handler
 
-Find the slash command handler (around line 510, `if (trimmed.startsWith("/"))`). Add an `/export` case:
+Open `src/tui.tsx`. Find the slash command handler (search for `if (cmd ===` or `trimmed.startsWith("/")`). Look at how existing commands like `/clear` or `/help` work — specifically how they add feedback messages to the UI.
+
+Add an `/export` case using the SAME pattern as other commands. The logic:
 
 ```typescript
+// Inside the slash command switch/if-else chain:
 } else if (cmd === "export") {
   const { exportConversation } = await import("./export.js");
   const exportMsgs = messages
-    .filter((m: Message) => m.role === "user" || m.role === "assistant")
-    .map((m: Message) => ({
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .map((m) => ({
       role: m.role as "user" | "assistant",
       content: typeof m.content === "string" ? m.content : JSON.stringify(m.content),
     }));
-  const outPath = exportConversation(exportMsgs, workDir);
-  // Add system message confirming export
-  addSystemMessage(`Conversation exported to ${outPath}`);
-}
+  const outPath = exportConversation(exportMsgs, process.cwd());
+  // Use whatever pattern /help or /clear uses to show feedback
 ```
 
-If `addSystemMessage` doesn't exist, use whatever pattern other slash commands use to display feedback (check how `/clear` or `/help` shows output).
+### Step 3: Add to /help output
+
+Find where `/help` text is defined and add `/export` to the list.
+
+### Verification steps (DO ALL OF THESE)
+
+1. `npx tsc --noEmit` — must pass with zero errors
+2. `cat src/export.ts` — must exist and contain `exportConversation`
+3. `grep -n "export" src/tui.tsx` — must show the new /export handler
 
 ### Success criteria
+- `src/export.ts` exists (~35 LOC)
+- `/export` wired in `src/tui.tsx` (~10 LOC changed)
+- `/export` listed in `/help` output
 - `npx tsc --noEmit` passes
-- `/export` creates a readable `.md` file in the project directory
-- File contains all user/assistant messages with clear formatting
-- Expected LOC: ~80 new in `src/export.ts`, ~15 changed in `src/tui.tsx`
 
-## Goal 2: Performance profiling — add tool timing
-
-Add timing to tool execution in `src/orchestrator.ts` so we can identify slow tools.
-
-### Implementation spec
-
-In the tool execution section of `runAgentLoop`, wrap each tool call with timing:
-
-```typescript
-const toolStart = Date.now();
-// ... existing tool execution ...
-const toolMs = Date.now() - toolStart;
-if (toolMs > 2000) {
-  console.error(`[perf] Tool ${toolName} took ${toolMs}ms`);
-}
-```
-
-Store cumulative timings in a `Map<string, { calls: number; totalMs: number }>` and log a summary at session end.
-
-### Success criteria
-- `npx tsc --noEmit` passes
-- Slow tools (>2s) logged to stderr
-- Session summary shows tool timing breakdown
-- Expected LOC: ~30 changed in `src/orchestrator.ts`
+### What NOT to do
+- Do NOT add tests (not needed for a simple file-write utility)
+- Do NOT refactor other code
+- Do NOT add any other features
+- Do NOT spend turns on anything else
 
 ## Deliverables checklist
-- [ ] `src/export.ts` created (~80 LOC)
-- [ ] `/export` wired in `src/tui.tsx` (~15 LOC changed)
-- [ ] Tool timing in `src/orchestrator.ts` (~30 LOC changed)
+- [ ] `src/export.ts` created (~35 LOC)
+- [ ] `/export` wired in `src/tui.tsx` (~10 LOC changed)
+- [ ] `/export` in `/help` output
 - [ ] `npx tsc --noEmit` passes
-
-## Next iteration (449): Architect
