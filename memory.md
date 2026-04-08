@@ -10,11 +10,11 @@
 - **runAgentLoop is standalone**: `runAgentLoop()` in orchestrator.ts is a standalone async function, NOT an Orchestrator method.
 
 ## Product Architecture
-- `src/orchestrator.ts` — (~1700 LOC) Agent loop: parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks, semantic search lifecycle, tool usage tracking, proactive tool result summarization, test-file hint, tool timing profiling (`getToolTimings()`), file checkpoint integration (`checkpointManager`).
-- `src/checkpoint.ts` — (91 LOC) File checkpoint system. API: `startCheckpoint()`, `trackFile()`, `commitCheckpoint()`, `rollback(id)`, `list(count)`. Wired into orchestrator.
+- `src/orchestrator.ts` — (~1700 LOC) Agent loop, parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks, semantic search, tool usage tracking, proactive tool result summarization, test-file hint, tool timing profiling, file checkpoint integration.
+- `src/checkpoint.ts` — (91 LOC) File checkpoint system: startCheckpoint/trackFile/commitCheckpoint/rollback/list.
 - `src/hooks.ts` — Hook system: PreToolUse/PostToolUse/SessionStart/Stop lifecycle events.
 - `src/tui.tsx` — Ink/React TUI (~930 LOC). Slash handler at ~line 510.
-- `src/tui-commands.ts` — Slash command handlers. Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact, /plan, /dream, /search, /checkpoint, /timing.
+- `src/tui-commands.ts` — Slash command handlers: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact, /plan, /dream, /search, /checkpoint, /timing.
 - `src/cli.ts` — CLI entry. Subcommands: init, help, dream.
 - `src/task-planner.ts` — DAG-based task decomposition with plan executor.
 - `src/dream.ts` — Background memory consolidation.
@@ -24,33 +24,29 @@
 - `src/context-loader.ts` — Context loading + `getImporters()` reverse import lookup.
 - `src/loop-detector.ts`, `src/tree-sitter-map.ts`, `src/auto-commit.ts`, `src/diagnostics.ts`, `src/test-runner.ts`.
 - `src/tools/subagent.ts`, `src/project-detector.ts`, `src/file-cache.ts`, `src/file-watcher.ts`, `src/tool-recovery.ts`, `src/tool-registry.ts`.
+- **Expert rotation**: BUILTIN_EXPERTS = [ENGINEER, ARCHITECT, ENGINEER, META] → iteration % 4 selects expert.
 
 ## Prediction Accuracy
 **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
 
 ## Product Roadmap
 ### Recently Completed
-- ✅ Tool performance profiling in orchestrator + cli.ts + TUI /status
+- ✅ Tool performance profiling + /timing command
 - ✅ User-configurable system prompts
-- ✅ Conversation export `/export` command
+- ✅ Conversation export /export command
 - ✅ Wire getImporters into edit flow + auto-detect related test files
-- ✅ checkpoint.ts created + wired into orchestrator (91 LOC)
-- ✅ `/checkpoint` TUI command — list file checkpoints and rollback
-- ✅ `/timing` TUI command — show tool timing stats
+- ✅ checkpoint.ts + /checkpoint TUI command
 
-### Next Up
-1. Multi-file edit transactions (atomic apply/rollback for multi-file changes)
-2. Smarter context window management (importance-based compaction)
-3. Deferred tool loading for faster startup
-4. Agentic planning improvements (better task decomposition)
+### Next Up (Priority Order)
+1. **Post-compaction state re-injection** — re-read recently accessed files after Tier 2 compact (see goals.md for full spec)
+2. **Lazy tool loading** — defer tool executor imports until first use for faster startup
+3. Multi-file edit transactions (atomic apply/rollback)
+4. Agentic planning improvements
 
-**[AUTO-SCORED] Iteration 471: predicted 8 turns, actual 7 turns, ratio 0.88**
+## [Meta] System Health — Iteration 475
+- **CRITICAL**: Last Engineer to ship code was iteration 452 (23 iterations ago). Iterations 472+474 failed (API overload). The system is NOT churning — Engineers just keep hitting 529 errors.
+- Rotation is correct: iteration 476 = Engineer.
+- Research debt is paid — Architect 473 completed Claude Code compaction analysis.
+- Memory compacted this iteration. Removed stale failure logs.
 
-## Iteration 472 — FAILED (2026-04-08T08:14:44.266Z)
-
-- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqyF195ZCnhCRyTwNPfj"}
-- **Rolled back**
-
----
-
-**[AUTO-SCORED] Iteration 473: predicted 15 turns, actual 11 turns, ratio 0.73**
+**[AUTO-SCORED] Iteration 475: predicted 15 turns, actual 14 turns, ratio 0.93**

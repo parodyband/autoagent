@@ -1,86 +1,3 @@
-[2026-04-08T07:42:40.541Z] iter=453 turn=4 INFO: Turn 4/25
-[2026-04-08T07:42:44.198Z] iter=453 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getToolTimings" src/tui.tsx 2>/dev/null | head -5
-[2026-04-08T07:42:44.200Z] iter=453 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/*.ts src/*.tsx src/**/*.ts 2>/dev/null | tail -5
-[2026-04-08T07:42:44.211Z] iter=453 turn=4 INFO:   -> exit=0 (11 chars)
-[2026-04-08T07:42:44.222Z] iter=453 turn=4 INFO:   -> exit=0 (141 chars)
-[2026-04-08T07:42:44.223Z] iter=453 turn=5 INFO: Turn 5/25
-[2026-04-08T07:42:57.718Z] iter=453 turn=5 INFO: think: Evaluation of iter 452:
-- ✅ Tool profiling: toolTimings Map added to orchestrator, getToolTimings() exported, wired into...
-[2026-04-08T07:42:57.719Z] iter=453 turn=6 INFO: Turn 6/25
-[2026-04-08T07:43:02.018Z] iter=453 turn=6 INFO: Agent: 
-
-Status: I'm the Architect — my deliverable is writing goals.md for the next Engineer iteration. NOT STARTED yet. Let me produce it now, then do quick research.
-[2026-04-08T07:43:02.018Z] iter=453 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5
-[2026-04-08T07:43:03.107Z] iter=453 turn=6 INFO:   -> exit=0 (11 chars)
-[2026-04-08T07:43:03.107Z] iter=453 turn=7 INFO: Turn 7/25
-[2026-04-08T07:43:07.239Z] iter=453 turn=7 INFO: Agent: TypeScript clean. Now let me do quick research and write goals.
-[2026-04-08T07:43:07.239Z] iter=453 turn=7 INFO: web_search: "coding agent multi-file edit transaction rollback 2024 2025"
-[2026-04-08T07:43:07.258Z] iter=453 turn=7 INFO: web_search: "Claude Code aider coding agent checkpoint undo architecture"
-[2026-04-08T07:43:08.153Z] iter=453 turn=7 INFO:   -> 8 results
-[2026-04-08T07:43:08.154Z] iter=453 turn=7 INFO:   -> 8 results
-[2026-04-08T07:43:08.155Z] iter=453 turn=8 INFO: Turn 8/25
-[2026-04-08T07:43:11.747Z] iter=453 turn=8 INFO: web_fetch: https://code.claude.com/docs/en/checkpointing
-[2026-04-08T07:43:12.004Z] iter=453 turn=8 INFO:   -> ok (40619 chars)
-[2026-04-08T07:43:12.004Z] iter=453 turn=9 INFO: Turn 9/25
-[2026-04-08T07:43:44.516Z] iter=453 turn=9 INFO: Agent: Good research. Key insight from Claude Code: **checkpointing creates automatic snapshots before each edit, with rewind UI**. This is exactly the "multi-file edit transactions" pattern we need. Now let me write the goals file.
-[2026-04-08T07:43:44.516Z] iter=453 turn=9 INFO: write_file: goals.md (write)
-[2026-04-08T07:43:44.518Z] iter=453 turn=9 INFO:   -> ok: Updated goals.md (3790 chars, +37 lines delta)
-[2026-04-08T07:43:44.518Z] iter=453 turn=10 INFO: Turn 10/25
-[2026-04-08T07:43:51.601Z] iter=453 turn=10 INFO: Agent: 
-
-I'm the Architect — my job is NOT to change src/, it's to evaluate and write goals.md for the Engineer. Goals.md is DONE. Let me wrap up now.
-[2026-04-08T07:43:51.601Z] iter=453 turn=10 INFO: save_memory: "[Architect] Iteration 453 evaluation"
-[2026-04-08T07:43:51.602Z] iter=453 turn=10 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T07:43:51.602Z] iter=453 turn=11 INFO: Turn 11/25
-[2026-04-08T07:43:57.723Z] iter=453 turn=11 INFO: save_memory: "[Research] Claude Code checkpointing architecture (iter 453)"
-[2026-04-08T07:43:57.724Z] iter=453 turn=11 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T07:43:57.725Z] iter=453 turn=12 INFO: Turn 12/25
-[2026-04-08T07:44:01.718Z] iter=453 turn=12 INFO: save_memory: "[Architect] Product roadmap update iter 453"
-[2026-04-08T07:44:01.720Z] iter=453 turn=12 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T07:44:01.720Z] iter=453 turn=13 INFO: Turn 13/25
-[2026-04-08T07:44:05.506Z] iter=453 turn=13 INFO: Agent: 
-
-All deliverables done. Wrapping up.
-[2026-04-08T07:44:05.506Z] iter=453 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5
-[2026-04-08T07:44:06.673Z] iter=453 turn=13 INFO:   -> exit=0 (11 chars)
-[2026-04-08T07:44:06.673Z] iter=453 turn=14 INFO: Turn 14/25
-[2026-04-08T07:44:09.807Z] iter=453 turn=14 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T07:44:09.808Z] iter=453 turn=14 INFO: RESTART signal
-[2026-04-08T07:44:09.809Z] iter=453 turn=14 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T07:44:10.974Z] iter=453 turn=14 INFO: Compilation OK
-[2026-04-08T07:44:20.061Z] iter=453 turn=14 INFO: Cache persisted: 61 entries to .autoagent-cache.json
-[2026-04-08T07:44:20.062Z] iter=453 turn=14 INFO: Cache stats: 0 hits, 1 misses, 61 entries, 1 invalidations (0 entries removed)
-[2026-04-08T07:44:20.062Z] iter=453 turn=14 INFO: Tool cache stats
-[2026-04-08T07:44:20.062Z] iter=453 turn=14 INFO: Tool timing: bash: 9x, avg=266ms, total=2393ms; web_search: 2x, avg=906ms, total=1811ms; web_fetch: 1x, avg=257ms, total=257ms; save_memory: 3x, avg=2ms, total=5ms; read_file: 1x, avg=4ms, total=4ms; write_file: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms
-[2026-04-08T07:44:20.062Z] iter=453 turn=14 INFO: Tool timing stats
-[2026-04-08T07:44:27.884Z] iter=453 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 453: predicted 15 turns, actual 14 turns, ratio 0.93**
-[2026-04-08T07:44:27.907Z] iter=453 turn=14 INFO: Pre-commit review: no significant code changes to review
-[2026-04-08T07:46:02.738Z] iter=454 turn=1 INFO: Rolled back to pre-iteration-454
-[2026-04-08T07:46:02.738Z] iter=454 turn=1 INFO: Failure recorded. Restarting...
-[2026-04-08T07:46:02.935Z] iter=455 1/3 consecutive failures
-[2026-04-08T07:46:02.939Z] iter=455 INFO: Cache restored: 60/61 entries (1 stale)
-[2026-04-08T07:46:02.941Z] iter=455 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=15)
-[2026-04-08T07:46:02.941Z] iter=455 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-08T07:46:03.134Z] iter=455 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-08T07:46:03.135Z] iter=455 turn=1 INFO: Turn 1/25
-[2026-04-08T07:46:13.700Z] iter=455 turn=1 INFO: Agent: 
-
-I need to assess the current state of the system as Meta expert before executing. Let me review what's happening.
-[2026-04-08T07:46:13.701Z] iter=455 turn=1 INFO: think: Let me analyze the situation:
-
-1. I'm the Meta expert for iteration 454 (which failed due to a 529 overload error and wa...
-[2026-04-08T07:46:13.702Z] iter=455 turn=2 INFO: Turn 2/25
-[2026-04-08T07:46:16.905Z] iter=455 turn=2 INFO: $ cat .autoagent-state.json 2>/dev/null
-[2026-04-08T07:46:16.909Z] iter=455 turn=2 INFO: $ cat .expert-rotation.json 2>/dev/null
-[2026-04-08T07:46:16.911Z] iter=455 turn=2 INFO: $ cat .autoagent-metrics.json 2>/dev/null | head -100
-[2026-04-08T07:46:16.916Z] iter=455 turn=2 INFO:   -> exit=0 (290 chars)
-[2026-04-08T07:46:16.919Z] iter=455 turn=2 INFO:   -> exit=0 (1297 chars)
-[2026-04-08T07:46:16.922Z] iter=455 turn=2 INFO:   -> exit=0 (2117 chars)
-[2026-04-08T07:46:16.923Z] iter=455 turn=3 INFO: Turn 3/25
-[2026-04-08T07:46:23.391Z] iter=455 turn=3 INFO: Agent: 
-
-You're right. Let me focus on my Meta deliverables:
-
 1. **Compact memory** - it's getting cluttered
 2. **Assess system health** - are we shipping product or spinning?
 3. **Write goals.md** for next iteration (Engineer)
@@ -1078,3 +995,91 @@ I'm the **Architect** — my deliverable is goals.md + research + memory, not sr
 [2026-04-08T08:16:22.125Z] iter=473 turn=11 INFO: Tool timing stats
 [2026-04-08T08:16:30.079Z] iter=473 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 473: predicted 15 turns, actual 11 turns, ratio 0.73**
 [2026-04-08T08:16:30.102Z] iter=473 turn=11 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T08:17:25.131Z] iter=474 turn=2 INFO: Rolled back to pre-iteration-474
+[2026-04-08T08:17:25.132Z] iter=474 turn=2 INFO: Failure recorded. Restarting...
+[2026-04-08T08:17:25.335Z] iter=475 1/3 consecutive failures
+[2026-04-08T08:17:25.338Z] iter=475 INFO: Cache restored: 61/61 entries (0 stale)
+[2026-04-08T08:17:25.340Z] iter=475 INFO: Turn budget: 15/25 (calibration=0.88x, predicted=15)
+[2026-04-08T08:17:25.341Z] iter=475 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-08T08:17:25.545Z] iter=475 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T08:17:25.546Z] iter=475 turn=1 INFO: Turn 1/25
+[2026-04-08T08:17:35.642Z] iter=475 turn=1 INFO: Agent: 
+
+I need to assess the current state of the system as Meta expert before making any changes.
+[2026-04-08T08:17:35.643Z] iter=475 turn=1 INFO: think: Let me analyze the situation:
+
+1. Last 5 iterations (465-473): avg 11 turns, LOC stalls: 3, 3/4 recent iterations had ze...
+[2026-04-08T08:17:35.645Z] iter=475 turn=2 INFO: Turn 2/25
+[2026-04-08T08:17:38.481Z] iter=475 turn=2 INFO: $ cat .autoagent-state.json
+[2026-04-08T08:17:38.487Z] iter=475 turn=2 INFO: $ cat .expert-rotation.json
+[2026-04-08T08:17:38.491Z] iter=475 turn=2 INFO: $ cat .autoagent-metrics.json | head -80
+[2026-04-08T08:17:38.499Z] iter=475 turn=2 INFO:   -> exit=0 (290 chars)
+[2026-04-08T08:17:38.501Z] iter=475 turn=2 INFO:   -> exit=0 (1297 chars)
+[2026-04-08T08:17:38.506Z] iter=475 turn=2 INFO:   -> exit=0 (1679 chars)
+[2026-04-08T08:17:38.507Z] iter=475 turn=3 INFO: Turn 3/25
+[2026-04-08T08:17:48.027Z] iter=475 turn=3 INFO: think: As Meta expert, my deliverables are:
+1. Assess if the system is making progress or churning
+2. Compact memory if clutter...
+[2026-04-08T08:17:48.029Z] iter=475 turn=4 INFO: Turn 4/25
+[2026-04-08T08:17:54.876Z] iter=475 turn=4 INFO: Agent: The critical finding: **No Engineer has run since iteration 452** — 23 iterations ago! The rotation has been Meta↔Architect for 23 straight iterations. The product is not improving because nobody ships code. This is the #1 systemic issue.
+
+My deliverables:
+1. Fix expert rotation to force Engineer next
+2. Compact memory 
+3. Write goals.md targeting Engineer with the already-specced features
+
+Let me...
+[2026-04-08T08:17:54.877Z] iter=475 turn=4 INFO: $ cat .expert-rotation.json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for h in data['history'][-15:]:
+    print(f\"  iter {h['iteration']}: {h['expert']}\")"
+[2026-04-08T08:17:54.881Z] iter=475 turn=4 INFO: $ cat src/finalization.ts | grep -n "expert\|rotation\|Engineer\|Architect\|Meta" | head -40
+[2026-04-08T08:17:54.904Z] iter=475 turn=4 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:17:54.935Z] iter=475 turn=4 INFO:   -> exit=0 (293 chars)
+[2026-04-08T08:17:54.936Z] iter=475 turn=5 INFO: Turn 5/25
+[2026-04-08T08:17:57.845Z] iter=475 turn=5 INFO: grep: "expert.*rotation|rotation.*expert|nextExpert|chooseExpert|selectExpert" in src
+[2026-04-08T08:17:57.893Z] iter=475 turn=5 INFO:   -> 0 matches
+[2026-04-08T08:17:57.893Z] iter=475 turn=6 INFO: Turn 6/25
+[2026-04-08T08:18:03.871Z] iter=475 turn=6 INFO: think: As Meta expert, my goals from the orientation are:
+1. Assess if system is building product or itself - DONE (found the c...
+[2026-04-08T08:18:03.872Z] iter=475 turn=7 INFO: Turn 7/25
+[2026-04-08T08:18:07.591Z] iter=475 turn=7 INFO: $ grep -rn "expert\|rotation\|Engineer\|Architect\|Meta" scripts/ 2>/dev/null | head -30
+[2026-04-08T08:18:07.593Z] iter=475 turn=7 INFO: $ grep -rn "expert-rotation\|chooseExpert\|nextExpert\|rotation" src/ --include="*.ts" | head -20
+[2026-04-08T08:18:07.613Z] iter=475 turn=7 INFO:   -> exit=0 (2801 chars)
+[2026-04-08T08:18:07.645Z] iter=475 turn=7 INFO:   -> exit=0 (732 chars)
+[2026-04-08T08:18:07.646Z] iter=475 turn=8 INFO: Turn 8/25
+[2026-04-08T08:18:10.339Z] iter=475 turn=8 INFO: read_file: src/experts.ts
+[2026-04-08T08:18:10.340Z] iter=475 turn=8 INFO:   -> ok (2492 chars)
+[2026-04-08T08:18:10.340Z] iter=475 turn=9 INFO: Turn 9/25
+[2026-04-08T08:18:13.002Z] iter=475 turn=9 INFO: $ grep -n "BUILTIN_EXPERTS" src/experts.ts | head -5
+[2026-04-08T08:18:13.018Z] iter=475 turn=9 INFO:   -> exit=0 (121 chars)
+[2026-04-08T08:18:13.019Z] iter=475 turn=10 INFO: Turn 10/25
+[2026-04-08T08:18:22.118Z] iter=475 turn=10 INFO: think: OK, I now understand the rotation system. BUILTIN_EXPERTS = [ENGINEER, ARCHITECT, ENGINEER, META], so:
+- iteration % 4 =...
+[2026-04-08T08:18:22.119Z] iter=475 turn=11 INFO: Turn 11/25
+[2026-04-08T08:18:57.588Z] iter=475 turn=11 INFO: Agent: Good — the rotation is correct (Engineer is next at 476). The real problem: iterations 472 and 474 (both Engineers) failed due to API overload, not rotation bugs. My job: compact memory, write tight Engineer goals, get out fast.
+[2026-04-08T08:18:57.589Z] iter=475 turn=11 INFO: write_file: memory.md (write)
+[2026-04-08T08:18:57.591Z] iter=475 turn=11 INFO:   -> ok: Updated memory.md (3840 chars, -13 lines delta)
+[2026-04-08T08:18:57.592Z] iter=475 turn=12 INFO: Turn 12/25
+[2026-04-08T08:29:15.743Z] iter=475 turn=12 INFO: write_file: goals.md (write)
+[2026-04-08T08:29:15.744Z] iter=475 turn=12 INFO:   -> ok: Updated goals.md (2502 chars, +7 lines delta)
+[2026-04-08T08:29:15.744Z] iter=475 turn=13 INFO: Turn 13/25
+[2026-04-08T08:29:18.712Z] iter=475 turn=13 INFO: Agent: 
+
+Memory and goals already written. Wrapping up now.
+[2026-04-08T08:29:18.714Z] iter=475 turn=13 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T08:29:19.898Z] iter=475 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:29:19.898Z] iter=475 turn=14 INFO: Turn 14/25
+[2026-04-08T08:29:23.729Z] iter=475 turn=14 INFO: Agent: TypeScript clean. Done.
+[2026-04-08T08:29:23.730Z] iter=475 turn=14 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T08:29:23.730Z] iter=475 turn=14 INFO: RESTART signal
+[2026-04-08T08:29:23.731Z] iter=475 turn=14 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T08:29:24.935Z] iter=475 turn=14 INFO: Compilation OK
+[2026-04-08T08:29:34.009Z] iter=475 turn=14 INFO: Cache persisted: 63 entries to .autoagent-cache.json
+[2026-04-08T08:29:34.009Z] iter=475 turn=14 INFO: Cache stats: 0 hits, 2 misses, 63 entries, 2 invalidations (0 entries removed)
+[2026-04-08T08:29:34.009Z] iter=475 turn=14 INFO: Tool cache stats
+[2026-04-08T08:29:34.009Z] iter=475 turn=14 INFO: Tool timing: bash: 10x, avg=141ms, total=1408ms; grep: 1x, avg=48ms, total=48ms; think: 4x, avg=1ms, total=4ms; write_file: 2x, avg=2ms, total=4ms; read_file: 1x, avg=1ms, total=1ms
+[2026-04-08T08:29:34.009Z] iter=475 turn=14 INFO: Tool timing stats
+[2026-04-08T08:29:42.236Z] iter=475 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 475: predicted 15 turns, actual 14 turns, ratio 0.93**
+[2026-04-08T08:29:42.260Z] iter=475 turn=14 INFO: Pre-commit review: no significant code changes to review
