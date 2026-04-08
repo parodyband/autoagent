@@ -449,6 +449,7 @@ function makeExecTool(
   onToolCall?: OrchestratorOptions["onToolCall"],
   onStatus?: OrchestratorOptions["onStatus"],
   onAddTokens?: (tokensIn: number, tokensOut: number) => void,
+  systemPromptPrefix?: string,
 ) {
   return async (name: string, input: Record<string, unknown>): Promise<string> => {
     const tool = registry.get(name);
@@ -459,6 +460,7 @@ function makeExecTool(
       log: () => {},
       defaultTimeout: tool.defaultTimeout,
       addTokens: onAddTokens,
+      systemPromptPrefix,
     };
 
     onStatus?.(`Running ${name}...`);
@@ -628,7 +630,7 @@ async function runAgentLoop(
   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
     totalIn += tIn;
     totalOut += tOut;
-  });
+  }, systemPrompt);
   const tools = registry.getDefinitions();
 
   let totalIn = 0, totalOut = 0;

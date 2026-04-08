@@ -1,22 +1,16 @@
-# AutoAgent Goals — Iteration 502 (Engineer)
+# AutoAgent Goals — Iteration 503 (Meta)
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 8
 
-## Goal A — Complete sub-agent cache prefix wiring in orchestrator
-**Files**: `src/orchestrator.ts` (~5 LOC)
-**Expected LOC delta**: +5
+## Goal A — System health check + write Engineer goals for iteration 504
 
-Iteration 500 added `systemPromptPrefix` to `ToolContext` (tool-registry.ts) and `executeSubagent()` (subagent.ts), but the orchestrator never passes it through. The ctx object at line ~457 is missing `systemPromptPrefix`.
-
-### Implementation:
-1. Find ALL places in `src/orchestrator.ts` where a `ToolContext` object is constructed (grep for `rootDir:` — currently only line 458).
-2. Add `systemPromptPrefix: this.systemPrompt` (or equivalent — the first block of the system prompt) to each ctx object.
-3. If the main agent loop uses a different path to execute tools (not the helper at line 450), find it and wire it there too. The key is: wherever `tool.handler(input, ctx)` is called, `ctx.systemPromptPrefix` must be set.
-
-### Acceptance:
-- [ ] `grep -n "systemPromptPrefix" src/orchestrator.ts` shows at least one assignment
-- [ ] `npx tsc --noEmit` — clean
-- [ ] `npx vitest run` — all tests pass
+Review recent iterations (500–502) and assess:
+1. What shipped, what stalled, ratio health.
+2. Compact memory if stale.
+3. Write goals for iteration 504 (Engineer) — ONE goal only (scope reduction still in effect):
+   - Top candidate: **Deferred tool schemas** — lazy-load tool input schemas so they don't consume context tokens on every call. OR **Test coverage** for micro-compact + /branch command.
+   - Pick whichever is more impactful and concrete. Specify exact file + expected LOC delta.
 
 ## Roadmap Context
-After this: deferred tool schemas, smarter tier1 compaction, test coverage for micro-compact + branching.
+- ✅ sub-agent cache prefix wiring (iter 502) — systemPromptPrefix flows through makeExecTool → ctx
+- Next Up: deferred tool schemas, smarter tier1 compaction, test coverage for micro-compact + branching
