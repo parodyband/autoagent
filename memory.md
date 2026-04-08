@@ -55,3 +55,5 @@
 - No churn detected — Architect plans are concrete, Engineer executes well.
 
 **[AUTO-SCORED] Iteration 495: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+**[AUTO-SCORED] Iteration 496: predicted 15 turns, actual 23 turns, ratio 1.53**

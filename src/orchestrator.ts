@@ -23,6 +23,7 @@ import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decompos
 import { runVerification, formatVerificationResults } from "./verification.js";
 import { createDefaultRegistry, buildSearchIndex } from "./tool-registry.js";
 import { getProjectMemoryBlock, saveToLocalMemory } from "./project-memory.js";
+import { getSkillsMenu } from "./skills.js";
 import { CostTracker } from "./cost-tracker.js";
 import { checkpointManager } from "./checkpoint.js";
 import {
@@ -338,11 +339,14 @@ export function buildSystemPrompt(
     } catch { /* non-fatal */ }
   }
 
+  const skillsMenu = getSkillsMenu(workDir);
+  const skillsBlock = skillsMenu ? `\n\n${skillsMenu}` : "";
+
   const systemPrompt = `${userSystemPromptPrefix}You are an expert coding assistant with direct access to the filesystem and shell.
 
 Working directory: ${workDir}
 
-You have these tools: bash, read_file, write_file, grep, web_search, semantic_search.
+You have these tools: bash, read_file, write_file, grep, web_search, semantic_search, load_skill, tool_search.
 
 Rules:
 - Be concise and action-oriented. Do the thing, show the result.
@@ -353,7 +357,7 @@ Rules:
 - To persist instructions for future sessions, ask the user to say "remember: ..." or use the save_memory tool.
 - For complex multi-step tasks, use save_scratchpad to record your plan, progress, and key findings. Use read_scratchpad after context compaction to recover working state.
 
-${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}`;
+${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}${skillsBlock}`;
 
   return { systemPrompt, repoMapBlock, rawRepoMap };
 }

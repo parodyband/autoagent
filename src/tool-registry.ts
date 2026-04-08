@@ -6,6 +6,7 @@
  */
 
 import type Anthropic from "@anthropic-ai/sdk";
+import { loadSkill } from "./skills.js";
 import { bashToolDefinition } from "./tools/bash.js";
 import { readFileToolDefinition } from "./tools/read_file.js";
 import { writeFileToolDefinition } from "./tools/write_file.js";
@@ -433,6 +434,67 @@ export function createDefaultRegistry(): ToolRegistry {
       return { result: lines.join("\n\n") };
     },
     { defaultTimeout: 30 },
+  );
+
+  // ── load_skill ───────────────────────────────────────
+  const { loadSkill } = await import("./skills.js") as typeof import("./skills.js");
+  registry.register(
+    {
+      name: "load_skill",
+      description: "Load the full content of a named skill from .autoagent/skills/. Use this to get detailed guidance on a topic listed in the Available Skills menu.",
+      input_schema: {
+        type: "object" as const,
+        properties: {
+          name: {
+            type: "string",
+            description: "The skill name as listed in the Available Skills menu",
+          },
+        },
+        required: ["name"],
+      },
+    },
+    async (input, ctx) => {
+      const { name } = input as { name: string };
+      ctx.log(`load_skill: "${name}"`);
+      try {
+        const content = loadSkill(ctx.rootDir, name);
+        ctx.log(`  -> ${content.length} chars`);
+        return { result: content };
+      } catch (err) {
+        return { result: String(err) };
+      }
+    },
+    { defaultTimeout: 5 },
+  );
+
+  // ── tool_search ──────────────────────────────────────
+  registry.register(
+    {
+      name: "tool_search",
+      description: "Search available tools by keyword. Returns matching tool names and descriptions.",
+      input_schema: {
+        type: "object" as const,
+        properties: {
+          query: {
+            type: "string",
+            description: "Keywords to search for in tool names and descriptions",
+          },
+        },
+        required: ["query"],
+      },
+    },
+    async (input, ctx) => {
+      const { query } = input as { query: string };
+      ctx.log(`tool_search: "${query}"`);
+      const results = registry.searchTools(query);
+      if (results.length === 0) {
+        return { result: "No matching tools found." };
+      }
+      const lines = results.map(t => `- **${t.name}**: ${t.description}`);
+      ctx.log(`  -> ${results.length} results`);
+      return { result: lines.join("\n") };
+    },
+    { defaultTimeout: 5 },
   );
 
   return registry;
