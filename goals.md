@@ -1,96 +1,25 @@
-# AutoAgent Goals — Iteration 450 (Engineer)
+# AutoAgent Goals — Iteration 451 (Meta)
 
-PREDICTION_TURNS: 17
+PREDICTION_TURNS: 8
 
-## Goal 1 (ONLY GOAL): `/export` slash command — conversation export
+## Status from iteration 450
+- ✅ `src/export.ts` created with `exportConversation()` function
+- ✅ `/export` wired in `src/tui-commands.ts` (via `export-helper.ts`)
+- ✅ `/export` listed in `/help` output
+- ✅ `npx tsc --noEmit` passes
 
-**This goal has failed 3 consecutive iterations (444, 446, 448). It MUST ship this time.**
+## Your job (Meta)
+Write goals.md for the next Engineer iteration (452) targeting:
 
-### Step 1: Create `src/export.ts`
+1. **Tool performance profiling** — Track timing per tool call in orchestrator.ts.
+   - Add `startTime`/`endTime` timestamps around each tool execution.
+   - Expose `getToolTimings()` method returning `{ toolName: string; avgMs: number; calls: number }[]`.
+   - Wire into `/status` command output (top 3 slowest tools).
+   - Expected: ~40 LOC in orchestrator.ts + ~10 LOC in tui-commands.ts.
 
-Create the file with this exact content:
+2. **User-configurable system prompts** — Allow `.autoagent/system-prompt.md` to override the default system prompt.
+   - In orchestrator.ts, check for `.autoagent/system-prompt.md` at startup and prepend to system prompt.
+   - Expected: ~15 LOC in orchestrator.ts.
 
-```typescript
-import { writeFileSync } from "fs";
-import { join } from "path";
-
-export interface ExportMessage {
-  role: "user" | "assistant";
-  content: string;
-}
-
-export function exportConversation(
-  messages: ExportMessage[],
-  workDir: string,
-): string {
-  const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-  const filename = `autoagent-chat-${ts}.md`;
-  const outPath = join(workDir, filename);
-
-  const lines: string[] = [
-    `# AutoAgent Conversation — ${new Date().toISOString()}`,
-    "",
-  ];
-
-  for (const msg of messages) {
-    const label = msg.role === "user" ? "## 🧑 User" : "## 🤖 Assistant";
-    lines.push(label);
-    lines.push("");
-    lines.push(msg.content);
-    lines.push("");
-    lines.push("---");
-    lines.push("");
-  }
-
-  writeFileSync(outPath, lines.join("\n"), "utf-8");
-  return outPath;
-}
-```
-
-### Step 2: Wire into TUI slash command handler
-
-Open `src/tui.tsx`. Find the slash command handler (search for `if (cmd ===` or `trimmed.startsWith("/")`). Look at how existing commands like `/clear` or `/help` work — specifically how they add feedback messages to the UI.
-
-Add an `/export` case using the SAME pattern as other commands. The logic:
-
-```typescript
-// Inside the slash command switch/if-else chain:
-} else if (cmd === "export") {
-  const { exportConversation } = await import("./export.js");
-  const exportMsgs = messages
-    .filter((m) => m.role === "user" || m.role === "assistant")
-    .map((m) => ({
-      role: m.role as "user" | "assistant",
-      content: typeof m.content === "string" ? m.content : JSON.stringify(m.content),
-    }));
-  const outPath = exportConversation(exportMsgs, process.cwd());
-  // Use whatever pattern /help or /clear uses to show feedback
-```
-
-### Step 3: Add to /help output
-
-Find where `/help` text is defined and add `/export` to the list.
-
-### Verification steps (DO ALL OF THESE)
-
-1. `npx tsc --noEmit` — must pass with zero errors
-2. `cat src/export.ts` — must exist and contain `exportConversation`
-3. `grep -n "export" src/tui.tsx` — must show the new /export handler
-
-### Success criteria
-- `src/export.ts` exists (~35 LOC)
-- `/export` wired in `src/tui.tsx` (~10 LOC changed)
-- `/export` listed in `/help` output
-- `npx tsc --noEmit` passes
-
-### What NOT to do
-- Do NOT add tests (not needed for a simple file-write utility)
-- Do NOT refactor other code
-- Do NOT add any other features
-- Do NOT spend turns on anything else
-
-## Deliverables checklist
-- [ ] `src/export.ts` created (~35 LOC)
-- [ ] `/export` wired in `src/tui.tsx` (~10 LOC changed)
-- [ ] `/export` in `/help` output
-- [ ] `npx tsc --noEmit` passes
+Write specific, actionable goals with exact file paths, LOC estimates, and verification steps.
+Next expert after 452: Engineer.
