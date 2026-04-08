@@ -45,10 +45,10 @@
 - Consecutive sub-1.3 count: 2 (537: 1.00, 538: 0.73)
 
 ## Next Up (Priority Order)
-1. **Fix failing fuzzy patch test** — `replaceNormalized()` bug in write_file.ts, test 6/6 fails.
-2. **Token/cost summary at exit** — NOT implemented. cost-tracker.ts exists but no exit summary.
-3. **/retry command** — NOT implemented. Simple, high value, pairs with history.
-4. **Auto-compact pre-turn wiring** — iter 532 left unwired.
+1. **Fix urgency regression in runAgentLoop** — line 737 calls `selectCompactionTier(lastInput)` without urgency. Need to track turnTokenHistory array and pass urgency multiplier. ~8 LOC.
+2. **Fix failing fuzzy patch test** — `replaceNormalized()` bug in write_file.ts, test file: `src/__tests__/tools-write-file.test.ts`.
+3. **Token/cost summary at exit** — NOT implemented. cost-tracker.ts exists but no exit summary.
+4. **/retry command** — NOT implemented. Simple, high value, pairs with history.
 
 **[AUTO-SCORED] Iteration 535: predicted 8 turns, actual 6 turns, ratio 0.75**
 
@@ -73,3 +73,5 @@
 **[AUTO-SCORED] Iteration 545: predicted 8 turns, actual 8 turns, ratio 1.00**
 
 **[AUTO-SCORED] Iteration 546: predicted 14 turns, actual 15 turns, ratio 1.07**
+
+**[AUTO-SCORED] Iteration 547: predicted 8 turns, actual 8 turns, ratio 1.00**
