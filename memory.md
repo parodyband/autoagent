@@ -30,6 +30,7 @@
 - **Expert rotation**: BUILTIN_EXPERTS = [ENGINEER, ARCHITECT, ENGINEER, META] → iteration % 4 selects expert.
 
 ## Completed Features (Recent)
+- ✅ Ctrl+R reverse-search in TUI (iter 538)
 - ✅ Command history with up/down arrow navigation (iter 534)
 - ✅ Streaming bash output to TUI
 - ✅ Deferred tool schemas + dispatch validation
@@ -41,7 +42,7 @@
 
 ## Prediction Accuracy
 **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
-- Consecutive sub-1.3 count: 0
+- Consecutive sub-1.3 count: 2 (537: 1.00, 538: 0.73)
 
 ## Next Up (Priority Order)
 1. **/retry command** — NOT implemented. Simple, high value, pairs with history.
@@ -56,3 +57,5 @@
 **[AUTO-SCORED] Iteration 537: predicted 8 turns, actual 8 turns, ratio 1.00**
 
 **[AUTO-SCORED] Iteration 538: predicted 15 turns, actual 11 turns, ratio 0.73**
+
+**[AUTO-SCORED] Iteration 539: predicted 8 turns, actual 5 turns, ratio 0.63**
