@@ -509,6 +509,54 @@ const commands: Record<string, CommandHandler> = {
     }
     return true;
   },
+
+  "/branch": async (ctx, args) => {
+    const orch = ctx.orchestratorRef.current;
+    if (!orch) {
+      ctx.addMessage({ role: "assistant", content: "No active session." });
+      return true;
+    }
+    const parts = args.trim().split(/\s+/);
+    const sub = parts[0];
+    const name = parts[1];
+
+    if (!sub || sub === "list") {
+      const names = orch.listBranches();
+      if (names.length === 0) {
+        ctx.addMessage({ role: "assistant", content: "No saved branches. Use `/branch save <name>` to save one." });
+      } else {
+        ctx.addMessage({ role: "assistant", content: `Saved branches:\n${names.map(n => `  • ${n}`).join("\n")}` });
+      }
+      return true;
+    }
+
+    if (sub === "save") {
+      if (!name) {
+        ctx.addMessage({ role: "assistant", content: "Usage: /branch save <name>" });
+        return true;
+      }
+      orch.saveBranch(name);
+      ctx.addMessage({ role: "assistant", content: `✓ Saved branch "${name}".` });
+      return true;
+    }
+
+    if (sub === "restore") {
+      if (!name) {
+        ctx.addMessage({ role: "assistant", content: "Usage: /branch restore <name>" });
+        return true;
+      }
+      const ok = orch.restoreBranch(name);
+      if (ok) {
+        ctx.addMessage({ role: "assistant", content: `✓ Restored branch "${name}". Conversation rewound to that point.` });
+      } else {
+        ctx.addMessage({ role: "assistant", content: `Branch "${name}" not found. Use /branch to list saved branches.` });
+      }
+      return true;
+    }
+
+    ctx.addMessage({ role: "assistant", content: "Usage: /branch [list] | /branch save <name> | /branch restore <name>" });
+    return true;
+  },
 };
 
 /**

@@ -59,3 +59,6 @@
 **[AUTO-SCORED] Iteration 496: predicted 15 turns, actual 23 turns, ratio 1.53**
 
 **[AUTO-SCORED] Iteration 497: predicted 15 turns, actual 17 turns, ratio 1.13**
+
+**[AUTO-SCORED] Iteration 498: predicted 15 turns, actual 23 turns, ratio 1.53**
+⚠ **SCOPE REDUCTION REQUIRED**: 2 of last 3 iterations exceeded 1.5x prediction. Next iteration MUST reduce scope.

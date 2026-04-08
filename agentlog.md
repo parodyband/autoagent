@@ -1,98 +1,3 @@
-1455 |         }),
-1456 |         { maxRetries: 2, baseDelayMs: 1000, retryableStatuses: [429, 529] }
-1457 |       );
-1458 |       const block = response.content[0];
-1459 |       raw = block.type === "text" ? block.text.trim() : "";
-1460 |     } catch {
-1461 |       return null; // API failure is non-fatal
-1462 |     }
-[2026-04-08T08:57:20.971Z] iter=490 turn=11 INFO: Turn 11/25
-[2026-04-08T08:57:30.234Z] iter=490 turn=11 INFO: Agent: Now fix task-planner.ts to use Promise.allSettled:
-[2026-04-08T08:57:30.234Z] iter=490 turn=11 INFO: write_file: src/task-planner.ts (patch)
-[2026-04-08T08:57:30.236Z] iter=490 turn=11 INFO:   -> ok: Patched src/task-planner.ts: -27 +40 lines
-
-Context after patch:
-165 |       break;
-166 |     }
-167 | 
-168 |     // Mark all ready tasks as in-progress before launching them in parallel
-169 |     for (const task of ready) {
-170 |       task.status = "in-progress";
-171 |       onUpdate?.(task, currentPlan);
-172 |     }
-173 | 
-174 |     // Execute independent tasks in parallel
-175 |     const results = await Promise.allSettled(
-176 |       ready.map((task) => executor(task).then((result) => ({ task, result })))
-177 |     );
-178 | 
-179 |     let failed = false;
-180 |     for (const outcome of results) {
-181 |       if (outcome.status === "fulfilled") {
-182 |         const { task, result } = outcome.value;
-183 |         task.status = "done";
-184 |         task.result = result;
-185 |         onUpdate?.(task, currentPlan);
-186 |       } else {
-187 |         // Find the corresponding task by matching against ready array
-188 |         const idx = results.indexOf(outcome);
-189 |         const task = ready[idx];
-190 |         task.status = "failed";
-191 |         task.error = outcome.reason instanceof Error ? outcome.reason.message : String(outcome.reason);
-192 |         onUpdate?.(task, currentPlan);
-193 | 
-194 |         if (onFailure) {
-195 |           const newPlan = await onFailure(currentPlan, task);
-196 |           if (newPlan) {
-197 |             currentPlan = newPlan;
-198 |             failed = true;
-199 |             break;
-200 |           }
-201 |         }
-202 |         // No callback or returned null — stop execution
-203 |         return currentPlan;
-204 |       }
-205 |     }
-206 | 
-207 |     if (failed) continue;
-208 |   }
-209 | 
-210 |   return currentPlan;
-[2026-04-08T08:57:30.237Z] iter=490 turn=12 INFO: Turn 12/25
-[2026-04-08T08:57:39.553Z] iter=490 turn=12 INFO: Agent: Now add the parallel test file and run tsc:
-[2026-04-08T08:57:39.554Z] iter=490 turn=12 INFO: write_file: src/__tests__/task-planner-parallel.test.ts (write)
-[2026-04-08T08:57:39.556Z] iter=490 turn=12 INFO:   -> ok: Created src/__tests__/task-planner-parallel.test.ts (1743 chars)
-[2026-04-08T08:57:39.557Z] iter=490 turn=13 INFO: Turn 13/25
-[2026-04-08T08:57:42.935Z] iter=490 turn=13 INFO: Agent: Running tsc and tests now:
-[2026-04-08T08:57:42.935Z] iter=490 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -40
-[2026-04-08T08:57:44.093Z] iter=490 turn=13 INFO:   -> exit=0 (11 chars)
-[2026-04-08T08:57:44.093Z] iter=490 turn=14 INFO: Turn 14/25
-[2026-04-08T08:57:47.131Z] iter=490 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/task-planner-parallel.test.ts --reporter=verbose 2>&1 | tail -20
-[2026-04-08T08:57:48.164Z] iter=490 turn=14 INFO:   -> exit=0 (662 chars)
-[2026-04-08T08:57:48.164Z] iter=490 turn=15 INFO: Turn 15/25
-[2026-04-08T08:57:52.382Z] iter=490 turn=15 INFO: Agent: The test tasks use `dependencies` but the code expects `dependsOn`. Fix the test:
-[2026-04-08T08:57:52.382Z] iter=490 turn=15 INFO: write_file: src/__tests__/task-planner-parallel.test.ts (patch)
-[2026-04-08T08:57:52.383Z] iter=490 turn=15 INFO:   -> ok: Patched src/__tests__/task-planner-parallel.test.ts: -3 +3 lines
-
-Context after patch:
-6 |   it("runs independent tasks in parallel (faster than sequential)", async () => {
-7 |     const plan: TaskPlan = {
-8 |       tasks: [
-9 |         { id: "t1", title: "Task 1", description: "", status: "pending", dependsOn: [] },
-10 |         { id: "t2", title: "Task 2", description: "", status: "pending", dependsOn: [] },
-11 |         { id: "t3", title: "Task 3", description: "", status: "pending", dependsOn: [] },
-12 |       ],
-13 |     };
-14 | 
-[2026-04-08T08:57:52.383Z] iter=490 turn=16 INFO: Turn 16/25
-[2026-04-08T08:57:55.669Z] iter=490 turn=16 INFO: write_file: src/__tests__/task-planner-parallel.test.ts (patch)
-[2026-04-08T08:57:55.670Z] iter=490 turn=16 INFO:   -> ok: Patched src/__tests__/task-planner-parallel.test.ts: -2 +2 lines
-
-Context after patch:
-6 |   it("runs independent tasks in parallel (faster than sequential)", async () => {
-7 |     const plan: TaskPlan = {
-8 |       tasks: [
-9 |         { id: "t1", title: "Task 1", description: "", status: "pending", dependsOn: [] },
 10 |         { id: "t2", title: "Task 2", description: "", status: "pending", dependsOn: [] },
 11 |         { id: "t3", title: "Task 3", description: "", status: "pending", dependsOn: [] },
 12 |       ],
@@ -1091,3 +996,262 @@ AUTOAGENT_RESTART
 [2026-04-08T19:31:27.824Z] iter=497 turn=17 INFO: Tool timing stats
 [2026-04-08T19:31:35.745Z] iter=497 turn=17 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 497: predicted 15 turns, actual 17 turns, ratio 1.13**
 [2026-04-08T19:31:38.627Z] iter=497 turn=17 INFO: Pre-commit review (930in/57out): LGTM. The context budget ratio now correctly reflects actual context window utilization using the real input token count against the model's context window size, and the `/autoaccept` command is a str
+[2026-04-08T19:31:38.716Z] iter=497 turn=17 INFO: Committed: 00edc703 (31 in / 4641 out, cache: 44594 created, 430511 read)
+[2026-04-08T19:31:38.717Z] iter=497 turn=17 INFO: Restarting as iteration 498...
+[2026-04-08T19:31:38.909Z] iter=498 INFO: Cache restored: 63/63 entries (0 stale)
+[2026-04-08T19:31:38.914Z] iter=498 INFO: Turn budget: 18/25 (calibration=1.13x, predicted=15)
+[2026-04-08T19:31:38.914Z] iter=498 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T19:31:39.135Z] iter=498 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T19:31:39.136Z] iter=498 turn=1 INFO: Turn 1/25
+[2026-04-08T19:31:44.571Z] iter=498 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && head -50 goals.md
+[2026-04-08T19:31:44.572Z] iter=498 turn=1 INFO: read_scratchpad: 450 chars
+[2026-04-08T19:31:44.581Z] iter=498 turn=1 INFO:   -> exit=0 (2398 chars)
+[2026-04-08T19:31:44.582Z] iter=498 turn=2 INFO: Turn 2/25
+[2026-04-08T19:31:47.293Z] iter=498 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "MICRO_COMPACT\|selectCompaction\|onCompact\|compactHistory\|COMPACT_TIER" src/orchestrator.ts | head -60
+[2026-04-08T19:31:47.296Z] iter=498 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "apiMessages\|branchConversation\|branch\|MessageParam" src/orchestrator.ts | head -40
+[2026-04-08T19:31:47.310Z] iter=498 turn=2 INFO:   -> exit=0 (2367 chars)
+[2026-04-08T19:31:47.311Z] iter=498 turn=2 INFO:   -> exit=0 (1416 chars)
+[2026-04-08T19:31:47.311Z] iter=498 turn=3 INFO: Turn 3/25
+[2026-04-08T19:31:49.826Z] iter=498 turn=3 INFO: read_file: src/orchestrator.ts
+[2026-04-08T19:31:49.829Z] iter=498 turn=3 INFO:   -> ok (2151 chars)
+[2026-04-08T19:31:49.830Z] iter=498 turn=4 INFO: Turn 4/25
+[2026-04-08T19:31:55.249Z] iter=498 turn=4 INFO: think: The current micro-compact already calls `scoredPrune(messages, messages.length, 10_000)`. The goal is to implement micro...
+[2026-04-08T19:31:55.250Z] iter=498 turn=5 INFO: Turn 5/25
+[2026-04-08T19:31:59.699Z] iter=498 turn=5 INFO: Agent: Now let me look at the Orchestrator class to understand where to add branch methods:
+[2026-04-08T19:31:59.699Z] iter=498 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "class Orchestrator\|private apiMessages\|branchConversation\|branches\|Map<" src/orchestrator.ts | head -30
+[2026-04-08T19:31:59.704Z] iter=498 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getRecentFiles\|rewindToTurn\|getStatus" src/orchestrator.ts | head -20
+[2026-04-08T19:31:59.724Z] iter=498 turn=5 INFO:   -> exit=0 (455 chars)
+[2026-04-08T19:31:59.725Z] iter=498 turn=5 INFO:   -> exit=0 (99 chars)
+[2026-04-08T19:31:59.726Z] iter=498 turn=6 INFO: Turn 6/25
+[2026-04-08T19:32:04.832Z] iter=498 turn=6 INFO: Agent: **Goal A (micro-compact)**: NOT STARTED — I need to patch the `onCompact` handler in orchestrator.ts  
+**Goal B (branch command)**: NOT STARTED — Need Orchestrator methods + tui-commands.ts
+
+Let me implement both now:
+[2026-04-08T19:32:04.833Z] iter=498 turn=6 INFO: read_file: src/orchestrator.ts
+[2026-04-08T19:32:04.833Z] iter=498 turn=6 INFO:   -> ok (1433 chars)
+[2026-04-08T19:32:04.834Z] iter=498 turn=7 INFO: Turn 7/25
+[2026-04-08T19:32:09.020Z] iter=498 turn=7 INFO: read_file: src/orchestrator.ts
+[2026-04-08T19:32:09.022Z] iter=498 turn=7 INFO:   -> ok (584 chars)
+[2026-04-08T19:32:09.022Z] iter=498 turn=8 INFO: Turn 8/25
+[2026-04-08T19:32:12.930Z] iter=498 turn=8 INFO: Agent: Now I have enough context. Let me implement both goals:
+[2026-04-08T19:32:12.931Z] iter=498 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T19:32:12.936Z] iter=498 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -3 +6 lines
+
+Context after patch:
+1122 |   /** Path to current session's JSONL file */
+1123 |   sessionPath: string = "";
+1124 | 
+1125 |   /** Conversation checkpoints for /rewind command. */
+1126 |   private checkpoints: ConversationCheckpoint[] = [];
+1127 |   private nextCheckpointId = 0;
+1128 | 
+1129 |   /** Named conversation branches for /branch command. */
+1130 |   private branches = new Map<string, Anthropic.MessageParam[]>();
+1131 | 
+1132 |   /** FileWatcher instance — tracks externally modified files. */
+1133 |   private fileWatcher = new FileWatcher();
+[2026-04-08T19:32:12.937Z] iter=498 turn=9 INFO: Turn 9/25
+[2026-04-08T19:32:15.902Z] iter=498 turn=9 INFO: Agent: Now add the branch methods. Let me find a good spot near the checkpoint methods:
+[2026-04-08T19:32:15.903Z] iter=498 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "rewindToCheckpoint\|createCheckpoint\|getCheckpoints" src/orchestrator.ts | head -20
+[2026-04-08T19:32:15.918Z] iter=498 turn=9 INFO:   -> exit=0 (52 chars)
+[2026-04-08T19:32:15.919Z] iter=498 turn=10 INFO: Turn 10/25
+[2026-04-08T19:32:18.345Z] iter=498 turn=10 INFO: think: I've only added the `branches` field to the Orchestrator class. I need to actually implement the branch methods and the ...
+[2026-04-08T19:32:18.346Z] iter=498 turn=11 INFO: Turn 11/25
+[2026-04-08T19:32:21.328Z] iter=498 turn=11 INFO: Agent: I've only added the `branches` field so far. Let me ship both goals now in bulk:
+[2026-04-08T19:32:21.330Z] iter=498 turn=11 INFO: read_file: src/orchestrator.ts
+[2026-04-08T19:32:21.332Z] iter=498 turn=11 INFO:   -> ok (1194 chars)
+[2026-04-08T19:32:21.332Z] iter=498 turn=12 INFO: Turn 12/25
+[2026-04-08T19:32:56.224Z] iter=498 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T19:32:56.227Z] iter=498 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -4 +22 lines
+
+Context after patch:
+1283 |     return { label: cp.label };
+1284 |   }
+1285 | 
+1286 |   /** Get all current checkpoints (most recent last). */
+1287 |   getCheckpoints(): ConversationCheckpoint[] {
+1288 |     return [...this.checkpoints];
+1289 |   }
+1290 | 
+1291 |   /** Save current conversation as a named branch. */
+1292 |   saveBranch(name: string): void {
+1293 |     this.branches.set(name, this.apiMessages.map(m => JSON.parse(JSON.stringify(m)) as Anthropic.MessageParam));
+1294 |   }
+1295 | 
+1296 |   /** Restore a named branch. Returns false if not found. */
+1297 |   restoreBranch(name: string): boolean {
+1298 |     const snapshot = this.branches.get(name);
+1299 |     if (!snapshot) return false;
+1300 |     this.apiMessages = snapshot.map(m => JSON.parse(JSON.stringify(m)) as Anthropic.MessageParam);
+1301 |     return true;
+1302 |   }
+1303 | 
+1304 |   /** List all saved branch names. */
+1305 |   listBranches(): string[] {
+1306 |     return [...this.branches.keys()];
+1307 |   }
+1308 | 
+1309 |   /** Re-index the repo (after significant changes). Uses incremental update when possible. */
+1310 |   reindex(): void {
+[2026-04-08T19:32:56.228Z] iter=498 turn=13 INFO: Turn 13/25
+[2026-04-08T19:33:04.738Z] iter=498 turn=13 INFO: Agent: Let me implement Goal A (micro-compact) and Goal B (/branch command) right now:
+[2026-04-08T19:33:04.740Z] iter=498 turn=13 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T19:33:04.744Z] iter=498 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -3 +30 lines
+
+Context after patch:
+2263 |         await this.compact();
+2264 |       } else if (tier === 'tier1') {
+2265 |         this.compactTier1();
+2266 |       } else if (tier === 'micro') {
+2267 |         // Find the indices of the last 5 assistant turns to define "recent"
+2268 |         let assistantCount = 0;
+2269 |         let cutoffIdx = messages.length;
+2270 |         for (let i = messages.length - 1; i >= 0; i--) {
+2271 |           if (messages[i].role === 'assistant') {
+2272 |             assistantCount++;
+2273 |             if (assistantCount >= 5) { cutoffIdx = i; break; }
+2274 |           }
+2275 |         }
+2276 |         // Clear tool_result content in user messages older than cutoff
+2277 |         let cleared = 0;
+2278 |         for (let i = 0; i < cutoffIdx; i++) {
+2279 |           const msg = messages[i];
+2280 |           if (msg.role !== 'user') continue;
+2281 |           const content = Array.isArray(msg.content) ? msg.content : [];
+2282 |           for (const block of content) {
+2283 |             if (block.type === 'tool_result' && block.content !== '[cleared]') {
+2284 |               if (typeof block.content === 'string' && block.content.length > 0) {
+2285 |                 (block as { type: 'tool_result'; tool_use_id: string; content: string }).content = '[cleared]';
+2286 |                 cleared++;
+2287 |               } else if (Array.isArray(block.content)) {
+2288 |                 (block as { type: 'tool_result'; tool_use_id: string; content: unknown[] }).content = [{ type: 'text', text: '[cleared]' }];
+2289 |                 cleared++;
+2290 |               }
+2291 |             }
+2292 |           }
+2293 |         }
+2294 |         process.stderr.write(`[micro-compact] cleared ${cleared} tool_result blocks (kept last 5 turns)\n`);
+2295 |       }
+2296 |       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
+2297 |     };
+2298 | 
+[2026-04-08T19:33:04.744Z] iter=498 turn=14 INFO: Turn 14/25
+[2026-04-08T19:33:09.252Z] iter=498 turn=14 INFO: Agent: Now add the `/branch` command to tui-commands.ts:
+[2026-04-08T19:33:09.253Z] iter=498 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "case 'checkpoint'\|case 'timing'\|case 'plan'\|case 'rewind'" src/tui-commands.ts | tail -10
+[2026-04-08T19:33:09.267Z] iter=498 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-08T19:33:09.267Z] iter=498 turn=15 INFO: Turn 15/25
+[2026-04-08T19:33:11.304Z] iter=498 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "checkpoint\|timing\|'rewind'" src/tui-commands.ts | tail -20
+[2026-04-08T19:33:11.315Z] iter=498 turn=15 INFO:   -> exit=0 (1372 chars)
+[2026-04-08T19:33:11.316Z] iter=498 turn=16 INFO: Turn 16/25
+[2026-04-08T19:33:15.732Z] iter=498 turn=16 INFO: Agent: Let me add the `/branch` command and then wrap up:
+[2026-04-08T19:33:15.734Z] iter=498 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && tail -30 src/tui-commands.ts
+[2026-04-08T19:33:15.752Z] iter=498 turn=16 INFO:   -> exit=0 (1382 chars)
+[2026-04-08T19:33:15.753Z] iter=498 turn=17 INFO: Turn 17/25
+[2026-04-08T19:33:25.019Z] iter=498 turn=17 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T19:33:25.023Z] iter=498 turn=17 INFO:   -> ok: Patched src/tui-commands.ts: -5 +54 lines
+
+Context after patch:
+511 |   },
+512 | };
+513 | 
+514 |   "/branch": async (ctx, args) => {
+515 |     const orch = ctx.orchestratorRef.current;
+516 |     if (!orch) {
+517 |       ctx.addMessage({ role: "assistant", content: "No active session." });
+518 |       return true;
+519 |     }
+520 |     const parts = args.trim().split(/\s+/);
+521 |     const sub = parts[0];
+522 |     const name = parts[1];
+523 | 
+524 |     if (!sub || sub === "list") {
+525 |       const names = orch.listBranches();
+526 |       if (names.length === 0) {
+527 |         ctx.addMessage({ role: "assistant", content: "No saved branches. Use `/branch save <name>` to save one." });
+528 |       } else {
+529 |         ctx.addMessage({ role: "assistant", content: `Saved branches:\n${names.map(n => `  • ${n}`).join("\n")}` });
+530 |       }
+531 |       return true;
+532 |     }
+533 | 
+534 |     if (sub === "save") {
+535 |       if (!name) {
+536 |         ctx.addMessage({ role: "assistant", content: "Usage: /branch save <name>" });
+537 |         return true;
+538 |       }
+539 |       orch.saveBranch(name);
+540 |       ctx.addMessage({ role: "assistant", content: `✓ Saved branch "${name}".` });
+541 |       return true;
+542 |     }
+543 | 
+544 |     if (sub === "restore") {
+545 |       if (!name) {
+546 |         ctx.addMessage({ role: "assistant", content: "Usage: /branch restore <name>" });
+547 |         return true;
+548 |       }
+549 |       const ok = orch.restoreBranch(name);
+550 |       if (ok) {
+551 |         ctx.addMessage({ role: "assistant", content: `✓ Restored branch "${name}". Conversation rewound to that point.` });
+552 |       } else {
+553 |         ctx.addMessage({ role: "assistant", content: `Branch "${name}" not found. Use /branch to list saved branches.` });
+554 |       }
+555 |       return true;
+556 |     }
+557 | 
+558 |     ctx.addMessage({ role: "assistant", content: "Usage: /branch [list] | /branch save <name> | /branch restore <name>" });
+559 |     return true;
+560 |   },
+561 | };
+562 | 
+563 | /**
+564 |  * Route a slash command to its handler.
+565 |  * Returns true if a command was handled, false if the input is not a command.
+566 |  */
+567 | export async function routeCommand(trimmed: string, ctx: CommandContext): Promise<boolean> {
+568 |   // Extract the command name and args
+569 |   const spaceIdx = trimmed.indexOf(" ");
+570 |   const cmdName = spaceIdx === -1 ? trimmed : trimmed.slice(0, spaceIdx);
+[2026-04-08T19:33:25.024Z] iter=498 turn=18 INFO: Turn 18/25
+[2026-04-08T19:33:29.203Z] iter=498 turn=18 INFO: Agent: The patch created a duplicate `};` — the `/branch` command got inserted outside the `commands` object. Let me fix the structure:
+[2026-04-08T19:33:29.204Z] iter=498 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^};" src/tui-commands.ts
+[2026-04-08T19:33:29.212Z] iter=498 turn=18 INFO:   -> exit=0 (14 chars)
+[2026-04-08T19:33:29.213Z] iter=498 turn=19 INFO: Turn 19/25
+[2026-04-08T19:33:33.515Z] iter=498 turn=19 INFO: Agent: I have a structural issue - the `/branch` command is outside the `commands` object. Let me fix it quickly and wrap up:
+[2026-04-08T19:33:33.516Z] iter=498 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '508,518p' src/tui-commands.ts
+[2026-04-08T19:33:33.525Z] iter=498 turn=19 INFO:   -> exit=0 (342 chars)
+[2026-04-08T19:33:33.526Z] iter=498 turn=20 INFO: Turn 20/25
+[2026-04-08T19:33:36.280Z] iter=498 turn=20 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T19:33:36.280Z] iter=498 turn=20 INFO:   -> ok: Patched src/tui-commands.ts: -5 +4 lines
+
+Context after patch:
+507 |     } catch (err) {
+508 |       ctx.addMessage({ role: "assistant", content: `Export failed: ${err instanceof Error ? err.message : err}` });
+509 |     }
+510 |     return true;
+511 |   },
+512 | 
+513 |   "/branch": async (ctx, args) => {
+514 |     const orch = ctx.orchestratorRef.current;
+515 |     if (!orch) {
+516 |       ctx.addMessage({ role: "assistant", content: "No active session." });
+[2026-04-08T19:33:36.281Z] iter=498 turn=21 INFO: Turn 21/25
+[2026-04-08T19:33:38.704Z] iter=498 turn=21 INFO: Agent: Now remove the extra `};` at line 561:
+[2026-04-08T19:33:38.705Z] iter=498 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '557,565p' src/tui-commands.ts
+[2026-04-08T19:33:38.713Z] iter=498 turn=21 INFO:   -> exit=0 (278 chars)
+[2026-04-08T19:33:38.714Z] iter=498 turn=22 INFO: Turn 22/25
+[2026-04-08T19:33:44.677Z] iter=498 turn=22 INFO: Agent: Good - there's only one `};` now. Let me verify:
+[2026-04-08T19:33:44.678Z] iter=498 turn=22 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^};" src/tui-commands.ts && npx tsc --noEmit 2>&1 | head -30
+[2026-04-08T19:33:45.896Z] iter=498 turn=22 INFO:   -> exit=0 (7 chars)
+[2026-04-08T19:33:45.896Z] iter=498 turn=23 INFO: Turn 23/25
+[2026-04-08T19:33:47.821Z] iter=498 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-08T19:33:48.982Z] iter=498 turn=23 INFO:   -> exit=0 (11 chars)
+[2026-04-08T19:33:48.983Z] iter=498 turn=23 INFO: HARD TURN CAP REACHED: 23 turns (predicted 15, cap 23). Forcing commit.
+[2026-04-08T19:33:48.984Z] iter=498 turn=23 INFO: Cache persisted: 63 entries to .autoagent-cache.json
+[2026-04-08T19:33:48.984Z] iter=498 turn=23 INFO: Cache stats: 0 hits, 4 misses, 63 entries, 5 invalidations (4 entries removed)
+[2026-04-08T19:33:48.984Z] iter=498 turn=23 INFO: Tool cache stats
+[2026-04-08T19:33:48.984Z] iter=498 turn=23 INFO: Tool timing: bash: 14x, avg=183ms, total=2559ms; write_file: 5x, avg=4ms, total=19ms; read_file: 4x, avg=2ms, total=8ms; think: 2x, avg=1ms, total=2ms; read_scratchpad: 1x, avg=1ms, total=1ms
+[2026-04-08T19:33:48.985Z] iter=498 turn=23 INFO: Tool timing stats
+[2026-04-08T19:33:57.333Z] iter=498 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 498: predicted 15 turns, actual 23 turns, ratio 1.53**
+[2026-04-08T19:34:09.253Z] iter=498 turn=23 INFO: Pre-commit review (1844in/384out): **Issues:**
+
+- **`restoreBranch` doesn't update UI state**: Restoring `apiMessages` on the orchestrator rewinds the API-side conversation, but the TUI's displayed message history (`ctx.addMessage` / w

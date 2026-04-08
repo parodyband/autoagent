@@ -1126,6 +1126,9 @@ export class Orchestrator {
   private checkpoints: ConversationCheckpoint[] = [];
   private nextCheckpointId = 0;
 
+  /** Named conversation branches for /branch command. */
+  private branches = new Map<string, Anthropic.MessageParam[]>();
+
   /** FileWatcher instance — tracks externally modified files. */
   private fileWatcher = new FileWatcher();
   /** Paths changed externally since last send(). */
@@ -1283,6 +1286,24 @@ export class Orchestrator {
   /** Get all current checkpoints (most recent last). */
   getCheckpoints(): ConversationCheckpoint[] {
     return [...this.checkpoints];
+  }
+
+  /** Save current conversation as a named branch. */
+  saveBranch(name: string): void {
+    this.branches.set(name, this.apiMessages.map(m => JSON.parse(JSON.stringify(m)) as Anthropic.MessageParam));
+  }
+
+  /** Restore a named branch. Returns false if not found. */
+  restoreBranch(name: string): boolean {
+    const snapshot = this.branches.get(name);
+    if (!snapshot) return false;
+    this.apiMessages = snapshot.map(m => JSON.parse(JSON.stringify(m)) as Anthropic.MessageParam);
+    return true;
+  }
+
+  /** List all saved branch names. */
+  listBranches(): string[] {
+    return [...this.branches.keys()];
   }
 
   /** Re-index the repo (after significant changes). Uses incremental update when possible. */
@@ -2243,7 +2264,34 @@ export class Orchestrator {
       } else if (tier === 'tier1') {
         this.compactTier1();
       } else if (tier === 'micro') {
-        scoredPrune(messages, messages.length, 10_000);
+        // Find the indices of the last 5 assistant turns to define "recent"
+        let assistantCount = 0;
+        let cutoffIdx = messages.length;
+        for (let i = messages.length - 1; i >= 0; i--) {
+          if (messages[i].role === 'assistant') {
+            assistantCount++;
+            if (assistantCount >= 5) { cutoffIdx = i; break; }
+          }
+        }
+        // Clear tool_result content in user messages older than cutoff
+        let cleared = 0;
+        for (let i = 0; i < cutoffIdx; i++) {
+          const msg = messages[i];
+          if (msg.role !== 'user') continue;
+          const content = Array.isArray(msg.content) ? msg.content : [];
+          for (const block of content) {
+            if (block.type === 'tool_result' && block.content !== '[cleared]') {
+              if (typeof block.content === 'string' && block.content.length > 0) {
+                (block as { type: 'tool_result'; tool_use_id: string; content: string }).content = '[cleared]';
+                cleared++;
+              } else if (Array.isArray(block.content)) {
+                (block as { type: 'tool_result'; tool_use_id: string; content: unknown[] }).content = [{ type: 'text', text: '[cleared]' }];
+                cleared++;
+              }
+            }
+          }
+        }
+        process.stderr.write(`[micro-compact] cleared ${cleared} tool_result blocks (kept last 5 turns)\n`);
       }
       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
     };
