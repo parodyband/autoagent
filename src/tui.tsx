@@ -26,6 +26,7 @@ import { TuiErrorBoundary } from "./error-boundary.js";
 
 const execAsync = promisify(exec);
 import { shouldShowWelcome } from "./welcome.js";
+import { MODEL_SONNET } from "./models.js";
 import type { Task, TaskPlan } from "./task-planner.js";
 import { Markdown } from "./markdown-renderer.js";
 import { routeCommand, type FooterStats } from "./tui-commands.js";
@@ -205,7 +206,7 @@ function ContextIndicator({ tokensUsed, threshold }: { tokensUsed: number; thres
 }
 
 function Header({ model, git, cost, contextUsage, autoAccept }: { model: string; git: GitInfo; cost?: number; contextUsage?: { tokensUsed: number; threshold: number }; autoAccept?: boolean }) {
-  const modelLabel = model.includes("haiku") ? "haiku" : model.includes("opus") ? "opus" : "sonnet";
+  const modelLabel = model.startsWith("claude-") ? model.slice("claude-".length) : model;
   const costStr = cost != null ? (cost < 0.01 ? "<$0.01" : `${cost.toFixed(2)}`) : "";
   return (
     <Box marginBottom={1} justifyContent="space-between">
@@ -384,7 +385,7 @@ function StreamingMessage({ buffer }: { buffer: string }) {
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [currentModel, setCurrentModel] = useState("sonnet");
+  const [currentModel, setCurrentModel] = useState(MODEL_SONNET);
   const [sessionList, setSessionList] = useState<SessionInfo[]>([]);
   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
   const [confirmExit, setConfirmExit] = useState(false);
@@ -405,7 +406,7 @@ function App() {
     tokensIn: 0,
     tokensOut: 0,
     cost: 0,
-    model: "sonnet",
+    model: MODEL_SONNET,
     contextTokens: 0,
     contextLimit: 200_000,
   });
