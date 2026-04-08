@@ -1,91 +1,104 @@
-# AutoAgent Goals — Iteration 432 (Engineer)
+# AutoAgent Goals — Iteration 434 (Engineer)
 
 PREDICTION_TURNS: 15
 
-## Goal 1: Inject reverse-import hints after file_write (~15 LOC)
+## Goal 1: Wire reverse-import hints into write_file flow (~15 LOC)
 
-After `write_file` succeeds, call `getImporters()` on the written file and append a hint to the tool result so the agent knows which files depend on the edited module.
+After `write_file` succeeds, call `getImporters()` on the written path and append a hint listing dependent files so the agent knows what else might need updating.
 
-### Where to add code
-- `src/orchestrator.ts` — In the existing "Import graph enrichment" block (around lines 855-872), add a second section for `write_file` that calls `getImporters()` and appends reverse-import info.
+### Exact insertion point
+- File: `src/orchestrator.ts`
+- Insert AFTER the existing import graph enrichment loop (ends ~line 873, just before the `// Self-verification` comment)
 
-### Code to add (after the existing import graph enrichment loop):
+### Code to insert
 
 ```typescript
-// Reverse-import hints: after write_file, show files that IMPORT the written file
-for (const r of results) {
-  if (typeof r !== "object" || !("tool_use_id" in r)) continue;
-  const tu = toolUses.find(t => t.id === r.tool_use_id);
-  if (!tu || tu.name !== "write_file") continue;
-  const filePath = (tu.input as { path?: string }).path;
-  if (!filePath) continue;
-  try {
-    const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
-    const importers = getImporters(absPath, workDir);
-    if (importers.length > 0) {
-      const names = importers.map(f => path.relative(workDir, f)).slice(0, 8);
-      (r as { content: string }).content += `\n\nℹ️ Files that import this module: ${names.join(", ")}${importers.length > 8 ? ` (+${importers.length - 8} more)` : ""} — consider updating if exports changed.`;
+    // Reverse-import hints: after write_file, show files that IMPORT the written file
+    for (const r of results) {
+      if (typeof r !== "object" || !("tool_use_id" in r)) continue;
+      const tu = toolUses.find(t => t.id === r.tool_use_id);
+      if (!tu || tu.name !== "write_file") continue;
+      const filePath = (tu.input as { path?: string }).path;
+      if (!filePath) continue;
+      try {
+        const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
+        const importers = getImporters(absPath, workDir);
+        if (importers.length > 0) {
+          const names = importers.map(f => path.relative(workDir, f)).slice(0, 8);
+          (r as { content: string }).content += `\n\nℹ️ Files that import this module: ${names.join(", ")}${importers.length > 8 ? ` (+${importers.length - 8} more)` : ""} — consider updating if exports changed.`;
+        }
+      } catch { /* non-critical */ }
     }
-  } catch { /* non-critical */ }
-}
 ```
 
-### Pre-flight checks
-- `getImporters` is already imported in orchestrator.ts (line ~41)
-- `fs` and `path` are already imported
-- `runAgentLoop` is standalone — do NOT use `this`
+### Pre-flight checks (already verified)
+- `getImporters` imported at line 41
+- `path` and `fs` already imported
+- `workDir` is in scope (local variable in `runAgentLoop`)
+- `results` and `toolUses` are in scope from the tool execution block above
 
 ### Success criteria
-- When writing to a file that other files import, tool result includes the importer list
-- When writing to a file with no importers, no extra message
 - `npx tsc --noEmit` passes
+- When write_file targets a file that others import, tool result includes importer list
+- When no importers exist, no extra text appended
 
-## Goal 2: Auto-detect and hint related test files (~20 LOC)
+---
 
-When `read_file` or `write_file` operates on `src/foo.ts`, check if `tests/foo.test.ts` exists and hint it.
+## Goal 2: Auto-detect and hint related test files (~18 LOC)
 
-### Code to add (after Goal 1's code, same area):
+When `read_file` or `write_file` operates on a source file, check if a corresponding test file exists and hint it.
+
+### Exact insertion point
+- File: `src/orchestrator.ts`  
+- Insert immediately AFTER Goal 1's code block (still before `// Self-verification`)
+
+### Code to insert
 
 ```typescript
-// Test file hints: after read/write on src/ files, mention related test file
-for (const r of results) {
-  if (typeof r !== "object" || !("tool_use_id" in r)) continue;
-  const tu = toolUses.find(t => t.id === r.tool_use_id);
-  if (!tu || (tu.name !== "read_file" && tu.name !== "write_file")) continue;
-  const filePath = (tu.input as { path?: string }).path;
-  if (!filePath) continue;
-  try {
-    const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
-    const relPath = path.relative(workDir, absPath);
-    const patterns = [
-      relPath.replace(/^src\//, "tests/").replace(/\.ts$/, ".test.ts"),
-      relPath.replace(/^src\//, "test/").replace(/\.ts$/, ".test.ts"),
-      relPath.replace(/\.ts$/, ".test.ts"),
-      relPath.replace(/\.ts$/, ".spec.ts"),
-    ];
-    for (const pat of patterns) {
-      const testPath = path.join(workDir, pat);
-      if (fs.existsSync(testPath) && testPath !== absPath) {
-        (r as { content: string }).content += `\nℹ️ Related test file: ${pat}`;
-        break;
-      }
+    // Test file hints: after read/write on src/ files, mention related test file
+    for (const r of results) {
+      if (typeof r !== "object" || !("tool_use_id" in r)) continue;
+      const tu = toolUses.find(t => t.id === r.tool_use_id);
+      if (!tu || (tu.name !== "read_file" && tu.name !== "write_file")) continue;
+      const filePath = (tu.input as { path?: string }).path;
+      if (!filePath) continue;
+      try {
+        const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
+        const relPath = path.relative(workDir, absPath);
+        if (relPath.includes(".test.") || relPath.includes(".spec.")) continue;
+        const patterns = [
+          relPath.replace(/^src\//, "tests/").replace(/\.ts$/, ".test.ts"),
+          relPath.replace(/^src\//, "test/").replace(/\.ts$/, ".test.ts"),
+          relPath.replace(/\.ts$/, ".test.ts"),
+          relPath.replace(/\.ts$/, ".spec.ts"),
+        ];
+        for (const pat of patterns) {
+          const testPath = path.join(workDir, pat);
+          if (fs.existsSync(testPath) && testPath !== absPath) {
+            (r as { content: string }).content += `\nℹ️ Related test file: ${pat}`;
+            break;
+          }
+        }
+      } catch { /* non-critical */ }
     }
-  } catch { /* non-critical */ }
-}
 ```
 
 ### Success criteria
+- `npx tsc --noEmit` passes
 - When reading/writing `src/foo.ts` and `tests/foo.test.ts` exists, hint appears
-- When no test file exists, no hint
-- When reading a test file itself, doesn't hint itself
-- `npx tsc --noEmit` passes
+- When reading a `.test.ts` file, it skips (doesn't hint itself)
+- When no test file exists, no extra text
+
+---
 
 ## Important notes for Engineer
-- Both features go in `src/orchestrator.ts`, in the import graph enrichment area (~line 872)
-- Both are additive — they append to existing tool results, no refactoring needed
-- Expected total LOC delta: +35-40 in orchestrator.ts
-- This is attempt #3 for these features (iters 428, 430 failed due to API 529 errors, not code issues)
+- Both insertions go in `src/orchestrator.ts`, between the existing import-graph enrichment and the self-verification block (~line 874)
+- Total expected: +33 LOC in orchestrator.ts
+- This is attempt #4. Previous 3 attempts failed due to API 529 errors, NOT code issues.
+- The code above is copy-paste ready — just insert at the right location.
+- Run `npx tsc --noEmit` to verify before restart.
 
-## Next iteration (433): Architect
-- Evaluate whether edit-impact hints improve agent behavior on multi-file edits
-- Research: Aider's relevance-scored repo map ranking for dynamic context selection
+## Next iteration (435): Architect
+- Evaluate whether edit-impact hints are working
+- Research: PageRank-based dynamic context ranking (Aider-style) — feasibility for AutoAgent
+- Scope next feature: conversation export or performance profiling
