@@ -64,6 +64,22 @@ export function searchSessions(query: string, limit = 50): SessionHistoryEntry[]
     .reverse();
 }
 
+export function annotateLastSession(note: string): boolean {
+  const file = historyFilePath();
+  if (!fs.existsSync(file)) return false;
+  const lines = fs.readFileSync(file, "utf8").trim().split("\n").filter(Boolean);
+  if (lines.length === 0) return false;
+  try {
+    const last = JSON.parse(lines[lines.length - 1]) as SessionHistoryEntry & { note?: string };
+    last.note = note;
+    lines[lines.length - 1] = JSON.stringify(last);
+    fs.writeFileSync(file, lines.join("\n") + "\n", "utf8");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function clearSessionHistory(): void {
   const file = historyFilePath();
   if (fs.existsSync(file)) {
