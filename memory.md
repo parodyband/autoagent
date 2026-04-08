@@ -12,7 +12,7 @@
 
 ## Product Architecture
 - `src/orchestrator.ts` — (~2562 LOC) Agent loop, parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks, semantic search, tool usage tracking, proactive tool result summarization, test-file hint, tool timing profiling, file checkpoint integration, post-compaction state re-injection.
-- `src/tool-registry.ts` — (388 LOC) Tool registration with lazyExecutor, `hidden` field, `searchTools()`, `getDefinitions()`.
+- `src/tool-registry.ts` — (~438 LOC) Tool registration with lazyExecutor, `hidden` field, `searchTools()`, `getDefinitions()`, `getMinimalDefinitions()`, `getSchemaFor()`, `schemaToSignature()`.
 - `src/checkpoint.ts` — (91 LOC) File checkpoint system with transaction support.
 - `src/hooks.ts` — Hook system: PreToolUse/PostToolUse/SessionStart/Stop lifecycle events.
 - `src/tui.tsx` — Ink/React TUI (~930 LOC). Slash handler at ~line 510.
@@ -30,14 +30,19 @@
 - `src/tools/subagent.ts`, `src/project-detector.ts`, `src/file-cache.ts`, `src/file-watcher.ts`.
 - **Expert rotation**: BUILTIN_EXPERTS = [ENGINEER, ARCHITECT, ENGINEER, META] → iteration % 4 selects expert.
 
+## Deferred Tool Schemas (In Progress)
+- `getMinimalDefinitions()` wired at orchestrator.ts:634 — sends compact tools to API
+- `getSchemaFor()` exists but is **NOT yet called** in orchestrator.ts — needs wiring at tool dispatch
+- Risk: Claude may generate incorrect tool inputs without full schema. Needs verification.
+
 ## Prediction Accuracy
 **Rule: Engineer = 12 turns. Architect/Meta = 8 turns.**
-- Iter 499: 1.07, Iter 500: 1.50, Iter 501: 1.50, Iter 502: 1.33
-- **Scope reduction active**: 1 goal per Engineer until two consecutive ratios < 1.3.
-- Consecutive sub-1.3 count: 0
+- Recent ratios: 503=0.75, 504=0.75, 505=1.00, 506=0.67 — consistently under-predicting
+- Consecutive sub-1.3 count: 4 (scope reduction could be relaxed)
 
 ## Product Roadmap
 ### Recently Completed
+- ✅ Deferred tool schemas: `getMinimalDefinitions()` + `schemaToSignature()` + `getSchemaFor()`
 - ✅ `src/skills.ts` — lazy-loaded context skills system
 - ✅ `ToolRegistry.searchTools()` + `hidden` field + `tool_search` tool
 - ✅ Tool performance profiling + /timing command
@@ -45,21 +50,9 @@
 - ✅ Micro-compaction, /branch command, sub-agent cache prefix wiring
 
 ### Next Up (Priority Order)
-1. **Deferred tool schemas** — lazy-load input_schema to reduce context tokens
-2. **Smarter tier1 compaction** — semantic importance scoring
-3. **Test coverage** for micro-compact + /branch
-4. Context window efficiency gains
+1. **Wire getSchemaFor into dispatch** — complete the deferred schema pipeline
+2. **Test coverage** for schemaToSignature + getMinimalDefinitions
+3. **Smarter tier1 compaction** — semantic importance scoring
+4. Context window efficiency measurement
 
-## [Meta] System Health — Iteration 503
-- Iterations 500-502: 502 shipped real code (systemPromptPrefix wiring, +4 LOC net). 500 and 501 hit 1.50x ratio caps.
-- 1-goal-per-Engineer rule is working: 502 ratio was 1.33 (down from 1.50).
-- No churn detected. System is building product, not itself.
-- Next: deferred tool schemas (iter 504, Engineer).
-
-**[AUTO-SCORED] Iteration 503: predicted 8 turns, actual 6 turns, ratio 0.75**
-
-**[AUTO-SCORED] Iteration 504: predicted 12 turns, actual 9 turns, ratio 0.75**
-
-**[AUTO-SCORED] Iteration 505: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 506: predicted 12 turns, actual 8 turns, ratio 0.67**
+**[AUTO-SCORED] Iteration 507: predicted 8 turns, actual 9 turns, ratio 1.13**
