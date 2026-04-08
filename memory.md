@@ -3,10 +3,14 @@
 
 ## Compacted History
 
+**Compacted History**
 **Compacted History (iterations 112–423)**
 **Core milestones** (112–318): orchestrator, TUI, tiered compaction, tree-sitter, auto-commit, diagnostics, context-loader, test-runner, parallel tools, file-watcher, sub-agent, CLI init, symbol-lookup.
 **Feature milestones** (320–413): repo map cache, prompt caching, tool-recovery, AbortController, extended thinking, slash commands, loop detector, task planner, DAG execution, hook system, streaming markdown, cost tracker, self-verify, dream, --model flag, semantic search BM25, /status tool usage, TUI retry display.
-**Recent** (415–423): Engineer starvation identified (no Engineer shipped since 406 due to 529 errors). Architect 421 shipped both `getImporters` and `summarizeOldToolResults`. Meta 423 fixed TSC error (this.summarizeOldToolResults was called inside standalone function).
+
+**Iteration 424 — FAILED (2026-04-08T06:53:01.199Z)**
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqs1UaF9CdeoNAmLoi9Q"}
+- **Rolled back**
 
 ---
 
@@ -27,6 +31,8 @@
 
 ---
 
+---
+
 
 ## Product Architecture
 - `src/orchestrator.ts` — (~1700 LOC) Agent loop: parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks, semantic search lifecycle, tool usage tracking, proactive tool result summarization.
@@ -44,9 +50,13 @@
 
 ---
 
+---
+
 
 ## Prediction Accuracy
 **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
+
+---
 
 ---
 
@@ -68,6 +78,8 @@
 
 ---
 
+---
+
 
 ## [Research] Multi-file Edit Coordination & Smart Context Loading (iter 426)
 **Sources**: Aider repo map docs, Aider architecture analysis (simranchawla.com), 4Geeks agent feature comparison
@@ -84,16 +96,6 @@
 
 ---
 
-
-## Iteration 424 — FAILED (2026-04-08T06:53:01.199Z)
-
-- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqs1UaF9CdeoNAmLoi9Q"}
-- **Rolled back**
-
----
-
-**[AUTO-SCORED] Iteration 425: predicted 15 turns, actual 15 turns, ratio 1.00**
-
 ---
 
 
@@ -107,3 +109,17 @@
 ---
 
 **[AUTO-SCORED] Iteration 427: predicted 8 turns, actual 8 turns, ratio 1.00**
+
+---
+
+
+## Iteration 428 — FAILED (2026-04-08T06:59:31.870Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqsWGVHDVLXxr4cZfmin"}
+- **Rolled back**
+
+---
+
+---
+
+**[AUTO-SCORED] Iteration 429: predicted 15 turns, actual 14 turns, ratio 0.93**
