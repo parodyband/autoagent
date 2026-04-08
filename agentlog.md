@@ -1,73 +1,3 @@
-394 |   const [inputHistory, setInputHistory] = useState<string[]>([]);
-395 |   const [historyIndex, setHistoryIndex] = useState(-1);
-396 |   const [savedInput, setSavedInput] = useState("");
-397 |   // Reverse-search state (Ctrl+R)
-398 |   const [searchMode, setSearchMode] = useState(false);
-399 |   const [searchQuery, setSearchQuery] = useState("");
-400 |   const [searchMatchIdx, setSearchMatchIdx] = useState(-1); // index into inputHistory
-401 |   const [searchPreInput, setSearchPreInput] = useState(""); // input to restore on cancel
-402 |   const [bashStream, setBashStream] = useState<string[]>([]);
-403 |   const [footerStats, setFooterStats] = useState<FooterStats>({
-404 |     tokensIn: 0,
-[2026-04-08T20:45:32.544Z] iter=538 turn=5 INFO: Turn 5/25
-[2026-04-08T20:45:43.802Z] iter=538 turn=5 INFO: Agent: Now add the helper function and the search logic to `useInput`. First let me add a helper function after the `handleInputChange` callback:
-[2026-04-08T20:45:43.802Z] iter=538 turn=5 INFO: write_file: src/tui.tsx (patch)
-[2026-04-08T20:45:43.803Z] iter=538 turn=5 INFO:   -> ok: Patched src/tui.tsx: -5 +56 lines
-
-Context after patch:
-515 |     try { fs.writeFileSync(historyFile, entries.join("\n") + "\n", "utf8"); } catch { /* ignore */ }
-516 |   }, [workDir]);
-517 | 
-518 |   // Wrap file suggestion handler to also set input; reset history browsing on any typing
-519 |   const handleInputChange = useCallback((val: string) => {
-520 |     if (historyIndex !== -1) setHistoryIndex(-1);
-521 |     onFileInput(val, setInput);
-522 |   }, [onFileInput, historyIndex]);
-523 | 
-524 |   // ─── Reverse-search helpers ───────────────────────────────
-525 |   /** Find most recent inputHistory index at or before `startIdx` matching `query`. */
-526 |   const findPrevMatch = useCallback((query: string, startIdx: number): number => {
-527 |     if (!query) {
-528 |       // No query — return the most recent entry
-529 |       return startIdx >= 0 && startIdx < inputHistory.length ? startIdx : inputHistory.length - 1;
-530 |     }
-531 |     for (let i = startIdx; i >= 0; i--) {
-532 |       if (inputHistory[i].includes(query)) return i;
-533 |     }
-534 |     return -1;
-535 |   }, [inputHistory]);
-536 | 
-537 |   const enterSearchMode = useCallback(() => {
-538 |     setSearchPreInput(input);
-539 |     setSearchQuery("");
-540 |     const idx = findPrevMatch("", inputHistory.length - 1);
-541 |     setSearchMatchIdx(idx);
-542 |     setSearchMode(true);
-543 |     if (idx >= 0) setInput(inputHistory[idx]);
-544 |   }, [input, inputHistory, findPrevMatch]);
-545 | 
-546 |   const exitSearchMode = useCallback((accept: boolean) => {
-547 |     setSearchMode(false);
-548 |     if (!accept) {
-549 |       setInput(searchPreInput);
-550 |     }
-551 |     setSearchQuery("");
-552 |     setSearchMatchIdx(-1);
-553 |     setHistoryIndex(-1);
-554 |   }, [searchPreInput]);
-555 | 
-556 |   const updateSearchQuery = useCallback((newQuery: string) => {
-557 |     setSearchQuery(newQuery);
-558 |     const idx = findPrevMatch(newQuery, inputHistory.length - 1);
-559 |     setSearchMatchIdx(idx);
-560 |     if (idx >= 0) setInput(inputHistory[idx]);
-561 |     else setInput(newQuery); // show query itself if no match
-562 |   }, [inputHistory, findPrevMatch]);
-563 | 
-564 |   const cycleSearchMatch = useCallback(() => {
-565 |     // Go to next older match from current position
-566 |     const startFrom = searchMatchIdx > 0 ? searchMatchIdx - 1 : -1;
-567 |     const idx = findPrevMatch(searchQuery, startFrom);
 568 |     if (idx >= 0) {
 569 |       setSearchMatchIdx(idx);
 570 |       setInput(inputHistory[idx]);
@@ -1066,3 +996,102 @@ Context after patch:
 [2026-04-08T21:00:02.491Z] iter=547 turn=8 INFO: Tool timing stats
 [2026-04-08T21:00:11.498Z] iter=547 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 547: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-08T21:00:11.521Z] iter=547 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T21:00:11.557Z] iter=547 turn=8 INFO: Committed: 95fa5b8c (18 in / 2248 out, cache: 10696 created, 57006 read)
+[2026-04-08T21:00:11.558Z] iter=547 turn=8 INFO: Restarting as iteration 548...
+[2026-04-08T21:00:11.743Z] iter=548 INFO: Cache restored: 68/68 entries (0 stale)
+[2026-04-08T21:00:11.746Z] iter=548 INFO: Turn budget: 13/25 (calibration=1.07x, predicted=15)
+[2026-04-08T21:00:11.746Z] iter=548 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T21:00:11.936Z] iter=548 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T21:00:11.936Z] iter=548 turn=1 INFO: Turn 1/25
+[2026-04-08T21:00:15.565Z] iter=548 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files and running the failing test to understand what needs to be fixed.
+[2026-04-08T21:00:15.566Z] iter=548 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "selectCompactionTier\|compactionUrgency\|turnTokenHistory" src/orchestrator.ts | head -40
+[2026-04-08T21:00:15.566Z] iter=548 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tools-write-file.test.ts 2>&1 | tail -50
+[2026-04-08T21:00:15.576Z] iter=548 turn=1 INFO:   -> exit=0 (678 chars)
+[2026-04-08T21:00:16.551Z] iter=548 turn=1 INFO:   -> exit=0 (287 chars)
+[2026-04-08T21:00:16.552Z] iter=548 turn=2 INFO: Turn 2/25
+[2026-04-08T21:00:19.651Z] iter=548 turn=2 INFO: think: The fuzzy patch test is already passing! That's one task done. Now let me focus on:
+1. Fix urgency regression in runAgen...
+[2026-04-08T21:00:19.651Z] iter=548 turn=3 INFO: Turn 3/25
+[2026-04-08T21:00:23.852Z] iter=548 turn=3 INFO: Agent: Good. The fuzzy test already passes. Now I'll fix the two remaining tasks directly.
+[2026-04-08T21:00:23.853Z] iter=548 turn=3 INFO: read_file: src/orchestrator.ts
+[2026-04-08T21:00:23.854Z] iter=548 turn=3 INFO:   -> ok (1662 chars)
+[2026-04-08T21:00:23.855Z] iter=548 turn=4 INFO: Turn 4/25
+[2026-04-08T21:00:25.817Z] iter=548 turn=4 INFO: read_file: src/orchestrator.ts
+[2026-04-08T21:00:25.818Z] iter=548 turn=4 INFO:   -> ok (1866 chars)
+[2026-04-08T21:00:25.818Z] iter=548 turn=5 INFO: Turn 5/25
+[2026-04-08T21:00:28.417Z] iter=548 turn=5 INFO: Agent: Now let me find where `runAgentLoop` starts to see variable declarations:
+[2026-04-08T21:00:28.418Z] iter=548 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^export async function runAgentLoop\|^async function runAgentLoop\|let lastInput\|let totalIn\|let turnTokenHistory" src/orchestrator.ts | head -20
+[2026-04-08T21:00:28.430Z] iter=548 turn=5 INFO:   -> exit=0 (95 chars)
+[2026-04-08T21:00:28.430Z] iter=548 turn=6 INFO: Turn 6/25
+[2026-04-08T21:00:32.248Z] iter=548 turn=6 INFO: Agent: **Goal status:**
+1. Fix urgency regression in runAgentLoop — **IN PROGRESS** (found location, writing now)
+2. Fix failing fuzzy patch test — **DONE** (already passing)
+3. Token/cost summary at exit — **NOT STARTED**
+
+Making both fixes now:
+[2026-04-08T21:00:32.249Z] iter=548 turn=6 INFO: read_file: src/orchestrator.ts
+[2026-04-08T21:00:32.250Z] iter=548 turn=6 INFO:   -> ok (98 chars)
+[2026-04-08T21:00:32.251Z] iter=548 turn=7 INFO: Turn 7/25
+[2026-04-08T21:00:35.218Z] iter=548 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "CostTracker\|costTracker\|\.summary()\|printSummary\|sessionEnd\|onEnd\|onExit\|totalCost" src/cost-tracker.ts | head -30
+[2026-04-08T21:00:35.231Z] iter=548 turn=7 INFO:   -> exit=0 (97 chars)
+[2026-04-08T21:00:35.231Z] iter=548 turn=8 INFO: Turn 8/25
+[2026-04-08T21:00:37.165Z] iter=548 turn=8 INFO: read_file: CACHE HIT
+[2026-04-08T21:00:37.166Z] iter=548 turn=9 INFO: Turn 9/25
+[2026-04-08T21:00:40.571Z] iter=548 turn=9 INFO: Agent: Now let me find where the session ends in the TUI or orchestrator to wire in the summary:
+[2026-04-08T21:00:40.572Z] iter=548 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "costTracker\|CostTracker\|onExit\|process\.exit\|unmount\|sessionSummary" src/tui.tsx | head -30
+[2026-04-08T21:00:40.582Z] iter=548 turn=9 INFO:   -> exit=0 (209 chars)
+[2026-04-08T21:00:40.582Z] iter=548 turn=10 INFO: Turn 10/25
+[2026-04-08T21:00:43.888Z] iter=548 turn=10 INFO: Agent: I've been reading too much. Let me make the actual code changes now.
+[2026-04-08T21:00:43.889Z] iter=548 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T21:00:43.893Z] iter=548 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
+
+Context after patch:
+656 |   }, systemPrompt, onToolOutput);
+657 |   const tools = registry.getMinimalDefinitions();
+658 | 
+659 |   let totalIn = 0, totalOut = 0;
+660 |   let lastInput = 0;
+661 |   const runLoopTurnTokenHistory: number[] = [];
+662 |   let cumulativeIn = 0;
+663 |   let fullText = "";
+664 |   let consecutiveLoopCount = 0;
+[2026-04-08T21:00:43.894Z] iter=548 turn=11 INFO: Turn 11/25
+[2026-04-08T21:00:48.223Z] iter=548 turn=11 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T21:00:48.227Z] iter=548 turn=11 INFO:   -> ok: Patched src/orchestrator.ts: -4 +6 lines
+
+Context after patch:
+733 |       onContextBudget(lastInput / contextWindow);
+734 |     }
+735 | 
+736 |     // Mid-loop compaction: if context is growing large, compact between rounds
+737 |     if (onCompact) {
+738 |       runLoopTurnTokenHistory.push(lastInput);
+739 |       const urgency = compactionUrgency(runLoopTurnTokenHistory);
+740 |       const compactTier = selectCompactionTier(lastInput, urgency);
+741 |       if (compactTier !== 'none') {
+742 |         await onCompact(compactTier, lastInput, apiMessages);
+743 |       }
+744 |     }
+[2026-04-08T21:00:48.228Z] iter=548 turn=12 INFO: Turn 12/25
+[2026-04-08T21:00:50.310Z] iter=548 turn=12 INFO: Agent: Wrapping up now.
+[2026-04-08T21:00:50.311Z] iter=548 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
+[2026-04-08T21:00:51.481Z] iter=548 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-08T21:00:51.481Z] iter=548 turn=13 INFO: Turn 13/25
+[2026-04-08T21:00:56.006Z] iter=548 turn=13 INFO: Agent: TypeScript passes. Now write memory and update goals.
+[2026-04-08T21:00:56.007Z] iter=548 turn=13 INFO: save_memory: "[Engineer] Iteration 548 results"
+[2026-04-08T21:00:56.008Z] iter=548 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T21:00:56.008Z] iter=548 turn=14 INFO: Turn 14/25
+[2026-04-08T21:01:06.038Z] iter=548 turn=14 INFO: write_file: goals.md (write)
+[2026-04-08T21:01:06.039Z] iter=548 turn=14 INFO:   -> ok: Updated goals.md (1294 chars, -17 lines delta)
+[2026-04-08T21:01:06.039Z] iter=548 turn=15 INFO: Turn 15/25
+[2026-04-08T21:01:07.984Z] iter=548 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T21:01:07.985Z] iter=548 turn=15 INFO: RESTART signal
+[2026-04-08T21:01:07.986Z] iter=548 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T21:01:09.169Z] iter=548 turn=15 INFO: Compilation OK
+[2026-04-08T21:01:18.150Z] iter=548 turn=15 INFO: Cache persisted: 68 entries to .autoagent-cache.json
+[2026-04-08T21:01:18.150Z] iter=548 turn=15 INFO: Cache stats: 1 hits, 3 misses, 68 entries, 3 invalidations (3 entries removed)
+[2026-04-08T21:01:18.150Z] iter=548 turn=15 INFO: Tool cache stats
+[2026-04-08T21:01:18.151Z] iter=548 turn=15 INFO: Tool timing: bash: 7x, avg=315ms, total=2203ms; write_file: 3x, avg=3ms, total=10ms; read_file: 3x, avg=1ms, total=4ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
+[2026-04-08T21:01:18.151Z] iter=548 turn=15 INFO: Tool timing stats
+[2026-04-08T21:01:26.283Z] iter=548 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 548: predicted 15 turns, actual 15 turns, ratio 1.00**
+[2026-04-08T21:01:30.512Z] iter=548 turn=15 INFO: Pre-commit review (465in/124out): **LGTM** — the change is straightforward: it accumulates per-turn token counts into a history array and passes a derived urgency signal to `selectCompactionTier`, which is a clean, additive improvemen

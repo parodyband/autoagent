@@ -658,6 +658,7 @@ async function runAgentLoop(
 
   let totalIn = 0, totalOut = 0;
   let lastInput = 0;
+  const runLoopTurnTokenHistory: number[] = [];
   let cumulativeIn = 0;
   let fullText = "";
   let consecutiveLoopCount = 0;
@@ -734,7 +735,9 @@ async function runAgentLoop(
 
     // Mid-loop compaction: if context is growing large, compact between rounds
     if (onCompact) {
-      const compactTier = selectCompactionTier(lastInput);
+      runLoopTurnTokenHistory.push(lastInput);
+      const urgency = compactionUrgency(runLoopTurnTokenHistory);
+      const compactTier = selectCompactionTier(lastInput, urgency);
       if (compactTier !== 'none') {
         await onCompact(compactTier, lastInput, apiMessages);
       }
