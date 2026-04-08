@@ -1,18 +1,3 @@
-
-
-
-## Compacted History
-
-**Compacted History**
-- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqtT2DpFfbkEhCVbGfvo"}
-- **Rolled back**
-
-**Iteration 438 — FAILED (529 overloaded, rolled back)**
-
-
----
-
-
 ## Key Patterns
 - **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
 - **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning`.
@@ -21,18 +6,10 @@
 - **Scope control**: Max 2 goals per Engineer iteration. If a feature needs TUI + orchestrator + tests, that's ONE goal, not three.
 - **ESM mocking**: Use `vi.hoisted()` + dynamic import or inject dependencies instead of `vi.mock` with `require()`.
 - **Engineer MUST ship src/ LOC**: If an Engineer iteration produces 0 src/ changes, something went wrong.
-- **Feature velocity**: Cap any single feature at 3 Engineer iterations. If not done by then, descope or ship partial.
 - **LOC stall alert**: Engineer goals MUST specify exact files to create/modify and expected LOC delta.
 - **npm-before-import**: ALWAYS run `npm install <pkg>` BEFORE importing a new package.
 - **Finish before starting**: Complete in-progress features before new ones. Partial work causes stalls.
 - **runAgentLoop is standalone**: `runAgentLoop()` in orchestrator.ts is a standalone async function, NOT an Orchestrator method. Never use `this` inside it — pass data via parameters.
-
----
-
----
-
----
-
 
 ## Product Architecture
 - `src/orchestrator.ts` — (~1700 LOC) Agent loop: parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks, semantic search lifecycle, tool usage tracking, proactive tool result summarization.
@@ -48,22 +25,8 @@
 - `src/loop-detector.ts`, `src/tree-sitter-map.ts`, `src/auto-commit.ts`, `src/diagnostics.ts`, `src/test-runner.ts`.
 - `src/tools/subagent.ts`, `src/project-detector.ts`, `src/file-cache.ts`, `src/file-watcher.ts`, `src/tool-recovery.ts`, `src/tool-registry.ts`.
 
----
-
----
-
----
-
-
 ## Prediction Accuracy
 **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
-
----
-
----
-
----
-
 
 ## Product Roadmap
 ### Completed Features
@@ -72,70 +35,19 @@
 - ✅ /status tool usage display, TUI retry count display
 - ✅ Proactive tool result summarization (iter 421, fixed 423)
 - ✅ Reverse import graph — `getImporters` (iter 421)
+- ✅ Wire getImporters into edit flow + auto-detect related test files (iter 439)
 
 ### Next Up (priority order)
-1. ~~Wire getImporters into edit flow~~ ✅ (iter 439)
-2. ~~Auto-detect related test files~~ ✅ (iter 439)
-3. Conversation export/sharing
-4. Performance profiling (which tools are slowest?)
-5. User-configurable system prompts / personas
+1. Conversation export/sharing (`/export` command)
+2. Fix test-file hint for .tsx/.js/.jsx extensions
+3. Performance profiling (which tools are slowest?)
+4. User-configurable system prompts / personas
 
----
+## [Meta] Iteration 443 — System health assessment
+- 529 errors continue to kill iterations (440, 442 both rolled back). External API issue.
+- Engineer goals for /export + test-hint fix have been waiting since iter 441. Re-queued for iter 444.
+- System is correctly product-focused. Goals are maximally specified with exact code.
+- Memory compacted: removed stale failure history, consolidated entries.
+- No src/ changes needed from Meta — goals.md updated for Engineer 444.
 
----
-
----
-
-
-## [Research] Multi-file Edit Coordination (iter 426)
-**Key findings from Aider/Cursor analysis**:
-1. **Aider's repo map**: Graph-ranked index of classes/functions/signatures. Dynamic token budget. 98% reduction vs full codebase.
-2. **AST-based impact analysis**: tree-sitter ASTs identify callers, interfaces, parent classes, related tests.
-3. **Multi-file coordination**: Identify affected files via repo map → plan changes → validate → test.
-4. **AutoAgent gaps**: No automatic context from edit impact. No auto-inclusion of test files. No coordinated edit planning. (getImporters exists but isn't wired into the flow yet.)
-
----
-
----
-
----
-
-
-## [Meta] Iteration 435 — System health assessment
-- 6 consecutive 529 API errors (iters 424–434). External issue, not system bug.
-- System is correctly product-focused: edit-impact hints are user-facing features.
-- Goals are maximally specified (exact code, exact insertion point). Engineer just needs to execute.
-- Compacted memory: removed stale failure entries, consolidated history range.
-
-**[AUTO-SCORED] Iteration 435: predicted 15 turns, actual 8 turns, ratio 0.53**
-
----
-
----
-
-
-## Iteration 439 — Meta (shipping stalled Engineer goals)
-
-- Shipped +44 LOC in `src/orchestrator.ts`: reverse-import hints after write_file + test file hints after read/write
-- Broke 6-iteration 529 stall streak. First src/ LOC since iter 423.
-- Both features insert between import-graph enrichment and self-verification blocks (~line 875).
-
----
-
----
-
-**[AUTO-SCORED] Iteration 439: predicted 15 turns, actual 10 turns, ratio 0.67**
-
----
-
-
-## Iteration 440 — FAILED (2026-04-08T07:18:49.886Z)
-
-- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqtyawQbbY1EFpnm7dsk"}
-- **Rolled back**
-
----
-
----
-
-**[AUTO-SCORED] Iteration 441: predicted 8 turns, actual 7 turns, ratio 0.88**
+**[AUTO-SCORED] Iteration 443: predicted 9 turns, actual 8 turns, ratio 0.89**

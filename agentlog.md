@@ -1,76 +1,3 @@
-1605 |     if (toolName === "list_files" && text.length > 1000) {
-1606 |       const lines = text.split("\n").filter(l => l.trim());
-1607 |       const dirs = lines.filter(l => l.endsWith("/")).length;
-1608 |       return `[list_files: ${dirs} directories, ${lines.length - dirs} files]`;
-1609 |     }
-1610 |     return null;
-1611 |   }
-1612 | 
-1613 |   /**
-1614 |    * Prune stale tool results with priority-based ordering.
-1615 |    *
-1616 |    * Fires at MICRO_COMPACT_THRESHOLD (80K) and above.
-1617 |    * - Never prunes results that contain error indicators.
-[2026-04-08T06:46:11.830Z] iter=421 turn=14 INFO: Turn 14/25
-[2026-04-08T06:46:15.730Z] iter=421 turn=14 INFO: Agent: Now wire it into the agent loop - after tool results are pushed to apiMessages (line ~883):
-[2026-04-08T06:46:15.731Z] iter=421 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "apiMessages.push.*role.*user.*content.*results" src/orchestrator.ts
-[2026-04-08T06:46:15.741Z] iter=421 turn=14 INFO:   -> exit=0 (62 chars)
-[2026-04-08T06:46:15.741Z] iter=421 turn=15 INFO: Turn 15/25
-[2026-04-08T06:46:18.275Z] iter=421 turn=15 INFO: read_file: src/orchestrator.ts
-[2026-04-08T06:46:18.278Z] iter=421 turn=15 INFO:   -> ok (382 chars)
-[2026-04-08T06:46:18.278Z] iter=421 turn=16 INFO: Turn 16/25
-[2026-04-08T06:46:22.371Z] iter=421 turn=16 INFO: Agent: 
-
-I need to wire it in, add Goal 2, write tests, run tsc, and restart. Moving fast.
-[2026-04-08T06:46:22.371Z] iter=421 turn=16 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T06:46:22.372Z] iter=421 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
-
-Context after patch:
-880 |       }
-881 |     }
-882 | 
-883 |     apiMessages.push({ role: "user", content: results });
-884 |     this.summarizeOldToolResults();
-885 |     reflectionCbs.onTurnComplete?.();
-886 | 
-887 |     // Loop detection: check after each round
-888 |     const loopCheck = detectLoop(apiMessages);
-[2026-04-08T06:46:22.373Z] iter=421 turn=17 INFO: Turn 17/25
-[2026-04-08T06:46:25.769Z] iter=421 turn=17 INFO: Agent: Now Goal 2 - `getImporters` in context-loader.ts:
-[2026-04-08T06:46:25.770Z] iter=421 turn=17 INFO: read_file: src/context-loader.ts
-[2026-04-08T06:46:25.772Z] iter=421 turn=17 INFO:   -> ok (298 chars)
-[2026-04-08T06:46:25.773Z] iter=421 turn=18 INFO: Turn 18/25
-[2026-04-08T06:46:29.027Z] iter=421 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && head -20 src/context-loader.ts | grep -n "import\|from\|require"
-[2026-04-08T06:46:29.036Z] iter=421 turn=18 INFO:   -> exit=0 (338 chars)
-[2026-04-08T06:46:29.036Z] iter=421 turn=19 INFO: Turn 19/25
-[2026-04-08T06:46:32.513Z] iter=421 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && tail -5 src/context-loader.ts
-[2026-04-08T06:46:32.530Z] iter=421 turn=19 INFO:   -> exit=0 (86 chars)
-[2026-04-08T06:46:32.531Z] iter=421 turn=20 INFO: Turn 20/25
-[2026-04-08T06:46:43.137Z] iter=421 turn=20 INFO: write_file: src/context-loader.ts (append)
-[2026-04-08T06:46:43.139Z] iter=421 turn=20 INFO:   -> ok: Appended 1597 chars to src/context-loader.ts
-[2026-04-08T06:46:43.139Z] iter=421 turn=21 INFO: Turn 21/25
-[2026-04-08T06:46:46.851Z] iter=421 turn=21 INFO: Agent: Wait, `resolveSpecifier` is a module-private function. Let me check:
-[2026-04-08T06:46:46.852Z] iter=421 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^function resolveSpecifier\|^export function resolveSpecifier" src/context-loader.ts
-[2026-04-08T06:46:46.872Z] iter=421 turn=21 INFO:   -> exit=0 (84 chars)
-[2026-04-08T06:46:46.873Z] iter=421 turn=22 INFO: Turn 22/25
-[2026-04-08T06:46:50.472Z] iter=421 turn=22 INFO: Agent: Good - it's a module-level function (not exported but accessible within the file). Now wire into file-watcher:
-[2026-04-08T06:46:50.472Z] iter=421 turn=22 INFO: read_file: src/orchestrator.ts
-[2026-04-08T06:46:50.473Z] iter=421 turn=22 INFO:   -> ok (774 chars)
-[2026-04-08T06:46:50.474Z] iter=421 turn=23 INFO: Turn 23/25
-[2026-04-08T06:46:53.296Z] iter=421 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "import.*context-loader\|from.*context-loader" src/orchestrator.ts | head -5
-[2026-04-08T06:46:53.317Z] iter=421 turn=23 INFO:   -> exit=0 (142 chars)
-[2026-04-08T06:46:53.317Z] iter=421 turn=23 INFO: HARD TURN CAP REACHED: 23 turns (predicted 15, cap 23). Forcing commit.
-[2026-04-08T06:46:53.320Z] iter=421 turn=23 INFO: Cache persisted: 57 entries to .autoagent-cache.json
-[2026-04-08T06:46:53.321Z] iter=421 turn=23 INFO: Cache stats: 0 hits, 11 misses, 57 entries, 4 invalidations (10 entries removed)
-[2026-04-08T06:46:53.321Z] iter=421 turn=23 INFO: Tool cache stats
-[2026-04-08T06:46:53.322Z] iter=421 turn=23 INFO: Tool timing: bash: 12x, avg=18ms, total=221ms; read_file: 11x, avg=2ms, total=24ms; write_file: 4x, avg=2ms, total=9ms; think: 1x, avg=1ms, total=1ms
-[2026-04-08T06:46:53.322Z] iter=421 turn=23 INFO: Tool timing stats
-[2026-04-08T06:47:01.083Z] iter=421 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 421: predicted 15 turns, actual 23 turns, ratio 1.53**
-[2026-04-08T06:47:35.484Z] iter=421 turn=23 INFO: Pre-commit review (0in/0out): ERROR: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqrbUFyYHMqfF8vZXNjB"}
-[2026-04-08T06:48:42.145Z] iter=422 turn=1 INFO: Rolled back to pre-iteration-422
-[2026-04-08T06:48:42.145Z] iter=422 turn=1 INFO: Failure recorded. Restarting...
-[2026-04-08T06:48:42.327Z] iter=423 1/3 consecutive failures
-[2026-04-08T06:48:42.329Z] iter=423 INFO: Cache restored: 57/57 entries (0 stale)
 [2026-04-08T06:48:42.331Z] iter=423 INFO: Turn budget: 17/25 (calibration=1.07x, predicted=15)
 [2026-04-08T06:48:42.331Z] iter=423 INFO: Starting. Expert=Meta Model=claude-opus-4-6
 [2026-04-08T06:48:42.527Z] iter=423 INFO: Hard turn cap: 23 (1.5x prediction of 15)
@@ -1068,3 +995,58 @@ Build passes. All deliverables done. Wrapping up.
 [2026-04-08T07:20:05.437Z] iter=441 turn=7 INFO: Tool timing stats
 [2026-04-08T07:20:13.542Z] iter=441 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 441: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-08T07:20:13.565Z] iter=441 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T07:21:29.801Z] iter=442 turn=1 INFO: Rolled back to pre-iteration-442
+[2026-04-08T07:21:29.801Z] iter=442 turn=1 INFO: Failure recorded. Restarting...
+[2026-04-08T07:21:30.007Z] iter=443 1/3 consecutive failures
+[2026-04-08T07:21:30.010Z] iter=443 INFO: Cache restored: 60/60 entries (0 stale)
+[2026-04-08T07:21:30.012Z] iter=443 INFO: Turn budget: 10/25 (calibration=0.67x, predicted=9)
+[2026-04-08T07:21:30.013Z] iter=443 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-08T07:21:30.212Z] iter=443 INFO: Hard turn cap: 14 (1.5x prediction of 9)
+[2026-04-08T07:21:30.212Z] iter=443 turn=1 INFO: Turn 1/25
+[2026-04-08T07:21:42.599Z] iter=443 turn=1 INFO: Agent: 
+
+Let me assess the current state before acting.
+[2026-04-08T07:21:42.601Z] iter=443 turn=1 INFO: think: I'm the Meta expert. Let me review what's happening:
+
+1. The goals.md says I should be the Engineer (iteration 441 goals...
+[2026-04-08T07:21:42.601Z] iter=443 turn=2 INFO: Turn 2/25
+[2026-04-08T07:21:46.764Z] iter=443 turn=2 INFO: think: I'm Meta. My deliverables are:
+1. Assess system health - are we shipping product features or spinning?
+2. Check if Engin...
+[2026-04-08T07:21:46.766Z] iter=443 turn=3 INFO: Turn 3/25
+[2026-04-08T07:21:50.526Z] iter=443 turn=3 INFO: $ test -f src/export.ts && echo "EXISTS" || echo "MISSING"
+[2026-04-08T07:21:50.532Z] iter=443 turn=3 INFO: $ grep -n "testExt\|\.tsx.*test" src/orchestrator.ts | head -5
+[2026-04-08T07:21:50.535Z] iter=443 turn=3 INFO: $ cat .expert-rotation.json
+[2026-04-08T07:21:50.541Z] iter=443 turn=3 INFO:   -> exit=0 (8 chars)
+[2026-04-08T07:21:50.547Z] iter=443 turn=3 INFO:   -> exit=0 (1294 chars)
+[2026-04-08T07:21:50.550Z] iter=443 turn=3 INFO:   -> exit=0 (11 chars)
+[2026-04-08T07:21:50.550Z] iter=443 turn=4 INFO: Turn 4/25
+[2026-04-08T07:21:59.628Z] iter=443 turn=4 INFO: think: I'm Meta (iteration 443). The Engineer goals from 441 were NOT completed — src/export.ts is missing and the orchestrator...
+[2026-04-08T07:21:59.629Z] iter=443 turn=5 INFO: Turn 5/25
+[2026-04-08T07:22:21.165Z] iter=443 turn=5 INFO: Agent: **Status:** I'm Meta (iter 443). The Engineer goals from iter 441 were never executed (442 was 529, now we're Meta again). Both goals NOT STARTED. My job: assess system health, compact memory, write goals.md for Engineer iter 444.
+
+Let me do all three deliverables now:
+[2026-04-08T07:22:21.166Z] iter=443 turn=5 INFO: write_file: goals.md (write)
+[2026-04-08T07:22:21.168Z] iter=443 turn=5 INFO:   -> ok: Updated goals.md (3675 chars, -7 lines delta)
+[2026-04-08T07:22:21.169Z] iter=443 turn=6 INFO: Turn 6/25
+[2026-04-08T07:22:55.188Z] iter=443 turn=6 INFO: Agent: 
+
+Right — I'm Meta, not Engineer. No src/ changes expected. Let me wrap up: compact memory and finish.
+[2026-04-08T07:22:55.189Z] iter=443 turn=6 INFO: write_file: memory.md (write)
+[2026-04-08T07:22:55.189Z] iter=443 turn=6 INFO:   -> ok: Updated memory.md (3865 chars, -97 lines delta)
+[2026-04-08T07:22:55.190Z] iter=443 turn=7 INFO: Turn 7/25
+[2026-04-08T07:22:57.935Z] iter=443 turn=7 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T07:22:59.088Z] iter=443 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-08T07:22:59.089Z] iter=443 turn=8 INFO: Turn 8/25
+[2026-04-08T07:23:02.090Z] iter=443 turn=8 INFO: Agent: 
+
+TypeScript passes. Goals and memory are already written. Done.
+[2026-04-08T07:23:02.090Z] iter=443 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T07:23:02.090Z] iter=443 turn=8 INFO: RESTART signal
+[2026-04-08T07:23:02.091Z] iter=443 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T07:23:03.170Z] iter=443 turn=8 INFO: Compilation OK
+[2026-04-08T07:23:11.407Z] iter=443 turn=8 INFO: Cache persisted: 60 entries to .autoagent-cache.json
+[2026-04-08T07:23:11.407Z] iter=443 turn=8 INFO: Tool timing: bash: 5x, avg=240ms, total=1199ms; think: 3x, avg=1ms, total=3ms; write_file: 2x, avg=2ms, total=3ms
+[2026-04-08T07:23:11.407Z] iter=443 turn=8 INFO: Tool timing stats
+[2026-04-08T07:23:19.281Z] iter=443 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 443: predicted 9 turns, actual 8 turns, ratio 0.89**
+[2026-04-08T07:23:19.304Z] iter=443 turn=8 INFO: Pre-commit review: no significant code changes to review

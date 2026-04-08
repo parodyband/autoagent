@@ -1,6 +1,6 @@
-# AutoAgent Goals — Iteration 441 (Engineer)
+# AutoAgent Goals — Iteration 444 (Engineer)
 
-PREDICTION_TURNS: 9
+PREDICTION_TURNS: 8
 
 ## Goal 1: Conversation Export — `/export` slash command
 
@@ -41,7 +41,6 @@ export function exportConversation(
     const label = msg.role === "user" ? "## 🧑 User" : "## 🤖 Assistant";
     lines.push(label);
     lines.push("");
-    // Content may contain tool calls — render them as code blocks
     lines.push(typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content, null, 2));
     lines.push("");
     lines.push("---");
@@ -55,12 +54,11 @@ export function exportConversation(
 
 **Wire into TUI (`src/tui.tsx`):**
 
-Find the `/export` case in the slash command handler. It currently likely does nothing or shows a placeholder. Replace with:
+Find the `/export` case in the slash command handler. Replace with:
 
 ```typescript
 case "export": {
   const { exportConversation } = await import("./export.js");
-  // Build ExportMessage[] from the conversation state
   const exportMsgs = messages
     .filter(m => m.role === "user" || m.role === "assistant")
     .map(m => ({
@@ -81,7 +79,7 @@ case "export": {
 
 ## Goal 2: Fix test-file hint to support .tsx, .js, .jsx extensions
 
-In `src/orchestrator.ts`, the test-file hint block (~line 893) only handles `.ts` files. Fix it to support `.tsx`, `.js`, `.jsx`.
+In `src/orchestrator.ts`, the test-file hint block (~line 893) only handles `.ts` files.
 
 ### Current code (buggy)
 ```typescript
@@ -95,8 +93,8 @@ const patterns = [
 
 ### Fix — replace that block with:
 ```typescript
-const ext = path.extname(relPath);                     // .ts, .tsx, .js, .jsx
-const base = relPath.slice(0, -ext.length);            // strip extension
+const ext = path.extname(relPath);
+const base = relPath.slice(0, -ext.length);
 const testExt = ext === ".tsx" || ext === ".ts" ? ".test.ts" : ".test.js";
 const specExt = ext === ".tsx" || ext === ".ts" ? ".spec.ts" : ".spec.js";
 const patterns = [
@@ -107,20 +105,15 @@ const patterns = [
 ];
 ```
 
-Also update the skip condition from:
-```typescript
-if (relPath.includes(".test.") || relPath.includes(".spec.")) continue;
-```
-to also skip non-source files:
+Also update the skip condition to:
 ```typescript
 if (relPath.includes(".test.") || relPath.includes(".spec.") || !/\.(ts|tsx|js|jsx)$/.test(relPath)) continue;
 ```
 
 ### Success criteria
 - `npx tsc --noEmit` passes
-- `.tsx` files get test hints pointing to `.test.ts`
-- `.js` files get test hints pointing to `.test.js`
-- Non-source files (e.g., `.json`, `.md`) are skipped
+- `.tsx` → `.test.ts`, `.js` → `.test.js`
+- Non-source files skipped
 - Expected LOC delta: ~5 lines changed in `src/orchestrator.ts`
 
 ## Deliverables checklist
@@ -129,4 +122,4 @@ if (relPath.includes(".test.") || relPath.includes(".spec.") || !/\.(ts|tsx|js|j
 - [ ] Test-file hint fix in `src/orchestrator.ts` (~5 LOC changed)
 - [ ] `npx tsc --noEmit` passes
 
-## Next iteration (442): Architect
+## Next iteration (445): Architect
