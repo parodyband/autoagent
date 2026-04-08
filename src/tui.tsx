@@ -11,6 +11,7 @@ import { render, Box, Text, useInput, useApp } from "ink";
 import Spinner from "ink-spinner";
 import TextInput from "ink-text-input";
 import path from "path";
+import fs from "fs";
 import "dotenv/config";
 import { Orchestrator } from "./orchestrator.js";
 import { listSessions, type SessionInfo } from "./session-store.js";
@@ -390,6 +391,9 @@ function App() {
   const [autoAccept, setAutoAccept] = useState(noConfirm);
   const [externalChanges, setExternalChanges] = useState<string[]>([]);
   const [scrollOffset, setScrollOffset] = useState(0);
+  const [inputHistory, setInputHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [savedInput, setSavedInput] = useState("");
   const [bashStream, setBashStream] = useState<string[]>([]);
   const [footerStats, setFooterStats] = useState<FooterStats>({
     tokensIn: 0,
@@ -414,6 +418,19 @@ function App() {
 
   // Keep autoAccept ref in sync with state
   useEffect(() => { autoAcceptRef.current = autoAccept; }, [autoAccept]);
+
+  // Load input history from file on mount
+  useEffect(() => {
+    const historyFile = path.join(workDir, ".autoagent-history");
+    try {
+      if (fs.existsSync(historyFile)) {
+        const lines = fs.readFileSync(historyFile, "utf8").split("\n").filter(l => l.length > 0);
+        setInputHistory(lines);
+      }
+    } catch {
+      // ignore
+    }
+  }, [workDir]);
 
   // Initialize orchestrator
   useEffect(() => {
@@ -486,10 +503,18 @@ function App() {
     }).catch(() => setStatus("Init failed"));
   }, []);
 
-  // Wrap file suggestion handler to also set input
+  // Persist history to file (last 200 entries)
+  const persistHistory = useCallback((history: string[]) => {
+    const historyFile = path.join(workDir, ".autoagent-history");
+    const entries = history.slice(-200);
+    try { fs.writeFileSync(historyFile, entries.join("\n") + "\n", "utf8"); } catch { /* ignore */ }
+  }, [workDir]);
+
+  // Wrap file suggestion handler to also set input; reset history browsing on any typing
   const handleInputChange = useCallback((val: string) => {
+    if (historyIndex !== -1) setHistoryIndex(-1);
     onFileInput(val, setInput);
-  }, [onFileInput]);
+  }, [onFileInput, historyIndex]);
 
   useInput((ch, key) => {
     if (pendingDiff) {
@@ -502,16 +527,40 @@ function App() {
       }
       return;
     }
-    // Scroll-back: Up/Down arrow when input is empty and not loading
-    // Shift+arrow or pageUp/pageDown for larger jumps
-    if (key.upArrow && !loading && input === "") {
-      const step = key.shift ? 15 : 3;
-      setScrollOffset(prev => Math.min(prev + step, Math.max(0, messages.length)));
+    // Shift+Up/Down: scroll message view
+    if (key.upArrow && key.shift) {
+      setScrollOffset(prev => Math.min(prev + 15, Math.max(0, messages.length)));
       return;
     }
-    if (key.downArrow && !loading && input === "") {
-      const step = key.shift ? 15 : 3;
-      setScrollOffset(prev => Math.max(prev - step, 0));
+    if (key.downArrow && key.shift) {
+      setScrollOffset(prev => Math.max(prev - 15, 0));
+      return;
+    }
+    // Up/Down: history navigation
+    if (key.upArrow && !loading) {
+      if (inputHistory.length === 0) return;
+      if (historyIndex === -1) {
+        setSavedInput(input);
+        const newIdx = inputHistory.length - 1;
+        setHistoryIndex(newIdx);
+        setInput(inputHistory[newIdx]);
+      } else {
+        const newIdx = Math.max(historyIndex - 1, 0);
+        setHistoryIndex(newIdx);
+        setInput(inputHistory[newIdx]);
+      }
+      return;
+    }
+    if (key.downArrow && !loading) {
+      if (historyIndex === -1) return;
+      if (historyIndex >= inputHistory.length - 1) {
+        setHistoryIndex(-1);
+        setInput(savedInput);
+      } else {
+        const newIdx = historyIndex + 1;
+        setHistoryIndex(newIdx);
+        setInput(inputHistory[newIdx]);
+      }
       return;
     }
     // Tab: cycle through / accept file suggestions
@@ -552,7 +601,15 @@ function App() {
     const trimmed = value.trim();
     if (!trimmed) return;
     setInput("");
+    setHistoryIndex(-1);
+    setSavedInput("");
     setConfirmExit(false); // dismiss exit prompt on any input
+    // Push to history and persist
+    setInputHistory(prev => {
+      const next = [...prev, trimmed];
+      persistHistory(next);
+      return next;
+    });
 
     // Route slash commands to extracted handlers
     if (trimmed.startsWith("/")) {
@@ -732,7 +789,7 @@ function App() {
       ) : externalChanges.length > 0 ? (
         <Box paddingLeft={2}><Text color="gray" dimColor>Files changed externally: {externalChanges.map(p => path.basename(p)).join(", ")}</Text></Box>
       ) : scrollOffset > 0 ? (
-        <Box paddingLeft={2}><Text color="gray" dimColor>↑{scrollOffset} — ↓ to return · shift+arrow for fast scroll</Text></Box>
+        <Box paddingLeft={2}><Text color="gray" dimColor>↑{scrollOffset} — shift+↓ to return · shift+arrow to scroll</Text></Box>
       ) : contextWarning ? (
         <Box paddingLeft={2}><Text color="yellow" dimColor>Context 80%+ — /clear or start new session</Text></Box>
       ) : null}

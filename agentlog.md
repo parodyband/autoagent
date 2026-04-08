@@ -1,62 +1,3 @@
-
-Context after patch:
-2468 |             role: "user",
-2469 |             content: `Verification results:\n${formatted}\n\nPlease fix any failures.`,
-2470 |           });
-2471 |           this.opts.onStatus?.("Fixing verification failures...");
-2472 |           await runAgentLoop(
-2473 |             this.client,
-2474 |             model,
-2475 |             this.systemPrompt,
-2476 |             this.apiMessages,
-2477 |             this.registry,
-2478 |             this.opts.workDir,
-2479 |             this.opts.onToolCall,
-2480 |             this.opts.onStatus,
-2481 |             this.opts.onText,
-2482 |             this.opts.onDiffPreview,
-2483 |             undefined,
-2484 |             undefined,
-2485 |             fileWatchCallback,
-2486 |             undefined,
-2487 |             2,
-2488 |             this.hooksConfig,
-2489 |             undefined,
-2490 |             undefined,
-2491 |             {},
-2492 |             this.opts.onToolOutput,
-2493 |           );
-2494 |         }
-2495 |       }
-2496 |     }
-[2026-04-08T20:24:13.234Z] iter=524 turn=11 INFO: Turn 11/25
-[2026-04-08T20:24:16.144Z] iter=524 turn=11 INFO: Agent: Let me finish the remaining patches and TUI change now, then wrap up.
-[2026-04-08T20:24:16.144Z] iter=524 turn=11 INFO: $ grep -n "2,\n\s*this.hooksConfig," src/orchestrator.ts | head -20
-# Find all remaining runAgentLoop calls that need onToolOutput
-grep -n "this.hooksConfig," src/orchestrator.ts
-[2026-04-08T20:24:16.158Z] iter=524 turn=11 INFO:   -> exit=0 (148 chars)
-[2026-04-08T20:24:16.158Z] iter=524 turn=12 INFO: Turn 12/25
-[2026-04-08T20:24:17.825Z] iter=524 turn=12 INFO: $ sed -n '2525,2545p' src/orchestrator.ts && echo "---" && sed -n '2570,2590p' src/orchestrator.ts
-[2026-04-08T20:24:17.838Z] iter=524 turn=12 INFO:   -> exit=0 (1695 chars)
-[2026-04-08T20:24:17.838Z] iter=524 turn=13 INFO: Turn 13/25
-[2026-04-08T20:24:21.454Z] iter=524 turn=13 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T20:24:21.457Z] iter=524 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -13 +17 lines
-
-Context after patch:
-2528 |           this.opts.onStatus,
-2529 |           this.opts.onText,
-2530 |           this.opts.onDiffPreview,
-2531 |           undefined,
-2532 |           undefined,
-2533 |           fileWatchCallback,
-2534 |           undefined,
-2535 |           2,
-2536 |           this.hooksConfig,
-2537 |           undefined,
-2538 |           undefined,
-2539 |           {},
-2540 |           this.opts.onToolOutput,
-2541 |         );
 2542 | 
 2543 |         this.sessionTokensIn += fixResult.tokensIn;
 2544 |         this.sessionTokensOut += fixResult.tokensOut;
@@ -1055,3 +996,230 @@ I'm an Architect iteration — my deliverable is goals.md, not src/ changes. Wri
 [2026-04-08T20:38:24.682Z] iter=533 turn=9 INFO: Tool timing stats
 [2026-04-08T20:38:32.810Z] iter=533 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 533: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-08T20:38:32.833Z] iter=533 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:38:32.867Z] iter=533 turn=9 INFO: Committed: 3ddcd5e1 (19 in / 2672 out, cache: 12352 created, 66434 read)
+[2026-04-08T20:38:32.867Z] iter=533 turn=9 INFO: Restarting as iteration 534...
+[2026-04-08T20:38:33.055Z] iter=534 INFO: Cache restored: 64/64 entries (0 stale)
+[2026-04-08T20:38:33.058Z] iter=534 INFO: Turn budget: 15/25 (calibration=0.88x, predicted=15)
+[2026-04-08T20:38:33.058Z] iter=534 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T20:38:33.275Z] iter=534 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T20:38:33.275Z] iter=534 turn=1 INFO: Turn 1/25
+[2026-04-08T20:38:37.097Z] iter=534 turn=1 INFO: Agent: I'll implement command history with up/down arrow navigation in the TUI. Let me start by reading the relevant sections of tui.tsx.
+[2026-04-08T20:38:37.098Z] iter=534 turn=1 INFO: $ wc -l src/tui.tsx && grep -n "historyIndex\|inputHistory\|savedInput\|useInput\|handleSubmit\|handleInputChange\|scroll\|arrowUp\|arrowDown" src/tui.tsx | head -60
+[2026-04-08T20:38:37.099Z] iter=534 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T20:38:37.109Z] iter=534 turn=1 INFO:   -> exit=0 (882 chars)
+[2026-04-08T20:38:37.110Z] iter=534 turn=2 INFO: Turn 2/25
+[2026-04-08T20:38:40.061Z] iter=534 turn=2 INFO: read_file: src/tui.tsx
+[2026-04-08T20:38:40.061Z] iter=534 turn=2 INFO: read_file: src/tui.tsx
+[2026-04-08T20:38:40.062Z] iter=534 turn=2 INFO:   -> ok (1615 chars)
+[2026-04-08T20:38:40.063Z] iter=534 turn=2 INFO:   -> ok (2342 chars)
+[2026-04-08T20:38:40.063Z] iter=534 turn=3 INFO: Turn 3/25
+[2026-04-08T20:38:44.268Z] iter=534 turn=3 INFO: think: I have enough context. I need to:
+1. Add `inputHistory`, `historyIndex`, `savedInput` state near line 390
+2. Add useEffe...
+[2026-04-08T20:38:44.269Z] iter=534 turn=4 INFO: Turn 4/25
+[2026-04-08T20:38:46.973Z] iter=534 turn=4 INFO: Agent: I have enough context. Let me implement the changes now.
+[2026-04-08T20:38:46.973Z] iter=534 turn=4 INFO: read_file: src/tui.tsx
+[2026-04-08T20:38:46.974Z] iter=534 turn=4 INFO:   -> ok (531 chars)
+[2026-04-08T20:38:46.974Z] iter=534 turn=5 INFO: Turn 5/25
+[2026-04-08T20:38:49.171Z] iter=534 turn=5 INFO: $ grep -n "^import\|^import " src/tui.tsx | head -25
+[2026-04-08T20:38:49.180Z] iter=534 turn=5 INFO:   -> exit=0 (1113 chars)
+[2026-04-08T20:38:49.181Z] iter=534 turn=6 INFO: Turn 6/25
+[2026-04-08T20:38:52.159Z] iter=534 turn=6 INFO: Agent: **Goal status: IN PROGRESS** — Command history feature. I've read enough context; writing now.
+[2026-04-08T20:38:52.159Z] iter=534 turn=6 INFO: $ grep -n "^import fs\|^import { " src/tui.tsx | grep -i "fs\|promises"
+[2026-04-08T20:38:52.168Z] iter=534 turn=6 INFO:   -> exit=1 (11 chars)
+[2026-04-08T20:38:52.169Z] iter=534 turn=7 INFO: Turn 7/25
+[2026-04-08T20:38:55.420Z] iter=534 turn=7 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:38:55.424Z] iter=534 turn=7 INFO:   -> ok: Patched src/tui.tsx: -2 +3 lines
+
+Context after patch:
+10 | import { render, Box, Text, useInput, useApp } from "ink";
+11 | import Spinner from "ink-spinner";
+12 | import TextInput from "ink-text-input";
+13 | import path from "path";
+14 | import fs from "fs";
+15 | import "dotenv/config";
+16 | import { Orchestrator } from "./orchestrator.js";
+17 | import { listSessions, type SessionInfo } from "./session-store.js";
+18 | import type { EditPlan } from "./architect-mode.js";
+[2026-04-08T20:38:55.426Z] iter=534 turn=8 INFO: Turn 8/25
+[2026-04-08T20:38:59.776Z] iter=534 turn=8 INFO: Agent: Now add the state variables for history after `scrollOffset`:
+[2026-04-08T20:38:59.777Z] iter=534 turn=8 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:38:59.778Z] iter=534 turn=8 INFO:   -> ok: Patched src/tui.tsx: -2 +5 lines
+
+Context after patch:
+390 |   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
+391 |   const [autoAccept, setAutoAccept] = useState(noConfirm);
+392 |   const [externalChanges, setExternalChanges] = useState<string[]>([]);
+393 |   const [scrollOffset, setScrollOffset] = useState(0);
+394 |   const [inputHistory, setInputHistory] = useState<string[]>([]);
+395 |   const [historyIndex, setHistoryIndex] = useState(-1);
+396 |   const [savedInput, setSavedInput] = useState("");
+397 |   const [bashStream, setBashStream] = useState<string[]>([]);
+398 |   const [footerStats, setFooterStats] = useState<FooterStats>({
+399 |     tokensIn: 0,
+400 |     tokensOut: 0,
+[2026-04-08T20:38:59.778Z] iter=534 turn=9 INFO: Turn 9/25
+[2026-04-08T20:39:02.794Z] iter=534 turn=9 INFO: Agent: Now find where to add the load-history useEffect. Let me find the `useEffect(() => { autoAcceptRef` line:
+[2026-04-08T20:39:02.794Z] iter=534 turn=9 INFO: read_file: src/tui.tsx
+[2026-04-08T20:39:02.795Z] iter=534 turn=9 INFO:   -> ok (895 chars)
+[2026-04-08T20:39:02.795Z] iter=534 turn=10 INFO: Turn 10/25
+[2026-04-08T20:39:07.456Z] iter=534 turn=10 INFO: Agent: I've already patched 3 things in src/tui.tsx (added `import fs`, added 3 state variables). Let me finish the remaining patches now.
+[2026-04-08T20:39:07.456Z] iter=534 turn=10 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:39:07.457Z] iter=534 turn=10 INFO:   -> ok: Patched src/tui.tsx: -2 +15 lines
+
+Context after patch:
+416 |     repoMapRef, handleInputChange: onFileInput, acceptFileSuggestion, dismissSuggestions,
+417 |   } = useFileSuggestions({ workDir, setInput: (fn) => setInput(fn) });
+418 | 
+419 |   // Keep autoAccept ref in sync with state
+420 |   useEffect(() => { autoAcceptRef.current = autoAccept; }, [autoAccept]);
+421 | 
+422 |   // Load input history from file on mount
+423 |   useEffect(() => {
+424 |     const historyFile = path.join(workDir, ".autoagent-history");
+425 |     try {
+426 |       if (fs.existsSync(historyFile)) {
+427 |         const lines = fs.readFileSync(historyFile, "utf8").split("\n").filter(l => l.length > 0);
+428 |         setInputHistory(lines);
+429 |       }
+430 |     } catch {
+431 |       // ignore
+432 |     }
+433 |   }, [workDir]);
+434 | 
+435 |   // Initialize orchestrator
+436 |   useEffect(() => {
+[2026-04-08T20:39:07.457Z] iter=534 turn=11 INFO: Turn 11/25
+[2026-04-08T20:39:13.826Z] iter=534 turn=11 INFO: Agent: Now add `persistHistory` helper and fix `handleInputChange` to reset historyIndex:
+[2026-04-08T20:39:13.827Z] iter=534 turn=11 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:39:13.828Z] iter=534 turn=11 INFO:   -> ok: Patched src/tui.tsx: -4 +12 lines
+
+Context after patch:
+503 |     }).catch(() => setStatus("Init failed"));
+504 |   }, []);
+505 | 
+506 |   // Persist history to file (last 200 entries)
+507 |   const persistHistory = useCallback((history: string[]) => {
+508 |     const historyFile = path.join(workDir, ".autoagent-history");
+509 |     const entries = history.slice(-200);
+510 |     try { fs.writeFileSync(historyFile, entries.join("\n") + "\n", "utf8"); } catch { /* ignore */ }
+511 |   }, [workDir]);
+512 | 
+513 |   // Wrap file suggestion handler to also set input; reset history browsing on any typing
+514 |   const handleInputChange = useCallback((val: string) => {
+515 |     if (historyIndex !== -1) setHistoryIndex(-1);
+516 |     onFileInput(val, setInput);
+517 |   }, [onFileInput, historyIndex]);
+518 | 
+519 |   useInput((ch, key) => {
+520 |     if (pendingDiff) {
+[2026-04-08T20:39:13.829Z] iter=534 turn=12 INFO: Turn 12/25
+[2026-04-08T20:39:22.072Z] iter=534 turn=12 INFO: Agent: Now replace the up/down arrow scroll handlers with history navigation:
+[2026-04-08T20:39:22.073Z] iter=534 turn=12 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:39:22.074Z] iter=534 turn=12 INFO:   -> ok: Patched src/tui.tsx: -12 +36 lines
+
+Context after patch:
+527 |       }
+528 |       return;
+529 |     }
+530 |     // Shift+Up/Down: scroll message view
+531 |     if (key.upArrow && key.shift) {
+532 |       setScrollOffset(prev => Math.min(prev + 15, Math.max(0, messages.length)));
+533 |       return;
+534 |     }
+535 |     if (key.downArrow && key.shift) {
+536 |       setScrollOffset(prev => Math.max(prev - 15, 0));
+537 |       return;
+538 |     }
+539 |     // Up/Down: history navigation
+540 |     if (key.upArrow && !loading) {
+541 |       if (inputHistory.length === 0) return;
+542 |       if (historyIndex === -1) {
+543 |         setSavedInput(input);
+544 |         const newIdx = inputHistory.length - 1;
+545 |         setHistoryIndex(newIdx);
+546 |         setInput(inputHistory[newIdx]);
+547 |       } else {
+548 |         const newIdx = Math.max(historyIndex - 1, 0);
+549 |         setHistoryIndex(newIdx);
+550 |         setInput(inputHistory[newIdx]);
+551 |       }
+552 |       return;
+553 |     }
+554 |     if (key.downArrow && !loading) {
+555 |       if (historyIndex === -1) return;
+556 |       if (historyIndex >= inputHistory.length - 1) {
+557 |         setHistoryIndex(-1);
+558 |         setInput(savedInput);
+559 |       } else {
+560 |         const newIdx = historyIndex + 1;
+561 |         setHistoryIndex(newIdx);
+562 |         setInput(inputHistory[newIdx]);
+563 |       }
+564 |       return;
+565 |     }
+566 |     // Tab: cycle through / accept file suggestions
+567 |     if (key.tab && fileSuggestions.length > 0) {
+568 |       const nextIdx = (fileSuggestionIdx + 1) % fileSuggestions.length;
+[2026-04-08T20:39:22.074Z] iter=534 turn=13 INFO: Turn 13/25
+[2026-04-08T20:39:25.294Z] iter=534 turn=13 INFO: Agent: Now add history push in `handleSubmit`, then run tsc and wrap up.
+[2026-04-08T20:39:25.295Z] iter=534 turn=13 INFO: $ grep -n "const trimmed = value.trim\|setInput(\"\")\|setConfirmExit(false)" src/tui.tsx | head -10
+[2026-04-08T20:39:25.307Z] iter=534 turn=13 INFO:   -> exit=0 (186 chars)
+[2026-04-08T20:39:25.308Z] iter=534 turn=14 INFO: Turn 14/25
+[2026-04-08T20:39:28.527Z] iter=534 turn=14 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:39:28.529Z] iter=534 turn=14 INFO:   -> ok: Patched src/tui.tsx: -4 +12 lines
+
+Context after patch:
+598 |   });
+599 | 
+600 |   const handleSubmit = useCallback(async (value: string) => {
+601 |     const trimmed = value.trim();
+602 |     if (!trimmed) return;
+603 |     setInput("");
+604 |     setHistoryIndex(-1);
+605 |     setSavedInput("");
+606 |     setConfirmExit(false); // dismiss exit prompt on any input
+607 |     // Push to history and persist
+608 |     setInputHistory(prev => {
+609 |       const next = [...prev, trimmed];
+610 |       persistHistory(next);
+611 |       return next;
+612 |     });
+613 | 
+614 |     // Route slash commands to extracted handlers
+615 |     if (trimmed.startsWith("/")) {
+[2026-04-08T20:39:28.530Z] iter=534 turn=15 INFO: Turn 15/25
+[2026-04-08T20:39:31.836Z] iter=534 turn=15 INFO: Agent: Also update the footer hint to reflect the new scroll keybinding:
+[2026-04-08T20:39:31.836Z] iter=534 turn=15 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:39:31.837Z] iter=534 turn=15 INFO:   -> ok: Patched src/tui.tsx: -1 +1 lines
+
+Context after patch:
+789 |       ) : externalChanges.length > 0 ? (
+790 |         <Box paddingLeft={2}><Text color="gray" dimColor>Files changed externally: {externalChanges.map(p => path.basename(p)).join(", ")}</Text></Box>
+791 |       ) : scrollOffset > 0 ? (
+792 |         <Box paddingLeft={2}><Text color="gray" dimColor>↑{scrollOffset} — shift+↓ to return · shift+arrow to scroll</Text></Box>
+793 |       ) : contextWarning ? (
+794 |         <Box paddingLeft={2}><Text color="yellow" dimColor>Context 80%+ — /clear or start new session</Text></Box>
+795 |       ) : null}
+[2026-04-08T20:39:31.837Z] iter=534 turn=16 INFO: Turn 16/25
+[2026-04-08T20:39:33.615Z] iter=534 turn=16 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-08T20:39:34.760Z] iter=534 turn=16 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:39:34.760Z] iter=534 turn=17 INFO: Turn 17/25
+[2026-04-08T20:39:38.990Z] iter=534 turn=17 INFO: Agent: Clean. Now write memory and goals:
+[2026-04-08T20:39:38.990Z] iter=534 turn=17 INFO: save_memory: "[Engineer] Iteration 534 — Command history"
+[2026-04-08T20:39:38.991Z] iter=534 turn=17 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T20:39:38.991Z] iter=534 turn=18 INFO: Turn 18/25
+[2026-04-08T20:39:49.897Z] iter=534 turn=18 INFO: write_file: goals.md (write)
+[2026-04-08T20:39:49.899Z] iter=534 turn=18 INFO:   -> ok: Updated goals.md (1238 chars, -31 lines delta)
+[2026-04-08T20:39:49.899Z] iter=534 turn=19 INFO: Turn 19/25
+[2026-04-08T20:39:51.972Z] iter=534 turn=19 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:39:51.973Z] iter=534 turn=19 INFO: RESTART signal
+[2026-04-08T20:39:51.973Z] iter=534 turn=19 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:39:53.145Z] iter=534 turn=19 INFO: Compilation OK
+[2026-04-08T20:40:02.017Z] iter=534 turn=19 INFO: Cache persisted: 63 entries to .autoagent-cache.json
+[2026-04-08T20:40:02.017Z] iter=534 turn=19 INFO: Cache stats: 0 hits, 4 misses, 63 entries, 8 invalidations (5 entries removed)
+[2026-04-08T20:40:02.017Z] iter=534 turn=19 INFO: Tool cache stats
+[2026-04-08T20:40:02.017Z] iter=534 turn=19 INFO: Tool timing: bash: 6x, avg=198ms, total=1190ms; write_file: 8x, avg=2ms, total=16ms; read_file: 4x, avg=2ms, total=6ms; read_scratchpad: 1x, avg=1ms, total=1ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T20:40:02.017Z] iter=534 turn=19 INFO: Tool timing stats
+[2026-04-08T20:40:11.524Z] iter=534 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 534: predicted 15 turns, actual 19 turns, ratio 1.27**
+[2026-04-08T20:40:11.550Z] iter=534 turn=19 INFO: Pre-commit review: no significant code changes to review

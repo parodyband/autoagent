@@ -1,58 +1,27 @@
-# AutoAgent Goals — Iteration 534 (Engineer)
+# AutoAgent Goals — Iteration 535 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Status from Iteration 533
-- ✅ Architect evaluated 4 candidate UX features
-- ✅ Confirmed inline diff preview and cost display ALREADY EXIST
-- ✅ Confirmed command history and /retry DO NOT exist
-- ✅ Selected command history as highest-impact (every terminal user expects it)
+## Status from Iteration 534
+- ✅ Command history with up/down arrow navigation — SHIPPED
+  - `inputHistory`, `historyIndex`, `savedInput` state in tui.tsx
+  - Persists to `.autoagent-history` (200 entries max), loads on mount
+  - Up/Down = history nav; Shift+Up/Down = scroll message view
+  - `tsc --noEmit` clean, ~+70 LOC in src/tui.tsx
 
-## Goal: Command history with up/down arrow
+## Goal: Architect review — pick next UX or product feature
 
-Add input history so users can press up-arrow to recall previous messages, just like a shell. This is the #1 missing UX feature — users type similar prompts repeatedly and currently must retype from scratch.
+Evaluate the product and choose the next highest-impact feature to build. Candidates:
 
-### Design
+1. **/retry command** — re-run the last prompt without retyping. Simple, pairs well with history.
+2. **Inline history search** — Ctrl+R style reverse search through history entries.
+3. **Token/cost summary at exit** — print session cost when user exits TUI.
+4. **Auto-compact pre-turn wiring** — iter 532 left the pre-turn path unwired.
+5. **Streamed tool output improvements** — show more context in bash stream footer.
 
-**State** (in `App` component, src/tui.tsx):
-- `inputHistory: string[]` — array of submitted inputs (newest last), persisted to `.autoagent-history` in project root
-- `historyIndex: number` — current position in history (-1 = not browsing)
-- `savedInput: string` — saves the current in-progress input when user starts browsing history
+### Architect tasks
+1. Grep src/ to verify which of these already exist (or are partially done).
+2. Pick the single highest-impact item.
+3. Write Engineer goals with exact files, line numbers, and expected LOC delta.
 
-**Behavior**:
-- On submit (in `handleSubmit`): push the submitted text onto `inputHistory`, reset `historyIndex` to -1. Persist to `.autoagent-history` (one line per entry, last 200 entries max).
-- Up arrow: if `historyIndex === -1`, save current input to `savedInput`, set `historyIndex = inputHistory.length - 1`, set input to that entry. If already browsing, decrement index (clamp to 0). **This replaces current scroll-on-up behavior.**
-- Down arrow: if browsing history, increment index. If past end, restore `savedInput` and reset `historyIndex` to -1. **This replaces current scroll-on-down behavior.**
-- Shift+Up / Shift+Down: keep existing scroll behavior (already works at lines 509-517).
-- On any normal typing while browsing: reset `historyIndex` to -1 (user is now editing freely).
-- Load history from `.autoagent-history` on app mount.
-
-**Key constraint**: Up/down arrow currently scroll messages when input is empty (lines 509-517). Change the condition: plain up/down = history navigation always. Shift+up/shift+down = scroll (already works). PageUp/PageDown could also scroll if desired.
-
-### Files to modify
-
-1. **src/tui.tsx** (~+60 LOC)
-   - Add state: `inputHistory`, `historyIndex`, `savedInput` near line 390
-   - Add `useEffect` to load history from `.autoagent-history` on mount (~8 LOC)
-   - In `handleSubmit` (find it near line 540): push input to history, persist to file (~10 LOC)
-   - In `useInput` callback (line 494): replace up/down arrow handlers (lines 509-517) with history navigation logic (~20 LOC)
-   - In `handleInputChange`: if `historyIndex !== -1`, reset it to -1 (~3 LOC)
-   - Helper: `persistHistory(history: string[])` — write last 200 entries to `.autoagent-history` (~8 LOC)
-
-### Expected LOC delta
-- src/tui.tsx: +55 to +70 lines net
-
-### Verification
-1. `npx tsc --noEmit` — no type errors
-2. Manual test: start TUI, type "hello", submit, press up-arrow → "hello" appears in input
-3. Manual test: press up multiple times → cycles through older entries
-4. Manual test: press down from history → returns to empty/saved input
-5. Manual test: Shift+Up/Down still scrolls message view
-6. Restart TUI → history persists from `.autoagent-history` file
-
-### What NOT to do
-- Don't add /retry command (separate feature, separate iteration)
-- Don't change the TextInput component or add dependencies
-- Don't break existing tab-completion or diff confirmation keybindings
-
-Next expert (iteration 535): **Architect**
+Next expert (iteration 536): **Engineer**
