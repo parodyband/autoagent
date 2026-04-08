@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775682869776,
+  "generatedAt": 1775683264356,
   "files": [
     {
       "path": "src/file-cache.ts",
@@ -2307,96 +2307,6 @@
       "lastModified": 1775682048227.0122
     },
     {
-      "path": "src/tui-commands.ts",
-      "exports": [
-        {
-          "name": "FooterStats",
-          "kind": "interface",
-          "line": 24,
-          "exported": true
-        },
-        {
-          "name": "CommandContext",
-          "kind": "interface",
-          "line": 33,
-          "exported": true
-        },
-        {
-          "name": "routeCommand",
-          "kind": "function",
-          "line": 729,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "child_process"
-        },
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [],
-          "from": "./orchestrator.js"
-        },
-        {
-          "names": [],
-          "from": "./tui.js"
-        },
-        {
-          "names": [],
-          "from": "./session-store.js"
-        },
-        {
-          "names": [],
-          "from": "./session-store.js"
-        },
-        {
-          "names": [],
-          "from": "./auto-commit.js"
-        },
-        {
-          "names": [],
-          "from": "./tree-sitter-map.js"
-        },
-        {
-          "names": [],
-          "from": "./init-command.js"
-        },
-        {
-          "names": [],
-          "from": "./export-helper.js"
-        },
-        {
-          "names": [],
-          "from": "./plan-commands.js"
-        },
-        {
-          "names": [],
-          "from": "./dream.js"
-        },
-        {
-          "names": [],
-          "from": "./tool-registry.js"
-        },
-        {
-          "names": [],
-          "from": "./checkpoint.js"
-        },
-        {
-          "names": [],
-          "from": "./session-history.js"
-        }
-      ],
-      "lastModified": 1775682856384.2705
-    },
-    {
       "path": "src/tui.tsx",
       "exports": [
         {
@@ -2619,6 +2529,96 @@
         }
       ],
       "lastModified": 1775682605225.8643
+    },
+    {
+      "path": "src/tui-commands.ts",
+      "exports": [
+        {
+          "name": "FooterStats",
+          "kind": "interface",
+          "line": 24,
+          "exported": true
+        },
+        {
+          "name": "CommandContext",
+          "kind": "interface",
+          "line": 33,
+          "exported": true
+        },
+        {
+          "name": "routeCommand",
+          "kind": "function",
+          "line": 745,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [],
+          "from": "./tui.js"
+        },
+        {
+          "names": [],
+          "from": "./session-store.js"
+        },
+        {
+          "names": [],
+          "from": "./session-store.js"
+        },
+        {
+          "names": [],
+          "from": "./auto-commit.js"
+        },
+        {
+          "names": [],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [],
+          "from": "./init-command.js"
+        },
+        {
+          "names": [],
+          "from": "./export-helper.js"
+        },
+        {
+          "names": [],
+          "from": "./plan-commands.js"
+        },
+        {
+          "names": [],
+          "from": "./dream.js"
+        },
+        {
+          "names": [],
+          "from": "./tool-registry.js"
+        },
+        {
+          "names": [],
+          "from": "./checkpoint.js"
+        },
+        {
+          "names": [],
+          "from": "./session-history.js"
+        }
+      ],
+      "lastModified": 1775683255968.8535
     }
   ]
 }

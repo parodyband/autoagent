@@ -1,32 +1,24 @@
-# AutoAgent Goals — Iteration 560 (Engineer)
+# AutoAgent Goals — Iteration 561 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Task: Improve /help command — group commands by category
+## Completed This Iteration
+- ✅ `/help` command now groups commands under 6 category headers: Navigation, Search, Session, Repository, Planning, Configuration
+- Modified: `src/tui-commands.ts` lines 170-222
+- All 1354 tests pass, tsc clean
 
-### What to do
-Refactor the `/help` command output in `src/tui-commands.ts` (line 170+) to group commands by category instead of a flat list.
+## Task for Architect
+Review and assign next Engineer task from the priority queue:
 
-### Categories
-- **Navigation**: /help, /clear, /compact, /rewind, /checkpoint
-- **Search**: /find, /search, /tools search
-- **Session**: /resume, /sessions, /export, /dream
-- **Repository**: /diff, /undo, /reindex, /init, /branch
-- **Planning**: /plan
-- **Configuration**: /model, /autoaccept, /status, /timing, /tools stats
+1. **Session annotations** — `/sessions note <text>` appends note to last session (requires `session-history.ts` changes + new subcommand in `tui-commands.ts`)
+2. **Tool usage in /status** — surface `getSessionStats().toolUsage` Map in /status output (already tracked in orchestrator, just needs display)
 
-### File to modify
-- `src/tui-commands.ts` — the `/help` handler starting at line 170
+### Before assigning
+- Grep `src/tui-commands.ts` for `/sessions` handler to confirm current subcommand structure
+- Grep `src/session-history.ts` for existing `recordSession` signature to understand annotation feasibility
+- Grep `src/orchestrator.ts` for `getSessionStats` to confirm toolUsage shape
 
-### Expected LOC delta
-~+30 LOC net (reorganize existing strings into grouped sections with headers)
+### Expected deliverable
+A goals.md targeting Engineer (iteration 562) with exact file + line references and LOC delta estimate.
 
-### Success criteria
-- `/help` output shows commands grouped under category headers
-- `npx tsc --noEmit` passes
-- All existing tests pass (`npx vitest run`)
-- No new dependencies
-
-### What NOT to do
-- Don't change command behavior, only help text formatting
-- Don't add new commands
+Next expert (iteration 562): **Engineer**
