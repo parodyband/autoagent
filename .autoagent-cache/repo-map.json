@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775681766447,
+  "generatedAt": 1775682869776,
   "files": [
     {
       "path": "src/file-cache.ts",
@@ -1894,6 +1894,60 @@
       "lastModified": 1775679429980.6096
     },
     {
+      "path": "src/tools/write_file.ts",
+      "exports": [
+        {
+          "name": "writeFileToolDefinition",
+          "kind": "const",
+          "line": 10,
+          "exported": true
+        },
+        {
+          "name": "WriteFileResult",
+          "kind": "interface",
+          "line": 46,
+          "exported": true
+        },
+        {
+          "name": "fuzzyFindReplace",
+          "kind": "function",
+          "line": 73,
+          "exported": true
+        },
+        {
+          "name": "isAppendOnly",
+          "kind": "function",
+          "line": 151,
+          "exported": true
+        },
+        {
+          "name": "executeWriteFile",
+          "kind": "function",
+          "line": 158,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "../file-cache.js"
+        }
+      ],
+      "lastModified": 1775681672406.741
+    },
+    {
       "path": "src/orchestrator.ts",
       "exports": [
         {
@@ -2037,13 +2091,13 @@
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 1133,
+          "line": 1139,
           "exported": true
         },
         {
           "name": "runSingleTask",
           "kind": "function",
-          "line": 2708,
+          "line": 2712,
           "exported": true
         }
       ],
@@ -2250,61 +2304,7 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775680980290.4873
-    },
-    {
-      "path": "src/tools/write_file.ts",
-      "exports": [
-        {
-          "name": "writeFileToolDefinition",
-          "kind": "const",
-          "line": 10,
-          "exported": true
-        },
-        {
-          "name": "WriteFileResult",
-          "kind": "interface",
-          "line": 46,
-          "exported": true
-        },
-        {
-          "name": "fuzzyFindReplace",
-          "kind": "function",
-          "line": 73,
-          "exported": true
-        },
-        {
-          "name": "isAppendOnly",
-          "kind": "function",
-          "line": 151,
-          "exported": true
-        },
-        {
-          "name": "executeWriteFile",
-          "kind": "function",
-          "line": 158,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [],
-          "from": "../file-cache.js"
-        }
-      ],
-      "lastModified": 1775681672406.741
+      "lastModified": 1775682048227.0122
     },
     {
       "path": "src/tui-commands.ts",
@@ -2312,19 +2312,19 @@
         {
           "name": "FooterStats",
           "kind": "interface",
-          "line": 23,
+          "line": 24,
           "exported": true
         },
         {
           "name": "CommandContext",
           "kind": "interface",
-          "line": 32,
+          "line": 33,
           "exported": true
         },
         {
           "name": "routeCommand",
           "kind": "function",
-          "line": 610,
+          "line": 729,
           "exported": true
         }
       ],
@@ -2388,9 +2388,13 @@
         {
           "names": [],
           "from": "./checkpoint.js"
+        },
+        {
+          "names": [],
+          "from": "./session-history.js"
         }
       ],
-      "lastModified": 1775680967917.3306
+      "lastModified": 1775682856384.2705
     },
     {
       "path": "src/tui.tsx",
@@ -2398,25 +2402,25 @@
         {
           "name": "Message",
           "kind": "interface",
-          "line": 73,
+          "line": 74,
           "exported": true
         },
         {
           "name": "getContextColor",
           "kind": "function",
-          "line": 93,
+          "line": 94,
           "exported": true
         },
         {
           "name": "extractFileQuery",
           "kind": "function",
-          "line": 107,
+          "line": 108,
           "exported": true
         },
         {
           "name": "getFileSuggestions",
           "kind": "function",
-          "line": 120,
+          "line": 121,
           "exported": true
         }
       ],
@@ -2555,10 +2559,66 @@
             "type FooterStats"
           ],
           "from": "./tui-commands.js"
+        },
+        {
+          "names": [
+            "recordSession"
+          ],
+          "from": "./session-history.js"
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775681705168.0298
+      "lastModified": 1775682424038.784
+    },
+    {
+      "path": "src/session-history.ts",
+      "exports": [
+        {
+          "name": "SessionHistoryEntry",
+          "kind": "interface",
+          "line": 9,
+          "exported": true
+        },
+        {
+          "name": "recordSession",
+          "kind": "function",
+          "line": 27,
+          "exported": true
+        },
+        {
+          "name": "getRecentSessions",
+          "kind": "function",
+          "line": 32,
+          "exported": true
+        },
+        {
+          "name": "searchSessions",
+          "kind": "function",
+          "line": 49,
+          "exported": true
+        },
+        {
+          "name": "clearSessionHistory",
+          "kind": "function",
+          "line": 67,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "os"
+        },
+        {
+          "names": [],
+          "from": "path"
+        }
+      ],
+      "lastModified": 1775682605225.8643
     }
   ]
 }

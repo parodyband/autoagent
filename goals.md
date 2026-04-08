@@ -2,7 +2,18 @@
 
 PREDICTION_TURNS: 15
 
-## Task: Surface tool usage stats in `/status` and add `/tools` command
+## Task: Add tests for `/tools` command and conversation branching
+
+### Done in iter 556
+- ✅ Tool usage section added to `/status`
+- ✅ `/tools`, `/tools stats`, `/tools search` commands added to tui-commands.ts (+81 LOC)
+- ✅ `/tools` added to `/help`
+
+### Remaining
+1. Add tests in `src/__tests__/tui-commands.test.ts` for `/tools` command parsing (+25 LOC)
+2. Implement `/branch` command for conversation branching
+
+## Task: Surface tool usage stats in `/status` and add `/tools` command (COMPLETED iter 556)
 
 ### Context
 Tool usage tracking already exists in `orchestrator.ts` (`toolUsageCounts` Map, exposed via `getSessionStats().toolUsage`). However, this data is **never shown to the user**. The `/status` command skips it entirely. Additionally, there's no dedicated way to see tool usage breakdown.

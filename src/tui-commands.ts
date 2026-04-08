@@ -177,7 +177,10 @@ const commands: Record<string, CommandHandler> = {
         "  /help       — Show this help message",
         "  /autoaccept — Toggle auto-accept edits (skip Y/N prompts)",
         "  /init     — Analyze repo and generate/update .autoagent.md",
-        "  /status   — Show session stats (turns, tokens, cost, model)",
+        "  /status   — Show session stats (turns, tokens, cost, model, tool usage)",
+        "  /tools           — List all registered tools with descriptions",
+        "  /tools stats     — Show tool usage counts and timings for this session",
+        "  /tools search Q  — Search tools by keyword",
         "  /find Q   — Fuzzy search files & symbols in the repo",
         "  /search Q — BM25 semantic code search (concept-based)",
         "  /model    — Show current model (or /model haiku|sonnet to switch)",
@@ -349,6 +352,17 @@ const commands: Record<string, CommandHandler> = {
       }
     }
 
+    // Tool usage counts
+    const usageLines: string[] = [];
+    const toolUsage = stats?.toolUsage ?? {};
+    const usageEntries = Object.entries(toolUsage).sort((a, b) => b[1] - a[1]);
+    if (usageEntries.length > 0) {
+      usageLines.push(`  🔧 Tool Usage (${usageEntries.length} tools):`);
+      for (const [name, count] of usageEntries) {
+        usageLines.push(`    ${name}: ${count} calls`);
+      }
+    }
+
     ctx.addMessage({
       role: "assistant",
       content: [
@@ -361,8 +375,74 @@ const commands: Record<string, CommandHandler> = {
         ...sessionLines,
         ...effLines,
         ...timingLines,
+        ...usageLines,
       ].join("\n"),
     });
+    return true;
+  },
+
+  "/tools": async (ctx, args) => {
+    const sub = args?.trim() ?? "";
+    if (sub === "stats") {
+      const stats = ctx.orchestratorRef.current?.getSessionStats();
+      const timings = ctx.orchestratorRef.current?.getToolTimings() ?? [];
+      const toolUsage = stats?.toolUsage ?? {};
+      const entries = Object.entries(toolUsage).sort((a, b) => b[1] - a[1]);
+      if (entries.length === 0) {
+        ctx.addMessage({ role: "assistant", content: "No tool calls recorded this session." });
+        return true;
+      }
+      const timingMap = new Map(timings.map(t => [t.toolName, t]));
+      const lines = ["Tool Usage Stats (this session):", ""];
+      lines.push("  Tool                   Calls  Avg (ms)");
+      lines.push("  ───────────────────── ─────── ─────────");
+      for (const [name, count] of entries) {
+        const t = timingMap.get(name);
+        const avg = t ? String(Math.round(t.avgMs)).padStart(9) : "        —";
+        lines.push(`  ${name.padEnd(21)} ${String(count).padStart(7)}${avg}`);
+      }
+      ctx.addMessage({ role: "assistant", content: lines.join("\n") });
+      return true;
+    }
+
+    if (sub.startsWith("search ")) {
+      const query = sub.slice(7).trim();
+      if (!query) {
+        ctx.addMessage({ role: "assistant", content: "Usage: /tools search <query>" });
+        return true;
+      }
+      const { createDefaultRegistry: cdr } = await import("./tool-registry.js");
+      const results = cdr().searchTools(query);
+      if (!results || results.length === 0) {
+        ctx.addMessage({ role: "assistant", content: `No tools matching "${query}".` });
+        return true;
+      }
+      const lines = [`Tools matching "${query}":`, ""];
+      for (const t of results) {
+        const desc = (t.definition.description ?? "").split("\n")[0];
+        lines.push(`  ${t.definition.name.padEnd(22)} ${desc}`);
+      }
+      ctx.addMessage({ role: "assistant", content: lines.join("\n") });
+      return true;
+    }
+
+    // Default: list all tools using dynamic import (ESM)
+    const { createDefaultRegistry } = await import("./tool-registry.js");
+    const tempReg = createDefaultRegistry();
+    const defs = tempReg.getDefinitions();
+    if (!defs || defs.length === 0) {
+      ctx.addMessage({ role: "assistant", content: "No tools registered." });
+      return true;
+    }
+    const lines = [`Registered tools (${defs.length}):`, ""];
+    for (const d of defs) {
+      const desc = (d.description ?? "").split("\n")[0].slice(0, 60);
+      lines.push(`  ${d.name.padEnd(22)} ${desc}`);
+    }
+    lines.push("");
+    lines.push("  Use /tools stats to see usage counts and timings.");
+    lines.push("  Use /tools search <query> to find tools by keyword.");
+    ctx.addMessage({ role: "assistant", content: lines.join("\n") });
     return true;
   },
 
