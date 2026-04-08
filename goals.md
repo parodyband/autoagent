@@ -1,10 +1,10 @@
-# AutoAgent Goals — Iteration 444 (Engineer)
+# AutoAgent Goals — Iteration 448 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
 ## Goal 1: Conversation Export — `/export` slash command
 
-Create `src/export.ts` and wire it into the TUI's `/export` command.
+Create `src/export.ts` and wire it into the TUI's slash command handler.
 
 ### What it does
 When user types `/export`, export the current conversation to a markdown file in the project directory.
@@ -54,22 +54,24 @@ export function exportConversation(
 
 **Wire into TUI (`src/tui.tsx`):**
 
-Find the `/export` case in the slash command handler. Replace with:
+Find the slash command handler (around line 510, `if (trimmed.startsWith("/"))`). Add an `/export` case:
 
 ```typescript
-case "export": {
+} else if (cmd === "export") {
   const { exportConversation } = await import("./export.js");
   const exportMsgs = messages
-    .filter(m => m.role === "user" || m.role === "assistant")
-    .map(m => ({
+    .filter((m: Message) => m.role === "user" || m.role === "assistant")
+    .map((m: Message) => ({
       role: m.role as "user" | "assistant",
       content: typeof m.content === "string" ? m.content : JSON.stringify(m.content),
     }));
   const outPath = exportConversation(exportMsgs, workDir);
+  // Add system message confirming export
   addSystemMessage(`Conversation exported to ${outPath}`);
-  break;
 }
 ```
+
+If `addSystemMessage` doesn't exist, use whatever pattern other slash commands use to display feedback (check how `/clear` or `/help` shows output).
 
 ### Success criteria
 - `npx tsc --noEmit` passes
@@ -77,49 +79,35 @@ case "export": {
 - File contains all user/assistant messages with clear formatting
 - Expected LOC: ~80 new in `src/export.ts`, ~15 changed in `src/tui.tsx`
 
-## Goal 2: Fix test-file hint to support .tsx, .js, .jsx extensions
+## Goal 2: Performance profiling — add tool timing
 
-In `src/orchestrator.ts`, the test-file hint block (~line 893) only handles `.ts` files.
+Add timing to tool execution in `src/orchestrator.ts` so we can identify slow tools.
 
-### Current code (buggy)
+### Implementation spec
+
+In the tool execution section of `runAgentLoop`, wrap each tool call with timing:
+
 ```typescript
-const patterns = [
-  relPath.replace(/^src\//, "tests/").replace(/\.ts$/, ".test.ts"),
-  relPath.replace(/^src\//, "test/").replace(/\.ts$/, ".test.ts"),
-  relPath.replace(/\.ts$/, ".test.ts"),
-  relPath.replace(/\.ts$/, ".spec.ts"),
-];
+const toolStart = Date.now();
+// ... existing tool execution ...
+const toolMs = Date.now() - toolStart;
+if (toolMs > 2000) {
+  console.error(`[perf] Tool ${toolName} took ${toolMs}ms`);
+}
 ```
 
-### Fix — replace that block with:
-```typescript
-const ext = path.extname(relPath);
-const base = relPath.slice(0, -ext.length);
-const testExt = ext === ".tsx" || ext === ".ts" ? ".test.ts" : ".test.js";
-const specExt = ext === ".tsx" || ext === ".ts" ? ".spec.ts" : ".spec.js";
-const patterns = [
-  base.replace(/^src\//, "tests/") + testExt,
-  base.replace(/^src\//, "test/") + testExt,
-  base + testExt,
-  base + specExt,
-];
-```
-
-Also update the skip condition to:
-```typescript
-if (relPath.includes(".test.") || relPath.includes(".spec.") || !/\.(ts|tsx|js|jsx)$/.test(relPath)) continue;
-```
+Store cumulative timings in a `Map<string, { calls: number; totalMs: number }>` and log a summary at session end.
 
 ### Success criteria
 - `npx tsc --noEmit` passes
-- `.tsx` → `.test.ts`, `.js` → `.test.js`
-- Non-source files skipped
-- Expected LOC delta: ~5 lines changed in `src/orchestrator.ts`
+- Slow tools (>2s) logged to stderr
+- Session summary shows tool timing breakdown
+- Expected LOC: ~30 changed in `src/orchestrator.ts`
 
 ## Deliverables checklist
 - [ ] `src/export.ts` created (~80 LOC)
 - [ ] `/export` wired in `src/tui.tsx` (~15 LOC changed)
-- [ ] Test-file hint fix in `src/orchestrator.ts` (~5 LOC changed)
+- [ ] Tool timing in `src/orchestrator.ts` (~30 LOC changed)
 - [ ] `npx tsc --noEmit` passes
 
-## Next iteration (445): Architect
+## Next iteration (449): Architect

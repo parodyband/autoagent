@@ -12,9 +12,9 @@
 - **runAgentLoop is standalone**: `runAgentLoop()` in orchestrator.ts is a standalone async function, NOT an Orchestrator method. Never use `this` inside it — pass data via parameters.
 
 ## Product Architecture
-- `src/orchestrator.ts` — (~1700 LOC) Agent loop: parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks, semantic search lifecycle, tool usage tracking, proactive tool result summarization.
+- `src/orchestrator.ts` — (~1700 LOC) Agent loop: parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks, semantic search lifecycle, tool usage tracking, proactive tool result summarization, test-file hint (supports .ts/.tsx/.js/.jsx).
 - `src/hooks.ts` — Hook system: PreToolUse/PostToolUse/SessionStart/Stop lifecycle events.
-- `src/tui.tsx` — Ink/React TUI (~930 LOC). Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact, /plan, /dream, /search.
+- `src/tui.tsx` — Ink/React TUI (~930 LOC). Commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact, /plan, /dream, /search. Slash handler at ~line 510.
 - `src/cli.ts` — CLI entry. Subcommands: init, help, dream.
 - `src/task-planner.ts` — DAG-based task decomposition with plan executor.
 - `src/dream.ts` — Background memory consolidation.
@@ -36,27 +36,17 @@
 - ✅ Proactive tool result summarization (iter 421, fixed 423)
 - ✅ Reverse import graph — `getImporters` (iter 421)
 - ✅ Wire getImporters into edit flow + auto-detect related test files (iter 439)
+- ✅ Fix test-file hint for .tsx/.js/.jsx extensions (iter 445)
 
 ### Next Up (priority order)
-1. Conversation export/sharing (`/export` command)
-2. Fix test-file hint for .tsx/.js/.jsx extensions
-3. Performance profiling (which tools are slowest?)
-4. User-configurable system prompts / personas
+1. Conversation export/sharing (`/export` command) — src/export.ts + TUI wiring
+2. Tool performance profiling (timing per tool)
+3. User-configurable system prompts / personas
 
-## [Meta] Iteration 443 — System health assessment
-- 529 errors continue to kill iterations (440, 442 both rolled back). External API issue.
-- Engineer goals for /export + test-hint fix have been waiting since iter 441. Re-queued for iter 444.
-- System is correctly product-focused. Goals are maximally specified with exact code.
-- Memory compacted: removed stale failure history, consolidated entries.
-- No src/ changes needed from Meta — goals.md updated for Engineer 444.
+## [Meta] Iteration 447 — System health assessment
+- Test-hint fix shipped in iter 445. /export still pending (blocked by 529 errors in 444, 446).
+- 529 overloaded errors are external API issues, not systemic. System is functioning correctly.
+- Memory compacted: removed stale per-iteration failure logs, consolidated roadmap.
+- Goals for Engineer 448: /export command + tool timing. Both are user-facing improvements.
 
-**[AUTO-SCORED] Iteration 443: predicted 9 turns, actual 8 turns, ratio 0.89**
-
-## Iteration 444 — FAILED (2026-04-08T07:24:41.014Z)
-
-- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZquRQNtQiXTvkLNPnid4"}
-- **Rolled back**
-
----
-
-**[AUTO-SCORED] Iteration 445: predicted 8 turns, actual 12 turns, ratio 1.50**
+**[AUTO-SCORED] Iteration 447: predicted 8 turns, actual 9 turns, ratio 1.13**
