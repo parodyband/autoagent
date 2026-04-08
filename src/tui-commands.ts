@@ -754,6 +754,34 @@ const commands: Record<string, CommandHandler> = {
   },
 };
 
+/** Command names with short descriptions for autocomplete. */
+export const commandMeta: { name: string; desc: string }[] = [
+  { name: "/autoaccept", desc: "Toggle auto-accept edits" },
+  { name: "/branch", desc: "Save/restore branch snapshots" },
+  { name: "/checkpoint", desc: "List or rollback file checkpoints" },
+  { name: "/clear", desc: "Clear conversation history" },
+  { name: "/compact", desc: "Compact conversation context" },
+  { name: "/diff", desc: "Show uncommitted git changes" },
+  { name: "/dream", desc: "Consolidate session memory" },
+  { name: "/exit", desc: "Quit AutoAgent" },
+  { name: "/export", desc: "Export conversation to markdown" },
+  { name: "/find", desc: "Fuzzy search files & symbols" },
+  { name: "/help", desc: "Show help message" },
+  { name: "/init", desc: "Analyze repo, generate .autoagent.md" },
+  { name: "/model", desc: "Show or switch model" },
+  { name: "/plan", desc: "Create and execute a task plan" },
+  { name: "/reindex", desc: "Re-index repository files" },
+  { name: "/resume", desc: "Restore a previous session" },
+  { name: "/retry", desc: "Re-send last user message" },
+  { name: "/rewind", desc: "Restore conversation checkpoint" },
+  { name: "/search", desc: "BM25 semantic code search" },
+  { name: "/sessions", desc: "Browse saved sessions" },
+  { name: "/status", desc: "Show session stats" },
+  { name: "/timing", desc: "Show tool performance timings" },
+  { name: "/tools", desc: "List registered tools" },
+  { name: "/undo", desc: "Revert last autoagent commit" },
+];
+
 /**
  * Route a slash command to its handler.
  * Returns true if a command was handled, false if the input is not a command.

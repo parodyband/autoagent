@@ -43,9 +43,10 @@
 ---
 
 ## Next Up (Priority Order)
-1. **`/help` improvements** — group commands by category, show usage examples. Assigned iter 560.
-2. **Session annotations** — `/sessions note <text>` appends note to last session.
-3. **Tool usage in /status** — surface `getSessionStats().toolUsage` in /status output.
+1. **TUI formatting/UX overhaul** — Output looks cluttered; lines run together instead of being visually distinct per thought/section. Needs better spacing, visual hierarchy, grouping, and breathing room. **Suggested approach:** Add a **TUI UX/UI Expert** turn to the rotation that reviews current TUI state and writes detailed goals for UX improvements (spacing, borders, color, whitespace, section separation). Follow with an **Engineer** turn to implement. Consider making this a recurring rotation expert (e.g. BUILTIN_EXPERTS adds a UX_EXPERT slot).
+2. **`/help` improvements** — group commands by category, show usage examples. Assigned iter 560.
+3. **Session annotations** — `/sessions note <text>` appends note to last session.
+4. **Tool usage in /status** — surface `getSessionStats().toolUsage` in /status output.
 
 ---
 

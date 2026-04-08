@@ -29,7 +29,7 @@ import { shouldShowWelcome } from "./welcome.js";
 import { MODEL_SONNET } from "./models.js";
 import type { Task, TaskPlan } from "./task-planner.js";
 import { Markdown } from "./markdown-renderer.js";
-import { routeCommand, type FooterStats } from "./tui-commands.js";
+import { routeCommand, commandMeta, type FooterStats } from "./tui-commands.js";
 import { recordSession } from "./session-history.js";
 
 // Parse args
@@ -396,6 +396,9 @@ function App() {
   const [inputHistory, setInputHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [savedInput, setSavedInput] = useState("");
+  // Command autocomplete state
+  const [cmdSuggestions, setCmdSuggestions] = useState<{ name: string; desc: string }[]>([]);
+  const [cmdSuggestionIdx, setCmdSuggestionIdx] = useState(0);
   // Reverse-search state (Ctrl+R)
   const [searchMode, setSearchMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -521,6 +524,18 @@ function App() {
   const handleInputChange = useCallback((val: string) => {
     if (historyIndex !== -1) setHistoryIndex(-1);
     onFileInput(val, setInput);
+
+    // Command autocomplete: trigger when input is "/" alone or "/partial" with no spaces
+    if (val.startsWith("/") && !val.includes(" ")) {
+      const partial = val.toLowerCase();
+      const matches = commandMeta.filter(c => c.name.startsWith(partial)).slice(0, 10);
+      // Hide if exact match (user already typed the full command)
+      setCmdSuggestions(matches.length === 1 && matches[0].name === val ? [] : matches);
+      setCmdSuggestionIdx(0);
+    } else {
+      setCmdSuggestions([]);
+      setCmdSuggestionIdx(0);
+    }
   }, [onFileInput, historyIndex]);
 
   // ─── Reverse-search helpers ───────────────────────────────
@@ -653,6 +668,20 @@ function App() {
       }
       return;
     }
+    // Tab: cycle through command suggestions
+    if (key.tab && cmdSuggestions.length > 0) {
+      const nextIdx = (cmdSuggestionIdx + 1) % cmdSuggestions.length;
+      setCmdSuggestionIdx(nextIdx);
+      return;
+    }
+    // Enter when command suggestions open: accept highlighted suggestion
+    if (key.return && cmdSuggestions.length > 0) {
+      const selected = cmdSuggestions[cmdSuggestionIdx];
+      setInput(selected.name + " ");
+      setCmdSuggestions([]);
+      setCmdSuggestionIdx(0);
+      return;
+    }
     // Tab: cycle through / accept file suggestions
     if (key.tab && fileSuggestions.length > 0) {
       const nextIdx = (fileSuggestionIdx + 1) % fileSuggestions.length;
@@ -669,6 +698,11 @@ function App() {
       return;
     }
     if (key.escape) {
+      if (cmdSuggestions.length > 0) {
+        setCmdSuggestions([]);
+        setCmdSuggestionIdx(0);
+        return;
+      }
       if (fileSuggestions.length > 0) {
         dismissSuggestions();
         return;
@@ -877,6 +911,20 @@ function App() {
         <Box marginTop={1} paddingLeft={2}>
           {loading && <Text color="gray"><Spinner type="dots" /> </Text>}
           <Text color="gray" dimColor>{status}{ctxWarningText}</Text>
+        </Box>
+      )}
+
+      {/* Command suggestions */}
+      {cmdSuggestions.length > 0 && (
+        <Box flexDirection="column" paddingLeft={2}>
+          {cmdSuggestions.map((c, i) => (
+            <Box key={c.name}>
+              <Text color={i === cmdSuggestionIdx ? "cyan" : "gray"} dimColor={i !== cmdSuggestionIdx}>
+                {i === cmdSuggestionIdx ? "▸ " : "  "}{c.name.padEnd(16)}
+              </Text>
+              <Text color="gray" dimColor> {c.desc}</Text>
+            </Box>
+          ))}
         </Box>
       )}
 
