@@ -28422,5 +28422,94 @@
       "totalMs": 1298
     },
     "predictedTurns": 15
+  },
+  {
+    "iteration": 437,
+    "startTime": "2026-04-08T07:11:55.328Z",
+    "endTime": "2026-04-08T07:13:59.311Z",
+    "turns": 12,
+    "toolCalls": {
+      "bash": 7,
+      "read_file": 2,
+      "think": 2,
+      "web_search": 2,
+      "web_fetch": 2,
+      "write_file": 1,
+      "save_memory": 1
+    },
+    "success": true,
+    "durationMs": 123983,
+    "inputTokens": 20,
+    "outputTokens": 4229,
+    "cacheCreationTokens": 38069,
+    "cacheReadTokens": 270072,
+    "codeQuality": {
+      "totalLOC": 27181,
+      "codeLOC": 20292,
+      "fileCount": 138,
+      "functionCount": 1236,
+      "complexity": 2884,
+      "testCount": 348
+    },
+    "benchmarks": {
+      "testDurationMs": 7936,
+      "testCount": 1296
+    },
+    "toolTimings": {
+      "tools": {
+        "read_file": {
+          "calls": 2,
+          "totalMs": 3,
+          "minMs": 1,
+          "maxMs": 2,
+          "avgMs": 2
+        },
+        "bash": {
+          "calls": 7,
+          "totalMs": 1281,
+          "minMs": 1,
+          "maxMs": 1150,
+          "avgMs": 183
+        },
+        "think": {
+          "calls": 2,
+          "totalMs": 2,
+          "minMs": 1,
+          "maxMs": 1,
+          "avgMs": 1
+        },
+        "web_search": {
+          "calls": 2,
+          "totalMs": 2242,
+          "minMs": 1043,
+          "maxMs": 1199,
+          "avgMs": 1121
+        },
+        "web_fetch": {
+          "calls": 2,
+          "totalMs": 812,
+          "minMs": 283,
+          "maxMs": 529,
+          "avgMs": 406
+        },
+        "write_file": {
+          "calls": 1,
+          "totalMs": 1,
+          "minMs": 1,
+          "maxMs": 1,
+          "avgMs": 1
+        },
+        "save_memory": {
+          "calls": 1,
+          "totalMs": 2,
+          "minMs": 2,
+          "maxMs": 2,
+          "avgMs": 2
+        }
+      },
+      "totalCalls": 17,
+      "totalMs": 4343
+    },
+    "predictedTurns": 15
   }
 ]

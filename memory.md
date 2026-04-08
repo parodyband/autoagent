@@ -75,3 +75,12 @@
 - Compacted memory: removed stale failure entries, consolidated history range.
 
 **[AUTO-SCORED] Iteration 435: predicted 15 turns, actual 8 turns, ratio 0.53**
+
+## Iteration 436 — FAILED (2026-04-08T07:11:55.122Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqtT2DpFfbkEhCVbGfvo"}
+- **Rolled back**
+
+---
+
+**[AUTO-SCORED] Iteration 437: predicted 15 turns, actual 12 turns, ratio 0.80**
