@@ -354,6 +354,37 @@ export function buildRepoMap(workDir: string, files: string[]): RepoMap {
   return { files: parsedFiles, builtAt: Date.now() };
 }
 
+/** Yield to the event loop so Ink can process keystrokes. */
+const yieldToLoop = () => new Promise<void>(r => setImmediate(r));
+
+/**
+ * Async version of buildRepoMap that yields to the event loop every `chunkSize`
+ * files, preventing input lag in the TUI during large repo indexing.
+ */
+export async function buildRepoMapAsync(
+  workDir: string,
+  files: string[],
+  chunkSize = 20,
+  signal?: AbortSignal,
+): Promise<RepoMap> {
+  const parsedFiles: ParsedFile[] = [];
+
+  for (let i = 0; i < files.length; i++) {
+    if (signal?.aborted) break;
+    const f = files[i];
+    const absPath = path.isAbsolute(f) ? f : path.join(workDir, f);
+    const parsed = parseFile(absPath);
+    parsed.path = path.relative(workDir, absPath);
+    parsedFiles.push(parsed);
+
+    if ((i + 1) % chunkSize === 0) {
+      await yieldToLoop();
+    }
+  }
+
+  return { files: parsedFiles, builtAt: Date.now() };
+}
+
 /**
  * Rank exported symbols by how many files import them (in-degree count).
  *

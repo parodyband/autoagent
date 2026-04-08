@@ -139,7 +139,7 @@ const MAX_ESTIMATE_FILES = 200;
 
 function estimateSize(dir: string): { fileCount: number; approxLoc: number } {
   let fileCount = 0;
-  let approxLoc = 0;
+  let totalBytes = 0;
 
   function walk(d: string, depth: number): void {
     if (depth > 5 || fileCount >= MAX_ESTIMATE_FILES) return;
@@ -153,14 +153,15 @@ function estimateSize(dir: string): { fileCount: number; approxLoc: number } {
       } else if (entry.isFile() && SOURCE_EXTS.has(path.extname(entry.name).toLowerCase())) {
         fileCount++;
         try {
-          const content = readFileSync(path.join(d, entry.name), "utf-8");
-          approxLoc += content.split("\n").length;
+          totalBytes += statSync(path.join(d, entry.name)).size;
         } catch { /* skip unreadable files */ }
       }
     }
   }
 
   walk(dir, 0);
+  // Estimate ~35 bytes per line for source code
+  const approxLoc = Math.round(totalBytes / 35);
   return { fileCount, approxLoc };
 }
 

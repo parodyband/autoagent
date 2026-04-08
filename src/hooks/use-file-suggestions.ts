@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { buildRepoMap, fuzzySearch, type RepoMap } from "../tree-sitter-map.js";
-import { execSync } from "child_process";
+import { buildRepoMapAsync, fuzzySearch, type RepoMap } from "../tree-sitter-map.js";
+import { exec } from "child_process";
 import { extractFileQuery, getFileSuggestions } from "../tui.js";
 
 interface UseFileSuggestionsOpts {
@@ -13,13 +13,21 @@ export function useFileSuggestions({ workDir, setInput }: UseFileSuggestionsOpts
   const [fileSuggestionIdx, setFileSuggestionIdx] = useState(0);
   const repoMapRef = useRef<RepoMap | null>(null);
 
-  // Build initial repo map
+  // Build initial repo map asynchronously so the event loop stays responsive
   useEffect(() => {
-    try {
-      const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
-      const allFiles = out.split("\n").filter(Boolean);
-      repoMapRef.current = buildRepoMap(workDir, allFiles);
-    } catch { /* non-git repo — suggestions unavailable */ }
+    const ac = new AbortController();
+
+    exec(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf8" }, (err, stdout) => {
+      if (err || ac.signal.aborted) return;
+      const allFiles = stdout.split("\n").filter(Boolean);
+      buildRepoMapAsync(workDir, allFiles, 20, ac.signal).then(map => {
+        if (!ac.signal.aborted) {
+          repoMapRef.current = map;
+        }
+      });
+    });
+
+    return () => ac.abort();
   }, [workDir]);
 
   const handleInputChange = useCallback((val: string, rawSetInput: (v: string) => void) => {
