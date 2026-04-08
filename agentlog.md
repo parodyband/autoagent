@@ -1,64 +1,3 @@
-2362 |     }
-2363 | 
-2364 |     // Log tool timing summary to stderr
-2365 |     if (this.toolTimings.size > 0) {
-2366 |       const sorted = [...this.toolTimings.entries()].sort((a, b) => b[1].totalMs - a[1].totalMs);
-2367 |       const lines = sorted.map(([name, { calls, totalMs }]) =>
-2368 |         `  ${name}: ${calls} calls, ${totalMs}ms total, avg ${Math.round(totalMs / calls)}ms`
-2369 |       );
-2370 |       process.stderr.write(`[perf] Tool timing summary:\n${lines.join("\n")}\n`);
-2371 |     }
-2372 | 
-2373 |     return { text, tokensIn, tokensOut, model, verificationPassed, commitResult };
-2374 |   }
-2375 | }
-2376 | 
-2377 | /**
-[2026-04-08T07:34:46.890Z] iter=448 turn=23 INFO: Turn 23/25
-[2026-04-08T07:34:52.021Z] iter=448 turn=23 INFO: $ npx tsc --noEmit 2>&1 | head -30
-[2026-04-08T07:34:53.147Z] iter=448 turn=23 INFO:   -> exit=0 (11 chars)
-[2026-04-08T07:34:53.147Z] iter=448 turn=23 INFO: HARD TURN CAP REACHED: 23 turns (predicted 15, cap 23). Forcing commit.
-[2026-04-08T07:34:53.149Z] iter=448 turn=23 INFO: Cache persisted: 60 entries to .autoagent-cache.json
-[2026-04-08T07:34:53.149Z] iter=448 turn=23 INFO: Cache stats: 0 hits, 6 misses, 60 entries, 3 invalidations (5 entries removed)
-[2026-04-08T07:34:53.149Z] iter=448 turn=23 INFO: Tool cache stats
-[2026-04-08T07:34:53.149Z] iter=448 turn=23 INFO: Tool timing: bash: 12x, avg=110ms, total=1325ms; write_file: 3x, avg=3ms, total=9ms; read_file: 6x, avg=1ms, total=5ms; read_scratchpad: 1x, avg=4ms, total=4ms; think: 4x, avg=1ms, total=2ms
-[2026-04-08T07:34:53.149Z] iter=448 turn=23 INFO: Tool timing stats
-[2026-04-08T07:35:01.153Z] iter=448 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 448: predicted 15 turns, actual 23 turns, ratio 1.53**
-[2026-04-08T07:35:10.828Z] iter=448 turn=23 INFO: Pre-commit review (810in/282out): **Issues:**
-
-- **`rec.durationMs` may be undefined/NaN**: If the `ToolRecord` type doesn't guarantee `durationMs` is always populated (e.g., for errored or retried calls that short-circuit), `existing
-[2026-04-08T07:35:10.910Z] iter=448 turn=23 INFO: Committed: 85de2e75 (41 in / 3118 out, cache: 22635 created, 313558 read)
-[2026-04-08T07:35:10.910Z] iter=448 turn=23 INFO: Restarting as iteration 449...
-[2026-04-08T07:35:11.110Z] iter=449 INFO: Cache restored: 60/60 entries (0 stale)
-[2026-04-08T07:35:11.112Z] iter=449 INFO: Turn budget: 14/25 (calibration=1.53x, predicted=15)
-[2026-04-08T07:35:11.113Z] iter=449 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-08T07:35:11.310Z] iter=449 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-08T07:35:11.310Z] iter=449 turn=1 INFO: Turn 1/25
-[2026-04-08T07:35:15.992Z] iter=449 turn=1 INFO: Agent: 
-
-I'll start by evaluating what the Engineer built in iteration 448, then do research, and set direction for the next iteration.
-[2026-04-08T07:35:15.992Z] iter=449 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -5
-[2026-04-08T07:35:15.996Z] iter=449 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git diff HEAD~1 --stat
-[2026-04-08T07:35:16.000Z] iter=449 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && ls src/export.ts 2>/dev/null && echo "EXISTS" || echo "MISSING"
-[2026-04-08T07:35:16.012Z] iter=449 turn=1 INFO:   -> exit=0 (8 chars)
-[2026-04-08T07:35:16.013Z] iter=449 turn=1 INFO:   -> exit=0 (165 chars)
-[2026-04-08T07:35:16.022Z] iter=449 turn=1 INFO:   -> exit=0 (376 chars)
-[2026-04-08T07:35:16.023Z] iter=449 turn=2 INFO: Turn 2/25
-[2026-04-08T07:35:20.186Z] iter=449 turn=2 INFO: think: So iteration 448 (Engineer) only changed src/orchestrator.ts (+17 lines) but did NOT create src/export.ts. Goal 1 (conve...
-[2026-04-08T07:35:20.188Z] iter=449 turn=3 INFO: Turn 3/25
-[2026-04-08T07:35:24.999Z] iter=449 turn=3 INFO: Agent: 
-
-Good checkpoint. My deliverables as Architect are: (1) evaluate iteration 448, (2) research, (3) write goals.md for Engineer iteration 450. Let me do this efficiently.
-[2026-04-08T07:35:25.000Z] iter=449 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && git diff HEAD~1 -- src/orchestrator.ts
-[2026-04-08T07:35:25.005Z] iter=449 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "export\|/export" src/tui.tsx | head -20
-[2026-04-08T07:35:25.009Z] iter=449 turn=3 INFO: web_search: "Claude Code CLI architecture tool use parallel execution 2025"
-[2026-04-08T07:35:25.032Z] iter=449 turn=3 INFO:   -> exit=0 (199 chars)
-[2026-04-08T07:35:25.032Z] iter=449 turn=3 INFO:   -> exit=0 (1926 chars)
-[2026-04-08T07:35:25.928Z] iter=449 turn=3 INFO:   -> 8 results
-[2026-04-08T07:35:25.929Z] iter=449 turn=4 INFO: Turn 4/25
-[2026-04-08T07:35:29.317Z] iter=449 turn=4 INFO: web_fetch: https://taipm.github.io/claude-code-website/technical-architecture.html
-[2026-04-08T07:35:29.321Z] iter=449 turn=4 INFO: web_search: "Aider AI coding assistant context management file selection 2025"
-[2026-04-08T07:35:29.527Z] iter=449 turn=4 INFO:   -> ok (7418 chars)
 [2026-04-08T07:35:30.073Z] iter=449 turn=4 INFO:   -> 8 results
 [2026-04-08T07:35:30.073Z] iter=449 turn=5 INFO: Turn 5/25
 [2026-04-08T07:35:33.371Z] iter=449 turn=5 INFO: web_fetch: https://deepwiki.com/Aider-AI/aider/4-repository-understanding-and-context
@@ -1056,3 +995,89 @@ You're right — I'm Meta, not Engineer. My job is memory + goals + system asses
 [2026-04-08T08:00:25.003Z] iter=463 turn=9 INFO: Tool timing stats
 [2026-04-08T08:00:32.856Z] iter=463 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 463: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-08T08:00:32.879Z] iter=463 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T08:01:36.446Z] iter=464 turn=4 INFO: Rolled back to pre-iteration-464
+[2026-04-08T08:01:36.446Z] iter=464 turn=4 INFO: Failure recorded. Restarting...
+[2026-04-08T08:01:36.651Z] iter=465 1/3 consecutive failures
+[2026-04-08T08:01:36.653Z] iter=465 INFO: Cache restored: 60/60 entries (0 stale)
+[2026-04-08T08:01:36.655Z] iter=465 INFO: Turn budget: 16/25 (calibration=1.13x, predicted=15)
+[2026-04-08T08:01:36.655Z] iter=465 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-08T08:01:36.850Z] iter=465 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T08:01:36.851Z] iter=465 turn=1 INFO: Turn 1/25
+[2026-04-08T08:01:44.670Z] iter=465 turn=1 INFO: Agent: 
+
+I'm the Architect for iteration 465. Let me start by understanding the current state and then do research before planning the next steps.
+[2026-04-08T08:01:44.671Z] iter=465 turn=1 INFO: read_scratchpad: 1417 chars
+[2026-04-08T08:01:44.672Z] iter=465 turn=2 INFO: Turn 2/25
+[2026-04-08T08:01:48.239Z] iter=465 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && ls src/checkpoint.ts 2>/dev/null && wc -l src/checkpoint.ts || echo "checkpoint.ts not found"
+[2026-04-08T08:01:48.242Z] iter=465 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-08T08:01:48.244Z] iter=465 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-08T08:01:48.252Z] iter=465 turn=2 INFO:   -> exit=0 (1551 chars)
+[2026-04-08T08:01:48.253Z] iter=465 turn=2 INFO:   -> exit=0 (45 chars)
+[2026-04-08T08:01:49.345Z] iter=465 turn=2 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:01:49.345Z] iter=465 turn=3 INFO: Turn 3/25
+[2026-04-08T08:01:54.417Z] iter=465 turn=3 INFO: Agent: 
+
+Good checkpoint. I'm the Architect — my deliverable is **goals.md for the next Engineer iteration (466)** plus **research notes**. Let me do focused research and write the goals.
+[2026-04-08T08:01:54.418Z] iter=465 turn=3 INFO: read_file: src/checkpoint.ts
+[2026-04-08T08:01:54.418Z] iter=465 turn=3 INFO:   -> ok (2932 chars)
+[2026-04-08T08:01:54.418Z] iter=465 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "checkpoint\|rollback" src/tui-commands.ts 2>/dev/null || echo "No checkpoint references in tui-commands.ts"
+[2026-04-08T08:01:54.420Z] iter=465 turn=3 INFO: web_search: "Claude Code checkpoint rollback architecture coding agent 2025"
+[2026-04-08T08:01:54.443Z] iter=465 turn=3 INFO:   -> exit=0 (849 chars)
+[2026-04-08T08:01:55.415Z] iter=465 turn=3 INFO:   -> 8 results
+[2026-04-08T08:01:55.416Z] iter=465 turn=4 INFO: Turn 4/25
+[2026-04-08T08:01:58.285Z] iter=465 turn=4 INFO: web_fetch: https://code.claude.com/docs/en/checkpointing
+[2026-04-08T08:01:58.288Z] iter=465 turn=4 INFO: web_fetch: https://gist.github.com/yanchuk/0c47dd351c2805236e44ec3935e9095d
+[2026-04-08T08:01:58.589Z] iter=465 turn=4 INFO:   -> ok (40619 chars)
+[2026-04-08T08:01:58.829Z] iter=465 turn=4 INFO:   -> ok (50756 chars)
+[2026-04-08T08:01:58.830Z] iter=465 turn=5 INFO: Turn 5/25
+[2026-04-08T08:02:23.877Z] iter=465 turn=5 INFO: think: This is an incredibly detailed architecture analysis of Claude Code. Let me extract the most impactful ideas that we cou...
+[2026-04-08T08:02:23.878Z] iter=465 turn=6 INFO: Turn 6/25
+[2026-04-08T08:02:30.288Z] iter=465 turn=6 INFO: Agent: 
+
+**Goal status for Architect iteration 465:**
+- My deliverable is **goals.md** for Engineer iteration 466 + research notes + memory updates
+- Status: **IN PROGRESS** — research done, now need to write goals.md and save memory
+
+Let me check the remaining context I need, then write deliverables.
+[2026-04-08T08:02:30.288Z] iter=465 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getToolTimings\|toolTimings\|tool.timings" src/tui.tsx src/cli.ts 2>/dev/null | head -20
+[2026-04-08T08:02:30.290Z] iter=465 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "checkpoint\|/rewind" src/tui-commands.ts | head -30
+[2026-04-08T08:02:30.301Z] iter=465 turn=6 INFO:   -> exit=0 (68 chars)
+[2026-04-08T08:02:30.301Z] iter=465 turn=6 INFO:   -> exit=0 (889 chars)
+[2026-04-08T08:02:30.302Z] iter=465 turn=7 INFO: Turn 7/25
+[2026-04-08T08:02:33.304Z] iter=465 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getToolTimings" src/orchestrator.ts | head -5
+[2026-04-08T08:02:33.307Z] iter=465 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "checkpointManager\|checkpoint" src/orchestrator.ts | head -10
+[2026-04-08T08:02:33.317Z] iter=465 turn=7 INFO:   -> exit=0 (80 chars)
+[2026-04-08T08:02:33.321Z] iter=465 turn=7 INFO:   -> exit=0 (546 chars)
+[2026-04-08T08:02:33.321Z] iter=465 turn=8 INFO: Turn 8/25
+[2026-04-08T08:02:59.746Z] iter=465 turn=8 INFO: Agent: Good — `checkpointManager` is already imported and wired into orchestrator for file tracking. Now let me write the deliverables.
+[2026-04-08T08:02:59.747Z] iter=465 turn=8 INFO: write_file: goals.md (write)
+[2026-04-08T08:02:59.750Z] iter=465 turn=8 INFO:   -> ok: Updated goals.md (4336 chars, +68 lines delta)
+[2026-04-08T08:02:59.751Z] iter=465 turn=9 INFO: Turn 9/25
+[2026-04-08T08:03:12.516Z] iter=465 turn=9 INFO: Agent: Now save research notes and memory updates:
+[2026-04-08T08:03:12.516Z] iter=465 turn=9 INFO: save_memory: "[Architect][Research] Claude Code Architecture Deep-Dive (iter 465)"
+[2026-04-08T08:03:12.517Z] iter=465 turn=9 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T08:03:12.518Z] iter=465 turn=9 INFO: save_memory: "[Architect] Pending features after iter 466"
+[2026-04-08T08:03:12.518Z] iter=465 turn=9 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T08:03:12.518Z] iter=465 turn=10 INFO: Turn 10/25
+[2026-04-08T08:03:16.045Z] iter=465 turn=10 INFO: Agent: 
+
+Correct — I'm the Architect. My deliverable is goals.md (written) + memory (saved). No src/ changes expected. Let me verify and wrap up.
+[2026-04-08T08:03:16.046Z] iter=465 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5
+[2026-04-08T08:03:17.206Z] iter=465 turn=10 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:03:17.206Z] iter=465 turn=11 INFO: Turn 11/25
+[2026-04-08T08:03:23.780Z] iter=465 turn=11 INFO: Agent: TypeScript compiles clean. Goals written, memory saved, research complete.
+[2026-04-08T08:03:23.781Z] iter=465 turn=11 INFO: save_scratchpad: ## Iteration 465 — Architect (complete)
+
+**Research**: Deep-
+[2026-04-08T08:03:23.781Z] iter=465 turn=12 INFO: Turn 12/25
+[2026-04-08T08:03:26.449Z] iter=465 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T08:03:26.449Z] iter=465 turn=12 INFO: RESTART signal
+[2026-04-08T08:03:26.450Z] iter=465 turn=12 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T08:03:27.613Z] iter=465 turn=12 INFO: Compilation OK
+[2026-04-08T08:03:37.090Z] iter=465 turn=12 INFO: Cache persisted: 61 entries to .autoagent-cache.json
+[2026-04-08T08:03:37.090Z] iter=465 turn=12 INFO: Cache stats: 0 hits, 1 misses, 61 entries, 1 invalidations (0 entries removed)
+[2026-04-08T08:03:37.090Z] iter=465 turn=12 INFO: Tool cache stats
+[2026-04-08T08:03:37.090Z] iter=465 turn=12 INFO: Tool timing: bash: 10x, avg=237ms, total=2367ms; web_search: 1x, avg=996ms, total=996ms; web_fetch: 2x, avg=423ms, total=846ms; read_file: 1x, avg=25ms, total=25ms; write_file: 1x, avg=4ms, total=4ms; save_memory: 2x, avg=1ms, total=2ms; think: 1x, avg=1ms, total=1ms; save_scratchpad: 1x, avg=1ms, total=1ms; read_scratchpad: 1x, avg=0ms, total=0ms
+[2026-04-08T08:03:37.090Z] iter=465 turn=12 INFO: Tool timing stats
+[2026-04-08T08:03:44.959Z] iter=465 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 465: predicted 15 turns, actual 12 turns, ratio 0.80**
+[2026-04-08T08:03:44.983Z] iter=465 turn=12 INFO: Pre-commit review: no significant code changes to review
