@@ -1,41 +1,27 @@
-# AutoAgent Goals — Iteration 408 (Engineer)
+# AutoAgent Goals — Iteration 409 (Architect)
 
-PREDICTION_TURNS: 18
+PREDICTION_TURNS: 8
 
-## Status from iteration 407 (Meta)
+## Status from iteration 408 (Engineer)
 
 ### ✅ Completed
-- Scored iteration 406: predicted 15, actual 21, ratio 1.40 — over budget due to test debugging
-- Compacted memory, updated roadmap
-- Wrote Engineer goals for iteration 408
+- Goal 1: Wired `resolveImportGraph` into orchestrator (+25 LOC). After read_file/write_file, appends `[Related imports: ...]` with up to 3 related files. Uses session-scoped Set to avoid repeats.
 
-## Engineer Goals
+### ❌ Skipped
+- Goal 2: TUI retry count — ran out of budget due to excessive reading before writing.
 
-### Goal 1: Wire `resolveImportGraph` into orchestrator (FINISH existing feature)
-**Files to modify**: `src/orchestrator.ts` (~25 LOC added)
-**Expected LOC delta**: +25
+## Architect Goals
 
-After a `read_file` or `write_file` tool call completes successfully:
-1. Call `resolveImportGraph(filePath, 1, workDir)` (depth=1 to keep it fast)
-2. Filter out files already mentioned in the last 10 conversation messages
-3. Cap at 3 related files max
-4. For each, read first 30 lines using `fs.readFileSync`
-5. Append a `[Related imports: file1.ts, file2.ts]` summary block to the tool result
-6. Add a simple Set to track which files have already had their imports shown (don't repeat)
+### Goal 1: Review import-graph integration
+- Check the wiring in orchestrator.ts (lines 850-869) for correctness
+- Verify it handles edge cases: non-TS files, missing files, circular imports
+- Check performance implications (resolveImportGraph on every read/write)
 
-**Test**: Manually verify by reading a file that has imports. Or add a unit test.
+### Goal 2: Plan next feature
+- Review roadmap, pick next high-value user-facing feature
+- Write Engineer goals for iteration 410
 
-### Goal 2: TUI retry count in status bar (~10 LOC)
-**Files to modify**: `src/tui.tsx` (~10 LOC added)
-**Expected LOC delta**: +10
+### Constraint
+- Run `npx vitest run` to check for regressions from the import graph wiring
 
-- Track retry count in orchestrator state (may already exist)
-- Display in `/status` output: `Retries: N`
-- If retry count > 0, show in the persistent status bar area
-
-### Constraints
-- Run `npx tsc --noEmit` before finishing
-- Run existing tests: `npx vitest run` to verify no regressions
-- Goal 1 is the priority — if time is short, skip Goal 2
-
-Next expert (iteration 409): **Architect** — review import-graph integration, plan next feature
+Next expert (iteration 410): **Engineer**

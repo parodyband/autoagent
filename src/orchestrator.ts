@@ -13,6 +13,7 @@
  *   - Structured status callbacks for the UI
  */
 
+import * as path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
 import { compressToolOutput } from "./tool-output-compressor.js";
 import { fingerprintRepo } from "./repo-context.js";
@@ -43,6 +44,7 @@ import { detectProject } from "./project-detector.js";
 import { detectLoop } from "./loop-detector.js";
 import { loadHooksConfig, runHooks, type HooksConfig } from "./hooks.js";
 import { ReflectionStore, type ToolCallRecord } from "./reflection.js";
+import { aggregate, savePatternCache, loadPatternCache } from "./reflection-aggregator.js";
 import { selfVerify } from "./self-verify.js";
 import * as fs from "fs";
 import { FileWatcher } from "./file-watcher.js";
@@ -614,6 +616,7 @@ async function runAgentLoop(
   let cumulativeIn = 0;
   let fullText = "";
   let consecutiveLoopCount = 0;
+  const importGraphShown = new Set<string>();
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
     // Check abort signal before starting a new round
@@ -845,6 +848,27 @@ async function runAgentLoop(
       }
     }
 
+    // Import graph enrichment: after read_file/write_file, show related imports
+    for (const r of results) {
+      if (typeof r !== "object" || !("tool_use_id" in r)) continue;
+      const tu = toolUses.find(t => t.id === r.tool_use_id);
+      if (!tu || (tu.name !== "read_file" && tu.name !== "write_file")) continue;
+      const filePath = (tu.input as { path?: string }).path;
+      if (!filePath || importGraphShown.has(filePath)) continue;
+      try {
+        const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
+        const related = resolveImportGraph(absPath, 1, workDir)
+          .filter(f => !importGraphShown.has(f))
+          .slice(0, 3);
+        if (related.length > 0) {
+          importGraphShown.add(filePath);
+          related.forEach(f => importGraphShown.add(f));
+          const names = related.map(f => path.relative(workDir, f));
+          (r as { content: string }).content += `\n\n[Related imports: ${names.join(", ")}]`;
+        }
+      } catch { /* non-critical — skip */ }
+    }
+
     // Self-verification: after any write_file calls, run diagnostics and inject errors
     if (writeTools.length > 0) {
       const verifyResult = await selfVerify(workDir);
@@ -1034,6 +1058,8 @@ export class Orchestrator {
 
   /** Persists ReflectionCheckpoints and supplies aggregate stats. */
   private reflectionStore!: ReflectionStore;
+  /** Set to true once learned-pattern guidance has been appended to systemPrompt. */
+  private patternGuidanceInjected = false;
   /**
    * Promise for the in-flight reflectOnCompletion() call from the previous send().
    * Awaited at the start of the next send() so lessons land in local.md before
@@ -1773,6 +1799,19 @@ export class Orchestrator {
       this.pendingReflection = null;
     }
 
+    // ── Inject learned tool-failure patterns (once per session) ───────────────
+    // Loads the pattern cache written at the end of the previous session and
+    // appends it to the system prompt so the agent sees it on every API call.
+    if (!this.patternGuidanceInjected) {
+      this.patternGuidanceInjected = true;
+      try {
+        const cache = loadPatternCache(this.opts.workDir);
+        if (cache?.guidancePrompt && cache.topPatterns.length > 0) {
+          this.systemPrompt += "\n\n" + cache.guidancePrompt;
+        }
+      } catch { /* non-fatal */ }
+    }
+
     // Per-task counters populated via reflectionCbs (reset each send)
     const taskStartMs = Date.now();
     let taskCompacted        = false;
@@ -2137,6 +2176,16 @@ export class Orchestrator {
       verificationPassed,
       tscClean: verificationPassed,          // best proxy available at this point
     });
+
+    // ── Aggregate patterns and persist cache (synchronous, fast) ─────────────
+    // Done after every task so the next session starts with up-to-date guidance.
+    try {
+      const recent = this.reflectionStore.getRecent(20);
+      if (recent.length >= 2) {
+        const report = aggregate(recent);
+        savePatternCache(this.opts.workDir, report);
+      }
+    } catch { /* non-fatal */ }
 
     // ── Fire background reflection (AI-synthesised lessons) ───────────────────
     // Only when code was committed — skip Q&A turns to keep reflections meaningful.
