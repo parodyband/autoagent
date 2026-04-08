@@ -872,6 +872,50 @@ async function runAgentLoop(
       } catch { /* non-critical — skip */ }
     }
 
+    // Reverse-import hints: after write_file, show files that IMPORT the written file
+    for (const r of results) {
+      if (typeof r !== "object" || !("tool_use_id" in r)) continue;
+      const tu = toolUses.find(t => t.id === r.tool_use_id);
+      if (!tu || tu.name !== "write_file") continue;
+      const filePath = (tu.input as { path?: string }).path;
+      if (!filePath) continue;
+      try {
+        const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
+        const importers = getImporters(absPath, workDir);
+        if (importers.length > 0) {
+          const names = importers.map(f => path.relative(workDir, f)).slice(0, 8);
+          (r as { content: string }).content += `\n\nℹ️ Files that import this module: ${names.join(", ")}${importers.length > 8 ? ` (+${importers.length - 8} more)` : ""} — consider updating if exports changed.`;
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // Test file hints: after read/write on src/ files, mention related test file
+    for (const r of results) {
+      if (typeof r !== "object" || !("tool_use_id" in r)) continue;
+      const tu = toolUses.find(t => t.id === r.tool_use_id);
+      if (!tu || (tu.name !== "read_file" && tu.name !== "write_file")) continue;
+      const filePath = (tu.input as { path?: string }).path;
+      if (!filePath) continue;
+      try {
+        const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
+        const relPath = path.relative(workDir, absPath);
+        if (relPath.includes(".test.") || relPath.includes(".spec.")) continue;
+        const patterns = [
+          relPath.replace(/^src\//, "tests/").replace(/\.ts$/, ".test.ts"),
+          relPath.replace(/^src\//, "test/").replace(/\.ts$/, ".test.ts"),
+          relPath.replace(/\.ts$/, ".test.ts"),
+          relPath.replace(/\.ts$/, ".spec.ts"),
+        ];
+        for (const pat of patterns) {
+          const testPath = path.join(workDir, pat);
+          if (fs.existsSync(testPath) && testPath !== absPath) {
+            (r as { content: string }).content += `\nℹ️ Related test file: ${pat}`;
+            break;
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
     // Self-verification: after any write_file calls, run diagnostics and inject errors
     if (writeTools.length > 0) {
       const verifyResult = await selfVerify(workDir);

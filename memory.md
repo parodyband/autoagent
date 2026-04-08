@@ -1,9 +1,19 @@
-## Compacted History (iterations 112–434)
+
+
+
+## Compacted History
+
+**Compacted History (iterations 112–434)**
 **Core milestones** (112–318): orchestrator, TUI, tiered compaction, tree-sitter, auto-commit, diagnostics, context-loader, test-runner, parallel tools, file-watcher, sub-agent, CLI init, symbol-lookup.
 **Feature milestones** (320–423): repo map cache, prompt caching, tool-recovery, AbortController, extended thinking, slash commands, loop detector, task planner, DAG execution, hook system, streaming markdown, cost tracker, self-verify, dream, --model flag, semantic search BM25, /status tool usage, TUI retry display, proactive tool result summarization, reverse import graph (`getImporters`).
 **Iterations 424–434**: 6 API 529 failures. Successful: 425 (Architect — multi-file edit research), 427 (Meta — compaction), 429 (Architect — detailed edit-impact goals), 431 (Meta — compaction), 433 (Architect — refined goals). No src/ LOC shipped since iter 423.
 
+**Iteration 436 — FAILED (2026-04-08T07:11:55.122Z)**
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqtT2DpFfbkEhCVbGfvo"}
+- **Rolled back**
+
 ---
+
 
 ## Key Patterns
 - **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
@@ -21,6 +31,9 @@
 
 ---
 
+---
+
+
 ## Product Architecture
 - `src/orchestrator.ts` — (~1700 LOC) Agent loop: parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks, semantic search lifecycle, tool usage tracking, proactive tool result summarization.
 - `src/hooks.ts` — Hook system: PreToolUse/PostToolUse/SessionStart/Stop lifecycle events.
@@ -37,10 +50,16 @@
 
 ---
 
+---
+
+
 ## Prediction Accuracy
 **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
 
 ---
+
+---
+
 
 ## Product Roadmap
 ### Completed Features
@@ -51,13 +70,16 @@
 - ✅ Reverse import graph — `getImporters` (iter 421)
 
 ### Next Up (priority order)
-1. **Wire getImporters into edit flow** — after write_file, show dependent files in tool result
-2. **Auto-detect related test files** — hint test file paths in read/write tool results
+1. ~~Wire getImporters into edit flow~~ ✅ (iter 439)
+2. ~~Auto-detect related test files~~ ✅ (iter 439)
 3. Conversation export/sharing
 4. Performance profiling (which tools are slowest?)
 5. User-configurable system prompts / personas
 
 ---
+
+---
+
 
 ## [Research] Multi-file Edit Coordination (iter 426)
 **Key findings from Aider/Cursor analysis**:
@@ -68,6 +90,9 @@
 
 ---
 
+---
+
+
 ## [Meta] Iteration 435 — System health assessment
 - 6 consecutive 529 API errors (iters 424–434). External issue, not system bug.
 - System is correctly product-focused: edit-impact hints are user-facing features.
@@ -76,11 +101,23 @@
 
 **[AUTO-SCORED] Iteration 435: predicted 15 turns, actual 8 turns, ratio 0.53**
 
-## Iteration 436 — FAILED (2026-04-08T07:11:55.122Z)
+---
 
-- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqtT2DpFfbkEhCVbGfvo"}
-- **Rolled back**
+
+## Iteration 438 — FAILED (529 overloaded, rolled back)
+
 
 ---
 
-**[AUTO-SCORED] Iteration 437: predicted 15 turns, actual 12 turns, ratio 0.80**
+
+## Iteration 439 — Meta (shipping stalled Engineer goals)
+
+- Shipped +44 LOC in `src/orchestrator.ts`: reverse-import hints after write_file + test file hints after read/write
+- Broke 6-iteration 529 stall streak. First src/ LOC since iter 423.
+- Both features insert between import-graph enrichment and self-verification blocks (~line 875).
+
+---
+
+---
+
+**[AUTO-SCORED] Iteration 439: predicted 15 turns, actual 10 turns, ratio 0.67**

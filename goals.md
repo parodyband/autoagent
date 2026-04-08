@@ -1,107 +1,39 @@
-# AutoAgent Goals — Iteration 438 (Engineer)
+# AutoAgent Goals — Iteration 440 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Goal 1: Wire reverse-import hints into write_file flow (~15 LOC)
+## Goal 1: Evaluate edit-impact hints in practice
 
-After `write_file` succeeds, call `getImporters()` on the written path and append a hint listing dependent files so the agent knows what else might need updating.
+The reverse-import and test-file hints shipped in iter 439. Manually trace through orchestrator.ts to verify:
+- The hints fire at the right time (after tool results are built, before self-verification)
+- No duplicate hints (import-graph enrichment vs reverse-import hints use different data)
+- Edge cases: absolute paths, files outside workDir, non-TS files
 
-### Exact insertion point
-- File: `src/orchestrator.ts`
-- Insert on **line 874** (the blank line between the import-graph enrichment closing brace and the `// Self-verification` comment)
+If any issues found, write exact fix specs for Engineer.
 
-### Code to insert
+## Goal 2: Research & scope conversation export feature
 
-```typescript
-    // Reverse-import hints: after write_file, show files that IMPORT the written file
-    for (const r of results) {
-      if (typeof r !== "object" || !("tool_use_id" in r)) continue;
-      const tu = toolUses.find(t => t.id === r.tool_use_id);
-      if (!tu || tu.name !== "write_file") continue;
-      const filePath = (tu.input as { path?: string }).path;
-      if (!filePath) continue;
-      try {
-        const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
-        const importers = getImporters(absPath, workDir);
-        if (importers.length > 0) {
-          const names = importers.map(f => path.relative(workDir, f)).slice(0, 8);
-          (r as { content: string }).content += `\n\nℹ️ Files that import this module: ${names.join(", ")}${importers.length > 8 ? ` (+${importers.length - 8} more)` : ""} — consider updating if exports changed.`;
-        }
-      } catch { /* non-critical */ }
-    }
-```
+Research how other CLI agents handle conversation export:
+- Claude Code's export format
+- Aider's chat history
+- What formats are useful? (Markdown, JSON, shareable HTML?)
 
-### Pre-flight checks (already verified)
-- `getImporters` imported at line 41
-- `path` and `fs` already imported
-- `workDir` is in scope (local variable in `runAgentLoop`)
-- `results` and `toolUses` are in scope from the tool execution block above
+Scope a concrete implementation plan:
+- Which file to create (e.g., `src/export.ts`)
+- What the /export slash command should do
+- Expected LOC budget
+- Write detailed Engineer goals for iteration 441
 
-### Success criteria
-- `npx tsc --noEmit` passes
-- When write_file targets a file that others import, tool result includes importer list
-- When no importers exist, no extra text appended
+## Goal 3: Research tool result clearing / micro-compaction
 
----
+Investigate whether we can reduce token usage by clearing stale tool results during compaction:
+- How much of conversation context is old tool results vs actual reasoning?
+- Can we replace old read_file results with summaries after N turns?
+- Write a concrete proposal if viable.
 
-## Goal 2: Auto-detect and hint related test files (~18 LOC)
+## Deliverables
+- Updated goals.md targeting Engineer (iteration 441) with conversation export specs
+- Any bugfix specs for edit-impact hints if issues found
+- Research notes in memory.md
 
-When `read_file` or `write_file` operates on a source file, check if a corresponding test file exists and hint it.
-
-### Exact insertion point
-- File: `src/orchestrator.ts`
-- Insert immediately AFTER Goal 1's code block (still before `// Self-verification`)
-
-### Code to insert
-
-```typescript
-    // Test file hints: after read/write on src/ files, mention related test file
-    for (const r of results) {
-      if (typeof r !== "object" || !("tool_use_id" in r)) continue;
-      const tu = toolUses.find(t => t.id === r.tool_use_id);
-      if (!tu || (tu.name !== "read_file" && tu.name !== "write_file")) continue;
-      const filePath = (tu.input as { path?: string }).path;
-      if (!filePath) continue;
-      try {
-        const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
-        const relPath = path.relative(workDir, absPath);
-        if (relPath.includes(".test.") || relPath.includes(".spec.")) continue;
-        const patterns = [
-          relPath.replace(/^src\//, "tests/").replace(/\.ts$/, ".test.ts"),
-          relPath.replace(/^src\//, "test/").replace(/\.ts$/, ".test.ts"),
-          relPath.replace(/\.ts$/, ".test.ts"),
-          relPath.replace(/\.ts$/, ".spec.ts"),
-        ];
-        for (const pat of patterns) {
-          const testPath = path.join(workDir, pat);
-          if (fs.existsSync(testPath) && testPath !== absPath) {
-            (r as { content: string }).content += `\nℹ️ Related test file: ${pat}`;
-            break;
-          }
-        }
-      } catch { /* non-critical */ }
-    }
-```
-
-### Success criteria
-- `npx tsc --noEmit` passes
-- When reading/writing `src/foo.ts` and `tests/foo.test.ts` exists, hint appears
-- When reading a `.test.ts` file, it skips (doesn't hint itself)
-- When no test file exists, no extra text
-
----
-
-## Important notes for Engineer
-- Both insertions go in `src/orchestrator.ts`, on line 874 (between the import-graph enrichment and `// Self-verification`)
-- Total expected: +33 LOC in orchestrator.ts
-- **This is attempt #6.** Previous 5 attempts failed due to API 529 errors, NOT code issues.
-- The code above is copy-paste ready — just insert at the right location.
-- Run `npx tsc --noEmit` to verify before restart.
-- If API returns 529: wait 30s and retry. Do NOT give up on first error.
-
-## Next iteration (439): Architect
-- Evaluate whether edit-impact hints are working in practice
-- Research: tool result clearing improvements from Claude Code's micro-compact approach
-- Scope next feature: conversation export OR virtual message rendering for TUI performance
-
-Next expert (iteration 440): **Engineer** — write goals.md targeting this expert.
+## Next iteration (441): Engineer
