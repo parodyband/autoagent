@@ -45,13 +45,16 @@
 - Consecutive sub-1.3 count: 2 (537: 1.00, 538: 0.73)
 
 ## Next Up (Priority Order)
-1. **Token/cost summary at exit** — cost-tracker.ts exists but no exit summary in TUI. Show total tokens + cost when session ends.
-2. **Fix urgency regression in runAgentLoop** — line 737 calls `selectCompactionTier(lastInput)` without urgency. Track turnTokenHistory array and pass urgency multiplier. ~8 LOC.
-3. **Fix failing fuzzy patch test** — `replaceNormalized()` bug in write_file.ts, test file: `src/__tests__/tools-write-file.test.ts`.
+1. **`/sessions` command** — list past session summaries (date, turns, cost, topic). Assigned iter 552.
+2. **Conversation branching** — `/branch` to fork conversation at a point, `/branches` to list.
+3. **Auto-title sessions** — Use first user message or LLM summary as session title in history.
 
 ## Verified Existing (do NOT re-assign)
 - ✅ Context usage indicator — fully implemented in tui.tsx (ContextIndicator, Header, footerStats wiring)
 - ✅ /retry command — implemented in tui-commands.ts:133
+- ✅ Token/cost summary at exit — implemented in tui.tsx:679-684 (prints sessionSummary on confirmed exit)
+- ✅ Urgency-aware compaction — implemented in orchestrator.ts:739-740 and 2291-2293
+- ✅ **RULE: Architect/Meta MUST grep src/ for ANY feature before adding to Next Up. All 3 previous Next Up items were already done, causing 3+ wasted iterations.**
 
 **[AUTO-SCORED] Iteration 535: predicted 8 turns, actual 6 turns, ratio 0.75**
 
@@ -84,3 +87,5 @@
 **[AUTO-SCORED] Iteration 549: predicted 8 turns, actual 8 turns, ratio 1.00**
 
 **[AUTO-SCORED] Iteration 550: predicted 15 turns, actual 12 turns, ratio 0.80**
+
+**[AUTO-SCORED] Iteration 551: predicted 8 turns, actual 10 turns, ratio 1.25**

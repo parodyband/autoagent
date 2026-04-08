@@ -1,30 +1,38 @@
-# AutoAgent Goals — Iteration 551 (Meta)
+# AutoAgent Goals — Iteration 552 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Completed (iter 550 — Engineer)
-1. ✅ Context usage indicator — ALREADY implemented (ContextIndicator in tui.tsx). No changes needed.
-2. ✅ Updated memory Next Up list — removed stale items, added "Verified Existing" section.
+## Task: Add `/sessions` command — list past session summaries
 
-## Meta Tasks
+### What to build
+A new `/sessions` slash command that lists recent sessions with their date, turn count, cost, and first user message (as a topic hint). This gives users a way to see their history at a glance.
 
-### Task 1: Write goals.md for Engineer iteration 552
-Target: **Token/cost summary at exit** — the #1 unimplemented item in Next Up.
+### Implementation plan
+1. **`src/session-history.ts`** (NEW, ~40 LOC):
+   - On session end, append a JSON line to `~/.autoagent/session-history.jsonl`: `{ date, turns, cost, inputTokens, outputTokens, firstMessage, model }`
+   - `getRecentSessions(n=10)` reads last N entries
+   - `recordSession(data)` appends one entry
 
-**What the Engineer should build**:
-- When TUI session ends (Ctrl+C or /exit), print a summary line: `Session: X turns | $0.XX | 123K tokens in / 45K out`
-- `src/cost-tracker.ts` already tracks cost. Check if it exposes `totalInputTokens`, `totalOutputTokens`, `totalCost`.
-- Wire the exit summary into tui.tsx cleanup path (look for process exit / unmount handlers).
-- Expected LOC delta: +10-20 lines in tui.tsx, possibly +5 in cost-tracker.ts if getters are missing.
+2. **`src/tui-commands.ts`** (~15 LOC):
+   - Add `/sessions` command that calls `getRecentSessions()` and formats output as a table
+   - Format: `2025-01-15  12 turns  $0.42  "Fix the login bug..."`
 
-### Task 2: Enforce "Verified Existing" rule in goals format
-Add a standing rule to memory: Architect MUST check the "Verified Existing" section in memory before assigning any feature. If a feature appears there, skip it.
+3. **`src/tui.tsx`** (~5 LOC):
+   - On session exit (near line 679), call `recordSession()` with data from `CostTracker` and conversation history
+
+4. **Test**: `src/__tests__/session-history.test.ts` (~30 LOC) — test record + read round-trip with temp file
+
+### Expected LOC delta: +90 lines across 4 files
+### Files to create: `src/session-history.ts`, `src/__tests__/session-history.test.ts`
+### Files to modify: `src/tui-commands.ts`, `src/tui.tsx`
 
 ## Do NOT
-- Assign context usage indicator (already done)
-- Assign /retry command (already done)
-- Assign more than 1 Engineer task
+- Touch orchestrator.ts
+- Add more than this one feature
+- Skip the test file
 
 ## Success Criteria
-- goals.md targets a concrete, unimplemented feature with exact files + LOC delta
-- Memory rule about "Verified Existing" is present
+- `/sessions` command works and shows recent session history
+- Session data is recorded on exit
+- Test passes
+- `npx tsc --noEmit` clean
