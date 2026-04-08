@@ -48,6 +48,8 @@ export interface CommandContext {
   autoAccept: boolean;
   setAutoAccept: (b: boolean) => void;
   exit: () => void;
+  inputHistory?: string[];
+  submitMessage?: (msg: string) => Promise<void>;
 }
 
 type CommandHandler = (ctx: CommandContext, args: string) => Promise<boolean>;
@@ -119,7 +121,27 @@ const commands: Record<string, CommandHandler> = {
         buildExportContentHelper(exportMsgs, model, { tokensIn: ctx.footerStats.tokensIn, tokensOut: ctx.footerStats.tokensOut, cost: ctx.footerStats.cost }, ctx.workDir, filePath);
       } catch { /* never block exit */ }
     }
+    // Print session cost summary before exit
+    const costTracker = ctx.orchestratorRef.current?.getCostTracker?.();
+    if (costTracker && costTracker.entryCount > 0) {
+      ctx.addMessage({ role: "assistant", content: `Session cost: ${costTracker.sessionSummary}` });
+    }
     ctx.exit();
+    return true;
+  },
+
+  "/retry": async (ctx) => {
+    // Find last user message from conversation history
+    const lastUserMsg = [...ctx.messages].reverse().find(m => m.role === "user");
+    if (!lastUserMsg || typeof lastUserMsg.content !== "string") {
+      ctx.addMessage({ role: "assistant", content: "Nothing to retry." });
+      return true;
+    }
+    if (ctx.submitMessage) {
+      await ctx.submitMessage(lastUserMsg.content);
+    } else {
+      ctx.addMessage({ role: "assistant", content: "Retry not available in this context." });
+    }
     return true;
   },
 
@@ -172,6 +194,7 @@ const commands: Record<string, CommandHandler> = {
         "  /plan list — Show saved plans",
         "  /plan resume — Resume the most recent incomplete plan",
         "  /export   — Export conversation to markdown (optional filename arg)",
+        "  /retry    — Re-send the last user message",
         "  /exit     — Quit AutoAgent",
       ].join("\n"),
     });

@@ -1,72 +1,3 @@
-1140 |   private sessionFilesModified = new Set<string>();
-1141 |   /** Per-tool invocation counts for this session. */
-[2026-04-08T20:27:11.585Z] iter=526 turn=6 INFO: Turn 6/25
-[2026-04-08T20:27:15.963Z] iter=526 turn=6 INFO: Agent: **Goal status:**
-- Task A (turnTokenHistory field): ✅ DONE
-- Task A (push to turnTokenHistory after runAgentLoop): NOT STARTED
-- Task A (getContextEfficiency getter): NOT STARTED  
-- Task B (/status display): NOT STARTED
-
-Continuing now:
-[2026-04-08T20:27:15.965Z] iter=526 turn=6 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T20:27:15.968Z] iter=526 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
-
-Context after patch:
-2434 |     this.sessionCost += turnCost;
-2435 |     this.turnCosts.push(turnCost);
-2436 |     this.costTracker.record(model, tokensIn, tokensOut);
-2437 |     this.lastInputTokens = lastInputTokens;
-2438 |     this.turnTokenHistory.push(lastInputTokens);
-2439 |     this.tokenHistory.push({ turn: this.turnCosts.length, input: tokensIn, output: tokensOut });
-2440 | 
-2441 |     // If aborted, return early with partial result
-2442 |     if (aborted) {
-[2026-04-08T20:27:15.970Z] iter=526 turn=7 INFO: Turn 7/25
-[2026-04-08T20:27:19.179Z] iter=526 turn=7 INFO: Agent: Now add the getter. Let me find a good place near other getters:
-[2026-04-08T20:27:19.180Z] iter=526 turn=7 INFO: $ grep -n "getStatus\|getStats\|getTurnCosts\|tokenHistory\|public get\b" src/orchestrator.ts | head -20
-[2026-04-08T20:27:19.193Z] iter=526 turn=7 INFO:   -> exit=0 (236 chars)
-[2026-04-08T20:27:19.193Z] iter=526 turn=8 INFO: Turn 8/25
-[2026-04-08T20:27:21.752Z] iter=526 turn=8 INFO: read_file: src/orchestrator.ts
-[2026-04-08T20:27:21.753Z] iter=526 turn=8 INFO:   -> ok (1984 chars)
-[2026-04-08T20:27:21.754Z] iter=526 turn=9 INFO: Turn 9/25
-[2026-04-08T20:27:25.478Z] iter=526 turn=9 INFO: think: There's already a `getTokenEfficiency()` method that returns avgInput, avgOutput, peakInput, peakTurn, currentUtilPct. T...
-[2026-04-08T20:27:25.480Z] iter=526 turn=10 INFO: Turn 10/25
-[2026-04-08T20:27:28.500Z] iter=526 turn=10 INFO: Agent: I've made 2 src/ changes so far. Let me finish the remaining work now - add `getContextEfficiency()` and wire `/status`. I'll do it in one shot.
-[2026-04-08T20:27:28.501Z] iter=526 turn=10 INFO: read_file: src/tui-commands.ts
-[2026-04-08T20:27:28.501Z] iter=526 turn=10 INFO:   -> ok (3548 chars)
-[2026-04-08T20:27:28.502Z] iter=526 turn=11 INFO: Turn 11/25
-[2026-04-08T20:27:43.860Z] iter=526 turn=11 INFO: think: The `/status` command already has context efficiency stats using `getTokenEfficiency()`. And there's already a `getToken...
-[2026-04-08T20:27:43.860Z] iter=526 turn=12 INFO: Turn 12/25
-[2026-04-08T20:27:49.729Z] iter=526 turn=12 INFO: Agent: The `/status` command already shows context efficiency via `getTokenEfficiency()`. The goals want a `getContextEfficiency()` method using `turnTokenHistory`. Let me add it and update the display:
-[2026-04-08T20:27:49.729Z] iter=526 turn=12 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T20:27:49.731Z] iter=526 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -2 +12 lines
-
-Context after patch:
-1414 |       .sort((a, b) => b.avgMs - a.avgMs);
-1415 |   }
-1416 | 
-1417 |   /** Context window efficiency metrics for /status display. */
-1418 |   getContextEfficiency(): { avgTokensPerTurn: number; currentTokens: number; peakTokens: number } {
-1419 |     const h = this.turnTokenHistory;
-1420 |     if (h.length === 0) return { avgTokensPerTurn: 0, currentTokens: 0, peakTokens: 0 };
-1421 |     const avgTokensPerTurn = Math.round(h.reduce((s, n) => s + n, 0) / h.length);
-1422 |     const currentTokens = h[h.length - 1];
-1423 |     const peakTokens = Math.max(...h);
-1424 |     return { avgTokensPerTurn, currentTokens, peakTokens };
-1425 |   }
-1426 | 
-1427 |   /** Session statistics for /status display. */
-1428 |   getTokenEfficiency(): { avgInput: number; avgOutput: number; peakInput: number; peakTurn: number; currentUtilPct: number } {
-1429 |     const history = this.tokenHistory;
-1430 |     if (history.length === 0) return { avgInput: 0, avgOutput: 0, peakInput: 0, peakTurn: 0, currentUtilPct: 0 };
-1431 |     const avgInput = Math.round(history.reduce((s, t) => s + t.input, 0) / history.length);
-[2026-04-08T20:27:49.731Z] iter=526 turn=13 INFO: Turn 13/25
-[2026-04-08T20:27:58.735Z] iter=526 turn=13 INFO: Agent: Now update `/status` to use `getContextEfficiency()`, then wrap up:
-[2026-04-08T20:27:58.735Z] iter=526 turn=13 INFO: write_file: src/tui-commands.ts (patch)
-[2026-04-08T20:27:58.736Z] iter=526 turn=13 INFO:   -> ok: Patched src/tui-commands.ts: -10 +18 lines
-
-Context after patch:
-293 |         sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(", ")}`);
 294 |       }
 295 |     }
 296 |     // Context efficiency stats
@@ -1065,3 +996,224 @@ I'm Meta — no src/ changes expected. All deliverables are DONE:
 [2026-04-08T20:41:50.932Z] iter=535 turn=6 INFO: Tool timing stats
 [2026-04-08T20:41:59.250Z] iter=535 turn=6 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 535: predicted 8 turns, actual 6 turns, ratio 0.75**
 [2026-04-08T20:41:59.272Z] iter=535 turn=6 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:41:59.306Z] iter=535 turn=6 INFO: Committed: c59238ca (14 in / 3028 out, cache: 297879 created, 1189103 read)
+[2026-04-08T20:41:59.307Z] iter=535 turn=6 INFO: Restarting as iteration 536...
+[2026-04-08T20:41:59.509Z] iter=536 INFO: Cache restored: 65/66 entries (1 stale)
+[2026-04-08T20:41:59.512Z] iter=536 INFO: Turn budget: 15/25 (calibration=1.00x, predicted=15)
+[2026-04-08T20:41:59.512Z] iter=536 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T20:41:59.721Z] iter=536 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T20:41:59.722Z] iter=536 turn=1 INFO: Turn 1/25
+[2026-04-08T20:42:02.421Z] iter=536 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "retry\|inputHistory\|history" src/tui.tsx | head -40
+[2026-04-08T20:42:02.421Z] iter=536 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T20:42:02.429Z] iter=536 turn=1 INFO:   -> exit=0 (1469 chars)
+[2026-04-08T20:42:02.430Z] iter=536 turn=2 INFO: Turn 2/25
+[2026-04-08T20:42:06.308Z] iter=536 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "slash\|handleSlash\|case '/" src/tui.tsx | head -40
+[2026-04-08T20:42:06.313Z] iter=536 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "exit\|cleanup\|unmount\|SIGINT\|process.on" src/tui.tsx | head -30
+[2026-04-08T20:42:06.320Z] iter=536 turn=2 INFO:   -> exit=0 (54 chars)
+[2026-04-08T20:42:06.321Z] iter=536 turn=2 INFO:   -> exit=0 (403 chars)
+[2026-04-08T20:42:06.321Z] iter=536 turn=3 INFO: Turn 3/25
+[2026-04-08T20:42:08.620Z] iter=536 turn=3 INFO: think: I need to:
+1. Add /retry command to tui-commands.ts and wire it in tui.tsx
+2. Add session cost summary at exit
+
+Let me l...
+[2026-04-08T20:42:08.621Z] iter=536 turn=4 INFO: Turn 4/25
+[2026-04-08T20:42:11.277Z] iter=536 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '600,650p' src/tui.tsx
+[2026-04-08T20:42:11.279Z] iter=536 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "retry\|/help\|'\/clear'\|case '/" src/tui-commands.ts | head -30
+[2026-04-08T20:42:11.287Z] iter=536 turn=4 INFO:   -> exit=0 (1472 chars)
+[2026-04-08T20:42:11.290Z] iter=536 turn=4 INFO:   -> exit=0 (86 chars)
+[2026-04-08T20:42:11.290Z] iter=536 turn=5 INFO: Turn 5/25
+[2026-04-08T20:42:14.285Z] iter=536 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '140,200p' src/tui-commands.ts
+[2026-04-08T20:42:14.288Z] iter=536 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getSessionSummary\|sessionCost\|totalCost\|costTracker\|CostTracker" src/cost-tracker.ts | head -20
+[2026-04-08T20:42:14.295Z] iter=536 turn=5 INFO:   -> exit=0 (2666 chars)
+[2026-04-08T20:42:14.296Z] iter=536 turn=5 INFO:   -> exit=0 (97 chars)
+[2026-04-08T20:42:14.296Z] iter=536 turn=6 INFO: Turn 6/25
+[2026-04-08T20:42:17.315Z] iter=536 turn=6 INFO: Agent: **Goal 1: /retry command** — NOT STARTED
+**Goal 2: Session cost summary at exit** — NOT STARTED
+
+I've been reading. Let me now write both features.
+[2026-04-08T20:42:17.315Z] iter=536 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '44,75p' src/cost-tracker.ts
+[2026-04-08T20:42:17.323Z] iter=536 turn=6 INFO:   -> exit=0 (725 chars)
+[2026-04-08T20:42:17.324Z] iter=536 turn=7 INFO: Turn 7/25
+[2026-04-08T20:42:20.017Z] iter=536 turn=7 INFO: Agent: `sessionSummary` already exists. Now I'll add both features:
+[2026-04-08T20:42:20.017Z] iter=536 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "routeCommand\|CommandContext\|addMessage\|messages.*Message" src/tui-commands.ts | head -10
+[2026-04-08T20:42:20.027Z] iter=536 turn=7 INFO:   -> exit=0 (688 chars)
+[2026-04-08T20:42:20.027Z] iter=536 turn=8 INFO: Turn 8/25
+[2026-04-08T20:42:22.068Z] iter=536 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '32,58p' src/tui-commands.ts
+[2026-04-08T20:42:22.080Z] iter=536 turn=8 INFO:   -> exit=0 (984 chars)
+[2026-04-08T20:42:22.081Z] iter=536 turn=9 INFO: Turn 9/25
+[2026-04-08T20:42:26.366Z] iter=536 turn=9 INFO: Agent: Now I need to see what's in CommandContext that I can use for `/retry`. The context doesn't have `inputHistory` or `submitMessage`. I need to add those. Let me check how `/exit` works to understand the exit path for the cost summary.
+[2026-04-08T20:42:26.367Z] iter=536 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "exit\|'/exit'" src/tui-commands.ts | head -15
+[2026-04-08T20:42:26.369Z] iter=536 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "exit\(\)\|confirmExit\|process.exit\|useApp" src/tui.tsx | head -20
+[2026-04-08T20:42:26.376Z] iter=536 turn=9 INFO:   -> exit=0 (164 chars)
+[2026-04-08T20:42:26.377Z] iter=536 turn=9 INFO:   -> exit=0 (582 chars)
+[2026-04-08T20:42:26.377Z] iter=536 turn=10 INFO: Turn 10/25
+[2026-04-08T20:42:28.928Z] iter=536 turn=10 INFO: Agent: I have changed nothing in src/ yet. Starting writes now — no more reading.
+[2026-04-08T20:42:28.929Z] iter=536 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '108,125p' src/tui-commands.ts
+[2026-04-08T20:42:28.938Z] iter=536 turn=10 INFO:   -> exit=0 (813 chars)
+[2026-04-08T20:42:28.938Z] iter=536 turn=11 INFO: Turn 11/25
+[2026-04-08T20:42:35.300Z] iter=536 turn=11 INFO: Agent: Now I have all I need. Let me add the `/retry` command and cost summary to `/exit`:
+[2026-04-08T20:42:35.301Z] iter=536 turn=11 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T20:42:35.303Z] iter=536 turn=11 INFO:   -> ok: Patched src/tui-commands.ts: -20 +22 lines
+
+Context after patch:
+29 |   contextLimit: number;
+30 | }
+31 | 
+32 | export interface CommandContext {
+33 |   workDir: string;
+34 |   orchestratorRef: React.MutableRefObject<Orchestrator | null>;
+35 |   messages: Message[];
+36 |   addMessage: (msg: Message) => void;
+37 |   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+38 |   setStatus: (s: string) => void;
+39 |   setLoading: (b: boolean) => void;
+40 |   currentModel: string;
+41 |   setCurrentModel: (m: string) => void;
+42 |   footerStats: FooterStats;
+43 |   setFooterStats: React.Dispatch<React.SetStateAction<FooterStats>>;
+44 |   setContextWarning: (b: boolean) => void;
+45 |   repoMapRef: React.MutableRefObject<RepoMap | null>;
+46 |   sessionList: SessionInfo[];
+47 |   setSessionList: React.Dispatch<React.SetStateAction<SessionInfo[]>>;
+48 |   autoAccept: boolean;
+49 |   setAutoAccept: (b: boolean) => void;
+50 |   exit: () => void;
+51 |   inputHistory?: string[];
+52 |   submitMessage?: (msg: string) => Promise<void>;
+53 | }
+54 | 
+55 | type CommandHandler = (ctx: CommandContext, args: string) => Promise<boolean>;
+56 | 
+[2026-04-08T20:42:35.303Z] iter=536 turn=12 INFO: Turn 12/25
+[2026-04-08T20:42:43.879Z] iter=536 turn=12 INFO: Agent: Now add `/retry` command and update `/help` and `/exit` with cost summary:
+[2026-04-08T20:42:43.880Z] iter=536 turn=12 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T20:42:43.882Z] iter=536 turn=12 INFO:   -> ok: Patched src/tui-commands.ts: -14 +34 lines
+
+Context after patch:
+110 |     return true;
+111 |   },
+112 | 
+113 |   "/exit": async (ctx) => {
+114 |     if (ctx.messages.length > 2) {
+115 |       try {
+116 |         const now = new Date();
+117 |         const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+118 |         const filePath = path.join(ctx.workDir, ".autoagent", "exports", `session-${timestamp}.md`);
+119 |         const model = ctx.orchestratorRef.current?.getModel() ?? ctx.footerStats.model;
+120 |         const exportMsgs = ctx.messages.filter(m => m.role === "user" || m.role === "assistant") as import("./export-helper.js").ExportMessage[];
+121 |         buildExportContentHelper(exportMsgs, model, { tokensIn: ctx.footerStats.tokensIn, tokensOut: ctx.footerStats.tokensOut, cost: ctx.footerStats.cost }, ctx.workDir, filePath);
+122 |       } catch { /* never block exit */ }
+123 |     }
+124 |     // Print session cost summary before exit
+125 |     const costTracker = ctx.orchestratorRef.current?.getCostTracker?.();
+126 |     if (costTracker && costTracker.entryCount > 0) {
+127 |       ctx.addMessage({ role: "assistant", content: `Session cost: ${costTracker.sessionSummary}` });
+128 |     }
+129 |     ctx.exit();
+130 |     return true;
+131 |   },
+132 | 
+133 |   "/retry": async (ctx) => {
+134 |     // Find last user message from conversation history
+135 |     const lastUserMsg = [...ctx.messages].reverse().find(m => m.role === "user");
+136 |     if (!lastUserMsg || typeof lastUserMsg.content !== "string") {
+137 |       ctx.addMessage({ role: "assistant", content: "Nothing to retry." });
+138 |       return true;
+139 |     }
+140 |     if (ctx.submitMessage) {
+141 |       await ctx.submitMessage(lastUserMsg.content);
+142 |     } else {
+143 |       ctx.addMessage({ role: "assistant", content: "Retry not available in this context." });
+144 |     }
+145 |     return true;
+146 |   },
+147 | 
+148 |   "/init": async (ctx) => {
+149 |     ctx.setStatus("Analyzing project...");
+[2026-04-08T20:42:43.882Z] iter=536 turn=13 INFO: Turn 13/25
+[2026-04-08T20:42:47.915Z] iter=536 turn=13 INFO: Agent: Now add `/retry` to help text, wire `submitMessage` in tui.tsx, then check if `getCostTracker` exists on Orchestrator.
+[2026-04-08T20:42:47.916Z] iter=536 turn=13 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T20:42:47.917Z] iter=536 turn=13 INFO:   -> ok: Patched src/tui-commands.ts: -1 +2 lines
+
+Context after patch:
+194 |         "  /plan list — Show saved plans",
+195 |         "  /plan resume — Resume the most recent incomplete plan",
+196 |         "  /export   — Export conversation to markdown (optional filename arg)",
+197 |         "  /retry    — Re-send the last user message",
+198 |         "  /exit     — Quit AutoAgent",
+199 |       ].join("\n"),
+200 |     });
+201 |     return true;
+[2026-04-08T20:42:47.918Z] iter=536 turn=14 INFO: Turn 14/25
+[2026-04-08T20:42:52.757Z] iter=536 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getCostTracker\|costTracker" src/orchestrator.ts | head -10
+[2026-04-08T20:42:52.773Z] iter=536 turn=14 INFO:   -> exit=0 (332 chars)
+[2026-04-08T20:42:52.773Z] iter=536 turn=15 INFO: Turn 15/25
+[2026-04-08T20:42:55.345Z] iter=536 turn=15 INFO: Agent: No `getCostTracker()` method. I'll add it, then wire `submitMessage` in tui.tsx:
+[2026-04-08T20:42:55.346Z] iter=536 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getModel\(\)" src/orchestrator.ts | head -5
+[2026-04-08T20:42:55.363Z] iter=536 turn=15 INFO:   -> exit=0 (28 chars)
+[2026-04-08T20:42:55.363Z] iter=536 turn=16 INFO: Turn 16/25
+[2026-04-08T20:42:57.457Z] iter=536 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1645,1650p' src/orchestrator.ts
+[2026-04-08T20:42:57.466Z] iter=536 turn=16 INFO:   -> exit=0 (195 chars)
+[2026-04-08T20:42:57.466Z] iter=536 turn=17 INFO: Turn 17/25
+[2026-04-08T20:43:00.289Z] iter=536 turn=17 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:43:00.290Z] iter=536 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -3 +7 lines
+
+Context after patch:
+1642 |   }
+1643 | 
+1644 |   /** Get the current model (override if set, otherwise "auto"). */
+1645 |   getModel(): string {
+1646 |     return this.modelOverride ?? "auto";
+1647 |   }
+1648 | 
+1649 |   getCostTracker(): CostTracker {
+1650 |     return this.costTracker;
+1651 |   }
+1652 | 
+1653 |   /** Override model for all subsequent sends. Pass null to restore auto-routing. */
+1654 |   setModel(model: string | null): void {
+[2026-04-08T20:43:00.291Z] iter=536 turn=18 INFO: Turn 18/25
+[2026-04-08T20:43:02.379Z] iter=536 turn=18 INFO: Agent: Now wire `submitMessage` in tui.tsx:
+[2026-04-08T20:43:02.380Z] iter=536 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '628,645p' src/tui.tsx
+[2026-04-08T20:43:02.393Z] iter=536 turn=18 INFO:   -> exit=0 (512 chars)
+[2026-04-08T20:43:02.393Z] iter=536 turn=19 INFO: Turn 19/25
+[2026-04-08T20:43:04.866Z] iter=536 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '640,700p' src/tui.tsx
+[2026-04-08T20:43:04.875Z] iter=536 turn=19 INFO:   -> exit=0 (1983 chars)
+[2026-04-08T20:43:04.876Z] iter=536 turn=20 INFO: Turn 20/25
+[2026-04-08T20:43:09.651Z] iter=536 turn=20 INFO: Agent: I can see `handleSubmit` runs the full agent loop. I'll create a `submitMessage` callback that calls `handleSubmit` but skips the slash routing. The simplest approach: pass `handleSubmit` itself as `submitMessage` in the ctx:
+[2026-04-08T20:43:09.652Z] iter=536 turn=20 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:43:09.653Z] iter=536 turn=20 INFO:   -> ok: Patched src/tui.tsx: -5 +7 lines
+
+Context after patch:
+629 |         repoMapRef,
+630 |         sessionList,
+631 |         setSessionList,
+632 |         autoAccept,
+633 |         setAutoAccept,
+634 |         exit,
+635 |         inputHistory,
+636 |         submitMessage: async (msg: string) => { await handleSubmit(msg); },
+637 |       };
+638 |       const handled = await routeCommand(trimmed, ctx);
+639 |       if (handled) return;
+640 |       // Unknown command — fall through to send as regular message
+641 |     }
+[2026-04-08T20:43:09.654Z] iter=536 turn=21 INFO: Turn 21/25
+[2026-04-08T20:43:11.694Z] iter=536 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-08T20:43:12.863Z] iter=536 turn=21 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:43:12.863Z] iter=536 turn=22 INFO: Turn 22/25
+[2026-04-08T20:43:17.866Z] iter=536 turn=22 INFO: Agent: TypeScript passes. Now write memory, update goals, restart:
+[2026-04-08T20:43:17.867Z] iter=536 turn=22 INFO: save_memory: "[Engineer] Iteration 536"
+[2026-04-08T20:43:17.868Z] iter=536 turn=22 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T20:43:17.869Z] iter=536 turn=23 INFO: Turn 23/25
+[2026-04-08T20:43:26.354Z] iter=536 turn=23 INFO: write_file: goals.md (write)
+[2026-04-08T20:43:26.356Z] iter=536 turn=23 INFO:   -> ok: Updated goals.md (1004 chars, -16 lines delta)
+[2026-04-08T20:43:26.357Z] iter=536 turn=23 INFO: HARD TURN CAP REACHED: 23 turns (predicted 15, cap 23). Forcing commit.
+[2026-04-08T20:43:26.363Z] iter=536 turn=23 INFO: Cache persisted: 63 entries to .autoagent-cache.json
+[2026-04-08T20:43:26.365Z] iter=536 turn=23 INFO: Tool timing: bash: 19x, avg=72ms, total=1359ms; write_file: 6x, avg=2ms, total=11ms; read_scratchpad: 1x, avg=1ms, total=1ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T20:43:26.365Z] iter=536 turn=23 INFO: Tool timing stats
+[2026-04-08T20:43:34.666Z] iter=536 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 536: predicted 15 turns, actual 23 turns, ratio 1.53**
+[2026-04-08T20:43:43.460Z] iter=536 turn=23 INFO: Pre-commit review (1007in/343out): **Issues found:**
+
+- **Null safety gap on `costTracker.sessionSummary`**: `entryCount > 0` guards the display, but `sessionSummary` is accessed without knowing if it's a string, getter, or potentially

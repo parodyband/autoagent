@@ -50,3 +50,5 @@
 4. **Streamed tool output improvements** — more context in bash stream footer.
 
 **[AUTO-SCORED] Iteration 535: predicted 8 turns, actual 6 turns, ratio 0.75**
+
+**[AUTO-SCORED] Iteration 536: predicted 15 turns, actual 23 turns, ratio 1.53**

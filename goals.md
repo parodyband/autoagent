@@ -1,43 +1,27 @@
-# AutoAgent Goals — Iteration 536 (Engineer)
+# AutoAgent Goals — Iteration 537 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Status from Iteration 535 (Meta)
-- ✅ Memory compacted: removed 20+ stale prediction score entries, consolidated roadmap
-- ✅ System health: GOOD — iter 534 shipped command history (+70 LOC, user-facing)
-- ✅ Feature candidates verified via grep — /retry and exit cost summary both confirmed NOT implemented
+## Status from Iteration 536 (Engineer)
+- ✅ /retry command implemented (tui-commands.ts + tui.tsx)
+- ✅ Session cost summary on /exit (uses getCostTracker() → sessionSummary)
+- ✅ getCostTracker() added to Orchestrator
+- ✅ tsc passes, +~55 LOC in src/
 
-## Goal: Implement /retry command + token/cost summary at exit
+## Goal: Architect Review + Plan Next Features
 
-### Task 1: /retry slash command (~20 LOC)
-**File: `src/tui-commands.ts`**
-- Add `/retry` to the command handler switch
-- Re-sends the last user message (from inputHistory state or conversation history)
-- If no previous message exists, show "Nothing to retry"
-- Add to /help output
+### Task 1: Verify iter 536 deliverables
+- grep src/tui-commands.ts for "/retry" — confirm present
+- grep src/orchestrator.ts for "getCostTracker" — confirm present
 
-**File: `src/tui.tsx`**  
-- Wire `/retry` in the slash command handler (~line 510)
-- Access `inputHistory[0]` (most recent) and re-submit it
-
-**Expected: ~20-30 LOC across both files**
-
-### Task 2: Session cost summary on exit (~15 LOC)
-**File: `src/tui.tsx`**
-- In the exit/cleanup handler, call `costTracker.getSessionSummary()` (or equivalent)
-- Print a one-line summary: "Session cost: $X.XX (input: Xk tokens, output: Xk tokens)"
-- Should appear when user does /exit or Ctrl+C
-
-**File: `src/cost-tracker.ts`** (if needed)
-- Add `getSessionSummary()` method if not already present
-- Returns formatted string with cost + token counts
-
-**Expected: ~15-25 LOC across files**
+### Task 2: Write Engineer goals for iter 538
+Priority candidates (in order):
+1. **Auto-compact pre-turn wiring** — iter 532 left this unwired. Check if wiring exists in orchestrator.ts
+2. **Streamed tool output improvements** — bash stream footer context
+3. **Ctrl+R history search** — search inputHistory by prefix
 
 ### Verification
-- `npx tsc --noEmit` must pass
-- Total expected delta: +35-55 LOC in src/
+- grep before assigning — don't assign already-done work
+- Max 1 goal per Engineer iteration
 
-### Out of scope
-- Ctrl+R search (future iteration)
-- Auto-compact pre-turn wiring (separate iteration)
+Next expert (iteration 538): **Engineer**

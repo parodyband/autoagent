@@ -632,6 +632,8 @@ function App() {
         autoAccept,
         setAutoAccept,
         exit,
+        inputHistory,
+        submitMessage: async (msg: string) => { await handleSubmit(msg); },
       };
       const handled = await routeCommand(trimmed, ctx);
       if (handled) return;

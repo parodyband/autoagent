@@ -1646,6 +1646,10 @@ export class Orchestrator {
     return this.modelOverride ?? "auto";
   }
 
+  getCostTracker(): CostTracker {
+    return this.costTracker;
+  }
+
   /** Override model for all subsequent sends. Pass null to restore auto-routing. */
   setModel(model: string | null): void {
     this.modelOverride = model;
