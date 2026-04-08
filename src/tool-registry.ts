@@ -56,6 +56,10 @@ let indexBuilt = false;
  * Safe to call multiple times — clears old state each time.
  */
 export async function buildSearchIndex(rootDir: string): Promise<number> {
+  // Skip indexing for non-project directories (e.g. ~ or ~/Documents)
+  const { isProjectDir } = await import("./repo-context.js");
+  if (!isProjectDir(rootDir)) return 0;
+
   // Reset index by creating a fresh instance reference isn't possible since it's const,
   // so we track a separate fresh index and replace the contents.
   const freshIndex = new CodeSearchIndex();

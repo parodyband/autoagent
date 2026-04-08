@@ -17,7 +17,7 @@ import * as path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
 import { compressToolOutput } from "./tool-output-compressor.js";
 import { scoreToolOutput } from "./compaction-scorer.js";
-import { fingerprintRepo } from "./repo-context.js";
+import { fingerprintRepo, isProjectDir } from "./repo-context.js";
 import { rankFiles } from "./file-ranker.js";
 import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap, saveRepoMapCache, loadRepoMapCache, getStaleFiles, updateRepoMapIncremental, cacheToRepoMap } from "./tree-sitter-map.js";
 import { shouldDecompose, decomposeTasks, formatSubtasks } from "./task-decomposer.js";
