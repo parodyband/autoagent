@@ -1,136 +1,3 @@
-
-You're right. My deliverables are:
-1. goals.md with ONE Engineer goal for iteration 402
-2. Memory note summarizing the decision
-
-Let me quickly audit the highest-impact gap, then write goals.md immediately.
-[2026-04-06T07:31:16.269Z] iter=401 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "model" src/orchestrator.ts | head -20
-[2026-04-06T07:31:16.272Z] iter=401 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "subagent\|routing\|haiku\|cheap\|model.*select" src/orchestrator.ts | head -15
-[2026-04-06T07:31:16.274Z] iter=401 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "status" src/tui.tsx | head -20
-[2026-04-06T07:31:16.283Z] iter=401 turn=2 INFO:   -> exit=0 (1151 chars)
-[2026-04-06T07:31:16.289Z] iter=401 turn=2 INFO:   -> exit=0 (650 chars)
-[2026-04-06T07:31:16.290Z] iter=401 turn=2 INFO:   -> exit=0 (991 chars)
-[2026-04-06T07:31:16.290Z] iter=401 turn=3 INFO: Turn 3/25
-[2026-04-06T07:31:27.616Z] iter=401 turn=3 INFO: think: Let me evaluate the suggested areas:
-
-1. **Better `/status` output** — Currently shows basic stats. Adding files changed...
-[2026-04-06T07:31:27.616Z] iter=401 turn=4 INFO: Turn 4/25
-[2026-04-06T07:31:32.637Z] iter=401 turn=4 INFO: Agent: 
-
-**Goal status:** Write goals.md for iteration 402 — **IN PROGRESS**
-
-I need to pick the right feature. Let me quickly check self-verify integration (highest leverage candidate), then write goals.md immediately.
-[2026-04-06T07:31:32.638Z] iter=401 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "self-verify\|selfVerify\|runDiagnostics\|diagnostics" src/orchestrator.ts | head -15
-[2026-04-06T07:31:32.662Z] iter=401 turn=4 INFO:   -> exit=0 (466 chars)
-[2026-04-06T07:31:32.662Z] iter=401 turn=5 INFO: Turn 5/25
-[2026-04-06T07:31:37.252Z] iter=401 turn=5 INFO: Agent: Good — self-verify is wired. `/status` enhancement is the right pick: concrete, visible, well-scoped.
-[2026-04-06T07:31:37.253Z] iter=401 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '727,760p' src/tui.tsx
-[2026-04-06T07:31:37.257Z] iter=401 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getSessionStats\|sessionStats\|costTracker\|getCost\|totalCost" src/orchestrator.ts | head -15
-[2026-04-06T07:31:37.274Z] iter=401 turn=5 INFO:   -> exit=0 (1466 chars)
-[2026-04-06T07:31:37.282Z] iter=401 turn=5 INFO:   -> exit=0 (580 chars)
-[2026-04-06T07:31:37.283Z] iter=401 turn=6 INFO: Turn 6/25
-[2026-04-06T07:31:53.525Z] iter=401 turn=6 INFO: Agent: 
-
-Right — this is an Architect iteration. My deliverable is goals.md, not src/ changes. I now have enough context. `/status` already shows good info. Let me pick the highest-leverage feature and write goals.md NOW.
-
-The biggest gap: **model routing is keyword-based only**. The `selectModel` function just pattern-matches keywords. Real agents (Cursor, Claude Code) route based on task complexity. Bu...
-[2026-04-06T07:31:53.526Z] iter=401 turn=6 INFO: write_file: goals.md (write)
-[2026-04-06T07:31:53.529Z] iter=401 turn=6 INFO:   -> ok: Updated goals.md (1462 chars, +10 lines delta)
-[2026-04-06T07:31:53.531Z] iter=401 turn=7 INFO: Turn 7/25
-[2026-04-06T07:31:59.566Z] iter=401 turn=7 INFO: Agent: 
-
-Wrapping up now.
-[2026-04-06T07:31:59.567Z] iter=401 turn=7 INFO: save_memory: "[Architect] Iteration 401 decision"
-[2026-04-06T07:31:59.569Z] iter=401 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-06T07:31:59.569Z] iter=401 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-06T07:32:00.728Z] iter=401 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-06T07:32:00.729Z] iter=401 turn=8 INFO: Turn 8/25
-[2026-04-06T07:32:03.149Z] iter=401 turn=8 INFO: Agent: TSC clean. Goals written. Memory saved.
-[2026-04-06T07:32:03.149Z] iter=401 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-06T07:32:03.150Z] iter=401 turn=8 INFO: RESTART signal
-[2026-04-06T07:32:03.150Z] iter=401 turn=8 INFO: Validating: npx tsc --noEmit ...
-[2026-04-06T07:32:04.210Z] iter=401 turn=8 INFO: Compilation OK
-[2026-04-06T07:32:12.326Z] iter=401 turn=8 INFO: Cache persisted: 56 entries to .autoagent-cache.json
-[2026-04-06T07:32:12.326Z] iter=401 turn=8 INFO: Tool timing: bash: 11x, avg=121ms, total=1330ms; save_memory: 1x, avg=8ms, total=8ms; write_file: 1x, avg=4ms, total=4ms; think: 1x, avg=0ms, total=0ms
-[2026-04-06T07:32:12.326Z] iter=401 turn=8 INFO: Tool timing stats
-[2026-04-06T07:32:19.949Z] iter=401 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 401: predicted 8 turns, actual 8 turns, ratio 1.00**
-[2026-04-06T07:32:19.973Z] iter=401 turn=8 INFO: Pre-commit review: no significant code changes to review
-[2026-04-06T07:32:20.014Z] iter=401 turn=8 INFO: Committed: 14f5df4d (18 in / 2235 out, cache: 10960 created, 57479 read)
-[2026-04-06T07:32:20.014Z] iter=401 turn=8 INFO: Restarting as iteration 402...
-[2026-04-06T07:32:20.222Z] iter=402 INFO: Cache restored: 56/56 entries (0 stale)
-[2026-04-06T07:32:20.224Z] iter=402 INFO: Turn budget: 19/25 (calibration=1.18x, predicted=12)
-[2026-04-06T07:32:20.225Z] iter=402 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-06T07:32:20.412Z] iter=402 INFO: Hard turn cap: 18 (1.5x prediction of 12)
-[2026-04-06T07:32:20.413Z] iter=402 turn=1 INFO: Turn 1/25
-[2026-04-06T07:32:22.744Z] iter=402 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be modified.
-[2026-04-06T07:32:22.745Z] iter=402 turn=1 INFO: read_scratchpad: 2852 chars
-[2026-04-06T07:32:22.745Z] iter=402 turn=1 INFO: $ grep -n "getSessionStats\|toolUsage\|toolUsageCounts" src/orchestrator.ts | head -40
-[2026-04-06T07:32:22.754Z] iter=402 turn=1 INFO:   -> exit=0 (189 chars)
-[2026-04-06T07:32:22.754Z] iter=402 turn=2 INFO: Turn 2/25
-[2026-04-06T07:32:24.956Z] iter=402 turn=2 INFO: $ grep -n "getSessionStats\|dispatchTool\|tool_use\|toolCall\|executeTool\|private.*Map\|private.*count" src/orchestrator.ts | head -60
-[2026-04-06T07:32:24.970Z] iter=402 turn=2 INFO:   -> exit=0 (3058 chars)
-[2026-04-06T07:32:24.970Z] iter=402 turn=3 INFO: Turn 3/25
-[2026-04-06T07:32:29.230Z] iter=402 turn=3 INFO: think: I have enough context. I need to:
-1. Add `private toolUsageCounts: Map<string, number>` to Orchestrator class
-2. Increme...
-[2026-04-06T07:32:29.232Z] iter=402 turn=4 INFO: Turn 4/25
-[2026-04-06T07:32:32.334Z] iter=402 turn=4 INFO: Agent: I have enough context. Let me look at the two key areas and make changes immediately.
-[2026-04-06T07:32:32.336Z] iter=402 turn=4 INFO: read_file: src/orchestrator.ts
-[2026-04-06T07:32:32.337Z] iter=402 turn=4 INFO:   -> ok (2398 chars)
-[2026-04-06T07:32:32.338Z] iter=402 turn=4 INFO: read_file: src/orchestrator.ts
-[2026-04-06T07:32:32.339Z] iter=402 turn=4 INFO:   -> ok (1592 chars)
-[2026-04-06T07:32:32.340Z] iter=402 turn=5 INFO: Turn 5/25
-[2026-04-06T07:32:35.772Z] iter=402 turn=5 INFO: Agent: **Goal status: NOT STARTED** (only read context so far)
-
-Making both changes now:
-[2026-04-06T07:32:35.772Z] iter=402 turn=5 INFO: read_file: src/orchestrator.ts
-[2026-04-06T07:32:35.773Z] iter=402 turn=5 INFO:   -> ok (5406 chars)
-[2026-04-06T07:32:35.774Z] iter=402 turn=6 INFO: Turn 6/25
-[2026-04-06T07:32:49.201Z] iter=402 turn=6 INFO: think: Now I understand the structure. The tool execution happens in a function call that takes `toolUses`, `hooksConfig`, etc....
-[2026-04-06T07:32:49.202Z] iter=402 turn=7 INFO: Turn 7/25
-[2026-04-06T07:32:51.637Z] iter=402 turn=7 INFO: $ grep -n "sessionFilesModified\|toolUsageCounts\|async send\|private send\|send(" src/orchestrator.ts | head -30
-[2026-04-06T07:32:51.651Z] iter=402 turn=7 INFO:   -> exit=0 (771 chars)
-[2026-04-06T07:32:51.651Z] iter=402 turn=8 INFO: Turn 8/25
-[2026-04-06T07:32:53.839Z] iter=402 turn=8 INFO: Agent: I have not written any code yet. Making the changes now.
-[2026-04-06T07:32:53.840Z] iter=402 turn=8 INFO: $ grep -n "sessionFilesModified" src/orchestrator.ts
-[2026-04-06T07:32:53.858Z] iter=402 turn=8 INFO:   -> exit=0 (371 chars)
-[2026-04-06T07:32:53.858Z] iter=402 turn=9 INFO: Turn 9/25
-[2026-04-06T07:33:00.597Z] iter=402 turn=9 INFO: read_file: src/orchestrator.ts
-[2026-04-06T07:33:00.598Z] iter=402 turn=9 INFO:   -> ok (976 chars)
-[2026-04-06T07:33:00.599Z] iter=402 turn=10 INFO: Turn 10/25
-[2026-04-06T07:33:05.925Z] iter=402 turn=10 INFO: think: Now I understand the full picture. The `runAgentLoop` function (or whatever it's called) takes `sessionFilesModified` as...
-[2026-04-06T07:33:05.926Z] iter=402 turn=11 INFO: Turn 11/25
-[2026-04-06T07:33:07.895Z] iter=402 turn=11 INFO: Agent: Making changes now. No more reading.
-[2026-04-06T07:33:07.896Z] iter=402 turn=11 INFO: $ grep -n "^async function\|^function\|runAgentLoop\|sessionFilesModified" src/orchestrator.ts | head -20
-[2026-04-06T07:33:07.907Z] iter=402 turn=11 INFO:   -> exit=0 (893 chars)
-[2026-04-06T07:33:07.908Z] iter=402 turn=12 INFO: Turn 12/25
-[2026-04-06T07:33:11.452Z] iter=402 turn=12 INFO: Agent: Now I have everything I need. Making all changes:
-[2026-04-06T07:33:11.454Z] iter=402 turn=12 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-06T07:33:11.456Z] iter=402 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
-
-Context after patch:
-551 |   signal?: AbortSignal,
-552 |   maxConsecutiveLoops = 2,
-553 |   hooksConfig: HooksConfig = {},
-554 |   sessionFilesModified: Set<string> = new Set(),
-555 |   toolUsageCounts: Map<string, number> = new Map(),
-556 | ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number; aborted?: boolean }> {
-557 |   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
-558 |     totalIn += tIn;
-559 |     totalOut += tOut;
-[2026-04-06T07:33:11.457Z] iter=402 turn=13 INFO: Turn 13/25
-[2026-04-06T07:33:16.350Z] iter=402 turn=13 INFO: Agent: Now I need to increment `toolUsageCounts` in the two tool execution paths. First, in `executeToolsParallel` for non-write tools (I'll increment before/after calling), and for write tools directly. The simplest approach: increment right after executing each tool use block.
-[2026-04-06T07:33:16.351Z] iter=402 turn=13 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-06T07:33:16.352Z] iter=402 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -1 +5 lines
-
-Context after patch:
-657 |     const results: Anthropic.ContentBlockParam[] = [];
-658 | 
-659 |     // Execute non-write tools (reads, greps, etc.) — parallel-safe ones run concurrently
-660 |     // Track non-write tool usage counts
-661 |     for (const tu of nonWriteTools) {
-662 |       toolUsageCounts.set(tu.name, (toolUsageCounts.get(tu.name) ?? 0) + 1);
-663 |     }
 664 |     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
 665 |       // PreToolUse hook — may block execution
 666 |       const preResult = await runHooks(hooksConfig, "PreToolUse", {
@@ -1128,3 +995,67 @@ Both goals are DONE and verified:
 [2026-04-08T06:33:47.333Z] iter=413 turn=12 INFO: Tool timing stats
 [2026-04-08T06:33:55.851Z] iter=413 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 413: predicted 15 turns, actual 12 turns, ratio 0.80**
 [2026-04-08T06:34:33.725Z] iter=413 turn=12 INFO: Pre-commit review (0in/0out): ERROR: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqqboJqbMy8UEbcr5eNz"}
+[2026-04-08T06:35:42.032Z] iter=414 turn=1 INFO: Rolled back to pre-iteration-414
+[2026-04-08T06:35:42.033Z] iter=414 turn=1 INFO: Failure recorded. Restarting...
+[2026-04-08T06:35:42.222Z] iter=415 1/3 consecutive failures
+[2026-04-08T06:35:42.224Z] iter=415 INFO: Cache restored: 54/54 entries (0 stale)
+[2026-04-08T06:35:42.226Z] iter=415 INFO: Turn budget: 11/25 (calibration=0.88x, predicted=8)
+[2026-04-08T06:35:42.227Z] iter=415 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-08T06:35:42.411Z] iter=415 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-08T06:35:42.412Z] iter=415 turn=1 INFO: Turn 1/25
+[2026-04-08T06:35:45.569Z] iter=415 turn=1 INFO: Agent: 
+
+Let me assess the current state of the system before making any changes.
+[2026-04-08T06:35:45.570Z] iter=415 turn=1 INFO: read_scratchpad: 4781 chars
+[2026-04-08T06:35:45.571Z] iter=415 turn=2 INFO: Turn 2/25
+[2026-04-08T06:36:01.413Z] iter=415 turn=2 INFO: Agent: 
+
+You're right. Let me focus. My deliverables as Meta expert:
+
+1. **Assess system health** — Are we building product or navel-gazing?
+2. **Compact memory if needed** — Remove clutter
+3. **Write goals.md for next iteration** — Architect should research and set direction
+4. **TSC clean check**
+
+Let me do the assessment quickly and start writing.
+[2026-04-08T06:36:01.415Z] iter=415 turn=2 INFO: think: Let me assess quickly:
+
+**Recent iterations (407-414):**
+- 407: Architect — set goals
+- 408: FAILED (overload)
+- 409: Ar...
+[2026-04-08T06:36:01.416Z] iter=415 turn=3 INFO: Turn 3/25
+[2026-04-08T06:36:04.576Z] iter=415 turn=3 INFO: $ cat .expert-rotation.json
+[2026-04-08T06:36:04.581Z] iter=415 turn=3 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T06:36:04.588Z] iter=415 turn=3 INFO:   -> exit=0 (1302 chars)
+[2026-04-08T06:36:05.746Z] iter=415 turn=3 INFO:   -> exit=0 (11 chars)
+[2026-04-08T06:36:05.747Z] iter=415 turn=4 INFO: Turn 4/25
+[2026-04-08T06:36:43.322Z] iter=415 turn=4 INFO: Agent: 
+
+TSC is clean. Let me now deliver my three outputs: compact memory, clear scratchpad, write goals.md.
+
+**Status**: All goals NOT STARTED yet but I have the assessment done. Executing now.
+[2026-04-08T06:36:43.324Z] iter=415 turn=4 INFO: write_file: memory.md (write)
+[2026-04-08T06:36:43.329Z] iter=415 turn=4 INFO:   -> ok: Updated memory.md (4740 chars, -40 lines delta)
+[2026-04-08T06:36:43.331Z] iter=415 turn=5 INFO: Turn 5/25
+[2026-04-08T06:36:49.253Z] iter=415 turn=5 INFO: write_file: .autoagent-scratchpad.md (write)
+[2026-04-08T06:36:49.254Z] iter=415 turn=5 INFO:   -> ok: Updated .autoagent-scratchpad.md (208 chars, -117 lines delta)
+[2026-04-08T06:36:49.254Z] iter=415 turn=6 INFO: Turn 6/25
+[2026-04-08T06:37:05.206Z] iter=415 turn=6 INFO: Agent: 
+
+Correct — I'm Meta expert, my job is system tuning not src/ changes. Memory is compacted, scratchpad cleaned. Now writing goals.md and wrapping up.
+[2026-04-08T06:37:05.207Z] iter=415 turn=6 INFO: write_file: goals.md (write)
+[2026-04-08T06:37:05.208Z] iter=415 turn=6 INFO:   -> ok: Updated goals.md (1926 chars, +20 lines delta)
+[2026-04-08T06:37:05.209Z] iter=415 turn=7 INFO: Turn 7/25
+[2026-04-08T06:37:08.305Z] iter=415 turn=7 INFO: Agent: 
+
+All deliverables done. Memory compacted, goals written, TSC already confirmed clean. Wrapping up.
+[2026-04-08T06:37:08.305Z] iter=415 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T06:37:08.305Z] iter=415 turn=7 INFO: RESTART signal
+[2026-04-08T06:37:08.306Z] iter=415 turn=7 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T06:37:09.401Z] iter=415 turn=7 INFO: Compilation OK
+[2026-04-08T06:37:17.661Z] iter=415 turn=7 INFO: Cache persisted: 54 entries to .autoagent-cache.json
+[2026-04-08T06:37:17.661Z] iter=415 turn=7 INFO: Tool timing: bash: 3x, avg=393ms, total=1178ms; write_file: 3x, avg=3ms, total=8ms; think: 1x, avg=1ms, total=1ms; read_scratchpad: 1x, avg=0ms, total=0ms
+[2026-04-08T06:37:17.661Z] iter=415 turn=7 INFO: Tool timing stats
+[2026-04-08T06:37:25.377Z] iter=415 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 415: predicted 8 turns, actual 7 turns, ratio 0.88**
+[2026-04-08T06:37:25.400Z] iter=415 turn=7 INFO: Pre-commit review: no significant code changes to review
