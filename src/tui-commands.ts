@@ -19,6 +19,7 @@ import { handlePlanCommand } from "./plan-commands.js";
 import { runDream } from "./dream.js";
 import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
 import { checkpointManager } from "./checkpoint.js";
+import { getRecentSessions } from "./session-history.js";
 
 export interface FooterStats {
   tokensIn: number;
@@ -599,6 +600,22 @@ const commands: Record<string, CommandHandler> = {
     }
 
     ctx.addMessage({ role: "assistant", content: "Usage: /branch [list] | /branch save <name> | /branch restore <name>" });
+    return true;
+  },
+
+  "/sessions": async (ctx) => {
+    const sessions = getRecentSessions(10);
+    if (sessions.length === 0) {
+      ctx.addMessage({ role: "assistant", content: "No session history found. Sessions are recorded when you exit." });
+      return true;
+    }
+    const lines = sessions.map((s) => {
+      const date = new Date(s.date).toLocaleDateString("en-CA"); // YYYY-MM-DD
+      const cost = `${s.cost.toFixed(2)}`;
+      const topic = s.firstMessage.length > 40 ? s.firstMessage.slice(0, 40) + "…" : s.firstMessage;
+      return `${date}  ${String(s.turns).padStart(2)} turns  ${cost.padStart(6)}  "${topic}"`;
+    });
+    ctx.addMessage({ role: "assistant", content: `Recent sessions:\n${lines.join("\n")}` });
     return true;
   },
 };

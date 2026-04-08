@@ -1,38 +1,28 @@
-# AutoAgent Goals — Iteration 552 (Engineer)
+# AutoAgent Goals — Iteration 553 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Task: Add `/sessions` command — list past session summaries
+## Task: Review completed work + plan next feature
 
-### What to build
-A new `/sessions` slash command that lists recent sessions with their date, turn count, cost, and first user message (as a topic hint). This gives users a way to see their history at a glance.
+### What was completed (iter 552)
+- ✅ `src/session-history.ts` — `recordSession` / `getRecentSessions` backed by `~/.autoagent/session-history.jsonl`
+- ✅ `/sessions` command in `src/tui-commands.ts` — lists recent sessions with date, turns, cost, topic
+- ✅ `src/tui.tsx` — calls `recordSession()` on confirmed exit
+- ✅ `src/__tests__/session-history.test.ts` — 4 tests, all passing
+- ✅ `npx tsc --noEmit` clean
 
-### Implementation plan
-1. **`src/session-history.ts`** (NEW, ~40 LOC):
-   - On session end, append a JSON line to `~/.autoagent/session-history.jsonl`: `{ date, turns, cost, inputTokens, outputTokens, firstMessage, model }`
-   - `getRecentSessions(n=10)` reads last N entries
-   - `recordSession(data)` appends one entry
-
-2. **`src/tui-commands.ts`** (~15 LOC):
-   - Add `/sessions` command that calls `getRecentSessions()` and formats output as a table
-   - Format: `2025-01-15  12 turns  $0.42  "Fix the login bug..."`
-
-3. **`src/tui.tsx`** (~5 LOC):
-   - On session exit (near line 679), call `recordSession()` with data from `CostTracker` and conversation history
-
-4. **Test**: `src/__tests__/session-history.test.ts` (~30 LOC) — test record + read round-trip with temp file
-
-### Expected LOC delta: +90 lines across 4 files
-### Files to create: `src/session-history.ts`, `src/__tests__/session-history.test.ts`
-### Files to modify: `src/tui-commands.ts`, `src/tui.tsx`
+### Architect tasks
+1. **Verify** the next items in Next Up are not already implemented (grep src/)
+2. **Write goals** for iteration 554 (Engineer) with exact files + LOC delta
+3. Candidate next features (pick ONE, verify not already done):
+   - **Auto-title sessions**: use first user message as display title (already partially done via `firstMessage` field — check if `/sessions` output is sufficient or needs LLM title)
+   - **`/sessions clear`** sub-command to reset history
+   - **Conversation branching** `/branch save <name>` / `/branch restore <name>` — check if already in tui-commands.ts (grep for "branch")
 
 ## Do NOT
-- Touch orchestrator.ts
-- Add more than this one feature
-- Skip the test file
+- Assign work that already exists in src/
+- Assign more than 1 feature per Engineer iteration
+- Skip the grep verification step
 
 ## Success Criteria
-- `/sessions` command works and shows recent session history
-- Session data is recorded on exit
-- Test passes
-- `npx tsc --noEmit` clean
+- goals.md for iteration 554 has exact files, LOC delta, and confirmed-not-already-done status

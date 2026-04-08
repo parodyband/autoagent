@@ -29,6 +29,7 @@ import { shouldShowWelcome } from "./welcome.js";
 import type { Task, TaskPlan } from "./task-planner.js";
 import { Markdown } from "./markdown-renderer.js";
 import { routeCommand, type FooterStats } from "./tui-commands.js";
+import { recordSession } from "./session-history.js";
 
 // Parse args
 let workDir = process.cwd();
@@ -680,6 +681,17 @@ function App() {
         const tracker = orchestratorRef.current?.getCostTracker();
         if (tracker && tracker.entryCount > 0) {
           process.stdout.write(`\nSession summary: ${tracker.sessionSummary}\n`);
+          // Record session to history
+          const firstUserMsg = messages.find((m) => m.role === "user");
+          recordSession({
+            date: new Date().toISOString(),
+            turns: messages.filter((m) => m.role === "user").length,
+            cost: tracker.totalCost,
+            inputTokens: tracker.totalInputTokens,
+            outputTokens: tracker.totalOutputTokens,
+            firstMessage: firstUserMsg ? String(firstUserMsg.content).slice(0, 100) : "",
+            model: currentModel,
+          });
         }
         exit();
       } else {
