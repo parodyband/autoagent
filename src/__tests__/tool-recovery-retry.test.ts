@@ -16,7 +16,7 @@ describe("retryWithBackoff", () => {
       if (calls < 2) throw new Error("transient");
       return "recovered";
     });
-    const result = await retryWithBackoff(fn, { maxRetries: 3, baseDelayMs: 1 });
+    const result = await retryWithBackoff(fn, { maxRetries: 3, baseDelayMs: 1, isRetryable: () => true });
     expect(result).toBe("recovered");
     expect(fn).toHaveBeenCalledTimes(2);
   });
@@ -24,7 +24,7 @@ describe("retryWithBackoff", () => {
   it("throws after exhausting all retries", async () => {
     const fn = vi.fn().mockRejectedValue(new Error("permanent"));
     await expect(
-      retryWithBackoff(fn, { maxRetries: 2, baseDelayMs: 1 })
+      retryWithBackoff(fn, { maxRetries: 2, baseDelayMs: 1, isRetryable: () => true })
     ).rejects.toThrow("permanent");
     expect(fn).toHaveBeenCalledTimes(3); // 1 initial + 2 retries
   });

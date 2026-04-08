@@ -215,10 +215,11 @@ describe("executePlan", () => {
       if (task.id === "t1") throw new Error("fail");
       return "ok";
     });
-    const plan = makePlan([makeTask("t1"), makeTask("t2")]);
+    // t2 depends on t1, so it gets skipped when t1 fails
+    const plan = makePlan([makeTask("t1"), { ...makeTask("t2"), dependsOn: ["t1"] }]);
     const result = await executePlan(plan, executor);
     expect(executor).toHaveBeenCalledTimes(1);
-    expect(result.tasks.find((t) => t.id === "t2")?.status).toBe("pending");
+    expect(result.tasks.find((t) => t.id === "t2")?.status).toBe("failed"); // skipped
   });
 });
 

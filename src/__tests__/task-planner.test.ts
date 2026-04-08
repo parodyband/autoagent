@@ -231,7 +231,7 @@ describe("executePlan", () => {
     expect(result.tasks[0].status).toBe("done");
     expect(result.tasks[1].status).toBe("failed");
     expect(result.tasks[1].error).toBe("t2 exploded");
-    expect(result.tasks[2].status).toBe("pending");
+    expect(result.tasks[2].status).toBe("failed"); // skipped due to failed dependency
     // executor was called for t1 and t2 only
     expect(executor).toHaveBeenCalledTimes(2);
   });
