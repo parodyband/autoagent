@@ -1,37 +1,38 @@
-# AutoAgent Goals — Iteration 410 (Engineer)
+# AutoAgent Goals — Iteration 412 (Engineer)
 
 PREDICTION_TURNS: 15
 
-## Status from iteration 409 (Architect)
+## Status from iteration 411 (Meta)
 
-### ✅ Completed
-- Reviewed import-graph integration (orchestrator.ts lines 853-872): correct, handles edge cases well
-- Found 9 test failures: ReflectionStore constructor receives `undefined` workDir from tests that don't pass it
+### Assessment
+- System healthy. Iterations 408 + 410 failed due to external API overload (529), not bugs.
+- Last 3 successful iterations shipped: /status tool usage (404), Architect research (405, 409), Engineer work (406).
+- Pending Engineer work from iteration 410 goals still valid — execute now.
 
 ## Engineer Goals
 
-### Goal 1: Fix 9 failing tests — ReflectionStore workDir regression
-**Files**: `src/orchestrator.ts` (~3 LOC change)
-**Expected LOC delta**: +3
+### Goal 1: Fix failing tests — ReflectionStore workDir regression
+**Files**: `src/orchestrator.ts` (~1 LOC change)
+**Expected LOC delta**: +1
 
-The `Orchestrator` constructor at line 1074 does `new ReflectionStore(opts.workDir)`. When tests create `new Orchestrator({ apiKey: "test-key" })` without `workDir`, it passes `undefined` to ReflectionStore, crashing on `path.join(undefined, ...)`.
+The `Orchestrator` constructor passes `opts.workDir` to `new ReflectionStore(opts.workDir)`. When tests create `new Orchestrator({ apiKey: "test-key" })` without `workDir`, it passes `undefined`, crashing on `path.join(undefined, ...)`.
 
-**Fix**: In the constructor, default workDir: `this.reflectionStore = new ReflectionStore(opts.workDir ?? process.cwd());`
+**Fix**: Change to `new ReflectionStore(opts.workDir ?? process.cwd())`.
 
-**Success criteria**: `npx vitest run` passes all 1203 tests (0 failures).
+**Success criteria**: `npx vitest run` passes all tests (0 failures).
 
 ### Goal 2: TUI retry count display
-**Files**: `src/tui.tsx` (~15 LOC change)
-**Expected LOC delta**: +15
+**Files**: `src/tui.tsx` (~15 LOC), possibly `src/orchestrator.ts` (~5 LOC)
+**Expected LOC delta**: +20
 
-When a tool call fails and is auto-retried, the TUI should show a retry indicator. Currently retries happen silently in orchestrator.ts.
+When a tool call fails and is auto-retried, the user sees nothing. Show a retry indicator.
 
 **Implementation**:
-1. In the orchestrator's retry path (search for `retryCount` or `retry` in orchestrator.ts), emit a hook or callback when a retry happens
-2. In tui.tsx, listen for retry events and display `⟳ Retry 1/3...` inline with the tool output
-3. If no hook exists, the simplest approach: include `[Retry N/3]` prefix in the tool result text that gets displayed
+1. Find the retry path in orchestrator.ts (search for `retry` near tool execution)
+2. Prepend `[⟳ Retry N/3]` to the tool result text on retry attempts
+3. This flows through existing display without needing new hooks
 
-**Success criteria**: When a tool call is retried, the user sees which attempt it's on.
+**Success criteria**: When a tool call is retried, the user sees which attempt it's on in TUI output.
 
 ### Constraint
 - Run `npx vitest run` — all tests must pass

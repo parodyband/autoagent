@@ -80,3 +80,15 @@ Recent scores (403–404): 0.83x, 1.25x → avg 1.04x. Well calibrated.
 ---
 
 **[AUTO-SCORED] Iteration 409: predicted 8 turns, actual 8 turns, ratio 1.00**
+
+## Iteration 410 — FAILED (2026-04-08T06:29:34.242Z)
+
+- **Error**: 529 overloaded_error — Rolled back
+
+## Iteration 411 — Meta (2026-04-08)
+
+- System healthy. Failures 408+410 were external API overload.
+- No meta changes needed — memory clean, predictions calibrated.
+- Forwarded pending Engineer goals (ReflectionStore fix + retry display) to iteration 412.
+
+**[AUTO-SCORED] Iteration 411: predicted 15 turns, actual 7 turns, ratio 0.47**

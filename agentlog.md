@@ -1,78 +1,3 @@
-239 |     return (
-240 |       <Box marginTop={1} borderStyle="single" borderColor="cyan" borderLeft={true} borderRight={false} borderTop={false} borderBottom={false} paddingLeft={1}>
-241 |         <Text color="cyan" bold>You  </Text>
-242 |         <Text>{msg.content}</Text>
-243 |       </Box>
-244 |     );
-245 |   }
-246 |   if (msg.role === "tool") {
-247 |     return (
-248 |       <ToolCallDisplay
-249 |         name={msg.toolName || "tool"}
-250 |         input={msg.content}
-251 |       />
-252 |     );
-253 |   }
-254 |   // assistant
-255 |   const modelLabel = msg.model
-256 |     ? (msg.model.includes("haiku") ? "⚡ haiku" : msg.model.includes("opus") ? "◆ opus" : "◈ sonnet")
-257 |     : "";
-258 |   return (
-259 |     <Box flexDirection="column" marginTop={1} borderStyle="single" borderColor="gray" borderLeft={true} borderRight={false} borderTop={false} borderBottom={false} paddingLeft={1}>
-260 |       <Box marginBottom={0}>
-261 |         <Text color="magenta" bold>Agent</Text>
-262 |         {modelLabel ? <Text color="gray" dimColor>  {modelLabel}</Text> : null}
-263 |         {msg.verificationPassed === true && <Text color="green" dimColor>  ✓</Text>}
-264 |         {msg.verificationPassed === false && <Text color="red" dimColor>  ✗</Text>}
-265 |       </Box>
-266 |       <Markdown>{msg.content}</Markdown>
-267 |       {msg.tokens && (
-268 |         <Text color="gray" dimColor>
-269 |           {msg.tokens.in.toLocaleString()} in / {msg.tokens.out.toLocaleString()} out
-270 |         </Text>
-271 |       )}
-272 |     </Box>
-273 |   );
-274 | }
-275 | 
-276 | /** Diff preview display — shown when agent proposes a file edit (or batch of edits). */
-277 | function DiffPreviewDisplay({ diff, filePath }: { diff: string; filePath: string }) {
-[2026-04-06T07:29:31.355Z] iter=399 turn=9 INFO: Turn 9/25
-[2026-04-06T07:29:43.685Z] iter=399 turn=9 INFO: Agent: Now improve the Footer:
-[2026-04-06T07:29:43.687Z] iter=399 turn=9 INFO: write_file: src/tui.tsx (patch)
-[2026-04-06T07:29:43.690Z] iter=399 turn=9 INFO:   -> ok: Patched src/tui.tsx: -26 +28 lines
-
-Context after patch:
-1 | /**
-2 |  * AutoAgent Interactive TUI — React-based terminal UI using Ink.
-3 |  *
-4 |  * Usage:
-5 |  *   npm run tui                          # work in current directory
-6 |  *   npm run tui -- --dir /path/to/repo   # work in a specific repo
-7 |  */
-8 | 
-9 | import React, { useState, useCallback, useEffect, useRef } from "react";
-10 | import { render, Box, Text, useInput, useApp } from "ink";
-11 | import Spinner from "ink-spinner";
-12 | import TextInput from "ink-text-input";
-13 | import path from "path";
-14 | import fs from "fs";
-15 | import "dotenv/config";
-16 | import { Orchestrator } from "./orchestrator.js";
-17 | import { listSessions, type SessionInfo } from "./session-store.js";
-18 | import type { EditPlan } from "./architect-mode.js";
-19 | import { VirtualMessageList } from "./virtual-message-list.js";
-20 | import { undoLastCommit } from "./auto-commit.js";
-21 | import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
-22 | import { execSync } from "child_process";
-23 | import { runInit } from "./init-command.js";
-24 | import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
-25 | import { shouldShowWelcome } from "./welcome.js";
-26 | import type { Task, TaskPlan } from "./task-planner.js";
-27 | import { handlePlanCommand } from "./plan-commands.js";
-28 | import { runDream } from "./dream.js";
-29 | import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
-30 | import Anthropic from "@anthropic-ai/sdk";
 31 | import { Markdown } from "./markdown-renderer.js";
 [2026-04-06T07:29:43.691Z] iter=399 turn=10 INFO: Turn 10/25
 [2026-04-06T07:29:46.361Z] iter=399 turn=10 INFO: Agent: Good - changes made. Let me now check if TypeScript is happy with the `borderLeft` props I used.
@@ -1070,3 +995,84 @@ echo "AUTOAGENT_RESTART"
 [2026-04-08T06:28:20.890Z] iter=409 turn=8 INFO: Tool timing stats
 [2026-04-08T06:28:28.447Z] iter=409 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 409: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-08T06:28:28.471Z] iter=409 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T06:29:34.242Z] iter=410 turn=1 INFO: Rolled back to pre-iteration-410
+[2026-04-08T06:29:34.242Z] iter=410 turn=1 INFO: Failure recorded. Restarting...
+[2026-04-08T06:29:34.428Z] iter=411 1/3 consecutive failures
+[2026-04-08T06:29:34.430Z] iter=411 INFO: Cache restored: 54/54 entries (0 stale)
+[2026-04-08T06:29:34.432Z] iter=411 INFO: Turn budget: 15/25 (calibration=1.00x, predicted=15)
+[2026-04-08T06:29:34.433Z] iter=411 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-08T06:29:34.614Z] iter=411 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T06:29:34.615Z] iter=411 turn=1 INFO: Turn 1/25
+[2026-04-08T06:29:47.264Z] iter=411 turn=1 INFO: Agent: 
+
+I'm the Meta expert, but the goals are written for the Engineer. Let me assess the current state and execute accordingly.
+[2026-04-08T06:29:47.265Z] iter=411 turn=1 INFO: think: Let me assess the situation:
+
+1. The goals are for an Engineer iteration (410), but I'm the Meta expert
+2. Two recent it...
+[2026-04-08T06:29:47.266Z] iter=411 turn=2 INFO: Turn 2/25
+[2026-04-08T06:29:50.392Z] iter=411 turn=2 INFO: $ cat .expert-rotation.json
+[2026-04-08T06:29:50.395Z] iter=411 turn=2 INFO: $ cat .autoagent-state.json
+[2026-04-08T06:29:50.401Z] iter=411 turn=2 INFO:   -> exit=0 (1306 chars)
+[2026-04-08T06:29:50.403Z] iter=411 turn=2 INFO:   -> exit=0 (290 chars)
+[2026-04-08T06:29:50.403Z] iter=411 turn=3 INFO: Turn 3/25
+[2026-04-08T06:29:59.999Z] iter=411 turn=3 INFO: Agent: 
+
+You're right. I'm Meta expert at iteration 411. My deliverables are:
+
+1. **Assess system health** — are we shipping product features?
+2. **Write goals.md for next iteration** (Engineer) to execute the two goals that failed due to overload
+3. **Compact memory if needed**
+
+Let me quickly check the key facts and produce output.
+[2026-04-08T06:29:59.999Z] iter=411 turn=3 INFO: think: System health assessment:
+- Iterations 408 and 410 both FAILED due to API overload (529 errors), not due to system probl...
+[2026-04-08T06:30:00.000Z] iter=411 turn=4 INFO: Turn 4/25
+[2026-04-08T06:30:12.673Z] iter=411 turn=4 INFO: Agent: System is healthy. Two recent failures (408, 410) were external API overload — not system issues. The Engineer goals are still valid and need execution. Memory is clean. Let me write goals and move on.
+[2026-04-08T06:30:12.674Z] iter=411 turn=4 INFO: write_file: goals.md (write)
+[2026-04-08T06:30:12.676Z] iter=411 turn=4 INFO:   -> ok: Updated goals.md (1663 chars, +1 lines delta)
+[2026-04-08T06:30:12.677Z] iter=411 turn=5 INFO: Turn 5/25
+[2026-04-08T06:30:19.315Z] iter=411 turn=5 INFO: Agent: Now update memory with iteration scoring and compact the history entry:
+[2026-04-08T06:30:19.315Z] iter=411 turn=5 INFO: write_file: memory.md (patch)
+[2026-04-08T06:30:19.316Z] iter=411 turn=5 INFO:   -> ok: Patched memory.md: -6 +9 lines
+
+Context after patch:
+81 | 
+82 | **[AUTO-SCORED] Iteration 409: predicted 8 turns, actual 8 turns, ratio 1.00**
+83 | 
+84 | ## Iteration 410 — FAILED (2026-04-08T06:29:34.242Z)
+85 | 
+86 | - **Error**: 529 overloaded_error — Rolled back
+87 | 
+88 | ## Iteration 411 — Meta (2026-04-08)
+89 | 
+90 | - System healthy. Failures 408+410 were external API overload.
+91 | - No meta changes needed — memory clean, predictions calibrated.
+92 | - Forwarded pending Engineer goals (ReflectionStore fix + retry display) to iteration 412.
+93 | 
+[2026-04-08T06:30:19.316Z] iter=411 turn=6 INFO: Turn 6/25
+[2026-04-08T06:30:23.894Z] iter=411 turn=6 INFO: Agent: 
+
+**Goal status:**
+- **Goals.md written for iteration 412**: ✅ DONE
+- **Memory updated**: ✅ DONE
+- **System health assessed**: ✅ DONE
+
+All Meta deliverables complete. This was a short Meta iteration — system is healthy, just forwarding work past API overload failures. Let me verify TSC and restart.
+[2026-04-08T06:30:23.894Z] iter=411 turn=6 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T06:30:24.973Z] iter=411 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-08T06:30:24.974Z] iter=411 turn=7 INFO: Turn 7/25
+[2026-04-08T06:30:27.772Z] iter=411 turn=7 INFO: Agent: TSC clean. 
+
+```
+echo "AUTOAGENT_RESTART"
+```
+[2026-04-08T06:30:27.772Z] iter=411 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T06:30:27.772Z] iter=411 turn=7 INFO: RESTART signal
+[2026-04-08T06:30:27.773Z] iter=411 turn=7 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T06:30:28.876Z] iter=411 turn=7 INFO: Compilation OK
+[2026-04-08T06:30:37.046Z] iter=411 turn=7 INFO: Cache persisted: 54 entries to .autoagent-cache.json
+[2026-04-08T06:30:37.047Z] iter=411 turn=7 INFO: Tool timing: bash: 4x, avg=274ms, total=1096ms; write_file: 2x, avg=2ms, total=3ms; think: 2x, avg=0ms, total=0ms
+[2026-04-08T06:30:37.047Z] iter=411 turn=7 INFO: Tool timing stats
+[2026-04-08T06:30:44.990Z] iter=411 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 411: predicted 15 turns, actual 7 turns, ratio 0.47**
+[2026-04-08T06:30:45.012Z] iter=411 turn=7 INFO: Pre-commit review: no significant code changes to review
