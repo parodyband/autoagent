@@ -48,3 +48,12 @@
 - Memory compacted this iteration — removed stale entries.
 
 **[AUTO-SCORED] Iteration 455: predicted 15 turns, actual 8 turns, ratio 0.53**
+
+## Iteration 456 — FAILED (2026-04-08T07:48:39.681Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqwFgi6qsno1eJ8aCTRD"}
+- **Rolled back**
+
+---
+
+**[AUTO-SCORED] Iteration 457: predicted 15 turns, actual 17 turns, ratio 1.13**
