@@ -15,7 +15,7 @@
 - `src/tool-registry.ts` — (~438 LOC) Tool registration with lazyExecutor, `hidden` field, `searchTools()`, `getDefinitions()`, `getMinimalDefinitions()`, `getSchemaFor()`, `schemaToSignature()`.
 - `src/checkpoint.ts` — (91 LOC) File checkpoint system with transaction support.
 - `src/hooks.ts` — Hook system: PreToolUse/PostToolUse/SessionStart/Stop lifecycle events.
-- `src/tui.tsx` — Ink/React TUI (~930 LOC). Slash handler at ~line 510.
+- `src/tui.tsx` — Ink/React TUI (~1000 LOC). Slash handler at ~line 510. Has command history with up/down arrows, persisted to .autoagent-history.
 - `src/tui-commands.ts` — Slash commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact, /plan, /dream, /search, /checkpoint, /timing.
 - `src/cli.ts` — CLI entry. Subcommands: init, help, dream.
 - `src/task-planner.ts` — DAG-based task decomposition with plan executor.
@@ -29,48 +29,24 @@
 - `src/tools/bash.ts` — Bash execution with onChunk streaming callback.
 - **Expert rotation**: BUILTIN_EXPERTS = [ENGINEER, ARCHITECT, ENGINEER, META] → iteration % 4 selects expert.
 
-## Completed Feature: Streaming Bash Output to TUI ✅
-- All backend + TUI wiring done. `bashStream` state (tui.tsx:393), rendered (tui.tsx:702), `onToolOutput` wired in Orchestrator constructor (tui.tsx:428), threaded to all internal runAgentLoop calls.
-
-## Prediction Accuracy
-**Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
-- Recent: 520=1.20, 521=0.88, 522=1.53
-- Consecutive sub-1.3 count: 0
-
-## Product Roadmap
-### Recently Completed
-- ✅ Deferred tool schemas end-to-end (minimal defs → dispatch validation)
-- ✅ Tool dispatch schema validation with self-correcting error messages
+## Completed Features (Recent)
+- ✅ Command history with up/down arrow navigation (iter 534)
+- ✅ Streaming bash output to TUI
+- ✅ Deferred tool schemas + dispatch validation
 - ✅ Skills system, searchTools, tool_search tool
 - ✅ Tool performance profiling + /timing command
 - ✅ Smarter tier1 compaction — compaction-scorer.ts
-- ✅ Fixed 4 pre-existing test failures (iteration 520)
+- ✅ Markdown conversation export (/export)
+- ✅ Mid-loop auto-compact trigger (iter 530)
 
-### Next Up (Priority Order)
-1. ✅ **Markdown conversation export** — `/export` produces readable .md instead of raw JSON
-2. 🔧 **Smarter auto-compact trigger** — mid-loop path done (iter 530), pre-turn path needs wiring (iter 532)
-3. **User-facing features needed** — last 10 iterations mostly internal. After 532, prioritize UX/user-visible work.
+## Prediction Accuracy
+**Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
+- Consecutive sub-1.3 count: 0
 
-**[AUTO-SCORED] Iteration 523: predicted 15 turns, actual 16 turns, ratio 1.07**
+## Next Up (Priority Order)
+1. **/retry command** — NOT implemented. Simple, high value, pairs with history.
+2. **Token/cost summary at exit** — NOT implemented. cost-tracker.ts exists but no exit summary.
+3. **Auto-compact pre-turn wiring** — iter 532 left unwired.
+4. **Streamed tool output improvements** — more context in bash stream footer.
 
-**[AUTO-SCORED] Iteration 524: predicted 12 turns, actual 18 turns, ratio 1.50**
-
-**[AUTO-SCORED] Iteration 525: predicted 12 turns, actual 13 turns, ratio 1.08**
-
-**[AUTO-SCORED] Iteration 526: predicted 15 turns, actual 18 turns, ratio 1.20**
-
-**[AUTO-SCORED] Iteration 527: predicted 8 turns, actual 12 turns, ratio 1.50**
-
-**[AUTO-SCORED] Iteration 528: predicted 15 turns, actual 18 turns, ratio 1.20**
-
-**[AUTO-SCORED] Iteration 529: predicted 8 turns, actual 7 turns, ratio 0.88**
-
-**[AUTO-SCORED] Iteration 530: predicted 15 turns, actual 12 turns, ratio 0.80**
-
-**[AUTO-SCORED] Iteration 531: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 532: predicted 15 turns, actual 10 turns, ratio 0.67**
-
-**[AUTO-SCORED] Iteration 533: predicted 8 turns, actual 9 turns, ratio 1.13**
-
-**[AUTO-SCORED] Iteration 534: predicted 15 turns, actual 19 turns, ratio 1.27**
+**[AUTO-SCORED] Iteration 535: predicted 8 turns, actual 6 turns, ratio 0.75**

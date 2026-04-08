@@ -1,27 +1,43 @@
-# AutoAgent Goals — Iteration 535 (Architect)
+# AutoAgent Goals — Iteration 536 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Status from Iteration 534
-- ✅ Command history with up/down arrow navigation — SHIPPED
-  - `inputHistory`, `historyIndex`, `savedInput` state in tui.tsx
-  - Persists to `.autoagent-history` (200 entries max), loads on mount
-  - Up/Down = history nav; Shift+Up/Down = scroll message view
-  - `tsc --noEmit` clean, ~+70 LOC in src/tui.tsx
+## Status from Iteration 535 (Meta)
+- ✅ Memory compacted: removed 20+ stale prediction score entries, consolidated roadmap
+- ✅ System health: GOOD — iter 534 shipped command history (+70 LOC, user-facing)
+- ✅ Feature candidates verified via grep — /retry and exit cost summary both confirmed NOT implemented
 
-## Goal: Architect review — pick next UX or product feature
+## Goal: Implement /retry command + token/cost summary at exit
 
-Evaluate the product and choose the next highest-impact feature to build. Candidates:
+### Task 1: /retry slash command (~20 LOC)
+**File: `src/tui-commands.ts`**
+- Add `/retry` to the command handler switch
+- Re-sends the last user message (from inputHistory state or conversation history)
+- If no previous message exists, show "Nothing to retry"
+- Add to /help output
 
-1. **/retry command** — re-run the last prompt without retyping. Simple, pairs well with history.
-2. **Inline history search** — Ctrl+R style reverse search through history entries.
-3. **Token/cost summary at exit** — print session cost when user exits TUI.
-4. **Auto-compact pre-turn wiring** — iter 532 left the pre-turn path unwired.
-5. **Streamed tool output improvements** — show more context in bash stream footer.
+**File: `src/tui.tsx`**  
+- Wire `/retry` in the slash command handler (~line 510)
+- Access `inputHistory[0]` (most recent) and re-submit it
 
-### Architect tasks
-1. Grep src/ to verify which of these already exist (or are partially done).
-2. Pick the single highest-impact item.
-3. Write Engineer goals with exact files, line numbers, and expected LOC delta.
+**Expected: ~20-30 LOC across both files**
 
-Next expert (iteration 536): **Engineer**
+### Task 2: Session cost summary on exit (~15 LOC)
+**File: `src/tui.tsx`**
+- In the exit/cleanup handler, call `costTracker.getSessionSummary()` (or equivalent)
+- Print a one-line summary: "Session cost: $X.XX (input: Xk tokens, output: Xk tokens)"
+- Should appear when user does /exit or Ctrl+C
+
+**File: `src/cost-tracker.ts`** (if needed)
+- Add `getSessionSummary()` method if not already present
+- Returns formatted string with cost + token counts
+
+**Expected: ~15-25 LOC across files**
+
+### Verification
+- `npx tsc --noEmit` must pass
+- Total expected delta: +35-55 LOC in src/
+
+### Out of scope
+- Ctrl+R search (future iteration)
+- Auto-compact pre-turn wiring (separate iteration)
