@@ -1,16 +1,23 @@
-# AutoAgent Goals — Iteration 503 (Meta)
+# AutoAgent Goals — Iteration 504 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 12
 
-## Goal A — System health check + write Engineer goals for iteration 504
+## Goal A — Deferred tool schemas: lazy-load input_schema to save context tokens
 
-Review recent iterations (500–502) and assess:
-1. What shipped, what stalled, ratio health.
-2. Compact memory if stale.
-3. Write goals for iteration 504 (Engineer) — ONE goal only (scope reduction still in effect):
-   - Top candidate: **Deferred tool schemas** — lazy-load tool input schemas so they don't consume context tokens on every call. OR **Test coverage** for micro-compact + /branch command.
-   - Pick whichever is more impactful and concrete. Specify exact file + expected LOC delta.
+Currently `registry.getDefinitions()` returns all tool schemas on every API call, consuming ~2-3K tokens of context. Instead, send tools with minimal schemas and only expand the full schema when the model actually uses a tool.
 
-## Roadmap Context
-- ✅ sub-agent cache prefix wiring (iter 502) — systemPromptPrefix flows through makeExecTool → ctx
-- Next Up: deferred tool schemas, smarter tier1 compaction, test coverage for micro-compact + branching
+### Implementation
+1. **`src/tool-registry.ts`** — Add `getMinimalDefinitions()` method that returns tools with `description` only (no `input_schema` detail — just `{"type": "object"}` placeholder). Add `getSchemaFor(name: string)` to return full schema for one tool.
+2. **`src/orchestrator.ts`** — In `runAgentLoop`, use `getMinimalDefinitions()` for the initial tool list. After each tool_use response, if the model picks a tool, validate params against the full schema. If the model hallucinates params (unlikely with good descriptions), inject a one-shot correction with the full schema.
+
+### Acceptance criteria
+- `getMinimalDefinitions()` returns tools without detailed input_schema properties
+- `getSchemaFor(name)` returns the full schema for a single tool
+- `npx tsc --noEmit` passes
+- Existing tests pass
+
+### Files to modify
+- `src/tool-registry.ts` (+20 LOC)
+- `src/orchestrator.ts` (+5 LOC)
+
+### Expected LOC delta: +25
