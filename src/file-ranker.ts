@@ -64,8 +64,11 @@ const ENTRY_NAMES = new Set(["index", "main", "app", "server", "cli", "mod", "li
 
 // ─── File walking ───────────────────────────────────────────
 
-function walkFiles(dir: string, rootDir: string, maxDepth: number = 8, depth: number = 0): string[] {
-  if (depth > maxDepth) return [];
+const MAX_WALK_FILES = 500; // bail out early on huge trees
+
+function walkFiles(dir: string, rootDir: string, maxDepth: number = 6, depth: number = 0, state?: { count: number }): string[] {
+  if (!state) state = { count: 0 };
+  if (depth > maxDepth || state.count >= MAX_WALK_FILES) return [];
   const results: string[] = [];
 
   let entries;
@@ -76,14 +79,16 @@ function walkFiles(dir: string, rootDir: string, maxDepth: number = 8, depth: nu
   }
 
   for (const entry of entries) {
+    if (state.count >= MAX_WALK_FILES) break;
     if (entry.isDirectory()) {
       if (SKIP_DIRS.has(entry.name) || entry.name.startsWith(".")) continue;
-      results.push(...walkFiles(path.join(dir, entry.name), rootDir, maxDepth, depth + 1));
+      results.push(...walkFiles(path.join(dir, entry.name), rootDir, maxDepth, depth + 1, state));
     } else if (entry.isFile()) {
       const ext = path.extname(entry.name).toLowerCase();
       const baseName = entry.name;
       if (SOURCE_EXTS.has(ext) || CONFIG_FILES.has(baseName)) {
         results.push(path.relative(rootDir, path.join(dir, entry.name)));
+        state.count++;
       }
     }
   }
@@ -117,6 +122,8 @@ function isConfigFile(relPath: string): boolean {
 
 function getLineCount(filePath: string): number {
   try {
+    const stat = statSync(filePath);
+    if (stat.size > 512 * 1024) return 200; // assume large for files > 512KB, skip reading
     const content = readFileSync(filePath, "utf-8");
     return content.split("\n").length;
   } catch {

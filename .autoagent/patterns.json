@@ -1,6 +1,6 @@
 {
-  "windowSize": 6,
-  "totalTasks": 6,
+  "windowSize": 7,
+  "totalTasks": 7,
   "successRate": 1,
   "topPatterns": [],
   "toolErrorRates": {
@@ -13,5 +13,5 @@
   "avgRetryRate": 0,
   "compactionRate": 0,
   "guidancePrompt": "",
-  "generatedAt": "2026-04-08T17:31:02.785Z"
+  "generatedAt": "2026-04-08T20:28:57.416Z"
 }

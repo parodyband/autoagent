@@ -133,19 +133,35 @@ function getGitInfo(dir: string): { commits: string[]; recentFiles: string[] } {
 
 // ─── Size estimate ────────────────────────────────────────────
 
+const SOURCE_EXTS = new Set([".ts", ".tsx", ".js", ".jsx", ".py", ".rs", ".go"]);
+const SKIP_DIRS_EST = new Set(["node_modules", ".git", "dist", "build", ".next", "__pycache__", ".venv", "venv", "vendor", "target"]);
+const MAX_ESTIMATE_FILES = 200;
+
 function estimateSize(dir: string): { fileCount: number; approxLoc: number } {
-  const count = safeExec(
-    "find . -type f \\( -name '*.ts' -o -name '*.js' -o -name '*.py' -o -name '*.rs' -o -name '*.go' \\) ! -path '*/node_modules/*' ! -path '*/.git/*' | wc -l",
-    dir
-  );
-  const loc = safeExec(
-    "find . -type f \\( -name '*.ts' -o -name '*.js' -o -name '*.py' -o -name '*.rs' -o -name '*.go' \\) ! -path '*/node_modules/*' ! -path '*/.git/*' -exec wc -l {} + 2>/dev/null | tail -1",
-    dir
-  );
-  return {
-    fileCount: count ? parseInt(count.trim(), 10) || 0 : 0,
-    approxLoc: loc ? parseInt(loc.trim().split(/\s+/)[0], 10) || 0 : 0,
-  };
+  let fileCount = 0;
+  let approxLoc = 0;
+
+  function walk(d: string, depth: number): void {
+    if (depth > 5 || fileCount >= MAX_ESTIMATE_FILES) return;
+    let entries;
+    try { entries = readdirSync(d, { withFileTypes: true }); } catch { return; }
+    for (const entry of entries) {
+      if (fileCount >= MAX_ESTIMATE_FILES) return;
+      if (entry.isDirectory()) {
+        if (SKIP_DIRS_EST.has(entry.name) || entry.name.startsWith(".")) continue;
+        walk(path.join(d, entry.name), depth + 1);
+      } else if (entry.isFile() && SOURCE_EXTS.has(path.extname(entry.name).toLowerCase())) {
+        fileCount++;
+        try {
+          const content = readFileSync(path.join(d, entry.name), "utf-8");
+          approxLoc += content.split("\n").length;
+        } catch { /* skip unreadable files */ }
+      }
+    }
+  }
+
+  walk(dir, 0);
+  return { fileCount, approxLoc };
 }
 
 // ─── Main export ──────────────────────────────────────────────

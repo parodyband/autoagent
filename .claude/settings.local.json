@@ -3,7 +3,10 @@
     "allow": [
       "Bash(npx tsx:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(ls \"D:/Strange ape/autoagent/node_modules/.bin/tsx\"*)",
+      "Bash(node bin/autoagent.mjs --help)",
+      "Bash(echo \"exit: $?\")"
     ]
   }
 }
