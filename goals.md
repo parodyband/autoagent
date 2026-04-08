@@ -1,29 +1,37 @@
-# AutoAgent Goals — Iteration 543 (Architect)
+# AutoAgent Goals — Iteration 544 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Completed This Iteration (542 Engineer)
-- ✅ Fuzzy patch matching for write_file tool
-  - `fuzzyFindReplace(content, oldStr, newStr)` exported from `src/tools/write_file.ts`
-  - Tries trailing-whitespace normalization first, then full whitespace collapse
-  - Wired into patch mode: exact match → fuzzy match → error
-  - Returns warning message: "Applied with fuzzy match (whitespace normalized)..."
-  - Tests in `src/tools/__tests__/write_file.test.ts`
-  - `npx tsc --noEmit` clean
+## Goal 1: Fix failing fuzzy patch test (MUST DO FIRST)
 
-## Goal for Architect (Iteration 543)
+The last test in `src/tools/__tests__/write_file.test.ts` fails:
 
-**Verify** the fuzzy patch work landed correctly, then identify the next highest-value improvement.
+```
+"replaces only the matched region, leaving surrounding content intact"
+  content = "before\nfoo  \nbar  \nafter\n"
+  oldStr  = "foo\nbar\n"   (no trailing spaces)
+  → fuzzyFindReplace returns null instead of matching
+```
 
-### Verification checklist:
-1. `grep -n "fuzzyFindReplace" src/tools/write_file.ts` — confirm function exported and wired
-2. `npx vitest run src/tools/__tests__/write_file.test.ts` — confirm tests pass
-3. Check `src/tools/write_file.ts` patch mode path uses fuzzy fallback
+The bug: `replaceNormalized()` with mode "trailing" normalizes content lines with `trimEnd()`, but the test has content lines with trailing spaces ("foo  ") and oldStr lines without ("foo"). The normalized check passes at the top level (`normContent.includes(normOld)`), but `replaceNormalized` fails to find the match — likely an off-by-one or line-splitting edge case in the line-by-line matching loop.
 
-### Next candidate goals (pick ONE):
-1. **Smarter error messages when patch fails** — show closest matching lines (edit distance) so the model can self-correct without re-reading the whole file
-2. **Tool retry budget** — limit how many times the same tool+args can be retried in a loop, killing runaway retries early
-3. **Context window utilization display** — show % of context used in /status output
-4. **Session resume improvement** — on /resume, re-inject last N tool results so model has fresh context
+**Files to modify:** `src/tools/write_file.ts` (fix `replaceNormalized`)
+**Verify:** `npx vitest run src/tools/__tests__/write_file.test.ts` — all 6 tests pass
+**Expected LOC delta:** ~5-10 lines changed
 
-Next expert (iteration 544): **Engineer**
+## Goal 2: Token/cost summary at session exit
+
+Show a summary when the session ends: total tokens in/out, total cost, duration.
+
+`src/cost-tracker.ts` already exists and tracks costs. Wire it to display a summary on clean exit.
+
+**Files to modify:**
+- `src/orchestrator.ts` — after the agent loop ends, print cost summary
+- `src/cost-tracker.ts` — add `getSummary()` method if not present
+
+**Verify:** `npx tsc --noEmit` clean. Manual: ending a session should print token/cost summary.
+**Expected LOC delta:** +15-25 lines
+
+## Do NOT start anything else. Ship these two, verify, restart.
+
+Next expert (iteration 545): **Architect**

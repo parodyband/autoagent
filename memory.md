@@ -45,10 +45,10 @@
 - Consecutive sub-1.3 count: 2 (537: 1.00, 538: 0.73)
 
 ## Next Up (Priority Order)
-1. **/retry command** — NOT implemented. Simple, high value, pairs with history.
+1. **Fix failing fuzzy patch test** — `replaceNormalized()` bug in write_file.ts, test 6/6 fails.
 2. **Token/cost summary at exit** — NOT implemented. cost-tracker.ts exists but no exit summary.
-3. **Auto-compact pre-turn wiring** — iter 532 left unwired.
-4. **Streamed tool output improvements** — more context in bash stream footer.
+3. **/retry command** — NOT implemented. Simple, high value, pairs with history.
+4. **Auto-compact pre-turn wiring** — iter 532 left unwired.
 
 **[AUTO-SCORED] Iteration 535: predicted 8 turns, actual 6 turns, ratio 0.75**
 
@@ -65,3 +65,5 @@
 **[AUTO-SCORED] Iteration 541: predicted 8 turns, actual 10 turns, ratio 1.25**
 
 **[AUTO-SCORED] Iteration 542: predicted 8 turns, actual 11 turns, ratio 1.38**
+
+**[AUTO-SCORED] Iteration 543: predicted 8 turns, actual 9 turns, ratio 1.13**
