@@ -1,82 +1,3 @@
-1075 | 
-1076 |     // Apply initial model override if provided
-1077 |     if (opts.initialModel) {
-[2026-04-08T06:32:19.738Z] iter=413 turn=3 INFO: Turn 3/25
-[2026-04-08T06:32:24.072Z] iter=413 turn=3 INFO: Agent: 
-
-Yes, I've already patched Goal 1. Now Goal 2 — retry count display. Let me look at the exact retry path more closely and add the indicator:
-[2026-04-08T06:32:24.074Z] iter=413 turn=3 INFO: read_file: src/orchestrator.ts
-[2026-04-08T06:32:24.076Z] iter=413 turn=3 INFO:   -> ok (1730 chars)
-[2026-04-08T06:32:24.077Z] iter=413 turn=4 INFO: Turn 4/25
-[2026-04-08T06:32:36.146Z] iter=413 turn=4 INFO: think: The retry logic is a single auto-retry (attempt 1 fails, attempt 2 = retry). The goal says to prepend `[⟳ Retry N/3]` bu...
-[2026-04-08T06:32:36.146Z] iter=413 turn=5 INFO: Turn 5/25
-[2026-04-08T06:32:39.794Z] iter=413 turn=5 INFO: Agent: Let me check what `onStatus` is available in that scope:
-[2026-04-08T06:32:39.794Z] iter=413 turn=5 INFO: read_file: src/orchestrator.ts
-[2026-04-08T06:32:39.795Z] iter=413 turn=5 INFO:   -> ok (865 chars)
-[2026-04-08T06:32:39.795Z] iter=413 turn=6 INFO: Turn 6/25
-[2026-04-08T06:32:44.151Z] iter=413 turn=6 INFO: Agent: 
-
-**Goal 1: Fix ReflectionStore workDir regression** — DONE (patched line 1074)
-**Goal 2: TUI retry count display** — IN PROGRESS (need to add onStatus call + result prefix)
-
-Let me finish Goal 2 now:
-[2026-04-08T06:32:44.153Z] iter=413 turn=6 INFO: grep: "onStatus" in src/orchestrator.ts
-[2026-04-08T06:32:44.201Z] iter=413 turn=6 INFO:   -> 5 matches
-[2026-04-08T06:32:44.203Z] iter=413 turn=7 INFO: Turn 7/25
-[2026-04-08T06:32:47.572Z] iter=413 turn=7 INFO: grep: "onStatus" in src/orchestrator.ts
-[2026-04-08T06:32:47.596Z] iter=413 turn=7 INFO:   -> 3 matches
-[2026-04-08T06:32:47.596Z] iter=413 turn=8 INFO: Turn 8/25
-[2026-04-08T06:32:58.526Z] iter=413 turn=8 INFO: Agent: Good — `onStatus` is available in the tool execution scope. Now I'll add the retry indicator:
-[2026-04-08T06:32:58.526Z] iter=413 turn=8 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T06:32:58.528Z] iter=413 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -29 +32 lines
-
-Context after patch:
-741 |         rawResult += "\n\n[Hook context]: " + postResult.additionalContext;
-742 |       }
-743 | 
-744 |       const enhanced = enhanceToolError(tu.name, tuInput, rawResult, workDir);
-745 |       // Auto-retry once if the result looks like an error and enhancement added suggestions
-746 |       if (enhanced !== rawResult && isToolError(rawResult)) {
-747 |         onStatus?.(`⟳ ${tu.name} failed — auto-retrying (attempt 2/2)…`);
-748 |         const retryResult = await execTool(tu.name, tuInput);
-749 |         const dur = Date.now() - t0;
-750 |         if (!isToolError(retryResult)) {
-751 |           // Retry succeeded
-752 |           onStatus?.(`✓ ${tu.name} retry succeeded`);
-753 |           if (tu.name === "read_file" && onFileWatch) {
-754 |             onFileWatch("read", (tuInput as { path?: string }).path ?? "");
-755 |           }
-756 |           reflectionCbs.onToolRecord?.({
-757 |             name: tu.name, input: tuInput,
-758 |             resultSnippet: retryResult.slice(0, 300),
-759 |             durationMs: dur, isError: false, wasRetried: true, timestamp: callTs,
-760 |           });
-761 |           return compressToolOutput(tu.name, `[⟳ Auto-retry succeeded]\n${retryResult}`);
-762 |         }
-763 |         // Both attempts failed — return enhanced error with suggestions
-764 |         onStatus?.(`✗ ${tu.name} retry also failed`);
-765 |         const enhancedRetry = enhanceToolError(tu.name, tuInput, retryResult, workDir);
-766 |         if (tu.name === "read_file" && onFileWatch) {
-767 |           onFileWatch("read", (tuInput as { path?: string }).path ?? "");
-768 |         }
-769 |         reflectionCbs.onToolRecord?.({
-770 |           name: tu.name, input: tuInput,
-771 |           resultSnippet: retryResult.slice(0, 300),
-772 |           durationMs: dur, isError: true, wasRetried: true, timestamp: callTs,
-773 |         });
-774 |         return compressToolOutput(tu.name, `[⟳ Retry 2/2 failed]\n${enhanced}\n\n[Retry also failed]: ${enhancedRetry}`);
-775 |       }
-776 | 
-777 |       const dur = Date.now() - t0;
-778 |       if (tu.name === "read_file" && onFileWatch) {
-[2026-04-08T06:32:58.529Z] iter=413 turn=9 INFO: Turn 9/25
-[2026-04-08T06:33:02.661Z] iter=413 turn=9 INFO: Agent: Both goals done. Now verify:
-[2026-04-08T06:33:02.662Z] iter=413 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-08T06:33:02.671Z] iter=413 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -15
-[2026-04-08T06:33:04.097Z] iter=413 turn=9 INFO:   -> exit=0 (11 chars)
-[2026-04-08T06:33:18.365Z] iter=413 turn=9 INFO:   -> exit=0 (826 chars)
-[2026-04-08T06:33:18.365Z] iter=413 turn=10 INFO: Turn 10/25
-[2026-04-08T06:33:30.711Z] iter=413 turn=10 INFO: Agent: 
 
 Both goals are DONE and verified:
 - **TSC**: clean (no output)
@@ -1074,3 +995,99 @@ Goals are written. Wrapping up now.
 [2026-04-08T07:01:04.147Z] iter=429 turn=14 INFO: Tool timing stats
 [2026-04-08T07:01:12.316Z] iter=429 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 429: predicted 15 turns, actual 14 turns, ratio 0.93**
 [2026-04-08T07:01:12.341Z] iter=429 turn=14 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T07:02:22.559Z] iter=430 turn=1 INFO: Rolled back to pre-iteration-430
+[2026-04-08T07:02:22.560Z] iter=430 turn=1 INFO: Failure recorded. Restarting...
+[2026-04-08T07:02:22.758Z] iter=431 1/3 consecutive failures
+[2026-04-08T07:02:22.761Z] iter=431 INFO: Cache restored: 57/57 entries (0 stale)
+[2026-04-08T07:02:22.763Z] iter=431 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=15)
+[2026-04-08T07:02:22.763Z] iter=431 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-08T07:02:22.969Z] iter=431 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T07:02:22.969Z] iter=431 turn=1 INFO: Turn 1/25
+[2026-04-08T07:02:34.234Z] iter=431 turn=1 INFO: Agent: 
+
+I'm the Meta expert. Let me assess the current state of the system before making any changes.
+[2026-04-08T07:02:34.235Z] iter=431 turn=1 INFO: think: Let me analyze what's happening:
+
+1. Iterations 424, 426, 428, 430 all FAILED with 529 overloaded errors. That's 4 failu...
+[2026-04-08T07:02:34.235Z] iter=431 turn=2 INFO: Turn 2/25
+[2026-04-08T07:02:38.076Z] iter=431 turn=2 INFO: $ cat .autoagent-state.json
+[2026-04-08T07:02:38.084Z] iter=431 turn=2 INFO: $ cat .expert-rotation.json
+[2026-04-08T07:02:38.096Z] iter=431 turn=2 INFO: $ cat .autoagent-metrics.json | head -80
+[2026-04-08T07:02:38.103Z] iter=431 turn=2 INFO:   -> exit=0 (290 chars)
+[2026-04-08T07:02:38.105Z] iter=431 turn=2 INFO:   -> exit=0 (1048 chars)
+[2026-04-08T07:02:38.110Z] iter=431 turn=2 INFO:   -> exit=0 (1679 chars)
+[2026-04-08T07:02:38.110Z] iter=431 turn=3 INFO: Turn 3/25
+[2026-04-08T07:02:44.940Z] iter=431 turn=3 INFO: Agent: 
+
+You're right. Let me focus. My deliverables as Meta:
+
+1. **Compact memory** — remove duplicate failure entries, noise
+2. **Add retry logic for overloaded errors** — the #1 problem right now (4 failures in recent iterations)
+3. **Write goals.md for next iteration** (Engineer to retry the edit-impact features)
+
+Let me start with the most impactful: adding retry logic for overloaded errors.
+[2026-04-08T07:02:44.941Z] iter=431 turn=3 INFO: grep: "overloaded|529|retry.*api|api.*retry" in src/orchestrator.ts
+[2026-04-08T07:02:44.964Z] iter=431 turn=3 INFO:   -> 0 matches
+[2026-04-08T07:02:44.964Z] iter=431 turn=3 INFO: grep: "overloaded|529|retry" in src
+[2026-04-08T07:02:44.998Z] iter=431 turn=3 INFO:   -> 0 matches
+[2026-04-08T07:02:44.998Z] iter=431 turn=4 INFO: Turn 4/25
+[2026-04-08T07:02:50.260Z] iter=431 turn=4 INFO: grep: "messages\.create|client\.messages|anthropic.*create" in src
+[2026-04-08T07:02:50.316Z] iter=431 turn=4 INFO:   -> 0 matches
+[2026-04-08T07:02:50.317Z] iter=431 turn=5 INFO: Turn 5/25
+[2026-04-08T07:02:53.842Z] iter=431 turn=5 INFO: grep: "anthropic|claude|api.*call|sendMessage|callModel" in src
+[2026-04-08T07:02:53.888Z] iter=431 turn=5 INFO:   -> 0 matches
+[2026-04-08T07:02:53.888Z] iter=431 turn=6 INFO: Turn 6/25
+[2026-04-08T07:02:58.719Z] iter=431 turn=6 INFO: Agent: 
+
+Let me reassess. The API call happens in the harness layer, not in src/. Let me check where the iteration loop and error handling lives.
+[2026-04-08T07:02:58.720Z] iter=431 turn=6 INFO: grep: "overloaded|529|AUTOAGENT_RESTART|runIteration|startIteration" in scripts
+[2026-04-08T07:02:58.743Z] iter=431 turn=6 INFO:   -> 0 matches
+[2026-04-08T07:02:58.743Z] iter=431 turn=6 INFO: $ ls scripts/
+[2026-04-08T07:02:58.753Z] iter=431 turn=6 INFO:   -> exit=0 (97 chars)
+[2026-04-08T07:02:58.754Z] iter=431 turn=7 INFO: Turn 7/25
+[2026-04-08T07:03:05.096Z] iter=431 turn=7 INFO: think: The overloaded errors happen at the harness level - the self-improvement loop that calls the Anthropic API. The 529 erro...
+[2026-04-08T07:03:05.097Z] iter=431 turn=8 INFO: Turn 8/25
+[2026-04-08T07:03:09.204Z] iter=431 turn=8 INFO: Agent: **Status:** All goals NOT STARTED. Pivoting to ship now.
+
+**Deliverables:**
+1. Compact memory.md (remove noise, duplicate failures)
+2. Write goals.md for iteration 432 (Engineer — retry edit-impact features)
+3. TypeCheck + restart
+[2026-04-08T07:03:09.206Z] iter=431 turn=8 INFO: read_file: memory.md
+[2026-04-08T07:03:09.208Z] iter=431 turn=8 INFO:   -> ok (7043 chars)
+[2026-04-08T07:03:09.210Z] iter=431 turn=9 INFO: Turn 9/25
+[2026-04-08T07:03:27.737Z] iter=431 turn=9 INFO: Agent: Now let me ship both deliverables — compacted memory and goals.md:
+[2026-04-08T07:03:27.738Z] iter=431 turn=9 INFO: write_file: memory.md (write)
+[2026-04-08T07:03:27.739Z] iter=431 turn=9 INFO:   -> ok: Updated memory.md (5091 chars, -64 lines delta)
+[2026-04-08T07:03:27.740Z] iter=431 turn=10 INFO: Turn 10/25
+[2026-04-08T07:03:54.467Z] iter=431 turn=10 INFO: Agent: 
+
+Good checkpoint. As Meta expert, my job is memory/goals/prompts, not src/ code. I've shipped the compacted memory. Now finishing: goals.md for next Engineer iteration, then restart.
+[2026-04-08T07:03:54.468Z] iter=431 turn=10 INFO: write_file: goals.md (write)
+[2026-04-08T07:03:54.469Z] iter=431 turn=10 INFO:   -> ok: Updated goals.md (3981 chars, -6 lines delta)
+[2026-04-08T07:03:54.470Z] iter=431 turn=11 INFO: Turn 11/25
+[2026-04-08T07:03:57.182Z] iter=431 turn=11 INFO: $ npx tsc --noEmit 2>&1 | head -20
+[2026-04-08T07:03:58.350Z] iter=431 turn=11 INFO:   -> exit=0 (11 chars)
+[2026-04-08T07:03:58.350Z] iter=431 turn=12 INFO: Turn 12/25
+[2026-04-08T07:04:05.639Z] iter=431 turn=12 INFO: Agent: TypeScript passes. Let me wrap up with the memory entry for this iteration:
+[2026-04-08T07:04:05.640Z] iter=431 turn=12 INFO: write_file: memory.md (append)
+[2026-04-08T07:04:05.641Z] iter=431 turn=12 INFO:   -> ok: Appended 503 chars to memory.md
+[2026-04-08T07:04:05.641Z] iter=431 turn=13 INFO: Turn 13/25
+[2026-04-08T07:04:08.902Z] iter=431 turn=13 INFO: Agent: 
+
+All deliverables done. Memory compacted, goals written, tsc passes.
+
+```bash
+echo "AUTOAGENT_RESTART"
+```
+[2026-04-08T07:04:08.902Z] iter=431 turn=13 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T07:04:08.902Z] iter=431 turn=13 INFO: RESTART signal
+[2026-04-08T07:04:08.902Z] iter=431 turn=13 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T07:04:10.085Z] iter=431 turn=13 INFO: Compilation OK
+[2026-04-08T07:04:19.035Z] iter=431 turn=13 INFO: Cache persisted: 62 entries to .autoagent-cache.json
+[2026-04-08T07:04:19.035Z] iter=431 turn=13 INFO: Cache stats: 0 hits, 6 misses, 62 entries, 3 invalidations (1 entries removed)
+[2026-04-08T07:04:19.035Z] iter=431 turn=13 INFO: Tool cache stats
+[2026-04-08T07:04:19.035Z] iter=431 turn=13 INFO: Tool timing: bash: 6x, avg=207ms, total=1243ms; grep: 5x, avg=44ms, total=222ms; read_file: 1x, avg=4ms, total=4ms; write_file: 3x, avg=1ms, total=4ms; think: 2x, avg=1ms, total=1ms
+[2026-04-08T07:04:19.036Z] iter=431 turn=13 INFO: Tool timing stats
+[2026-04-08T07:04:26.727Z] iter=431 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 431: predicted 15 turns, actual 13 turns, ratio 0.87**
+[2026-04-08T07:04:26.750Z] iter=431 turn=13 INFO: Pre-commit review: no significant code changes to review

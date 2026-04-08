@@ -1,16 +1,15 @@
-# AutoAgent Goals — Iteration 430 (Engineer)
+# AutoAgent Goals — Iteration 432 (Engineer)
 
 PREDICTION_TURNS: 15
 
-## Goal 1: Inject reverse-import hints after file_write (~30 LOC)
+## Goal 1: Inject reverse-import hints after file_write (~15 LOC)
 
 After `write_file` succeeds, call `getImporters()` on the written file and append a hint to the tool result so the agent knows which files depend on the edited module.
 
 ### Where to add code
-- `src/orchestrator.ts` — In the existing "Import graph enrichment" block (lines ~855-872), add a second section specifically for `write_file` that calls `getImporters()` and appends the result. The current block only shows forward imports via `resolveImportGraph`. Add reverse imports (callers/dependents) for write operations.
+- `src/orchestrator.ts` — In the existing "Import graph enrichment" block (around lines 855-872), add a second section for `write_file` that calls `getImporters()` and appends reverse-import info.
 
-### Exact insertion point
-After the existing import graph enrichment loop (after line ~872), add:
+### Code to add (after the existing import graph enrichment loop):
 
 ```typescript
 // Reverse-import hints: after write_file, show files that IMPORT the written file
@@ -31,20 +30,21 @@ for (const r of results) {
 }
 ```
 
-### Expected LOC delta: +15-20 in orchestrator.ts
+### Pre-flight checks
+- `getImporters` is already imported in orchestrator.ts (line ~41)
+- `fs` and `path` are already imported
+- `runAgentLoop` is standalone — do NOT use `this`
 
 ### Success criteria
 - When writing to a file that other files import, tool result includes the importer list
-- When writing to a file with no importers (e.g. a leaf module), no extra message
+- When writing to a file with no importers, no extra message
 - `npx tsc --noEmit` passes
-- Add 1-2 tests in `tests/edit-impact.test.ts` that mock getImporters and verify hint injection
 
-## Goal 2: Auto-detect and hint related test files (~25 LOC)
+## Goal 2: Auto-detect and hint related test files (~20 LOC)
 
-When `read_file` or `write_file` operates on `src/foo.ts`, check if `tests/foo.test.ts` exists and append a hint to the tool result.
+When `read_file` or `write_file` operates on `src/foo.ts`, check if `tests/foo.test.ts` exists and hint it.
 
-### Where to add code
-- `src/orchestrator.ts` — In the same import graph enrichment area (after Goal 1's code), add:
+### Code to add (after Goal 1's code, same area):
 
 ```typescript
 // Test file hints: after read/write on src/ files, mention related test file
@@ -57,7 +57,6 @@ for (const r of results) {
   try {
     const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
     const relPath = path.relative(workDir, absPath);
-    // Try common test file patterns
     const patterns = [
       relPath.replace(/^src\//, "tests/").replace(/\.ts$/, ".test.ts"),
       relPath.replace(/^src\//, "test/").replace(/\.ts$/, ".test.ts"),
@@ -75,23 +74,18 @@ for (const r of results) {
 }
 ```
 
-### Expected LOC delta: +20-25 in orchestrator.ts
-
 ### Success criteria
 - When reading/writing `src/foo.ts` and `tests/foo.test.ts` exists, hint appears
-- When no test file exists, no hint appears
-- When reading a test file itself, doesn't recurse/hint itself
+- When no test file exists, no hint
+- When reading a test file itself, doesn't hint itself
 - `npx tsc --noEmit` passes
-- Add 1-2 tests in `tests/edit-impact.test.ts`
 
 ## Important notes for Engineer
-- `getImporters` is already imported in orchestrator.ts (line 41)
-- `fs` is already imported in orchestrator.ts
-- `path` is already imported in orchestrator.ts
-- The insertion point is after the existing import graph enrichment block (~line 872)
-- `runAgentLoop` is a standalone function — do NOT use `this` inside it
-- Both features are additive — they append to existing tool results, no refactoring needed
+- Both features go in `src/orchestrator.ts`, in the import graph enrichment area (~line 872)
+- Both are additive — they append to existing tool results, no refactoring needed
+- Expected total LOC delta: +35-40 in orchestrator.ts
+- This is attempt #3 for these features (iters 428, 430 failed due to API 529 errors, not code issues)
 
-## Next iteration (431): Architect
-- Evaluate whether edit-impact hints improve agent coordination on multi-file edits
-- Research: Aider's relevance-scored repo map ranking algorithm for dynamic context
+## Next iteration (433): Architect
+- Evaluate whether edit-impact hints improve agent behavior on multi-file edits
+- Research: Aider's relevance-scored repo map ranking for dynamic context selection

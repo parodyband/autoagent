@@ -1,63 +1,3 @@
-{"timestamp":"2026-04-08T06:36:01.415Z","iteration":415,"level":"info","message":"think: Let me assess quickly:\n\n**Recent iterations (407-414):**\n- 407: Architect — set goals\n- 408: FAILED (overload)\n- 409: Ar...","turn":2}
-{"timestamp":"2026-04-08T06:36:01.416Z","iteration":415,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-08T06:36:04.576Z","iteration":415,"level":"info","message":"$ cat .expert-rotation.json","turn":3}
-{"timestamp":"2026-04-08T06:36:04.581Z","iteration":415,"level":"info","message":"$ npx tsc --noEmit 2>&1 | tail -5","turn":3}
-{"timestamp":"2026-04-08T06:36:04.588Z","iteration":415,"level":"info","message":"  -> exit=0 (1302 chars)","turn":3}
-{"timestamp":"2026-04-08T06:36:05.746Z","iteration":415,"level":"info","message":"  -> exit=0 (11 chars)","turn":3}
-{"timestamp":"2026-04-08T06:36:05.747Z","iteration":415,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-08T06:36:43.322Z","iteration":415,"level":"info","message":"Agent: \n\nTSC is clean. Let me now deliver my three outputs: compact memory, clear scratchpad, write goals.md.\n\n**Status**: All goals NOT STARTED yet but I have the assessment done. Executing now.","turn":4}
-{"timestamp":"2026-04-08T06:36:43.324Z","iteration":415,"level":"info","message":"write_file: memory.md (write)","turn":4}
-{"timestamp":"2026-04-08T06:36:43.329Z","iteration":415,"level":"info","message":"  -> ok: Updated memory.md (4740 chars, -40 lines delta)","turn":4}
-{"timestamp":"2026-04-08T06:36:43.331Z","iteration":415,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-08T06:36:49.253Z","iteration":415,"level":"info","message":"write_file: .autoagent-scratchpad.md (write)","turn":5}
-{"timestamp":"2026-04-08T06:36:49.254Z","iteration":415,"level":"info","message":"  -> ok: Updated .autoagent-scratchpad.md (208 chars, -117 lines delta)","turn":5}
-{"timestamp":"2026-04-08T06:36:49.254Z","iteration":415,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-08T06:37:05.206Z","iteration":415,"level":"info","message":"Agent: \n\nCorrect — I'm Meta expert, my job is system tuning not src/ changes. Memory is compacted, scratchpad cleaned. Now writing goals.md and wrapping up.","turn":6}
-{"timestamp":"2026-04-08T06:37:05.207Z","iteration":415,"level":"info","message":"write_file: goals.md (write)","turn":6}
-{"timestamp":"2026-04-08T06:37:05.208Z","iteration":415,"level":"info","message":"  -> ok: Updated goals.md (1926 chars, +20 lines delta)","turn":6}
-{"timestamp":"2026-04-08T06:37:05.209Z","iteration":415,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-08T06:37:08.305Z","iteration":415,"level":"info","message":"Agent: \n\nAll deliverables done. Memory compacted, goals written, TSC already confirmed clean. Wrapping up.","turn":7}
-{"timestamp":"2026-04-08T06:37:08.305Z","iteration":415,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":7}
-{"timestamp":"2026-04-08T06:37:08.305Z","iteration":415,"level":"info","message":"RESTART signal","turn":7}
-{"timestamp":"2026-04-08T06:37:08.306Z","iteration":415,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":7}
-{"timestamp":"2026-04-08T06:37:09.401Z","iteration":415,"level":"info","message":"Compilation OK","turn":7}
-{"timestamp":"2026-04-08T06:37:17.661Z","iteration":415,"level":"info","message":"Cache persisted: 54 entries to .autoagent-cache.json","turn":7}
-{"timestamp":"2026-04-08T06:37:17.661Z","iteration":415,"level":"info","message":"Tool timing: bash: 3x, avg=393ms, total=1178ms; write_file: 3x, avg=3ms, total=8ms; think: 1x, avg=1ms, total=1ms; read_scratchpad: 1x, avg=0ms, total=0ms","turn":7}
-{"timestamp":"2026-04-08T06:37:17.661Z","iteration":415,"level":"info","message":"Tool timing stats","turn":7,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":0,"minMs":0,"maxMs":0,"avgMs":0},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"bash":{"calls":3,"totalMs":1178,"minMs":1,"maxMs":1165,"avgMs":393},"write_file":{"calls":3,"totalMs":8,"minMs":1,"maxMs":6,"avgMs":3}},"totalCalls":8,"totalMs":1187}}}
-{"timestamp":"2026-04-08T06:37:25.377Z","iteration":415,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 415: predicted 8 turns, actual 7 turns, ratio 0.88**","turn":7}
-{"timestamp":"2026-04-08T06:37:25.400Z","iteration":415,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":7}
-{"timestamp":"2026-04-08T06:38:34.755Z","iteration":416,"level":"info","message":"Rolled back to pre-iteration-416","turn":1}
-{"timestamp":"2026-04-08T06:38:34.756Z","iteration":416,"level":"info","message":"Failure recorded. Restarting...","turn":1}
-{"timestamp":"2026-04-08T06:38:34.952Z","iteration":417,"level":"info","message":"Cache restored: 54/54 entries (0 stale)"}
-{"timestamp":"2026-04-08T06:38:34.954Z","iteration":417,"level":"info","message":"Turn budget: 14/25 (calibration=1.00x, predicted=15)"}
-{"timestamp":"2026-04-08T06:38:34.954Z","iteration":417,"level":"info","message":"Starting. Expert=Architect Model=claude-opus-4-6"}
-{"timestamp":"2026-04-08T06:38:35.138Z","iteration":417,"level":"info","message":"Hard turn cap: 23 (1.5x prediction of 15)"}
-{"timestamp":"2026-04-08T06:38:35.139Z","iteration":417,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-08T06:38:39.077Z","iteration":417,"level":"info","message":"Agent: \n\nI'll start by understanding the current state of the codebase, then research and plan the highest-impact next feature.","turn":1}
-{"timestamp":"2026-04-08T06:38:39.078Z","iteration":417,"level":"info","message":"read_scratchpad: 207 chars","turn":1}
-{"timestamp":"2026-04-08T06:38:39.078Z","iteration":417,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git log --oneline -10","turn":1}
-{"timestamp":"2026-04-08T06:38:39.081Z","iteration":417,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat goals.md","turn":1}
-{"timestamp":"2026-04-08T06:38:39.091Z","iteration":417,"level":"info","message":"  -> exit=0 (1926 chars)","turn":1}
-{"timestamp":"2026-04-08T06:38:39.097Z","iteration":417,"level":"info","message":"  -> exit=0 (446 chars)","turn":1}
-{"timestamp":"2026-04-08T06:38:39.097Z","iteration":417,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-08T06:38:44.284Z","iteration":417,"level":"info","message":"save_scratchpad: ## Iteration 417 — Architect\n\n**Status**: Previous Engineer ","turn":2}
-{"timestamp":"2026-04-08T06:38:44.286Z","iteration":417,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-08T06:38:49.401Z","iteration":417,"level":"info","message":"Agent: \n\nYou're right. My deliverable is `goals.md` for the next Engineer iteration. Let me do focused research first, then write it.","turn":3}
-{"timestamp":"2026-04-08T06:38:49.401Z","iteration":417,"level":"info","message":"web_search: \"Claude Code architecture context management import graph coding agent 2024 2025\"","turn":3}
-{"timestamp":"2026-04-08T06:38:49.421Z","iteration":417,"level":"info","message":"web_search: \"Aider coding agent context management architecture techniques 2025\"","turn":3}
-{"timestamp":"2026-04-08T06:38:49.423Z","iteration":417,"level":"info","message":"web_search: \"SWE-Agent coding agent architecture file context selection 2025\"","turn":3}
-{"timestamp":"2026-04-08T06:38:50.298Z","iteration":417,"level":"info","message":"  -> 8 results","turn":3}
-{"timestamp":"2026-04-08T06:38:50.305Z","iteration":417,"level":"info","message":"  -> 8 results","turn":3}
-{"timestamp":"2026-04-08T06:38:50.641Z","iteration":417,"level":"info","message":"  -> 8 results","turn":3}
-{"timestamp":"2026-04-08T06:38:50.642Z","iteration":417,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-08T06:38:55.325Z","iteration":417,"level":"info","message":"web_fetch: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents","turn":4}
-{"timestamp":"2026-04-08T06:38:55.327Z","iteration":417,"level":"info","message":"web_fetch: https://blog.langchain.com/context-engineering-for-agents/","turn":4}
-{"timestamp":"2026-04-08T06:38:55.550Z","iteration":417,"level":"info","message":"  -> ok (16683 chars)","turn":4}
-{"timestamp":"2026-04-08T06:38:57.840Z","iteration":417,"level":"info","message":"  -> ok (22770 chars)","turn":4}
-{"timestamp":"2026-04-08T06:38:57.840Z","iteration":417,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-08T06:39:08.739Z","iteration":417,"level":"info","message":"think: Great research. Key takeaways from Anthropic's context engineering post and LangChain's post:\n\n1. **Import graph / relat...","turn":5}
-{"timestamp":"2026-04-08T06:39:08.740Z","iteration":417,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-08T06:39:15.024Z","iteration":417,"level":"info","message":"Agent: \n\nStatus: **NOT STARTED** on my deliverable (goals.md). I've been researching. Let me check the existing files quickly and then write goals.md.","turn":6}
 {"timestamp":"2026-04-08T06:39:15.026Z","iteration":417,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && head -50 src/context-loader.ts","turn":6}
 {"timestamp":"2026-04-08T06:39:15.034Z","iteration":417,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"read_file\\|readFile\\|file_read\" src/orchestrator.ts | head -20","turn":6}
 {"timestamp":"2026-04-08T06:39:15.050Z","iteration":417,"level":"info","message":"  -> exit=0 (2021 chars)","turn":6}
@@ -556,3 +496,71 @@
 {"timestamp":"2026-04-08T07:01:04.147Z","iteration":429,"level":"info","message":"Tool timing stats","turn":14,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"bash":{"calls":10,"totalMs":1226,"minMs":0,"maxMs":1104,"avgMs":123},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2},"save_memory":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2}},"totalCalls":14,"totalMs":1232}}}
 {"timestamp":"2026-04-08T07:01:12.316Z","iteration":429,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 429: predicted 15 turns, actual 14 turns, ratio 0.93**","turn":14}
 {"timestamp":"2026-04-08T07:01:12.341Z","iteration":429,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":14}
+{"timestamp":"2026-04-08T07:02:22.559Z","iteration":430,"level":"info","message":"Rolled back to pre-iteration-430","turn":1}
+{"timestamp":"2026-04-08T07:02:22.560Z","iteration":430,"level":"info","message":"Failure recorded. Restarting...","turn":1}
+{"timestamp":"2026-04-08T07:02:22.761Z","iteration":431,"level":"info","message":"Cache restored: 57/57 entries (0 stale)"}
+{"timestamp":"2026-04-08T07:02:22.763Z","iteration":431,"level":"info","message":"Turn budget: 16/25 (calibration=1.00x, predicted=15)"}
+{"timestamp":"2026-04-08T07:02:22.763Z","iteration":431,"level":"info","message":"Starting. Expert=Meta Model=claude-opus-4-6"}
+{"timestamp":"2026-04-08T07:02:22.969Z","iteration":431,"level":"info","message":"Hard turn cap: 23 (1.5x prediction of 15)"}
+{"timestamp":"2026-04-08T07:02:22.969Z","iteration":431,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-08T07:02:34.234Z","iteration":431,"level":"info","message":"Agent: \n\nI'm the Meta expert. Let me assess the current state of the system before making any changes.","turn":1}
+{"timestamp":"2026-04-08T07:02:34.235Z","iteration":431,"level":"info","message":"think: Let me analyze what's happening:\n\n1. Iterations 424, 426, 428, 430 all FAILED with 529 overloaded errors. That's 4 failu...","turn":1}
+{"timestamp":"2026-04-08T07:02:34.235Z","iteration":431,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-08T07:02:38.076Z","iteration":431,"level":"info","message":"$ cat .autoagent-state.json","turn":2}
+{"timestamp":"2026-04-08T07:02:38.084Z","iteration":431,"level":"info","message":"$ cat .expert-rotation.json","turn":2}
+{"timestamp":"2026-04-08T07:02:38.096Z","iteration":431,"level":"info","message":"$ cat .autoagent-metrics.json | head -80","turn":2}
+{"timestamp":"2026-04-08T07:02:38.103Z","iteration":431,"level":"info","message":"  -> exit=0 (290 chars)","turn":2}
+{"timestamp":"2026-04-08T07:02:38.105Z","iteration":431,"level":"info","message":"  -> exit=0 (1048 chars)","turn":2}
+{"timestamp":"2026-04-08T07:02:38.110Z","iteration":431,"level":"info","message":"  -> exit=0 (1679 chars)","turn":2}
+{"timestamp":"2026-04-08T07:02:38.110Z","iteration":431,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-08T07:02:44.940Z","iteration":431,"level":"info","message":"Agent: \n\nYou're right. Let me focus. My deliverables as Meta:\n\n1. **Compact memory** — remove duplicate failure entries, noise\n2. **Add retry logic for overloaded errors** — the #1 problem right now (4 failures in recent iterations)\n3. **Write goals.md for next iteration** (Engineer to retry the edit-impact features)\n\nLet me start with the most impactful: adding retry logic for overloaded errors.","turn":3}
+{"timestamp":"2026-04-08T07:02:44.941Z","iteration":431,"level":"info","message":"grep: \"overloaded|529|retry.*api|api.*retry\" in src/orchestrator.ts","turn":3}
+{"timestamp":"2026-04-08T07:02:44.964Z","iteration":431,"level":"info","message":"  -> 0 matches","turn":3}
+{"timestamp":"2026-04-08T07:02:44.964Z","iteration":431,"level":"info","message":"grep: \"overloaded|529|retry\" in src","turn":3}
+{"timestamp":"2026-04-08T07:02:44.998Z","iteration":431,"level":"info","message":"  -> 0 matches","turn":3}
+{"timestamp":"2026-04-08T07:02:44.998Z","iteration":431,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-08T07:02:50.260Z","iteration":431,"level":"info","message":"grep: \"messages\\.create|client\\.messages|anthropic.*create\" in src","turn":4}
+{"timestamp":"2026-04-08T07:02:50.316Z","iteration":431,"level":"info","message":"  -> 0 matches","turn":4}
+{"timestamp":"2026-04-08T07:02:50.317Z","iteration":431,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-08T07:02:53.842Z","iteration":431,"level":"info","message":"grep: \"anthropic|claude|api.*call|sendMessage|callModel\" in src","turn":5}
+{"timestamp":"2026-04-08T07:02:53.888Z","iteration":431,"level":"info","message":"  -> 0 matches","turn":5}
+{"timestamp":"2026-04-08T07:02:53.888Z","iteration":431,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-08T07:02:58.719Z","iteration":431,"level":"info","message":"Agent: \n\nLet me reassess. The API call happens in the harness layer, not in src/. Let me check where the iteration loop and error handling lives.","turn":6}
+{"timestamp":"2026-04-08T07:02:58.720Z","iteration":431,"level":"info","message":"grep: \"overloaded|529|AUTOAGENT_RESTART|runIteration|startIteration\" in scripts","turn":6}
+{"timestamp":"2026-04-08T07:02:58.743Z","iteration":431,"level":"info","message":"  -> 0 matches","turn":6}
+{"timestamp":"2026-04-08T07:02:58.743Z","iteration":431,"level":"info","message":"$ ls scripts/","turn":6}
+{"timestamp":"2026-04-08T07:02:58.753Z","iteration":431,"level":"info","message":"  -> exit=0 (97 chars)","turn":6}
+{"timestamp":"2026-04-08T07:02:58.754Z","iteration":431,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-08T07:03:05.096Z","iteration":431,"level":"info","message":"think: The overloaded errors happen at the harness level - the self-improvement loop that calls the Anthropic API. The 529 erro...","turn":7}
+{"timestamp":"2026-04-08T07:03:05.097Z","iteration":431,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-08T07:03:09.204Z","iteration":431,"level":"info","message":"Agent: **Status:** All goals NOT STARTED. Pivoting to ship now.\n\n**Deliverables:**\n1. Compact memory.md (remove noise, duplicate failures)\n2. Write goals.md for iteration 432 (Engineer — retry edit-impact features)\n3. TypeCheck + restart","turn":8}
+{"timestamp":"2026-04-08T07:03:09.206Z","iteration":431,"level":"info","message":"read_file: memory.md","turn":8}
+{"timestamp":"2026-04-08T07:03:09.208Z","iteration":431,"level":"info","message":"  -> ok (7043 chars)","turn":8}
+{"timestamp":"2026-04-08T07:03:09.210Z","iteration":431,"level":"info","message":"Turn 9/25","turn":9}
+{"timestamp":"2026-04-08T07:03:27.737Z","iteration":431,"level":"info","message":"Agent: Now let me ship both deliverables — compacted memory and goals.md:","turn":9}
+{"timestamp":"2026-04-08T07:03:27.738Z","iteration":431,"level":"info","message":"write_file: memory.md (write)","turn":9}
+{"timestamp":"2026-04-08T07:03:27.739Z","iteration":431,"level":"info","message":"  -> ok: Updated memory.md (5091 chars, -64 lines delta)","turn":9}
+{"timestamp":"2026-04-08T07:03:27.740Z","iteration":431,"level":"info","message":"Turn 10/25","turn":10}
+{"timestamp":"2026-04-08T07:03:54.467Z","iteration":431,"level":"info","message":"Agent: \n\nGood checkpoint. As Meta expert, my job is memory/goals/prompts, not src/ code. I've shipped the compacted memory. Now finishing: goals.md for next Engineer iteration, then restart.","turn":10}
+{"timestamp":"2026-04-08T07:03:54.468Z","iteration":431,"level":"info","message":"write_file: goals.md (write)","turn":10}
+{"timestamp":"2026-04-08T07:03:54.469Z","iteration":431,"level":"info","message":"  -> ok: Updated goals.md (3981 chars, -6 lines delta)","turn":10}
+{"timestamp":"2026-04-08T07:03:54.470Z","iteration":431,"level":"info","message":"Turn 11/25","turn":11}
+{"timestamp":"2026-04-08T07:03:57.182Z","iteration":431,"level":"info","message":"$ npx tsc --noEmit 2>&1 | head -20","turn":11}
+{"timestamp":"2026-04-08T07:03:58.350Z","iteration":431,"level":"info","message":"  -> exit=0 (11 chars)","turn":11}
+{"timestamp":"2026-04-08T07:03:58.350Z","iteration":431,"level":"info","message":"Turn 12/25","turn":12}
+{"timestamp":"2026-04-08T07:04:05.639Z","iteration":431,"level":"info","message":"Agent: TypeScript passes. Let me wrap up with the memory entry for this iteration:","turn":12}
+{"timestamp":"2026-04-08T07:04:05.640Z","iteration":431,"level":"info","message":"write_file: memory.md (append)","turn":12}
+{"timestamp":"2026-04-08T07:04:05.641Z","iteration":431,"level":"info","message":"  -> ok: Appended 503 chars to memory.md","turn":12}
+{"timestamp":"2026-04-08T07:04:05.641Z","iteration":431,"level":"info","message":"Turn 13/25","turn":13}
+{"timestamp":"2026-04-08T07:04:08.902Z","iteration":431,"level":"info","message":"Agent: \n\nAll deliverables done. Memory compacted, goals written, tsc passes.\n\n```bash\necho \"AUTOAGENT_RESTART\"\n```","turn":13}
+{"timestamp":"2026-04-08T07:04:08.902Z","iteration":431,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":13}
+{"timestamp":"2026-04-08T07:04:08.902Z","iteration":431,"level":"info","message":"RESTART signal","turn":13}
+{"timestamp":"2026-04-08T07:04:08.902Z","iteration":431,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":13}
+{"timestamp":"2026-04-08T07:04:10.085Z","iteration":431,"level":"info","message":"Compilation OK","turn":13}
+{"timestamp":"2026-04-08T07:04:19.035Z","iteration":431,"level":"info","message":"Cache persisted: 62 entries to .autoagent-cache.json","turn":13}
+{"timestamp":"2026-04-08T07:04:19.035Z","iteration":431,"level":"info","message":"Cache stats: 0 hits, 6 misses, 62 entries, 3 invalidations (1 entries removed)","turn":13}
+{"timestamp":"2026-04-08T07:04:19.035Z","iteration":431,"level":"info","message":"Tool cache stats","turn":13,"metadata":{"cacheHits":0,"cacheMisses":6,"cacheEntries":62,"invalidations":3,"invalidatedEntries":1,"toolStats":{"grep":{"hits":0,"misses":5},"read_file":{"hits":0,"misses":1}}}}
+{"timestamp":"2026-04-08T07:04:19.035Z","iteration":431,"level":"info","message":"Tool timing: bash: 6x, avg=207ms, total=1243ms; grep: 5x, avg=44ms, total=222ms; read_file: 1x, avg=4ms, total=4ms; write_file: 3x, avg=1ms, total=4ms; think: 2x, avg=1ms, total=1ms","turn":13}
+{"timestamp":"2026-04-08T07:04:19.036Z","iteration":431,"level":"info","message":"Tool timing stats","turn":13,"metadata":{"timing":{"tools":{"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"bash":{"calls":6,"totalMs":1243,"minMs":0,"maxMs":1168,"avgMs":207},"grep":{"calls":5,"totalMs":222,"minMs":28,"maxMs":57,"avgMs":44},"read_file":{"calls":1,"totalMs":4,"minMs":4,"maxMs":4,"avgMs":4},"write_file":{"calls":3,"totalMs":4,"minMs":1,"maxMs":2,"avgMs":1}},"totalCalls":17,"totalMs":1474}}}
+{"timestamp":"2026-04-08T07:04:26.727Z","iteration":431,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 431: predicted 15 turns, actual 13 turns, ratio 0.87**","turn":13}
+{"timestamp":"2026-04-08T07:04:26.750Z","iteration":431,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":13}
