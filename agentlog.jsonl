@@ -1,55 +1,3 @@
-{"timestamp":"2026-04-08T19:41:33.682Z","iteration":503,"level":"info","message":"Agent: \n\nGoal A status: **IN PROGRESS** — assessment done mentally, now writing deliverables.\n\nLet me write both files now:","turn":4}
-{"timestamp":"2026-04-08T19:41:33.684Z","iteration":503,"level":"info","message":"write_file: goals.md (write)","turn":4}
-{"timestamp":"2026-04-08T19:41:33.686Z","iteration":503,"level":"info","message":"write_file: memory.md (write)","turn":4}
-{"timestamp":"2026-04-08T19:41:33.690Z","iteration":503,"level":"info","message":"  -> ok: Updated goals.md (1311 chars, +7 lines delta)","turn":4}
-{"timestamp":"2026-04-08T19:41:33.693Z","iteration":503,"level":"info","message":"  -> ok: Updated memory.md (4309 chars, -23 lines delta)","turn":4}
-{"timestamp":"2026-04-08T19:41:33.694Z","iteration":503,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-08T19:41:36.913Z","iteration":503,"level":"info","message":"Agent: Good. Both deliverables written. Now verify and restart:","turn":5}
-{"timestamp":"2026-04-08T19:41:36.914Z","iteration":503,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -5","turn":5}
-{"timestamp":"2026-04-08T19:41:38.121Z","iteration":503,"level":"info","message":"  -> exit=0 (11 chars)","turn":5}
-{"timestamp":"2026-04-08T19:41:38.121Z","iteration":503,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-08T19:41:42.074Z","iteration":503,"level":"info","message":"Agent: \n\nThis is a Meta iteration — no src/ changes expected. My deliverables were: (1) health assessment, (2) compact memory.md, (3) write goals.md for next Engineer. All three are **DONE**.","turn":6}
-{"timestamp":"2026-04-08T19:41:42.075Z","iteration":503,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":6}
-{"timestamp":"2026-04-08T19:41:42.075Z","iteration":503,"level":"info","message":"RESTART signal","turn":6}
-{"timestamp":"2026-04-08T19:41:42.075Z","iteration":503,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":6}
-{"timestamp":"2026-04-08T19:41:43.190Z","iteration":503,"level":"info","message":"Compilation OK","turn":6}
-{"timestamp":"2026-04-08T19:41:51.892Z","iteration":503,"level":"info","message":"Cache persisted: 64 entries to .autoagent-cache.json","turn":6}
-{"timestamp":"2026-04-08T19:41:51.893Z","iteration":503,"level":"info","message":"Tool timing: bash: 7x, avg=186ms, total=1301ms; write_file: 2x, avg=8ms, total=15ms; think: 1x, avg=1ms, total=1ms","turn":6}
-{"timestamp":"2026-04-08T19:41:51.893Z","iteration":503,"level":"info","message":"Tool timing stats","turn":6,"metadata":{"timing":{"tools":{"bash":{"calls":7,"totalMs":1301,"minMs":0,"maxMs":1208,"avgMs":186},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":2,"totalMs":15,"minMs":7,"maxMs":8,"avgMs":8}},"totalCalls":10,"totalMs":1317}}}
-{"timestamp":"2026-04-08T19:41:59.895Z","iteration":503,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 503: predicted 8 turns, actual 6 turns, ratio 0.75**","turn":6}
-{"timestamp":"2026-04-08T19:41:59.918Z","iteration":503,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":6}
-{"timestamp":"2026-04-08T19:41:59.954Z","iteration":503,"level":"info","message":"Committed: 4eef83b5 (14 in / 2848 out, cache: 55379 created, 219398 read)","turn":6}
-{"timestamp":"2026-04-08T19:41:59.954Z","iteration":503,"level":"info","message":"Restarting as iteration 504...","turn":6}
-{"timestamp":"2026-04-08T19:42:00.135Z","iteration":504,"level":"info","message":"Cache restored: 64/64 entries (0 stale)"}
-{"timestamp":"2026-04-08T19:42:00.138Z","iteration":504,"level":"info","message":"Turn budget: 16/25 (calibration=1.00x, predicted=12)"}
-{"timestamp":"2026-04-08T19:42:00.138Z","iteration":504,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
-{"timestamp":"2026-04-08T19:42:00.325Z","iteration":504,"level":"info","message":"Hard turn cap: 18 (1.5x prediction of 12)"}
-{"timestamp":"2026-04-08T19:42:00.326Z","iteration":504,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-08T19:42:02.436Z","iteration":504,"level":"info","message":"read_file: src/tool-registry.ts","turn":1}
-{"timestamp":"2026-04-08T19:42:02.437Z","iteration":504,"level":"info","message":"read_scratchpad: 898 chars","turn":1}
-{"timestamp":"2026-04-08T19:42:02.438Z","iteration":504,"level":"info","message":"  -> ok (19559 chars)","turn":1}
-{"timestamp":"2026-04-08T19:42:02.439Z","iteration":504,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-08T19:42:06.458Z","iteration":504,"level":"info","message":"think: Now I understand the current structure. I need to:\n\n1. Add `getMinimalDefinitions()` to `ToolRegistry` — returns tools w...","turn":2}
-{"timestamp":"2026-04-08T19:42:06.459Z","iteration":504,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-08T19:42:08.397Z","iteration":504,"level":"info","message":"Agent: I have what I need. Let me implement the two changes now.","turn":3}
-{"timestamp":"2026-04-08T19:42:08.398Z","iteration":504,"level":"info","message":"grep: \"getDefinitions()\" in src/orchestrator.ts","turn":3}
-{"timestamp":"2026-04-08T19:42:08.416Z","iteration":504,"level":"info","message":"  -> 5 matches","turn":3}
-{"timestamp":"2026-04-08T19:42:08.416Z","iteration":504,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-08T19:42:16.789Z","iteration":504,"level":"info","message":"Agent: Now I'll make both changes:","turn":4}
-{"timestamp":"2026-04-08T19:42:16.789Z","iteration":504,"level":"info","message":"write_file: src/tool-registry.ts (patch)","turn":4}
-{"timestamp":"2026-04-08T19:42:16.791Z","iteration":504,"level":"info","message":"  -> ok: Patched src/tool-registry.ts: -16 +39 lines\n\nContext after patch:\n149 |     return this.tools.get(name)?.defaultTimeout;\n150 |   }\n151 | \n152 |   /**\n153 |    * Returns tool definitions for the system prompt.\n154 |    * Hidden tools are excluded — they're discoverable via searchTools().\n155 |    */\n156 |   getDefinitions(): Anthropic.Tool[] {\n157 |     return Array.from(this.tools.values())\n158 |       .filter((t) => !t.hidden)\n159 |       .map((t) => t.definition);\n160 |   }\n161 | \n162 |   /**\n163 |    * Returns tool definitions with minimal schemas — description only, no property details.\n164 |    * Saves ~2-3K tokens per API call by omitting input_schema property listings.\n165 |    * Hidden tools are excluded.\n166 |    */\n167 |   getMinimalDefinitions(): Anthropic.Tool[] {\n168 |     return Array.from(this.tools.values())\n169 |       .filter((t) => !t.hidden)\n170 |       .map((t) => ({\n171 |         name: t.definition.name,\n172 |         description: t.definition.description,\n173 |         input_schema: { type: \"object\" as const },\n174 |       }));\n175 |   }\n176 | \n177 |   /**\n178 |    * Returns the full schema for a single tool by name.\n179 |    * Use this after the model selects a tool to get the complete input_schema.\n180 |    */\n181 |   getSchemaFor(name: string): Anthropic.Tool[\"input_schema\"] | undefined {\n182 |     return this.tools.get(name)?.definition.input_schema;\n183 |   }\n184 | \n185 |   /**\n186 |    * Returns ALL tool definitions including hidden ones (for dispatching).\n187 |    */\n188 |   getAllDefinitions(): Anthropic.Tool[] {\n189 |     return Array.from(this.tools.values()).map((t) => t.definition);\n190 |   }\n191 | \n192 |   getNames(): string[] {\n193 |     return Array.from(this.tools.keys());","turn":4}
-{"timestamp":"2026-04-08T19:42:16.792Z","iteration":504,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-08T19:42:20.800Z","iteration":504,"level":"info","message":"Agent: **Goal A status: IN PROGRESS**\n\n- ✅ `getMinimalDefinitions()` added to `tool-registry.ts`\n- ✅ `getSchemaFor(name)` added to `tool-registry.ts`  \n- ❌ `orchestrator.ts` — need to use `getMinimalDefinitions()` instead of `getDefinitions()`\n\nDoing it now:","turn":5}
-{"timestamp":"2026-04-08T19:42:20.800Z","iteration":504,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":5}
-{"timestamp":"2026-04-08T19:42:20.801Z","iteration":504,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -1 +1 lines\n\nContext after patch:\n631 |     totalIn += tIn;\n632 |     totalOut += tOut;\n633 |   }, systemPrompt);\n634 |   const tools = registry.getMinimalDefinitions();\n635 | \n636 |   let totalIn = 0, totalOut = 0;\n637 |   let lastInput = 0;","turn":5}
-{"timestamp":"2026-04-08T19:42:20.802Z","iteration":504,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-08T19:42:22.241Z","iteration":504,"level":"info","message":"$ npx tsc --noEmit 2>&1","turn":6}
-{"timestamp":"2026-04-08T19:42:23.436Z","iteration":504,"level":"info","message":"  -> exit=0 (11 chars)","turn":6}
-{"timestamp":"2026-04-08T19:42:23.436Z","iteration":504,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-08T19:42:28.176Z","iteration":504,"level":"info","message":"Agent: TypeScript passes. Now write memory, update goals, restart:","turn":7}
-{"timestamp":"2026-04-08T19:42:28.177Z","iteration":504,"level":"info","message":"save_memory: \"[Engineer] Iteration 504 — Deferred tool schemas\"","turn":7}
-{"timestamp":"2026-04-08T19:42:28.178Z","iteration":504,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":7}
-{"timestamp":"2026-04-08T19:42:28.178Z","iteration":504,"level":"info","message":"Turn 8/25","turn":8}
 {"timestamp":"2026-04-08T19:42:36.507Z","iteration":504,"level":"info","message":"Agent: All src/ changes are done. Updating goals and restarting now.","turn":8}
 {"timestamp":"2026-04-08T19:42:36.507Z","iteration":504,"level":"info","message":"write_file: goals.md (write)","turn":8}
 {"timestamp":"2026-04-08T19:42:36.508Z","iteration":504,"level":"info","message":"  -> ok: Updated goals.md (1180 chars, +2 lines delta)","turn":8}
@@ -548,3 +496,58 @@
 {"timestamp":"2026-04-08T19:58:34.054Z","iteration":513,"level":"info","message":"Tool timing stats","turn":10,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"think":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2},"grep":{"calls":6,"totalMs":261,"minMs":15,"maxMs":91,"avgMs":44},"write_file":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2},"save_memory":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2},"bash":{"calls":2,"totalMs":1217,"minMs":1,"maxMs":1216,"avgMs":609}},"totalCalls":12,"totalMs":1485}}}
 {"timestamp":"2026-04-08T19:58:42.816Z","iteration":513,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 513: predicted 8 turns, actual 10 turns, ratio 1.25**","turn":10}
 {"timestamp":"2026-04-08T19:58:42.841Z","iteration":513,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":10}
+{"timestamp":"2026-04-08T19:58:42.881Z","iteration":513,"level":"info","message":"Committed: 5053a38c (24 in / 1645 out, cache: 9014 created, 66033 read)","turn":10}
+{"timestamp":"2026-04-08T19:58:42.881Z","iteration":513,"level":"info","message":"Restarting as iteration 514...","turn":10}
+{"timestamp":"2026-04-08T19:58:43.082Z","iteration":514,"level":"info","message":"Cache restored: 74/74 entries (0 stale)"}
+{"timestamp":"2026-04-08T19:58:43.085Z","iteration":514,"level":"info","message":"Turn budget: 12/25 (calibration=1.25x, predicted=7)"}
+{"timestamp":"2026-04-08T19:58:43.085Z","iteration":514,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
+{"timestamp":"2026-04-08T19:58:43.303Z","iteration":514,"level":"info","message":"Hard turn cap: 11 (1.5x prediction of 7)"}
+{"timestamp":"2026-04-08T19:58:43.303Z","iteration":514,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-08T19:58:47.177Z","iteration":514,"level":"info","message":"think: Let me read the goals and understand what I need to build:\n\n1. Add token-per-turn tracking to orchestrator.ts (~30 LOC)\n...","turn":1}
+{"timestamp":"2026-04-08T19:58:47.181Z","iteration":514,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-08T19:58:50.347Z","iteration":514,"level":"info","message":"Agent: I'll start building immediately. Let me look at just what I need.","turn":2}
+{"timestamp":"2026-04-08T19:58:50.348Z","iteration":514,"level":"info","message":"$ grep -n \"usage\\|inputTokens\\|outputTokens\\|input_tokens\\|output_tokens\" src/orchestrator.ts | head -40","turn":2}
+{"timestamp":"2026-04-08T19:58:50.349Z","iteration":514,"level":"info","message":"$ grep -n \"getStatus\\|tokenHistory\\|costTracker\\|/status\\|Context Efficiency\" src/tui-commands.ts | head -30","turn":2}
+{"timestamp":"2026-04-08T19:58:50.374Z","iteration":514,"level":"info","message":"  -> exit=0 (782 chars)","turn":2}
+{"timestamp":"2026-04-08T19:58:50.377Z","iteration":514,"level":"info","message":"  -> exit=0 (111 chars)","turn":2}
+{"timestamp":"2026-04-08T19:58:50.378Z","iteration":514,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-08T19:58:53.188Z","iteration":514,"level":"info","message":"Agent: **Goal status:**\n- Token tracking in orchestrator.ts: NOT STARTED\n- `/status` context efficiency section: NOT STARTED\n\nLet me look at the key lines then write the code:","turn":3}
+{"timestamp":"2026-04-08T19:58:53.189Z","iteration":514,"level":"info","message":"$ sed -n '690,710p' src/orchestrator.ts","turn":3}
+{"timestamp":"2026-04-08T19:58:53.191Z","iteration":514,"level":"info","message":"$ sed -n '278,340p' src/tui-commands.ts","turn":3}
+{"timestamp":"2026-04-08T19:58:53.198Z","iteration":514,"level":"info","message":"  -> exit=0 (911 chars)","turn":3}
+{"timestamp":"2026-04-08T19:58:53.199Z","iteration":514,"level":"info","message":"  -> exit=0 (2573 chars)","turn":3}
+{"timestamp":"2026-04-08T19:58:53.199Z","iteration":514,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-08T19:58:55.442Z","iteration":514,"level":"info","message":"Agent: Now I have what I need. Let me look at where the orchestrator exports its class/functions:","turn":4}
+{"timestamp":"2026-04-08T19:58:55.442Z","iteration":514,"level":"info","message":"$ grep -n \"getSessionStats\\|getToolTimings\\|export.*Orchestrator\\|class Orchestrator\\|getContextUsage\" src/orchestrator.ts | head -20","turn":4}
+{"timestamp":"2026-04-08T19:58:55.459Z","iteration":514,"level":"info","message":"  -> exit=0 (509 chars)","turn":4}
+{"timestamp":"2026-04-08T19:58:55.459Z","iteration":514,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-08T19:58:58.142Z","iteration":514,"level":"info","message":"Agent: I've been reading, not writing. Let me implement the feature now.","turn":5}
+{"timestamp":"2026-04-08T19:58:58.143Z","iteration":514,"level":"info","message":"$ sed -n '1409,1445p' src/orchestrator.ts","turn":5}
+{"timestamp":"2026-04-08T19:58:58.161Z","iteration":514,"level":"info","message":"  -> exit=0 (1855 chars)","turn":5}
+{"timestamp":"2026-04-08T19:58:58.162Z","iteration":514,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-08T19:59:00.055Z","iteration":514,"level":"info","message":"$ grep -n \"turnCosts\\|sessionCost\\|this\\.turn\" src/orchestrator.ts | head -20","turn":6}
+{"timestamp":"2026-04-08T19:59:00.068Z","iteration":514,"level":"info","message":"  -> exit=0 (1105 chars)","turn":6}
+{"timestamp":"2026-04-08T19:59:00.069Z","iteration":514,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-08T19:59:02.351Z","iteration":514,"level":"info","message":"Agent: Writing now. No more reading.","turn":7}
+{"timestamp":"2026-04-08T19:59:02.351Z","iteration":514,"level":"info","message":"$ sed -n '1120,1135p' src/orchestrator.ts","turn":7}
+{"timestamp":"2026-04-08T19:59:02.359Z","iteration":514,"level":"info","message":"  -> exit=0 (646 chars)","turn":7}
+{"timestamp":"2026-04-08T19:59:02.360Z","iteration":514,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-08T19:59:05.545Z","iteration":514,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":8}
+{"timestamp":"2026-04-08T19:59:05.552Z","iteration":514,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -2 +4 lines\n\nContext after patch:\n1131 |   private turnCosts: number[] = [];\n1132 |   /** Files written during this session. */\n1133 |   private sessionFilesModified = new Set<string>();\n1134 |   /** Per-tool invocation counts for this session. */\n1135 |   private toolUsageCounts = new Map<string, number>();\n1136 |   /** Token usage per turn for context efficiency tracking. */\n1137 |   private tokenHistory: Array<{ turn: number; input: number; output: number }> = [];\n1138 |   /** Per-tool cumulative timing for this session. */\n1139 |   private toolTimings = new Map<string, { calls: number; totalMs: number }>();\n1140 | ","turn":8}
+{"timestamp":"2026-04-08T19:59:05.553Z","iteration":514,"level":"info","message":"Turn 9/25","turn":9}
+{"timestamp":"2026-04-08T19:59:07.723Z","iteration":514,"level":"info","message":"Agent: Now record token history after each API call:","turn":9}
+{"timestamp":"2026-04-08T19:59:07.724Z","iteration":514,"level":"info","message":"$ sed -n '2388,2400p' src/orchestrator.ts","turn":9}
+{"timestamp":"2026-04-08T19:59:07.742Z","iteration":514,"level":"info","message":"  -> exit=0 (444 chars)","turn":9}
+{"timestamp":"2026-04-08T19:59:07.743Z","iteration":514,"level":"info","message":"Turn 10/25","turn":10}
+{"timestamp":"2026-04-08T19:59:10.256Z","iteration":514,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":10}
+{"timestamp":"2026-04-08T19:59:10.260Z","iteration":514,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -3 +4 lines\n\nContext after patch:\n2393 |     this.sessionTokensOut += tokensOut;\n2394 |     const turnCost = computeCost(model, tokensIn, tokensOut);\n2395 |     this.sessionCost += turnCost;\n2396 |     this.turnCosts.push(turnCost);\n2397 |     this.costTracker.record(model, tokensIn, tokensOut);\n2398 |     this.lastInputTokens = lastInputTokens;\n2399 |     this.tokenHistory.push({ turn: this.turnCosts.length, input: tokensIn, output: tokensOut });\n2400 | \n2401 |     // If aborted, return early with partial result\n2402 |     if (aborted) {","turn":10}
+{"timestamp":"2026-04-08T19:59:10.262Z","iteration":514,"level":"info","message":"Turn 11/25","turn":11}
+{"timestamp":"2026-04-08T19:59:16.212Z","iteration":514,"level":"info","message":"Agent: Now add the getter and update /status:","turn":11}
+{"timestamp":"2026-04-08T19:59:16.213Z","iteration":514,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":11}
+{"timestamp":"2026-04-08T19:59:16.215Z","iteration":514,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -1 +12 lines\n\nContext after patch:\n1408 |   }\n1409 | \n1410 |   /** Session statistics for /status display. */\n1411 |   getTokenEfficiency(): { avgInput: number; avgOutput: number; peakInput: number; peakTurn: number; currentUtilPct: number } {\n1412 |     const history = this.tokenHistory;\n1413 |     if (history.length === 0) return { avgInput: 0, avgOutput: 0, peakInput: 0, peakTurn: 0, currentUtilPct: 0 };\n1414 |     const avgInput = Math.round(history.reduce((s, t) => s + t.input, 0) / history.length);\n1415 |     const avgOutput = Math.round(history.reduce((s, t) => s + t.output, 0) / history.length);\n1416 |     const peak = history.reduce((p, t) => t.input > p.input ? t : p, history[0]);\n1417 |     const lastInput = history[history.length - 1].input;\n1418 |     const currentUtilPct = Math.round((lastInput / 200_000) * 100);\n1419 |     return { avgInput, avgOutput, peakInput: peak.input, peakTurn: peak.turn, currentUtilPct };\n1420 |   }\n1421 | \n1422 |   getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: \"↑\" | \"→\" | \"↓\"; sessionCost: number; costSummary: string; filesModified: string[]; toolUsage: Record<string, number> } {\n1423 |     const durationMs = Date.now() - this.sessionStartTime;\n1424 |     const turnCount = this.turnCosts.length;\n1425 |     const avgCostPerTurn = turnCount > 0 ? this.sessionCost / turnCount : 0;","turn":11}
+{"timestamp":"2026-04-08T19:59:16.215Z","iteration":514,"level":"info","message":"HARD TURN CAP REACHED: 11 turns (predicted 7, cap 11). Forcing commit.","turn":11}
+{"timestamp":"2026-04-08T19:59:16.219Z","iteration":514,"level":"info","message":"Cache persisted: 68 entries to .autoagent-cache.json","turn":11}
+{"timestamp":"2026-04-08T19:59:16.219Z","iteration":514,"level":"info","message":"Tool timing: bash: 9x, avg=17ms, total=152ms; write_file: 3x, avg=5ms, total=15ms; think: 1x, avg=3ms, total=3ms","turn":11}
+{"timestamp":"2026-04-08T19:59:16.220Z","iteration":514,"level":"info","message":"Tool timing stats","turn":11,"metadata":{"timing":{"tools":{"think":{"calls":1,"totalMs":3,"minMs":3,"maxMs":3,"avgMs":3},"bash":{"calls":9,"totalMs":152,"minMs":8,"maxMs":29,"avgMs":17},"write_file":{"calls":3,"totalMs":15,"minMs":2,"maxMs":8,"avgMs":5}},"totalCalls":13,"totalMs":170}}}
+{"timestamp":"2026-04-08T19:59:24.939Z","iteration":514,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 514: predicted 7 turns, actual 11 turns, ratio 1.57**","turn":11}
+{"timestamp":"2026-04-08T19:59:33.496Z","iteration":514,"level":"info","message":"Pre-commit review (909in/290out): **Issues found:**\n\n- **Hardcoded context window**: `currentUtilPct` divides by `200_000`, but this magic constant will silently give wrong results for any model with a different context limit (e.g., G","turn":11}

@@ -1133,6 +1133,8 @@ export class Orchestrator {
   private sessionFilesModified = new Set<string>();
   /** Per-tool invocation counts for this session. */
   private toolUsageCounts = new Map<string, number>();
+  /** Token usage per turn for context efficiency tracking. */
+  private tokenHistory: Array<{ turn: number; input: number; output: number }> = [];
   /** Per-tool cumulative timing for this session. */
   private toolTimings = new Map<string, { calls: number; totalMs: number }>();
 
@@ -1406,6 +1408,17 @@ export class Orchestrator {
   }
 
   /** Session statistics for /status display. */
+  getTokenEfficiency(): { avgInput: number; avgOutput: number; peakInput: number; peakTurn: number; currentUtilPct: number } {
+    const history = this.tokenHistory;
+    if (history.length === 0) return { avgInput: 0, avgOutput: 0, peakInput: 0, peakTurn: 0, currentUtilPct: 0 };
+    const avgInput = Math.round(history.reduce((s, t) => s + t.input, 0) / history.length);
+    const avgOutput = Math.round(history.reduce((s, t) => s + t.output, 0) / history.length);
+    const peak = history.reduce((p, t) => t.input > p.input ? t : p, history[0]);
+    const lastInput = history[history.length - 1].input;
+    const currentUtilPct = Math.round((lastInput / 200_000) * 100);
+    return { avgInput, avgOutput, peakInput: peak.input, peakTurn: peak.turn, currentUtilPct };
+  }
+
   getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: "↑" | "→" | "↓"; sessionCost: number; costSummary: string; filesModified: string[]; toolUsage: Record<string, number> } {
     const durationMs = Date.now() - this.sessionStartTime;
     const turnCount = this.turnCosts.length;
@@ -2394,6 +2407,7 @@ export class Orchestrator {
     this.turnCosts.push(turnCost);
     this.costTracker.record(model, tokensIn, tokensOut);
     this.lastInputTokens = lastInputTokens;
+    this.tokenHistory.push({ turn: this.turnCosts.length, input: tokensIn, output: tokensOut });
 
     // If aborted, return early with partial result
     if (aborted) {
