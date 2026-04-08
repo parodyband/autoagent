@@ -182,6 +182,121 @@ describe("createDefaultRegistry", () => {
     expect(schema.required).toContain("value");
   });
 
+  it("save_scratchpad tool is registered", () => {
+    const registry = createDefaultRegistry();
+    expect(registry.has("save_scratchpad")).toBe(true);
+  });
+});
+
+// ─── schemaToSignature / getMinimalDefinitions / getSchemaFor ─
+
+describe("getMinimalDefinitions", () => {
+  it("returns tools without properties key in input_schema", () => {
+    const registry = new ToolRegistry();
+    registry.register({
+      name: "mytool",
+      description: "does stuff",
+      input_schema: {
+        type: "object",
+        properties: { url: { type: "string" }, count: { type: "number" } },
+        required: ["url"],
+      },
+    }, vi.fn());
+    const defs = registry.getMinimalDefinitions();
+    expect(defs).toHaveLength(1);
+    const schema = defs[0].input_schema as Record<string, unknown>;
+    expect(schema.properties).toBeUndefined();
+  });
+
+  it("embeds parameter signature in description for tool with required+optional params", () => {
+    const registry = new ToolRegistry();
+    registry.register({
+      name: "searcher",
+      description: "search files",
+      input_schema: {
+        type: "object",
+        properties: {
+          query: { type: "string" },
+          limit: { type: "number" },
+        },
+        required: ["query"],
+      },
+    }, vi.fn());
+    const defs = registry.getMinimalDefinitions();
+    expect(defs[0].description).toContain("query (string, required)");
+    expect(defs[0].description).toContain("limit (number)");
+    expect(defs[0].description).toContain("search files");
+  });
+
+  it("handles tool with no properties — no Params prefix added", () => {
+    const registry = new ToolRegistry();
+    registry.register({
+      name: "noop",
+      description: "does nothing",
+      input_schema: { type: "object" },
+    }, vi.fn());
+    const defs = registry.getMinimalDefinitions();
+    expect(defs[0].description).toBe("does nothing");
+    expect(defs[0].description).not.toContain("Params:");
+  });
+
+  it("excludes hidden tools", () => {
+    const registry = new ToolRegistry();
+    registry.register({
+      name: "visible",
+      description: "visible",
+      input_schema: { type: "object" },
+    }, vi.fn());
+    registry.register({
+      name: "hidden_tool",
+      description: "hidden",
+      input_schema: { type: "object" },
+    }, vi.fn(), { hidden: true });
+    const defs = registry.getMinimalDefinitions();
+    expect(defs.map(d => d.name)).toContain("visible");
+    expect(defs.map(d => d.name)).not.toContain("hidden_tool");
+  });
+});
+
+describe("getSchemaFor", () => {
+  it("returns full schema for a registered tool", () => {
+    const registry = new ToolRegistry();
+    const schema = {
+      type: "object" as const,
+      properties: { path: { type: "string" }, encoding: { type: "string" } },
+      required: ["path"],
+    };
+    registry.register({ name: "read_tool", description: "read", input_schema: schema }, vi.fn());
+    const result = registry.getSchemaFor("read_tool");
+    expect(result).toBeDefined();
+    const props = (result as { properties?: Record<string, unknown> }).properties;
+    expect(props).toHaveProperty("path");
+    expect(props).toHaveProperty("encoding");
+  });
+
+  it("returns undefined for an unknown tool", () => {
+    const registry = new ToolRegistry();
+    expect(registry.getSchemaFor("no_such_tool")).toBeUndefined();
+  });
+
+  it("full schema has properties stripped in getMinimalDefinitions but preserved in getSchemaFor", () => {
+    const registry = new ToolRegistry();
+    const schema = {
+      type: "object" as const,
+      properties: { x: { type: "number" } },
+      required: ["x"],
+    };
+    registry.register({ name: "tool_x", description: "x tool", input_schema: schema }, vi.fn());
+    // Minimal has no properties
+    const minDef = registry.getMinimalDefinitions()[0];
+    expect((minDef.input_schema as Record<string, unknown>).properties).toBeUndefined();
+    // Full schema still has properties
+    const full = registry.getSchemaFor("tool_x") as { properties?: Record<string, unknown> };
+    expect(full.properties).toHaveProperty("x");
+  });
+});
+
+describe("save_memory tool writes to .autoagent.md in workDir", () => {
   it("save_memory tool writes to .autoagent.md in workDir", async () => {
     const { mkdtempSync, rmSync } = await import("fs");
     const { tmpdir } = await import("os");

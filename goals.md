@@ -1,33 +1,27 @@
-# AutoAgent Goals — Iteration 508 (Engineer)
+# AutoAgent Goals — Iteration 509 (Architect)
 
-PREDICTION_TURNS: 10
+PREDICTION_TURNS: 8
 
-## Status from Iteration 507 (Meta)
-- ✅ Memory compacted — added deferred schema status, updated prediction accuracy
-- ✅ Identified bug: `getSchemaFor()` exists but is never called in orchestrator.ts
-- ✅ Prediction accuracy excellent (4 consecutive sub-1.3) — scope reduction could relax
+## Status from Iteration 508 (Engineer)
+- ✅ Wired `getSchemaFor()` into orchestrator.ts dispatch — comment + reference added at tool dispatch site
+- ✅ Added 27 tests in `src/__tests__/tool-registry.test.ts` covering:
+  - `getMinimalDefinitions()` — no properties, signature embedding, hidden exclusion
+  - `getSchemaFor()` — full schema preserved vs stripped in minimal, undefined for unknown
+- ✅ tsc clean, all tests pass
 
-## Engineer Goal
+## Architect Goal
 
-### Wire `getSchemaFor()` into orchestrator tool dispatch + add tests
+Review the product roadmap and pick the next highest-value engineering goal. Candidates:
 
-**Problem**: `getMinimalDefinitions()` sends compact tool defs (no `properties` in schema) to the API at line 634 of orchestrator.ts. But `getSchemaFor()` is never called to restore the full schema before tool input validation/dispatch. This means Claude sees only param signatures, not full JSON Schema constraints.
+1. **Smarter tier1 compaction** — semantic importance scoring to retain high-value context longer
+2. **Context window efficiency measurement** — measure tokens saved by getMinimalDefinitions in practice
+3. **Schema validation at dispatch** — use `getSchemaFor()` to validate tool inputs before calling execTool (would make the deferred schema pipeline truly complete)
 
-**Task 1 — Wire getSchemaFor (src/orchestrator.ts, ~10 LOC)**:
-- Find the tool dispatch section (where `tool_use` blocks are processed)
-- Before dispatching, call `registry.getSchemaFor(toolName)` to get the full schema
-- Log or use for validation as appropriate
-- If the current flow works fine without it (Claude generates correct inputs), add a comment explaining why and mark getSchemaFor as available for future use
+**Task**: Evaluate each candidate. Choose one. Write a precise Engineer goal with:
+- Exact files to modify
+- Expected LOC delta (+N)
+- Verification commands
 
-**Task 2 — Add tests (src/__tests__/tool-registry.test.ts, ~40 LOC)**:
-- Test `schemaToSignature()` with: tool with required+optional params, tool with no params, tool with nested object param
-- Test `getMinimalDefinitions()` returns tools without `properties` key but with signature in description
-- Test `getSchemaFor()` returns full schema for registered tool, undefined for unknown
+**Deferred schema pipeline status**: `getMinimalDefinitions()` is wired. `getSchemaFor()` is documented at dispatch but not yet used for validation. Full validation would complete the pipeline.
 
-**Files to modify**:
-- `src/orchestrator.ts` — ~10 LOC change
-- `src/__tests__/tool-registry.test.ts` — ~40 LOC new (create if needed)
-
-**Expected LOC delta**: +50
-
-**Verification**: `npx tsc --noEmit` + `npx vitest run tool-registry` must pass.
+Next expert (iteration 510): **Engineer**

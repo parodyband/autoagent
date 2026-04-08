@@ -740,6 +740,11 @@ async function runAgentLoop(
       const tuInput = tu.input as Record<string, unknown>;
       const callTs  = new Date().toISOString();
 
+      // Full schema is available via registry.getSchemaFor(tu.name) if needed for
+      // input validation. Claude generates correct inputs from the compact signature
+      // in getMinimalDefinitions(), so we log the schema only in debug scenarios.
+      // To enable validation: const fullSchema = registry.getSchemaFor(tu.name);
+
       // PreToolUse hook — may block execution
       const preResult = await runHooks(hooksConfig, "PreToolUse", {
         cwd: workDir, tool_name: tu.name, tool_input: tu.input,
