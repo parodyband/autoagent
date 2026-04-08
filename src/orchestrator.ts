@@ -639,7 +639,7 @@ async function runAgentLoop(
   onStatus?: OrchestratorOptions["onStatus"],
   onText?: OrchestratorOptions["onText"],
   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
-  onCompact?: (inputTokens: number, messages: Anthropic.MessageParam[]) => Promise<void>,
+  onCompact?: (tier: 'micro' | 'tier1' | 'tier2', inputTokens: number, messages: Anthropic.MessageParam[]) => Promise<void>,
   onContextBudget?: OrchestratorOptions["onContextBudget"],
   onFileWatch?: (event: "read" | "write", filePath: string) => void,
   signal?: AbortSignal,
@@ -733,8 +733,11 @@ async function runAgentLoop(
     }
 
     // Mid-loop compaction: if context is growing large, compact between rounds
-    if (onCompact && lastInput >= MICRO_COMPACT_THRESHOLD) {
-      await onCompact(lastInput, apiMessages);
+    if (onCompact) {
+      const compactTier = selectCompactionTier(lastInput);
+      if (compactTier !== 'none') {
+        await onCompact(compactTier, lastInput, apiMessages);
+      }
     }
 
     const toolUses = finalMessage.content.filter(
@@ -2358,10 +2361,8 @@ export class Orchestrator {
 
     // 5. Run streaming agent loop
     // Build mid-loop compaction callback
-    const onCompact = async (inputTokens: number, messages: Anthropic.MessageParam[]): Promise<void> => {
+    const onCompact = async (tier: 'micro' | 'tier1' | 'tier2', inputTokens: number, messages: Anthropic.MessageParam[]): Promise<void> => {
       taskCompacted = true;
-      const urgency = compactionUrgency(this.turnTokenHistory);
-      const tier = selectCompactionTier(inputTokens, urgency);
       if (tier === 'tier2') {
         await this.compact();
       } else if (tier === 'tier1') {

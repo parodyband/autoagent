@@ -1,66 +1,3 @@
-144 |     }
-145 |     return true;
-146 |   },
-147 | 
-148 |   "/init": async (ctx) => {
-149 |     ctx.setStatus("Analyzing project...");
-[2026-04-08T20:42:43.882Z] iter=536 turn=13 INFO: Turn 13/25
-[2026-04-08T20:42:47.915Z] iter=536 turn=13 INFO: Agent: Now add `/retry` to help text, wire `submitMessage` in tui.tsx, then check if `getCostTracker` exists on Orchestrator.
-[2026-04-08T20:42:47.916Z] iter=536 turn=13 INFO: write_file: src/tui-commands.ts (patch)
-[2026-04-08T20:42:47.917Z] iter=536 turn=13 INFO:   -> ok: Patched src/tui-commands.ts: -1 +2 lines
-
-Context after patch:
-194 |         "  /plan list — Show saved plans",
-195 |         "  /plan resume — Resume the most recent incomplete plan",
-196 |         "  /export   — Export conversation to markdown (optional filename arg)",
-197 |         "  /retry    — Re-send the last user message",
-198 |         "  /exit     — Quit AutoAgent",
-199 |       ].join("\n"),
-200 |     });
-201 |     return true;
-[2026-04-08T20:42:47.918Z] iter=536 turn=14 INFO: Turn 14/25
-[2026-04-08T20:42:52.757Z] iter=536 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getCostTracker\|costTracker" src/orchestrator.ts | head -10
-[2026-04-08T20:42:52.773Z] iter=536 turn=14 INFO:   -> exit=0 (332 chars)
-[2026-04-08T20:42:52.773Z] iter=536 turn=15 INFO: Turn 15/25
-[2026-04-08T20:42:55.345Z] iter=536 turn=15 INFO: Agent: No `getCostTracker()` method. I'll add it, then wire `submitMessage` in tui.tsx:
-[2026-04-08T20:42:55.346Z] iter=536 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getModel\(\)" src/orchestrator.ts | head -5
-[2026-04-08T20:42:55.363Z] iter=536 turn=15 INFO:   -> exit=0 (28 chars)
-[2026-04-08T20:42:55.363Z] iter=536 turn=16 INFO: Turn 16/25
-[2026-04-08T20:42:57.457Z] iter=536 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1645,1650p' src/orchestrator.ts
-[2026-04-08T20:42:57.466Z] iter=536 turn=16 INFO:   -> exit=0 (195 chars)
-[2026-04-08T20:42:57.466Z] iter=536 turn=17 INFO: Turn 17/25
-[2026-04-08T20:43:00.289Z] iter=536 turn=17 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T20:43:00.290Z] iter=536 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -3 +7 lines
-
-Context after patch:
-1642 |   }
-1643 | 
-1644 |   /** Get the current model (override if set, otherwise "auto"). */
-1645 |   getModel(): string {
-1646 |     return this.modelOverride ?? "auto";
-1647 |   }
-1648 | 
-1649 |   getCostTracker(): CostTracker {
-1650 |     return this.costTracker;
-1651 |   }
-1652 | 
-1653 |   /** Override model for all subsequent sends. Pass null to restore auto-routing. */
-1654 |   setModel(model: string | null): void {
-[2026-04-08T20:43:00.291Z] iter=536 turn=18 INFO: Turn 18/25
-[2026-04-08T20:43:02.379Z] iter=536 turn=18 INFO: Agent: Now wire `submitMessage` in tui.tsx:
-[2026-04-08T20:43:02.380Z] iter=536 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '628,645p' src/tui.tsx
-[2026-04-08T20:43:02.393Z] iter=536 turn=18 INFO:   -> exit=0 (512 chars)
-[2026-04-08T20:43:02.393Z] iter=536 turn=19 INFO: Turn 19/25
-[2026-04-08T20:43:04.866Z] iter=536 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '640,700p' src/tui.tsx
-[2026-04-08T20:43:04.875Z] iter=536 turn=19 INFO:   -> exit=0 (1983 chars)
-[2026-04-08T20:43:04.876Z] iter=536 turn=20 INFO: Turn 20/25
-[2026-04-08T20:43:09.651Z] iter=536 turn=20 INFO: Agent: I can see `handleSubmit` runs the full agent loop. I'll create a `submitMessage` callback that calls `handleSubmit` but skips the slash routing. The simplest approach: pass `handleSubmit` itself as `submitMessage` in the ctx:
-[2026-04-08T20:43:09.652Z] iter=536 turn=20 INFO: write_file: src/tui.tsx (patch)
-[2026-04-08T20:43:09.653Z] iter=536 turn=20 INFO:   -> ok: Patched src/tui.tsx: -5 +7 lines
-
-Context after patch:
-629 |         repoMapRef,
-630 |         sessionList,
 631 |         setSessionList,
 632 |         autoAccept,
 633 |         setAutoAccept,
@@ -1059,3 +996,131 @@ Right — this is an Architect iteration. My deliverable is goals.md, not src/ c
 [2026-04-08T20:57:13.273Z] iter=545 turn=8 INFO: Tool timing stats
 [2026-04-08T20:57:21.304Z] iter=545 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 545: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-08T20:57:21.328Z] iter=545 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:57:21.369Z] iter=545 turn=8 INFO: Committed: 803cf73e (18 in / 2046 out, cache: 10701 created, 57423 read)
+[2026-04-08T20:57:21.370Z] iter=545 turn=8 INFO: Restarting as iteration 546...
+[2026-04-08T20:57:21.572Z] iter=546 INFO: Cache restored: 69/69 entries (0 stale)
+[2026-04-08T20:57:21.576Z] iter=546 INFO: Turn budget: 14/25 (calibration=1.25x, predicted=14)
+[2026-04-08T20:57:21.576Z] iter=546 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T20:57:21.792Z] iter=546 INFO: Hard turn cap: 21 (1.5x prediction of 14)
+[2026-04-08T20:57:21.792Z] iter=546 turn=1 INFO: Turn 1/25
+[2026-04-08T20:57:24.854Z] iter=546 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be done.
+[2026-04-08T20:57:24.855Z] iter=546 turn=1 INFO: $ grep -n "selectCompactionTier\|onCompact\|MICRO_COMPACT" src/orchestrator.ts | head -50
+[2026-04-08T20:57:24.855Z] iter=546 turn=1 INFO: $ grep -n "model\|/model" src/tui-commands.ts | head -40
+[2026-04-08T20:57:24.858Z] iter=546 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T20:57:24.865Z] iter=546 turn=1 INFO:   -> exit=0 (1260 chars)
+[2026-04-08T20:57:24.866Z] iter=546 turn=1 INFO:   -> exit=0 (1044 chars)
+[2026-04-08T20:57:24.867Z] iter=546 turn=2 INFO: Turn 2/25
+[2026-04-08T20:57:28.748Z] iter=546 turn=2 INFO: read_file: src/orchestrator.ts
+[2026-04-08T20:57:28.748Z] iter=546 turn=2 INFO: read_file: src/orchestrator.ts
+[2026-04-08T20:57:28.748Z] iter=546 turn=2 INFO: read_file: src/orchestrator.ts
+[2026-04-08T20:57:28.750Z] iter=546 turn=2 INFO:   -> ok (953 chars)
+[2026-04-08T20:57:28.750Z] iter=546 turn=2 INFO:   -> ok (754 chars)
+[2026-04-08T20:57:28.751Z] iter=546 turn=2 INFO:   -> ok (936 chars)
+[2026-04-08T20:57:28.751Z] iter=546 turn=3 INFO: Turn 3/25
+[2026-04-08T20:57:35.295Z] iter=546 turn=3 INFO: think: I have enough context. Let me plan the two tasks:
+
+**Task 1: Wire auto-compact pre-turn into `runAgentLoop`**
+
+Current s...
+[2026-04-08T20:57:35.296Z] iter=546 turn=4 INFO: Turn 4/25
+[2026-04-08T20:57:38.655Z] iter=546 turn=4 INFO: read_file: src/orchestrator.ts
+[2026-04-08T20:57:38.656Z] iter=546 turn=4 INFO: read_file: src/tui-commands.ts
+[2026-04-08T20:57:38.657Z] iter=546 turn=4 INFO:   -> ok (951 chars)
+[2026-04-08T20:57:38.657Z] iter=546 turn=4 INFO:   -> ok (1522 chars)
+[2026-04-08T20:57:38.657Z] iter=546 turn=5 INFO: Turn 5/25
+[2026-04-08T20:57:42.037Z] iter=546 turn=5 INFO: Agent: **Goal Status:**
+- Task 1 (Wire auto-compact tiers): **NOT STARTED** — need to update `onCompact` signature in orchestrator.ts + caller in tui.tsx
+- Task 2 (`/model` command): **DONE** — already fully implemented with switching support
+
+Task 1 is all that's left. Let me do it now.
+[2026-04-08T20:57:42.039Z] iter=546 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-08T20:57:42.040Z] iter=546 turn=5 INFO:   -> ok (2045 chars)
+[2026-04-08T20:57:42.041Z] iter=546 turn=6 INFO: Turn 6/25
+[2026-04-08T20:57:53.625Z] iter=546 turn=6 INFO: think: I see the current state:
+
+1. In `runAgentLoop` (standalone function), `onCompact` has signature `(inputTokens: number, m...
+[2026-04-08T20:57:53.626Z] iter=546 turn=7 INFO: Turn 7/25
+[2026-04-08T20:57:56.394Z] iter=546 turn=7 INFO: $ grep -n "runAgentLoop\|onCompact" src/tui.tsx | head -20
+[2026-04-08T20:57:56.398Z] iter=546 turn=7 INFO: read_file: src/orchestrator.ts
+[2026-04-08T20:57:56.400Z] iter=546 turn=7 INFO:   -> ok (341 chars)
+[2026-04-08T20:57:56.406Z] iter=546 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:57:56.407Z] iter=546 turn=8 INFO: Turn 8/25
+[2026-04-08T20:58:00.780Z] iter=546 turn=8 INFO: Agent: Now I have everything I need. The changes are:
+
+1. **`src/orchestrator.ts` line 642**: Update `onCompact` signature in `runAgentLoop` params
+2. **`src/orchestrator.ts` line 736-738**: Use `selectCompactionTier` and pass tier  
+3. **`src/orchestrator.ts` line ~2361**: Update the Orchestrator's callback to use provided tier
+
+tui.tsx doesn't call `runAgentLoop` directly — the Orchestrator does. So on...
+[2026-04-08T20:58:00.780Z] iter=546 turn=8 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:58:00.783Z] iter=546 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+639 |   onStatus?: OrchestratorOptions["onStatus"],
+640 |   onText?: OrchestratorOptions["onText"],
+641 |   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
+642 |   onCompact?: (tier: 'micro' | 'tier1' | 'tier2', inputTokens: number, messages: Anthropic.MessageParam[]) => Promise<void>,
+643 |   onContextBudget?: OrchestratorOptions["onContextBudget"],
+644 |   onFileWatch?: (event: "read" | "write", filePath: string) => void,
+645 |   signal?: AbortSignal,
+[2026-04-08T20:58:00.784Z] iter=546 turn=9 INFO: Turn 9/25
+[2026-04-08T20:58:04.816Z] iter=546 turn=9 INFO: Agent: I've made 1 patch so far. Let me finish the remaining 2 patches now, then wrap up.
+[2026-04-08T20:58:04.816Z] iter=546 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:58:04.818Z] iter=546 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -4 +7 lines
+
+Context after patch:
+732 |       onContextBudget(lastInput / contextWindow);
+733 |     }
+734 | 
+735 |     // Mid-loop compaction: if context is growing large, compact between rounds
+736 |     if (onCompact) {
+737 |       const compactTier = selectCompactionTier(lastInput);
+738 |       if (compactTier !== 'none') {
+739 |         await onCompact(compactTier, lastInput, apiMessages);
+740 |       }
+741 |     }
+742 | 
+743 |     const toolUses = finalMessage.content.filter(
+744 |       (b): b is Anthropic.ToolUseBlock => b.type === "tool_use"
+[2026-04-08T20:58:04.818Z] iter=546 turn=10 INFO: Turn 10/25
+[2026-04-08T20:58:08.610Z] iter=546 turn=10 INFO: Agent: Now update the Orchestrator's `onCompact` callback to accept and use the provided tier:
+[2026-04-08T20:58:08.611Z] iter=546 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:58:08.612Z] iter=546 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -4 +2 lines
+
+Context after patch:
+2361 | 
+2362 |     // 5. Run streaming agent loop
+2363 |     // Build mid-loop compaction callback
+2364 |     const onCompact = async (tier: 'micro' | 'tier1' | 'tier2', inputTokens: number, messages: Anthropic.MessageParam[]): Promise<void> => {
+2365 |       taskCompacted = true;
+2366 |       if (tier === 'tier2') {
+2367 |         await this.compact();
+2368 |       } else if (tier === 'tier1') {
+[2026-04-08T20:58:08.612Z] iter=546 turn=11 INFO: Turn 11/25
+[2026-04-08T20:58:10.667Z] iter=546 turn=11 INFO: Agent: Now verify TypeScript compiles cleanly:
+[2026-04-08T20:58:10.668Z] iter=546 turn=11 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-08T20:58:11.762Z] iter=546 turn=11 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:58:11.763Z] iter=546 turn=12 INFO: Turn 12/25
+[2026-04-08T20:58:17.793Z] iter=546 turn=12 INFO: Agent: Clean. Wrapping up now.
+[2026-04-08T20:58:17.794Z] iter=546 turn=12 INFO: save_memory: "[Engineer] Iteration 546"
+[2026-04-08T20:58:17.795Z] iter=546 turn=12 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T20:58:17.795Z] iter=546 turn=13 INFO: Turn 13/25
+[2026-04-08T20:58:29.364Z] iter=546 turn=13 INFO: write_file: goals.md (write)
+[2026-04-08T20:58:29.365Z] iter=546 turn=13 INFO:   -> ok: Updated goals.md (1429 chars, -18 lines delta)
+[2026-04-08T20:58:29.366Z] iter=546 turn=14 INFO: Turn 14/25
+[2026-04-08T20:58:31.515Z] iter=546 turn=14 INFO: $ npx tsc --noEmit 2>&1 && echo "TSC_CLEAN"
+[2026-04-08T20:58:32.637Z] iter=546 turn=14 INFO:   -> exit=0 (10 chars)
+[2026-04-08T20:58:32.638Z] iter=546 turn=15 INFO: Turn 15/25
+[2026-04-08T20:58:34.327Z] iter=546 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:58:34.328Z] iter=546 turn=15 INFO: RESTART signal
+[2026-04-08T20:58:34.328Z] iter=546 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:58:35.496Z] iter=546 turn=15 INFO: Compilation OK
+[2026-04-08T20:58:44.462Z] iter=546 turn=15 INFO: Cache persisted: 68 entries to .autoagent-cache.json
+[2026-04-08T20:58:44.462Z] iter=546 turn=15 INFO: Cache stats: 0 hits, 7 misses, 68 entries, 4 invalidations (8 entries removed)
+[2026-04-08T20:58:44.462Z] iter=546 turn=15 INFO: Tool cache stats
+[2026-04-08T20:58:44.462Z] iter=546 turn=15 INFO: Tool timing: bash: 6x, avg=376ms, total=2253ms; read_file: 7x, avg=2ms, total=15ms; write_file: 4x, avg=2ms, total=7ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T20:58:44.462Z] iter=546 turn=15 INFO: Tool timing stats
+[2026-04-08T20:58:52.661Z] iter=546 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 546: predicted 14 turns, actual 15 turns, ratio 1.07**
+[2026-04-08T20:59:00.082Z] iter=546 turn=15 INFO: Pre-commit review (784in/281out): **Issue: `selectCompactionTier` signature mismatch**
+
+The original `selectCompactionTier(inputTokens, urgency)` took two arguments, but the new call site `selectCompactionTier(lastInput)` passes only 
