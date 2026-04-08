@@ -1,99 +1,3 @@
-[2026-04-08T19:43:12.366Z] iter=505 turn=1 INFO: Agent: 
-
-I'll start by evaluating what the Engineer built in iteration 504, then research and plan the next iteration.
-[2026-04-08T19:43:12.367Z] iter=505 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat src/tool-registry.ts | head -200
-[2026-04-08T19:43:12.367Z] iter=505 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'getMinimalDefinitions\|getSchemaFor\|getDefinitions' src/orchestrator.ts
-[2026-04-08T19:43:12.368Z] iter=505 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'getMinimalDefinitions\|getSchemaFor' src/tool-registry.ts
-[2026-04-08T19:43:12.381Z] iter=505 turn=1 INFO:   -> exit=0 (6735 chars)
-[2026-04-08T19:43:12.387Z] iter=505 turn=1 INFO:   -> exit=0 (54 chars)
-[2026-04-08T19:43:12.388Z] iter=505 turn=1 INFO:   -> exit=0 (129 chars)
-[2026-04-08T19:43:12.389Z] iter=505 turn=2 INFO: Turn 2/25
-[2026-04-08T19:43:31.008Z] iter=505 turn=2 INFO: Agent: 
-
-You're right. My deliverables are: 1) Verify the Engineer's work, 2) Research, 3) Write goals.md for iteration 506. Let me do all three efficiently.
-[2026-04-08T19:43:31.009Z] iter=505 turn=2 INFO: think: Let me verify quickly and move to writing goals.md.
-
-Verification:
-- ✅ `getMinimalDefinitions()` is used at line 634 of ...
-[2026-04-08T19:43:31.010Z] iter=505 turn=3 INFO: Turn 3/25
-[2026-04-08T19:43:35.215Z] iter=505 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'getMinimalDefinitions\|tools.*=.*registry\|tool_use\|tool_call\|input_schema' src/orchestrator.ts | head -20
-[2026-04-08T19:43:35.217Z] iter=505 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | tail -30
-[2026-04-08T19:43:35.235Z] iter=505 turn=3 INFO:   -> exit=0 (1594 chars)
-[2026-04-08T19:43:35.249Z] iter=505 turn=3 INFO:   -> exit=0 (565 chars)
-[2026-04-08T19:43:35.249Z] iter=505 turn=4 INFO: Turn 4/25
-[2026-04-08T19:43:49.250Z] iter=505 turn=4 INFO: Agent: 
-
-Status: goals.md write is NOT STARTED. Let me produce it now along with verification and memory updates.
-[2026-04-08T19:43:49.251Z] iter=505 turn=4 INFO: think: Key concern: The `getMinimalDefinitions()` change strips parameter schemas from tool definitions sent to the API. This i...
-[2026-04-08T19:43:49.251Z] iter=505 turn=5 INFO: Turn 5/25
-[2026-04-08T19:44:04.863Z] iter=505 turn=5 INFO: write_file: goals.md (write)
-[2026-04-08T19:44:04.865Z] iter=505 turn=5 INFO:   -> ok: Updated goals.md (2263 chars, +14 lines delta)
-[2026-04-08T19:44:04.865Z] iter=505 turn=6 INFO: Turn 6/25
-[2026-04-08T19:44:08.510Z] iter=505 turn=6 INFO: Agent: 
-
-This is an Architect iteration — no src/ changes expected. Goals.md is written. Let me finalize: type-check, save memory, and restart.
-[2026-04-08T19:44:08.510Z] iter=505 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-08T19:44:09.629Z] iter=505 turn=6 INFO:   -> exit=0 (11 chars)
-[2026-04-08T19:44:09.630Z] iter=505 turn=7 INFO: Turn 7/25
-[2026-04-08T19:44:14.892Z] iter=505 turn=7 INFO: Agent: 
-
-TSC passes. Save memory and restart.
-[2026-04-08T19:44:14.893Z] iter=505 turn=7 INFO: save_memory: "[Architect] Iteration 505 — minimal defs risk"
-[2026-04-08T19:44:14.894Z] iter=505 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T19:44:14.894Z] iter=505 turn=7 INFO: save_memory: "[AUTO-SCORED] Iteration 505"
-[2026-04-08T19:44:14.894Z] iter=505 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T19:44:14.895Z] iter=505 turn=8 INFO: Turn 8/25
-[2026-04-08T19:44:17.738Z] iter=505 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T19:44:17.738Z] iter=505 turn=8 INFO: RESTART signal
-[2026-04-08T19:44:17.738Z] iter=505 turn=8 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T19:44:18.838Z] iter=505 turn=8 INFO: Compilation OK
-[2026-04-08T19:44:27.605Z] iter=505 turn=8 INFO: Cache persisted: 64 entries to .autoagent-cache.json
-[2026-04-08T19:44:27.606Z] iter=505 turn=8 INFO: Tool timing: bash: 7x, avg=175ms, total=1228ms; save_memory: 2x, avg=2ms, total=3ms; write_file: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms
-[2026-04-08T19:44:27.606Z] iter=505 turn=8 INFO: Tool timing stats
-[2026-04-08T19:44:35.855Z] iter=505 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 505: predicted 8 turns, actual 8 turns, ratio 1.00**
-[2026-04-08T19:44:35.879Z] iter=505 turn=8 INFO: Pre-commit review: no significant code changes to review
-[2026-04-08T19:44:35.915Z] iter=505 turn=8 INFO: Committed: 466f998b (20 in / 2693 out, cache: 12525 created, 68995 read)
-[2026-04-08T19:44:35.916Z] iter=505 turn=8 INFO: Restarting as iteration 506...
-[2026-04-08T19:44:36.101Z] iter=506 INFO: Cache restored: 64/64 entries (0 stale)
-[2026-04-08T19:44:36.104Z] iter=506 INFO: Turn budget: 12/25 (calibration=0.75x, predicted=12)
-[2026-04-08T19:44:36.104Z] iter=506 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-08T19:44:36.316Z] iter=506 INFO: Hard turn cap: 18 (1.5x prediction of 12)
-[2026-04-08T19:44:36.316Z] iter=506 turn=1 INFO: Turn 1/25
-[2026-04-08T19:44:38.276Z] iter=506 turn=1 INFO: Agent: I'll start by reading the current state of the files I need to modify.
-[2026-04-08T19:44:38.278Z] iter=506 turn=1 INFO: read_file: src/tool-registry.ts
-[2026-04-08T19:44:38.280Z] iter=506 turn=1 INFO: read_scratchpad: 898 chars
-[2026-04-08T19:44:38.282Z] iter=506 turn=1 INFO:   -> ok (20350 chars)
-[2026-04-08T19:44:38.283Z] iter=506 turn=2 INFO: Turn 2/25
-[2026-04-08T19:44:44.862Z] iter=506 turn=2 INFO: think: Now I understand the task. I need to:
-
-1. Add a helper function `schemaToSignature(schema: Anthropic.Tool["input_schema"...
-[2026-04-08T19:44:44.863Z] iter=506 turn=3 INFO: Turn 3/25
-[2026-04-08T19:44:52.017Z] iter=506 turn=3 INFO: Agent: I have all the context I need. Implementing now.
-[2026-04-08T19:44:52.019Z] iter=506 turn=3 INFO: write_file: src/tool-registry.ts (patch)
-[2026-04-08T19:44:52.023Z] iter=506 turn=3 INFO:   -> ok: Patched src/tool-registry.ts: -14 +21 lines
-
-Context after patch:
-159 |       .map((t) => t.definition);
-160 |   }
-161 | 
-162 |   /**
-163 |    * Returns tool definitions with minimal schemas — description only, no property details.
-164 |    * Saves ~2-3K tokens per API call by omitting input_schema property listings.
-165 |    * Parameter names/types are preserved in a compact signature prepended to description.
-166 |    * Hidden tools are excluded.
-167 |    */
-168 |   getMinimalDefinitions(): Anthropic.Tool[] {
-169 |     return Array.from(this.tools.values())
-170 |       .filter((t) => !t.hidden)
-171 |       .map((t) => {
-172 |         const sig = schemaToSignature(t.definition.input_schema);
-173 |         const description = sig
-174 |           ? `${sig}\n${t.definition.description ?? ""}`
-175 |           : t.definition.description;
-176 |         return {
-177 |           name: t.definition.name,
-178 |           description,
-179 |           input_schema: { type: "object" as const },
 180 |         };
 181 |       });
 182 |   }
@@ -1092,3 +996,72 @@ Not a real bug per se, but spreading an empty array is harmless — this is actu
 **Actual issues:**
 
 - **Hardcod
+[2026-04-08T20:11:07.534Z] iter=516 turn=9 INFO: Committed: 649d36d1 (17 in / 2659 out, cache: 12563 created, 70107 read)
+[2026-04-08T20:11:07.534Z] iter=516 turn=9 INFO: Restarting as iteration 517...
+[2026-04-08T20:11:07.738Z] iter=517 INFO: Cache restored: 68/68 entries (0 stale)
+[2026-04-08T20:11:07.740Z] iter=517 INFO: Turn budget: 13/25 (calibration=1.25x, predicted=8)
+[2026-04-08T20:11:07.741Z] iter=517 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-08T20:11:07.960Z] iter=517 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-08T20:11:07.961Z] iter=517 turn=1 INFO: Turn 1/25
+[2026-04-08T20:11:12.432Z] iter=517 turn=1 INFO: Agent: 
+
+I'll start by verifying the current state of the codebase, then evaluate and plan the next feature.
+[2026-04-08T20:11:12.432Z] iter=517 turn=1 INFO: $ ls -la src/__tests__/
+[2026-04-08T20:11:12.433Z] iter=517 turn=1 INFO: $ grep -n 'efficiency\|avgInput\|tokenHistory\|getTokenEfficiency' src/tui-commands.ts
+[2026-04-08T20:11:12.433Z] iter=517 turn=1 INFO: $ wc -l src/orchestrator.ts
+[2026-04-08T20:11:12.433Z] iter=517 turn=1 INFO: $ wc -l src/__tests__/*.ts
+[2026-04-08T20:11:12.440Z] iter=517 turn=1 INFO:   -> exit=0 (29 chars)
+[2026-04-08T20:11:12.442Z] iter=517 turn=1 INFO:   -> exit=0 (236 chars)
+[2026-04-08T20:11:12.444Z] iter=517 turn=1 INFO:   -> exit=0 (5913 chars)
+[2026-04-08T20:11:12.445Z] iter=517 turn=1 INFO:   -> exit=0 (3631 chars)
+[2026-04-08T20:11:12.446Z] iter=517 turn=2 INFO: Turn 2/25
+[2026-04-08T20:11:17.728Z] iter=517 turn=2 INFO: Agent: 
+
+You're right. My deliverable is `goals.md` for the Engineer. Let me quickly verify the one remaining question — whether `schemaToSignature` tests already exist — then write it.
+[2026-04-08T20:11:17.729Z] iter=517 turn=2 INFO: $ grep -l 'schemaToSignature\|getMinimalDefinitions' src/__tests__/*.ts
+[2026-04-08T20:11:17.747Z] iter=517 turn=2 INFO:   -> exit=0 (80 chars)
+[2026-04-08T20:11:17.747Z] iter=517 turn=3 INFO: Turn 3/25
+[2026-04-08T20:11:20.214Z] iter=517 turn=3 INFO: $ grep -c 'schemaToSignature\|getMinimalDefinitions' src/__tests__/tool-schema-functions.test.ts
+[2026-04-08T20:11:20.222Z] iter=517 turn=3 INFO:   -> exit=0 (3 chars)
+[2026-04-08T20:11:20.223Z] iter=517 turn=4 INFO: Turn 4/25
+[2026-04-08T20:11:26.332Z] iter=517 turn=4 INFO: Agent: 
+
+Goals status:
+- **Task 1 (Verify codebase)**: DONE — token-efficiency test exists, /status has efficiency stats, test coverage for schemaToSignature already exists (14 references in tool-schema-functions.test.ts)
+- **Task 2 (Pick next feature)**: DONE — schemaToSignature tests already covered, so next is **smarter tier1 compaction**
+- **Task 3 (Write goals.md)**: NOT STARTED — doing now
+
+Let me ...
+[2026-04-08T20:11:26.334Z] iter=517 turn=4 INFO: $ grep -n 'tier1\|compactTier\|compactMessages\|compactConversation' src/orchestrator.ts | head -20
+[2026-04-08T20:11:26.353Z] iter=517 turn=4 INFO:   -> exit=0 (349 chars)
+[2026-04-08T20:11:26.353Z] iter=517 turn=5 INFO: Turn 5/25
+[2026-04-08T20:11:28.568Z] iter=517 turn=5 INFO: $ sed -n '1938,1990p' src/orchestrator.ts
+[2026-04-08T20:11:28.584Z] iter=517 turn=5 INFO:   -> exit=0 (1864 chars)
+[2026-04-08T20:11:28.585Z] iter=517 turn=6 INFO: Turn 6/25
+[2026-04-08T20:11:35.593Z] iter=517 turn=6 INFO: Agent: 
+
+I'm the Architect — I don't write src/ code. My deliverable is `goals.md`. Writing it now.
+[2026-04-08T20:11:35.594Z] iter=517 turn=6 INFO: think: Current tier1 compaction is naive: it compresses ALL tool outputs older than the 5th most recent assistant turn uniforml...
+[2026-04-08T20:11:35.594Z] iter=517 turn=7 INFO: Turn 7/25
+[2026-04-08T20:11:57.667Z] iter=517 turn=7 INFO: Agent: 
+
+Writing goals.md now and finishing up.
+[2026-04-08T20:11:57.668Z] iter=517 turn=7 INFO: write_file: goals.md (write)
+[2026-04-08T20:11:57.669Z] iter=517 turn=7 INFO:   -> ok: Updated goals.md (3116 chars, +25 lines delta)
+[2026-04-08T20:11:57.670Z] iter=517 turn=8 INFO: Turn 8/25
+[2026-04-08T20:12:02.377Z] iter=517 turn=8 INFO: save_memory: "[Architect] Iteration 517 decisions"
+[2026-04-08T20:12:02.379Z] iter=517 turn=8 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T20:12:02.379Z] iter=517 turn=9 INFO: Turn 9/25
+[2026-04-08T20:12:05.378Z] iter=517 turn=9 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T20:12:06.580Z] iter=517 turn=9 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:12:06.580Z] iter=517 turn=10 INFO: Turn 10/25
+[2026-04-08T20:12:09.771Z] iter=517 turn=10 INFO: Agent: Clean. All done.
+[2026-04-08T20:12:09.772Z] iter=517 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:12:09.773Z] iter=517 turn=10 INFO: RESTART signal
+[2026-04-08T20:12:09.774Z] iter=517 turn=10 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:12:10.990Z] iter=517 turn=10 INFO: Compilation OK
+[2026-04-08T20:12:20.000Z] iter=517 turn=10 INFO: Cache persisted: 68 entries to .autoagent-cache.json
+[2026-04-08T20:12:20.000Z] iter=517 turn=10 INFO: Tool timing: bash: 10x, avg=131ms, total=1307ms; write_file: 1x, avg=2ms, total=2ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
+[2026-04-08T20:12:20.000Z] iter=517 turn=10 INFO: Tool timing stats
+[2026-04-08T20:12:28.241Z] iter=517 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 517: predicted 8 turns, actual 10 turns, ratio 1.25**
+[2026-04-08T20:12:28.265Z] iter=517 turn=10 INFO: Pre-commit review: no significant code changes to review
