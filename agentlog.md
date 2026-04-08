@@ -1,217 +1,3 @@
-[2026-04-08T21:09:49.097Z] iter=553 turn=8 INFO: Committed: cf302009 (18 in / 3098 out, cache: 12685 created, 61634 read)
-[2026-04-08T21:09:49.097Z] iter=553 turn=8 INFO: Restarting as iteration 554...
-[2026-04-08T21:09:49.299Z] iter=554 INFO: Cache restored: 66/66 entries (0 stale)
-[2026-04-08T21:09:49.302Z] iter=554 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=15)
-[2026-04-08T21:09:49.302Z] iter=554 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-08T21:09:49.505Z] iter=554 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-08T21:09:49.506Z] iter=554 turn=1 INFO: Turn 1/25
-[2026-04-08T21:09:52.593Z] iter=554 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be built.
-[2026-04-08T21:09:52.594Z] iter=554 turn=1 INFO: read_file: src/session-history.ts
-[2026-04-08T21:09:52.594Z] iter=554 turn=1 INFO: read_file: src/tui-commands.ts
-[2026-04-08T21:09:52.595Z] iter=554 turn=1 INFO:   -> ok (1217 chars)
-[2026-04-08T21:09:52.596Z] iter=554 turn=1 INFO:   -> ok (1916 chars)
-[2026-04-08T21:09:52.596Z] iter=554 turn=2 INFO: Turn 2/25
-[2026-04-08T21:09:55.153Z] iter=554 turn=2 INFO: Agent: Now let me check the test file to understand the structure:
-[2026-04-08T21:09:55.154Z] iter=554 turn=2 INFO: $ ls src/__tests__/ | grep session
-[2026-04-08T21:09:55.164Z] iter=554 turn=2 INFO:   -> exit=0 (46 chars)
-[2026-04-08T21:09:55.164Z] iter=554 turn=3 INFO: Turn 3/25
-[2026-04-08T21:09:58.122Z] iter=554 turn=3 INFO: Agent: I have all the context I need. Let me build all three changes now.
-[2026-04-08T21:09:58.122Z] iter=554 turn=3 INFO: read_file: src/__tests__/session-history.test.ts
-[2026-04-08T21:09:58.122Z] iter=554 turn=3 INFO:   -> ok (2772 chars)
-[2026-04-08T21:09:58.123Z] iter=554 turn=4 INFO: Turn 4/25
-[2026-04-08T21:10:05.223Z] iter=554 turn=4 INFO: Agent: Now I'll make all three changes simultaneously:
-[2026-04-08T21:10:05.224Z] iter=554 turn=4 INFO: write_file: src/session-history.ts (patch)
-[2026-04-08T21:10:05.226Z] iter=554 turn=4 INFO:   -> ok: Patched src/session-history.ts: -16 +41 lines
-
-Context after patch:
-29 |   fs.appendFileSync(file, JSON.stringify(entry) + "\n", "utf8");
-30 | }
-31 | 
-32 | export function getRecentSessions(n = 10): SessionHistoryEntry[] {
-33 |   const file = historyFilePath();
-34 |   if (!fs.existsSync(file)) return [];
-35 |   const lines = fs.readFileSync(file, "utf8").trim().split("\n").filter(Boolean);
-36 |   return lines
-37 |     .slice(-n)
-38 |     .map((line) => {
-39 |       try {
-40 |         return JSON.parse(line) as SessionHistoryEntry;
-41 |       } catch {
-42 |         return null;
-43 |       }
-44 |     })
-45 |     .filter((e): e is SessionHistoryEntry => e !== null)
-46 |     .reverse();
-47 | }
-48 | 
-49 | export function searchSessions(query: string, limit = 50): SessionHistoryEntry[] {
-50 |   const file = historyFilePath();
-51 |   if (!fs.existsSync(file)) return [];
-52 |   const lower = query.toLowerCase();
-53 |   const lines = fs.readFileSync(file, "utf8").trim().split("\n").filter(Boolean);
-54 |   return lines
-55 |     .map((line) => {
-56 |       try {
-57 |         return JSON.parse(line) as SessionHistoryEntry;
-58 |       } catch {
-59 |         return null;
-60 |       }
-61 |     })
-62 |     .filter((e): e is SessionHistoryEntry => e !== null && e.firstMessage.toLowerCase().includes(lower))
-63 |     .slice(-limit)
-64 |     .reverse();
-65 | }
-66 | 
-67 | export function clearSessionHistory(): void {
-68 |   const file = historyFilePath();
-69 |   if (fs.existsSync(file)) {
-70 |     fs.unlinkSync(file);
-71 |   }
-72 | }
-73 | 
-[2026-04-08T21:10:05.226Z] iter=554 turn=5 INFO: Turn 5/25
-[2026-04-08T21:10:07.643Z] iter=554 turn=5 INFO: Agent: Now update the `/sessions` command in tui-commands.ts to import and use the new functions:
-[2026-04-08T21:10:07.643Z] iter=554 turn=5 INFO: grep: "getRecentSessions" in src/tui-commands.ts
-[2026-04-08T21:10:07.657Z] iter=554 turn=5 INFO:   -> 2 matches
-[2026-04-08T21:10:07.657Z] iter=554 turn=6 INFO: Turn 6/25
-[2026-04-08T21:10:11.627Z] iter=554 turn=6 INFO: Agent: **Goal status:**
-- ✅ `searchSessions` + `clearSessionHistory` in session-history.ts — DONE
-- 🔄 Update `/sessions` import + handler in tui-commands.ts — IN PROGRESS
-- ❌ Tests — NOT STARTED
-
-Continuing now:
-[2026-04-08T21:10:11.627Z] iter=554 turn=6 INFO: write_file: src/tui-commands.ts (patch)
-[2026-04-08T21:10:11.628Z] iter=554 turn=6 INFO:   -> ok: Patched src/tui-commands.ts: -1 +1 lines
-
-Context after patch:
-19 | import { runDream } from "./dream.js";
-20 | import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
-21 | import { checkpointManager } from "./checkpoint.js";
-22 | import { getRecentSessions, searchSessions, clearSessionHistory } from "./session-history.js";
-23 | 
-24 | export interface FooterStats {
-25 |   tokensIn: number;
-[2026-04-08T21:10:11.629Z] iter=554 turn=7 INFO: Turn 7/25
-[2026-04-08T21:10:21.268Z] iter=554 turn=7 INFO: write_file: src/tui-commands.ts (patch)
-[2026-04-08T21:10:21.271Z] iter=554 turn=7 INFO:   -> ok: Patched src/tui-commands.ts: -15 +37 lines
-
-Context after patch:
-1 | /**
-2 |  * TUI command router — extracted from tui.tsx to keep the App component focused on layout.
-3 |  *
-4 |  * Each slash command is a handler function that receives a CommandContext.
-5 |  */
-6 | 
-7 | import path from "path";
-8 | import { execSync } from "child_process";
-9 | import Anthropic from "@anthropic-ai/sdk";
-10 | import type { Orchestrator } from "./orchestrator.js";
-11 | import type { Message } from "./tui.js";
-12 | import type { SessionInfo } from "./session-store.js";
-13 | import { listSessions } from "./session-store.js";
-14 | import { undoLastCommit } from "./auto-commit.js";
-15 | import { buildRepoMap, fuzzySearch, type RepoMap } from "./tree-sitter-map.js";
-16 | import { runInit } from "./init-command.js";
-17 | import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
-18 | import { handlePlanCommand } from "./plan-commands.js";
-19 | import { runDream } from "./dream.js";
-20 | import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
-21 | import { checkpointManager } from "./checkpoint.js";
-22 | import { getRecentSessions, searchSessions, clearSessionHistory } from "./session-history.js";
-23 | 
-24 | export interface FooterStats {
-25 |   tokensIn: number;
-26 |   tokensOut: number;
-27 |   cost: number;
-28 |   model: string;
-29 |   contextTokens: number;
-30 |   contextLimit: number;
-31 | }
-32 | 
-33 | export interface CommandContext {
-34 |   workDir: string;
-35 |   orchestratorRef: React.MutableRefObject<Orchestrator | null>;
-36 |   messages: Message[];
-37 |   addMessage: (msg: Message) => void;
-38 |   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-39 |   setStatus: (s: string) => void;
-40 |   setLoading: (b: boolean) => void;
-[2026-04-08T21:10:21.272Z] iter=554 turn=8 INFO: Turn 8/25
-[2026-04-08T21:10:32.123Z] iter=554 turn=8 INFO: Agent: Now add the tests:
-[2026-04-08T21:10:32.124Z] iter=554 turn=8 INFO: write_file: src/__tests__/session-history.test.ts (patch)
-[2026-04-08T21:10:32.126Z] iter=554 turn=8 INFO:   -> ok: Patched src/__tests__/session-history.test.ts: -9 +28 lines
-
-Context after patch:
-55 |     expect(sessions).toEqual([]);
-56 |   });
-57 | 
-58 |   it("getRecentSessions respects n limit", async () => {
-59 |     const { recordSession, getRecentSessions } = await import("../session-history.js");
-60 |     for (let i = 0; i < 15; i++) {
-61 |       recordSession({ date: `2025-01-${String(i + 1).padStart(2, "0")}T00:00:00.000Z`, turns: i, cost: 0.01 * i, inputTokens: i * 10, outputTokens: i * 5, firstMessage: `msg ${i}`, model: "m" });
-62 |     }
-63 |     const sessions = getRecentSessions(5);
-64 |     expect(sessions).toHaveLength(5);
-65 |   });
-66 | 
-67 |   it("searchSessions returns only matching entries", async () => {
-68 |     const { recordSession, searchSessions } = await import("../session-history.js");
-69 |     recordSession({ date: "2025-01-01T00:00:00.000Z", turns: 2, cost: 0.01, inputTokens: 100, outputTokens: 50, firstMessage: "Fix the login bug", model: "m" });
-70 |     recordSession({ date: "2025-01-02T00:00:00.000Z", turns: 3, cost: 0.02, inputTokens: 200, outputTokens: 100, firstMessage: "Refactor the database layer", model: "m" });
-71 |     recordSession({ date: "2025-01-03T00:00:00.000Z", turns: 4, cost: 0.03, inputTokens: 300, outputTokens: 150, firstMessage: "Add login tests", model: "m" });
-72 |     const results = searchSessions("login");
-73 |     expect(results).toHaveLength(2);
-74 |     expect(results.every((r) => r.firstMessage.toLowerCase().includes("login"))).toBe(true);
-75 |   });
-76 | 
-77 |   it("clearSessionHistory removes the history file", async () => {
-78 |     const { recordSession, clearSessionHistory, getRecentSessions } = await import("../session-history.js");
-79 |     recordSession({ date: "2025-01-01T00:00:00.000Z", turns: 1, cost: 0.01, inputTokens: 10, outputTokens: 5, firstMessage: "hello", model: "m" });
-80 |     expect(getRecentSessions(10)).toHaveLength(1);
-81 |     clearSessionHistory();
-82 |     expect(fs.existsSync(historyFile)).toBe(false);
-83 |     expect(getRecentSessions(10)).toEqual([]);
-84 |   });
-85 | });
-86 | 
-[2026-04-08T21:10:32.126Z] iter=554 turn=9 INFO: Turn 9/25
-[2026-04-08T21:10:37.626Z] iter=554 turn=9 INFO: Agent: Now run the tests and TypeScript check:
-[2026-04-08T21:10:37.627Z] iter=554 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/session-history.test.ts 2>&1
-[2026-04-08T21:10:38.616Z] iter=554 turn=9 INFO:   -> exit=0 (285 chars)
-[2026-04-08T21:10:38.617Z] iter=554 turn=10 INFO: Turn 10/25
-[2026-04-08T21:10:40.516Z] iter=554 turn=10 INFO: Agent: All 3 goals are DONE. Running final checks now.
-[2026-04-08T21:10:40.516Z] iter=554 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-08T21:10:41.695Z] iter=554 turn=10 INFO:   -> exit=0 (11 chars)
-[2026-04-08T21:10:41.696Z] iter=554 turn=11 INFO: Turn 11/25
-[2026-04-08T21:10:46.276Z] iter=554 turn=11 INFO: Agent: Clean. Now write memory and update goals:
-[2026-04-08T21:10:46.276Z] iter=554 turn=11 INFO: save_memory: "[Engineer] Iteration 554"
-[2026-04-08T21:10:46.277Z] iter=554 turn=11 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T21:10:46.278Z] iter=554 turn=12 INFO: Turn 12/25
-[2026-04-08T21:10:59.973Z] iter=554 turn=12 INFO: write_file: goals.md (write)
-[2026-04-08T21:10:59.974Z] iter=554 turn=12 INFO:   -> ok: Updated goals.md (1868 chars, -17 lines delta)
-[2026-04-08T21:10:59.975Z] iter=554 turn=13 INFO: Turn 13/25
-[2026-04-08T21:11:02.227Z] iter=554 turn=13 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T21:11:02.228Z] iter=554 turn=13 INFO: RESTART signal
-[2026-04-08T21:11:02.229Z] iter=554 turn=13 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T21:11:03.367Z] iter=554 turn=13 INFO: Compilation OK
-[2026-04-08T21:11:12.957Z] iter=554 turn=13 INFO: Cache persisted: 66 entries to .autoagent-cache.json
-[2026-04-08T21:11:12.958Z] iter=554 turn=13 INFO: Cache stats: 0 hits, 4 misses, 66 entries, 5 invalidations (4 entries removed)
-[2026-04-08T21:11:12.958Z] iter=554 turn=13 INFO: Tool cache stats
-[2026-04-08T21:11:12.958Z] iter=554 turn=13 INFO: Tool timing: bash: 4x, avg=546ms, total=2183ms; grep: 1x, avg=14ms, total=14ms; write_file: 5x, avg=2ms, total=11ms; read_file: 3x, avg=1ms, total=4ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-08T21:11:12.958Z] iter=554 turn=13 INFO: Tool timing stats
-[2026-04-08T21:11:21.910Z] iter=554 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 554: predicted 15 turns, actual 13 turns, ratio 0.87**
-[2026-04-08T21:11:31.307Z] iter=554 turn=13 INFO: Pre-commit review (2072in/342out): - **Padding change regression**: The original code used `cost.padStart(6)` but `formatSession` now uses `cost.padStart(7)`. This silently changes the display formatting for the default `/sessions` lis
-[2026-04-08T21:11:31.350Z] iter=554 turn=13 INFO: Committed: 4fb23c2f (23 in / 4104 out, cache: 13611 created, 133634 read)
-[2026-04-08T21:11:31.351Z] iter=554 turn=13 INFO: Restarting as iteration 555...
-[2026-04-08T21:11:31.540Z] iter=555 INFO: Cache restored: 66/66 entries (0 stale)
-[2026-04-08T21:11:31.543Z] iter=555 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
-[2026-04-08T21:11:31.543Z] iter=555 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-08T21:11:31.733Z] iter=555 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-08T21:11:31.733Z] iter=555 turn=1 INFO: Turn 1/25
-[2026-04-08T21:11:36.232Z] iter=555 turn=1 INFO: Agent: 
-
-I'll start by doing the verification checks outlined in the goals, then assess the current state before writing the next Engineer goals.
-[2026-04-08T21:11:36.233Z] iter=555 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "autoTitle\|sessionTitle\|llmTitle" src/*.ts
 [2026-04-08T21:11:36.234Z] iter=555 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "toolUsage\|toolCount\|toolStats" src/orchestrator.ts | head -20
 [2026-04-08T21:11:36.234Z] iter=555 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n '"/help"\|/help' src/tui-commands.ts | head -20
 [2026-04-08T21:11:36.246Z] iter=555 turn=1 INFO:   -> exit=0 (86 chars)
@@ -1057,3 +843,184 @@ I'm the Architect — my deliverable is `goals.md`, not src/ changes. That's don
 [2026-04-08T21:23:08.042Z] iter=561 turn=8 INFO: Tool timing stats
 [2026-04-08T21:23:16.884Z] iter=561 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 561: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-08T21:23:16.911Z] iter=561 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T21:23:16.950Z] iter=561 turn=8 INFO: Committed: 0f17d83e (18 in / 2360 out, cache: 12178 created, 62360 read)
+[2026-04-08T21:23:16.950Z] iter=561 turn=8 INFO: Restarting as iteration 562...
+[2026-04-08T21:23:17.155Z] iter=562 INFO: Cache restored: 69/69 entries (0 stale)
+[2026-04-08T21:23:17.157Z] iter=562 INFO: Turn budget: 13/25 (calibration=1.00x, predicted=10)
+[2026-04-08T21:23:17.158Z] iter=562 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T21:23:17.360Z] iter=562 INFO: Hard turn cap: 15 (1.5x prediction of 10)
+[2026-04-08T21:23:17.360Z] iter=562 turn=1 INFO: Turn 1/25
+[2026-04-08T21:23:20.217Z] iter=562 turn=1 INFO: Agent: I'll start by reading the relevant files to understand the current state before making changes.
+[2026-04-08T21:23:20.217Z] iter=562 turn=1 INFO: $ sed -n '310,400p' src/tui-commands.ts
+[2026-04-08T21:23:20.218Z] iter=562 turn=1 INFO: $ sed -n '1,30p' src/session-history.ts
+[2026-04-08T21:23:20.226Z] iter=562 turn=1 INFO:   -> exit=0 (748 chars)
+[2026-04-08T21:23:20.226Z] iter=562 turn=1 INFO:   -> exit=0 (3922 chars)
+[2026-04-08T21:23:20.226Z] iter=562 turn=2 INFO: Turn 2/25
+[2026-04-08T21:23:27.144Z] iter=562 turn=2 INFO: think: Goal 1 is already done! The `/status` handler already has the tool usage section (lines ~370-379). Let me verify by look...
+[2026-04-08T21:23:27.145Z] iter=562 turn=3 INFO: Turn 3/25
+[2026-04-08T21:23:29.867Z] iter=562 turn=3 INFO: Agent: Goal 1 is already implemented. Let me check Goal 2 status and implement it immediately.
+[2026-04-08T21:23:29.867Z] iter=562 turn=3 INFO: $ grep -n "notes\|annotateLastSession" src/session-history.ts src/tui-commands.ts
+[2026-04-08T21:23:29.877Z] iter=562 turn=3 INFO:   -> exit=1 (11 chars)
+[2026-04-08T21:23:29.877Z] iter=562 turn=4 INFO: Turn 4/25
+[2026-04-08T21:23:33.045Z] iter=562 turn=4 INFO: Agent: **Goal 1**: DONE (already implemented in codebase)
+**Goal 2**: NOT STARTED — implementing now
+[2026-04-08T21:23:33.046Z] iter=562 turn=4 INFO: $ grep -n "getRecentSessions\|searchSessions\|clearSessionHistory\|formatSession\|sessions.*note\|note.*sessions" src/session-history.ts src/tui-commands.ts | head -30
+[2026-04-08T21:23:33.056Z] iter=562 turn=4 INFO:   -> exit=0 (985 chars)
+[2026-04-08T21:23:33.057Z] iter=562 turn=5 INFO: Turn 5/25
+[2026-04-08T21:23:34.889Z] iter=562 turn=5 INFO: $ sed -n '695,745p' src/tui-commands.ts
+[2026-04-08T21:23:34.900Z] iter=562 turn=5 INFO:   -> exit=0 (1964 chars)
+[2026-04-08T21:23:34.900Z] iter=562 turn=6 INFO: Turn 6/25
+[2026-04-08T21:23:38.471Z] iter=562 turn=6 INFO: Agent: Now I have everything I need. Let me implement Goal 2:
+[2026-04-08T21:23:38.472Z] iter=562 turn=6 INFO: write_file: src/session-history.ts (patch)
+[2026-04-08T21:23:38.474Z] iter=562 turn=6 INFO:   -> ok: Patched src/session-history.ts: -9 +10 lines
+
+Context after patch:
+6 | import os from "os";
+7 | import path from "path";
+8 | 
+9 | export interface SessionHistoryEntry {
+10 |   date: string;       // ISO string
+11 |   turns: number;
+12 |   cost: number;
+13 |   inputTokens: number;
+14 |   outputTokens: number;
+15 |   firstMessage: string;
+16 |   model: string;
+17 |   notes?: string[];
+18 | }
+19 | 
+20 | function historyFilePath(): string {
+21 |   const dir = path.join(os.homedir(), ".autoagent");
+[2026-04-08T21:23:38.474Z] iter=562 turn=7 INFO: Turn 7/25
+[2026-04-08T21:23:40.933Z] iter=562 turn=7 INFO: Agent: I've changed `session-history.ts`. Now adding `annotateLastSession` and updating `tui-commands.ts` — then done.
+[2026-04-08T21:23:40.934Z] iter=562 turn=7 INFO: $ tail -10 src/session-history.ts
+[2026-04-08T21:23:40.942Z] iter=562 turn=7 INFO:   -> exit=0 (178 chars)
+[2026-04-08T21:23:40.942Z] iter=562 turn=8 INFO: Turn 8/25
+[2026-04-08T21:23:45.332Z] iter=562 turn=8 INFO: write_file: src/session-history.ts (patch)
+[2026-04-08T21:23:45.333Z] iter=562 turn=8 INFO:   -> ok: Patched src/session-history.ts: -6 +18 lines
+
+Context after patch:
+65 |     .reverse();
+66 | }
+67 | 
+68 | export function clearSessionHistory(): void {
+69 |   const file = historyFilePath();
+70 |   if (fs.existsSync(file)) {
+71 |     fs.unlinkSync(file);
+72 |   }
+73 | }
+74 | 
+75 | export function annotateLastSession(note: string): boolean {
+76 |   const file = historyFilePath();
+77 |   if (!fs.existsSync(file)) return false;
+78 |   const lines = fs.readFileSync(file, "utf8").split("\n").filter(l => l.trim());
+79 |   if (lines.length === 0) return false;
+80 |   const last = JSON.parse(lines[lines.length - 1]) as SessionHistoryEntry;
+81 |   last.notes = [...(last.notes ?? []), note];
+82 |   lines[lines.length - 1] = JSON.stringify(last);
+83 |   fs.writeFileSync(file, lines.join("\n") + "\n", "utf8");
+84 |   return true;
+85 | }
+86 | 
+[2026-04-08T21:23:45.334Z] iter=562 turn=9 INFO: Turn 9/25
+[2026-04-08T21:23:48.404Z] iter=562 turn=9 INFO: Agent: Now updating tui-commands.ts, then wrapping up.
+[2026-04-08T21:23:48.404Z] iter=562 turn=9 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T21:23:48.405Z] iter=562 turn=9 INFO:   -> ok: Patched src/tui-commands.ts: -1 +1 lines
+
+Context after patch:
+19 | import { runDream } from "./dream.js";
+20 | import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
+21 | import { checkpointManager } from "./checkpoint.js";
+22 | import { getRecentSessions, searchSessions, clearSessionHistory, annotateLastSession } from "./session-history.js";
+23 | 
+24 | export interface FooterStats {
+25 |   tokensIn: number;
+[2026-04-08T21:23:48.405Z] iter=562 turn=10 INFO: Turn 10/25
+[2026-04-08T21:23:53.935Z] iter=562 turn=10 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T21:23:53.936Z] iter=562 turn=10 INFO:   -> ok: Patched src/tui-commands.ts: -6 +7 lines
+
+Context after patch:
+700 |   },
+701 | 
+702 |   "/sessions": async (ctx, args) => {
+703 |     const formatSession = (s: import("./session-history.js").SessionHistoryEntry) => {
+704 |       const date = new Date(s.date).toLocaleDateString("en-CA"); // YYYY-MM-DD
+705 |       const cost = `${s.cost.toFixed(2)}`;
+706 |       const topic = s.firstMessage.length > 40 ? s.firstMessage.slice(0, 40) + "…" : s.firstMessage;
+707 |       const notesSuffix = s.notes?.length ? ` [${s.notes.length} note(s)]` : "";
+708 |       return `${date}  ${String(s.turns).padStart(2)} turns  ${cost.padStart(7)}  "${topic}"${notesSuffix}`;
+709 |     };
+710 | 
+711 |     if (args.startsWith("search ")) {
+712 |       const query = args.slice("search ".length).trim();
+[2026-04-08T21:23:53.937Z] iter=562 turn=11 INFO: Turn 11/25
+[2026-04-08T21:23:58.248Z] iter=562 turn=11 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T21:23:58.249Z] iter=562 turn=11 INFO:   -> ok: Patched src/tui-commands.ts: -5 +16 lines
+
+Context after patch:
+723 |       return true;
+724 |     }
+725 | 
+726 |     if (args === "clear") {
+727 |       clearSessionHistory();
+728 |       ctx.addMessage({ role: "assistant", content: "✓ Session history cleared." });
+729 |       return true;
+730 |     }
+731 | 
+732 |     if (args.startsWith("note ")) {
+733 |       const text = args.slice("note ".length).trim();
+734 |       if (!text) {
+735 |         ctx.addMessage({ role: "assistant", content: "Usage: /sessions note <text>" });
+736 |         return true;
+737 |       }
+738 |       const ok = annotateLastSession(text);
+739 |       ctx.addMessage({ role: "assistant", content: ok ? "✓ Note added to last session." : "No session history found to annotate." });
+740 |       return true;
+741 |     }
+742 | 
+743 |     const sessions = getRecentSessions(10);
+744 |     if (sessions.length === 0) {
+[2026-04-08T21:23:58.250Z] iter=562 turn=12 INFO: Turn 12/25
+[2026-04-08T21:24:00.180Z] iter=562 turn=12 INFO: $ npx tsc --noEmit 2>&1 && npx vitest run 2>&1 | tail -5
+[2026-04-08T21:24:20.090Z] iter=562 turn=12 INFO:   -> exit=0 (196 chars)
+[2026-04-08T21:24:20.090Z] iter=562 turn=13 INFO: Turn 13/25
+[2026-04-08T21:24:24.656Z] iter=562 turn=13 INFO: Agent: All tests pass. Now write memory and update goals.
+[2026-04-08T21:24:24.657Z] iter=562 turn=13 INFO: save_memory: "[Engineer] Iteration 562"
+[2026-04-08T21:24:24.659Z] iter=562 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T21:24:24.660Z] iter=562 turn=14 INFO: Turn 14/25
+[2026-04-08T21:24:36.039Z] iter=562 turn=14 INFO: write_file: goals.md (write)
+[2026-04-08T21:24:36.039Z] iter=562 turn=14 INFO:   -> ok: Updated goals.md (1504 chars, -38 lines delta)
+[2026-04-08T21:24:36.040Z] iter=562 turn=15 INFO: Turn 15/25
+[2026-04-08T21:24:38.089Z] iter=562 turn=15 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T21:24:38.089Z] iter=562 turn=15 INFO: RESTART signal
+[2026-04-08T21:24:38.090Z] iter=562 turn=15 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T21:24:39.241Z] iter=562 turn=15 INFO: Compilation OK
+[2026-04-08T21:24:49.857Z] iter=562 turn=15 INFO: Cache persisted: 66 entries to .autoagent-cache.json
+[2026-04-08T21:24:49.858Z] iter=562 turn=15 INFO: Tool timing: bash: 8x, avg=2496ms, total=19967ms; write_file: 6x, avg=2ms, total=10ms; save_memory: 1x, avg=3ms, total=3ms; think: 1x, avg=0ms, total=0ms
+[2026-04-08T21:24:49.858Z] iter=562 turn=15 INFO: Tool timing stats
+[2026-04-08T21:45:16.108Z] iter=562 INFO: Cache restored: 65/66 entries (1 stale)
+[2026-04-08T21:45:16.111Z] iter=562 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
+[2026-04-08T21:45:16.111Z] iter=562 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T21:45:16.318Z] iter=562 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-08T21:45:16.318Z] iter=562 turn=1 INFO: Turn 1/25
+[2026-04-08T21:45:18.395Z] iter=562 turn=1 INFO: read_file: goals.md
+[2026-04-08T21:45:18.396Z] iter=562 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T21:45:18.396Z] iter=562 turn=1 INFO:   -> ok (1504 chars)
+[2026-04-08T21:45:18.396Z] iter=562 turn=2 INFO: Turn 2/25
+[2026-04-08T21:45:21.132Z] iter=562 turn=2 INFO: think: I'm in iteration 563 (Meta). My goal is to write goals.md for iteration 564 (Engineer). I need to:
+1. Verify which featu...
+[2026-04-08T21:45:21.132Z] iter=562 turn=3 INFO: Turn 3/25
+[2026-04-08T21:45:23.588Z] iter=562 turn=3 INFO: $ grep -n "sessions view\|sessions note\|formatSession\|notes.*session\|\/help\|category.*command\|command.*category" src/tui-commands.ts | head -40
+[2026-04-08T21:45:23.595Z] iter=562 turn=3 INFO:   -> exit=0 (531 chars)
+[2026-04-08T21:45:23.596Z] iter=562 turn=4 INFO: Turn 4/25
+[2026-04-08T21:45:25.787Z] iter=562 turn=4 INFO: Agent: My single goal: write goals.md for iteration 564 (Engineer). Status: **NOT STARTED**. Writing it now.
+[2026-04-08T21:45:25.787Z] iter=562 turn=4 INFO: $ grep -n "sessions view\|\/sessions" src/tui-commands.ts | head -20
+[2026-04-08T21:45:25.794Z] iter=562 turn=4 INFO:   -> exit=0 (309 chars)
+[2026-04-08T21:45:25.794Z] iter=562 turn=5 INFO: Turn 5/25
+[2026-04-08T21:45:27.912Z] iter=562 turn=5 INFO: $ grep -n "formatSession" src/tui-commands.ts
+[2026-04-08T21:45:27.917Z] iter=562 turn=5 INFO:   -> exit=0 (343 chars)
+[2026-04-08T21:45:27.918Z] iter=562 turn=6 INFO: Turn 6/25
+[2026-04-08T21:45:33.110Z] iter=562 turn=6 INFO: Agent: I'm Meta — my job is to write goals.md, not src/ changes. Writing now.
+[2026-04-08T21:45:33.110Z] iter=562 turn=6 INFO: $ sed -n '711,760p' src/tui-commands.ts
+[2026-04-08T21:45:33.115Z] iter=562 turn=6 INFO:   -> exit=0 (2057 chars)
+[2026-04-08T21:45:33.116Z] iter=562 turn=7 INFO: Turn 7/25

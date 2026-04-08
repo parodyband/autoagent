@@ -11,7 +11,9 @@ import { detectProject, type ProjectSummary } from "./project-detector.js";
 import { buildRepoMap, formatRepoMap, rankSymbols } from "./tree-sitter-map.js";
 
 const AUTOAGENT_MD = ".autoagent.md";
-const HAIKU_MODEL = "claude-haiku-4-5";
+import { MODEL_HAIKU } from "./models.js";
+
+const HAIKU_MODEL = MODEL_HAIKU;
 
 /** Read package.json scripts for build/test/run commands */
 function readPackageScripts(workDir: string): Record<string, string> {

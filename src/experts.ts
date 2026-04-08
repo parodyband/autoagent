@@ -16,6 +16,7 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync } from "fs";
 import path from "path";
 import type { IterationState } from "./iteration.js";
+import { MODEL_SONNET, MODEL_OPUS } from "./models.js";
 
 export interface Expert {
   name: string;
@@ -27,7 +28,7 @@ export interface Expert {
 
 const ENGINEER: Expert = {
   name: "Engineer",
-  model: "claude-sonnet-4-6",
+  model: MODEL_SONNET,
   prompt: `You are the Engineer for AutoAgent.
 
 ## Mission
@@ -65,7 +66,7 @@ Grep for similar functionality first. Extend existing code over creating new fil
 
 const ARCHITECT: Expert = {
   name: "Architect",
-  model: "claude-opus-4-6",
+  model: MODEL_OPUS,
   prompt: `You are the Architect for AutoAgent.
 
 ## Mission
@@ -111,7 +112,7 @@ At least once every 3 Architect iterations, spend time researching:
 
 const META: Expert = {
   name: "Meta",
-  model: "claude-opus-4-6",
+  model: MODEL_OPUS,
   prompt: `You are the Meta expert for AutoAgent.
 
 ## Mission
@@ -182,7 +183,7 @@ export function parseExpertFile(content: string): Expert | null {
 
   return {
     name: nameMatch[1].trim(),
-    model: modelMatch ? modelMatch[1].trim() : "claude-sonnet-4-6",
+    model: modelMatch ? modelMatch[1].trim() : MODEL_SONNET,
     prompt,
   };
 }

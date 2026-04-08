@@ -18,6 +18,7 @@ import { execSync } from "child_process";
 import "dotenv/config";
 import { Orchestrator } from "./orchestrator.js";
 import { runInit } from "./init-command.js";
+import { MODEL_ALIASES, MODEL_SONNET } from "./models.js";
 
 // ─── Parse args ─────────────────────────────────────────────
 
@@ -31,12 +32,7 @@ if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
 
 /** Expand shorthand model aliases to full model IDs. */
 export function resolveModelAlias(alias: string): string {
-  const modelMap: Record<string, string> = {
-    haiku: "claude-haiku-4-5",
-    sonnet: "claude-sonnet-4-6",
-    opus: "claude-opus-4-6",
-  };
-  return modelMap[alias.toLowerCase()] ?? alias;
+  return MODEL_ALIASES[alias.toLowerCase()] ?? alias;
 }
 
 const VALID_ALIASES = new Set(["haiku", "sonnet", "opus"]);
@@ -53,7 +49,7 @@ if (modelIdx !== -1) {
   if (!VALID_ALIASES.has(modelArg.toLowerCase()) && !modelArg.startsWith("claude-")) {
     console.error(
       `Error: unknown model "${modelArg}". ` +
-      `Use: haiku, sonnet, opus, or a full model ID (e.g. claude-sonnet-4-6).`
+      `Use: haiku, sonnet, opus, or a full model ID (e.g. ${MODEL_SONNET}).`
     );
     process.exit(1);
   }
@@ -245,11 +241,7 @@ function prompt() {
         console.log(`Current model: ${current}\n`);
       } else {
         // Expand shorthand: "sonnet" → full name, "haiku" → full name
-        const modelMap: Record<string, string> = {
-          sonnet: "claude-sonnet-4-6",
-          haiku: "claude-haiku-4-5",
-        };
-        const resolved = modelMap[arg.toLowerCase()] ?? arg;
+        const resolved = MODEL_ALIASES[arg.toLowerCase()] ?? arg;
         orchestrator.setModel(resolved);
         console.log(`Model set to: ${resolved}\n`);
       }

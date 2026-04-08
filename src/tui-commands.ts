@@ -568,11 +568,7 @@ const commands: Record<string, CommandHandler> = {
   },
 
   "/model": async (ctx, arg) => {
-    const MODEL_ALIASES: Record<string, string> = {
-      haiku: "claude-haiku-4-5",
-      sonnet: "claude-sonnet-4-6",
-      opus: "claude-opus-4-6",
-    };
+    const { MODEL_ALIASES } = await import("./models.js");
     if (!arg) {
       const current = ctx.orchestratorRef.current?.getModel() ?? "auto";
       ctx.addMessage({ role: "assistant", content: `Current model: ${current}` });

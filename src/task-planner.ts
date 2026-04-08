@@ -6,6 +6,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import { MODEL_HAIKU } from "./models.js";
 import fs from "fs";
 import path from "path";
 
@@ -295,7 +296,7 @@ Rules:
   const userPrompt = `Project context:\n${projectContext}\n\nUser request:\n${userRequest}`;
 
   const response = await client.messages.create({
-    model: "claude-haiku-4-5",
+    model: MODEL_HAIKU,
     max_tokens: 2048,
     system: systemPrompt,
     messages: [{ role: "user", content: userPrompt }],

@@ -3,11 +3,17 @@
  * Estimates USD cost from token usage per model.
  */
 
+import { MODEL_OPUS, MODEL_SONNET, MODEL_HAIKU } from "./models.js";
+
 // Model pricing per 1M tokens (input/output) as of 2025
 const PRICING: Record<string, { input: number; output: number }> = {
+  [MODEL_SONNET]: { input: 3, output: 15 },
+  [MODEL_OPUS]: { input: 15, output: 75 },
+  [MODEL_HAIKU]: { input: 1, output: 5 },
+  // Legacy model IDs for historical cost entries
   "claude-sonnet-4-20250514": { input: 3, output: 15 },
   "claude-opus-4-20250514": { input: 15, output: 75 },
-  "claude-haiku-3-20250307": { input: 0.25, output: 1.25 },
+  "claude-haiku-4-5-20251001": { input: 1, output: 5 },
   "claude-3-5-haiku-20241022": { input: 1, output: 5 },
   "claude-3-5-sonnet-20241022": { input: 3, output: 15 },
   "claude-3-7-sonnet-20250219": { input: 3, output: 15 },

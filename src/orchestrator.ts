@@ -68,8 +68,10 @@ export const PARALLEL_SAFE_TOOLS = new Set([
   "list_files",
 ]);
 
-const MODEL_COMPLEX = "claude-sonnet-4-6";
-const MODEL_SIMPLE = "claude-haiku-4-5";
+import { MODEL_SONNET, MODEL_HAIKU } from "./models.js";
+
+const MODEL_COMPLEX = MODEL_SONNET;
+const MODEL_SIMPLE = MODEL_HAIKU;
 const MAX_TOKENS = 16384;
 const MAX_ROUNDS = 30;
 
@@ -2720,7 +2722,7 @@ export async function runSingleTask(
   workDir: string,
   taskDescription: string,
 ): Promise<string> {
-  const model = "claude-sonnet-4-20250514";
+  const model = MODEL_SONNET;
   const registry = createDefaultRegistry();
   const { systemPrompt } = buildSystemPrompt(workDir, "");
   const messages: Anthropic.MessageParam[] = [

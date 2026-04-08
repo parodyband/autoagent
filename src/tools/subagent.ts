@@ -10,9 +10,11 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 
+import { MODEL_HAIKU, MODEL_SONNET } from "../models.js";
+
 const MODELS: Record<string, string> = {
-  fast: "claude-haiku-4-5-20251001",
-  balanced: "claude-sonnet-4-6",
+  fast: MODEL_HAIKU,
+  balanced: MODEL_SONNET,
 };
 
 /** Timeout in milliseconds per model tier. */

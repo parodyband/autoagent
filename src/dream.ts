@@ -8,6 +8,7 @@
 import fs from "fs";
 import path from "path";
 import Anthropic from "@anthropic-ai/sdk";
+import { MODEL_HAIKU } from "./models.js";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -52,7 +53,7 @@ export async function consolidateMemory(
   const userMessage = `EXISTING MEMORY:\n\`\`\`\n${existingMemory}\n\`\`\`\n\nRECENT SESSION LOG:\n\`\`\`\n${sessionLog.slice(0, 8000)}\n\`\`\``;
 
   const response = await client.messages.create({
-    model: "claude-haiku-4-5",
+    model: MODEL_HAIKU,
     max_tokens: 4096,
     messages: [
       { role: "user", content: `${CONSOLIDATE_PROMPT}\n\n${userMessage}` },

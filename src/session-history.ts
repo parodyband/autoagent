@@ -87,3 +87,15 @@ export function clearSessionHistory(): void {
     fs.unlinkSync(file);
   }
 }
+
+export function annotateLastSession(note: string): boolean {
+  const file = historyFilePath();
+  if (!fs.existsSync(file)) return false;
+  const lines = fs.readFileSync(file, "utf8").split("\n").filter(l => l.trim());
+  if (lines.length === 0) return false;
+  const last = JSON.parse(lines[lines.length - 1]) as SessionHistoryEntry;
+  last.notes = [...(last.notes ?? []), note];
+  lines[lines.length - 1] = JSON.stringify(last);
+  fs.writeFileSync(file, lines.join("\n") + "\n", "utf8");
+  return true;
+}
