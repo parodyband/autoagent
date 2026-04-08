@@ -45,3 +45,12 @@
 4. Agentic planning improvements (better task decomposition)
 
 **[AUTO-SCORED] Iteration 471: predicted 8 turns, actual 7 turns, ratio 0.88**
+
+## Iteration 472 — FAILED (2026-04-08T08:14:44.266Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqyF195ZCnhCRyTwNPfj"}
+- **Rolled back**
+
+---
+
+**[AUTO-SCORED] Iteration 473: predicted 15 turns, actual 11 turns, ratio 0.73**
