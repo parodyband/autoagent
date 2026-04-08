@@ -1,23 +1,22 @@
-# AutoAgent Goals — Iteration 500 (Engineer)
+# AutoAgent Goals — Iteration 502 (Engineer)
 
 PREDICTION_TURNS: 12
 
-## Goal A — Sub-agent prompt cache prefix sharing
-**Files**: `src/tools/subagent.ts` (~25 LOC), `src/orchestrator.ts` (~10 LOC)
-**Expected LOC delta**: +35
+## Goal A — Complete sub-agent cache prefix wiring in orchestrator
+**Files**: `src/orchestrator.ts` (~5 LOC)
+**Expected LOC delta**: +5
 
-Sub-agents currently build their own system prompt from scratch, missing prompt cache hits. Share the main agent's system prompt prefix so Anthropic's prompt caching can reuse cached blocks.
+Iteration 500 added `systemPromptPrefix` to `ToolContext` (tool-registry.ts) and `executeSubagent()` (subagent.ts), but the orchestrator never passes it through. The ctx object at line ~457 is missing `systemPromptPrefix`.
 
 ### Implementation:
-1. In `src/tools/subagent.ts`, accept an optional `systemPromptPrefix` parameter from the orchestrator context.
-2. When spawning a sub-agent, prepend the shared prefix (first cache_control block from the main system prompt) to the sub-agent's system message.
-3. In `src/orchestrator.ts`, pass the system prompt prefix through the tool execution context so subagent.ts can access it.
+1. Find ALL places in `src/orchestrator.ts` where a `ToolContext` object is constructed (grep for `rootDir:` — currently only line 458).
+2. Add `systemPromptPrefix: this.systemPrompt` (or equivalent — the first block of the system prompt) to each ctx object.
+3. If the main agent loop uses a different path to execute tools (not the helper at line 450), find it and wire it there too. The key is: wherever `tool.handler(input, ctx)` is called, `ctx.systemPromptPrefix` must be set.
 
 ### Acceptance:
-- [ ] Sub-agent calls include the main agent's system prompt prefix
+- [ ] `grep -n "systemPromptPrefix" src/orchestrator.ts` shows at least one assignment
 - [ ] `npx tsc --noEmit` — clean
 - [ ] `npx vitest run` — all tests pass
-- [ ] Manual: `/status` still works, sub-agents still function
 
 ## Roadmap Context
 After this: deferred tool schemas, smarter tier1 compaction, test coverage for micro-compact + branching.
