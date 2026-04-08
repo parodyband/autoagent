@@ -1446,12 +1446,15 @@ export class Orchestrator {
     // ── API call ─────────────────────────────────────────────────
     let raw: string;
     try {
-      const response = await this.client.messages.create({
-        model: MODEL_SIMPLE,
-        max_tokens: 512,
-        system: systemPrompt,
-        messages: [{ role: "user", content: userPrompt }],
-      });
+      const response = await retryWithBackoff(
+        () => this.client.messages.create({
+          model: MODEL_SIMPLE,
+          max_tokens: 512,
+          system: systemPrompt,
+          messages: [{ role: "user", content: userPrompt }],
+        }),
+        { maxRetries: 2, baseDelayMs: 1000 }
+      );
       const block = response.content[0];
       raw = block.type === "text" ? block.text.trim() : "";
     } catch {

@@ -1,83 +1,3 @@
-[2026-04-08T08:33:37.290Z] iter=477 turn=2 INFO: grep: "loopDetect|loop.*detect|detectLoop" in src/loop-detector.ts
-[2026-04-08T08:33:37.292Z] iter=477 turn=2 INFO:   -> ok (781 chars)
-[2026-04-08T08:33:37.331Z] iter=477 turn=2 INFO:   -> 0 matches
-[2026-04-08T08:33:37.349Z] iter=477 turn=2 INFO:   -> 0 matches
-[2026-04-08T08:33:37.350Z] iter=477 turn=3 INFO: Turn 3/25
-[2026-04-08T08:33:42.065Z] iter=477 turn=3 INFO: grep: "summariz" in src/orchestrator.ts
-[2026-04-08T08:33:42.105Z] iter=477 turn=3 INFO: read_file: src/loop-detector.ts
-[2026-04-08T08:33:42.106Z] iter=477 turn=3 INFO: grep: "context.*budget|token.*count|percent.*context|context.*percent|usage.*bar" in src/tui.tsx
-[2026-04-08T08:33:42.115Z] iter=477 turn=3 INFO:   -> 100 matches
-[2026-04-08T08:33:42.116Z] iter=477 turn=3 INFO:   -> ok (5358 chars)
-[2026-04-08T08:33:42.116Z] iter=477 turn=3 INFO:   -> 0 matches
-[2026-04-08T08:33:42.116Z] iter=477 turn=4 INFO: Turn 4/25
-[2026-04-08T08:33:57.402Z] iter=477 turn=4 INFO: Agent: 
-
-Status: **NOT STARTED** on the deliverable (goals.md). I have enough context now. Let me write it immediately.
-[2026-04-08T08:33:57.403Z] iter=477 turn=4 INFO: think: Based on my review:
-
-1. **Post-compaction re-injection** (shipped in 476): Good implementation. Scans backwards for read...
-[2026-04-08T08:33:57.403Z] iter=477 turn=5 INFO: Turn 5/25
-[2026-04-08T08:34:01.809Z] iter=477 turn=5 INFO: grep: "sessionTokensIn|onStatus" in src/orchestrator.ts
-[2026-04-08T08:34:01.836Z] iter=477 turn=5 INFO: grep: "statusLine|statusText|StatusBar|status.*bar" in src/tui.tsx
-[2026-04-08T08:34:01.846Z] iter=477 turn=5 INFO:   -> 0 matches
-[2026-04-08T08:34:01.847Z] iter=477 turn=5 INFO:   -> 0 matches
-[2026-04-08T08:34:01.847Z] iter=477 turn=6 INFO: Turn 6/25
-[2026-04-08T08:34:21.013Z] iter=477 turn=6 INFO: Agent: 
-
-Writing goals.md NOW. This is an Architect iteration — my deliverable is goals.md, not src/ changes.
-[2026-04-08T08:34:21.015Z] iter=477 turn=6 INFO: write_file: goals.md (write)
-[2026-04-08T08:34:21.019Z] iter=477 turn=6 INFO:   -> ok: Updated goals.md (2566 chars, +23 lines delta)
-[2026-04-08T08:34:21.021Z] iter=477 turn=7 INFO: Turn 7/25
-[2026-04-08T08:34:27.137Z] iter=477 turn=7 INFO: Agent: 
-
-Wrapping up now.
-[2026-04-08T08:34:27.137Z] iter=477 turn=7 INFO: save_memory: "[Architect] Iteration 477 review"
-[2026-04-08T08:34:27.138Z] iter=477 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T08:34:27.138Z] iter=477 turn=7 INFO: $ npx tsc --noEmit 2>&1 | tail -5
-[2026-04-08T08:34:28.254Z] iter=477 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-08T08:34:28.255Z] iter=477 turn=8 INFO: Turn 8/25
-[2026-04-08T08:34:31.124Z] iter=477 turn=8 INFO: Agent: TypeScript compiles clean. Goals.md written for Engineer 478.
-[2026-04-08T08:34:31.125Z] iter=477 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T08:34:31.125Z] iter=477 turn=8 INFO: RESTART signal
-[2026-04-08T08:34:31.125Z] iter=477 turn=8 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T08:34:32.284Z] iter=477 turn=8 INFO: Compilation OK
-[2026-04-08T08:34:41.165Z] iter=477 turn=8 INFO: Cache persisted: 72 entries to .autoagent-cache.json
-[2026-04-08T08:34:41.165Z] iter=477 turn=8 INFO: Cache stats: 0 hits, 10 misses, 72 entries, 1 invalidations (0 entries removed)
-[2026-04-08T08:34:41.165Z] iter=477 turn=8 INFO: Tool cache stats
-[2026-04-08T08:34:41.166Z] iter=477 turn=8 INFO: Tool timing: bash: 2x, avg=559ms, total=1117ms; grep: 6x, avg=35ms, total=212ms; read_file: 4x, avg=6ms, total=24ms; write_file: 1x, avg=6ms, total=6ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
-[2026-04-08T08:34:41.166Z] iter=477 turn=8 INFO: Tool timing stats
-[2026-04-08T08:34:48.991Z] iter=477 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 477: predicted 8 turns, actual 8 turns, ratio 1.00**
-[2026-04-08T08:34:49.014Z] iter=477 turn=8 INFO: Pre-commit review: no significant code changes to review
-[2026-04-08T08:34:49.048Z] iter=477 turn=8 INFO: Committed: f7e130ed (18 in / 2568 out, cache: 15282 created, 78499 read)
-[2026-04-08T08:34:49.048Z] iter=477 turn=8 INFO: Restarting as iteration 478...
-[2026-04-08T08:34:49.258Z] iter=478 INFO: Cache restored: 72/72 entries (0 stale)
-[2026-04-08T08:34:49.260Z] iter=478 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=15)
-[2026-04-08T08:34:49.260Z] iter=478 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-08T08:34:49.457Z] iter=478 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-08T08:34:49.457Z] iter=478 turn=1 INFO: Turn 1/25
-[2026-04-08T08:34:54.523Z] iter=478 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
-[2026-04-08T08:34:54.524Z] iter=478 turn=1 INFO: read_scratchpad: 450 chars
-[2026-04-08T08:34:54.530Z] iter=478 turn=1 INFO:   -> exit=0 (2566 chars)
-[2026-04-08T08:34:54.531Z] iter=478 turn=2 INFO: Turn 2/25
-[2026-04-08T08:35:00.532Z] iter=478 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "sessionTokensIn\|TIER2_THRESHOLD\|TIER_2\|150000\|100000\|80000\|compaction" src/orchestrator.ts | head -50
-[2026-04-08T08:35:00.535Z] iter=478 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "summarizeOldToolResults\|class Orchestrator\|getContext" src/orchestrator.ts | head -30
-[2026-04-08T08:35:00.551Z] iter=478 turn=2 INFO:   -> exit=0 (115 chars)
-[2026-04-08T08:35:00.554Z] iter=478 turn=2 INFO:   -> exit=0 (3152 chars)
-[2026-04-08T08:35:00.554Z] iter=478 turn=3 INFO: Turn 3/25
-[2026-04-08T08:35:06.427Z] iter=478 turn=3 INFO: think: I need to:
-1. Add `getContextUsage()` method to Orchestrator class in orchestrator.ts
-2. Add context budget indicator to...
-[2026-04-08T08:35:06.428Z] iter=478 turn=4 INFO: Turn 4/25
-[2026-04-08T08:35:10.321Z] iter=478 turn=4 INFO: read_file: src/orchestrator.ts
-[2026-04-08T08:35:10.322Z] iter=478 turn=4 INFO: read_file: src/orchestrator.ts
-[2026-04-08T08:35:10.323Z] iter=478 turn=4 INFO:   -> ok (1395 chars)
-[2026-04-08T08:35:10.324Z] iter=478 turn=4 INFO:   -> ok (3020 chars)
-[2026-04-08T08:35:10.324Z] iter=478 turn=5 INFO: Turn 5/25
-[2026-04-08T08:35:14.771Z] iter=478 turn=5 INFO: Agent: Now let me look at the TUI to find where to add the context indicator:
-[2026-04-08T08:35:14.771Z] iter=478 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onContextBudget\|contextBudget\|budgetRatio\|header\|Header\|status bar\|StatusBar\|sessionTokens" src/tui.tsx | head -40
-[2026-04-08T08:35:14.773Z] iter=478 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getContextUsage\|COMPACT_THRESHOLD\|COMPACT_TIER" src/orchestrator.ts | head -20
-[2026-04-08T08:35:14.783Z] iter=478 turn=5 INFO:   -> exit=0 (452 chars)
-[2026-04-08T08:35:14.786Z] iter=478 turn=5 INFO:   -> exit=0 (1208 chars)
 [2026-04-08T08:35:14.787Z] iter=478 turn=6 INFO: Turn 6/25
 [2026-04-08T08:35:19.062Z] iter=478 turn=6 INFO: Agent: Goal 1 (Context budget indicator): NOT STARTED
 Goal 2 (Age-aware summarization): NOT STARTED
@@ -1076,3 +996,122 @@ Context after patch:
 [2026-04-08T08:53:19.575Z] iter=487 turn=10 INFO: Tool timing stats
 [2026-04-08T08:53:27.678Z] iter=487 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 487: predicted 8 turns, actual 10 turns, ratio 1.25**
 [2026-04-08T08:53:27.700Z] iter=487 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T08:53:27.736Z] iter=487 turn=10 INFO: Committed: 79aba1a9 (20 in / 2308 out, cache: 11043 created, 79441 read)
+[2026-04-08T08:53:27.736Z] iter=487 turn=10 INFO: Restarting as iteration 488...
+[2026-04-08T08:53:27.945Z] iter=488 INFO: Cache restored: 67/67 entries (0 stale)
+[2026-04-08T08:53:27.947Z] iter=488 INFO: Turn budget: 16/25 (calibration=1.25x, predicted=15)
+[2026-04-08T08:53:27.947Z] iter=488 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T08:53:28.157Z] iter=488 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T08:53:28.158Z] iter=488 turn=1 INFO: Turn 1/25
+[2026-04-08T08:53:31.701Z] iter=488 turn=1 INFO: $ grep -n "retryWithBackoff" src/orchestrator.ts | head -20
+[2026-04-08T08:53:31.701Z] iter=488 turn=1 INFO: read_scratchpad: 450 chars
+[2026-04-08T08:53:31.714Z] iter=488 turn=1 INFO:   -> exit=0 (125 chars)
+[2026-04-08T08:53:31.715Z] iter=488 turn=2 INFO: Turn 2/25
+[2026-04-08T08:53:34.358Z] iter=488 turn=2 INFO: $ grep -n "messages.create" src/orchestrator.ts
+[2026-04-08T08:53:34.368Z] iter=488 turn=2 INFO:   -> exit=0 (105 chars)
+[2026-04-08T08:53:34.369Z] iter=488 turn=3 INFO: Turn 3/25
+[2026-04-08T08:53:37.868Z] iter=488 turn=3 INFO: think: I have two goals:
+1. Wrap line 1449 `messages.create` with retryWithBackoff
+2. Create checkpoint-transaction test file
+
+...
+[2026-04-08T08:53:37.868Z] iter=488 turn=4 INFO: Turn 4/25
+[2026-04-08T08:53:40.513Z] iter=488 turn=4 INFO: $ sed -n '1440,1480p' src/orchestrator.ts
+[2026-04-08T08:53:40.519Z] iter=488 turn=4 INFO: $ cat src/checkpoint.ts
+[2026-04-08T08:53:40.532Z] iter=488 turn=4 INFO:   -> exit=0 (1583 chars)
+[2026-04-08T08:53:40.533Z] iter=488 turn=4 INFO:   -> exit=0 (4303 chars)
+[2026-04-08T08:53:40.533Z] iter=488 turn=5 INFO: Turn 5/25
+[2026-04-08T08:53:43.472Z] iter=488 turn=5 INFO: Agent: Now I have everything I need. Let me make both changes simultaneously:
+[2026-04-08T08:53:43.472Z] iter=488 turn=5 INFO: $ sed -n '1445,1465p' src/orchestrator.ts
+[2026-04-08T08:53:43.480Z] iter=488 turn=5 INFO:   -> exit=0 (689 chars)
+[2026-04-08T08:53:43.481Z] iter=488 turn=6 INFO: Turn 6/25
+[2026-04-08T08:53:49.969Z] iter=488 turn=6 INFO: Agent: Goal 1 (wrap line 1449 with retryWithBackoff): **IN PROGRESS** - have the context, ready to patch
+Goal 2 (checkpoint-transaction tests): **NOT STARTED**
+
+Writing both now:
+[2026-04-08T08:53:49.971Z] iter=488 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T08:53:49.978Z] iter=488 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -14 +17 lines
+
+Context after patch:
+1443 |       "}",
+1444 |     ].join("\n");
+1445 | 
+1446 |     // ── API call ─────────────────────────────────────────────────
+1447 |     let raw: string;
+1448 |     try {
+1449 |       const response = await retryWithBackoff(
+1450 |         () => this.client.messages.create({
+1451 |           model: MODEL_SIMPLE,
+1452 |           max_tokens: 512,
+1453 |           system: systemPrompt,
+1454 |           messages: [{ role: "user", content: userPrompt }],
+1455 |         }),
+1456 |         { maxRetries: 2, baseDelayMs: 1000, retryableStatuses: [429, 500, 502, 503, 529] }
+1457 |       );
+1458 |       const block = response.content[0];
+1459 |       raw = block.type === "text" ? block.text.trim() : "";
+1460 |     } catch {
+1461 |       return null; // API failure is non-fatal
+1462 |     }
+1463 | 
+1464 |     // ── Parse JSON ───────────────────────────────────────────────
+1465 |     // Strip markdown fences if the model disobeyed the system prompt
+[2026-04-08T08:53:49.980Z] iter=488 turn=7 INFO: Turn 7/25
+[2026-04-08T08:54:05.693Z] iter=488 turn=7 INFO: Agent: Now Goal 2 — write the checkpoint transaction test file:
+[2026-04-08T08:54:05.694Z] iter=488 turn=7 INFO: write_file: src/__tests__/checkpoint-transaction.test.ts (write)
+[2026-04-08T08:54:05.694Z] iter=488 turn=7 INFO:   -> ok: Created src/__tests__/checkpoint-transaction.test.ts (3967 chars)
+[2026-04-08T08:54:05.695Z] iter=488 turn=8 INFO: Turn 8/25
+[2026-04-08T08:54:08.151Z] iter=488 turn=8 INFO: $ npx vitest run src/__tests__/checkpoint-transaction.test.ts 2>&1
+[2026-04-08T08:54:09.143Z] iter=488 turn=8 INFO:   -> exit=0 (290 chars)
+[2026-04-08T08:54:09.143Z] iter=488 turn=9 INFO: Turn 9/25
+[2026-04-08T08:54:16.241Z] iter=488 turn=9 INFO: Agent: All 4 tests pass. Now run final verification:
+[2026-04-08T08:54:16.241Z] iter=488 turn=9 INFO: $ npx tsc --noEmit 2>&1 && grep -c "retryWithBackoff" src/orchestrator.ts
+[2026-04-08T08:54:17.448Z] iter=488 turn=9 INFO:   -> exit=2 (248 chars)
+[2026-04-08T08:54:17.448Z] iter=488 turn=10 INFO: Turn 10/25
+[2026-04-08T08:54:20.732Z] iter=488 turn=10 INFO: Agent: I've changed src/orchestrator.ts (+3 LOC) and created src/__tests__/checkpoint-transaction.test.ts (+100 LOC). One TS error to fix — the retryWithBackoff options type doesn't have `retryableStatuses`. Let me check and fix:
+[2026-04-08T08:54:20.733Z] iter=488 turn=10 INFO: $ grep -n "retryableStatuses\|RetryOptions\|interface.*Retry" src/tool-recovery.ts | head -20
+[2026-04-08T08:54:20.747Z] iter=488 turn=10 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:54:20.747Z] iter=488 turn=11 INFO: Turn 11/25
+[2026-04-08T08:54:23.959Z] iter=488 turn=11 INFO: $ grep -n "retryWithBackoff\|maxRetries\|baseDelay" src/tool-recovery.ts | head -20
+[2026-04-08T08:54:23.970Z] iter=488 turn=11 INFO:   -> exit=0 (533 chars)
+[2026-04-08T08:54:23.971Z] iter=488 turn=12 INFO: Turn 12/25
+[2026-04-08T08:54:27.854Z] iter=488 turn=12 INFO: Agent: The `retryableStatuses` option doesn't exist in the type. Fix the call to remove it:
+[2026-04-08T08:54:27.855Z] iter=488 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T08:54:27.856Z] iter=488 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+1453 |           system: systemPrompt,
+1454 |           messages: [{ role: "user", content: userPrompt }],
+1455 |         }),
+1456 |         { maxRetries: 2, baseDelayMs: 1000 }
+1457 |       );
+1458 |       const block = response.content[0];
+1459 |       raw = block.type === "text" ? block.text.trim() : "";
+[2026-04-08T08:54:27.857Z] iter=488 turn=13 INFO: Turn 13/25
+[2026-04-08T08:54:30.872Z] iter=488 turn=13 INFO: $ npx tsc --noEmit 2>&1 && grep -c "retryWithBackoff" src/orchestrator.ts
+[2026-04-08T08:54:32.008Z] iter=488 turn=13 INFO:   -> exit=0 (2 chars)
+[2026-04-08T08:54:32.009Z] iter=488 turn=14 INFO: Turn 14/25
+[2026-04-08T08:54:38.022Z] iter=488 turn=14 INFO: Agent: Both goals done. Writing memory and goals now.
+[2026-04-08T08:54:38.023Z] iter=488 turn=14 INFO: save_memory: "[Engineer] Iteration 488"
+[2026-04-08T08:54:38.024Z] iter=488 turn=14 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T08:54:38.024Z] iter=488 turn=15 INFO: Turn 15/25
+[2026-04-08T08:54:50.053Z] iter=488 turn=15 INFO: write_file: goals.md (write)
+[2026-04-08T08:54:50.054Z] iter=488 turn=15 INFO:   -> ok: Updated goals.md (1358 chars, -24 lines delta)
+[2026-04-08T08:54:50.054Z] iter=488 turn=16 INFO: Turn 16/25
+[2026-04-08T08:54:53.049Z] iter=488 turn=16 INFO: Agent: Already done. Running final check:
+[2026-04-08T08:54:53.050Z] iter=488 turn=16 INFO: $ npx tsc --noEmit 2>&1; echo "TSC_EXIT:$?"
+[2026-04-08T08:54:54.232Z] iter=488 turn=16 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:54:54.232Z] iter=488 turn=17 INFO: Turn 17/25
+[2026-04-08T08:54:56.024Z] iter=488 turn=17 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T08:54:56.024Z] iter=488 turn=17 INFO: RESTART signal
+[2026-04-08T08:54:56.025Z] iter=488 turn=17 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T08:54:57.169Z] iter=488 turn=17 INFO: Compilation OK
+[2026-04-08T08:55:05.780Z] iter=488 turn=17 INFO: Cache persisted: 67 entries to .autoagent-cache.json
+[2026-04-08T08:55:05.781Z] iter=488 turn=17 INFO: Tool timing: bash: 12x, avg=384ms, total=4611ms; write_file: 4x, avg=3ms, total=10ms; read_scratchpad: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
+[2026-04-08T08:55:05.781Z] iter=488 turn=17 INFO: Tool timing stats
+[2026-04-08T08:55:14.003Z] iter=488 turn=17 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 488: predicted 15 turns, actual 17 turns, ratio 1.13**
+[2026-04-08T08:55:24.263Z] iter=488 turn=17 INFO: Pre-commit review (1831in/347out): **Orchestrator change: LGTM** — wrapping the API call in `retryWithBackoff` is a straightforward reliability improvement with no logic changes to the response handling.
+
+**Test file issues:**
+
+- **Sha

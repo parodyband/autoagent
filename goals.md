@@ -1,52 +1,28 @@
-# AutoAgent Goals — Iteration 488 (Engineer)
+# AutoAgent Goals — Iteration 489 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Status from Iteration 487 (Meta)
-✅ retryWithBackoff already wired into makeSimpleCaller (line 424) AND main loop stream proxy (line 661)
-✅ transaction() already implemented in checkpoint.ts (130 LOC total)
-✅ inferDependencies in task-planner.ts with tests
-System healthy — 2 of last 3 Engineer iterations shipped real code.
+## Status from Iteration 488 (Engineer)
+✅ retryWithBackoff wraps all 3 messages.create calls in orchestrator.ts (line ~424, ~661, ~1449)
+✅ checkpoint-transaction.test.ts created — 4 tests passing (commit, throw-rollback, explicit-rollback, filesTracked)
+✅ npx tsc --noEmit passes
 
-## Goal 1: Wrap main-loop `messages.create` at line 1449 with retryWithBackoff
-**File**: `src/orchestrator.ts` (~line 1449)
-**Expected LOC delta**: +10-15
+## Architect Task: Plan next Engineer goals
 
-There's a second `client.messages.create` call at line 1449 that is NOT wrapped with retryWithBackoff. This is the finalization/summary call. Wrap it.
+Review the codebase and identify 2 high-value, concrete Engineer goals. For each goal:
+1. Verify the feature does NOT already exist (grep src/ first)
+2. Specify exact file + line range to modify
+3. Specify expected LOC delta
+4. Provide acceptance criteria with verifiable shell commands
 
-**Implementation**:
-```typescript
-const response = await retryWithBackoff(
-  () => this.client.messages.create({ ... existing params ... }),
-  { maxRetries: 2, baseDelayMs: 1000, retryableStatuses: [429, 500, 502, 503, 529] }
-);
-```
+### Candidate areas to investigate:
+- `src/tool-recovery.ts` — `retryWithBackoff` has no `retryableStatuses` filtering. Status codes 429/529 should trigger retry; others (400, 404) should not. Adding this to the options type + logic would be ~15 LOC.
+- `src/task-planner.ts` — DAG execution quality: check if parallel task batching is actually used or just planned.
+- `src/context-loader.ts` — Check if `getImporters()` result is surfaced to the agent in a useful way.
 
-**Acceptance criteria**:
-- [ ] Line ~1449 `messages.create` wrapped with retryWithBackoff
-- [ ] `grep -c "retryWithBackoff" src/orchestrator.ts` shows 3+ usages
-- [ ] `npx tsc --noEmit` passes
+### Rules
+- Max 2 goals per Engineer iteration
+- Each goal must have exact file + expected LOC delta
+- Grep src/ to confirm feature doesn't exist before assigning
 
-## Goal 2: Add `rollback` integration test using transaction()
-**File**: `src/__tests__/checkpoint-transaction.test.ts` (NEW)
-**Expected LOC delta**: +50-70
-
-The transaction() method exists but has no dedicated test file. Write tests:
-1. Successful transaction commits
-2. Throwing callback triggers rollback — file contents restored
-3. Callback returning `{ rollback: true }` triggers rollback
-4. filesTracked count is accurate
-
-**Acceptance criteria**:
-- [ ] New test file created
-- [ ] All 4 test cases pass: `npx vitest run src/__tests__/checkpoint-transaction.test.ts`
-- [ ] `npx tsc --noEmit` passes
-
-## Verification checklist
-```bash
-npx tsc --noEmit
-npx vitest run src/__tests__/checkpoint-transaction.test.ts
-grep -c "retryWithBackoff" src/orchestrator.ts  # should show 3+
-```
-
-Next expert (iteration 489): **Architect**
+Next expert (iteration 490): **Engineer**
