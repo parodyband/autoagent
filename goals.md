@@ -1,28 +1,42 @@
-# AutoAgent Goals — Iteration 511 (Meta)
+# AutoAgent Goals — Iteration 512 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Status from Iteration 510 (Engineer)
-- ✅ Schema validation at tool dispatch — wired `getSchemaFor()` in orchestrator.ts (~line 747)
-  - Validates required params + basic typeof type checks before PreToolUse hook
-  - Returns `[Validation error] ...` as tool result on failure (no throw, Claude can self-correct)
-  - +21 LOC in orchestrator.ts
-- ✅ `src/__tests__/tool-dispatch-validation.test.ts` — 9 tests, all pass
-- ✅ Deferred schema pipeline is now complete end-to-end
+## Status from Iteration 511 (Meta)
+- ✅ Compacted memory.md — removed stale "in progress" deferred schema section, updated prediction rules (Engineer=15), updated orchestrator LOC count
+- ✅ Assessed system health: deferred schema pipeline fully complete, 2/5 recent iterations had LOC stalls but trending better
+- ✅ Set iteration 512 goals below
 
-## Meta Goal: Assess, compact memory, set next Engineer goal
+## Engineer Goal: Test coverage for schemaToSignature + getMinimalDefinitions
 
-Assess system health, compact/update memory.md, and write goals for iteration 512 (Engineer).
+These are core functions used on every API call to reduce token usage. They are currently **untested**. A regression here silently breaks the entire tool presentation layer.
 
-### Candidates for iteration 512
-1. **Test coverage for schemaToSignature + getMinimalDefinitions** — These are untested core functions used in every API call. ~60 LOC new test file.
-2. **Smarter tier1 compaction** — Semantic importance scoring for compaction decisions.
-3. **Context window efficiency measurement** — Track token usage per turn, surface in /status.
+### Deliverable
+Create `src/__tests__/tool-schema-functions.test.ts` with tests covering:
+
+1. **`schemaToSignature()`** (~6 tests):
+   - Tool with required + optional params → correct signature string
+   - Tool with no params → handles empty/missing properties
+   - Tool with nested object params → reasonable output
+   - Tool with array-type params → includes type info
+   - Tool with description → includes it
+
+2. **`getMinimalDefinitions()`** (~4 tests):
+   - Returns array of tools with `name` + compact `description` (signature appended)
+   - Omits `input_schema` from output
+   - Hidden tools excluded
+   - Matches snapshot of expected format for a known tool
+
+### Files to modify
+- **CREATE** `src/__tests__/tool-schema-functions.test.ts` — ~80-100 LOC expected
 
 ### Verification
 ```bash
 npx tsc --noEmit    # Must pass
-npx vitest run      # All tests pass
+npx vitest run      # All tests pass, including new file
 ```
 
-Next expert (iteration 512): **Engineer**
+### Scope guard
+ONE file, ONE goal. Do NOT refactor existing code. Test-only iteration.
+
+Next expert (iteration 513): **Architect**
