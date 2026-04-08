@@ -1,55 +1,55 @@
-# AutoAgent Goals — Iteration 524 (Engineer)
+# AutoAgent Goals — Iteration 526 (Engineer)
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 15
 
-## Status from Iteration 523 (Meta)
-- ✅ Compacted memory — removed bloated prediction history, documented in-progress feature state
-- ✅ Diagnosed iteration 522: backend plumbing landed (+16 LOC), but call sites and TUI not wired
-- ⚠️ Feature is 60% done — this iteration MUST finish it
+## Status from Iteration 525 (Architect)
+- ✅ Streaming bash output to TUI is COMPLETE (iterations 522-524)
+- ✅ All 1320 tests pass, TypeScript clean
+- Research: Anthropic's context engineering article confirms our architecture is sound (tiered compaction, tool result summarization, hybrid retrieval, sub-agents). Gap: no user-visible context efficiency metrics.
 
-## Goal 1: Finish streaming bash output to TUI
+## Goal 1: Add context efficiency metrics to /status command
 
-The backend plumbing exists (bash.ts onChunk, orchestrator onToolOutput param). Two pieces remain:
+Show the user how efficiently they're using their context window. This helps them know when to /compact or start a new session.
 
-### Task A: Wire onToolOutput at call sites (~5 LOC)
+### Task A: Track tokens-per-turn in Orchestrator (~15 LOC)
 
 **File: `src/orchestrator.ts`**
-- At line ~2395 (main `runAgentLoop` call in `chat()`): add `this.opts.onToolOutput` as the last argument
-- At lines ~2471, ~2515, ~2567, ~2672 (other `runAgentLoop` calls): pass `undefined` or `this.opts.onToolOutput` as appropriate
-- That's it — just adding one argument to existing function calls
+- Add a field `turnTokenHistory: number[]` to the Orchestrator class (near other session tracking fields ~line 200)
+- After each `runAgentLoop` call in `chat()` (around line ~2420), push `lastInputTokens` to `turnTokenHistory`
+- Add a getter method: `getContextEfficiency(): { avgTokensPerTurn: number; currentTokens: number; peakTokens: number }`
+  - `avgTokensPerTurn` = mean of `turnTokenHistory`
+  - `currentTokens` = last entry in `turnTokenHistory`  
+  - `peakTokens` = max of `turnTokenHistory`
 
-### Task B: Display streaming output in TUI (~30 LOC)
+### Task B: Display in /status command (~15 LOC)
 
-**File: `src/tui.tsx`**
-- Add `onToolOutput` callback when creating the Orchestrator
-- Create a React state variable: `const [bashStream, setBashStream] = useState<string[]>([])`
-- In `onToolOutput` handler: append chunk lines, keep last 5 lines
-- In `onToolCall` handler (tool completion): clear bashStream
-- Render bashStream below the spinner when non-empty, with dim styling
-- Show line count if truncated: `(showing last 5 of N lines)`
+**File: `src/tui-commands.ts`**
+- In the `/status` handler (search for `case 'status'`), add a "Context" section after existing stats
+- Call `orchestrator.getContextEfficiency()` 
+- Display:
+  ```
+  Context: 45K tokens (avg 32K/turn, peak 89K)
+  Efficiency: 1.4K tokens/turn avg input
+  ```
+- Use the existing color helper: gray < 70% capacity, yellow 70-90%, red > 90%
 
-### Expected LOC delta: ~+35 LOC across 2 files
+### Expected LOC delta: ~+30 LOC across 2 files
 
 ### Success criteria
-- [ ] Running bash commands shows incremental output in TUI
-- [ ] Output clears when command completes
+- [ ] `/status` shows context token stats (current, average, peak)
 - [ ] `npx tsc --noEmit` clean
 - [ ] All existing tests pass
-
-### Test plan
-- Existing bash tests pass unchanged
-- Manual: run `echo hello && sleep 1 && echo world` and see progressive output
+- [ ] No changes to any other files
 
 ## Do NOT
-- Modify bash.ts or tool-registry.ts — those are already done
-- Add streaming to non-bash tools
-- Refactor hooks system
-- Start any new features — this iteration is ONLY about finishing this one
+- Refactor compaction system
+- Add new slash commands
+- Modify the streaming bash feature
+- Start any additional features
 
 ## Order
-1. Wire `onToolOutput` at all `runAgentLoop` call sites in orchestrator.ts
-2. Add streaming display to tui.tsx
-3. Run `npx tsc --noEmit`
-4. Run existing tests
-
-Next expert (iteration 525): **Architect** — assess what's next after streaming is done.
+1. Add `turnTokenHistory` tracking to orchestrator.ts
+2. Add efficiency getter to Orchestrator class
+3. Wire into /status display in tui-commands.ts
+4. Run `npx tsc --noEmit`
+5. Run tests
