@@ -1,102 +1,3 @@
-568 |     if (idx >= 0) {
-569 |       setSearchMatchIdx(idx);
-570 |       setInput(inputHistory[idx]);
-571 |     }
-572 |     // If no older match, keep current
-573 |   }, [searchMatchIdx, searchQuery, inputHistory, findPrevMatch]);
-574 | 
-575 |   useInput((ch, key) => {
-576 |     if (pendingDiff) {
-[2026-04-08T20:45:43.804Z] iter=538 turn=6 INFO: Turn 6/25
-[2026-04-08T20:45:54.585Z] iter=538 turn=6 INFO: Agent: **Goal status: IN PROGRESS** — Ctrl+R search helpers added, still need to wire up `useInput` handler and update the render.
-[2026-04-08T20:45:54.585Z] iter=538 turn=6 INFO: write_file: src/tui.tsx (patch)
-[2026-04-08T20:45:54.586Z] iter=538 turn=6 INFO:   -> ok: Patched src/tui.tsx: -22 +54 lines
-
-Context after patch:
-572 |     // If no older match, keep current
-573 |   }, [searchMatchIdx, searchQuery, inputHistory, findPrevMatch]);
-574 | 
-575 |   useInput((ch, key) => {
-576 |     if (pendingDiff) {
-577 |       if (ch === "y" || ch === "Y" || key.return) {
-578 |         pendingDiff.resolve(true);
-579 |         setPendingDiff(null);
-580 |       } else if (ch === "n" || ch === "N" || key.escape) {
-581 |         pendingDiff.resolve(false);
-582 |         setPendingDiff(null);
-583 |       }
-584 |       return;
-585 |     }
-586 | 
-587 |     // ─── Reverse-search mode (Ctrl+R) ───────────────────────
-588 |     if (searchMode) {
-589 |       if (key.ctrl && ch === "r") {
-590 |         cycleSearchMatch();
-591 |         return;
-592 |       }
-593 |       if (key.return) {
-594 |         exitSearchMode(true);
-595 |         return;
-596 |       }
-597 |       if (key.escape || (key.ctrl && ch === "c")) {
-598 |         exitSearchMode(false);
-599 |         return;
-600 |       }
-601 |       if (key.backspace || key.delete) {
-602 |         updateSearchQuery(searchQuery.slice(0, -1));
-603 |         return;
-604 |       }
-605 |       if (ch && !key.ctrl && !key.meta) {
-606 |         updateSearchQuery(searchQuery + ch);
-607 |         return;
-608 |       }
-609 |       return;
-610 |     }
-611 | 
-612 |     // Enter reverse-search mode on Ctrl+R (when not loading)
-613 |     if (key.ctrl && ch === "r" && !loading) {
-614 |       if (inputHistory.length > 0) enterSearchMode();
-615 |       return;
-616 |     }
-617 | 
-618 |     // Shift+Up/Down: scroll message view
-619 |     if (key.upArrow && key.shift) {
-620 |       setScrollOffset(prev => Math.min(prev + 15, Math.max(0, messages.length)));
-621 |       return;
-622 |     }
-623 |     if (key.downArrow && key.shift) {
-624 |       setScrollOffset(prev => Math.max(prev - 15, 0));
-625 |       return;
-626 |     }
-627 |     // Up/Down: history navigation
-628 |     if (key.upArrow && !loading) {
-629 |       if (inputHistory.length === 0) return;
-630 |       if (historyIndex === -1) {
-631 |         setSavedInput(input);
-[2026-04-08T20:45:54.587Z] iter=538 turn=7 INFO: Turn 7/25
-[2026-04-08T20:46:01.206Z] iter=538 turn=7 INFO: Agent: Now add the search prompt to the render — replace the input section:
-[2026-04-08T20:46:01.206Z] iter=538 turn=7 INFO: write_file: src/tui.tsx (patch)
-[2026-04-08T20:46:01.207Z] iter=538 turn=7 INFO:   -> ok: Patched src/tui.tsx: -14 +27 lines
-
-Context after patch:
-884 |         <Box paddingLeft={2}><Text color="yellow" dimColor>Context 80%+ — /clear or start new session</Text></Box>
-885 |       ) : null}
-886 | 
-887 |       {/* Input */}
-888 |       <Box marginTop={1}>
-889 |         {searchMode ? (
-890 |           <Box>
-891 |             <Text color="magenta">(reverse-search)`</Text>
-892 |             <Text color="white">{searchQuery}</Text>
-893 |             <Text color="magenta">`: </Text>
-894 |             <Text color={searchMatchIdx >= 0 ? "cyan" : "gray"} dimColor={searchMatchIdx < 0}>
-895 |               {searchMatchIdx >= 0 ? inputHistory[searchMatchIdx] : ""}
-896 |             </Text>
-897 |           </Box>
-898 |         ) : (
-899 |           <>
-900 |             <Text color={loading ? "gray" : "cyan"} bold dimColor={loading}>{">"} </Text>
-901 |             {loading ? (
 902 |               <Text color="gray" dimColor></Text>
 903 |             ) : (
 904 |               <TextInput
@@ -1095,3 +996,73 @@ Context after patch:
 [2026-04-08T21:01:18.151Z] iter=548 turn=15 INFO: Tool timing stats
 [2026-04-08T21:01:26.283Z] iter=548 turn=15 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 548: predicted 15 turns, actual 15 turns, ratio 1.00**
 [2026-04-08T21:01:30.512Z] iter=548 turn=15 INFO: Pre-commit review (465in/124out): **LGTM** — the change is straightforward: it accumulates per-turn token counts into a history array and passes a derived urgency signal to `selectCompactionTier`, which is a clean, additive improvemen
+[2026-04-08T21:01:30.571Z] iter=548 turn=15 INFO: Committed: 4218edfc (29 in / 2326 out, cache: 9729 created, 126822 read)
+[2026-04-08T21:01:30.571Z] iter=548 turn=15 INFO: Restarting as iteration 549...
+[2026-04-08T21:01:30.771Z] iter=549 INFO: Cache restored: 68/68 entries (0 stale)
+[2026-04-08T21:01:30.773Z] iter=549 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
+[2026-04-08T21:01:30.774Z] iter=549 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-08T21:01:30.987Z] iter=549 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-08T21:01:30.987Z] iter=549 turn=1 INFO: Turn 1/25
+[2026-04-08T21:01:37.241Z] iter=549 turn=1 INFO: Agent: 
+
+I'll execute the Architect tasks: assess /retry command, evaluate model routing, and write Engineer goals for iter 550.
+[2026-04-08T21:01:37.242Z] iter=549 turn=1 INFO: $ grep -n "retry" src/tui-commands.ts src/tui.tsx 2>/dev/null | head -30
+[2026-04-08T21:01:37.242Z] iter=549 turn=1 INFO: $ grep -n "lastUserMessage\|lastMessage\|previousMessage\|messageHistory" src/tui.tsx 2>/dev/null | head -20
+[2026-04-08T21:01:37.243Z] iter=549 turn=1 INFO: grep: "model.*haiku|haiku|cheap.*model|model.*routing|subagent.*model" in src/orchestrator.ts
+[2026-04-08T21:01:37.264Z] iter=549 turn=1 INFO:   -> 0 matches
+[2026-04-08T21:01:37.264Z] iter=549 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-08T21:01:37.264Z] iter=549 turn=1 INFO:   -> exit=0 (231 chars)
+[2026-04-08T21:01:37.265Z] iter=549 turn=2 INFO: Turn 2/25
+[2026-04-08T21:01:41.985Z] iter=549 turn=2 INFO: Agent: 
+
+/retry already exists. Model routing has no quick win. Time to write the deliverable: goals.md for iter 550.
+
+Let me check what's next on the priority list and find a high-value task.
+[2026-04-08T21:01:41.986Z] iter=549 turn=2 INFO: $ grep -n "/retry" src/tui-commands.ts
+[2026-04-08T21:01:41.989Z] iter=549 turn=2 INFO: $ grep -rn "onAbort\|AbortController\|cancel" src/tui.tsx | head -10
+[2026-04-08T21:01:41.997Z] iter=549 turn=2 INFO:   -> exit=0 (92 chars)
+[2026-04-08T21:01:42.000Z] iter=549 turn=2 INFO:   -> exit=0 (106 chars)
+[2026-04-08T21:01:42.000Z] iter=549 turn=3 INFO: Turn 3/25
+[2026-04-08T21:01:57.241Z] iter=549 turn=3 INFO: think: Key findings:
+1. /retry is ALREADY implemented in tui-commands.ts:133 — memory said "NOT implemented" but it is. Good th...
+[2026-04-08T21:01:57.242Z] iter=549 turn=4 INFO: Turn 4/25
+[2026-04-08T21:02:01.776Z] iter=549 turn=4 INFO: Agent: 
+
+Status: Task 1 (assess /retry) DONE — already exists. Task 2 (model routing) DONE — no quick win. Task 3 (write goals.md) NOT STARTED. Let me check self-verify.ts quickly then write goals.md.
+[2026-04-08T21:02:01.776Z] iter=549 turn=4 INFO: $ wc -l src/self-verify.ts && head -30 src/self-verify.ts
+[2026-04-08T21:02:01.778Z] iter=549 turn=4 INFO: $ grep -n "self-verify\|selfVerify\|postWrite\|after.*write\|diagnostics" src/orchestrator.ts | head -15
+[2026-04-08T21:02:01.787Z] iter=549 turn=4 INFO:   -> exit=0 (965 chars)
+[2026-04-08T21:02:01.790Z] iter=549 turn=4 INFO:   -> exit=0 (878 chars)
+[2026-04-08T21:02:01.790Z] iter=549 turn=5 INFO: Turn 5/25
+[2026-04-08T21:02:14.539Z] iter=549 turn=5 INFO: think: Self-verify already exists and runs after write_file. Good. So what's the highest-value thing to build?
+
+Let me think ab...
+[2026-04-08T21:02:14.540Z] iter=549 turn=6 INFO: Turn 6/25
+[2026-04-08T21:02:30.728Z] iter=549 turn=6 INFO: Agent: 
+
+Architect iteration — I don't touch src/. My deliverable is goals.md. Writing it now.
+[2026-04-08T21:02:30.729Z] iter=549 turn=6 INFO: write_file: goals.md (write)
+[2026-04-08T21:02:30.730Z] iter=549 turn=6 INFO:   -> ok: Updated goals.md (1934 chars, +5 lines delta)
+[2026-04-08T21:02:30.731Z] iter=549 turn=7 INFO: Turn 7/25
+[2026-04-08T21:02:37.327Z] iter=549 turn=7 INFO: Agent: 
+
+Wrapping up now.
+[2026-04-08T21:02:37.327Z] iter=549 turn=7 INFO: save_memory: "[Architect] /retry already exists"
+[2026-04-08T21:02:37.328Z] iter=549 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T21:02:37.329Z] iter=549 turn=7 INFO: save_memory: "[Architect] Next Up updated iter 549"
+[2026-04-08T21:02:37.329Z] iter=549 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T21:02:37.330Z] iter=549 turn=7 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T21:02:38.420Z] iter=549 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-08T21:02:38.421Z] iter=549 turn=8 INFO: Turn 8/25
+[2026-04-08T21:02:41.274Z] iter=549 turn=8 INFO: Agent: TypeScript compiles clean.
+[2026-04-08T21:02:41.275Z] iter=549 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T21:02:41.276Z] iter=549 turn=8 INFO: RESTART signal
+[2026-04-08T21:02:41.276Z] iter=549 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T21:02:42.368Z] iter=549 turn=8 INFO: Compilation OK
+[2026-04-08T21:02:51.299Z] iter=549 turn=8 INFO: Cache persisted: 69 entries to .autoagent-cache.json
+[2026-04-08T21:02:51.299Z] iter=549 turn=8 INFO: Cache stats: 0 hits, 1 misses, 69 entries, 1 invalidations (0 entries removed)
+[2026-04-08T21:02:51.299Z] iter=549 turn=8 INFO: Tool cache stats
+[2026-04-08T21:02:51.299Z] iter=549 turn=8 INFO: Tool timing: bash: 8x, avg=148ms, total=1181ms; grep: 1x, avg=21ms, total=21ms; save_memory: 2x, avg=4ms, total=8ms; write_file: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms
+[2026-04-08T21:02:51.299Z] iter=549 turn=8 INFO: Tool timing stats
+[2026-04-08T21:02:59.671Z] iter=549 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 549: predicted 8 turns, actual 8 turns, ratio 1.00**
+[2026-04-08T21:02:59.694Z] iter=549 turn=8 INFO: Pre-commit review: no significant code changes to review
