@@ -1,62 +1,3 @@
-744 |       // getMinimalDefinitions() strips schemas to save tokens, so Claude occasionally
-745 |       // sends incomplete inputs. Catch those here and return a clear error instead of
-746 |       // crashing or producing silent failures.
-747 |       const fullSchema = registry.getSchemaFor(tu.name);
-748 |       if (fullSchema) {
-749 |         const required = (fullSchema.required as string[] | undefined) ?? [];
-750 |         const properties = (fullSchema.properties as Record<string, { type?: string }> | undefined) ?? {};
-751 |         const missing = required.filter((k) => !(k in tuInput));
-752 |         const wrongType = Object.entries(properties)
-753 |           .filter(([k, def]) => def.type && k in tuInput && typeof tuInput[k] !== def.type)
-754 |           .map(([k, def]) => `${k} (expected ${def.type}, got ${typeof tuInput[k]})`);
-755 |         if (missing.length > 0 || wrongType.length > 0) {
-756 |           const parts: string[] = [];
-757 |           if (missing.length > 0) parts.push(`missing required parameters: ${missing.join(", ")}`);
-758 |           if (wrongType.length > 0) parts.push(`wrong parameter types: ${wrongType.join("; ")}`);
-759 |           const errMsg = `[Validation error] ${parts.join(" | ")}`;
-760 |           reflectionCbs.onToolRecord?.({
-761 |             name: tu.name, input: tuInput,
-762 |             resultSnippet: errMsg,
-763 |             durationMs: 0, isError: true, wasRetried: false, timestamp: callTs,
-764 |           });
-765 |           return errMsg;
-766 |         }
-767 |       }
-768 | 
-769 |       // PreToolUse hook — may block execution
-770 |       const preResult = await runHooks(hooksConfig, "PreToolUse", {
-771 |         cwd: workDir, tool_name: tu.name, tool_input: tu.input,
-772 |       }, workDir);
-[2026-04-08T19:51:00.712Z] iter=510 turn=6 INFO: Turn 6/25
-[2026-04-08T19:51:15.791Z] iter=510 turn=6 INFO: Agent: Now write the test file:
-[2026-04-08T19:51:15.791Z] iter=510 turn=6 INFO: write_file: src/__tests__/tool-dispatch-validation.test.ts (write)
-[2026-04-08T19:51:15.792Z] iter=510 turn=6 INFO:   -> ok: Created src/__tests__/tool-dispatch-validation.test.ts (4821 chars)
-[2026-04-08T19:51:15.793Z] iter=510 turn=7 INFO: Turn 7/25
-[2026-04-08T19:51:17.739Z] iter=510 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -20
-[2026-04-08T19:51:18.949Z] iter=510 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-08T19:51:18.950Z] iter=510 turn=8 INFO: Turn 8/25
-[2026-04-08T19:51:20.748Z] iter=510 turn=8 INFO: Agent: TypeScript passes. Run tests then wrap up.
-[2026-04-08T19:51:20.748Z] iter=510 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tool-dispatch-validation.test.ts 2>&1 | tail -25
-[2026-04-08T19:51:21.789Z] iter=510 turn=8 INFO:   -> exit=0 (1046 chars)
-[2026-04-08T19:51:21.790Z] iter=510 turn=9 INFO: Turn 9/25
-[2026-04-08T19:52:05.659Z] iter=510 turn=9 INFO: think: The failing tests:
-1. "returns error when param has wrong type" — `{ path: "/foo", count: "not-a-number" }` — path is pr...
-[2026-04-08T19:52:05.662Z] iter=510 turn=10 INFO: Turn 10/25
-[2026-04-08T19:52:09.193Z] iter=510 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && node --loader ts-node/esm -e "
-import { ToolRegistry } from './src/tool-registry.js';
-const r = new ToolRegistry();
-r.register({
-  definition: { name: 'test_too...
-[2026-04-08T19:52:09.265Z] iter=510 turn=10 INFO:   -> exit=0 (122 chars)
-[2026-04-08T19:52:09.265Z] iter=510 turn=11 INFO: Turn 11/25
-[2026-04-08T19:52:12.044Z] iter=510 turn=11 INFO: Agent: Tests have 3 failures. Let me fix them quickly.
-[2026-04-08T19:52:12.045Z] iter=510 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tool-dispatch-validation.test.ts 2>&1 | grep "FAIL\|AssertionError\|●" | head -20
-[2026-04-08T19:52:13.103Z] iter=510 turn=11 INFO:   -> exit=0 (524 chars)
-[2026-04-08T19:52:13.103Z] iter=510 turn=12 INFO: Turn 12/25
-[2026-04-08T19:52:15.561Z] iter=510 turn=12 INFO: think: Even "returns error when required param is missing" fails - that's the most basic test. This means `getSchemaFor` is ret...
-[2026-04-08T19:52:15.562Z] iter=510 turn=13 INFO: Turn 13/25
-[2026-04-08T19:52:17.708Z] iter=510 turn=13 INFO: Agent: Let me check the ToolRegistry constructor quickly and fix the tests.
-[2026-04-08T19:52:17.709Z] iter=510 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "constructor\|class ToolRegistry" src/tool-registry.ts | head -5
 [2026-04-08T19:52:17.730Z] iter=510 turn=13 INFO:   -> exit=0 (32 chars)
 [2026-04-08T19:52:17.731Z] iter=510 turn=14 INFO: Turn 14/25
 [2026-04-08T19:52:20.693Z] iter=510 turn=14 INFO: read_file: src/tool-registry.ts
@@ -1055,3 +996,238 @@ TSC is clean. Goals.md is written. Memory saved. Done.
 [2026-04-08T20:19:29.380Z] iter=521 turn=7 INFO: Tool timing stats
 [2026-04-08T20:19:38.477Z] iter=521 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 521: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-08T20:19:38.503Z] iter=521 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:19:38.543Z] iter=521 turn=7 INFO: Committed: 897db790 (17 in / 2176 out, cache: 11235 created, 53271 read)
+[2026-04-08T20:19:38.544Z] iter=521 turn=7 INFO: Restarting as iteration 522...
+[2026-04-08T20:19:38.759Z] iter=522 INFO: Cache restored: 68/68 entries (0 stale)
+[2026-04-08T20:19:38.762Z] iter=522 INFO: Turn budget: 13/25 (calibration=1.20x, predicted=15)
+[2026-04-08T20:19:38.762Z] iter=522 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T20:19:38.972Z] iter=522 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T20:19:38.972Z] iter=522 turn=1 INFO: Turn 1/25
+[2026-04-08T20:19:41.935Z] iter=522 turn=1 INFO: Agent: I'll implement streaming bash output to the TUI. Let me start by reading the relevant files.
+[2026-04-08T20:19:41.936Z] iter=522 turn=1 INFO: $ cat src/tools/bash.ts
+[2026-04-08T20:19:41.936Z] iter=522 turn=1 INFO: $ cat src/hooks.ts
+[2026-04-08T20:19:41.939Z] iter=522 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T20:19:41.943Z] iter=522 turn=1 INFO:   -> exit=0 (4435 chars)
+[2026-04-08T20:19:41.943Z] iter=522 turn=1 INFO:   -> exit=0 (4948 chars)
+[2026-04-08T20:19:41.944Z] iter=522 turn=2 INFO: Turn 2/25
+[2026-04-08T20:19:44.435Z] iter=522 turn=2 INFO: $ grep -n "executeBash\|onToolOutput\|onChunk\|hooks\." src/orchestrator.ts | head -60
+[2026-04-08T20:19:44.442Z] iter=522 turn=2 INFO: $ grep -n "executeBash" src/orchestrator.ts | head -20
+[2026-04-08T20:19:44.455Z] iter=522 turn=2 INFO:   -> exit=0 (77 chars)
+[2026-04-08T20:19:44.457Z] iter=522 turn=2 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:19:44.457Z] iter=522 turn=3 INFO: Turn 3/25
+[2026-04-08T20:19:48.407Z] iter=522 turn=3 INFO: think: I have enough context. Let me start implementing:
+
+1. bash.ts - add `onChunk` parameter
+2. hooks.ts - this is the extern...
+[2026-04-08T20:19:48.407Z] iter=522 turn=4 INFO: Turn 4/25
+[2026-04-08T20:19:51.636Z] iter=522 turn=4 INFO: $ grep -n "onToolOutput\|onStatus\|onProgress\|AgentCallbacks\|AgentHooks\|interface.*Hooks\|interface.*Callbacks" src/orchestrator.ts | head -30
+[2026-04-08T20:19:51.640Z] iter=522 turn=4 INFO: $ grep -n "runAgentLoop\|interface\|type.*Hooks\|onStatus\|onProgress" src/orchestrator.ts | head -40
+[2026-04-08T20:19:51.654Z] iter=522 turn=4 INFO:   -> exit=0 (2290 chars)
+[2026-04-08T20:19:51.654Z] iter=522 turn=4 INFO:   -> exit=0 (1903 chars)
+[2026-04-08T20:19:51.654Z] iter=522 turn=5 INFO: Turn 5/25
+[2026-04-08T20:19:53.597Z] iter=522 turn=5 INFO: $ grep -n "onToolCall\|makeExecTool\|executeBash\|bash.*tool\|\"bash\"" src/orchestrator.ts | head -40
+[2026-04-08T20:19:53.611Z] iter=522 turn=5 INFO:   -> exit=0 (996 chars)
+[2026-04-08T20:19:53.611Z] iter=522 turn=6 INFO: Turn 6/25
+[2026-04-08T20:19:56.662Z] iter=522 turn=6 INFO: Agent: **Goal 1: Streaming bash output** — NOT STARTED (still reading)
+
+Let me look at the key areas I need and start writing immediately.
+[2026-04-08T20:19:56.662Z] iter=522 turn=6 INFO: $ sed -n '440,520p' src/orchestrator.ts
+[2026-04-08T20:19:56.672Z] iter=522 turn=6 INFO:   -> exit=0 (2655 chars)
+[2026-04-08T20:19:56.673Z] iter=522 turn=7 INFO: Turn 7/25
+[2026-04-08T20:20:00.596Z] iter=522 turn=7 INFO: Agent: Now I have what I need. Let me implement all 4 changes:
+[2026-04-08T20:20:00.596Z] iter=522 turn=7 INFO: write_file: src/tools/bash.ts (patch)
+[2026-04-08T20:20:00.598Z] iter=522 turn=7 INFO:   -> ok: Patched src/tools/bash.ts: -6 +7 lines
+
+Context after patch:
+48 |   exitCode: number;
+49 | }
+50 | 
+51 | export async function executeBash(
+52 |   command: string,
+53 |   timeout: number = 120,
+54 |   cwd?: string,
+55 |   skipGuards: boolean = false,
+56 |   onChunk?: (text: string) => void
+57 | ): Promise<BashResult> {
+58 |   // Block destructive commands (unless harness is calling internally)
+59 |   if (!skipGuards) {
+60 |     for (const pattern of BLOCKED_PATTERNS) {
+[2026-04-08T20:20:00.599Z] iter=522 turn=8 INFO: Turn 8/25
+[2026-04-08T20:20:04.381Z] iter=522 turn=8 INFO: write_file: src/tools/bash.ts (patch)
+[2026-04-08T20:20:04.383Z] iter=522 turn=8 INFO:   -> ok: Patched src/tools/bash.ts: -8 +12 lines
+
+Context after patch:
+88 |     // Close stdin to prevent interactive hangs
+89 |     proc.stdin.end();
+90 | 
+91 |     proc.stdout.on("data", (data: Buffer) => {
+92 |       const text = data.toString();
+93 |       stdout += text;
+94 |       lastDataTime = Date.now();
+95 |       onChunk?.(text);
+96 |     });
+97 |     proc.stderr.on("data", (data: Buffer) => {
+98 |       const text = data.toString();
+99 |       stderr += text;
+100 |       lastDataTime = Date.now();
+101 |       onChunk?.("[stderr] " + text);
+102 |     });
+103 | 
+104 |     // Hard timeout
+105 |     const timer = setTimeout(() => {
+[2026-04-08T20:20:04.383Z] iter=522 turn=9 INFO: Turn 9/25
+[2026-04-08T20:20:07.805Z] iter=522 turn=9 INFO: Agent: Now add `onToolOutput` to `OrchestratorOptions` and wire it through:
+[2026-04-08T20:20:07.806Z] iter=522 turn=9 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:20:07.808Z] iter=522 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
+
+Context after patch:
+137 | export interface OrchestratorOptions {
+138 |   workDir: string;
+139 |   /** Called when a tool is invoked */
+140 |   onToolCall?: (name: string, input: string, result: string) => void;
+141 |   onToolOutput?: (toolName: string, chunk: string) => void;
+142 |   /** Called with status updates (e.g. "Indexing repo...") */
+143 |   onStatus?: (status: string) => void;
+144 |   /** Called with streaming text deltas */
+[2026-04-08T20:20:07.808Z] iter=522 turn=10 INFO: Turn 10/25
+[2026-04-08T20:20:12.199Z] iter=522 turn=10 INFO: Agent: I've changed bash.ts (+5 LOC) and orchestrator.ts (+1 LOC). Still need: wire `onToolOutput` through `makeExecTool`, and update tui.tsx. Let me finish now.
+[2026-04-08T20:20:12.199Z] iter=522 turn=10 INFO: $ sed -n '447,460p' src/orchestrator.ts
+[2026-04-08T20:20:12.210Z] iter=522 turn=10 INFO:   -> exit=0 (478 chars)
+[2026-04-08T20:20:12.210Z] iter=522 turn=11 INFO: Turn 11/25
+[2026-04-08T20:20:13.802Z] iter=522 turn=11 INFO: $ sed -n '460,485p' src/orchestrator.ts
+[2026-04-08T20:20:13.813Z] iter=522 turn=11 INFO:   -> exit=0 (690 chars)
+[2026-04-08T20:20:13.813Z] iter=522 turn=12 INFO: Turn 12/25
+[2026-04-08T20:20:20.356Z] iter=522 turn=12 INFO: think: I need to finish quickly. The key remaining work:
+1. Wire onToolOutput through makeExecTool - need to add it as a param ...
+[2026-04-08T20:20:20.356Z] iter=522 turn=13 INFO: Turn 13/25
+[2026-04-08T20:20:23.686Z] iter=522 turn=13 INFO: Agent: Let me finish the implementation now in one shot.
+[2026-04-08T20:20:23.686Z] iter=522 turn=13 INFO: $ grep -n "onToolOutput\|onChunk\|ToolContext\|interface.*Ctx\|rootDir.*string" src/tool-registry.ts | head -20
+[2026-04-08T20:20:23.699Z] iter=522 turn=13 INFO:   -> exit=0 (890 chars)
+[2026-04-08T20:20:23.699Z] iter=522 turn=14 INFO: Turn 14/25
+[2026-04-08T20:20:27.805Z] iter=522 turn=14 INFO: Agent: I need to stop and wrap up. The implementation is partially done (bash.ts +5 LOC, orchestrator.ts +1 LOC). Let me finish the wiring quickly and wrap up.
+[2026-04-08T20:20:27.805Z] iter=522 turn=14 INFO: $ sed -n '110,130p' src/tool-registry.ts
+[2026-04-08T20:20:27.817Z] iter=522 turn=14 INFO:   -> exit=0 (610 chars)
+[2026-04-08T20:20:27.817Z] iter=522 turn=15 INFO: Turn 15/25
+[2026-04-08T20:20:31.100Z] iter=522 turn=15 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-08T20:20:31.102Z] iter=522 turn=15 INFO:   -> ok: Patched src/tool-registry.ts: -3 +5 lines
+
+Context after patch:
+114 |   defaultTimeout?: number;
+115 |   /** Callback to accumulate sub-agent token usage into session totals */
+116 |   addTokens?: (tokensIn: number, tokensOut: number) => void;
+117 |   /** Main agent's system prompt prefix — shared with sub-agents for cache reuse */
+118 |   systemPromptPrefix?: string;
+119 |   /** Called with partial output chunks during bash execution */
+120 |   onChunk?: (chunk: string) => void;
+121 | }
+122 | 
+123 | export interface ToolResult {
+124 |   result: string;
+[2026-04-08T20:20:31.103Z] iter=522 turn=16 INFO: Turn 16/25
+[2026-04-08T20:20:33.132Z] iter=522 turn=16 INFO: Agent: Let me finish wiring and wrap up in the remaining turns.
+[2026-04-08T20:20:33.133Z] iter=522 turn=16 INFO: $ sed -n '275,295p' src/tool-registry.ts
+[2026-04-08T20:20:33.141Z] iter=522 turn=16 INFO:   -> exit=0 (920 chars)
+[2026-04-08T20:20:33.142Z] iter=522 turn=17 INFO: Turn 17/25
+[2026-04-08T20:20:35.851Z] iter=522 turn=17 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-08T20:20:35.852Z] iter=522 turn=17 INFO:   -> ok: Patched src/tool-registry.ts: -2 +2 lines
+
+Context after patch:
+280 |       };
+281 |     }
+282 | 
+283 |     const effectiveTimeout = timeout || ctx.defaultTimeout || 120;
+284 |     const r = await lazyExecuteBash(command, effectiveTimeout, ctx.rootDir, false, ctx.onChunk) as { exitCode: number; output: string };
+285 |     ctx.log(`  -> exit=${r.exitCode} (${r.output.length} chars)`);
+286 |     return { result: r.output };
+287 |   }, { defaultTimeout: 120 });
+[2026-04-08T20:20:35.853Z] iter=522 turn=18 INFO: Turn 18/25
+[2026-04-08T20:20:44.160Z] iter=522 turn=18 INFO: Agent: Now wire `onToolOutput` through `makeExecTool` in orchestrator.ts and update tui.tsx:
+[2026-04-08T20:20:44.160Z] iter=522 turn=18 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:20:44.163Z] iter=522 turn=18 INFO:   -> ok: Patched src/orchestrator.ts: -19 +21 lines
+
+Context after patch:
+445 | 
+446 | // ─── Tool execution ───────────────────────────────────────────
+447 | 
+448 | function makeExecTool(
+449 |   registry: ReturnType<typeof createDefaultRegistry>,
+450 |   workDir: string,
+451 |   onToolCall?: OrchestratorOptions["onToolCall"],
+452 |   onStatus?: OrchestratorOptions["onStatus"],
+453 |   onAddTokens?: (tokensIn: number, tokensOut: number) => void,
+454 |   systemPromptPrefix?: string,
+455 |   onToolOutput?: OrchestratorOptions["onToolOutput"],
+456 | ) {
+457 |   return async (name: string, input: Record<string, unknown>): Promise<string> => {
+458 |     const tool = registry.get(name);
+459 |     if (!tool) return `Unknown tool: ${name}`;
+460 | 
+461 |     const ctx = {
+462 |       rootDir: workDir,
+463 |       log: () => {},
+464 |       defaultTimeout: tool.defaultTimeout,
+465 |       addTokens: onAddTokens,
+466 |       systemPromptPrefix,
+467 |       onChunk: name === "bash" ? (chunk: string) => onToolOutput?.(name, chunk) : undefined,
+468 |     };
+469 | 
+470 |     onStatus?.(`Running ${name}...`);
+471 | 
+[2026-04-08T20:20:44.164Z] iter=522 turn=19 INFO: Turn 19/25
+[2026-04-08T20:20:45.776Z] iter=522 turn=19 INFO: Agent: Now find all `makeExecTool` call sites and pass `onToolOutput`:
+[2026-04-08T20:20:45.776Z] iter=522 turn=19 INFO: $ grep -n "makeExecTool(" src/orchestrator.ts
+[2026-04-08T20:20:45.788Z] iter=522 turn=19 INFO:   -> exit=0 (121 chars)
+[2026-04-08T20:20:45.789Z] iter=522 turn=20 INFO: Turn 20/25
+[2026-04-08T20:20:47.403Z] iter=522 turn=20 INFO: $ sed -n '610,640p' src/orchestrator.ts
+[2026-04-08T20:20:47.413Z] iter=522 turn=20 INFO:   -> exit=0 (1203 chars)
+[2026-04-08T20:20:47.413Z] iter=522 turn=21 INFO: Turn 21/25
+[2026-04-08T20:20:55.724Z] iter=522 turn=21 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:20:55.726Z] iter=522 turn=21 INFO:   -> ok: Patched src/orchestrator.ts: -25 +26 lines
+
+Context after patch:
+610 |   });
+611 | }
+612 | 
+613 | async function runAgentLoop(
+614 |   client: Anthropic,
+615 |   model: string,
+616 |   systemPrompt: string,
+617 |   apiMessages: Anthropic.MessageParam[],
+618 |   registry: ReturnType<typeof createDefaultRegistry>,
+619 |   workDir: string,
+620 |   onToolCall?: OrchestratorOptions["onToolCall"],
+621 |   onStatus?: OrchestratorOptions["onStatus"],
+622 |   onText?: OrchestratorOptions["onText"],
+623 |   onDiffPreview?: OrchestratorOptions["onDiffPreview"],
+624 |   onCompact?: (inputTokens: number, messages: Anthropic.MessageParam[]) => Promise<void>,
+625 |   onContextBudget?: OrchestratorOptions["onContextBudget"],
+626 |   onFileWatch?: (event: "read" | "write", filePath: string) => void,
+627 |   signal?: AbortSignal,
+628 |   maxConsecutiveLoops = 2,
+629 |   hooksConfig: HooksConfig = {},
+630 |   sessionFilesModified: Set<string> = new Set(),
+631 |   toolUsageCounts: Map<string, number> = new Map(),
+632 |   reflectionCbs: ReflectionCallbacks = {},
+633 |   onToolOutput?: OrchestratorOptions["onToolOutput"],
+634 | ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number; aborted?: boolean }> {
+635 |   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
+636 |     totalIn += tIn;
+637 |     totalOut += tOut;
+638 |   }, systemPrompt, onToolOutput);
+639 |   const tools = registry.getMinimalDefinitions();
+640 | 
+641 |   let totalIn = 0, totalOut = 0;
+[2026-04-08T20:20:55.727Z] iter=522 turn=22 INFO: Turn 22/25
+[2026-04-08T20:21:01.157Z] iter=522 turn=22 INFO: Agent: Now find where `runAgentLoop` is called and pass `onToolOutput`. Let me check the call sites:
+[2026-04-08T20:21:01.158Z] iter=522 turn=22 INFO: $ grep -n "await runAgentLoop(" src/orchestrator.ts | head -10
+[2026-04-08T20:21:01.179Z] iter=522 turn=22 INFO:   -> exit=0 (231 chars)
+[2026-04-08T20:21:01.179Z] iter=522 turn=23 INFO: Turn 23/25
+[2026-04-08T20:21:03.093Z] iter=522 turn=23 INFO: Agent: Let me find the main call site and pass onToolOutput, then wrap up:
+[2026-04-08T20:21:03.094Z] iter=522 turn=23 INFO: $ sed -n '2395,2415p' src/orchestrator.ts
+[2026-04-08T20:21:03.103Z] iter=522 turn=23 INFO:   -> exit=0 (546 chars)
+[2026-04-08T20:21:03.103Z] iter=522 turn=23 INFO: HARD TURN CAP REACHED: 23 turns (predicted 15, cap 23). Forcing commit.
+[2026-04-08T20:21:03.106Z] iter=522 turn=23 INFO: Cache persisted: 63 entries to .autoagent-cache.json
+[2026-04-08T20:21:03.107Z] iter=522 turn=23 INFO: Tool timing: bash: 17x, avg=13ms, total=214ms; write_file: 7x, avg=2ms, total=16ms; read_scratchpad: 1x, avg=4ms, total=4ms; think: 2x, avg=0ms, total=0ms
+[2026-04-08T20:21:03.107Z] iter=522 turn=23 INFO: Tool timing stats
+[2026-04-08T20:21:11.776Z] iter=522 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 522: predicted 15 turns, actual 23 turns, ratio 1.53**
+[2026-04-08T20:21:16.164Z] iter=522 turn=23 INFO: Pre-commit review (1481in/113out): LGTM. The change cleanly threads a streaming `onChunk` callback from the orchestrator interface down through the tool registry to the bash executor, with correct optional chaining and no broken import

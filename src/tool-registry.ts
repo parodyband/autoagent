@@ -116,6 +116,8 @@ export interface ToolContext {
   addTokens?: (tokensIn: number, tokensOut: number) => void;
   /** Main agent's system prompt prefix — shared with sub-agents for cache reuse */
   systemPromptPrefix?: string;
+  /** Called with partial output chunks during bash execution */
+  onChunk?: (chunk: string) => void;
 }
 
 export interface ToolResult {
@@ -279,7 +281,7 @@ export function createDefaultRegistry(): ToolRegistry {
     }
 
     const effectiveTimeout = timeout || ctx.defaultTimeout || 120;
-    const r = await lazyExecuteBash(command, effectiveTimeout, ctx.rootDir) as { exitCode: number; output: string };
+    const r = await lazyExecuteBash(command, effectiveTimeout, ctx.rootDir, false, ctx.onChunk) as { exitCode: number; output: string };
     ctx.log(`  -> exit=${r.exitCode} (${r.output.length} chars)`);
     return { result: r.output };
   }, { defaultTimeout: 120 });

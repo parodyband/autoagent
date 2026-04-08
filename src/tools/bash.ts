@@ -52,7 +52,8 @@ export async function executeBash(
   command: string,
   timeout: number = 120,
   cwd?: string,
-  skipGuards: boolean = false
+  skipGuards: boolean = false,
+  onChunk?: (text: string) => void
 ): Promise<BashResult> {
   // Block destructive commands (unless harness is calling internally)
   if (!skipGuards) {
@@ -88,12 +89,16 @@ export async function executeBash(
     proc.stdin.end();
 
     proc.stdout.on("data", (data: Buffer) => {
-      stdout += data.toString();
+      const text = data.toString();
+      stdout += text;
       lastDataTime = Date.now();
+      onChunk?.(text);
     });
     proc.stderr.on("data", (data: Buffer) => {
-      stderr += data.toString();
+      const text = data.toString();
+      stderr += text;
       lastDataTime = Date.now();
+      onChunk?.("[stderr] " + text);
     });
 
     // Hard timeout

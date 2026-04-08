@@ -138,6 +138,7 @@ export interface OrchestratorOptions {
   workDir: string;
   /** Called when a tool is invoked */
   onToolCall?: (name: string, input: string, result: string) => void;
+  onToolOutput?: (toolName: string, chunk: string) => void;
   /** Called with status updates (e.g. "Indexing repo...") */
   onStatus?: (status: string) => void;
   /** Called with streaming text deltas */
@@ -451,6 +452,7 @@ function makeExecTool(
   onStatus?: OrchestratorOptions["onStatus"],
   onAddTokens?: (tokensIn: number, tokensOut: number) => void,
   systemPromptPrefix?: string,
+  onToolOutput?: OrchestratorOptions["onToolOutput"],
 ) {
   return async (name: string, input: Record<string, unknown>): Promise<string> => {
     const tool = registry.get(name);
@@ -462,6 +464,7 @@ function makeExecTool(
       defaultTimeout: tool.defaultTimeout,
       addTokens: onAddTokens,
       systemPromptPrefix,
+      onChunk: name === "bash" ? (chunk: string) => onToolOutput?.(name, chunk) : undefined,
     };
 
     onStatus?.(`Running ${name}...`);
@@ -627,11 +630,12 @@ async function runAgentLoop(
   sessionFilesModified: Set<string> = new Set(),
   toolUsageCounts: Map<string, number> = new Map(),
   reflectionCbs: ReflectionCallbacks = {},
+  onToolOutput?: OrchestratorOptions["onToolOutput"],
 ): Promise<{ text: string; tokensIn: number; tokensOut: number; lastInputTokens: number; aborted?: boolean }> {
   const execTool = makeExecTool(registry, workDir, onToolCall, onStatus, (tIn, tOut) => {
     totalIn += tIn;
     totalOut += tOut;
-  }, systemPrompt);
+  }, systemPrompt, onToolOutput);
   const tools = registry.getMinimalDefinitions();
 
   let totalIn = 0, totalOut = 0;
