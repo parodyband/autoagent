@@ -196,6 +196,12 @@ export interface OrchestratorOptions {
    * Accepts a full model ID or a shorthand alias (haiku/sonnet/opus).
    */
   initialModel?: string;
+  /**
+   * Enable git auto-commit after code changes.
+   * Only used by the agent loop — TUI relies on file-level checkpoints instead.
+   * Default: false
+   */
+  autoCommit?: boolean;
 }
 
 export interface OrchestratorResult {
@@ -2537,9 +2543,9 @@ export class Orchestrator {
       }
     }
 
-    // 7. Auto-commit if code was likely changed
+    // 7. Auto-commit if code was likely changed (only when autoCommit is enabled — agent loop only)
     let commitResult: AutoCommitResult | undefined;
-    if (looksLikeCodeChange) {
+    if (looksLikeCodeChange && this.opts.autoCommit) {
       commitResult = await autoCommit(this.opts.workDir, userMessage);
       if (commitResult.committed) {
         this.opts.onStatus?.(`✓ Committed ${commitResult.hash}: ${commitResult.message}`);

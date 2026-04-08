@@ -11,7 +11,6 @@ import type { Orchestrator } from "./orchestrator.js";
 import type { Message } from "./tui.js";
 import type { SessionInfo } from "./session-store.js";
 import { listSessions } from "./session-store.js";
-import { undoLastCommit } from "./auto-commit.js";
 import { buildRepoMap, fuzzySearch, type RepoMap } from "./tree-sitter-map.js";
 import { runInit } from "./init-command.js";
 import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
@@ -19,7 +18,7 @@ import { handlePlanCommand } from "./plan-commands.js";
 import { runDream } from "./dream.js";
 import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
 import { checkpointManager } from "./checkpoint.js";
-import { getRecentSessions, searchSessions, clearSessionHistory } from "./session-history.js";
+import { getRecentSessions, searchSessions, clearSessionHistory, annotateLastSession } from "./session-history.js";
 
 export interface FooterStats {
   tokensIn: number;
@@ -550,11 +549,20 @@ const commands: Record<string, CommandHandler> = {
   },
 
   "/undo": async (ctx) => {
-    const result = await undoLastCommit(ctx.workDir);
-    if (result.undone) {
-      ctx.addMessage({ role: "assistant", content: `✓ Undid commit ${result.hash}: ${result.message}` });
+    // Use file-level checkpoints (not git commits) for undo in TUI mode
+    const items = checkpointManager.list(1);
+    if (items.length === 0) {
+      ctx.addMessage({ role: "assistant", content: "No checkpoints to undo. Checkpoints are created automatically when files are edited." });
+      return true;
+    }
+    const latest = items[0];
+    const result = checkpointManager.rollback(latest.id);
+    if (result.restored > 0) {
+      ctx.addMessage({ role: "assistant", content: `✓ Rolled back ${result.restored} file(s) from "${latest.label}"` });
+    } else if (result.errors.length > 0) {
+      ctx.addMessage({ role: "assistant", content: `Undo failed:\n${result.errors.join("\n")}` });
     } else {
-      ctx.addMessage({ role: "assistant", content: `Cannot undo: ${result.error}` });
+      ctx.addMessage({ role: "assistant", content: "Nothing to undo." });
     }
     return true;
   },
@@ -704,7 +712,8 @@ const commands: Record<string, CommandHandler> = {
       const date = new Date(s.date).toLocaleDateString("en-CA"); // YYYY-MM-DD
       const cost = `${s.cost.toFixed(2)}`;
       const topic = s.firstMessage.length > 40 ? s.firstMessage.slice(0, 40) + "…" : s.firstMessage;
-      return `${date}  ${String(s.turns).padStart(2)} turns  ${cost.padStart(7)}  "${topic}"`;
+      const notesSuffix = s.notes?.length ? ` [${s.notes.length} note(s)]` : "";
+      return `${date}  ${String(s.turns).padStart(2)} turns  ${cost.padStart(7)}  "${topic}"${notesSuffix}`;
     };
 
     if (args.startsWith("search ")) {
@@ -725,6 +734,17 @@ const commands: Record<string, CommandHandler> = {
     if (args === "clear") {
       clearSessionHistory();
       ctx.addMessage({ role: "assistant", content: "✓ Session history cleared." });
+      return true;
+    }
+
+    if (args.startsWith("note ")) {
+      const text = args.slice("note ".length).trim();
+      if (!text) {
+        ctx.addMessage({ role: "assistant", content: "Usage: /sessions note <text>" });
+        return true;
+      }
+      const ok = annotateLastSession(text);
+      ctx.addMessage({ role: "assistant", content: ok ? "✓ Note added to last session." : "No session history found to annotate." });
       return true;
     }
 
