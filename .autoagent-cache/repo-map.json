@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775629987615,
+  "generatedAt": 1775668815116,
   "files": [
     {
       "path": "src/file-cache.ts",
@@ -565,34 +565,6 @@
       "lastModified": 1775416762488.8557
     },
     {
-      "path": "src/tool-recovery.ts",
-      "exports": [
-        {
-          "name": "RecoveryHint",
-          "kind": "interface",
-          "line": 19,
-          "exported": true
-        },
-        {
-          "name": "enhanceToolError",
-          "kind": "function",
-          "line": 374,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        }
-      ],
-      "lastModified": 1775416738533.5273
-    },
-    {
       "path": "src/agent.ts",
       "exports": [],
       "imports": [
@@ -1094,110 +1066,6 @@
       "lastModified": 1775423126940.2239
     },
     {
-      "path": "src/task-planner.ts",
-      "exports": [
-        {
-          "name": "Task",
-          "kind": "interface",
-          "line": 12,
-          "exported": true
-        },
-        {
-          "name": "TaskPlan",
-          "kind": "interface",
-          "line": 22,
-          "exported": true
-        },
-        {
-          "name": "TaskExecutor",
-          "kind": "type",
-          "line": 31,
-          "exported": true
-        },
-        {
-          "name": "OnFailureCallback",
-          "kind": "type",
-          "line": 34,
-          "exported": true
-        },
-        {
-          "name": "getNextTasks",
-          "kind": "function",
-          "line": 47,
-          "exported": true
-        },
-        {
-          "name": "formatPlan",
-          "kind": "function",
-          "line": 60,
-          "exported": true
-        },
-        {
-          "name": "buildTaskContext",
-          "kind": "function",
-          "line": 94,
-          "exported": true
-        },
-        {
-          "name": "executePlan",
-          "kind": "function",
-          "line": 131,
-          "exported": true
-        },
-        {
-          "name": "createPlan",
-          "kind": "function",
-          "line": 203,
-          "exported": true
-        },
-        {
-          "name": "replanOnFailure",
-          "kind": "function",
-          "line": 281,
-          "exported": true
-        },
-        {
-          "name": "createOrchestratorExecutor",
-          "kind": "function",
-          "line": 321,
-          "exported": true
-        },
-        {
-          "name": "PLAN_FILENAME",
-          "kind": "const",
-          "line": 339,
-          "exported": true
-        },
-        {
-          "name": "savePlan",
-          "kind": "function",
-          "line": 344,
-          "exported": true
-        },
-        {
-          "name": "loadPlan",
-          "kind": "function",
-          "line": 353,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        }
-      ],
-      "lastModified": 1775422919845.6897
-    },
-    {
       "path": "src/self-verify.ts",
       "exports": [
         {
@@ -1275,190 +1143,6 @@
         }
       ],
       "lastModified": 1775423723491.85
-    },
-    {
-      "path": "src/tool-registry.ts",
-      "exports": [
-        {
-          "name": "codeSearchIndex",
-          "kind": "const",
-          "line": 33,
-          "exported": true
-        },
-        {
-          "name": "buildSearchIndex",
-          "kind": "function",
-          "line": 40,
-          "exported": true
-        },
-        {
-          "name": "_searchIndexHolder",
-          "kind": "const",
-          "line": 68,
-          "exported": true
-        },
-        {
-          "name": "ToolContext",
-          "kind": "interface",
-          "line": 72,
-          "exported": true
-        },
-        {
-          "name": "ToolResult",
-          "kind": "interface",
-          "line": 81,
-          "exported": true
-        },
-        {
-          "name": "ToolHandler",
-          "kind": "type",
-          "line": 86,
-          "exported": true
-        },
-        {
-          "name": "ToolOptions",
-          "kind": "interface",
-          "line": 91,
-          "exported": true
-        },
-        {
-          "name": "RegisteredTool",
-          "kind": "interface",
-          "line": 96,
-          "exported": true
-        },
-        {
-          "name": "ToolRegistry",
-          "kind": "class",
-          "line": 104,
-          "exported": true
-        },
-        {
-          "name": "createDefaultRegistry",
-          "kind": "function",
-          "line": 143,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [],
-          "from": "./tools/bash.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/read_file.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/write_file.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/grep.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/web_fetch.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/think.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/list_files.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/subagent.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/web_search.js"
-        },
-        {
-          "names": [],
-          "from": "./model-selection.js"
-        },
-        {
-          "names": [],
-          "from": "./project-memory.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/scratchpad.js"
-        },
-        {
-          "names": [],
-          "from": "./semantic-search.js"
-        },
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "glob"
-        }
-      ],
-      "lastModified": 1775423924274.961
-    },
-    {
-      "path": "src/cli.ts",
-      "exports": [
-        {
-          "name": "resolveModelAlias",
-          "kind": "function",
-          "line": 33,
-          "exported": true
-        },
-        {
-          "name": "printHelp",
-          "kind": "function",
-          "line": 64,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [],
-          "from": "readline"
-        },
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "path"
-        },
-        {
-          "names": [],
-          "from": "url"
-        },
-        {
-          "names": [],
-          "from": "child_process"
-        },
-        {
-          "names": [],
-          "from": "dotenv/config"
-        },
-        {
-          "names": [],
-          "from": "./orchestrator.js"
-        },
-        {
-          "names": [],
-          "from": "./init-command.js"
-        }
-      ],
-      "lastModified": 1775461376802.478
     },
     {
       "path": "src/context-loader.ts",
@@ -1546,7 +1230,7 @@
           "from": "./tree-sitter-map.js"
         }
       ],
-      "lastModified": 1775461095647.401
+      "lastModified": 1775630803138.9812
     },
     {
       "path": "src/tui.tsx",
@@ -1658,7 +1342,7 @@
           "from": "./tui-commands.js"
         }
       ],
-      "lastModified": 1775463027356.0693
+      "lastModified": 1775637606635.996
     },
     {
       "path": "src/virtual-message-list.tsx",
@@ -1839,150 +1523,202 @@
       "lastModified": 1775467654579.8484
     },
     {
+      "path": "src/cli.ts",
+      "exports": [
+        {
+          "name": "resolveModelAlias",
+          "kind": "function",
+          "line": 33,
+          "exported": true
+        },
+        {
+          "name": "printHelp",
+          "kind": "function",
+          "line": 64,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "readline"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "url"
+        },
+        {
+          "names": [],
+          "from": "child_process"
+        },
+        {
+          "names": [],
+          "from": "dotenv/config"
+        },
+        {
+          "names": [],
+          "from": "./orchestrator.js"
+        },
+        {
+          "names": [],
+          "from": "./init-command.js"
+        }
+      ],
+      "lastModified": 1775634082196.4019
+    },
+    {
       "path": "src/orchestrator.ts",
       "exports": [
         {
           "name": "PARALLEL_SAFE_TOOLS",
           "kind": "const",
-          "line": 59,
+          "line": 61,
           "exported": true
         },
         {
           "name": "MICRO_COMPACT_THRESHOLD",
           "kind": "const",
-          "line": 74,
+          "line": 76,
           "exported": true
         },
         {
           "name": "COMPACT_TIER1_THRESHOLD",
           "kind": "const",
-          "line": 76,
+          "line": 78,
           "exported": true
         },
         {
           "name": "COMPACT_THRESHOLD",
           "kind": "const",
-          "line": 78,
+          "line": 80,
           "exported": true
         },
         {
           "name": "CONTEXT_WARNING_THRESHOLD",
           "kind": "const",
-          "line": 80,
+          "line": 82,
           "exported": true
         },
         {
           "name": "PRUNE_THRESHOLD",
           "kind": "const",
-          "line": 81,
+          "line": 83,
           "exported": true
         },
         {
           "name": "selectCompactionTier",
           "kind": "function",
-          "line": 87,
+          "line": 89,
           "exported": true
         },
         {
           "name": "MODEL_PRICING",
           "kind": "const",
-          "line": 95,
+          "line": 97,
           "exported": true
         },
         {
           "name": "MODEL_CONTEXT_WINDOW",
           "kind": "const",
-          "line": 101,
+          "line": 103,
           "exported": true
         },
         {
           "name": "ConversationCheckpoint",
           "kind": "interface",
-          "line": 124,
+          "line": 126,
           "exported": true
         },
         {
           "name": "MAX_CHECKPOINTS",
           "kind": "const",
-          "line": 132,
+          "line": 134,
           "exported": true
         },
         {
           "name": "OrchestratorOptions",
           "kind": "interface",
-          "line": 134,
+          "line": 136,
           "exported": true
         },
         {
           "name": "OrchestratorResult",
           "kind": "interface",
-          "line": 179,
+          "line": 181,
           "exported": true
         },
         {
           "name": "CostInfo",
           "kind": "interface",
-          "line": 188,
+          "line": 190,
           "exported": true
         },
         {
           "name": "TaskReflection",
           "kind": "interface",
-          "line": 203,
+          "line": 205,
           "exported": true
         },
         {
           "name": "routeModel",
           "kind": "function",
-          "line": 244,
+          "line": 246,
           "exported": true
         },
         {
           "name": "computeCost",
           "kind": "function",
-          "line": 272,
+          "line": 274,
           "exported": true
         },
         {
           "name": "buildSystemPrompt",
           "kind": "function",
-          "line": 284,
+          "line": 286,
           "exported": true
         },
         {
           "name": "buildCachedSystem",
           "kind": "function",
-          "line": 357,
+          "line": 371,
           "exported": true
         },
         {
           "name": "injectMessageCacheBreakpoints",
           "kind": "function",
-          "line": 368,
+          "line": 382,
           "exported": true
         },
         {
           "name": "isToolError",
           "kind": "function",
-          "line": 464,
+          "line": 481,
           "exported": true
         },
         {
           "name": "pruneStaleToolResults",
           "kind": "function",
-          "line": 525,
+          "line": 542,
           "exported": true
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 1007,
+          "line": 1078,
           "exported": true
         },
         {
           "name": "runSingleTask",
           "kind": "function",
-          "line": 2228,
+          "line": 2541,
           "exported": true
         }
       ],
@@ -2062,9 +1798,21 @@
         },
         {
           "names": [
+            "getSkillsMenu"
+          ],
+          "from": "./skills.js"
+        },
+        {
+          "names": [
             "CostTracker"
           ],
           "from": "./cost-tracker.js"
+        },
+        {
+          "names": [
+            "checkpointManager"
+          ],
+          "from": "./checkpoint.js"
         },
         {
           "names": [
@@ -2098,13 +1846,15 @@
             "extractFileReferences",
             "loadFileReferences",
             "stripFileReferences",
-            "resolveImportGraph"
+            "resolveImportGraph",
+            "getImporters"
           ],
           "from": "./context-loader.js"
         },
         {
           "names": [
-            "enhanceToolError"
+            "enhanceToolError",
+            "retryWithBackoff"
           ],
           "from": "./tool-recovery.js"
         },
@@ -2169,7 +1919,393 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775629978528.199
+      "lastModified": 1775639367641.9424
+    },
+    {
+      "path": "src/skills.ts",
+      "exports": [
+        {
+          "name": "Skill",
+          "kind": "interface",
+          "line": 13,
+          "exported": true
+        },
+        {
+          "name": "discoverSkills",
+          "kind": "function",
+          "line": 29,
+          "exported": true
+        },
+        {
+          "name": "loadSkill",
+          "kind": "function",
+          "line": 71,
+          "exported": true
+        },
+        {
+          "name": "getSkillsMenu",
+          "kind": "function",
+          "line": 86,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        }
+      ],
+      "lastModified": 1775639096598.5664
+    },
+    {
+      "path": "src/task-planner.ts",
+      "exports": [
+        {
+          "name": "Task",
+          "kind": "interface",
+          "line": 12,
+          "exported": true
+        },
+        {
+          "name": "TaskPlan",
+          "kind": "interface",
+          "line": 22,
+          "exported": true
+        },
+        {
+          "name": "TaskExecutor",
+          "kind": "type",
+          "line": 31,
+          "exported": true
+        },
+        {
+          "name": "OnFailureCallback",
+          "kind": "type",
+          "line": 34,
+          "exported": true
+        },
+        {
+          "name": "ProgressEvent",
+          "kind": "type",
+          "line": 37,
+          "exported": true
+        },
+        {
+          "name": "OnProgressCallback",
+          "kind": "type",
+          "line": 38,
+          "exported": true
+        },
+        {
+          "name": "getTransitiveDependents",
+          "kind": "function",
+          "line": 43,
+          "exported": true
+        },
+        {
+          "name": "getNextTasks",
+          "kind": "function",
+          "line": 74,
+          "exported": true
+        },
+        {
+          "name": "formatPlan",
+          "kind": "function",
+          "line": 87,
+          "exported": true
+        },
+        {
+          "name": "buildTaskContext",
+          "kind": "function",
+          "line": 121,
+          "exported": true
+        },
+        {
+          "name": "executePlan",
+          "kind": "function",
+          "line": 159,
+          "exported": true
+        },
+        {
+          "name": "createPlan",
+          "kind": "function",
+          "line": 267,
+          "exported": true
+        },
+        {
+          "name": "inferDependencies",
+          "kind": "function",
+          "line": 348,
+          "exported": true
+        },
+        {
+          "name": "replanOnFailure",
+          "kind": "function",
+          "line": 379,
+          "exported": true
+        },
+        {
+          "name": "createOrchestratorExecutor",
+          "kind": "function",
+          "line": 419,
+          "exported": true
+        },
+        {
+          "name": "PLAN_FILENAME",
+          "kind": "const",
+          "line": 437,
+          "exported": true
+        },
+        {
+          "name": "savePlan",
+          "kind": "function",
+          "line": 442,
+          "exported": true
+        },
+        {
+          "name": "loadPlan",
+          "kind": "function",
+          "line": 451,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        }
+      ],
+      "lastModified": 1775638872655.8057
+    },
+    {
+      "path": "src/tool-recovery.ts",
+      "exports": [
+        {
+          "name": "RecoveryHint",
+          "kind": "interface",
+          "line": 19,
+          "exported": true
+        },
+        {
+          "name": "enhanceToolError",
+          "kind": "function",
+          "line": 374,
+          "exported": true
+        },
+        {
+          "name": "retryWithBackoff",
+          "kind": "function",
+          "line": 414,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        }
+      ],
+      "lastModified": 1775638625893.53
+    },
+    {
+      "path": "src/tool-registry.ts",
+      "exports": [
+        {
+          "name": "codeSearchIndex",
+          "kind": "const",
+          "line": 51,
+          "exported": true
+        },
+        {
+          "name": "buildSearchIndex",
+          "kind": "function",
+          "line": 58,
+          "exported": true
+        },
+        {
+          "name": "_searchIndexHolder",
+          "kind": "const",
+          "line": 86,
+          "exported": true
+        },
+        {
+          "name": "ToolContext",
+          "kind": "interface",
+          "line": 90,
+          "exported": true
+        },
+        {
+          "name": "ToolResult",
+          "kind": "interface",
+          "line": 99,
+          "exported": true
+        },
+        {
+          "name": "ToolHandler",
+          "kind": "type",
+          "line": 104,
+          "exported": true
+        },
+        {
+          "name": "ToolOptions",
+          "kind": "interface",
+          "line": 109,
+          "exported": true
+        },
+        {
+          "name": "RegisteredTool",
+          "kind": "interface",
+          "line": 119,
+          "exported": true
+        },
+        {
+          "name": "ToolRegistry",
+          "kind": "class",
+          "line": 129,
+          "exported": true
+        },
+        {
+          "name": "createDefaultRegistry",
+          "kind": "function",
+          "line": 212,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "./skills.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/bash.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/read_file.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/write_file.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/grep.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/web_fetch.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/think.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/list_files.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/subagent.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/web_search.js"
+        },
+        {
+          "names": [],
+          "from": "./model-selection.js"
+        },
+        {
+          "names": [],
+          "from": "./project-memory.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/scratchpad.js"
+        },
+        {
+          "names": [],
+          "from": "./semantic-search.js"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "glob"
+        }
+      ],
+      "lastModified": 1775668781947.2834
+    },
+    {
+      "path": "src/__tests__/checkpoint-transaction.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "node:fs"
+        },
+        {
+          "names": [],
+          "from": "node:path"
+        },
+        {
+          "names": [],
+          "from": "../checkpoint.js"
+        }
+      ],
+      "lastModified": 1775638445694.5254
+    },
+    {
+      "path": "src/token-estimator.ts",
+      "exports": [
+        {
+          "name": "estimateTokens",
+          "kind": "function",
+          "line": 13,
+          "exported": true
+        },
+        {
+          "name": "estimateMessageTokens",
+          "kind": "function",
+          "line": 44,
+          "exported": true
+        },
+        {
+          "name": "shouldCompact",
+          "kind": "function",
+          "line": 60,
+          "exported": true
+        }
+      ],
+      "imports": [],
+      "lastModified": 1775638842646.4307
     }
   ]
 }

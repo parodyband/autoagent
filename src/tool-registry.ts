@@ -437,7 +437,6 @@ export function createDefaultRegistry(): ToolRegistry {
   );
 
   // ── load_skill ───────────────────────────────────────
-  const { loadSkill } = await import("./skills.js") as typeof import("./skills.js");
   registry.register(
     {
       name: "load_skill",
@@ -490,7 +489,7 @@ export function createDefaultRegistry(): ToolRegistry {
       if (results.length === 0) {
         return { result: "No matching tools found." };
       }
-      const lines = results.map(t => `- **${t.name}**: ${t.description}`);
+      const lines = results.map(t => `- **${t.definition.name}**: ${t.definition.description}`);
       ctx.log(`  -> ${results.length} results`);
       return { result: lines.join("\n") };
     },

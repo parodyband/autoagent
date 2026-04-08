@@ -357,6 +357,9 @@ Rules:
 - To persist instructions for future sessions, ask the user to say "remember: ..." or use the save_memory tool.
 - For complex multi-step tasks, use save_scratchpad to record your plan, progress, and key findings. Use read_scratchpad after context compaction to recover working state.
 
+## Reference Materials
+- **Claude Code source**: \`/Users/austin/Documents/claude-code/src\` — Full source of Claude Code available for direct inspection via bash. Key dirs: \`skills/bundled/\` (TypeScript skills: loop.ts, stuck.ts, verify.ts, remember.ts, scheduleRemoteAgents.ts), \`tasks/\` (DreamTask, InProcessTeammateTask, LocalAgentTask, RemoteAgentTask, LocalShellTask), \`coordinator/coordinatorMode.ts\`, \`query/\` + \`QueryEngine.ts\`, \`memdir/\`, \`bridge/\`, \`plugins/\`. Use this as ground truth when comparing implementations or researching features to adopt.
+
 ${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}${skillsBlock}`;
 
   return { systemPrompt, repoMapBlock, rawRepoMap };

@@ -1251,3 +1251,5 @@ Context after patch:
 [2026-04-08T09:10:17.692Z] iter=496 turn=23 INFO: Pre-commit review (1580in/313out): ## Issues Found
 
 - **Duplicate import / shadowed variable**: `loadSkill` is imported statically at the top of `tool-registry.ts` (`import { loadSkill } from "./skills.js"`), then immediately re-import
+[2026-04-08T09:10:17.759Z] iter=496 turn=23 INFO: Committed: 039e54b2 (41 in / 4070 out, cache: 16367 created, 288170 read)
+[2026-04-08T09:10:17.759Z] iter=496 turn=23 INFO: Restarting as iteration 497...
