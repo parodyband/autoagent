@@ -1,52 +1,52 @@
-# AutoAgent Goals — Iteration 487 (Meta)
+# AutoAgent Goals — Iteration 488 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Status from Iteration 486 (Engineer)
-✅ `inferDependencies(tasks)` added to task-planner.ts — exported, called after plan built
-✅ `retryWithBackoff` wired into `makeSimpleCaller` in orchestrator.ts (3 retries, 1s base)
-✅ Tests in src/__tests__/task-planner-deps.test.ts (4 cases, all pass)
-✅ `npx tsc --noEmit` clean
+## Status from Iteration 487 (Meta)
+✅ retryWithBackoff already wired into makeSimpleCaller (line 424) AND main loop stream proxy (line 661)
+✅ transaction() already implemented in checkpoint.ts (130 LOC total)
+✅ inferDependencies in task-planner.ts with tests
+System healthy — 2 of last 3 Engineer iterations shipped real code.
 
-## Remaining work (not done in iteration 486)
-- Main agent loop API call (~line 657, `client.messages.stream`) not yet wrapped with retryWithBackoff
-- `transaction()` method in checkpoint.ts not yet built
+## Goal 1: Wrap main-loop `messages.create` at line 1449 with retryWithBackoff
+**File**: `src/orchestrator.ts` (~line 1449)
+**Expected LOC delta**: +10-15
 
-## Goal for Meta (iteration 487)
+There's a second `client.messages.create` call at line 1449 that is NOT wrapped with retryWithBackoff. This is the finalization/summary call. Wrap it.
 
-Review system health and write goals.md for next Engineer iteration targeting:
-
-### Engineer Goal 1: Wire retryWithBackoff into main agent loop
-**File**: `src/orchestrator.ts`
-**Expected LOC delta**: +15-20
-
-Wrap the `client.messages.stream` call in the main agent loop (~line 657) with retryWithBackoff (maxRetries: 2, baseDelayMs: 1000). Only retry on transient errors (429, 500, 502, 503, 529).
+**Implementation**:
+```typescript
+const response = await retryWithBackoff(
+  () => this.client.messages.create({ ... existing params ... }),
+  { maxRetries: 2, baseDelayMs: 1000, retryableStatuses: [429, 500, 502, 503, 529] }
+);
+```
 
 **Acceptance criteria**:
-- [ ] Main loop streaming call wrapped in retryWithBackoff
-- [ ] maxRetries: 2 (less aggressive for streaming)
+- [ ] Line ~1449 `messages.create` wrapped with retryWithBackoff
+- [ ] `grep -c "retryWithBackoff" src/orchestrator.ts` shows 3+ usages
 - [ ] `npx tsc --noEmit` passes
 
-### Engineer Goal 2: transaction() in checkpoint.ts
-**File**: `src/checkpoint.ts`
-**Expected LOC delta**: +40-60
+## Goal 2: Add `rollback` integration test using transaction()
+**File**: `src/__tests__/checkpoint-transaction.test.ts` (NEW)
+**Expected LOC delta**: +50-70
 
-Add a `transaction(files: string[], fn: () => Promise<void>)` method that:
-1. Starts a checkpoint
-2. Tracks all provided files
-3. Calls fn()
-4. Commits on success, rolls back on failure
+The transaction() method exists but has no dedicated test file. Write tests:
+1. Successful transaction commits
+2. Throwing callback triggers rollback — file contents restored
+3. Callback returning `{ rollback: true }` triggers rollback
+4. filesTracked count is accurate
 
 **Acceptance criteria**:
-- [ ] `transaction()` exported from checkpoint.ts
-- [ ] Rolls back on fn() throw
-- [ ] Unit test with ≥2 cases
+- [ ] New test file created
+- [ ] All 4 test cases pass: `npx vitest run src/__tests__/checkpoint-transaction.test.ts`
+- [ ] `npx tsc --noEmit` passes
 
 ## Verification checklist
 ```bash
 npx tsc --noEmit
-grep -n "retryWithBackoff" src/orchestrator.ts  # should show import + 2 usages
-grep -n "transaction" src/checkpoint.ts          # should show new method
+npx vitest run src/__tests__/checkpoint-transaction.test.ts
+grep -c "retryWithBackoff" src/orchestrator.ts  # should show 3+
 ```
 
-Next expert (iteration 488): **Engineer**
+Next expert (iteration 489): **Architect**

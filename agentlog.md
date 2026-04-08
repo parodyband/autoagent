@@ -1,180 +1,3 @@
-230 | 
-231 |   // ── web_fetch ─────────────────────────────────────────
-232 |   const lazyExecuteWebFetch = lazyExecutor("./tools/web_fetch.js", "executeWebFetch");
-233 |   registry.register(webFetchToolDefinition, async (input, ctx) => {
-234 |     const { url, extract_text, headers } = input as {
-235 |       url: string; extract_text?: boolean; headers?: Record<string, string>;
-236 |     };
-237 |     ctx.log(`web_fetch: ${url}`);
-238 |     const r = await lazyExecuteWebFetch(url, extract_text, headers) as { success: boolean; content: string };
-239 |     ctx.log(`  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
-240 |     return { result: r.content };
-241 |   }, { defaultTimeout: 30 });
-242 | 
-243 |   // ── think ─────────────────────────────────────────────
-244 |   registry.register(thinkToolDefinition, async (input, _ctx) => {
-245 |     const { thought } = input as { thought: string };
-246 |     return { result: `Thought recorded (${thought.length} chars). Continue.` };
-247 |   }, { defaultTimeout: 5 });
-248 | 
-249 |   // ── list_files ────────────────────────────────────────
-250 |   const lazyExecuteListFiles = lazyExecutor("./tools/list_files.js", "executeListFiles");
-251 |   registry.register(listFilesToolDefinition, async (input, ctx) => {
-252 |     const { path: dirPath, depth, exclude } = input as {
-253 |       path?: string; depth?: number; exclude?: string[];
-254 |     };
-255 |     ctx.log(`list_files: ${dirPath || "."} (depth=${depth || 3})`);
-256 |     const r = await lazyExecuteListFiles(dirPath, depth, exclude, ctx.rootDir) as { success: boolean; dirCount: number; fileCount: number; content: string };
-257 |     ctx.log(`  -> ${r.success ? "ok" : "err"} (${r.dirCount} dirs, ${r.fileCount} files)`);
-258 |     return { result: r.content };
-259 |   }, { defaultTimeout: 15 });
-260 | 
-261 |   // ── subagent ──────────────────────────────────────────
-262 |   const lazyExecuteSubagent = lazyExecutor("./tools/subagent.js", "executeSubagent");
-263 |   registry.register(subagentToolDefinition, async (input, ctx) => {
-264 |     const { task, model, max_tokens } = input as {
-265 |       task: string; model?: string; max_tokens?: number;
-266 |     };
-267 |     // If no model specified, use autoSelectModel to pick based on task description
-268 |     const selectedModel = model ?? autoSelectModel(task);
-269 |     ctx.log(`subagent [${selectedModel}${!model ? ' (auto)' : ''}]: ${task.slice(0, 100)}...`);
-270 |     const r = await lazyExecuteSubagent(task, selectedModel, max_tokens) as { model: string; inputTokens: number; outputTokens: number; response: string };
-271 |     ctx.log(`  -> ${r.model} (${r.inputTokens}in/${r.outputTokens}out)`);
-272 |     ctx.addTokens?.(r.inputTokens, r.outputTokens);
-273 |     return {
-274 |       result: `[Sub-agent: ${selectedModel}${!model ? ' (auto-selected)' : ''} | ${r.inputTokens}+${r.outputTokens} tokens]\n\n${r.response}`,
-275 |     };
-276 |   }, { defaultTimeout: 60 });
-277 | 
-278 |   // ── web_search ───────────────────────────────────────
-279 |   const lazyExecuteWebSearch = lazyExecutor("./tools/web_search.js", "executeWebSearch");
-280 |   registry.register(webSearchToolDefinition, async (input, ctx) => {
-281 |     const { query, max_results } = input as { query: string; max_results?: number };
-282 |     ctx.log(`web_search: "${query}"`);
-283 |     const r = await lazyExecuteWebSearch(query, max_results) as { results: unknown[]; content: string };
-284 |     ctx.log(`  -> ${r.results.length} results`);
-285 |     return { result: r.content };
-286 |   }, { defaultTimeout: 15 });
-287 | 
-288 |   // ── save_memory ──────────────────────────────────────
-289 |   registry.register(
-[2026-04-08T08:31:19.512Z] iter=476 turn=10 INFO: Turn 10/25
-[2026-04-08T08:31:28.248Z] iter=476 turn=10 INFO: Agent: I've made real changes. Let me also fix the scratchpad executor and run tsc:
-[2026-04-08T08:31:28.249Z] iter=476 turn=10 INFO: write_file: src/tool-registry.ts (patch)
-[2026-04-08T08:31:28.250Z] iter=476 turn=10 INFO:   -> ok: Patched src/tool-registry.ts: -14 +16 lines
-
-Context after patch:
-320 |     { defaultTimeout: 5 },
-321 |   );
-322 | 
-323 |   // ── save_scratchpad ──────────────────────────────────
-324 |   const lazyExecuteSaveScratchpad = lazyExecutor("./tools/scratchpad.js", "executeSaveScratchpad");
-325 |   registry.register(saveScratchpadToolDefinition, async (input, ctx) => {
-326 |     const { note } = input as { note: string };
-327 |     const result = await lazyExecuteSaveScratchpad(note, ctx.rootDir) as string;
-328 |     ctx.log(`save_scratchpad: ${note.slice(0, 60)}`);
-329 |     return { result };
-330 |   }, { defaultTimeout: 5 });
-331 | 
-332 |   // ── read_scratchpad ──────────────────────────────────
-333 |   const lazyExecuteReadScratchpad = lazyExecutor("./tools/scratchpad.js", "executeReadScratchpad");
-334 |   registry.register(readScratchpadToolDefinition, async (_input, ctx) => {
-335 |     const result = await lazyExecuteReadScratchpad(ctx.rootDir) as string;
-336 |     ctx.log(`read_scratchpad: ${result.length} chars`);
-337 |     return { result };
-338 |   }, { defaultTimeout: 5 });
-339 | 
-340 |   // ── semantic_search ───────────────────────────────────
-341 |   registry.register(
-[2026-04-08T08:31:28.250Z] iter=476 turn=11 INFO: Turn 11/25
-[2026-04-08T08:31:30.701Z] iter=476 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-08T08:31:31.802Z] iter=476 turn=11 INFO:   -> exit=0 (11 chars)
-[2026-04-08T08:31:31.802Z] iter=476 turn=12 INFO: Turn 12/25
-[2026-04-08T08:31:34.284Z] iter=476 turn=12 INFO: Agent: Clean. Now verify goals:
-[2026-04-08T08:31:34.285Z] iter=476 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getRecentFiles\|Post-compaction context" src/orchestrator.ts
-[2026-04-08T08:31:34.298Z] iter=476 turn=12 INFO:   -> exit=0 (200 chars)
-[2026-04-08T08:31:34.299Z] iter=476 turn=13 INFO: Turn 13/25
-[2026-04-08T08:31:39.920Z] iter=476 turn=13 INFO: Agent: Both goals done. Wrapping up now.
-[2026-04-08T08:31:39.921Z] iter=476 turn=13 INFO: save_memory: "[Engineer] Iteration 476 — shipped"
-[2026-04-08T08:31:39.922Z] iter=476 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T08:31:39.922Z] iter=476 turn=14 INFO: Turn 14/25
-[2026-04-08T08:31:53.954Z] iter=476 turn=14 INFO: write_file: goals.md (write)
-[2026-04-08T08:31:53.955Z] iter=476 turn=14 INFO:   -> ok: Updated goals.md (1477 chars, -50 lines delta)
-[2026-04-08T08:31:53.955Z] iter=476 turn=15 INFO: Turn 15/25
-[2026-04-08T08:31:57.943Z] iter=476 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "TSC_OK"
-[2026-04-08T08:31:59.113Z] iter=476 turn=15 INFO:   -> exit=0 (7 chars)
-[2026-04-08T08:31:59.113Z] iter=476 turn=16 INFO: Turn 16/25
-[2026-04-08T08:32:01.296Z] iter=476 turn=16 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T08:32:01.296Z] iter=476 turn=16 INFO: RESTART signal
-[2026-04-08T08:32:01.297Z] iter=476 turn=16 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T08:32:02.385Z] iter=476 turn=16 INFO: Compilation OK
-[2026-04-08T08:32:10.255Z] iter=476 turn=16 INFO: VALIDATION BLOCKED RESTART — agent must fix
-[2026-04-08T08:32:10.255Z] iter=476 turn=17 INFO: Turn 17/25
-[2026-04-08T08:32:16.861Z] iter=476 turn=17 INFO: Agent: The self-test is importing executors directly. Let me check what's failing:
-[2026-04-08T08:32:16.861Z] iter=476 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -50
-[2026-04-08T08:32:17.977Z] iter=476 turn=17 INFO:   -> exit=0 (11 chars)
-[2026-04-08T08:32:17.978Z] iter=476 turn=18 INFO: Turn 18/25
-[2026-04-08T08:32:20.111Z] iter=476 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && node scripts/self-test.mjs 2>&1 | tail -40
-[2026-04-08T08:32:20.178Z] iter=476 turn=18 INFO:   -> exit=0 (760 chars)
-[2026-04-08T08:32:20.178Z] iter=476 turn=19 INFO: Turn 19/25
-[2026-04-08T08:32:22.864Z] iter=476 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && ls scripts/ && cat scripts/self-test* 2>/dev/null | head -5 || ls scripts/
-[2026-04-08T08:32:22.878Z] iter=476 turn=19 INFO:   -> exit=0 (241 chars)
-[2026-04-08T08:32:22.878Z] iter=476 turn=20 INFO: Turn 20/25
-[2026-04-08T08:32:27.469Z] iter=476 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | tail -40
-[2026-04-08T08:32:35.738Z] iter=476 turn=20 INFO:   -> exit=0 (1585 chars)
-[2026-04-08T08:32:35.739Z] iter=476 turn=21 INFO: Turn 21/25
-[2026-04-08T08:32:40.749Z] iter=476 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && npx tsx scripts/self-test.ts 2>&1 | grep -A5 "FAILED\|❌\|✗\|failed"
-[2026-04-08T08:32:48.541Z] iter=476 turn=21 INFO:   -> exit=0 (1015 chars)
-[2026-04-08T08:32:48.541Z] iter=476 turn=22 INFO: Turn 22/25
-[2026-04-08T08:32:54.367Z] iter=476 turn=22 INFO: Agent: The failure is `registry: handler calls ctx.log`. The think tool handler I changed removed the `ctx.log` call. Let me fix it:
-[2026-04-08T08:32:54.367Z] iter=476 turn=22 INFO: write_file: src/tool-registry.ts (patch)
-[2026-04-08T08:32:54.368Z] iter=476 turn=22 INFO:   -> ok: Patched src/tool-registry.ts: -5 +6 lines
-
-Context after patch:
-240 |     return { result: r.content };
-241 |   }, { defaultTimeout: 30 });
-242 | 
-243 |   // ── think ─────────────────────────────────────────────
-244 |   registry.register(thinkToolDefinition, async (input, ctx) => {
-245 |     const { thought } = input as { thought: string };
-246 |     ctx.log(`think: ${thought.slice(0, 120)}...`);
-247 |     return { result: `Thought recorded (${thought.length} chars). Continue.` };
-248 |   }, { defaultTimeout: 5 });
-249 | 
-250 |   // ── list_files ────────────────────────────────────────
-251 |   const lazyExecuteListFiles = lazyExecutor("./tools/list_files.js", "executeListFiles");
-[2026-04-08T08:32:54.368Z] iter=476 turn=23 INFO: Turn 23/25
-[2026-04-08T08:32:57.584Z] iter=476 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit && echo "AUTOAGENT_RESTART"
-[2026-04-08T08:32:57.584Z] iter=476 turn=23 INFO: RESTART signal
-[2026-04-08T08:32:57.584Z] iter=476 turn=23 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T08:32:58.681Z] iter=476 turn=23 INFO: Compilation OK
-[2026-04-08T08:33:07.195Z] iter=476 turn=23 INFO: Cache persisted: 62 entries to .autoagent-cache.json
-[2026-04-08T08:33:07.195Z] iter=476 turn=23 INFO: Cache stats: 0 hits, 5 misses, 62 entries, 7 invalidations (6 entries removed)
-[2026-04-08T08:33:07.196Z] iter=476 turn=23 INFO: Tool cache stats
-[2026-04-08T08:33:07.196Z] iter=476 turn=23 INFO: Tool timing: bash: 10x, avg=1955ms, total=19545ms; grep: 2x, avg=26ms, total=51ms; write_file: 7x, avg=2ms, total=11ms; read_file: 3x, avg=2ms, total=5ms; read_scratchpad: 1x, avg=3ms, total=3ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
-[2026-04-08T08:33:07.196Z] iter=476 turn=23 INFO: Tool timing stats
-[2026-04-08T08:33:15.166Z] iter=476 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 476: predicted 15 turns, actual 23 turns, ratio 1.53**
-[2026-04-08T08:33:25.709Z] iter=476 turn=23 INFO: Pre-commit review (2701in/392out): - **Lazy executor path bug**: `lazyExecutor` is called with relative paths like `"./tools/bash.js"`, but dynamic `import()` resolves relative paths against the *current working directory* at runtime i
-[2026-04-08T08:33:25.764Z] iter=476 turn=23 INFO: Committed: 62fbd12f (39 in / 9371 out, cache: 33970 created, 480724 read)
-[2026-04-08T08:33:25.764Z] iter=476 turn=23 INFO: Restarting as iteration 477...
-[2026-04-08T08:33:25.966Z] iter=477 INFO: Cache restored: 62/62 entries (0 stale)
-[2026-04-08T08:33:25.969Z] iter=477 INFO: Turn budget: 16/25 (calibration=1.53x, predicted=8)
-[2026-04-08T08:33:25.969Z] iter=477 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-08T08:33:26.179Z] iter=477 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-08T08:33:26.180Z] iter=477 turn=1 INFO: Turn 1/25
-[2026-04-08T08:33:31.224Z] iter=477 turn=1 INFO: Agent: 
-
-I'll start by reviewing what was shipped in iteration 476 and then do research to inform the next roadmap.
-[2026-04-08T08:33:31.226Z] iter=477 turn=1 INFO: read_file: src/orchestrator.ts
-[2026-04-08T08:33:31.227Z] iter=477 turn=1 INFO: read_file: src/tool-registry.ts
-[2026-04-08T08:33:31.229Z] iter=477 turn=1 INFO:   -> ok (3821 chars)
-[2026-04-08T08:33:31.231Z] iter=477 turn=1 INFO:   -> ok (3805 chars)
-[2026-04-08T08:33:31.232Z] iter=477 turn=2 INFO: Turn 2/25
-[2026-04-08T08:33:37.286Z] iter=477 turn=2 INFO: Agent: 
-
-You're right. My deliverable is `goals.md` for Engineer 478. Let me do focused review and research in parallel, then write it.
-[2026-04-08T08:33:37.287Z] iter=477 turn=2 INFO: read_file: src/orchestrator.ts
-[2026-04-08T08:33:37.289Z] iter=477 turn=2 INFO: grep: "proactive.*summar|summarize.*tool|tool.*result.*summar" in src/orchestrator.ts
 [2026-04-08T08:33:37.290Z] iter=477 turn=2 INFO: grep: "loopDetect|loop.*detect|detectLoop" in src/loop-detector.ts
 [2026-04-08T08:33:37.292Z] iter=477 turn=2 INFO:   -> ok (781 chars)
 [2026-04-08T08:33:37.331Z] iter=477 turn=2 INFO:   -> 0 matches
@@ -1173,3 +996,83 @@ Context after patch:
 [2026-04-08T08:51:18.176Z] iter=486 turn=19 INFO: Pre-commit review (2097in/340out): **Issues found:**
 
 - **False positive dependencies from generic filenames**: `FILE_RE` will match any shared filename across tasks. If two unrelated tasks both touch `src/config.ts` for genuinely inde
+[2026-04-08T08:51:18.233Z] iter=486 turn=19 INFO: Committed: 22929a4d (35 in / 4150 out, cache: 17176 created, 186399 read)
+[2026-04-08T08:51:18.233Z] iter=486 turn=19 INFO: Restarting as iteration 487...
+[2026-04-08T08:51:18.433Z] iter=487 INFO: Cache restored: 67/67 entries (0 stale)
+[2026-04-08T08:51:18.436Z] iter=487 INFO: Turn budget: 13/25 (calibration=1.13x, predicted=8)
+[2026-04-08T08:51:18.436Z] iter=487 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-08T08:51:18.641Z] iter=487 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-08T08:51:18.642Z] iter=487 turn=1 INFO: Turn 1/25
+[2026-04-08T08:51:23.187Z] iter=487 turn=1 INFO: Agent: 
+
+I'll start by reviewing the current system health, checking what's actually been shipped recently, and then writing focused goals for the next Engineer iteration.
+[2026-04-08T08:51:23.187Z] iter=487 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -20
+[2026-04-08T08:51:23.188Z] iter=487 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -80
+[2026-04-08T08:51:23.188Z] iter=487 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git diff --stat HEAD~5..HEAD -- src/
+[2026-04-08T08:51:23.201Z] iter=487 turn=1 INFO:   -> exit=0 (1679 chars)
+[2026-04-08T08:51:23.209Z] iter=487 turn=1 INFO:   -> exit=0 (660 chars)
+[2026-04-08T08:51:23.213Z] iter=487 turn=1 INFO:   -> exit=0 (470 chars)
+[2026-04-08T08:51:23.213Z] iter=487 turn=2 INFO: Turn 2/25
+[2026-04-08T08:51:32.810Z] iter=487 turn=2 INFO: Agent: 
+
+You're right. My deliverable is `goals.md` for the next Engineer iteration. Let me assess and write it now.
+[2026-04-08T08:51:32.812Z] iter=487 turn=2 INFO: think: Let me assess the system health quickly:
+
+Last 5 iterations (482-486):
+- 482: LOC stall (0 src changes)
+- 483: Meta - fi...
+[2026-04-08T08:51:32.813Z] iter=487 turn=3 INFO: Turn 3/25
+[2026-04-08T08:51:35.621Z] iter=487 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "retryWithBackoff" src/orchestrator.ts
+[2026-04-08T08:51:35.623Z] iter=487 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "transaction" src/checkpoint.ts
+[2026-04-08T08:51:35.633Z] iter=487 turn=3 INFO:   -> exit=0 (81 chars)
+[2026-04-08T08:51:35.634Z] iter=487 turn=3 INFO:   -> exit=0 (125 chars)
+[2026-04-08T08:51:35.634Z] iter=487 turn=4 INFO: Turn 4/25
+[2026-04-08T08:51:38.969Z] iter=487 turn=4 INFO: Agent: 
+
+Wait — both goals are already done! Let me verify before writing goals.
+[2026-04-08T08:51:38.969Z] iter=487 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "retryWithBackoff" src/orchestrator.ts && echo "---" && sed -n '91,120p' src/checkpoint.ts
+[2026-04-08T08:51:38.985Z] iter=487 turn=4 INFO:   -> exit=0 (1227 chars)
+[2026-04-08T08:51:38.986Z] iter=487 turn=5 INFO: Turn 5/25
+[2026-04-08T08:51:44.656Z] iter=487 turn=5 INFO: Agent: Both goals from iteration 487 are **already done** — they were completed in iteration 486. The goals.md was written anticipating unfinished work that actually got shipped. This is good news — the Engineer was productive.
+
+Now I need to: write new goals for the next Engineer iteration, compact memory, verify tsc, and restart.
+[2026-04-08T08:51:44.657Z] iter=487 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -c "retryWithBackoff" src/orchestrator.ts && echo "--- main loop stream check ---" && grep -n "messages.stream\|messages.create" src/orchestrator.ts | head...
+[2026-04-08T08:51:44.659Z] iter=487 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/orchestrator.ts src/checkpoint.ts src/tool-recovery.ts src/task-planner.ts
+[2026-04-08T08:51:44.667Z] iter=487 turn=5 INFO:   -> exit=0 (130 chars)
+[2026-04-08T08:51:44.676Z] iter=487 turn=5 INFO:   -> exit=0 (288 chars)
+[2026-04-08T08:51:44.676Z] iter=487 turn=6 INFO: Turn 6/25
+[2026-04-08T08:51:48.532Z] iter=487 turn=6 INFO: Agent: 
+
+Right — Meta iteration, my deliverable is goals.md. Both previous goals are done. Let me write goals and wrap up now.
+[2026-04-08T08:51:48.533Z] iter=487 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "messages.create\|messages.stream" src/orchestrator.ts | head -10
+[2026-04-08T08:51:48.559Z] iter=487 turn=6 INFO:   -> exit=0 (255 chars)
+[2026-04-08T08:51:48.560Z] iter=487 turn=7 INFO: Turn 7/25
+[2026-04-08T08:52:57.199Z] iter=487 turn=7 INFO: Agent: 
+
+Writing goals.md and finishing up now.
+[2026-04-08T08:52:57.199Z] iter=487 turn=7 INFO: write_file: goals.md (write)
+[2026-04-08T08:52:57.201Z] iter=487 turn=7 INFO:   -> ok: Updated goals.md (1962 chars, 0 lines delta)
+[2026-04-08T08:52:57.202Z] iter=487 turn=8 INFO: Turn 8/25
+[2026-04-08T08:53:03.097Z] iter=487 turn=8 INFO: write_file: memory.md (patch)
+[2026-04-08T08:53:03.098Z] iter=487 turn=8 INFO:   -> ok: Patched memory.md: -7 +1 lines
+
+Context after patch:
+53 | - Goals.md now has concrete, verifiable NEW features with code snippets.
+54 | - Memory compacted: removed stale auto-scored entries and old health notes.
+55 | 
+56 | **[AUTO-SCORED] Iterations 483-486: avg ratio 1.09 (well-calibrated). 486 was 1.27 (over budget — 2 goals + tests).**
+57 | 
+[2026-04-08T08:53:03.099Z] iter=487 turn=9 INFO: Turn 9/25
+[2026-04-08T08:53:05.687Z] iter=487 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T08:53:06.839Z] iter=487 turn=9 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:53:06.839Z] iter=487 turn=10 INFO: Turn 10/25
+[2026-04-08T08:53:09.405Z] iter=487 turn=10 INFO: Agent: TSC clean. 
+[2026-04-08T08:53:09.406Z] iter=487 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T08:53:09.406Z] iter=487 turn=10 INFO: RESTART signal
+[2026-04-08T08:53:09.407Z] iter=487 turn=10 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T08:53:10.588Z] iter=487 turn=10 INFO: Compilation OK
+[2026-04-08T08:53:19.574Z] iter=487 turn=10 INFO: Cache persisted: 67 entries to .autoagent-cache.json
+[2026-04-08T08:53:19.575Z] iter=487 turn=10 INFO: Tool timing: bash: 11x, avg=119ms, total=1307ms; write_file: 2x, avg=2ms, total=3ms; think: 1x, avg=1ms, total=1ms
+[2026-04-08T08:53:19.575Z] iter=487 turn=10 INFO: Tool timing stats
+[2026-04-08T08:53:27.678Z] iter=487 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 487: predicted 8 turns, actual 10 turns, ratio 1.25**
+[2026-04-08T08:53:27.700Z] iter=487 turn=10 INFO: Pre-commit review: no significant code changes to review
