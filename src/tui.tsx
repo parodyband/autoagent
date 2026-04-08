@@ -192,9 +192,19 @@ function GitBadge({ git }: { git: GitInfo }) {
   );
 }
 
-function Header({ model, git, cost }: { model: string; git: GitInfo; cost?: number }) {
+function ContextIndicator({ tokensUsed, threshold }: { tokensUsed: number; threshold: number }) {
+  const percent = Math.round((tokensUsed / threshold) * 100);
+  const usedK = Math.round(tokensUsed / 1000);
+  const thresholdK = Math.round(threshold / 1000);
+  const color = percent >= 80 ? "red" : percent >= 50 ? "yellow" : "green";
+  return (
+    <Text color={color} dimColor={percent < 50}>ctx: {usedK}K/{thresholdK}K ({percent}%)</Text>
+  );
+}
+
+function Header({ model, git, cost, contextUsage }: { model: string; git: GitInfo; cost?: number; contextUsage?: { tokensUsed: number; threshold: number } }) {
   const modelLabel = model.includes("haiku") ? "haiku" : model.includes("opus") ? "opus" : "sonnet";
-  const costStr = cost != null ? (cost < 0.01 ? "<$0.01" : `$${cost.toFixed(2)}`) : "";
+  const costStr = cost != null ? (cost < 0.01 ? "<$0.01" : `${cost.toFixed(2)}`) : "";
   return (
     <Box marginBottom={1} justifyContent="space-between">
       <Box>
@@ -206,6 +216,9 @@ function Header({ model, git, cost }: { model: string; git: GitInfo; cost?: numb
         <GitBadge git={git} />
       </Box>
       <Box gap={2}>
+        {contextUsage && contextUsage.tokensUsed > 0
+          ? <ContextIndicator tokensUsed={contextUsage.tokensUsed} threshold={contextUsage.threshold} />
+          : null}
         {costStr ? <Text color="gray" dimColor>{costStr}</Text> : null}
         <Text color="gray" dimColor>/help</Text>
       </Box>
@@ -625,7 +638,7 @@ function App() {
 
   return (
     <Box flexDirection="column" paddingX={1}>
-      <Header model={currentModel} git={gitInfo} cost={footerStats.cost} />
+      <Header model={currentModel} git={gitInfo} cost={footerStats.cost} contextUsage={orchestratorRef.current ? orchestratorRef.current.getContextUsage() : undefined} />
 
       {/* Messages — clean, auto-cleared view */}
       <Box flexDirection="column" flexGrow={1}>

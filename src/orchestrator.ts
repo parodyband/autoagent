@@ -1565,6 +1565,14 @@ export class Orchestrator {
     return this.sessionTokensIn >= MICRO_COMPACT_THRESHOLD;
   }
 
+  /** Returns current context usage for display in TUI. */
+  getContextUsage(): { tokensUsed: number; threshold: number; percent: number } {
+    const tokensUsed = this.sessionTokensIn;
+    const threshold = COMPACT_THRESHOLD;
+    const percent = Math.round((tokensUsed / threshold) * 100);
+    return { tokensUsed, threshold, percent };
+  }
+
   /**
    * Determine the "prune priority" for a tool result.
    * Lower number = prune first (low value); higher number = prune last (high value).
@@ -1583,6 +1591,19 @@ export class Orchestrator {
   /**
    * Build a map from tool_use_id → tool name by scanning all assistant messages.
    */
+  private findToolUseBlock(toolUseId: string): { input?: Record<string, unknown> } | undefined {
+    for (const msg of this.apiMessages) {
+      if (msg.role !== "assistant" || !Array.isArray(msg.content)) continue;
+      for (const block of msg.content) {
+        if (typeof block === "object" && "type" in block && block.type === "tool_use" && "id" in block) {
+          const b = block as { id: string; input?: Record<string, unknown> };
+          if (b.id === toolUseId) return b;
+        }
+      }
+    }
+    return undefined;
+  }
+
   private buildToolUseIdMap(): Map<string, string> {
     const map = new Map<string, string>();
     for (const msg of this.apiMessages) {
@@ -1614,6 +1635,8 @@ export class Orchestrator {
    * Proactive tool result summarization — runs every 5th tool turn.
    * Replaces large, old tool results with compact summaries to keep
    * the context window clean before hitting compaction thresholds.
+   * Only summarizes results older than 8 assistant turns; skips files
+   * actively being worked on (seen in last 4 tool_use blocks).
    */
   summarizeOldToolResults(): void {
     this.toolTurnCounter++;
@@ -1621,12 +1644,27 @@ export class Orchestrator {
 
     const toolUseIdMap = this.buildToolUseIdMap();
 
-    // Find the index of the 6th most recent assistant message
+    // Find the index of the 9th most recent assistant message (skip last 8 turns)
     const assistantIndices: number[] = [];
     for (let i = this.apiMessages.length - 1; i >= 0; i--) {
       if (this.apiMessages[i].role === "assistant") assistantIndices.push(i);
     }
-    const cutoffIdx = assistantIndices[5] ?? 0;
+    const cutoffIdx = assistantIndices[8] ?? 0;
+
+    // Collect files actively being worked on (in last 4 tool_use blocks)
+    const activeFiles = new Set<string>();
+    let recentToolUseCount = 0;
+    for (let i = this.apiMessages.length - 1; i >= 0 && recentToolUseCount < 4; i--) {
+      const msg = this.apiMessages[i];
+      if (msg.role !== "assistant" || !Array.isArray(msg.content)) continue;
+      for (const block of msg.content) {
+        if (typeof block !== "object" || !("type" in block) || block.type !== "tool_use") continue;
+        recentToolUseCount++;
+        const inp = (block as { input?: Record<string, unknown> }).input;
+        if (inp?.path && typeof inp.path === "string") activeFiles.add(inp.path);
+        if (recentToolUseCount >= 4) break;
+      }
+    }
 
     for (let i = 0; i < cutoffIdx; i++) {
       const msg = this.apiMessages[i];
@@ -1640,6 +1678,13 @@ export class Orchestrator {
         };
         if (this.summarizedToolIds.has(toolBlock.tool_use_id)) continue;
         const toolName = toolUseIdMap.get(toolBlock.tool_use_id) ?? "unknown";
+
+        // Skip tool results for files actively being worked on
+        if (activeFiles.size > 0 && toolName === "read_file") {
+          const toolUseBlock = this.findToolUseBlock(toolBlock.tool_use_id);
+          const filePath = toolUseBlock?.input?.path as string | undefined;
+          if (filePath && activeFiles.has(filePath)) continue;
+        }
 
         // Handle both string and array content
         if (typeof toolBlock.content === "string") {
