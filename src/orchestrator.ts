@@ -740,10 +740,31 @@ async function runAgentLoop(
       const tuInput = tu.input as Record<string, unknown>;
       const callTs  = new Date().toISOString();
 
-      // Full schema is available via registry.getSchemaFor(tu.name) if needed for
-      // input validation. Claude generates correct inputs from the compact signature
-      // in getMinimalDefinitions(), so we log the schema only in debug scenarios.
-      // To enable validation: const fullSchema = registry.getSchemaFor(tu.name);
+      // Validate required parameters against the full schema before dispatching.
+      // getMinimalDefinitions() strips schemas to save tokens, so Claude occasionally
+      // sends incomplete inputs. Catch those here and return a clear error instead of
+      // crashing or producing silent failures.
+      const fullSchema = registry.getSchemaFor(tu.name);
+      if (fullSchema) {
+        const required = (fullSchema.required as string[] | undefined) ?? [];
+        const properties = (fullSchema.properties as Record<string, { type?: string }> | undefined) ?? {};
+        const missing = required.filter((k) => !(k in tuInput));
+        const wrongType = Object.entries(properties)
+          .filter(([k, def]) => def.type && k in tuInput && typeof tuInput[k] !== def.type)
+          .map(([k, def]) => `${k} (expected ${def.type}, got ${typeof tuInput[k]})`);
+        if (missing.length > 0 || wrongType.length > 0) {
+          const parts: string[] = [];
+          if (missing.length > 0) parts.push(`missing required parameters: ${missing.join(", ")}`);
+          if (wrongType.length > 0) parts.push(`wrong parameter types: ${wrongType.join("; ")}`);
+          const errMsg = `[Validation error] ${parts.join(" | ")}`;
+          reflectionCbs.onToolRecord?.({
+            name: tu.name, input: tuInput,
+            resultSnippet: errMsg,
+            durationMs: 0, isError: true, wasRetried: false, timestamp: callTs,
+          });
+          return errMsg;
+        }
+      }
 
       // PreToolUse hook — may block execution
       const preResult = await runHooks(hooksConfig, "PreToolUse", {

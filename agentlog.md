@@ -1,79 +1,3 @@
-[2026-04-08T19:36:28.181Z] iter=500 turn=2 INFO: Turn 2/25
-[2026-04-08T19:36:30.415Z] iter=500 turn=2 INFO: read_file: src/tools/subagent.ts
-[2026-04-08T19:36:30.415Z] iter=500 turn=2 INFO: $ grep -n "systemPrompt\|system_prompt\|system prompt\|toolContext\|ToolContext\|executionContext" src/orchestrator.ts | head -50
-[2026-04-08T19:36:30.416Z] iter=500 turn=2 INFO:   -> ok (5935 chars)
-[2026-04-08T19:36:30.434Z] iter=500 turn=2 INFO:   -> exit=0 (2187 chars)
-[2026-04-08T19:36:30.434Z] iter=500 turn=3 INFO: Turn 3/25
-[2026-04-08T19:36:36.397Z] iter=500 turn=3 INFO: think: I have enough context. Let me implement the sub-agent prompt cache prefix sharing:
-
-1. `src/tools/subagent.ts`: Add `sys...
-[2026-04-08T19:36:36.398Z] iter=500 turn=4 INFO: Turn 4/25
-[2026-04-08T19:36:37.977Z] iter=500 turn=4 INFO: $ grep -n "executeSubagent\|subagent\|SubagentResult" src/orchestrator.ts | head -30
-[2026-04-08T19:36:37.994Z] iter=500 turn=4 INFO:   -> exit=0 (11 chars)
-[2026-04-08T19:36:37.994Z] iter=500 turn=5 INFO: Turn 5/25
-[2026-04-08T19:36:40.710Z] iter=500 turn=5 INFO: Agent: **Goal A - Sub-agent prompt cache prefix sharing**: IN PROGRESS
-[2026-04-08T19:36:40.711Z] iter=500 turn=5 INFO: $ grep -n "executeSubagent\|subagent\|\"subagent\"\|tool_name.*subagent\|subagentTool" src/orchestrator.ts | head -20
-[2026-04-08T19:36:40.727Z] iter=500 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-08T19:36:40.728Z] iter=500 turn=6 INFO: Turn 6/25
-[2026-04-08T19:36:41.909Z] iter=500 turn=6 INFO: $ grep -rn "executeSubagent" src/ | head -20
-[2026-04-08T19:36:41.958Z] iter=500 turn=6 INFO:   -> exit=0 (823 chars)
-[2026-04-08T19:36:41.959Z] iter=500 turn=7 INFO: Turn 7/25
-[2026-04-08T19:36:43.550Z] iter=500 turn=7 INFO: $ grep -n "lazyExecuteSubagent\|subagent" src/tool-registry.ts | head -30
-[2026-04-08T19:36:43.562Z] iter=500 turn=7 INFO:   -> exit=0 (551 chars)
-[2026-04-08T19:36:43.563Z] iter=500 turn=8 INFO: Turn 8/25
-[2026-04-08T19:36:45.682Z] iter=500 turn=8 INFO: Agent: I've been doing too much exploration. Let me implement now.
-[2026-04-08T19:36:45.683Z] iter=500 turn=8 INFO: read_file: src/tool-registry.ts
-[2026-04-08T19:36:45.683Z] iter=500 turn=8 INFO:   -> ok (1760 chars)
-[2026-04-08T19:36:45.683Z] iter=500 turn=9 INFO: Turn 9/25
-[2026-04-08T19:36:54.543Z] iter=500 turn=9 INFO: Agent: Now I have all the context I need. Let me implement the changes:
-
-**1. Update `executeSubagent` to accept and use `systemPromptPrefix`:**
-[2026-04-08T19:36:54.544Z] iter=500 turn=9 INFO: write_file: src/tools/subagent.ts (patch)
-[2026-04-08T19:36:54.546Z] iter=500 turn=9 INFO:   -> ok: Patched src/tools/subagent.ts: -28 +35 lines
-
-Context after patch:
-90 |   return text.slice(0, MAX_OUTPUT_CHARS) + `\n[truncated — showing first ${MAX_OUTPUT_CHARS} chars]`;
-91 | }
-92 | 
-93 | export async function executeSubagent(
-94 |   task: string,
-95 |   model: string = "fast",
-96 |   maxTokens: number = 2048,
-97 |   client?: Anthropic,
-98 |   systemPromptPrefix?: string,
-99 | ): Promise<SubagentResult> {
-100 |   const modelId = MODELS[model] || MODELS.fast;
-101 |   const timeoutMs = TIMEOUTS_MS[model] ?? TIMEOUTS_MS.fast;
-102 |   const _client = client ?? new Anthropic();
-103 | 
-104 |   const MAX_RETRIES = 2;
-105 |   const BACKOFF_MS = [1_000, 3_000];
-106 | 
-107 |   // Build system prompt array with cache_control to share cache prefix
-108 |   const systemBlocks: Anthropic.TextBlockParam[] = systemPromptPrefix
-109 |     ? [{ type: "text", text: systemPromptPrefix, cache_control: { type: "ephemeral" } }]
-110 |     : [];
-111 | 
-112 |   let lastErr: unknown;
-113 | 
-114 |   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-115 |     const controller = new AbortController();
-116 |     const timer = setTimeout(() => controller.abort(), timeoutMs);
-117 | 
-118 |     try {
-119 |       const response = await _client.messages.create(
-120 |         {
-121 |           model: modelId,
-122 |           max_tokens: maxTokens,
-123 |           ...(systemBlocks.length > 0 ? { system: systemBlocks } : {}),
-124 |           messages: [{ role: "user", content: task }],
-125 |         },
-126 |         { signal: controller.signal },
-127 |       );
-128 | 
-129 |       clearTimeout(timer);
-130 | 
-[2026-04-08T19:36:54.547Z] iter=500 turn=10 INFO: Turn 10/25
 [2026-04-08T19:36:59.142Z] iter=500 turn=10 INFO: Agent: **2. Also update `parallelResearch` to thread through the prefix:**
 [2026-04-08T19:36:59.143Z] iter=500 turn=10 INFO: write_file: src/tools/subagent.ts (patch)
 [2026-04-08T19:36:59.144Z] iter=500 turn=10 INFO:   -> ok: Patched src/tools/subagent.ts: -9 +10 lines
@@ -1072,3 +996,126 @@ Writing goals.md and memory now, then tsc and restart.
 [2026-04-08T19:50:28.973Z] iter=509 turn=10 INFO: Tool timing stats
 [2026-04-08T19:50:37.380Z] iter=509 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 509: predicted 8 turns, actual 10 turns, ratio 1.25**
 [2026-04-08T19:50:37.406Z] iter=509 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T19:50:37.446Z] iter=509 turn=10 INFO: Committed: 83c072e5 (20 in / 3012 out, cache: 13411 created, 85089 read)
+[2026-04-08T19:50:37.446Z] iter=509 turn=10 INFO: Restarting as iteration 510...
+[2026-04-08T19:50:37.653Z] iter=510 INFO: Cache restored: 67/67 entries (0 stale)
+[2026-04-08T19:50:37.656Z] iter=510 INFO: Turn budget: 15/25 (calibration=1.25x, predicted=12)
+[2026-04-08T19:50:37.656Z] iter=510 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T19:50:37.875Z] iter=510 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-08T19:50:37.876Z] iter=510 turn=1 INFO: Turn 1/25
+[2026-04-08T19:50:40.627Z] iter=510 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be implemented.
+[2026-04-08T19:50:40.628Z] iter=510 turn=1 INFO: $ grep -n "getSchemaFor\|execTool\|tool_result\|PreToolUse\|tu\.name\|tuInput" src/orchestrator.ts | head -60
+[2026-04-08T19:50:40.629Z] iter=510 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T19:50:40.649Z] iter=510 turn=1 INFO:   -> exit=0 (4515 chars)
+[2026-04-08T19:50:40.649Z] iter=510 turn=2 INFO: Turn 2/25
+[2026-04-08T19:50:43.574Z] iter=510 turn=2 INFO: read_file: src/orchestrator.ts
+[2026-04-08T19:50:43.575Z] iter=510 turn=2 INFO: $ grep -n "getSchemaFor\|getMinimalDefinitions" src/tool-registry.ts | head -20
+[2026-04-08T19:50:43.578Z] iter=510 turn=2 INFO:   -> ok (4402 chars)
+[2026-04-08T19:50:43.587Z] iter=510 turn=2 INFO:   -> exit=0 (129 chars)
+[2026-04-08T19:50:43.588Z] iter=510 turn=3 INFO: Turn 3/25
+[2026-04-08T19:50:46.890Z] iter=510 turn=3 INFO: think: I have enough context. I need to:
+1. Add schema validation at the dispatch site in orchestrator.ts (~line 743-748) — bef...
+[2026-04-08T19:50:46.892Z] iter=510 turn=4 INFO: Turn 4/25
+[2026-04-08T19:50:49.139Z] iter=510 turn=4 INFO: read_file: src/tool-registry.ts
+[2026-04-08T19:50:49.140Z] iter=510 turn=4 INFO:   -> ok (1167 chars)
+[2026-04-08T19:50:49.140Z] iter=510 turn=5 INFO: Turn 5/25
+[2026-04-08T19:51:00.707Z] iter=510 turn=5 INFO: Agent: **Goal status:**
+- Schema validation at tool dispatch (orchestrator.ts): NOT STARTED
+- Test file (tool-dispatch-validation.test.ts): NOT STARTED
+
+Writing both now.
+[2026-04-08T19:51:00.708Z] iter=510 turn=5 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T19:51:00.711Z] iter=510 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -6 +27 lines
+
+Context after patch:
+740 |       const tuInput = tu.input as Record<string, unknown>;
+741 |       const callTs  = new Date().toISOString();
+742 | 
+743 |       // Validate required parameters against the full schema before dispatching.
+744 |       // getMinimalDefinitions() strips schemas to save tokens, so Claude occasionally
+745 |       // sends incomplete inputs. Catch those here and return a clear error instead of
+746 |       // crashing or producing silent failures.
+747 |       const fullSchema = registry.getSchemaFor(tu.name);
+748 |       if (fullSchema) {
+749 |         const required = (fullSchema.required as string[] | undefined) ?? [];
+750 |         const properties = (fullSchema.properties as Record<string, { type?: string }> | undefined) ?? {};
+751 |         const missing = required.filter((k) => !(k in tuInput));
+752 |         const wrongType = Object.entries(properties)
+753 |           .filter(([k, def]) => def.type && k in tuInput && typeof tuInput[k] !== def.type)
+754 |           .map(([k, def]) => `${k} (expected ${def.type}, got ${typeof tuInput[k]})`);
+755 |         if (missing.length > 0 || wrongType.length > 0) {
+756 |           const parts: string[] = [];
+757 |           if (missing.length > 0) parts.push(`missing required parameters: ${missing.join(", ")}`);
+758 |           if (wrongType.length > 0) parts.push(`wrong parameter types: ${wrongType.join("; ")}`);
+759 |           const errMsg = `[Validation error] ${parts.join(" | ")}`;
+760 |           reflectionCbs.onToolRecord?.({
+761 |             name: tu.name, input: tuInput,
+762 |             resultSnippet: errMsg,
+763 |             durationMs: 0, isError: true, wasRetried: false, timestamp: callTs,
+764 |           });
+765 |           return errMsg;
+766 |         }
+767 |       }
+768 | 
+769 |       // PreToolUse hook — may block execution
+770 |       const preResult = await runHooks(hooksConfig, "PreToolUse", {
+771 |         cwd: workDir, tool_name: tu.name, tool_input: tu.input,
+772 |       }, workDir);
+[2026-04-08T19:51:00.712Z] iter=510 turn=6 INFO: Turn 6/25
+[2026-04-08T19:51:15.791Z] iter=510 turn=6 INFO: Agent: Now write the test file:
+[2026-04-08T19:51:15.791Z] iter=510 turn=6 INFO: write_file: src/__tests__/tool-dispatch-validation.test.ts (write)
+[2026-04-08T19:51:15.792Z] iter=510 turn=6 INFO:   -> ok: Created src/__tests__/tool-dispatch-validation.test.ts (4821 chars)
+[2026-04-08T19:51:15.793Z] iter=510 turn=7 INFO: Turn 7/25
+[2026-04-08T19:51:17.739Z] iter=510 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -20
+[2026-04-08T19:51:18.949Z] iter=510 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-08T19:51:18.950Z] iter=510 turn=8 INFO: Turn 8/25
+[2026-04-08T19:51:20.748Z] iter=510 turn=8 INFO: Agent: TypeScript passes. Run tests then wrap up.
+[2026-04-08T19:51:20.748Z] iter=510 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tool-dispatch-validation.test.ts 2>&1 | tail -25
+[2026-04-08T19:51:21.789Z] iter=510 turn=8 INFO:   -> exit=0 (1046 chars)
+[2026-04-08T19:51:21.790Z] iter=510 turn=9 INFO: Turn 9/25
+[2026-04-08T19:52:05.659Z] iter=510 turn=9 INFO: think: The failing tests:
+1. "returns error when param has wrong type" — `{ path: "/foo", count: "not-a-number" }` — path is pr...
+[2026-04-08T19:52:05.662Z] iter=510 turn=10 INFO: Turn 10/25
+[2026-04-08T19:52:09.193Z] iter=510 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && node --loader ts-node/esm -e "
+import { ToolRegistry } from './src/tool-registry.js';
+const r = new ToolRegistry();
+r.register({
+  definition: { name: 'test_too...
+[2026-04-08T19:52:09.265Z] iter=510 turn=10 INFO:   -> exit=0 (122 chars)
+[2026-04-08T19:52:09.265Z] iter=510 turn=11 INFO: Turn 11/25
+[2026-04-08T19:52:12.044Z] iter=510 turn=11 INFO: Agent: Tests have 3 failures. Let me fix them quickly.
+[2026-04-08T19:52:12.045Z] iter=510 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tool-dispatch-validation.test.ts 2>&1 | grep "FAIL\|AssertionError\|●" | head -20
+[2026-04-08T19:52:13.103Z] iter=510 turn=11 INFO:   -> exit=0 (524 chars)
+[2026-04-08T19:52:13.103Z] iter=510 turn=12 INFO: Turn 12/25
+[2026-04-08T19:52:15.561Z] iter=510 turn=12 INFO: think: Even "returns error when required param is missing" fails - that's the most basic test. This means `getSchemaFor` is ret...
+[2026-04-08T19:52:15.562Z] iter=510 turn=13 INFO: Turn 13/25
+[2026-04-08T19:52:17.708Z] iter=510 turn=13 INFO: Agent: Let me check the ToolRegistry constructor quickly and fix the tests.
+[2026-04-08T19:52:17.709Z] iter=510 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "constructor\|class ToolRegistry" src/tool-registry.ts | head -5
+[2026-04-08T19:52:17.730Z] iter=510 turn=13 INFO:   -> exit=0 (32 chars)
+[2026-04-08T19:52:17.731Z] iter=510 turn=14 INFO: Turn 14/25
+[2026-04-08T19:52:20.693Z] iter=510 turn=14 INFO: read_file: src/tool-registry.ts
+[2026-04-08T19:52:20.695Z] iter=510 turn=14 INFO:   -> ok (738 chars)
+[2026-04-08T19:52:20.696Z] iter=510 turn=15 INFO: Turn 15/25
+[2026-04-08T19:52:36.107Z] iter=510 turn=15 INFO: Agent: The `register` method takes `(definition, handler, options)` — not a single object. My test used the wrong signature. Fix the test:
+[2026-04-08T19:52:36.109Z] iter=510 turn=15 INFO: write_file: src/__tests__/tool-dispatch-validation.test.ts (write)
+[2026-04-08T19:52:36.111Z] iter=510 turn=15 INFO:   -> ok: Updated src/__tests__/tool-dispatch-validation.test.ts (4418 chars, -14 lines delta)
+[2026-04-08T19:52:36.112Z] iter=510 turn=16 INFO: Turn 16/25
+[2026-04-08T19:52:38.347Z] iter=510 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tool-dispatch-validation.test.ts 2>&1 | tail -8 && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T19:52:40.375Z] iter=510 turn=16 INFO:   -> exit=0 (244 chars)
+[2026-04-08T19:52:40.375Z] iter=510 turn=17 INFO: Turn 17/25
+[2026-04-08T19:54:44.373Z] iter=510 turn=17 INFO: Agent: All 9 tests pass, TypeScript clean. Now wrap up.
+[2026-04-08T19:54:44.374Z] iter=510 turn=17 INFO: save_memory: "[Engineer] Iteration 510"
+[2026-04-08T19:54:44.375Z] iter=510 turn=17 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T19:54:44.375Z] iter=510 turn=18 INFO: Turn 18/25
+[2026-04-08T19:54:53.223Z] iter=510 turn=18 INFO: write_file: goals.md (write)
+[2026-04-08T19:54:53.224Z] iter=510 turn=18 INFO:   -> ok: Updated goals.md (1203 chars, -29 lines delta)
+[2026-04-08T19:54:53.224Z] iter=510 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
+[2026-04-08T19:54:53.227Z] iter=510 turn=18 INFO: Cache persisted: 67 entries to .autoagent-cache.json
+[2026-04-08T19:54:53.227Z] iter=510 turn=18 INFO: Cache stats: 0 hits, 3 misses, 67 entries, 4 invalidations (3 entries removed)
+[2026-04-08T19:54:53.228Z] iter=510 turn=18 INFO: Tool cache stats
+[2026-04-08T19:54:53.228Z] iter=510 turn=18 INFO: Tool timing: bash: 8x, avg=683ms, total=5466ms; read_file: 3x, avg=3ms, total=9ms; write_file: 4x, avg=2ms, total=8ms; think: 3x, avg=1ms, total=4ms; read_scratchpad: 1x, avg=2ms, total=2ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T19:54:53.228Z] iter=510 turn=18 INFO: Tool timing stats
+[2026-04-08T19:55:01.525Z] iter=510 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 510: predicted 12 turns, actual 18 turns, ratio 1.50**
+[2026-04-08T19:55:09.797Z] iter=510 turn=18 INFO: Pre-commit review (2377in/260out): **Issues found:**
+
+- **Logic bug: `return errMsg` exits the entire `runAgentLoop` function early.** The validation error should be appended to `toolResults` and allow the loop to continue (like other 
