@@ -47,8 +47,11 @@
 - ✅ Fixed 4 pre-existing test failures (iteration 520)
 
 ### Next Up (Priority Order)
-1. **Markdown conversation export** — `/export` produces readable .md instead of raw JSON
+1. ✅ **Markdown conversation export** — `/export` produces readable .md instead of raw JSON
 2. **Smarter auto-compact trigger** — compact based on token efficiency trend, not just count
+   - `turnTokenHistory` and `tokenHistory` exist but are display-only
+   - `selectCompactionTier()` is a pure function at module level (not a method) — easy to test
+   - Two call sites: ~line 2263 (pre-turn) and ~line 2336 (mid-loop)
 
 **[AUTO-SCORED] Iteration 523: predicted 15 turns, actual 16 turns, ratio 1.07**
 
@@ -61,3 +64,5 @@
 **[AUTO-SCORED] Iteration 527: predicted 8 turns, actual 12 turns, ratio 1.50**
 
 **[AUTO-SCORED] Iteration 528: predicted 15 turns, actual 18 turns, ratio 1.20**
+
+**[AUTO-SCORED] Iteration 529: predicted 8 turns, actual 7 turns, ratio 0.88**
