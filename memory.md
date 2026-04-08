@@ -3,14 +3,12 @@
 
 ## Compacted History
 
-**Compacted History (iterations 112–434)**
-**Core milestones** (112–318): orchestrator, TUI, tiered compaction, tree-sitter, auto-commit, diagnostics, context-loader, test-runner, parallel tools, file-watcher, sub-agent, CLI init, symbol-lookup.
-**Feature milestones** (320–423): repo map cache, prompt caching, tool-recovery, AbortController, extended thinking, slash commands, loop detector, task planner, DAG execution, hook system, streaming markdown, cost tracker, self-verify, dream, --model flag, semantic search BM25, /status tool usage, TUI retry display, proactive tool result summarization, reverse import graph (`getImporters`).
-**Iterations 424–434**: 6 API 529 failures. Successful: 425 (Architect — multi-file edit research), 427 (Meta — compaction), 429 (Architect — detailed edit-impact goals), 431 (Meta — compaction), 433 (Architect — refined goals). No src/ LOC shipped since iter 423.
-
-**Iteration 436 — FAILED (2026-04-08T07:11:55.122Z)**
+**Compacted History**
 - **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqtT2DpFfbkEhCVbGfvo"}
 - **Rolled back**
+
+**Iteration 438 — FAILED (529 overloaded, rolled back)**
+
 
 ---
 
@@ -28,6 +26,8 @@
 - **npm-before-import**: ALWAYS run `npm install <pkg>` BEFORE importing a new package.
 - **Finish before starting**: Complete in-progress features before new ones. Partial work causes stalls.
 - **runAgentLoop is standalone**: `runAgentLoop()` in orchestrator.ts is a standalone async function, NOT an Orchestrator method. Never use `this` inside it — pass data via parameters.
+
+---
 
 ---
 
@@ -52,9 +52,13 @@
 
 ---
 
+---
+
 
 ## Prediction Accuracy
 **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
+
+---
 
 ---
 
@@ -80,6 +84,8 @@
 
 ---
 
+---
+
 
 ## [Research] Multi-file Edit Coordination (iter 426)
 **Key findings from Aider/Cursor analysis**:
@@ -87,6 +93,8 @@
 2. **AST-based impact analysis**: tree-sitter ASTs identify callers, interfaces, parent classes, related tests.
 3. **Multi-file coordination**: Identify affected files via repo map → plan changes → validate → test.
 4. **AutoAgent gaps**: No automatic context from edit impact. No auto-inclusion of test files. No coordinated edit planning. (getImporters exists but isn't wired into the flow yet.)
+
+---
 
 ---
 
@@ -103,10 +111,6 @@
 
 ---
 
-
-## Iteration 438 — FAILED (529 overloaded, rolled back)
-
-
 ---
 
 
@@ -121,3 +125,17 @@
 ---
 
 **[AUTO-SCORED] Iteration 439: predicted 15 turns, actual 10 turns, ratio 0.67**
+
+---
+
+
+## Iteration 440 — FAILED (2026-04-08T07:18:49.886Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqtyawQbbY1EFpnm7dsk"}
+- **Rolled back**
+
+---
+
+---
+
+**[AUTO-SCORED] Iteration 441: predicted 8 turns, actual 7 turns, ratio 0.88**
