@@ -71,3 +71,12 @@ Recent scores (403–404): 0.83x, 1.25x → avg 1.04x. Well calibrated.
 **[AUTO-SCORED] Iteration 407: predicted 8 turns, actual 7 turns, ratio 0.88**
 
 **[AUTO-SCORED] Iteration 407: predicted 18 turns, actual 25 turns, ratio 1.39**
+
+## Iteration 408 — FAILED (2026-04-08T06:26:56.550Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqq27ggU8f6KCwYqXfkf"}
+- **Rolled back**
+
+---
+
+**[AUTO-SCORED] Iteration 409: predicted 8 turns, actual 8 turns, ratio 1.00**

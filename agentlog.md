@@ -1,195 +1,3 @@
-[2026-04-05T22:13:37.444Z] iter=398 turn=1 INFO: Turn 1/25
-[2026-04-05T22:13:39.770Z] iter=398 turn=1 INFO: Agent: I'll start by reading the current state of the codebase to understand what needs to be fixed.
-[2026-04-05T22:13:39.772Z] iter=398 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
-[2026-04-05T22:13:39.778Z] iter=398 turn=1 INFO: read_scratchpad: 2852 chars
-[2026-04-05T22:13:40.913Z] iter=398 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-05T22:13:40.913Z] iter=398 turn=2 INFO: Turn 2/25
-[2026-04-05T22:13:44.630Z] iter=398 turn=2 INFO: Agent: TSC is clean already (no output = no errors). Let me check the current state of the files I need to modify:
-[2026-04-05T22:13:44.631Z] iter=398 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "semantic_search\|execTool\|sessionFilesModified\|filesModified\|getSessionStats" src/orchestrator.ts | head -50
-[2026-04-05T22:13:44.635Z] iter=398 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "filesModified\|sessionFilesModified\|/status\|status" src/tui.tsx | head -30
-[2026-04-05T22:13:44.654Z] iter=398 turn=2 INFO:   -> exit=0 (844 chars)
-[2026-04-05T22:13:44.655Z] iter=398 turn=2 INFO:   -> exit=0 (1282 chars)
-[2026-04-05T22:13:44.655Z] iter=398 turn=3 INFO: Turn 3/25
-[2026-04-05T22:13:47.758Z] iter=398 turn=3 INFO: think: I have enough context. Let me just do the work:
-
-1. Goal 0: TSC is already clean (no errors shown)
-2. Goal 1: Add semant...
-[2026-04-05T22:13:47.759Z] iter=398 turn=4 INFO: Turn 4/25
-[2026-04-05T22:13:50.532Z] iter=398 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "makeExecTool\|web_search\|web_fetch\|return.*unknown tool\|name === " src/orchestrator.ts | head -40
-[2026-04-05T22:13:50.537Z] iter=398 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "filesModified\|sessionLines\|/status" src/tui.tsx | head -20
-[2026-04-05T22:13:50.552Z] iter=398 turn=4 INFO:   -> exit=0 (568 chars)
-[2026-04-05T22:13:50.552Z] iter=398 turn=4 INFO:   -> exit=0 (765 chars)
-[2026-04-05T22:13:50.553Z] iter=398 turn=5 INFO: Turn 5/25
-[2026-04-05T22:13:53.466Z] iter=398 turn=5 INFO: Agent: Goals status:
-- **Goal 1** (semantic_search dispatch): NOT STARTED
-- **Goal 2** (/status files modified): NOT STARTED
-
-Let me find the exact code locations and patch both files now.
-[2026-04-05T22:13:53.467Z] iter=398 turn=5 INFO: read_file: src/orchestrator.ts
-[2026-04-05T22:13:53.468Z] iter=398 turn=5 INFO:   -> ok (3756 chars)
-[2026-04-05T22:13:53.468Z] iter=398 turn=6 INFO: Turn 6/25
-[2026-04-05T22:13:56.839Z] iter=398 turn=6 INFO: think: I see that `makeExecTool` uses the registry to look up tools. `semantic_search` is not in the registry - it's a special ...
-[2026-04-05T22:13:56.841Z] iter=398 turn=7 INFO: Turn 7/25
-[2026-04-05T22:13:59.809Z] iter=398 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "_searchIndexHolder\|searchIndex\|CodeSearchIndex\|buildSearchIndex" src/orchestrator.ts | head -20
-[2026-04-05T22:13:59.816Z] iter=398 turn=7 INFO: read_file: src/tui.tsx
-[2026-04-05T22:13:59.816Z] iter=398 turn=7 INFO:   -> ok (1316 chars)
-[2026-04-05T22:13:59.834Z] iter=398 turn=7 INFO:   -> exit=0 (314 chars)
-[2026-04-05T22:13:59.835Z] iter=398 turn=8 INFO: Turn 8/25
-[2026-04-05T22:14:02.867Z] iter=398 turn=8 INFO: Agent: I have changed nothing. Let me write both patches now immediately.
-[2026-04-05T22:14:02.868Z] iter=398 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "searchIndex\|semantic_search\|getSearchIndex\|_search" src/tool-registry.ts | head -20
-[2026-04-05T22:14:02.878Z] iter=398 turn=8 INFO:   -> exit=0 (622 chars)
-[2026-04-05T22:14:02.879Z] iter=398 turn=9 INFO: Turn 9/25
-[2026-04-05T22:14:07.439Z] iter=398 turn=9 INFO: Agent: `semantic_search` is already in the registry! The tool is registered. The issue is something else. Let me check:
-[2026-04-05T22:14:07.439Z] iter=398 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "semantic_search\|tools:" src/orchestrator.ts | grep -i "tool\|defin\|schema" | head -20
-[2026-04-05T22:14:07.441Z] iter=398 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "tools:" src/orchestrator.ts | head -10
-[2026-04-05T22:14:07.454Z] iter=398 turn=9 INFO:   -> exit=0 (129 chars)
-[2026-04-05T22:14:07.455Z] iter=398 turn=9 INFO:   -> exit=0 (129 chars)
-[2026-04-05T22:14:07.455Z] iter=398 turn=10 INFO: Turn 10/25
-[2026-04-05T22:14:11.079Z] iter=398 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "tool_choice\|tools\b" src/orchestrator.ts | grep -v "//\|toolUse\|executeTool\|TOOL\|onTool\|execTool\|toolCall\|writeTools\|readTool\|batchTool\|tool_...
-[2026-04-05T22:14:11.100Z] iter=398 turn=10 INFO:   -> exit=0 (516 chars)
-[2026-04-05T22:14:11.101Z] iter=398 turn=11 INFO: Turn 11/25
-[2026-04-05T22:14:16.907Z] iter=398 turn=11 INFO: think: The registry already has semantic_search registered (lines 314-347 of tool-registry.ts). So the tool IS in the registry ...
-[2026-04-05T22:14:16.908Z] iter=398 turn=12 INFO: Turn 12/25
-[2026-04-05T22:14:20.331Z] iter=398 turn=12 INFO: write_file: src/tui.tsx (patch)
-[2026-04-05T22:14:20.334Z] iter=398 turn=12 INFO:   -> ok: Patched src/tui.tsx: -2 +5 lines
-
-Context after patch:
-679 |         sessionLines.push(`  Session:        ${m}m ${s}s`);
-680 |         sessionLines.push(`  Cost:           ${stats.costSummary}`);
-681 |         sessionLines.push(`  Avg cost/turn:  ${stats.avgCostPerTurn.toFixed(4)}`);
-682 |         sessionLines.push(`  Cost trend:     ${stats.costTrend}`);
-683 |         if (stats.filesModified?.length) {
-684 |           sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(", ")}`);
-685 |         }
-686 |       }
-687 |       setMessages(prev => [...prev, {
-688 |         role: "assistant",
-689 |         content: [
-[2026-04-05T22:14:20.335Z] iter=398 turn=13 INFO: Turn 13/25
-[2026-04-05T22:14:30.349Z] iter=398 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-05T22:14:31.452Z] iter=398 turn=13 INFO:   -> exit=0 (11 chars)
-[2026-04-05T22:14:31.452Z] iter=398 turn=14 INFO: Turn 14/25
-[2026-04-05T22:14:36.481Z] iter=398 turn=14 INFO: Agent: TSC clean. Now update memory and goals:
-[2026-04-05T22:14:36.482Z] iter=398 turn=14 INFO: save_memory: "[Engineer iter 398]"
-[2026-04-05T22:14:36.484Z] iter=398 turn=14 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-05T22:14:36.485Z] iter=398 turn=15 INFO: Turn 15/25
-[2026-04-05T22:14:46.247Z] iter=398 turn=15 INFO: write_file: goals.md (write)
-[2026-04-05T22:14:46.249Z] iter=398 turn=15 INFO:   -> ok: Updated goals.md (1270 chars, -62 lines delta)
-[2026-04-05T22:14:46.250Z] iter=398 turn=16 INFO: Turn 16/25
-[2026-04-05T22:14:49.312Z] iter=398 turn=16 INFO: Agent: Already done. Running final check and restarting.
-[2026-04-05T22:14:49.313Z] iter=398 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "AUTOAGENT_RESTART"
-[2026-04-05T22:14:49.314Z] iter=398 turn=16 INFO: RESTART signal
-[2026-04-05T22:14:49.315Z] iter=398 turn=16 INFO: Validating: npx tsc --noEmit ...
-[2026-04-05T22:14:50.450Z] iter=398 turn=16 INFO: Compilation OK
-[2026-04-05T22:14:58.740Z] iter=398 turn=16 INFO: Cache persisted: 57 entries to .autoagent-cache.json
-[2026-04-05T22:14:58.740Z] iter=398 turn=16 INFO: Cache stats: 0 hits, 2 misses, 57 entries, 2 invalidations (1 entries removed)
-[2026-04-05T22:14:58.740Z] iter=398 turn=16 INFO: Tool cache stats
-[2026-04-05T22:14:58.740Z] iter=398 turn=16 INFO: Tool timing: bash: 12x, avg=201ms, total=2413ms; write_file: 2x, avg=3ms, total=5ms; think: 3x, avg=1ms, total=3ms; save_memory: 1x, avg=3ms, total=3ms; read_scratchpad: 1x, avg=2ms, total=2ms; read_file: 2x, avg=1ms, total=2ms
-[2026-04-05T22:14:58.740Z] iter=398 turn=16 INFO: Tool timing stats
-[2026-04-05T22:15:07.157Z] iter=398 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 398: predicted 12 turns, actual 16 turns, ratio 1.33**
-[2026-04-05T22:15:07.183Z] iter=398 turn=16 INFO: Pre-commit review: no significant code changes to review
-[2026-04-05T22:15:07.226Z] iter=398 turn=16 INFO: Committed: 82d22102 (28 in / 2781 out, cache: 13090 created, 174436 read)
-[2026-04-05T22:15:07.226Z] iter=398 turn=16 INFO: Restarting as iteration 399...
-[2026-04-05T22:15:07.444Z] iter=399 INFO: Cache restored: 57/57 entries (0 stale)
-[2026-04-05T22:15:07.447Z] iter=399 INFO: Turn budget: 15/25 (calibration=1.33x, predicted=8)
-[2026-04-05T22:15:07.447Z] iter=399 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-05T22:15:07.649Z] iter=399 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-05T22:15:07.650Z] iter=399 turn=1 INFO: Turn 1/25
-[2026-04-05T22:15:11.251Z] iter=399 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state, scoring iteration 398, and then doing my Meta tasks.
-[2026-04-05T22:15:11.252Z] iter=399 turn=1 INFO: $ cat .autoagent-metrics.json | head -100
-[2026-04-05T22:15:11.254Z] iter=399 turn=1 INFO: $ cat .autoagent-state.json
-[2026-04-05T22:15:11.255Z] iter=399 turn=1 INFO: $ cat .expert-rotation.json
-[2026-04-06T07:28:44.035Z] iter=399 INFO: Cache restored: 56/57 entries (1 stale)
-[2026-04-06T07:28:44.036Z] iter=399 INFO: [TASK MODE] Expert overridden to Engineer
-[2026-04-06T07:28:44.036Z] iter=399 INFO: [TASK MODE] Running user task from TASK.md
-[2026-04-06T07:28:44.038Z] iter=399 INFO: Turn budget: 18/25 (calibration=1.33x, predicted=11)
-[2026-04-06T07:28:44.038Z] iter=399 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-06T07:28:44.196Z] iter=399 INFO: Hard turn cap: 17 (1.5x prediction of 11)
-[2026-04-06T07:28:44.196Z] iter=399 turn=1 INFO: Turn 1/25
-[2026-04-06T07:28:46.139Z] iter=399 turn=1 INFO: read_scratchpad: 2852 chars
-[2026-04-06T07:28:46.140Z] iter=399 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md 2>/dev/null || echo "No goals.md"
-[2026-04-06T07:28:46.147Z] iter=399 turn=1 INFO:   -> exit=0 (1270 chars)
-[2026-04-06T07:28:46.147Z] iter=399 turn=2 INFO: Turn 2/25
-[2026-04-06T07:28:48.357Z] iter=399 turn=2 INFO: read_file: src/tui.tsx
-[2026-04-06T07:28:48.358Z] iter=399 turn=2 INFO:   -> ok (3402 chars)
-[2026-04-06T07:28:48.359Z] iter=399 turn=3 INFO: Turn 3/25
-[2026-04-06T07:28:50.327Z] iter=399 turn=3 INFO: read_file: src/tui.tsx
-[2026-04-06T07:28:50.328Z] iter=399 turn=3 INFO:   -> ok (4538 chars)
-[2026-04-06T07:28:50.328Z] iter=399 turn=4 INFO: Turn 4/25
-[2026-04-06T07:28:52.644Z] iter=399 turn=4 INFO: read_file: src/tui.tsx
-[2026-04-06T07:28:52.645Z] iter=399 turn=4 INFO:   -> ok (7771 chars)
-[2026-04-06T07:28:52.645Z] iter=399 turn=5 INFO: Turn 5/25
-[2026-04-06T07:29:02.415Z] iter=399 turn=5 INFO: think: Goal: Make the interface more appealing in the TUI.
-
-Status: NOT STARTED - I've been reading but not writing yet.
-
-Looki...
-[2026-04-06T07:29:02.416Z] iter=399 turn=6 INFO: Turn 6/25
-[2026-04-06T07:29:07.123Z] iter=399 turn=6 INFO: Agent: Goal status: **NOT STARTED** (was reading code). Starting writing now.
-
-Key improvements I'll make to tui.tsx:
-1. Better `Header` — styled banner with box border
-2. `MessageDisplay` — user msg with left-accent box, assistant with styled container  
-3. `Footer` — cleaner layout with visual separators
-4. `StatusBar` — distinct styled status area
-[2026-04-06T07:29:07.124Z] iter=399 turn=6 INFO: read_file: src/tui.tsx
-[2026-04-06T07:29:07.125Z] iter=399 turn=6 INFO:   -> ok (2052 chars)
-[2026-04-06T07:29:07.126Z] iter=399 turn=7 INFO: Turn 7/25
-[2026-04-06T07:29:14.391Z] iter=399 turn=7 INFO: Agent: Now I have enough context. Let me make the targeted improvements:
-[2026-04-06T07:29:14.391Z] iter=399 turn=7 INFO: write_file: src/tui.tsx (patch)
-[2026-04-06T07:29:14.392Z] iter=399 turn=7 INFO:   -> ok: Patched src/tui.tsx: -17 +19 lines
-
-Context after patch:
-202 |   );
-203 | }
-204 | 
-205 | function Header({ model, git }: { model: string; git: GitInfo }) {
-206 |   const modelLabel = model.includes("haiku") ? "⚡ haiku" : model.includes("opus") ? "◆ opus" : "◈ sonnet";
-207 |   return (
-208 |     <Box flexDirection="column" marginBottom={1} borderStyle="round" borderColor="cyan" paddingX={1}>
-209 |       <Box justifyContent="space-between">
-210 |         <Box>
-211 |           <Text bold color="cyan">⚡ AutoAgent</Text>
-212 |           <Text color="gray">  </Text>
-213 |           <Text color="blueBright">{modelLabel}</Text>
-214 |           <GitBadge git={git} />
-215 |         </Box>
-216 |         <Text color="gray" dimColor>{path.basename(workDir)}</Text>
-217 |       </Box>
-218 |       <Text color="gray" dimColor>
-219 |         /help  /status  /clear  /diff  /undo  /plan  /search  /export  /exit
-220 |       </Text>
-221 |     </Box>
-222 |   );
-223 | }
-224 | 
-225 | function ToolCallDisplay({ name, input }: { name: string; input: string }) {
-226 |   return (
-[2026-04-06T07:29:14.393Z] iter=399 turn=8 INFO: Turn 8/25
-[2026-04-06T07:29:31.351Z] iter=399 turn=8 INFO: Agent: I've made 1 change so far (Header component). Let me finish the remaining improvements quickly.
-[2026-04-06T07:29:31.352Z] iter=399 turn=8 INFO: write_file: src/tui.tsx (patch)
-[2026-04-06T07:29:31.353Z] iter=399 turn=8 INFO:   -> ok: Patched src/tui.tsx: -54 +50 lines
-
-Context after patch:
-222 |   );
-223 | }
-224 | 
-225 | function ToolCallDisplay({ name, input }: { name: string; input: string }) {
-226 |   return (
-227 |     <Box flexDirection="column" marginLeft={2} marginTop={0}>
-228 |       <Text>
-229 |         <Text color="yellow" dimColor>  ▸ </Text>
-230 |         <Text color="yellow" bold>{name}</Text>
-231 |         <Text color="gray" dimColor> {input.slice(0, 80)}{input.length > 80 ? "…" : ""}</Text>
-232 |       </Text>
-233 |     </Box>
-234 |   );
-235 | }
-236 | 
-237 | function MessageDisplay({ msg }: { msg: Message }) {
-238 |   if (msg.role === "user") {
 239 |     return (
 240 |       <Box marginTop={1} borderStyle="single" borderColor="cyan" borderLeft={true} borderRight={false} borderTop={false} borderBottom={false} paddingLeft={1}>
 241 |         <Text color="cyan" bold>You  </Text>
@@ -1187,3 +995,78 @@ Context after patch:
 [2026-04-08T06:25:04.839Z] iter=407 turn=25 INFO: Tool timing stats
 [2026-04-08T06:25:12.904Z] iter=407 turn=25 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 407: predicted 18 turns, actual 25 turns, ratio 1.39**
 [2026-04-08T06:25:50.600Z] iter=407 turn=25 INFO: Pre-commit review (0in/0out): ERROR: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqpwJApmricUA66kW8Gm"}
+[2026-04-08T06:26:56.549Z] iter=408 turn=1 INFO: Rolled back to pre-iteration-408
+[2026-04-08T06:26:56.550Z] iter=408 turn=1 INFO: Failure recorded. Restarting...
+[2026-04-08T06:26:56.731Z] iter=409 1/3 consecutive failures
+[2026-04-08T06:26:56.733Z] iter=409 INFO: Cache restored: 54/54 entries (0 stale)
+[2026-04-08T06:26:56.735Z] iter=409 INFO: Turn budget: 16/25 (calibration=1.39x, predicted=8)
+[2026-04-08T06:26:56.735Z] iter=409 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-08T06:26:56.930Z] iter=409 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-08T06:26:56.931Z] iter=409 turn=1 INFO: Turn 1/25
+[2026-04-08T06:27:01.175Z] iter=409 turn=1 INFO: Agent: 
+
+I'll start by reviewing the import-graph integration, running tests, and then planning the next iteration.
+[2026-04-08T06:27:01.177Z] iter=409 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -40
+[2026-04-08T06:27:01.181Z] iter=409 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -20
+[2026-04-08T06:27:01.185Z] iter=409 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/orchestrator.ts
+[2026-04-08T06:27:01.202Z] iter=409 turn=1 INFO:   -> exit=0 (29 chars)
+[2026-04-08T06:27:02.463Z] iter=409 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-08T06:27:16.983Z] iter=409 turn=1 INFO:   -> exit=0 (1694 chars)
+[2026-04-08T06:27:16.983Z] iter=409 turn=2 INFO: Turn 2/25
+[2026-04-08T06:27:23.616Z] iter=409 turn=2 INFO: Agent: 
+
+Good point. My deliverables are: (1) Review import-graph integration, (2) Fix the 9 failing tests, (3) Write goals.md for Engineer iteration 410. Let me look at the failures and the import-graph code, then produce goals.md.
+[2026-04-08T06:27:23.617Z] iter=409 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/prune-backref-boost.test.ts 2>&1 | head -30
+[2026-04-08T06:27:23.622Z] iter=409 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run tests/context-pruning.test.ts 2>&1 | grep "FAIL\|TypeError\|undefined" | head -20
+[2026-04-08T06:27:23.627Z] iter=409 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1060,1085p' src/orchestrator.ts
+[2026-04-08T06:27:23.647Z] iter=409 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '840,880p' src/orchestrator.ts
+[2026-04-08T06:27:23.655Z] iter=409 turn=2 INFO:   -> exit=0 (1066 chars)
+[2026-04-08T06:27:23.657Z] iter=409 turn=2 INFO:   -> exit=0 (1901 chars)
+[2026-04-08T06:27:24.858Z] iter=409 turn=2 INFO:   -> exit=0 (1507 chars)
+[2026-04-08T06:27:24.917Z] iter=409 turn=2 INFO:   -> exit=0 (1754 chars)
+[2026-04-08T06:27:24.917Z] iter=409 turn=3 INFO: Turn 3/25
+[2026-04-08T06:27:33.338Z] iter=409 turn=3 INFO: think: The 9 test failures are all in context-pruning.test.ts and prune-backref-boost.test.ts, caused by `new Orchestrator` rec...
+[2026-04-08T06:27:33.340Z] iter=409 turn=4 INFO: Turn 4/25
+[2026-04-08T06:27:39.383Z] iter=409 turn=4 INFO: Agent: 
+
+**Goal status:**
+- Goal 1 (Review import-graph integration): IN PROGRESS — code reviewed, looks correct. Need to check test failures.
+- Goal 2 (Plan next feature + write goals.md): NOT STARTED
+
+Let me check the test failures quickly, then write goals.md and finish.
+[2026-04-08T06:27:39.383Z] iter=409 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'buildOrchestrator\|new Orchestrator' tests/prune-backref-boost.test.ts | head -10
+[2026-04-08T06:27:39.385Z] iter=409 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'buildOrchestrator\|new Orchestrator' tests/context-pruning.test.ts | head -10
+[2026-04-08T06:27:39.393Z] iter=409 turn=4 INFO:   -> exit=0 (203 chars)
+[2026-04-08T06:27:39.394Z] iter=409 turn=4 INFO:   -> exit=0 (549 chars)
+[2026-04-08T06:27:39.395Z] iter=409 turn=5 INFO: Turn 5/25
+[2026-04-08T06:27:44.910Z] iter=409 turn=5 INFO: think: The tests create `new Orchestrator({ apiKey: "test-key" })` without a `workDir`. The ReflectionStore constructor at line...
+[2026-04-08T06:27:44.911Z] iter=409 turn=6 INFO: Turn 6/25
+[2026-04-08T06:28:02.994Z] iter=409 turn=6 INFO: Agent: 
+
+Right — I'm an Architect iteration, so my deliverable is goals.md, not src/ changes. Let me wrap up now.
+
+**Goal 1 (Review import-graph integration): DONE**
+- Code at lines 853-872 is correct: session-scoped dedup Set, depth=1, try/catch, max 3 files
+- Found regression: 9 tests fail because `new Orchestrator({ apiKey: "test-key" })` passes no `workDir`, and `ReflectionStore(undefined)` crashes. ...
+[2026-04-08T06:28:02.994Z] iter=409 turn=6 INFO: write_file: goals.md (write)
+[2026-04-08T06:28:02.995Z] iter=409 turn=6 INFO:   -> ok: Updated goals.md (1799 chars, +12 lines delta)
+[2026-04-08T06:28:02.996Z] iter=409 turn=7 INFO: Turn 7/25
+[2026-04-08T06:28:07.854Z] iter=409 turn=7 INFO: save_memory: "[Architect 409] Import-graph review + test regression"
+[2026-04-08T06:28:07.855Z] iter=409 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T06:28:07.855Z] iter=409 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T06:28:08.926Z] iter=409 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-08T06:28:08.927Z] iter=409 turn=8 INFO: Turn 8/25
+[2026-04-08T06:28:11.646Z] iter=409 turn=8 INFO: Agent: TSC clean. Done.
+
+```
+echo "AUTOAGENT_RESTART"
+```
+[2026-04-08T06:28:11.646Z] iter=409 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T06:28:11.647Z] iter=409 turn=8 INFO: RESTART signal
+[2026-04-08T06:28:11.647Z] iter=409 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T06:28:12.774Z] iter=409 turn=8 INFO: Compilation OK
+[2026-04-08T06:28:20.889Z] iter=409 turn=8 INFO: Cache persisted: 54 entries to .autoagent-cache.json
+[2026-04-08T06:28:20.890Z] iter=409 turn=8 INFO: Tool timing: bash: 11x, avg=1889ms, total=20774ms; save_memory: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms; write_file: 1x, avg=2ms, total=2ms
+[2026-04-08T06:28:20.890Z] iter=409 turn=8 INFO: Tool timing stats
+[2026-04-08T06:28:28.447Z] iter=409 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 409: predicted 8 turns, actual 8 turns, ratio 1.00**
+[2026-04-08T06:28:28.471Z] iter=409 turn=8 INFO: Pre-commit review: no significant code changes to review

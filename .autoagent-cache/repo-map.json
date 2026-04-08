@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775468243257,
+  "generatedAt": 1775629626129,
   "files": [
     {
       "path": "src/file-cache.ts",
@@ -1727,154 +1727,200 @@
       "lastModified": 1775461972751.2568
     },
     {
+      "path": "src/reflection.ts",
+      "exports": [
+        {
+          "name": "ToolCallRecord",
+          "kind": "interface",
+          "line": 21,
+          "exported": true
+        },
+        {
+          "name": "ReflectionCheckpoint",
+          "kind": "interface",
+          "line": 42,
+          "exported": true
+        },
+        {
+          "name": "ReflectionSummary",
+          "kind": "interface",
+          "line": 93,
+          "exported": true
+        },
+        {
+          "name": "ReflectionStore",
+          "kind": "class",
+          "line": 149,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "path"
+        }
+      ],
+      "lastModified": 1775463849502.829
+    },
+    {
       "path": "src/orchestrator.ts",
       "exports": [
         {
           "name": "PARALLEL_SAFE_TOOLS",
           "kind": "const",
-          "line": 58,
+          "line": 59,
           "exported": true
         },
         {
           "name": "MICRO_COMPACT_THRESHOLD",
           "kind": "const",
-          "line": 73,
+          "line": 74,
           "exported": true
         },
         {
           "name": "COMPACT_TIER1_THRESHOLD",
           "kind": "const",
-          "line": 75,
+          "line": 76,
           "exported": true
         },
         {
           "name": "COMPACT_THRESHOLD",
           "kind": "const",
-          "line": 77,
+          "line": 78,
           "exported": true
         },
         {
           "name": "CONTEXT_WARNING_THRESHOLD",
           "kind": "const",
-          "line": 79,
+          "line": 80,
           "exported": true
         },
         {
           "name": "PRUNE_THRESHOLD",
           "kind": "const",
-          "line": 80,
+          "line": 81,
           "exported": true
         },
         {
           "name": "selectCompactionTier",
           "kind": "function",
-          "line": 86,
+          "line": 87,
           "exported": true
         },
         {
           "name": "MODEL_PRICING",
           "kind": "const",
-          "line": 94,
+          "line": 95,
           "exported": true
         },
         {
           "name": "MODEL_CONTEXT_WINDOW",
           "kind": "const",
-          "line": 100,
+          "line": 101,
           "exported": true
         },
         {
           "name": "ConversationCheckpoint",
           "kind": "interface",
-          "line": 123,
+          "line": 124,
           "exported": true
         },
         {
           "name": "MAX_CHECKPOINTS",
           "kind": "const",
-          "line": 131,
+          "line": 132,
           "exported": true
         },
         {
           "name": "OrchestratorOptions",
           "kind": "interface",
-          "line": 133,
+          "line": 134,
           "exported": true
         },
         {
           "name": "OrchestratorResult",
           "kind": "interface",
-          "line": 178,
+          "line": 179,
           "exported": true
         },
         {
           "name": "CostInfo",
           "kind": "interface",
-          "line": 187,
+          "line": 188,
           "exported": true
         },
         {
           "name": "TaskReflection",
           "kind": "interface",
-          "line": 202,
+          "line": 203,
           "exported": true
         },
         {
           "name": "routeModel",
           "kind": "function",
-          "line": 243,
+          "line": 244,
           "exported": true
         },
         {
           "name": "computeCost",
           "kind": "function",
-          "line": 271,
+          "line": 272,
           "exported": true
         },
         {
           "name": "buildSystemPrompt",
           "kind": "function",
-          "line": 283,
+          "line": 284,
           "exported": true
         },
         {
           "name": "buildCachedSystem",
           "kind": "function",
-          "line": 356,
+          "line": 357,
           "exported": true
         },
         {
           "name": "injectMessageCacheBreakpoints",
           "kind": "function",
-          "line": 367,
+          "line": 368,
           "exported": true
         },
         {
           "name": "isToolError",
           "kind": "function",
-          "line": 463,
+          "line": 464,
           "exported": true
         },
         {
           "name": "pruneStaleToolResults",
           "kind": "function",
-          "line": 524,
+          "line": 525,
           "exported": true
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 981,
+          "line": 1004,
           "exported": true
         },
         {
           "name": "runSingleTask",
           "kind": "function",
-          "line": 2202,
+          "line": 2225,
           "exported": true
         }
       ],
       "imports": [
+        {
+          "names": [
+            "* as path"
+          ],
+          "from": "node:path"
+        },
         {
           "names": [
             "Anthropic"
@@ -2051,33 +2097,57 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775468225967.0896
+      "lastModified": 1775629477600.207
     },
     {
-      "path": "src/reflection.ts",
+      "path": "src/reflection-aggregator.ts",
       "exports": [
         {
-          "name": "ToolCallRecord",
-          "kind": "interface",
-          "line": 21,
+          "name": "FailureCategory",
+          "kind": "type",
+          "line": 26,
           "exported": true
         },
         {
-          "name": "ReflectionCheckpoint",
+          "name": "FailurePattern",
           "kind": "interface",
-          "line": 42,
+          "line": 33,
           "exported": true
         },
         {
-          "name": "ReflectionSummary",
+          "name": "AggregateReport",
           "kind": "interface",
-          "line": 93,
+          "line": 56,
           "exported": true
         },
         {
-          "name": "ReflectionStore",
-          "kind": "class",
-          "line": 149,
+          "name": "detectPatterns",
+          "kind": "function",
+          "line": 162,
+          "exported": true
+        },
+        {
+          "name": "generateGuidancePrompt",
+          "kind": "function",
+          "line": 316,
+          "exported": true
+        },
+        {
+          "name": "aggregate",
+          "kind": "function",
+          "line": 346,
+          "exported": true
+        },
+        {
+          "name": "savePatternCache",
+          "kind": "function",
+          "line": 396,
+          "exported": true
+        },
+        {
+          "name": "loadPatternCache",
+          "kind": "function",
+          "line": 405,
           "exported": true
         }
       ],
@@ -2089,9 +2159,17 @@
         {
           "names": [],
           "from": "path"
+        },
+        {
+          "names": [],
+          "from": "./reflection.js"
+        },
+        {
+          "names": [],
+          "from": "./project-memory.js"
         }
       ],
-      "lastModified": 1775463849502.829
+      "lastModified": 1775467654579.8484
     }
   ]
 }
