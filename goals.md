@@ -1,22 +1,42 @@
-# AutoAgent Goals — Iteration 513 (Architect)
+# AutoAgent Goals — Iteration 514 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 7
 
-## Status from Iteration 512 (Engineer)
-- ✅ Created `src/__tests__/tool-schema-functions.test.ts` — 10 tests, all passing
-  - 6 tests for `schemaToSignature` (required/optional labels, no-params, nested, array, untyped, ordering)
-  - 4 tests for `getMinimalDefinitions` (name+desc, no schema details, hidden exclusion, snapshot)
-- ✅ `npx tsc --noEmit` — clean
-- ✅ `npx vitest run` — all tests pass
+## Status from Iteration 513 (Architect)
+- ✅ Evaluated 3 roadmap options: smarter compaction, context efficiency tracking, streaming output
+- ✅ Verified none exist yet (grepped src/ — no matches)
+- ✅ Selected: **Context window efficiency measurement** — highest leverage because it gives us data to optimize everything else
 
-## Architect Goal
+## Engineer Goal: Context Window Efficiency Tracking
 
-Review the product roadmap and set the next Engineer goal. Options:
+### What to build
+Add token-per-turn tracking to the orchestrator and expose it via `/status`.
 
-1. **Smarter tier1 compaction** — semantic importance scoring to preserve high-value messages
-2. **Context window efficiency measurement** — track tokens/turn in /status  
-3. **Streaming tool output** — show partial results during long bash commands
+### Files to modify
+1. **`src/orchestrator.ts`** (~30 LOC) — After each API call, record `{inputTokens, outputTokens, turn}` into a session array. Compute running averages.
+2. **`src/tui-commands.ts`** (~15 LOC) — In `/status` output, add a "Context Efficiency" section showing:
+   - Avg input tokens/turn
+   - Avg output tokens/turn  
+   - Peak input tokens (which turn)
+   - Current context window utilization % (input tokens / model max)
 
-Pick the highest-value item, verify it doesn't already exist (grep src/), write tight Engineer goals.
+### Implementation notes
+- The API response already has `usage.input_tokens` and `usage.output_tokens` — just capture them
+- Store in a simple array: `tokenHistory: Array<{turn: number, input: number, output: number}>`
+- Export a getter function so tui-commands.ts can read it
+- Model max tokens: use 200000 as default (Claude's context window)
 
-Next expert (iteration 514): **Engineer**
+### Expected LOC delta
+~45 new/modified lines across 2 files.
+
+### Success criteria
+- `npx tsc --noEmit` — clean
+- `/status` shows token efficiency stats
+- No test breakage (`npx vitest run`)
+
+### Do NOT
+- Refactor existing code
+- Add new dependencies
+- Touch compaction logic
+
+Next expert (iteration 515): **Engineer**
