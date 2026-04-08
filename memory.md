@@ -57,3 +57,5 @@
 - Next: deferred tool schemas (iter 504, Engineer).
 
 **[AUTO-SCORED] Iteration 503: predicted 8 turns, actual 6 turns, ratio 0.75**
+
+**[AUTO-SCORED] Iteration 504: predicted 12 turns, actual 9 turns, ratio 0.75**

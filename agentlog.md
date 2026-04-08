@@ -1,63 +1,3 @@
-[2026-04-08T09:09:27.640Z] iter=496 turn=14 INFO: Agent: Finishing all changes now in one batch.
-[2026-04-08T09:09:27.640Z] iter=496 turn=14 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T09:09:27.642Z] iter=496 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
-
-Context after patch:
-357 | - To persist instructions for future sessions, ask the user to say "remember: ..." or use the save_memory tool.
-358 | - For complex multi-step tasks, use save_scratchpad to record your plan, progress, and key findings. Use read_scratchpad after context compaction to recover working state.
-359 | 
-360 | ${repoFingerprint}${fileList}${repoMapBlock}${projectMemory}${skillsBlock}`;
-361 | 
-362 |   return { systemPrompt, repoMapBlock, rawRepoMap };
-363 | }
-[2026-04-08T09:09:27.642Z] iter=496 turn=15 INFO: Turn 15/25
-[2026-04-08T09:09:36.796Z] iter=496 turn=15 INFO: Agent: Now add `load_skill` and `tool_search` to tool-registry.ts:
-[2026-04-08T09:09:36.797Z] iter=496 turn=15 INFO: write_file: src/tool-registry.ts (patch)
-[2026-04-08T09:09:36.799Z] iter=496 turn=15 INFO:   -> ok: Patched src/tool-registry.ts: -2 +63 lines
-
-Context after patch:
-435 |     { defaultTimeout: 30 },
-436 |   );
-437 | 
-438 |   // ── load_skill ───────────────────────────────────────
-439 |   const { loadSkill } = await import("./skills.js");
-440 |   registry.register(
-441 |     {
-442 |       name: "load_skill",
-443 |       description: "Load the full content of a named skill from .autoagent/skills/. Use this to get detailed guidance on a topic listed in the Available Skills menu.",
-444 |       input_schema: {
-445 |         type: "object" as const,
-446 |         properties: {
-447 |           name: {
-448 |             type: "string",
-449 |             description: "The skill name as listed in the Available Skills menu",
-450 |           },
-451 |         },
-452 |         required: ["name"],
-453 |       },
-454 |     },
-455 |     async (input, ctx) => {
-456 |       const { name } = input as { name: string };
-457 |       ctx.log(`load_skill: "${name}"`);
-458 |       try {
-459 |         const content = loadSkill(ctx.rootDir, name);
-460 |         ctx.log(`  -> ${content.length} chars`);
-461 |         return { result: content };
-462 |       } catch (err) {
-463 |         return { result: String(err) };
-464 |       }
-465 |     },
-466 |     { defaultTimeout: 5 },
-467 |   );
-468 | 
-469 |   // ── tool_search ──────────────────────────────────────
-470 |   registry.register(
-471 |     {
-472 |       name: "tool_search",
-473 |       description: "Search available tools by keyword. Returns matching tool names and descriptions.",
-474 |       input_schema: {
-475 |         type: "object" as const,
-476 |         properties: {
 477 |           query: {
 478 |             type: "string",
 479 |             description: "Keywords to search for in tool names and descriptions",
@@ -1056,3 +996,116 @@ This is a Meta iteration — no src/ changes expected. My deliverables were: (1)
 [2026-04-08T19:41:51.893Z] iter=503 turn=6 INFO: Tool timing stats
 [2026-04-08T19:41:59.895Z] iter=503 turn=6 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 503: predicted 8 turns, actual 6 turns, ratio 0.75**
 [2026-04-08T19:41:59.918Z] iter=503 turn=6 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T19:41:59.954Z] iter=503 turn=6 INFO: Committed: 4eef83b5 (14 in / 2848 out, cache: 55379 created, 219398 read)
+[2026-04-08T19:41:59.954Z] iter=503 turn=6 INFO: Restarting as iteration 504...
+[2026-04-08T19:42:00.135Z] iter=504 INFO: Cache restored: 64/64 entries (0 stale)
+[2026-04-08T19:42:00.138Z] iter=504 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=12)
+[2026-04-08T19:42:00.138Z] iter=504 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T19:42:00.325Z] iter=504 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-08T19:42:00.326Z] iter=504 turn=1 INFO: Turn 1/25
+[2026-04-08T19:42:02.436Z] iter=504 turn=1 INFO: read_file: src/tool-registry.ts
+[2026-04-08T19:42:02.437Z] iter=504 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T19:42:02.438Z] iter=504 turn=1 INFO:   -> ok (19559 chars)
+[2026-04-08T19:42:02.439Z] iter=504 turn=2 INFO: Turn 2/25
+[2026-04-08T19:42:06.458Z] iter=504 turn=2 INFO: think: Now I understand the current structure. I need to:
+
+1. Add `getMinimalDefinitions()` to `ToolRegistry` — returns tools w...
+[2026-04-08T19:42:06.459Z] iter=504 turn=3 INFO: Turn 3/25
+[2026-04-08T19:42:08.397Z] iter=504 turn=3 INFO: Agent: I have what I need. Let me implement the two changes now.
+[2026-04-08T19:42:08.398Z] iter=504 turn=3 INFO: grep: "getDefinitions()" in src/orchestrator.ts
+[2026-04-08T19:42:08.416Z] iter=504 turn=3 INFO:   -> 5 matches
+[2026-04-08T19:42:08.416Z] iter=504 turn=4 INFO: Turn 4/25
+[2026-04-08T19:42:16.789Z] iter=504 turn=4 INFO: Agent: Now I'll make both changes:
+[2026-04-08T19:42:16.789Z] iter=504 turn=4 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-08T19:42:16.791Z] iter=504 turn=4 INFO:   -> ok: Patched src/tool-registry.ts: -16 +39 lines
+
+Context after patch:
+149 |     return this.tools.get(name)?.defaultTimeout;
+150 |   }
+151 | 
+152 |   /**
+153 |    * Returns tool definitions for the system prompt.
+154 |    * Hidden tools are excluded — they're discoverable via searchTools().
+155 |    */
+156 |   getDefinitions(): Anthropic.Tool[] {
+157 |     return Array.from(this.tools.values())
+158 |       .filter((t) => !t.hidden)
+159 |       .map((t) => t.definition);
+160 |   }
+161 | 
+162 |   /**
+163 |    * Returns tool definitions with minimal schemas — description only, no property details.
+164 |    * Saves ~2-3K tokens per API call by omitting input_schema property listings.
+165 |    * Hidden tools are excluded.
+166 |    */
+167 |   getMinimalDefinitions(): Anthropic.Tool[] {
+168 |     return Array.from(this.tools.values())
+169 |       .filter((t) => !t.hidden)
+170 |       .map((t) => ({
+171 |         name: t.definition.name,
+172 |         description: t.definition.description,
+173 |         input_schema: { type: "object" as const },
+174 |       }));
+175 |   }
+176 | 
+177 |   /**
+178 |    * Returns the full schema for a single tool by name.
+179 |    * Use this after the model selects a tool to get the complete input_schema.
+180 |    */
+181 |   getSchemaFor(name: string): Anthropic.Tool["input_schema"] | undefined {
+182 |     return this.tools.get(name)?.definition.input_schema;
+183 |   }
+184 | 
+185 |   /**
+186 |    * Returns ALL tool definitions including hidden ones (for dispatching).
+187 |    */
+188 |   getAllDefinitions(): Anthropic.Tool[] {
+189 |     return Array.from(this.tools.values()).map((t) => t.definition);
+190 |   }
+191 | 
+192 |   getNames(): string[] {
+193 |     return Array.from(this.tools.keys());
+[2026-04-08T19:42:16.792Z] iter=504 turn=5 INFO: Turn 5/25
+[2026-04-08T19:42:20.800Z] iter=504 turn=5 INFO: Agent: **Goal A status: IN PROGRESS**
+
+- ✅ `getMinimalDefinitions()` added to `tool-registry.ts`
+- ✅ `getSchemaFor(name)` added to `tool-registry.ts`  
+- ❌ `orchestrator.ts` — need to use `getMinimalDefinitions()` instead of `getDefinitions()`
+
+Doing it now:
+[2026-04-08T19:42:20.800Z] iter=504 turn=5 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T19:42:20.801Z] iter=504 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+631 |     totalIn += tIn;
+632 |     totalOut += tOut;
+633 |   }, systemPrompt);
+634 |   const tools = registry.getMinimalDefinitions();
+635 | 
+636 |   let totalIn = 0, totalOut = 0;
+637 |   let lastInput = 0;
+[2026-04-08T19:42:20.802Z] iter=504 turn=6 INFO: Turn 6/25
+[2026-04-08T19:42:22.241Z] iter=504 turn=6 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-08T19:42:23.436Z] iter=504 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-08T19:42:23.436Z] iter=504 turn=7 INFO: Turn 7/25
+[2026-04-08T19:42:28.176Z] iter=504 turn=7 INFO: Agent: TypeScript passes. Now write memory, update goals, restart:
+[2026-04-08T19:42:28.177Z] iter=504 turn=7 INFO: save_memory: "[Engineer] Iteration 504 — Deferred tool schemas"
+[2026-04-08T19:42:28.178Z] iter=504 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T19:42:28.178Z] iter=504 turn=8 INFO: Turn 8/25
+[2026-04-08T19:42:36.507Z] iter=504 turn=8 INFO: Agent: All src/ changes are done. Updating goals and restarting now.
+[2026-04-08T19:42:36.507Z] iter=504 turn=8 INFO: write_file: goals.md (write)
+[2026-04-08T19:42:36.508Z] iter=504 turn=8 INFO:   -> ok: Updated goals.md (1180 chars, +2 lines delta)
+[2026-04-08T19:42:36.508Z] iter=504 turn=9 INFO: Turn 9/25
+[2026-04-08T19:42:39.770Z] iter=504 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T19:42:39.771Z] iter=504 turn=9 INFO: RESTART signal
+[2026-04-08T19:42:39.771Z] iter=504 turn=9 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T19:42:40.955Z] iter=504 turn=9 INFO: Compilation OK
+[2026-04-08T19:42:49.951Z] iter=504 turn=9 INFO: Cache persisted: 64 entries to .autoagent-cache.json
+[2026-04-08T19:42:49.951Z] iter=504 turn=9 INFO: Cache stats: 0 hits, 2 misses, 64 entries, 3 invalidations (2 entries removed)
+[2026-04-08T19:42:49.951Z] iter=504 turn=9 INFO: Tool cache stats
+[2026-04-08T19:42:49.951Z] iter=504 turn=9 INFO: Tool timing: bash: 2x, avg=598ms, total=1196ms; grep: 1x, avg=18ms, total=18ms; write_file: 3x, avg=2ms, total=5ms; read_file: 1x, avg=3ms, total=3ms; read_scratchpad: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T19:42:49.951Z] iter=504 turn=9 INFO: Tool timing stats
+[2026-04-08T19:42:58.627Z] iter=504 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 504: predicted 12 turns, actual 9 turns, ratio 0.75**
+[2026-04-08T19:43:07.478Z] iter=504 turn=9 INFO: Pre-commit review (681in/366out): ## Issues Found
+
+- **Logic bug / regression**: `getMinimalDefinitions()` returns `input_schema: { type: "object" }` with no `properties` or `required` fields. The Anthropic API will accept this, but t

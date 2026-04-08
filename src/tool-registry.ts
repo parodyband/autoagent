@@ -160,6 +160,29 @@ export class ToolRegistry {
   }
 
   /**
+   * Returns tool definitions with minimal schemas — description only, no property details.
+   * Saves ~2-3K tokens per API call by omitting input_schema property listings.
+   * Hidden tools are excluded.
+   */
+  getMinimalDefinitions(): Anthropic.Tool[] {
+    return Array.from(this.tools.values())
+      .filter((t) => !t.hidden)
+      .map((t) => ({
+        name: t.definition.name,
+        description: t.definition.description,
+        input_schema: { type: "object" as const },
+      }));
+  }
+
+  /**
+   * Returns the full schema for a single tool by name.
+   * Use this after the model selects a tool to get the complete input_schema.
+   */
+  getSchemaFor(name: string): Anthropic.Tool["input_schema"] | undefined {
+    return this.tools.get(name)?.definition.input_schema;
+  }
+
+  /**
    * Returns ALL tool definitions including hidden ones (for dispatching).
    */
   getAllDefinitions(): Anthropic.Tool[] {

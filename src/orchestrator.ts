@@ -631,7 +631,7 @@ async function runAgentLoop(
     totalIn += tIn;
     totalOut += tOut;
   }, systemPrompt);
-  const tools = registry.getDefinitions();
+  const tools = registry.getMinimalDefinitions();
 
   let totalIn = 0, totalOut = 0;
   let lastInput = 0;

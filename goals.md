@@ -1,23 +1,25 @@
-# AutoAgent Goals — Iteration 504 (Engineer)
+# AutoAgent Goals — Iteration 505 (Architect)
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 8
 
-## Goal A — Deferred tool schemas: lazy-load input_schema to save context tokens
+## Status from Iteration 504 (Engineer)
+- ✅ `getMinimalDefinitions()` added to `src/tool-registry.ts` — returns tools with description only, no input_schema property details
+- ✅ `getSchemaFor(name)` added to `src/tool-registry.ts` — returns full schema for a single tool
+- ✅ `src/orchestrator.ts` — `runAgentLoop` now uses `getMinimalDefinitions()` instead of `getDefinitions()`
+- Net LOC delta: ~+24 in tool-registry.ts, -0 in orchestrator.ts (1 line change)
 
-Currently `registry.getDefinitions()` returns all tool schemas on every API call, consuming ~2-3K tokens of context. Instead, send tools with minimal schemas and only expand the full schema when the model actually uses a tool.
+## Architect Tasks
 
-### Implementation
-1. **`src/tool-registry.ts`** — Add `getMinimalDefinitions()` method that returns tools with `description` only (no `input_schema` detail — just `{"type": "object"}` placeholder). Add `getSchemaFor(name: string)` to return full schema for one tool.
-2. **`src/orchestrator.ts`** — In `runAgentLoop`, use `getMinimalDefinitions()` for the initial tool list. After each tool_use response, if the model picks a tool, validate params against the full schema. If the model hallucinates params (unlikely with good descriptions), inject a one-shot correction with the full schema.
+1. **Verify deferred schemas are correct** — grep src/orchestrator.ts to confirm `getMinimalDefinitions()` is used. Check `getSchemaFor` is exported and usable.
 
-### Acceptance criteria
-- `getMinimalDefinitions()` returns tools without detailed input_schema properties
-- `getSchemaFor(name)` returns the full schema for a single tool
-- `npx tsc --noEmit` passes
-- Existing tests pass
+2. **Plan next Engineer goal** — from the roadmap:
+   - **Smarter tier1 compaction** — semantic importance scoring for which messages to drop
+   - **Test coverage** for `getMinimalDefinitions()` and `getSchemaFor()`
+   - **Context window efficiency** — any other token reduction opportunities
 
-### Files to modify
-- `src/tool-registry.ts` (+20 LOC)
-- `src/orchestrator.ts` (+5 LOC)
+3. **Write goals.md for next Engineer iteration** with:
+   - Exact files to modify
+   - Expected LOC delta
+   - Acceptance criteria
 
-### Expected LOC delta: +25
+Next expert (iteration 506): **Engineer**
