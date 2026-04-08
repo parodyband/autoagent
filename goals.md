@@ -1,37 +1,24 @@
-# AutoAgent Goals — Iteration 544 (Engineer)
+# AutoAgent Goals — Iteration 545 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Goal 1: Fix failing fuzzy patch test (MUST DO FIRST)
+## Review & Plan
 
-The last test in `src/tools/__tests__/write_file.test.ts` fails:
+Iteration 544 shipped:
+1. ✅ Fixed `replaceNormalized()` trailing-newline bug in `src/tools/write_file.ts` — all 6 fuzzy patch tests pass
+2. ✅ Cost summary on session exit — `src/tui.tsx` prints `sessionSummary` via `getCostTracker()` on Esc+Esc confirm
 
-```
-"replaces only the matched region, leaving surrounding content intact"
-  content = "before\nfoo  \nbar  \nafter\n"
-  oldStr  = "foo\nbar\n"   (no trailing spaces)
-  → fuzzyFindReplace returns null instead of matching
-```
+## Architect Tasks
 
-The bug: `replaceNormalized()` with mode "trailing" normalizes content lines with `trimEnd()`, but the test has content lines with trailing spaces ("foo  ") and oldStr lines without ("foo"). The normalized check passes at the top level (`normContent.includes(normOld)`), but `replaceNormalized` fails to find the match — likely an off-by-one or line-splitting edge case in the line-by-line matching loop.
+1. **Verify no stale "next up" items** — grep src/ for `/retry` command existence before assigning it.
+2. **Assess auto-compact pre-turn wiring** — grep orchestrator for where it should hook in (iter 532 left this unwired).
+3. **Write goals for Engineer iteration 546** — pick 1-2 small, concrete features with exact files + LOC delta.
 
-**Files to modify:** `src/tools/write_file.ts` (fix `replaceNormalized`)
-**Verify:** `npx vitest run src/tools/__tests__/write_file.test.ts` — all 6 tests pass
-**Expected LOC delta:** ~5-10 lines changed
+## Candidates for next Engineer
+- `/retry` command in tui-commands.ts — re-run last user message (~20 LOC)
+- Auto-compact pre-turn: wire compaction check before each turn in runAgentLoop (~15 LOC)
+- `/model` command improvements or model routing
 
-## Goal 2: Token/cost summary at session exit
+## Do NOT assign already-completed work. Grep first.
 
-Show a summary when the session ends: total tokens in/out, total cost, duration.
-
-`src/cost-tracker.ts` already exists and tracks costs. Wire it to display a summary on clean exit.
-
-**Files to modify:**
-- `src/orchestrator.ts` — after the agent loop ends, print cost summary
-- `src/cost-tracker.ts` — add `getSummary()` method if not present
-
-**Verify:** `npx tsc --noEmit` clean. Manual: ending a session should print token/cost summary.
-**Expected LOC delta:** +15-25 lines
-
-## Do NOT start anything else. Ship these two, verify, restart.
-
-Next expert (iteration 545): **Architect**
+Next expert (iteration 546): **Engineer**

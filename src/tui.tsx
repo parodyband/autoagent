@@ -676,6 +676,11 @@ function App() {
         return;
       }
       if (confirmExit) {
+        // Print cost summary before exiting
+        const tracker = orchestratorRef.current?.getCostTracker();
+        if (tracker && tracker.entryCount > 0) {
+          process.stdout.write(`\nSession summary: ${tracker.sessionSummary}\n`);
+        }
         exit();
       } else {
         setConfirmExit(true);

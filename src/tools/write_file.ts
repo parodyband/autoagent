@@ -114,20 +114,26 @@ function replaceNormalized(
   newStr: string,
   mode: "trailing" | "collapse"
 ): string | null {
-  const normalize = mode === "trailing" ? normalizeWhitespace : collapseWhitespace;
   const contentLines = content.split("\n");
   const oldLines = oldStr.split("\n");
-  const normOldLines = oldLines.map(l => (mode === "trailing" ? l.trimEnd() : l.trim().replace(/\s+/g, " ")));
 
-  for (let i = 0; i <= contentLines.length - oldLines.length; i++) {
-    const slice = contentLines.slice(i, i + oldLines.length);
+  // Strip the trailing empty string that results from a trailing "\n" — it represents
+  // the newline terminator, not an actual empty line to match against.
+  const matchLines = oldLines[oldLines.length - 1] === "" ? oldLines.slice(0, -1) : oldLines;
+  const normMatchLines = matchLines.map(l => (mode === "trailing" ? l.trimEnd() : l.trim().replace(/\s+/g, " ")));
+
+  for (let i = 0; i <= contentLines.length - matchLines.length; i++) {
+    const slice = contentLines.slice(i, i + matchLines.length);
     const normSlice = slice.map(l => (mode === "trailing" ? l.trimEnd() : l.trim().replace(/\s+/g, " ")));
-    if (normSlice.join("\n") === normOldLines.join("\n")) {
+    if (normSlice.join("\n") === normMatchLines.join("\n")) {
       // Found matching region — replace it
       const before = contentLines.slice(0, i);
-      const after = contentLines.slice(i + oldLines.length);
+      const after = contentLines.slice(i + matchLines.length);
       const newLines = newStr.split("\n");
-      return [...before, ...newLines, ...after].join("\n");
+      // Also strip trailing empty from newStr (same trailing-newline logic) to avoid
+      // inserting a spurious blank line before the "after" region.
+      const newLinesForInsert = newLines[newLines.length - 1] === "" ? newLines.slice(0, -1) : newLines;
+      return [...before, ...newLinesForInsert, ...after].join("\n");
     }
   }
   return null;
