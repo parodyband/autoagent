@@ -265,7 +265,7 @@ function prompt() {
         `${mins} min, avg ${stats.avgCostPerTurn.toFixed(4)}/turn, trend ${stats.costTrend}`
       );
       try {
-        const gitOut = execSync("git status --short", { cwd: workDir, encoding: "utf8" }).trim();
+        const gitOut = execSync("git status --short", { cwd: workDir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
         console.log(`Git status:\n${gitOut || "  (clean)"}\n`);
       } catch {
         console.log("Git: not a git repo\n");

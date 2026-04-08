@@ -469,7 +469,7 @@ export function getImporters(
   let files = knownFiles;
   if (!files) {
     try {
-      const raw = execSync("git ls-files", { cwd: workDir, encoding: "utf-8", timeout: 5000 });
+      const raw = execSync("git ls-files", { cwd: workDir, encoding: "utf-8", timeout: 5000, stdio: ["ignore", "pipe", "pipe"] });
       files = raw.split("\n").filter(Boolean).map(f => join(workDir, f));
     } catch {
       return [];

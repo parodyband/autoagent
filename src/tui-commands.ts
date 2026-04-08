@@ -101,7 +101,7 @@ const commands: Record<string, CommandHandler> = {
     ctx.setStatus("Re-indexing repo...");
     ctx.orchestratorRef.current?.reindex();
     try {
-      const out = execSync(`git -C ${JSON.stringify(ctx.workDir)} ls-files`, { encoding: "utf8" });
+      const out = execSync(`git -C ${JSON.stringify(ctx.workDir)} ls-files`, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
       const allFiles = out.split("\n").filter(Boolean);
       ctx.repoMapRef.current = buildRepoMap(ctx.workDir, allFiles);
     } catch { /* ignore */ }

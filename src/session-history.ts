@@ -14,6 +14,7 @@ export interface SessionHistoryEntry {
   outputTokens: number;
   firstMessage: string;
   model: string;
+  notes?: string[];
 }
 
 function historyFilePath(): string {

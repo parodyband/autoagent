@@ -47,7 +47,7 @@ function getFileListing(workDir: string): string {
 /** Build a repo map string (truncated) for context */
 function buildRepoMapContext(workDir: string): string {
   try {
-    const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf-8" }) as string;
+    const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] }) as string;
     const files = out.split("\n").filter((f: string) => f.endsWith(".ts") || f.endsWith(".tsx") || f.endsWith(".js") || f.endsWith(".py") || f.endsWith(".rs") || f.endsWith(".go"));
     if (files.length === 0) return "";
     const repoMap = buildRepoMap(workDir, files.slice(0, 80));

@@ -16,7 +16,7 @@ export function useFileSuggestions({ workDir, setInput }: UseFileSuggestionsOpts
   // Build initial repo map
   useEffect(() => {
     try {
-      const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf8" });
+      const out = execSync(`git -C ${JSON.stringify(workDir)} ls-files`, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
       const allFiles = out.split("\n").filter(Boolean);
       repoMapRef.current = buildRepoMap(workDir, allFiles);
     } catch { /* non-git repo — suggestions unavailable */ }
