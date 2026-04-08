@@ -2412,6 +2412,7 @@ export class Orchestrator {
       this.sessionFilesModified,
       this.toolUsageCounts,
       reflectionCbs,
+      this.opts.onToolOutput,
     );
     const { text, tokensIn, tokensOut, lastInputTokens, aborted } = loopResult;
 
@@ -2485,6 +2486,10 @@ export class Orchestrator {
             undefined,
             2,
             this.hooksConfig,
+            undefined,
+            undefined,
+            {},
+            this.opts.onToolOutput,
           );
         }
       }
@@ -2529,6 +2534,10 @@ export class Orchestrator {
           undefined,
           2,
           this.hooksConfig,
+          undefined,
+          undefined,
+          {},
+          this.opts.onToolOutput,
         );
 
         this.sessionTokensIn += fixResult.tokensIn;
@@ -2570,6 +2579,7 @@ export class Orchestrator {
               this.opts.onStatus, this.opts.onText, this.opts.onDiffPreview,
               undefined, undefined, fileWatchCallback,
               undefined, 2, this.hooksConfig,
+              undefined, undefined, {}, this.opts.onToolOutput,
             );
             this.sessionTokensIn += fixResult.tokensIn;
             this.sessionTokensOut += fixResult.tokensOut;

@@ -57,3 +57,5 @@
 2. **Context window efficiency measurement** — track tokens/turn in /status
 
 **[AUTO-SCORED] Iteration 523: predicted 15 turns, actual 16 turns, ratio 1.07**
+
+**[AUTO-SCORED] Iteration 524: predicted 12 turns, actual 18 turns, ratio 1.50**

@@ -1,92 +1,3 @@
-1137 |   private tokenHistory: Array<{ turn: number; input: number; output: number }> = [];
-1138 |   /** Per-tool cumulative timing for this session. */
-1139 |   private toolTimings = new Map<string, { calls: number; totalMs: number }>();
-1140 | 
-[2026-04-08T19:59:05.553Z] iter=514 turn=9 INFO: Turn 9/25
-[2026-04-08T19:59:07.723Z] iter=514 turn=9 INFO: Agent: Now record token history after each API call:
-[2026-04-08T19:59:07.724Z] iter=514 turn=9 INFO: $ sed -n '2388,2400p' src/orchestrator.ts
-[2026-04-08T19:59:07.742Z] iter=514 turn=9 INFO:   -> exit=0 (444 chars)
-[2026-04-08T19:59:07.743Z] iter=514 turn=10 INFO: Turn 10/25
-[2026-04-08T19:59:10.256Z] iter=514 turn=10 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T19:59:10.260Z] iter=514 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -3 +4 lines
-
-Context after patch:
-2393 |     this.sessionTokensOut += tokensOut;
-2394 |     const turnCost = computeCost(model, tokensIn, tokensOut);
-2395 |     this.sessionCost += turnCost;
-2396 |     this.turnCosts.push(turnCost);
-2397 |     this.costTracker.record(model, tokensIn, tokensOut);
-2398 |     this.lastInputTokens = lastInputTokens;
-2399 |     this.tokenHistory.push({ turn: this.turnCosts.length, input: tokensIn, output: tokensOut });
-2400 | 
-2401 |     // If aborted, return early with partial result
-2402 |     if (aborted) {
-[2026-04-08T19:59:10.262Z] iter=514 turn=11 INFO: Turn 11/25
-[2026-04-08T19:59:16.212Z] iter=514 turn=11 INFO: Agent: Now add the getter and update /status:
-[2026-04-08T19:59:16.213Z] iter=514 turn=11 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T19:59:16.215Z] iter=514 turn=11 INFO:   -> ok: Patched src/orchestrator.ts: -1 +12 lines
-
-Context after patch:
-1408 |   }
-1409 | 
-1410 |   /** Session statistics for /status display. */
-1411 |   getTokenEfficiency(): { avgInput: number; avgOutput: number; peakInput: number; peakTurn: number; currentUtilPct: number } {
-1412 |     const history = this.tokenHistory;
-1413 |     if (history.length === 0) return { avgInput: 0, avgOutput: 0, peakInput: 0, peakTurn: 0, currentUtilPct: 0 };
-1414 |     const avgInput = Math.round(history.reduce((s, t) => s + t.input, 0) / history.length);
-1415 |     const avgOutput = Math.round(history.reduce((s, t) => s + t.output, 0) / history.length);
-1416 |     const peak = history.reduce((p, t) => t.input > p.input ? t : p, history[0]);
-1417 |     const lastInput = history[history.length - 1].input;
-1418 |     const currentUtilPct = Math.round((lastInput / 200_000) * 100);
-1419 |     return { avgInput, avgOutput, peakInput: peak.input, peakTurn: peak.turn, currentUtilPct };
-1420 |   }
-1421 | 
-1422 |   getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: "↑" | "→" | "↓"; sessionCost: number; costSummary: string; filesModified: string[]; toolUsage: Record<string, number> } {
-1423 |     const durationMs = Date.now() - this.sessionStartTime;
-1424 |     const turnCount = this.turnCosts.length;
-1425 |     const avgCostPerTurn = turnCount > 0 ? this.sessionCost / turnCount : 0;
-[2026-04-08T19:59:16.215Z] iter=514 turn=11 INFO: HARD TURN CAP REACHED: 11 turns (predicted 7, cap 11). Forcing commit.
-[2026-04-08T19:59:16.219Z] iter=514 turn=11 INFO: Cache persisted: 68 entries to .autoagent-cache.json
-[2026-04-08T19:59:16.219Z] iter=514 turn=11 INFO: Tool timing: bash: 9x, avg=17ms, total=152ms; write_file: 3x, avg=5ms, total=15ms; think: 1x, avg=3ms, total=3ms
-[2026-04-08T19:59:16.220Z] iter=514 turn=11 INFO: Tool timing stats
-[2026-04-08T19:59:24.939Z] iter=514 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 514: predicted 7 turns, actual 11 turns, ratio 1.57**
-[2026-04-08T19:59:33.496Z] iter=514 turn=11 INFO: Pre-commit review (909in/290out): **Issues found:**
-
-- **Hardcoded context window**: `currentUtilPct` divides by `200_000`, but this magic constant will silently give wrong results for any model with a different context limit (e.g., G
-[2026-04-08T19:59:33.541Z] iter=514 turn=11 INFO: Committed: 22aa749e (23 in / 1871 out, cache: 9445 created, 86905 read)
-[2026-04-08T19:59:33.541Z] iter=514 turn=11 INFO: Restarting as iteration 515...
-[2026-04-08T19:59:33.754Z] iter=515 INFO: Cache restored: 68/68 entries (0 stale)
-[2026-04-08T19:59:33.757Z] iter=515 INFO: Turn budget: 12/25 (calibration=1.25x, predicted=7)
-[2026-04-08T19:59:33.757Z] iter=515 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-08T19:59:33.996Z] iter=515 INFO: Hard turn cap: 11 (1.5x prediction of 7)
-[2026-04-08T19:59:33.996Z] iter=515 turn=1 INFO: Turn 1/25
-[2026-04-08T19:59:38.519Z] iter=515 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the context efficiency tracking that was partially implemented in iteration 514.
-[2026-04-08T19:59:38.520Z] iter=515 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git diff HEAD --stat
-[2026-04-08T19:59:38.520Z] iter=515 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "tokenHistory\|getTokenEfficiency\|token_efficiency\|Context Efficiency" src/orchestrator.ts src/tui-commands.ts 2>/dev/null
-[2026-04-08T19:59:38.533Z] iter=515 turn=1 INFO:   -> exit=0 (448 chars)
-[2026-04-08T19:59:38.533Z] iter=515 turn=1 INFO:   -> exit=0 (257 chars)
-[2026-04-08T19:59:38.534Z] iter=515 turn=2 INFO: Turn 2/25
-[2026-04-08T19:59:48.143Z] iter=515 turn=2 INFO: think: Let me focus. I'm the Meta expert. My job is to evaluate the system's health and make surgical improvements. Let me asse...
-[2026-04-08T19:59:48.144Z] iter=515 turn=3 INFO: Turn 3/25
-[2026-04-08T19:59:53.535Z] iter=515 turn=3 INFO: Agent: 
-
-My deliverables as Meta expert:
-
-1. **Assess system health** — IN PROGRESS (checked state, see partial feature landed)
-2. **Check if context efficiency feature is complete** — IN PROGRESS
-3. **Write goals for next iteration** — NOT STARTED
-4. **Compact memory / tune predictions** — NOT STARTED
-
-Let me quickly check the feature completeness and then produce deliverables:
-[2026-04-08T19:59:53.537Z] iter=515 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1405,1430p' src/orchestrator.ts
-[2026-04-08T19:59:53.539Z] iter=515 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "tokenHistory\|getTokenEfficiency\|efficiency\|Context" src/tui-commands.ts 2>/dev/null | head -20
-[2026-04-08T19:59:53.541Z] iter=515 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '2405,2415p' src/orchestrator.ts
-[2026-04-08T20:08:00.200Z] iter=515 INFO: Cache restored: 68/68 entries (0 stale)
-[2026-04-08T20:08:00.203Z] iter=515 INFO: Turn budget: 12/25 (calibration=1.25x, predicted=7)
-[2026-04-08T20:08:00.203Z] iter=515 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-08T20:08:00.427Z] iter=515 INFO: Hard turn cap: 11 (1.5x prediction of 7)
 [2026-04-08T20:08:00.427Z] iter=515 turn=1 INFO: Turn 1/25
 [2026-04-08T20:08:03.164Z] iter=515 turn=1 INFO: Agent: 
 
@@ -1085,3 +996,232 @@ echo "AUTOAGENT_RESTART"
 [2026-04-08T20:23:32.754Z] iter=523 turn=16 INFO: Tool timing stats
 [2026-04-08T20:23:40.996Z] iter=523 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 523: predicted 15 turns, actual 16 turns, ratio 1.07**
 [2026-04-08T20:23:41.026Z] iter=523 turn=16 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:23:41.060Z] iter=523 turn=16 INFO: Committed: b164bd76 (28 in / 4062 out, cache: 55093 created, 667658 read)
+[2026-04-08T20:23:41.061Z] iter=523 turn=16 INFO: Restarting as iteration 524...
+[2026-04-08T20:23:41.270Z] iter=524 INFO: Cache restored: 63/63 entries (0 stale)
+[2026-04-08T20:23:41.273Z] iter=524 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=12)
+[2026-04-08T20:23:41.274Z] iter=524 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T20:23:41.500Z] iter=524 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-08T20:23:41.501Z] iter=524 turn=1 INFO: Turn 1/25
+[2026-04-08T20:23:43.943Z] iter=524 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand exactly what needs to be wired up.
+[2026-04-08T20:23:43.944Z] iter=524 turn=1 INFO: $ grep -n "runAgentLoop" src/orchestrator.ts | head -40
+[2026-04-08T20:23:43.945Z] iter=524 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T20:23:43.955Z] iter=524 turn=1 INFO:   -> exit=0 (402 chars)
+[2026-04-08T20:23:43.955Z] iter=524 turn=2 INFO: Turn 2/25
+[2026-04-08T20:23:45.878Z] iter=524 turn=2 INFO: $ sed -n '230,250p' src/orchestrator.ts
+[2026-04-08T20:23:45.881Z] iter=524 turn=2 INFO: $ sed -n '610,660p' src/orchestrator.ts
+[2026-04-08T20:23:45.888Z] iter=524 turn=2 INFO:   -> exit=0 (670 chars)
+[2026-04-08T20:23:45.889Z] iter=524 turn=2 INFO:   -> exit=0 (2126 chars)
+[2026-04-08T20:23:45.889Z] iter=524 turn=3 INFO: Turn 3/25
+[2026-04-08T20:23:49.665Z] iter=524 turn=3 INFO: think: I have enough context. Let me look at the call sites quickly and then make the changes.
+
+The runAgentLoop signature ends...
+[2026-04-08T20:23:49.666Z] iter=524 turn=4 INFO: Turn 4/25
+[2026-04-08T20:23:52.328Z] iter=524 turn=4 INFO: $ sed -n '2385,2420p' src/orchestrator.ts
+[2026-04-08T20:23:52.331Z] iter=524 turn=4 INFO: $ sed -n '2460,2580p' src/orchestrator.ts
+[2026-04-08T20:23:52.333Z] iter=524 turn=4 INFO: $ sed -n '2660,2690p' src/orchestrator.ts
+[2026-04-08T20:23:52.339Z] iter=524 turn=4 INFO:   -> exit=0 (5218 chars)
+[2026-04-08T20:23:52.339Z] iter=524 turn=4 INFO:   -> exit=0 (915 chars)
+[2026-04-08T20:23:52.340Z] iter=524 turn=4 INFO:   -> exit=0 (804 chars)
+[2026-04-08T20:23:52.340Z] iter=524 turn=5 INFO: Turn 5/25
+[2026-04-08T20:23:57.635Z] iter=524 turn=5 INFO: Agent: **Goal 1A (Wire onToolOutput at call sites)**: NOT STARTED — I have the context I need now.
+**Goal 1B (TUI streaming display)**: NOT STARTED
+
+Making both changes now:
+[2026-04-08T20:23:57.636Z] iter=524 turn=5 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:23:57.639Z] iter=524 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -4 +5 lines
+
+Context after patch:
+2410 |       this.opts.maxConsecutiveLoops ?? 2,
+2411 |       this.hooksConfig,
+2412 |       this.sessionFilesModified,
+2413 |       this.toolUsageCounts,
+2414 |       reflectionCbs,
+2415 |       this.opts.onToolOutput,
+2416 |     );
+2417 |     const { text, tokensIn, tokensOut, lastInputTokens, aborted } = loopResult;
+2418 | 
+2419 |     // Proactive tool result summarization after each chat round
+2420 |     this.summarizeOldToolResults();
+[2026-04-08T20:23:57.640Z] iter=524 turn=6 INFO: Turn 6/25
+[2026-04-08T20:24:00.349Z] iter=524 turn=6 INFO: Agent: Now look at the TUI to understand where to add the streaming display:
+[2026-04-08T20:24:00.349Z] iter=524 turn=6 INFO: $ grep -n "onToolCall\|onToolOutput\|onStatus\|Orchestrator\|spinner\|useState\|bashStream" src/tui.tsx | head -50
+[2026-04-08T20:24:00.362Z] iter=524 turn=6 INFO:   -> exit=0 (1291 chars)
+[2026-04-08T20:24:00.363Z] iter=524 turn=7 INFO: Turn 7/25
+[2026-04-08T20:24:02.085Z] iter=524 turn=7 INFO: $ sed -n '415,460p' src/tui.tsx
+[2026-04-08T20:24:02.087Z] iter=524 turn=7 INFO: $ sed -n '685,720p' src/tui.tsx
+[2026-04-08T20:24:02.094Z] iter=524 turn=7 INFO:   -> exit=0 (1578 chars)
+[2026-04-08T20:24:02.095Z] iter=524 turn=7 INFO:   -> exit=0 (1655 chars)
+[2026-04-08T20:24:02.095Z] iter=524 turn=8 INFO: Turn 8/25
+[2026-04-08T20:24:05.947Z] iter=524 turn=8 INFO: think: I've made one change so far: added `this.opts.onToolOutput` to the main runAgentLoop call in orchestrator.ts. I still ne...
+[2026-04-08T20:24:05.949Z] iter=524 turn=9 INFO: Turn 9/25
+[2026-04-08T20:24:08.168Z] iter=524 turn=9 INFO: Agent: I've changed 1 line in orchestrator.ts. Now finishing both tasks immediately:
+[2026-04-08T20:24:08.169Z] iter=524 turn=9 INFO: $ sed -n '2470,2490p' src/orchestrator.ts
+[2026-04-08T20:24:08.187Z] iter=524 turn=9 INFO:   -> exit=0 (575 chars)
+[2026-04-08T20:24:08.187Z] iter=524 turn=10 INFO: Turn 10/25
+[2026-04-08T20:24:13.231Z] iter=524 turn=10 INFO: Agent: Now I'll make all the remaining orchestrator patches and the TUI changes at once:
+[2026-04-08T20:24:13.232Z] iter=524 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:24:13.234Z] iter=524 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -19 +23 lines
+
+Context after patch:
+2468 |             role: "user",
+2469 |             content: `Verification results:\n${formatted}\n\nPlease fix any failures.`,
+2470 |           });
+2471 |           this.opts.onStatus?.("Fixing verification failures...");
+2472 |           await runAgentLoop(
+2473 |             this.client,
+2474 |             model,
+2475 |             this.systemPrompt,
+2476 |             this.apiMessages,
+2477 |             this.registry,
+2478 |             this.opts.workDir,
+2479 |             this.opts.onToolCall,
+2480 |             this.opts.onStatus,
+2481 |             this.opts.onText,
+2482 |             this.opts.onDiffPreview,
+2483 |             undefined,
+2484 |             undefined,
+2485 |             fileWatchCallback,
+2486 |             undefined,
+2487 |             2,
+2488 |             this.hooksConfig,
+2489 |             undefined,
+2490 |             undefined,
+2491 |             {},
+2492 |             this.opts.onToolOutput,
+2493 |           );
+2494 |         }
+2495 |       }
+2496 |     }
+[2026-04-08T20:24:13.234Z] iter=524 turn=11 INFO: Turn 11/25
+[2026-04-08T20:24:16.144Z] iter=524 turn=11 INFO: Agent: Let me finish the remaining patches and TUI change now, then wrap up.
+[2026-04-08T20:24:16.144Z] iter=524 turn=11 INFO: $ grep -n "2,\n\s*this.hooksConfig," src/orchestrator.ts | head -20
+# Find all remaining runAgentLoop calls that need onToolOutput
+grep -n "this.hooksConfig," src/orchestrator.ts
+[2026-04-08T20:24:16.158Z] iter=524 turn=11 INFO:   -> exit=0 (148 chars)
+[2026-04-08T20:24:16.158Z] iter=524 turn=12 INFO: Turn 12/25
+[2026-04-08T20:24:17.825Z] iter=524 turn=12 INFO: $ sed -n '2525,2545p' src/orchestrator.ts && echo "---" && sed -n '2570,2590p' src/orchestrator.ts
+[2026-04-08T20:24:17.838Z] iter=524 turn=12 INFO:   -> exit=0 (1695 chars)
+[2026-04-08T20:24:17.838Z] iter=524 turn=13 INFO: Turn 13/25
+[2026-04-08T20:24:21.454Z] iter=524 turn=13 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:24:21.457Z] iter=524 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -13 +17 lines
+
+Context after patch:
+2528 |           this.opts.onStatus,
+2529 |           this.opts.onText,
+2530 |           this.opts.onDiffPreview,
+2531 |           undefined,
+2532 |           undefined,
+2533 |           fileWatchCallback,
+2534 |           undefined,
+2535 |           2,
+2536 |           this.hooksConfig,
+2537 |           undefined,
+2538 |           undefined,
+2539 |           {},
+2540 |           this.opts.onToolOutput,
+2541 |         );
+2542 | 
+2543 |         this.sessionTokensIn += fixResult.tokensIn;
+2544 |         this.sessionTokensOut += fixResult.tokensOut;
+2545 |         this.sessionCost += computeCost(model, fixResult.tokensIn, fixResult.tokensOut);
+2546 | 
+2547 |         // Re-commit the fix
+2548 |         const fixCommit = await autoCommit(this.opts.workDir, "fix TypeScript errors");
+2549 |         if (fixCommit.committed) {
+2550 |           commitResult = fixCommit;
+[2026-04-08T20:24:21.457Z] iter=524 turn=14 INFO: Turn 14/25
+[2026-04-08T20:24:26.428Z] iter=524 turn=14 INFO: Agent: Finishing now. Patch the last call site, then TUI, then wrap up.
+[2026-04-08T20:24:26.429Z] iter=524 turn=14 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:24:26.431Z] iter=524 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -7 +8 lines
+
+Context after patch:
+2577 |               this.client, model, this.systemPrompt, this.apiMessages,
+2578 |               this.registry, this.opts.workDir, this.opts.onToolCall,
+2579 |               this.opts.onStatus, this.opts.onText, this.opts.onDiffPreview,
+2580 |               undefined, undefined, fileWatchCallback,
+2581 |               undefined, 2, this.hooksConfig,
+2582 |               undefined, undefined, {}, this.opts.onToolOutput,
+2583 |             );
+2584 |             this.sessionTokensIn += fixResult.tokensIn;
+2585 |             this.sessionTokensOut += fixResult.tokensOut;
+2586 |             this.sessionCost += computeCost(model, fixResult.tokensIn, fixResult.tokensOut);
+2587 |             const fixCommit = await autoCommit(this.opts.workDir, "fix test failures");
+2588 |             if (fixCommit.committed) {
+2589 |               commitResult = fixCommit;
+2590 |               this.opts.onStatus?.(`✓ Fix committed ${fixCommit.hash}: ${fixCommit.message}`);
+[2026-04-08T20:24:26.432Z] iter=524 turn=15 INFO: Turn 15/25
+[2026-04-08T20:24:28.572Z] iter=524 turn=15 INFO: Agent: Now the TUI streaming display:
+[2026-04-08T20:24:28.573Z] iter=524 turn=15 INFO: $ sed -n '383,395p' src/tui.tsx
+[2026-04-08T20:24:28.587Z] iter=524 turn=15 INFO:   -> exit=0 (721 chars)
+[2026-04-08T20:24:28.587Z] iter=524 turn=16 INFO: Turn 16/25
+[2026-04-08T20:24:31.548Z] iter=524 turn=16 INFO: Agent: All orchestrator call sites done. Now TUI + wrap up in one shot:
+[2026-04-08T20:24:31.549Z] iter=524 turn=16 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:24:31.551Z] iter=524 turn=16 INFO:   -> ok: Patched src/tui.tsx: -1 +2 lines
+
+Context after patch:
+389 |   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
+390 |   const [autoAccept, setAutoAccept] = useState(noConfirm);
+391 |   const [externalChanges, setExternalChanges] = useState<string[]>([]);
+392 |   const [scrollOffset, setScrollOffset] = useState(0);
+393 |   const [bashStream, setBashStream] = useState<string[]>([]);
+394 |   const [footerStats, setFooterStats] = useState<FooterStats>({
+395 |     tokensIn: 0,
+396 |     tokensOut: 0,
+[2026-04-08T20:24:31.552Z] iter=524 turn=17 INFO: Turn 17/25
+[2026-04-08T20:24:36.144Z] iter=524 turn=17 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:24:36.145Z] iter=524 turn=17 INFO:   -> ok: Patched src/tui.tsx: -4 +11 lines
+
+Context after patch:
+420 |     const orch = new Orchestrator({
+421 |       workDir,
+422 |       resumeSessionPath: initialResumeSessionPath,
+423 |       onToolCall: (name, toolInput, _result) => {
+424 |         const tm: Message = { role: "tool", content: toolInput, toolName: name };
+425 |         setMessages(prev => [...prev, tm]);
+426 |         setBashStream([]);
+427 |       },
+428 |       onToolOutput: (chunk: string) => {
+429 |         setBashStream(prev => {
+430 |           const lines = [...prev, ...chunk.split("\n").filter(l => l.length > 0)];
+431 |           return lines.slice(-5);
+432 |         });
+433 |       },
+434 |       onStatus: (s) => setStatus(s),
+435 |       onText: (delta) => {
+436 |         // Append delta to streaming buffer for real-time display
+[2026-04-08T20:24:36.145Z] iter=524 turn=18 INFO: Turn 18/25
+[2026-04-08T20:24:41.610Z] iter=524 turn=18 INFO: write_file: src/tui.tsx (patch)
+[2026-04-08T20:24:41.611Z] iter=524 turn=18 INFO:   -> ok: Patched src/tui.tsx: -7 +16 lines
+
+Context after patch:
+698 |       {/* Streaming */}
+699 |       {!pendingDiff && streamBuffer && <StreamingMessage buffer={streamBuffer} />}
+700 | 
+701 |       {/* Bash streaming output */}
+702 |       {bashStream.length > 0 && (
+703 |         <Box flexDirection="column" paddingLeft={2}>
+704 |           {bashStream.map((line, i) => (
+705 |             <Text key={i} color="gray" dimColor>{line}</Text>
+706 |           ))}
+707 |         </Box>
+708 |       )}
+709 | 
+710 |       {/* Status line — single compact line for spinner + context warning */}
+711 |       {(loading || status) && (
+712 |         <Box marginTop={1} paddingLeft={2}>
+713 |           {loading && <Text color="gray"><Spinner type="dots" /> </Text>}
+714 |           <Text color="gray" dimColor>{status}{ctxWarningText}</Text>
+715 |         </Box>
+716 |       )}
+717 | 
+718 |       {/* File suggestions — minimal */}
+719 |       {fileSuggestions.length > 0 && (
+[2026-04-08T20:24:41.611Z] iter=524 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
+[2026-04-08T20:24:41.615Z] iter=524 turn=18 INFO: Cache persisted: 63 entries to .autoagent-cache.json
+[2026-04-08T20:24:41.616Z] iter=524 turn=18 INFO: Tool timing: bash: 13x, avg=11ms, total=146ms; write_file: 7x, avg=2ms, total=16ms; think: 2x, avg=2ms, total=3ms; read_scratchpad: 1x, avg=1ms, total=1ms
+[2026-04-08T20:24:41.616Z] iter=524 turn=18 INFO: Tool timing stats
+[2026-04-08T20:24:49.751Z] iter=524 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 524: predicted 12 turns, actual 18 turns, ratio 1.50**
+[2026-04-08T20:24:57.624Z] iter=524 turn=18 INFO: Pre-commit review (582in/293out): ## Issues Found
+
+- **Positional argument fragility**: The repeated pattern of `undefined, undefined, {}, this.opts.onToolOutput` passed as positional arguments to what appears to be a function with ma

@@ -390,6 +390,7 @@ function App() {
   const [autoAccept, setAutoAccept] = useState(noConfirm);
   const [externalChanges, setExternalChanges] = useState<string[]>([]);
   const [scrollOffset, setScrollOffset] = useState(0);
+  const [bashStream, setBashStream] = useState<string[]>([]);
   const [footerStats, setFooterStats] = useState<FooterStats>({
     tokensIn: 0,
     tokensOut: 0,
@@ -422,6 +423,13 @@ function App() {
       onToolCall: (name, toolInput, _result) => {
         const tm: Message = { role: "tool", content: toolInput, toolName: name };
         setMessages(prev => [...prev, tm]);
+        setBashStream([]);
+      },
+      onToolOutput: (chunk: string) => {
+        setBashStream(prev => {
+          const lines = [...prev, ...chunk.split("\n").filter(l => l.length > 0)];
+          return lines.slice(-5);
+        });
       },
       onStatus: (s) => setStatus(s),
       onText: (delta) => {
@@ -689,6 +697,15 @@ function App() {
 
       {/* Streaming */}
       {!pendingDiff && streamBuffer && <StreamingMessage buffer={streamBuffer} />}
+
+      {/* Bash streaming output */}
+      {bashStream.length > 0 && (
+        <Box flexDirection="column" paddingLeft={2}>
+          {bashStream.map((line, i) => (
+            <Text key={i} color="gray" dimColor>{line}</Text>
+          ))}
+        </Box>
+      )}
 
       {/* Status line — single compact line for spinner + context warning */}
       {(loading || status) && (
