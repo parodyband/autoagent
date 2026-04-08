@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775676115931,
+  "generatedAt": 1775678684045,
   "files": [
     {
       "path": "src/file-cache.ts",
@@ -1342,7 +1342,7 @@
           "from": "./tui-commands.js"
         }
       ],
-      "lastModified": 1775673494265.0903
+      "lastModified": 1775676453279.6094
     },
     {
       "path": "src/virtual-message-list.tsx",
@@ -1950,25 +1950,25 @@
         {
           "name": "isToolError",
           "kind": "function",
-          "line": 484,
+          "line": 486,
           "exported": true
         },
         {
           "name": "pruneStaleToolResults",
           "kind": "function",
-          "line": 545,
+          "line": 547,
           "exported": true
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 1082,
+          "line": 1110,
           "exported": true
         },
         {
           "name": "runSingleTask",
           "kind": "function",
-          "line": 2545,
+          "line": 2635,
           "exported": true
         }
       ],
@@ -2169,7 +2169,7 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775673430502.849
+      "lastModified": 1775678356214.7583
     },
     {
       "path": "src/tool-registry.ts",
@@ -2195,43 +2195,43 @@
         {
           "name": "ToolContext",
           "kind": "interface",
-          "line": 90,
+          "line": 110,
           "exported": true
         },
         {
           "name": "ToolResult",
           "kind": "interface",
-          "line": 99,
+          "line": 121,
           "exported": true
         },
         {
           "name": "ToolHandler",
           "kind": "type",
-          "line": 104,
+          "line": 126,
           "exported": true
         },
         {
           "name": "ToolOptions",
           "kind": "interface",
-          "line": 109,
+          "line": 131,
           "exported": true
         },
         {
           "name": "RegisteredTool",
           "kind": "interface",
-          "line": 119,
+          "line": 141,
           "exported": true
         },
         {
           "name": "ToolRegistry",
           "kind": "class",
-          "line": 129,
+          "line": 151,
           "exported": true
         },
         {
           "name": "createDefaultRegistry",
           "kind": "function",
-          "line": 212,
+          "line": 264,
           "exported": true
         }
       ],
@@ -2305,7 +2305,41 @@
           "from": "glob"
         }
       ],
-      "lastModified": 1775669455963.596
+      "lastModified": 1775677498419.8738
+    },
+    {
+      "path": "src/__tests__/tool-dispatch-validation.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "../tool-registry.js"
+        }
+      ],
+      "lastModified": 1775677956110.7512
+    },
+    {
+      "path": "src/__tests__/tool-registry.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "../tool-registry.js"
+        },
+        {
+          "names": [],
+          "from": "../tool-registry.js"
+        }
+      ],
+      "lastModified": 1775677692568.0413
     }
   ]
 }
