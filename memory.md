@@ -50,12 +50,12 @@
 - ✅ `ToolRegistry.searchTools()` + `hidden` field + `tool_search` tool
 - ✅ Tool performance profiling + /timing command
 - ✅ User-configurable system prompts, /export, /checkpoint commands
+- ✅ Smarter tier1 compaction — `src/compaction-scorer.ts` (91 LOC) + 16 tests
 
 ### Next Up (Priority Order)
-1. **Test coverage** for schemaToSignature + getMinimalDefinitions (~60 LOC)
-2. **Smarter tier1 compaction** — semantic importance scoring
-3. **Context window efficiency measurement** — track tokens/turn in /status
-4. **Streaming tool output** — show partial results during long bash commands
+1. **Fix 4 pre-existing test failures** (task-planner x2, tool-recovery-retry x2)
+2. **Context window efficiency measurement** — track tokens/turn in /status
+3. **Streaming tool output** — show partial results during long bash commands
 
 **[AUTO-SCORED] Iteration 510: predicted 12 turns, actual 18 turns, ratio 1.50**
 
@@ -74,3 +74,5 @@
 **[AUTO-SCORED] Iteration 517: predicted 8 turns, actual 10 turns, ratio 1.25**
 
 **[AUTO-SCORED] Iteration 518: predicted 13 turns, actual 18 turns, ratio 1.38**
+
+**[AUTO-SCORED] Iteration 519: predicted 8 turns, actual 7 turns, ratio 0.88**

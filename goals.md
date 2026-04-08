@@ -1,35 +1,63 @@
-# AutoAgent Goals — Iteration 519 (Meta)
+# AutoAgent Goals — Iteration 520 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Status from Iteration 518 (Engineer)
-- ✅ Created `src/compaction-scorer.ts` — `scoreToolOutput()` with high/medium/low importance tiers
-- ✅ Modified `compactTier1()` in `src/orchestrator.ts` — uses scorer + correct tool name lookup
-- ✅ Created `src/__tests__/compaction-scorer.test.ts` — 16 tests, all passing
+## Status from Iteration 519 (Meta)
+- ✅ Verified compaction-scorer landed: scoreToolOutput in scorer, orchestrator, and 16 tests
 - ✅ TSC clean
+- ⚠️ 4 pre-existing test failures (task-planner x2, tool-recovery-retry x2) — fix these first
 
-## What Meta should do
+## Goals
 
-1. **Verify the work landed**:
-   ```bash
-   grep -c 'scoreToolOutput' src/compaction-scorer.ts   # >= 1
-   grep -c 'scoreToolOutput' src/orchestrator.ts         # >= 1
-   grep -c 'scoreToolOutput' src/__tests__/compaction-scorer.test.ts  # >= 5
-   npx vitest run
-   npx tsc --noEmit
-   ```
+### Goal 1: Fix 4 failing tests (priority — clean test suite)
 
-2. **Assess next priority** from roadmap:
-   - Context window efficiency measurement — track tokens/turn in /status
-   - Streaming tool output — show partial results during long bash commands
+**Files to modify:**
+- `src/__tests__/task-planner.test.ts` (~5-15 LOC change)
+- `tests/task-planner.test.ts` (~5-15 LOC change)  
+- `src/__tests__/tool-recovery-retry.test.ts` (~5-15 LOC change)
 
-3. **Write goals for next Engineer iteration** with:
-   - Exact files to create/modify
-   - Expected LOC delta per file
-   - Success criteria with grep/test commands
+**What to do:**
+1. Run `npx vitest run src/__tests__/task-planner.test.ts` and read failures
+2. Run `npx vitest run tests/task-planner.test.ts` and read failures
+3. Run `npx vitest run src/__tests__/tool-recovery-retry.test.ts` and read failures
+4. Fix each test — the tests likely drifted from implementation changes. Update tests to match current behavior OR fix the implementation if the behavior is wrong.
+
+**Success criteria:**
+```bash
+npx vitest run src/__tests__/task-planner.test.ts  # 0 failures
+npx vitest run tests/task-planner.test.ts          # 0 failures
+npx vitest run src/__tests__/tool-recovery-retry.test.ts  # 0 failures
+npx vitest run 2>&1 | grep "failed"               # "0 failed" or no "failed" line
+```
+
+### Goal 2: Context window token efficiency tracking in /status
+
+**Files to modify:**
+- `src/orchestrator.ts` (~20 LOC) — track per-turn input token counts, compute context utilization %
+- `src/tui-commands.ts` (~15 LOC) — display context efficiency in /status output
+
+**What to do:**
+1. In orchestrator, after each API response, record `{turn, inputTokens, outputTokens}` into a per-session array
+2. Compute: context utilization = currentContextTokens / contextLimit as a percentage
+3. In /status command, add a "Context Efficiency" section showing:
+   - Current context utilization: X% (Y/Z tokens)
+   - Avg tokens per turn (already exists — verify it works)
+   - Turns until estimated compaction (based on growth rate)
+
+**Success criteria:**
+```bash
+grep -c 'utilization\|Utilization' src/tui-commands.ts  # >= 1
+grep -c 'contextLimit\|context_limit' src/orchestrator.ts  # >= 1  
+npx tsc --noEmit  # clean
+```
 
 ## Do NOT
-- Re-implement anything already done
-- Assign work that already exists in src/
+- Touch compaction-scorer.ts — it's done
+- Start streaming tool output — that's for a future iteration
+- Refactor orchestrator beyond the specific changes above
 
-Next expert (iteration 520): **Engineer**
+## Order
+1. Fix failing tests FIRST (Goal 1)
+2. Then context efficiency tracking (Goal 2)
+
+Next expert (iteration 521): **Architect**

@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775678684045,
+  "generatedAt": 1775679280324,
   "files": [
     {
       "path": "src/file-cache.ts",
@@ -1825,150 +1825,320 @@
       "lastModified": 1775638842646.4307
     },
     {
+      "path": "src/tool-registry.ts",
+      "exports": [
+        {
+          "name": "codeSearchIndex",
+          "kind": "const",
+          "line": 51,
+          "exported": true
+        },
+        {
+          "name": "buildSearchIndex",
+          "kind": "function",
+          "line": 58,
+          "exported": true
+        },
+        {
+          "name": "_searchIndexHolder",
+          "kind": "const",
+          "line": 86,
+          "exported": true
+        },
+        {
+          "name": "ToolContext",
+          "kind": "interface",
+          "line": 110,
+          "exported": true
+        },
+        {
+          "name": "ToolResult",
+          "kind": "interface",
+          "line": 121,
+          "exported": true
+        },
+        {
+          "name": "ToolHandler",
+          "kind": "type",
+          "line": 126,
+          "exported": true
+        },
+        {
+          "name": "ToolOptions",
+          "kind": "interface",
+          "line": 131,
+          "exported": true
+        },
+        {
+          "name": "RegisteredTool",
+          "kind": "interface",
+          "line": 141,
+          "exported": true
+        },
+        {
+          "name": "ToolRegistry",
+          "kind": "class",
+          "line": 151,
+          "exported": true
+        },
+        {
+          "name": "createDefaultRegistry",
+          "kind": "function",
+          "line": 264,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [],
+          "from": "./skills.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/bash.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/read_file.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/write_file.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/grep.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/web_fetch.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/think.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/list_files.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/subagent.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/web_search.js"
+        },
+        {
+          "names": [],
+          "from": "./model-selection.js"
+        },
+        {
+          "names": [],
+          "from": "./project-memory.js"
+        },
+        {
+          "names": [],
+          "from": "./tools/scratchpad.js"
+        },
+        {
+          "names": [],
+          "from": "./semantic-search.js"
+        },
+        {
+          "names": [],
+          "from": "fs"
+        },
+        {
+          "names": [],
+          "from": "glob"
+        }
+      ],
+      "lastModified": 1775677498419.8738
+    },
+    {
+      "path": "src/__tests__/tool-dispatch-validation.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "../tool-registry.js"
+        }
+      ],
+      "lastModified": 1775677956110.7512
+    },
+    {
+      "path": "src/__tests__/tool-registry.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "../tool-registry.js"
+        },
+        {
+          "names": [],
+          "from": "../tool-registry.js"
+        }
+      ],
+      "lastModified": 1775677692568.0413
+    },
+    {
       "path": "src/orchestrator.ts",
       "exports": [
         {
           "name": "PARALLEL_SAFE_TOOLS",
           "kind": "const",
-          "line": 61,
+          "line": 62,
           "exported": true
         },
         {
           "name": "MICRO_COMPACT_THRESHOLD",
           "kind": "const",
-          "line": 76,
+          "line": 77,
           "exported": true
         },
         {
           "name": "COMPACT_TIER1_THRESHOLD",
           "kind": "const",
-          "line": 78,
+          "line": 79,
           "exported": true
         },
         {
           "name": "COMPACT_THRESHOLD",
           "kind": "const",
-          "line": 80,
+          "line": 81,
           "exported": true
         },
         {
           "name": "CONTEXT_WARNING_THRESHOLD",
           "kind": "const",
-          "line": 82,
+          "line": 83,
           "exported": true
         },
         {
           "name": "PRUNE_THRESHOLD",
           "kind": "const",
-          "line": 83,
+          "line": 84,
           "exported": true
         },
         {
           "name": "selectCompactionTier",
           "kind": "function",
-          "line": 89,
+          "line": 90,
           "exported": true
         },
         {
           "name": "MODEL_PRICING",
           "kind": "const",
-          "line": 97,
+          "line": 98,
           "exported": true
         },
         {
           "name": "MODEL_CONTEXT_WINDOW",
           "kind": "const",
-          "line": 103,
+          "line": 104,
           "exported": true
         },
         {
           "name": "ConversationCheckpoint",
           "kind": "interface",
-          "line": 126,
+          "line": 127,
           "exported": true
         },
         {
           "name": "MAX_CHECKPOINTS",
           "kind": "const",
-          "line": 134,
+          "line": 135,
           "exported": true
         },
         {
           "name": "OrchestratorOptions",
           "kind": "interface",
-          "line": 136,
+          "line": 137,
           "exported": true
         },
         {
           "name": "OrchestratorResult",
           "kind": "interface",
-          "line": 181,
+          "line": 182,
           "exported": true
         },
         {
           "name": "CostInfo",
           "kind": "interface",
-          "line": 190,
+          "line": 191,
           "exported": true
         },
         {
           "name": "TaskReflection",
           "kind": "interface",
-          "line": 205,
+          "line": 206,
           "exported": true
         },
         {
           "name": "routeModel",
           "kind": "function",
-          "line": 246,
+          "line": 247,
           "exported": true
         },
         {
           "name": "computeCost",
           "kind": "function",
-          "line": 274,
+          "line": 275,
           "exported": true
         },
         {
           "name": "buildSystemPrompt",
           "kind": "function",
-          "line": 286,
+          "line": 287,
           "exported": true
         },
         {
           "name": "buildCachedSystem",
           "kind": "function",
-          "line": 374,
+          "line": 375,
           "exported": true
         },
         {
           "name": "injectMessageCacheBreakpoints",
           "kind": "function",
-          "line": 385,
+          "line": 386,
           "exported": true
         },
         {
           "name": "isToolError",
           "kind": "function",
-          "line": 486,
+          "line": 487,
           "exported": true
         },
         {
           "name": "pruneStaleToolResults",
           "kind": "function",
-          "line": 547,
+          "line": 548,
           "exported": true
         },
         {
           "name": "Orchestrator",
           "kind": "class",
-          "line": 1110,
+          "line": 1111,
           "exported": true
         },
         {
           "name": "runSingleTask",
           "kind": "function",
-          "line": 2635,
+          "line": 2656,
           "exported": true
         }
       ],
@@ -1990,6 +2160,12 @@
             "compressToolOutput"
           ],
           "from": "./tool-output-compressor.js"
+        },
+        {
+          "names": [
+            "scoreToolOutput"
+          ],
+          "from": "./compaction-scorer.js"
         },
         {
           "names": [
@@ -2169,177 +2345,118 @@
         }
       ],
       "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775678356214.7583
+      "lastModified": 1775679196251.9973
     },
     {
-      "path": "src/tool-registry.ts",
+      "path": "src/tui-commands.ts",
       "exports": [
         {
-          "name": "codeSearchIndex",
-          "kind": "const",
-          "line": 51,
+          "name": "FooterStats",
+          "kind": "interface",
+          "line": 23,
           "exported": true
         },
         {
-          "name": "buildSearchIndex",
+          "name": "CommandContext",
+          "kind": "interface",
+          "line": 32,
+          "exported": true
+        },
+        {
+          "name": "routeCommand",
           "kind": "function",
-          "line": 58,
-          "exported": true
-        },
-        {
-          "name": "_searchIndexHolder",
-          "kind": "const",
-          "line": 86,
-          "exported": true
-        },
-        {
-          "name": "ToolContext",
-          "kind": "interface",
-          "line": 110,
-          "exported": true
-        },
-        {
-          "name": "ToolResult",
-          "kind": "interface",
-          "line": 121,
-          "exported": true
-        },
-        {
-          "name": "ToolHandler",
-          "kind": "type",
-          "line": 126,
-          "exported": true
-        },
-        {
-          "name": "ToolOptions",
-          "kind": "interface",
-          "line": 131,
-          "exported": true
-        },
-        {
-          "name": "RegisteredTool",
-          "kind": "interface",
-          "line": 141,
-          "exported": true
-        },
-        {
-          "name": "ToolRegistry",
-          "kind": "class",
-          "line": 151,
-          "exported": true
-        },
-        {
-          "name": "createDefaultRegistry",
-          "kind": "function",
-          "line": 264,
+          "line": 578,
           "exported": true
         }
       ],
       "imports": [
+        {
+          "names": [],
+          "from": "path"
+        },
+        {
+          "names": [],
+          "from": "child_process"
+        },
         {
           "names": [],
           "from": "@anthropic-ai/sdk"
         },
         {
           "names": [],
-          "from": "./skills.js"
+          "from": "./orchestrator.js"
         },
         {
           "names": [],
-          "from": "./tools/bash.js"
+          "from": "./tui.js"
         },
         {
           "names": [],
-          "from": "./tools/read_file.js"
+          "from": "./session-store.js"
         },
         {
           "names": [],
-          "from": "./tools/write_file.js"
+          "from": "./session-store.js"
         },
         {
           "names": [],
-          "from": "./tools/grep.js"
+          "from": "./auto-commit.js"
         },
         {
           "names": [],
-          "from": "./tools/web_fetch.js"
+          "from": "./tree-sitter-map.js"
         },
         {
           "names": [],
-          "from": "./tools/think.js"
+          "from": "./init-command.js"
         },
         {
           "names": [],
-          "from": "./tools/list_files.js"
+          "from": "./export-helper.js"
         },
         {
           "names": [],
-          "from": "./tools/subagent.js"
+          "from": "./plan-commands.js"
         },
         {
           "names": [],
-          "from": "./tools/web_search.js"
+          "from": "./dream.js"
         },
         {
           "names": [],
-          "from": "./model-selection.js"
+          "from": "./tool-registry.js"
         },
         {
           "names": [],
-          "from": "./project-memory.js"
-        },
-        {
-          "names": [],
-          "from": "./tools/scratchpad.js"
-        },
-        {
-          "names": [],
-          "from": "./semantic-search.js"
-        },
-        {
-          "names": [],
-          "from": "fs"
-        },
-        {
-          "names": [],
-          "from": "glob"
+          "from": "./checkpoint.js"
         }
       ],
-      "lastModified": 1775677498419.8738
+      "lastModified": 1775679001037.9187
     },
     {
-      "path": "src/__tests__/tool-dispatch-validation.test.ts",
-      "exports": [],
-      "imports": [
+      "path": "src/compaction-scorer.ts",
+      "exports": [
         {
-          "names": [],
-          "from": "vitest"
+          "name": "Importance",
+          "kind": "type",
+          "line": 7,
+          "exported": true
         },
         {
-          "names": [],
-          "from": "../tool-registry.js"
+          "name": "ScoreResult",
+          "kind": "interface",
+          "line": 9,
+          "exported": true
+        },
+        {
+          "name": "scoreToolOutput",
+          "kind": "function",
+          "line": 59,
+          "exported": true
         }
       ],
-      "lastModified": 1775677956110.7512
-    },
-    {
-      "path": "src/__tests__/tool-registry.test.ts",
-      "exports": [],
-      "imports": [
-        {
-          "names": [],
-          "from": "vitest"
-        },
-        {
-          "names": [],
-          "from": "../tool-registry.js"
-        },
-        {
-          "names": [],
-          "from": "../tool-registry.js"
-        }
-      ],
-      "lastModified": 1775677692568.0413
+      "imports": [],
+      "lastModified": 1775679227414.012
     }
   ]
 }
