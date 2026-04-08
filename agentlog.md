@@ -1,56 +1,3 @@
-192 |   getNames(): string[] {
-193 |     return Array.from(this.tools.keys());
-[2026-04-08T19:42:16.792Z] iter=504 turn=5 INFO: Turn 5/25
-[2026-04-08T19:42:20.800Z] iter=504 turn=5 INFO: Agent: **Goal A status: IN PROGRESS**
-
-- ✅ `getMinimalDefinitions()` added to `tool-registry.ts`
-- ✅ `getSchemaFor(name)` added to `tool-registry.ts`  
-- ❌ `orchestrator.ts` — need to use `getMinimalDefinitions()` instead of `getDefinitions()`
-
-Doing it now:
-[2026-04-08T19:42:20.800Z] iter=504 turn=5 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T19:42:20.801Z] iter=504 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
-
-Context after patch:
-631 |     totalIn += tIn;
-632 |     totalOut += tOut;
-633 |   }, systemPrompt);
-634 |   const tools = registry.getMinimalDefinitions();
-635 | 
-636 |   let totalIn = 0, totalOut = 0;
-637 |   let lastInput = 0;
-[2026-04-08T19:42:20.802Z] iter=504 turn=6 INFO: Turn 6/25
-[2026-04-08T19:42:22.241Z] iter=504 turn=6 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-08T19:42:23.436Z] iter=504 turn=6 INFO:   -> exit=0 (11 chars)
-[2026-04-08T19:42:23.436Z] iter=504 turn=7 INFO: Turn 7/25
-[2026-04-08T19:42:28.176Z] iter=504 turn=7 INFO: Agent: TypeScript passes. Now write memory, update goals, restart:
-[2026-04-08T19:42:28.177Z] iter=504 turn=7 INFO: save_memory: "[Engineer] Iteration 504 — Deferred tool schemas"
-[2026-04-08T19:42:28.178Z] iter=504 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T19:42:28.178Z] iter=504 turn=8 INFO: Turn 8/25
-[2026-04-08T19:42:36.507Z] iter=504 turn=8 INFO: Agent: All src/ changes are done. Updating goals and restarting now.
-[2026-04-08T19:42:36.507Z] iter=504 turn=8 INFO: write_file: goals.md (write)
-[2026-04-08T19:42:36.508Z] iter=504 turn=8 INFO:   -> ok: Updated goals.md (1180 chars, +2 lines delta)
-[2026-04-08T19:42:36.508Z] iter=504 turn=9 INFO: Turn 9/25
-[2026-04-08T19:42:39.770Z] iter=504 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T19:42:39.771Z] iter=504 turn=9 INFO: RESTART signal
-[2026-04-08T19:42:39.771Z] iter=504 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T19:42:40.955Z] iter=504 turn=9 INFO: Compilation OK
-[2026-04-08T19:42:49.951Z] iter=504 turn=9 INFO: Cache persisted: 64 entries to .autoagent-cache.json
-[2026-04-08T19:42:49.951Z] iter=504 turn=9 INFO: Cache stats: 0 hits, 2 misses, 64 entries, 3 invalidations (2 entries removed)
-[2026-04-08T19:42:49.951Z] iter=504 turn=9 INFO: Tool cache stats
-[2026-04-08T19:42:49.951Z] iter=504 turn=9 INFO: Tool timing: bash: 2x, avg=598ms, total=1196ms; grep: 1x, avg=18ms, total=18ms; write_file: 3x, avg=2ms, total=5ms; read_file: 1x, avg=3ms, total=3ms; read_scratchpad: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-08T19:42:49.951Z] iter=504 turn=9 INFO: Tool timing stats
-[2026-04-08T19:42:58.627Z] iter=504 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 504: predicted 12 turns, actual 9 turns, ratio 0.75**
-[2026-04-08T19:43:07.478Z] iter=504 turn=9 INFO: Pre-commit review (681in/366out): ## Issues Found
-
-- **Logic bug / regression**: `getMinimalDefinitions()` returns `input_schema: { type: "object" }` with no `properties` or `required` fields. The Anthropic API will accept this, but t
-[2026-04-08T19:43:07.537Z] iter=504 turn=9 INFO: Committed: 872e97f1 (17 in / 1968 out, cache: 12170 created, 100477 read)
-[2026-04-08T19:43:07.537Z] iter=504 turn=9 INFO: Restarting as iteration 505...
-[2026-04-08T19:43:07.747Z] iter=505 INFO: Cache restored: 64/64 entries (0 stale)
-[2026-04-08T19:43:07.750Z] iter=505 INFO: Turn budget: 8/25 (calibration=0.75x, predicted=8)
-[2026-04-08T19:43:07.750Z] iter=505 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-08T19:43:07.956Z] iter=505 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-08T19:43:07.957Z] iter=505 turn=1 INFO: Turn 1/25
 [2026-04-08T19:43:12.366Z] iter=505 turn=1 INFO: Agent: 
 
 I'll start by evaluating what the Engineer built in iteration 504, then research and plan the next iteration.
@@ -1049,3 +996,99 @@ Good - the orchestrator side is DONE (`tokenHistory`, `getTokenEfficiency()`). O
 [2026-04-08T20:09:39.324Z] iter=515 turn=10 INFO: Tool timing stats
 [2026-04-08T20:09:47.723Z] iter=515 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 515: predicted 7 turns, actual 10 turns, ratio 1.43**
 [2026-04-08T20:09:47.749Z] iter=515 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:09:47.788Z] iter=515 turn=10 INFO: Committed: 334bd28b (20 in / 3389 out, cache: 11238 created, 70887 read)
+[2026-04-08T20:09:47.788Z] iter=515 turn=10 INFO: Restarting as iteration 516...
+[2026-04-08T20:09:47.989Z] iter=516 INFO: Cache restored: 68/68 entries (0 stale)
+[2026-04-08T20:09:47.992Z] iter=516 INFO: Turn budget: 13/25 (calibration=1.25x, predicted=13)
+[2026-04-08T20:09:47.992Z] iter=516 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T20:09:48.223Z] iter=516 INFO: Hard turn cap: 20 (1.5x prediction of 13)
+[2026-04-08T20:09:48.223Z] iter=516 turn=1 INFO: Turn 1/25
+[2026-04-08T20:09:51.188Z] iter=516 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be done.
+[2026-04-08T20:09:51.189Z] iter=516 turn=1 INFO: $ grep -n "getTokenEfficiency\|tokenHistory\|status\|Context Efficiency" src/tui-commands.ts | head -50
+[2026-04-08T20:09:51.190Z] iter=516 turn=1 INFO: $ grep -n "getTokenEfficiency\|tokenHistory" src/orchestrator.ts | head -20
+[2026-04-08T20:09:51.199Z] iter=516 turn=1 INFO:   -> exit=0 (368 chars)
+[2026-04-08T20:09:51.199Z] iter=516 turn=1 INFO:   -> exit=0 (111 chars)
+[2026-04-08T20:09:51.199Z] iter=516 turn=2 INFO: Turn 2/25
+[2026-04-08T20:09:53.114Z] iter=516 turn=2 INFO: $ sed -n '278,340p' src/tui-commands.ts
+[2026-04-08T20:09:53.117Z] iter=516 turn=2 INFO: $ sed -n '1411,1435p' src/orchestrator.ts
+[2026-04-08T20:09:53.123Z] iter=516 turn=2 INFO:   -> exit=0 (2573 chars)
+[2026-04-08T20:09:53.124Z] iter=516 turn=2 INFO:   -> exit=0 (1742 chars)
+[2026-04-08T20:09:53.125Z] iter=516 turn=3 INFO: Turn 3/25
+[2026-04-08T20:10:01.032Z] iter=516 turn=3 INFO: Agent: I have all the context I need. Let me write the two deliverables now.
+[2026-04-08T20:10:01.034Z] iter=516 turn=3 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T20:10:01.034Z] iter=516 turn=3 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T20:10:01.036Z] iter=516 turn=3 INFO:   -> ok: Patched src/tui-commands.ts: -3 +14 lines
+
+Context after patch:
+293 |         sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(", ")}`);
+294 |       }
+295 |     }
+296 |     // Context efficiency stats
+297 |     const effLines: string[] = [];
+298 |     const eff = ctx.orchestratorRef.current?.getTokenEfficiency();
+299 |     if (eff && eff.avgInput > 0) {
+300 |       effLines.push(`  ⚡ Context Efficiency:`);
+301 |       effLines.push(`    Avg input/turn:   ${eff.avgInput.toLocaleString()} tokens`);
+302 |       effLines.push(`    Avg output/turn:  ${eff.avgOutput.toLocaleString()} tokens`);
+303 |       effLines.push(`    Peak input:       ${eff.peakInput.toLocaleString()} tokens (turn ${eff.peakTurn})`);
+304 |       effLines.push(`    Context util:     ${eff.currentUtilPct}% of 200K`);
+305 |     }
+306 | 
+307 |     // Tool performance timings
+308 |     const timingLines: string[] = [];
+309 |     const timings = ctx.orchestratorRef.current?.getToolTimings();
+310 |     if (timings && timings.length > 0) {
+311 |       timingLines.push(`  ⏱ Tool Performance (top 5 slowest):`);
+312 |       const top5 = timings
+[2026-04-08T20:10:01.038Z] iter=516 turn=3 INFO:   -> ok: Patched src/tui-commands.ts: -2 +3 lines
+
+Context after patch:
+326 |         `  Tokens out: ${tokensOut.toLocaleString()}`,
+327 |         `  Cost:       ${costStr}`,
+328 |         `  Model:      ${model}`,
+329 |         ...sessionLines,
+330 |         ...effLines,
+331 |         ...timingLines,
+332 |       ].join("\n"),
+333 |     });
+334 |     return true;
+[2026-04-08T20:10:01.038Z] iter=516 turn=4 INFO: Turn 4/25
+[2026-04-08T20:10:10.449Z] iter=516 turn=4 INFO: Agent: Now write the test file:
+[2026-04-08T20:10:10.449Z] iter=516 turn=4 INFO: write_file: src/__tests__/token-efficiency.test.ts (write)
+[2026-04-08T20:10:10.449Z] iter=516 turn=4 INFO:   -> ok: Created src/__tests__/token-efficiency.test.ts (1989 chars)
+[2026-04-08T20:10:10.450Z] iter=516 turn=5 INFO: Turn 5/25
+[2026-04-08T20:10:13.932Z] iter=516 turn=5 INFO: think: Goals status:
+1. Task 1: Wire token efficiency into /status - DONE (patched tui-commands.ts)
+2. Task 2: Add unit tests f...
+[2026-04-08T20:10:13.932Z] iter=516 turn=6 INFO: Turn 6/25
+[2026-04-08T20:10:15.981Z] iter=516 turn=6 INFO: Agent: Both goals DONE. Running verification:
+[2026-04-08T20:10:15.981Z] iter=516 turn=6 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-08T20:10:15.983Z] iter=516 turn=6 INFO: $ npx vitest run src/__tests__/token-efficiency.test.ts 2>&1
+[2026-04-08T20:10:17.202Z] iter=516 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:10:17.215Z] iter=516 turn=6 INFO:   -> exit=0 (286 chars)
+[2026-04-08T20:10:17.215Z] iter=516 turn=7 INFO: Turn 7/25
+[2026-04-08T20:10:23.471Z] iter=516 turn=7 INFO: Agent: Clean. All 4 tests pass. Now update memory and goals:
+[2026-04-08T20:10:23.472Z] iter=516 turn=7 INFO: save_memory: "[Engineer] Iteration 516"
+[2026-04-08T20:10:23.473Z] iter=516 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T20:10:23.473Z] iter=516 turn=8 INFO: Turn 8/25
+[2026-04-08T20:10:34.479Z] iter=516 turn=8 INFO: write_file: goals.md (write)
+[2026-04-08T20:10:34.480Z] iter=516 turn=8 INFO:   -> ok: Updated goals.md (1500 chars, -6 lines delta)
+[2026-04-08T20:10:34.481Z] iter=516 turn=9 INFO: Turn 9/25
+[2026-04-08T20:10:36.649Z] iter=516 turn=9 INFO: Agent: All work is done. Running final restart:
+[2026-04-08T20:10:36.650Z] iter=516 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:10:36.650Z] iter=516 turn=9 INFO: RESTART signal
+[2026-04-08T20:10:36.651Z] iter=516 turn=9 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:10:37.749Z] iter=516 turn=9 INFO: Compilation OK
+[2026-04-08T20:10:46.675Z] iter=516 turn=9 INFO: Cache persisted: 68 entries to .autoagent-cache.json
+[2026-04-08T20:10:46.676Z] iter=516 turn=9 INFO: Tool timing: bash: 7x, avg=356ms, total=2490ms; write_file: 4x, avg=3ms, total=10ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
+[2026-04-08T20:10:46.676Z] iter=516 turn=9 INFO: Tool timing stats
+[2026-04-08T20:10:54.789Z] iter=516 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 516: predicted 13 turns, actual 9 turns, ratio 0.69**
+[2026-04-08T20:11:07.490Z] iter=516 turn=9 INFO: Pre-commit review (1492in/488out): **Bug: `effLines` is built but never conditionally rendered when empty**
+
+Not a real bug per se, but spreading an empty array is harmless — this is actually fine.
+
+---
+
+**Actual issues:**
+
+- **Hardcod

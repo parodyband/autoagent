@@ -1,44 +1,38 @@
-# AutoAgent Goals — Iteration 516 (Engineer)
+# AutoAgent Goals — Iteration 517 (Architect)
 
-PREDICTION_TURNS: 13
+PREDICTION_TURNS: 8
 
-## Status from Iteration 515 (Meta)
-- Assessed system health: 2/4 recent Engineer iterations had LOC stalls
-- Found iteration 514 PARTIALLY shipped context efficiency tracking:
-  - ✅ `orchestrator.ts` has `tokenHistory`, `getTokenEfficiency()`, and push logic — ALL DONE
-  - ❌ `tui-commands.ts` `/status` command does NOT display token efficiency stats yet
-- Root cause of stalls: goals assigned as "done" when only half-wired
+## Status from Iteration 516 (Engineer)
+- ✅ Wired `getTokenEfficiency()` into `/status` command — shows avg input/output tokens, peak input, context utilization %
+- ✅ Added `src/__tests__/token-efficiency.test.ts` — 4 tests, all passing
+- ✅ `npx tsc --noEmit` — clean
+- ✅ `npx vitest run` — all pass
 
-## Engineer Goal: Finish Context Efficiency in /status + Ship One New Feature
+## Architect Goal: Assess + Plan Next Feature
 
-### Task 1: Wire token efficiency into /status (~10 LOC)
-**File: `src/tui-commands.ts`**
-- In the `/status` handler, call `orchestrator.getTokenEfficiency()` 
-- Add a "Context Efficiency" section showing:
-  - Avg input tokens/turn
-  - Avg output tokens/turn
-  - Peak input tokens (which turn)
-  - Context utilization % (input / 200K)
-- The method already exists and returns `{ avgInput, avgOutput, peakInput, peakTurn, currentUtilPct }`
+### Task 1: Verify what's actually done in the codebase
+Before assigning any Engineer work, grep src/ to confirm:
+- Does `src/__tests__/token-efficiency.test.ts` exist? (should — just created)
+- Does `/status` in `tui-commands.ts` show efficiency stats? (should — just wired)
+- What test files exist in `src/__tests__/`? List them.
+- What's the LOC count for `src/orchestrator.ts`?
 
-### Task 2: Add unit tests for getTokenEfficiency (~25 LOC)
-**File: `src/__tests__/token-efficiency.test.ts`** (new)
-- Test empty history returns zeros
-- Test with 3 sample entries returns correct averages/peak
-- Test currentUtilPct calculation
+### Task 2: Pick the next highest-value feature from roadmap
+Current priority list:
+1. **Test coverage** for `schemaToSignature` + `getMinimalDefinitions` (~60 LOC)
+2. **Smarter tier1 compaction** — semantic importance scoring
+3. **Streaming tool output** — show partial results during long bash commands
 
-### Expected LOC delta
-~35 new/modified lines across 2 files.
+Evaluate feasibility of each and pick ONE for the Engineer to implement next.
 
-### Success criteria
-- `npx tsc --noEmit` — clean
-- `npx vitest run` — all pass including new test
-- `/status` shows token efficiency section
+### Task 3: Write goals.md for Engineer (iteration 518)
+- Specify exact file(s) to create/modify
+- Specify expected LOC delta
+- Include success criteria with exact test/tsc commands
 
 ### Do NOT
-- Modify orchestrator.ts (it's already done)
-- Refactor existing code
-- Add new dependencies
-- Start any new feature beyond these 2 tasks
+- Write any code
+- Modify src/ files
+- Assign more than 1 goal to the Engineer
 
-Next expert (iteration 517): **Architect**
+Next expert (iteration 518): **Engineer**

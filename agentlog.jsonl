@@ -1,48 +1,3 @@
-{"timestamp":"2026-04-08T19:44:38.280Z","iteration":506,"level":"info","message":"read_scratchpad: 898 chars","turn":1}
-{"timestamp":"2026-04-08T19:44:38.282Z","iteration":506,"level":"info","message":"  -> ok (20350 chars)","turn":1}
-{"timestamp":"2026-04-08T19:44:38.283Z","iteration":506,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-08T19:44:44.862Z","iteration":506,"level":"info","message":"think: Now I understand the task. I need to:\n\n1. Add a helper function `schemaToSignature(schema: Anthropic.Tool[\"input_schema\"...","turn":2}
-{"timestamp":"2026-04-08T19:44:44.863Z","iteration":506,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-08T19:44:52.017Z","iteration":506,"level":"info","message":"Agent: I have all the context I need. Implementing now.","turn":3}
-{"timestamp":"2026-04-08T19:44:52.019Z","iteration":506,"level":"info","message":"write_file: src/tool-registry.ts (patch)","turn":3}
-{"timestamp":"2026-04-08T19:44:52.023Z","iteration":506,"level":"info","message":"  -> ok: Patched src/tool-registry.ts: -14 +21 lines\n\nContext after patch:\n159 |       .map((t) => t.definition);\n160 |   }\n161 | \n162 |   /**\n163 |    * Returns tool definitions with minimal schemas — description only, no property details.\n164 |    * Saves ~2-3K tokens per API call by omitting input_schema property listings.\n165 |    * Parameter names/types are preserved in a compact signature prepended to description.\n166 |    * Hidden tools are excluded.\n167 |    */\n168 |   getMinimalDefinitions(): Anthropic.Tool[] {\n169 |     return Array.from(this.tools.values())\n170 |       .filter((t) => !t.hidden)\n171 |       .map((t) => {\n172 |         const sig = schemaToSignature(t.definition.input_schema);\n173 |         const description = sig\n174 |           ? `${sig}\\n${t.definition.description ?? \"\"}`\n175 |           : t.definition.description;\n176 |         return {\n177 |           name: t.definition.name,\n178 |           description,\n179 |           input_schema: { type: \"object\" as const },\n180 |         };\n181 |       });\n182 |   }\n183 | \n184 |   /**\n185 |    * Returns the full schema for a single tool by name.","turn":3}
-{"timestamp":"2026-04-08T19:44:52.024Z","iteration":506,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-08T19:44:58.418Z","iteration":506,"level":"info","message":"Agent: Now add the `schemaToSignature` helper function before the `ToolRegistry` class:","turn":4}
-{"timestamp":"2026-04-08T19:44:58.419Z","iteration":506,"level":"info","message":"write_file: src/tool-registry.ts (patch)","turn":4}
-{"timestamp":"2026-04-08T19:44:58.420Z","iteration":506,"level":"info","message":"  -> ok: Patched src/tool-registry.ts: -1 +21 lines\n\nContext after patch:\n85 | /** Mutable holder so orchestrator and TUI can share the latest index */\n86 | export const _searchIndexHolder: { index: CodeSearchIndex } = { index: codeSearchIndex };\n87 | \n88 | // ─── Schema helpers ─────────────────────────────────────────\n89 | \n90 | /**\n91 |  * Converts a JSON Schema object into a compact parameter signature string.\n92 |  * Example: \"Params: url (string, required), extract_text (boolean), headers (object)\"\n93 |  * Returns empty string for schemas with no properties.\n94 |  */\n95 | function schemaToSignature(schema: Anthropic.Tool[\"input_schema\"]): string {\n96 |   const props = (schema as { properties?: Record<string, { type?: string }> }).properties;\n97 |   if (!props || Object.keys(props).length === 0) return \"\";\n98 |   const required = new Set<string>(\n99 |     (schema as { required?: string[] }).required ?? []\n100 |   );\n101 |   const parts = Object.entries(props).map(([name, def]) => {\n102 |     const type = (def as { type?: string }).type ?? \"any\";\n103 |     return required.has(name) ? `${name} (${type}, required)` : `${name} (${type})`;\n104 |   });\n105 |   return `Params: ${parts.join(\", \")}`;\n106 | }\n107 | \n108 | // ─── Types ──────────────────────────────────────────────────\n109 | \n110 | export interface ToolContext {\n111 |   rootDir: string;","turn":4}
-{"timestamp":"2026-04-08T19:44:58.420Z","iteration":506,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-08T19:45:01.896Z","iteration":506,"level":"info","message":"Agent: Goals status:\n- **Harden `getMinimalDefinitions()` with auto-generated parameter signatures**: DONE ✅\n\nBoth the helper function and the updated method are in place. Let me verify with TypeScript and run a quick sanity check.","turn":5}
-{"timestamp":"2026-04-08T19:45:01.898Z","iteration":506,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1","turn":5}
-{"timestamp":"2026-04-08T19:45:03.077Z","iteration":506,"level":"info","message":"  -> exit=0 (11 chars)","turn":5}
-{"timestamp":"2026-04-08T19:45:03.077Z","iteration":506,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-08T19:45:06.879Z","iteration":506,"level":"info","message":"Agent: Clean. Now update memory and goals:","turn":6}
-{"timestamp":"2026-04-08T19:45:06.879Z","iteration":506,"level":"info","message":"save_memory: \"[Engineer] Iteration 506\"","turn":6}
-{"timestamp":"2026-04-08T19:45:06.880Z","iteration":506,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":6}
-{"timestamp":"2026-04-08T19:45:06.880Z","iteration":506,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-08T19:45:18.257Z","iteration":506,"level":"info","message":"write_file: goals.md (write)","turn":7}
-{"timestamp":"2026-04-08T19:45:18.258Z","iteration":506,"level":"info","message":"  -> ok: Updated goals.md (1469 chars, -7 lines delta)","turn":7}
-{"timestamp":"2026-04-08T19:45:18.259Z","iteration":506,"level":"info","message":"Turn 8/25","turn":8}
-{"timestamp":"2026-04-08T19:45:21.113Z","iteration":506,"level":"info","message":"Agent: src/ changes this iteration: `src/tool-registry.ts` — added `schemaToSignature()` helper (+20 LOC) and updated `getMinimalDefinitions()` to use it. Done. Wrapping up.","turn":8}
-{"timestamp":"2026-04-08T19:45:21.115Z","iteration":506,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":8}
-{"timestamp":"2026-04-08T19:45:21.116Z","iteration":506,"level":"info","message":"RESTART signal","turn":8}
-{"timestamp":"2026-04-08T19:45:21.117Z","iteration":506,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":8}
-{"timestamp":"2026-04-08T19:45:22.284Z","iteration":506,"level":"info","message":"Compilation OK","turn":8}
-{"timestamp":"2026-04-08T19:45:31.451Z","iteration":506,"level":"info","message":"Cache persisted: 64 entries to .autoagent-cache.json","turn":8}
-{"timestamp":"2026-04-08T19:45:31.451Z","iteration":506,"level":"info","message":"Cache stats: 0 hits, 1 misses, 64 entries, 3 invalidations (1 entries removed)","turn":8}
-{"timestamp":"2026-04-08T19:45:31.451Z","iteration":506,"level":"info","message":"Tool cache stats","turn":8,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":64,"invalidations":3,"invalidatedEntries":1,"toolStats":{"read_file":{"hits":0,"misses":1}}}}
-{"timestamp":"2026-04-08T19:45:31.451Z","iteration":506,"level":"info","message":"Tool timing: bash: 2x, avg=590ms, total=1180ms; write_file: 3x, avg=3ms, total=8ms; read_file: 1x, avg=5ms, total=5ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms","turn":8}
-{"timestamp":"2026-04-08T19:45:31.452Z","iteration":506,"level":"info","message":"Tool timing stats","turn":8,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":3,"minMs":3,"maxMs":3,"avgMs":3},"read_file":{"calls":1,"totalMs":5,"minMs":5,"maxMs":5,"avgMs":5},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":3,"totalMs":8,"minMs":1,"maxMs":5,"avgMs":3},"bash":{"calls":2,"totalMs":1180,"minMs":1,"maxMs":1179,"avgMs":590},"save_memory":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":9,"totalMs":1198}}}
-{"timestamp":"2026-04-08T19:45:39.698Z","iteration":506,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 506: predicted 12 turns, actual 8 turns, ratio 0.67**","turn":8}
-{"timestamp":"2026-04-08T19:45:44.315Z","iteration":506,"level":"info","message":"Pre-commit review (904in/107out): **LGTM** — the logic is sound, the helper is straightforward, and the signature-prepending approach correctly preserves parameter info while still saving tokens; no regressions, import issues, or mean","turn":8}
-{"timestamp":"2026-04-08T19:45:44.369Z","iteration":506,"level":"info","message":"Committed: f2997eae (16 in / 2198 out, cache: 12671 created, 92237 read)","turn":8}
-{"timestamp":"2026-04-08T19:45:44.369Z","iteration":506,"level":"info","message":"Restarting as iteration 507...","turn":8}
-{"timestamp":"2026-04-08T19:45:44.567Z","iteration":507,"level":"info","message":"Cache restored: 64/64 entries (0 stale)"}
-{"timestamp":"2026-04-08T19:45:44.570Z","iteration":507,"level":"info","message":"Turn budget: 8/25 (calibration=0.75x, predicted=8)"}
-{"timestamp":"2026-04-08T19:45:44.570Z","iteration":507,"level":"info","message":"Starting. Expert=Meta Model=claude-opus-4-6"}
-{"timestamp":"2026-04-08T19:45:44.793Z","iteration":507,"level":"info","message":"Hard turn cap: 12 (1.5x prediction of 8)"}
-{"timestamp":"2026-04-08T19:45:44.793Z","iteration":507,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-08T19:45:49.072Z","iteration":507,"level":"info","message":"Agent: \n\nI'll start by understanding the current state and executing my Meta goals: review the system's health, verify recent work, and write the next iteration's goals.","turn":1}
-{"timestamp":"2026-04-08T19:45:49.073Z","iteration":507,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | tail -40","turn":1}
 {"timestamp":"2026-04-08T19:45:49.073Z","iteration":507,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && git log --oneline -10","turn":1}
 {"timestamp":"2026-04-08T19:45:49.074Z","iteration":507,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && cat .expert-rotation.json","turn":1}
 {"timestamp":"2026-04-08T19:45:49.086Z","iteration":507,"level":"info","message":"  -> exit=0 (1311 chars)","turn":1}
@@ -541,3 +496,56 @@
 {"timestamp":"2026-04-08T20:09:39.324Z","iteration":515,"level":"info","message":"Tool timing stats","turn":10,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"think":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2},"bash":{"calls":5,"totalMs":1272,"minMs":1,"maxMs":1222,"avgMs":254},"write_file":{"calls":1,"totalMs":3,"minMs":3,"maxMs":3,"avgMs":3},"save_memory":{"calls":1,"totalMs":4,"minMs":4,"maxMs":4,"avgMs":4}},"totalCalls":10,"totalMs":1283}}}
 {"timestamp":"2026-04-08T20:09:47.723Z","iteration":515,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 515: predicted 7 turns, actual 10 turns, ratio 1.43**","turn":10}
 {"timestamp":"2026-04-08T20:09:47.749Z","iteration":515,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":10}
+{"timestamp":"2026-04-08T20:09:47.788Z","iteration":515,"level":"info","message":"Committed: 334bd28b (20 in / 3389 out, cache: 11238 created, 70887 read)","turn":10}
+{"timestamp":"2026-04-08T20:09:47.788Z","iteration":515,"level":"info","message":"Restarting as iteration 516...","turn":10}
+{"timestamp":"2026-04-08T20:09:47.989Z","iteration":516,"level":"info","message":"Cache restored: 68/68 entries (0 stale)"}
+{"timestamp":"2026-04-08T20:09:47.992Z","iteration":516,"level":"info","message":"Turn budget: 13/25 (calibration=1.25x, predicted=13)"}
+{"timestamp":"2026-04-08T20:09:47.992Z","iteration":516,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
+{"timestamp":"2026-04-08T20:09:48.223Z","iteration":516,"level":"info","message":"Hard turn cap: 20 (1.5x prediction of 13)"}
+{"timestamp":"2026-04-08T20:09:48.223Z","iteration":516,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-08T20:09:51.188Z","iteration":516,"level":"info","message":"Agent: I'll start by reading the current state of the relevant files to understand what needs to be done.","turn":1}
+{"timestamp":"2026-04-08T20:09:51.189Z","iteration":516,"level":"info","message":"$ grep -n \"getTokenEfficiency\\|tokenHistory\\|status\\|Context Efficiency\" src/tui-commands.ts | head -50","turn":1}
+{"timestamp":"2026-04-08T20:09:51.190Z","iteration":516,"level":"info","message":"$ grep -n \"getTokenEfficiency\\|tokenHistory\" src/orchestrator.ts | head -20","turn":1}
+{"timestamp":"2026-04-08T20:09:51.199Z","iteration":516,"level":"info","message":"  -> exit=0 (368 chars)","turn":1}
+{"timestamp":"2026-04-08T20:09:51.199Z","iteration":516,"level":"info","message":"  -> exit=0 (111 chars)","turn":1}
+{"timestamp":"2026-04-08T20:09:51.199Z","iteration":516,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-08T20:09:53.114Z","iteration":516,"level":"info","message":"$ sed -n '278,340p' src/tui-commands.ts","turn":2}
+{"timestamp":"2026-04-08T20:09:53.117Z","iteration":516,"level":"info","message":"$ sed -n '1411,1435p' src/orchestrator.ts","turn":2}
+{"timestamp":"2026-04-08T20:09:53.123Z","iteration":516,"level":"info","message":"  -> exit=0 (2573 chars)","turn":2}
+{"timestamp":"2026-04-08T20:09:53.124Z","iteration":516,"level":"info","message":"  -> exit=0 (1742 chars)","turn":2}
+{"timestamp":"2026-04-08T20:09:53.125Z","iteration":516,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-08T20:10:01.032Z","iteration":516,"level":"info","message":"Agent: I have all the context I need. Let me write the two deliverables now.","turn":3}
+{"timestamp":"2026-04-08T20:10:01.034Z","iteration":516,"level":"info","message":"write_file: src/tui-commands.ts (patch)","turn":3}
+{"timestamp":"2026-04-08T20:10:01.034Z","iteration":516,"level":"info","message":"write_file: src/tui-commands.ts (patch)","turn":3}
+{"timestamp":"2026-04-08T20:10:01.036Z","iteration":516,"level":"info","message":"  -> ok: Patched src/tui-commands.ts: -3 +14 lines\n\nContext after patch:\n293 |         sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(\", \")}`);\n294 |       }\n295 |     }\n296 |     // Context efficiency stats\n297 |     const effLines: string[] = [];\n298 |     const eff = ctx.orchestratorRef.current?.getTokenEfficiency();\n299 |     if (eff && eff.avgInput > 0) {\n300 |       effLines.push(`  ⚡ Context Efficiency:`);\n301 |       effLines.push(`    Avg input/turn:   ${eff.avgInput.toLocaleString()} tokens`);\n302 |       effLines.push(`    Avg output/turn:  ${eff.avgOutput.toLocaleString()} tokens`);\n303 |       effLines.push(`    Peak input:       ${eff.peakInput.toLocaleString()} tokens (turn ${eff.peakTurn})`);\n304 |       effLines.push(`    Context util:     ${eff.currentUtilPct}% of 200K`);\n305 |     }\n306 | \n307 |     // Tool performance timings\n308 |     const timingLines: string[] = [];\n309 |     const timings = ctx.orchestratorRef.current?.getToolTimings();\n310 |     if (timings && timings.length > 0) {\n311 |       timingLines.push(`  ⏱ Tool Performance (top 5 slowest):`);\n312 |       const top5 = timings","turn":3}
+{"timestamp":"2026-04-08T20:10:01.038Z","iteration":516,"level":"info","message":"  -> ok: Patched src/tui-commands.ts: -2 +3 lines\n\nContext after patch:\n326 |         `  Tokens out: ${tokensOut.toLocaleString()}`,\n327 |         `  Cost:       ${costStr}`,\n328 |         `  Model:      ${model}`,\n329 |         ...sessionLines,\n330 |         ...effLines,\n331 |         ...timingLines,\n332 |       ].join(\"\\n\"),\n333 |     });\n334 |     return true;","turn":3}
+{"timestamp":"2026-04-08T20:10:01.038Z","iteration":516,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-08T20:10:10.449Z","iteration":516,"level":"info","message":"Agent: Now write the test file:","turn":4}
+{"timestamp":"2026-04-08T20:10:10.449Z","iteration":516,"level":"info","message":"write_file: src/__tests__/token-efficiency.test.ts (write)","turn":4}
+{"timestamp":"2026-04-08T20:10:10.449Z","iteration":516,"level":"info","message":"  -> ok: Created src/__tests__/token-efficiency.test.ts (1989 chars)","turn":4}
+{"timestamp":"2026-04-08T20:10:10.450Z","iteration":516,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-08T20:10:13.932Z","iteration":516,"level":"info","message":"think: Goals status:\n1. Task 1: Wire token efficiency into /status - DONE (patched tui-commands.ts)\n2. Task 2: Add unit tests f...","turn":5}
+{"timestamp":"2026-04-08T20:10:13.932Z","iteration":516,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-08T20:10:15.981Z","iteration":516,"level":"info","message":"Agent: Both goals DONE. Running verification:","turn":6}
+{"timestamp":"2026-04-08T20:10:15.981Z","iteration":516,"level":"info","message":"$ npx tsc --noEmit 2>&1","turn":6}
+{"timestamp":"2026-04-08T20:10:15.983Z","iteration":516,"level":"info","message":"$ npx vitest run src/__tests__/token-efficiency.test.ts 2>&1","turn":6}
+{"timestamp":"2026-04-08T20:10:17.202Z","iteration":516,"level":"info","message":"  -> exit=0 (11 chars)","turn":6}
+{"timestamp":"2026-04-08T20:10:17.215Z","iteration":516,"level":"info","message":"  -> exit=0 (286 chars)","turn":6}
+{"timestamp":"2026-04-08T20:10:17.215Z","iteration":516,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-08T20:10:23.471Z","iteration":516,"level":"info","message":"Agent: Clean. All 4 tests pass. Now update memory and goals:","turn":7}
+{"timestamp":"2026-04-08T20:10:23.472Z","iteration":516,"level":"info","message":"save_memory: \"[Engineer] Iteration 516\"","turn":7}
+{"timestamp":"2026-04-08T20:10:23.473Z","iteration":516,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":7}
+{"timestamp":"2026-04-08T20:10:23.473Z","iteration":516,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-08T20:10:34.479Z","iteration":516,"level":"info","message":"write_file: goals.md (write)","turn":8}
+{"timestamp":"2026-04-08T20:10:34.480Z","iteration":516,"level":"info","message":"  -> ok: Updated goals.md (1500 chars, -6 lines delta)","turn":8}
+{"timestamp":"2026-04-08T20:10:34.481Z","iteration":516,"level":"info","message":"Turn 9/25","turn":9}
+{"timestamp":"2026-04-08T20:10:36.649Z","iteration":516,"level":"info","message":"Agent: All work is done. Running final restart:","turn":9}
+{"timestamp":"2026-04-08T20:10:36.650Z","iteration":516,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":9}
+{"timestamp":"2026-04-08T20:10:36.650Z","iteration":516,"level":"info","message":"RESTART signal","turn":9}
+{"timestamp":"2026-04-08T20:10:36.651Z","iteration":516,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":9}
+{"timestamp":"2026-04-08T20:10:37.749Z","iteration":516,"level":"info","message":"Compilation OK","turn":9}
+{"timestamp":"2026-04-08T20:10:46.675Z","iteration":516,"level":"info","message":"Cache persisted: 68 entries to .autoagent-cache.json","turn":9}
+{"timestamp":"2026-04-08T20:10:46.676Z","iteration":516,"level":"info","message":"Tool timing: bash: 7x, avg=356ms, total=2490ms; write_file: 4x, avg=3ms, total=10ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms","turn":9}
+{"timestamp":"2026-04-08T20:10:46.676Z","iteration":516,"level":"info","message":"Tool timing stats","turn":9,"metadata":{"timing":{"tools":{"bash":{"calls":7,"totalMs":2490,"minMs":0,"maxMs":1232,"avgMs":356},"write_file":{"calls":4,"totalMs":10,"minMs":1,"maxMs":4,"avgMs":3},"think":{"calls":1,"totalMs":0,"minMs":0,"maxMs":0,"avgMs":0},"save_memory":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":13,"totalMs":2501}}}
+{"timestamp":"2026-04-08T20:10:54.789Z","iteration":516,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 516: predicted 13 turns, actual 9 turns, ratio 0.69**","turn":9}
+{"timestamp":"2026-04-08T20:11:07.490Z","iteration":516,"level":"info","message":"Pre-commit review (1492in/488out): **Bug: `effLines` is built but never conditionally rendered when empty**\n\nNot a real bug per se, but spreading an empty array is harmless — this is actually fine.\n\n---\n\n**Actual issues:**\n\n- **Hardcod","turn":9}

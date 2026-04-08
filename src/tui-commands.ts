@@ -293,6 +293,17 @@ const commands: Record<string, CommandHandler> = {
         sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(", ")}`);
       }
     }
+    // Context efficiency stats
+    const effLines: string[] = [];
+    const eff = ctx.orchestratorRef.current?.getTokenEfficiency();
+    if (eff && eff.avgInput > 0) {
+      effLines.push(`  ⚡ Context Efficiency:`);
+      effLines.push(`    Avg input/turn:   ${eff.avgInput.toLocaleString()} tokens`);
+      effLines.push(`    Avg output/turn:  ${eff.avgOutput.toLocaleString()} tokens`);
+      effLines.push(`    Peak input:       ${eff.peakInput.toLocaleString()} tokens (turn ${eff.peakTurn})`);
+      effLines.push(`    Context util:     ${eff.currentUtilPct}% of 200K`);
+    }
+
     // Tool performance timings
     const timingLines: string[] = [];
     const timings = ctx.orchestratorRef.current?.getToolTimings();
@@ -316,6 +327,7 @@ const commands: Record<string, CommandHandler> = {
         `  Cost:       ${costStr}`,
         `  Model:      ${model}`,
         ...sessionLines,
+        ...effLines,
         ...timingLines,
       ].join("\n"),
     });
