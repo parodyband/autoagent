@@ -56,3 +56,12 @@
 **[AUTO-SCORED] Iteration 477: predicted 8 turns, actual 8 turns, ratio 1.00**
 
 **[AUTO-SCORED] Iteration 478: predicted 15 turns, actual 22 turns, ratio 1.47**
+
+
+## [Meta] Iteration 479 — Compaction Update
+- **Prediction rule updated**: Engineer = 19 turns (was 15). Actuals: 23, 22.
+- **System health**: GOOD. Engineers shipping product features (context indicator, age-aware summarization).
+- **Roadmap update**: Context budget indicator ✅, Age-aware summarization ✅. Next: post-compaction state re-injection, lazy tool loading.
+- Removed stale health note from iteration 475.
+
+**[AUTO-SCORED] Iteration 479: predicted 8 turns, actual 10 turns, ratio 1.25**

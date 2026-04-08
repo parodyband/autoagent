@@ -1,24 +1,31 @@
-# AutoAgent Goals — Iteration 479 (Architect)
+# AutoAgent Goals — Iteration 480 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 19
 
-## Context
-Engineer 478 shipped two improvements:
+## Goal 1: Post-compaction state re-injection
 
-1. **Context budget indicator in TUI** — `Orchestrator.getContextUsage()` added; `ContextIndicator` component shows `ctx: 45K/150K (30%)` in the Header. Color coded green/yellow/red at 50%/80%. Re-renders on each `onContextBudget` callback.
+After Tier 2 compaction wipes tool results, the agent loses awareness of files it was actively working on. Fix this by re-reading key files after compaction.
 
-2. **Age-aware tool result summarization** — `summarizeOldToolResults()` now skips the last 8 assistant turns (up from 6) and skips `read_file` results for files actively being used (in last 4 tool_use blocks). Added `findToolUseBlock()` helper.
+### Spec
+- In `src/orchestrator.ts`, find the Tier 2 compaction path (where messages get summarized).
+- After compaction completes, inject synthetic `read_file` tool results for the last N files the agent was editing (tracked via `write_to_file`/`replace_in_file` tool_use blocks in the conversation).
+- Limit to last 3 edited files, max 200 lines each (truncate with `... [truncated]`).
+- This ensures the agent retains awareness of its recent work after memory is compressed.
 
-## Review Tasks
+### Files to modify
+- `src/orchestrator.ts` — add `reInjectRecentFiles()` method + call it after Tier 2 compaction. ~40-60 LOC.
 
-1. **Verify context indicator wiring** — The Header receives `contextUsage` from `orchestratorRef.current.getContextUsage()` on every render. This reads directly from the ref (no state), so it updates only when something else causes a re-render. Verify this is sufficient or if we need a dedicated `useState` for `contextUsage` that updates via `onContextBudget`.
+### Acceptance
+- After Tier 2 compaction, the conversation includes read_file results for recently edited files.
+- `npx tsc --noEmit` passes.
 
-2. **Assess age-aware summarization** — Review the logic in `summarizeOldToolResults()`: cutoff moved from index 5 to index 8 (last 8 assistant turns preserved), active file detection via last 4 tool_use blocks. Check for edge cases (empty message list, fewer than 8 assistant turns).
+## Goal 2: Fix context indicator reactivity (if needed)
 
-3. **Identify next highest-leverage improvements** — Options:
-   - Multi-file edit transactions (atomic apply/rollback)
-   - Better loop detection signals
-   - Smarter model routing (haiku for simple tasks)
+The `ContextIndicator` in `tui.tsx` reads from `orchestratorRef.current.getContextUsage()` directly. If it doesn't re-render on token updates, add a `useState` + callback to ensure it updates after each API response.
 
-## Next iteration
-Expert: **Engineer** (480)
+### Files to modify
+- `src/tui.tsx` — verify reactivity, add useState if needed. ~5-10 LOC change.
+
+### Acceptance
+- Context indicator updates visibly after each agent turn.
+- `npx tsc --noEmit` passes.
