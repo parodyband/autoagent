@@ -2278,17 +2278,19 @@ export class Orchestrator {
     const budgetRatio = this.sessionTokensIn / COMPACT_TIER1_THRESHOLD;
     this.opts.onContextBudget?.(budgetRatio);
 
-    // 2. Context compaction if needed (tiered)
-    if (this.shouldCompact()) {
+    // 2. Context compaction if needed (tiered, urgency-aware)
+    const preTurnUrgency = compactionUrgency(this.turnTokenHistory);
+    const preTurnTier = selectCompactionTier(this.sessionTokensIn, preTurnUrgency);
+    if (preTurnTier === 'tier2') {
       await this.compact(); // Tier 2: summarize
       // After compaction, notify TUI that budget is now low
       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
-    } else if (this.shouldCompactTier1()) {
+    } else if (preTurnTier === 'tier1') {
       this.compactTier1(); // Tier 1: compress old tool outputs
       if (this.shouldPruneStaleTool()) {
         this.pruneStaleToolResults(); // Aggressive eviction between T1 and T2
       }
-    } else if (this.shouldMicroCompact()) {
+    } else if (preTurnTier === 'micro') {
       scoredPrune(this.apiMessages, this.apiMessages.length, 10_000); // Scored prune: target 10K token savings
     }
 

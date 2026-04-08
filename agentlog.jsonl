@@ -1,50 +1,3 @@
-{"timestamp":"2026-04-08T20:21:57.083Z","iteration":523,"level":"info","message":"Turn 10/25","turn":10}
-{"timestamp":"2026-04-08T20:22:00.726Z","iteration":523,"level":"info","message":"Agent: \n\nRight — as Meta expert, my job is memory + goals, not src/ changes. Let me deliver now.","turn":10}
-{"timestamp":"2026-04-08T20:22:00.727Z","iteration":523,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"onToolOutput\" src/orchestrator.ts | grep \"loopResult\\|runAgentLoop\" | head -5","turn":10}
-{"timestamp":"2026-04-08T20:22:00.738Z","iteration":523,"level":"info","message":"  -> exit=0 (11 chars)","turn":10}
-{"timestamp":"2026-04-08T20:22:00.739Z","iteration":523,"level":"info","message":"Turn 11/25","turn":11}
-{"timestamp":"2026-04-08T20:22:03.065Z","iteration":523,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && sed -n '2395,2420p' src/orchestrator.ts","turn":11}
-{"timestamp":"2026-04-08T20:22:03.079Z","iteration":523,"level":"info","message":"  -> exit=0 (729 chars)","turn":11}
-{"timestamp":"2026-04-08T20:22:03.079Z","iteration":523,"level":"info","message":"Turn 12/25","turn":12}
-{"timestamp":"2026-04-08T20:22:21.600Z","iteration":523,"level":"info","message":"think: So the call to runAgentLoop at line 2395 does NOT pass onToolOutput yet. The parameter was added to the function signatu...","turn":12}
-{"timestamp":"2026-04-08T20:22:21.601Z","iteration":523,"level":"info","message":"Turn 13/25","turn":13}
-{"timestamp":"2026-04-08T20:22:58.466Z","iteration":523,"level":"info","message":"Agent: \n\nDelivering now — memory, goals, tsc, restart.","turn":13}
-{"timestamp":"2026-04-08T20:22:58.467Z","iteration":523,"level":"info","message":"write_file: memory.md (write)","turn":13}
-{"timestamp":"2026-04-08T20:22:58.472Z","iteration":523,"level":"info","message":"  -> ok: Updated memory.md (4530 chars, -27 lines delta)","turn":13}
-{"timestamp":"2026-04-08T20:22:58.473Z","iteration":523,"level":"info","message":"Turn 14/25","turn":14}
-{"timestamp":"2026-04-08T20:23:15.942Z","iteration":523,"level":"info","message":"write_file: goals.md (write)","turn":14}
-{"timestamp":"2026-04-08T20:23:15.944Z","iteration":523,"level":"info","message":"  -> ok: Updated goals.md (2217 chars, -7 lines delta)","turn":14}
-{"timestamp":"2026-04-08T20:23:15.945Z","iteration":523,"level":"info","message":"Turn 15/25","turn":15}
-{"timestamp":"2026-04-08T20:23:18.188Z","iteration":523,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5","turn":15}
-{"timestamp":"2026-04-08T20:23:19.339Z","iteration":523,"level":"info","message":"  -> exit=0 (11 chars)","turn":15}
-{"timestamp":"2026-04-08T20:23:19.339Z","iteration":523,"level":"info","message":"Turn 16/25","turn":16}
-{"timestamp":"2026-04-08T20:23:22.528Z","iteration":523,"level":"info","message":"Agent: \n\nTSC clean, memory compacted, goals written. Done.\n\n```\necho \"AUTOAGENT_RESTART\"\n```","turn":16}
-{"timestamp":"2026-04-08T20:23:22.529Z","iteration":523,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":16}
-{"timestamp":"2026-04-08T20:23:22.529Z","iteration":523,"level":"info","message":"RESTART signal","turn":16}
-{"timestamp":"2026-04-08T20:23:22.529Z","iteration":523,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":16}
-{"timestamp":"2026-04-08T20:23:23.704Z","iteration":523,"level":"info","message":"Compilation OK","turn":16}
-{"timestamp":"2026-04-08T20:23:32.753Z","iteration":523,"level":"info","message":"Cache persisted: 63 entries to .autoagent-cache.json","turn":16}
-{"timestamp":"2026-04-08T20:23:32.754Z","iteration":523,"level":"info","message":"Tool timing: bash: 11x, avg=119ms, total=1307ms; write_file: 2x, avg=5ms, total=9ms; read_scratchpad: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms","turn":16}
-{"timestamp":"2026-04-08T20:23:32.754Z","iteration":523,"level":"info","message":"Tool timing stats","turn":16,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2},"bash":{"calls":11,"totalMs":1307,"minMs":0,"maxMs":1151,"avgMs":119},"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"write_file":{"calls":2,"totalMs":9,"minMs":3,"maxMs":6,"avgMs":5}},"totalCalls":16,"totalMs":1319}}}
-{"timestamp":"2026-04-08T20:23:40.996Z","iteration":523,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 523: predicted 15 turns, actual 16 turns, ratio 1.07**","turn":16}
-{"timestamp":"2026-04-08T20:23:41.026Z","iteration":523,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":16}
-{"timestamp":"2026-04-08T20:23:41.060Z","iteration":523,"level":"info","message":"Committed: b164bd76 (28 in / 4062 out, cache: 55093 created, 667658 read)","turn":16}
-{"timestamp":"2026-04-08T20:23:41.061Z","iteration":523,"level":"info","message":"Restarting as iteration 524...","turn":16}
-{"timestamp":"2026-04-08T20:23:41.270Z","iteration":524,"level":"info","message":"Cache restored: 63/63 entries (0 stale)"}
-{"timestamp":"2026-04-08T20:23:41.273Z","iteration":524,"level":"info","message":"Turn budget: 16/25 (calibration=1.00x, predicted=12)"}
-{"timestamp":"2026-04-08T20:23:41.274Z","iteration":524,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
-{"timestamp":"2026-04-08T20:23:41.500Z","iteration":524,"level":"info","message":"Hard turn cap: 18 (1.5x prediction of 12)"}
-{"timestamp":"2026-04-08T20:23:41.501Z","iteration":524,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-08T20:23:43.943Z","iteration":524,"level":"info","message":"Agent: I'll start by reading the current state of the relevant files to understand exactly what needs to be wired up.","turn":1}
-{"timestamp":"2026-04-08T20:23:43.944Z","iteration":524,"level":"info","message":"$ grep -n \"runAgentLoop\" src/orchestrator.ts | head -40","turn":1}
-{"timestamp":"2026-04-08T20:23:43.945Z","iteration":524,"level":"info","message":"read_scratchpad: 898 chars","turn":1}
-{"timestamp":"2026-04-08T20:23:43.955Z","iteration":524,"level":"info","message":"  -> exit=0 (402 chars)","turn":1}
-{"timestamp":"2026-04-08T20:23:43.955Z","iteration":524,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-08T20:23:45.878Z","iteration":524,"level":"info","message":"$ sed -n '230,250p' src/orchestrator.ts","turn":2}
-{"timestamp":"2026-04-08T20:23:45.881Z","iteration":524,"level":"info","message":"$ sed -n '610,660p' src/orchestrator.ts","turn":2}
-{"timestamp":"2026-04-08T20:23:45.888Z","iteration":524,"level":"info","message":"  -> exit=0 (670 chars)","turn":2}
-{"timestamp":"2026-04-08T20:23:45.889Z","iteration":524,"level":"info","message":"  -> exit=0 (2126 chars)","turn":2}
-{"timestamp":"2026-04-08T20:23:45.889Z","iteration":524,"level":"info","message":"Turn 3/25","turn":3}
 {"timestamp":"2026-04-08T20:23:49.665Z","iteration":524,"level":"info","message":"think: I have enough context. Let me look at the call sites quickly and then make the changes.\n\nThe runAgentLoop signature ends...","turn":3}
 {"timestamp":"2026-04-08T20:23:49.666Z","iteration":524,"level":"info","message":"Turn 4/25","turn":4}
 {"timestamp":"2026-04-08T20:23:52.328Z","iteration":524,"level":"info","message":"$ sed -n '2385,2420p' src/orchestrator.ts","turn":4}
@@ -543,3 +496,56 @@
 {"timestamp":"2026-04-08T20:35:46.208Z","iteration":531,"level":"info","message":"Tool timing stats","turn":8,"metadata":{"timing":{"tools":{"bash":{"calls":7,"totalMs":1163,"minMs":1,"maxMs":1103,"avgMs":166},"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"write_file":{"calls":2,"totalMs":4,"minMs":1,"maxMs":3,"avgMs":2}},"totalCalls":11,"totalMs":1168}}}
 {"timestamp":"2026-04-08T20:35:54.319Z","iteration":531,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 531: predicted 8 turns, actual 8 turns, ratio 1.00**","turn":8}
 {"timestamp":"2026-04-08T20:35:54.343Z","iteration":531,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":8}
+{"timestamp":"2026-04-08T20:35:54.385Z","iteration":531,"level":"info","message":"Committed: 814ec2f2 (18 in / 2941 out, cache: 11349 created, 61096 read)","turn":8}
+{"timestamp":"2026-04-08T20:35:54.385Z","iteration":531,"level":"info","message":"Restarting as iteration 532...","turn":8}
+{"timestamp":"2026-04-08T20:35:54.587Z","iteration":532,"level":"info","message":"Cache restored: 64/64 entries (0 stale)"}
+{"timestamp":"2026-04-08T20:35:54.590Z","iteration":532,"level":"info","message":"Turn budget: 18/25 (calibration=1.00x, predicted=15)"}
+{"timestamp":"2026-04-08T20:35:54.590Z","iteration":532,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
+{"timestamp":"2026-04-08T20:35:54.780Z","iteration":532,"level":"info","message":"Hard turn cap: 23 (1.5x prediction of 15)"}
+{"timestamp":"2026-04-08T20:35:54.780Z","iteration":532,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-08T20:35:57.723Z","iteration":532,"level":"info","message":"Agent: I'll start by reading the current state of the orchestrator to understand the exact lines I need to change.","turn":1}
+{"timestamp":"2026-04-08T20:35:57.723Z","iteration":532,"level":"info","message":"$ sed -n '2275,2310p' src/orchestrator.ts","turn":1}
+{"timestamp":"2026-04-08T20:35:57.724Z","iteration":532,"level":"info","message":"$ sed -n '1655,1680p' src/orchestrator.ts","turn":1}
+{"timestamp":"2026-04-08T20:35:57.731Z","iteration":532,"level":"info","message":"  -> exit=0 (1801 chars)","turn":1}
+{"timestamp":"2026-04-08T20:35:57.732Z","iteration":532,"level":"info","message":"  -> exit=0 (1045 chars)","turn":1}
+{"timestamp":"2026-04-08T20:35:57.732Z","iteration":532,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-08T20:35:59.915Z","iteration":532,"level":"info","message":"Agent: Now let me check the `compactionUrgency` and `selectCompactionTier` functions:","turn":2}
+{"timestamp":"2026-04-08T20:35:59.916Z","iteration":532,"level":"info","message":"$ grep -n \"compactionUrgency\\|selectCompactionTier\" src/orchestrator.ts | head -30","turn":2}
+{"timestamp":"2026-04-08T20:35:59.936Z","iteration":532,"level":"info","message":"  -> exit=0 (347 chars)","turn":2}
+{"timestamp":"2026-04-08T20:35:59.936Z","iteration":532,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-08T20:36:06.147Z","iteration":532,"level":"info","message":"Agent: I have all the context I need. Making the changes now.","turn":3}
+{"timestamp":"2026-04-08T20:36:06.148Z","iteration":532,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":3}
+{"timestamp":"2026-04-08T20:36:06.151Z","iteration":532,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -13 +15 lines\n\nContext after patch:\n2278 |     const budgetRatio = this.sessionTokensIn / COMPACT_TIER1_THRESHOLD;\n2279 |     this.opts.onContextBudget?.(budgetRatio);\n2280 | \n2281 |     // 2. Context compaction if needed (tiered, urgency-aware)\n2282 |     const preTurnUrgency = compactionUrgency(this.turnTokenHistory);\n2283 |     const preTurnTier = selectCompactionTier(this.sessionTokensIn, preTurnUrgency);\n2284 |     if (preTurnTier === 'tier2') {\n2285 |       await this.compact(); // Tier 2: summarize\n2286 |       // After compaction, notify TUI that budget is now low\n2287 |       this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);\n2288 |     } else if (preTurnTier === 'tier1') {\n2289 |       this.compactTier1(); // Tier 1: compress old tool outputs\n2290 |       if (this.shouldPruneStaleTool()) {\n2291 |         this.pruneStaleToolResults(); // Aggressive eviction between T1 and T2\n2292 |       }\n2293 |     } else if (preTurnTier === 'micro') {\n2294 |       scoredPrune(this.apiMessages, this.apiMessages.length, 10_000); // Scored prune: target 10K token savings\n2295 |     }\n2296 | \n2297 |     // 2b. Extract #file references from user message, inject as context\n2298 |     const fileRefs = extractFileReferences(userMessage, this.opts.workDir);","turn":3}
+{"timestamp":"2026-04-08T20:36:06.151Z","iteration":532,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-08T20:36:08.810Z","iteration":532,"level":"info","message":"Agent: Now let me check the existing tests for `selectCompactionTier` to know where to add the new ones:","turn":4}
+{"timestamp":"2026-04-08T20:36:08.810Z","iteration":532,"level":"info","message":"$ grep -n \"selectCompactionTier\\|compactionUrgency\" tests/orchestrator.test.ts | head -20","turn":4}
+{"timestamp":"2026-04-08T20:36:08.821Z","iteration":532,"level":"info","message":"  -> exit=0 (1209 chars)","turn":4}
+{"timestamp":"2026-04-08T20:36:08.821Z","iteration":532,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-08T20:36:10.446Z","iteration":532,"level":"info","message":"$ sed -n '42,80p' tests/orchestrator.test.ts","turn":5}
+{"timestamp":"2026-04-08T20:36:10.454Z","iteration":532,"level":"info","message":"  -> exit=0 (1091 chars)","turn":5}
+{"timestamp":"2026-04-08T20:36:10.455Z","iteration":532,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-08T20:36:15.261Z","iteration":532,"level":"info","message":"think: Let me review goal status:\n\n1. Replace pre-turn compaction block with urgency-aware version — DONE (patched in turn 3)\n2...","turn":6}
+{"timestamp":"2026-04-08T20:36:15.261Z","iteration":532,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-08T20:36:18.563Z","iteration":532,"level":"info","message":"Agent: Goal status:\n- **Wire pre-turn compaction to urgency** — DONE (patched)\n- **Add urgency tests** — DONE (already existed from iter 530, lines 61-68)\n- **Verify** — NOT DONE yet\n\nRunning verification now:","turn":7}
+{"timestamp":"2026-04-08T20:36:18.564Z","iteration":532,"level":"info","message":"$ npx vitest run tests/orchestrator.test.ts 2>&1 | tail -20","turn":7}
+{"timestamp":"2026-04-08T20:36:18.566Z","iteration":532,"level":"info","message":"$ npx tsc --noEmit 2>&1","turn":7}
+{"timestamp":"2026-04-08T20:36:19.802Z","iteration":532,"level":"info","message":"  -> exit=0 (277 chars)","turn":7}
+{"timestamp":"2026-04-08T20:36:19.813Z","iteration":532,"level":"info","message":"  -> exit=0 (11 chars)","turn":7}
+{"timestamp":"2026-04-08T20:36:19.813Z","iteration":532,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-08T20:36:26.773Z","iteration":532,"level":"info","message":"Agent: All 12 tests pass, no type errors. Writing memory and updating goals:","turn":8}
+{"timestamp":"2026-04-08T20:36:26.773Z","iteration":532,"level":"info","message":"save_memory: \"[Engineer] Iteration 532\"","turn":8}
+{"timestamp":"2026-04-08T20:36:26.774Z","iteration":532,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":8}
+{"timestamp":"2026-04-08T20:36:26.774Z","iteration":532,"level":"info","message":"Turn 9/25","turn":9}
+{"timestamp":"2026-04-08T20:36:38.415Z","iteration":532,"level":"info","message":"write_file: goals.md (write)","turn":9}
+{"timestamp":"2026-04-08T20:36:38.416Z","iteration":532,"level":"info","message":"  -> ok: Updated goals.md (1482 chars, -38 lines delta)","turn":9}
+{"timestamp":"2026-04-08T20:36:38.416Z","iteration":532,"level":"info","message":"Turn 10/25","turn":10}
+{"timestamp":"2026-04-08T20:36:40.438Z","iteration":532,"level":"info","message":"Agent: All work is done. Restarting.","turn":10}
+{"timestamp":"2026-04-08T20:36:40.438Z","iteration":532,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":10}
+{"timestamp":"2026-04-08T20:36:40.438Z","iteration":532,"level":"info","message":"RESTART signal","turn":10}
+{"timestamp":"2026-04-08T20:36:40.438Z","iteration":532,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":10}
+{"timestamp":"2026-04-08T20:36:41.550Z","iteration":532,"level":"info","message":"Compilation OK","turn":10}
+{"timestamp":"2026-04-08T20:36:50.319Z","iteration":532,"level":"info","message":"Cache persisted: 64 entries to .autoagent-cache.json","turn":10}
+{"timestamp":"2026-04-08T20:36:50.319Z","iteration":532,"level":"info","message":"Tool timing: bash: 8x, avg=318ms, total=2541ms; write_file: 2x, avg=2ms, total=4ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms","turn":10}
+{"timestamp":"2026-04-08T20:36:50.319Z","iteration":532,"level":"info","message":"Tool timing stats","turn":10,"metadata":{"timing":{"tools":{"bash":{"calls":8,"totalMs":2541,"minMs":0,"maxMs":1247,"avgMs":318},"write_file":{"calls":2,"totalMs":4,"minMs":1,"maxMs":3,"avgMs":2},"think":{"calls":1,"totalMs":0,"minMs":0,"maxMs":0,"avgMs":0},"save_memory":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":12,"totalMs":2546}}}
+{"timestamp":"2026-04-08T20:36:58.527Z","iteration":532,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 532: predicted 15 turns, actual 10 turns, ratio 0.67**","turn":10}
+{"timestamp":"2026-04-08T20:37:01.551Z","iteration":532,"level":"info","message":"Pre-commit review (624in/55out): LGTM. The refactor consolidates three separate `should*()` predicate calls into a single `selectCompactionTier()` dispatch, reducing redundant threshold checks and making the tiering logic easier to r","turn":10}
