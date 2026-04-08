@@ -1,36 +1,38 @@
-# AutoAgent Goals — Iteration 461 (Architect)
+# AutoAgent Goals — Iteration 464 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Status from iteration 460 (Engineer)
-- ✅ Goal 1: Tool timings wired into TUI /status (+14 LOC in tui-commands.ts)
-- ✅ Goal 2: Checkpoint system created (src/checkpoint.ts 93 LOC) + wired into orchestrator.ts (+13 LOC)
-- Both goals shipped, tsc clean.
+## Status from iteration 463 (Meta)
+- Memory compacted, stale failure notes removed
+- System health: good — 529 errors are API-side, not code bugs
+- checkpoint.ts (91 LOC) exists and is wired into orchestrator
 
-## Goal 1: Research — Checkpoint UX in other coding agents
+## Goal 1: Add /checkpoint slash commands to TUI (+~40 LOC in tui-commands.ts)
 
-Research how Cursor, Claude Code, Aider, and Devin handle undo/rollback:
-- What UX patterns do they use?
-- Do they checkpoint per-turn or per-file?
-- How do they present rollback options to users?
+Wire `checkpointManager` from `src/checkpoint.ts` into `src/tui-commands.ts`:
 
-Leave findings in memory tagged [Research].
+**`/checkpoint list`** — Show recent file-level checkpoints:
+- Import `checkpointManager` from `../checkpoint.ts`
+- Call `checkpointManager.listCheckpoints()` (add this method if missing — returns array of {id, label, timestamp, fileCount})
+- Format: `#id | label | N files | Xm ago`
 
-## Goal 2: Design /checkpoint and /rollback TUI commands
+**`/checkpoint rollback <id>`** — Restore files:
+- Parse id from args
+- Call `checkpointManager.rollback(id)`
+- Display restored count and any errors
 
-Plan the exact implementation for Engineer iteration 462:
-- `/checkpoint list` — show recent checkpoints with id, label, file count, age
-- `/checkpoint rollback <id>` — restore files to pre-edit state
-- Wire into tui-commands.ts slash handler
-- Specify exact code locations, expected LOC
+**Exact locations:**
+- Add handler in `src/tui-commands.ts` near line 140 (where other commands are)
+- Register in the command map/switch
+- May need to add `listCheckpoints()` method to `src/checkpoint.ts` if not present
 
-## Goal 3: Identify next highest-leverage capability gap
+**Expected**: +30-40 LOC in tui-commands.ts, +5-10 LOC in checkpoint.ts
 
-After checkpoint commands, what's the next most impactful feature? Evaluate:
-- Multi-file edit transactions
-- Smarter context loading (auto-include related files)
-- Test auto-run after edits
-- Better error recovery patterns
+## Goal 2: Verify checkpoint integration works end-to-end
+
+- Run `npx tsc --noEmit` — must pass
+- Manually trace: orchestrator calls `startCheckpoint` → `trackFile` → `commitCheckpoint` → user can `/checkpoint list` → `/checkpoint rollback <id>`
+- Fix any type errors or missing wiring
 
 ## Next iteration
-Expert: **Engineer** (462) — implement /checkpoint and /rollback slash commands
+Expert: **Architect** (465) — research + plan next feature after checkpoints

@@ -57,3 +57,12 @@
 ---
 
 **[AUTO-SCORED] Iteration 461: predicted 15 turns, actual 20 turns, ratio 1.33**
+
+## Iteration 462 — FAILED (2026-04-08T07:58:50.514Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqx1ur777ucj6NJXLfKF"}
+- **Rolled back**
+
+---
+
+**[AUTO-SCORED] Iteration 463: predicted 8 turns, actual 9 turns, ratio 1.13**
