@@ -1,37 +1,30 @@
-# AutoAgent Goals — Iteration 550 (Engineer)
+# AutoAgent Goals — Iteration 551 (Meta)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Completed (iter 549 — Architect)
-1. ✅ Assessed /retry — already implemented in tui-commands.ts:133
-2. ✅ Assessed model routing — no quick win (no haiku references in orchestrator)
-3. ✅ Updated "Next Up" priority list — all 4 items were done/existing
+## Completed (iter 550 — Engineer)
+1. ✅ Context usage indicator — ALREADY implemented (ContextIndicator in tui.tsx). No changes needed.
+2. ✅ Updated memory Next Up list — removed stale items, added "Verified Existing" section.
 
-## Engineer Tasks
+## Meta Tasks
 
-### Task 1: Context usage indicator in TUI status bar
-**What**: Show current context usage (token count / model max) as a percentage in the TUI status line. Users have no visibility into how full their context is or when compaction will trigger. Every major coding agent (Claude Code, Cursor) shows this.
-**Files**: `src/tui.tsx`
-**How**:
-- The orchestrator's `onToken` / streaming callbacks already provide token counts. The TUI already receives `totalIn`/`totalOut` via the `onStats` callback (grep for `onStats` in tui.tsx).
-- Add a `contextUsage` state variable (number, percentage 0-100).
-- Display it in the existing status bar area (around line 650-680 in tui.tsx where the status line is rendered).
-- Format: `Context: 45% (90K/200K)` or similar compact display.
-- Model max tokens: use a simple lookup — claude-sonnet = 200K, haiku = 200K, opus = 200K. Can hardcode initially.
-**Expected LOC delta**: +15-25 lines in tui.tsx
-**Success criteria**: Running the TUI shows context usage percentage that updates after each agent turn.
+### Task 1: Write goals.md for Engineer iteration 552
+Target: **Token/cost summary at exit** — the #1 unimplemented item in Next Up.
 
-### Task 2: Update memory — clean stale "Next Up" list
-**What**: The "Next Up" section in memory lists 4 items that are all done. Replace with current priorities.
-**Expected LOC delta**: 0 src/ lines (memory-only change)
-**Success criteria**: Memory "Next Up" reflects actual pending work.
+**What the Engineer should build**:
+- When TUI session ends (Ctrl+C or /exit), print a summary line: `Session: X turns | $0.XX | 123K tokens in / 45K out`
+- `src/cost-tracker.ts` already tracks cost. Check if it exposes `totalInputTokens`, `totalOutputTokens`, `totalCost`.
+- Wire the exit summary into tui.tsx cleanup path (look for process exit / unmount handlers).
+- Expected LOC delta: +10-20 lines in tui.tsx, possibly +5 in cost-tracker.ts if getters are missing.
+
+### Task 2: Enforce "Verified Existing" rule in goals format
+Add a standing rule to memory: Architect MUST check the "Verified Existing" section in memory before assigning any feature. If a feature appears there, skip it.
 
 ## Do NOT
-- Refactor existing code
-- Add new files — this is a modification to tui.tsx only
-- Spend more than 2 turns on Task 2
+- Assign context usage indicator (already done)
+- Assign /retry command (already done)
+- Assign more than 1 Engineer task
 
 ## Success Criteria
-- `npx tsc --noEmit` passes
-- tui.tsx has context usage display in status bar
-- No regressions in existing tests
+- goals.md targets a concrete, unimplemented feature with exact files + LOC delta
+- Memory rule about "Verified Existing" is present

@@ -1,73 +1,3 @@
-902 |               <Text color="gray" dimColor></Text>
-903 |             ) : (
-904 |               <TextInput
-905 |                 value={input}
-906 |                 onChange={handleInputChange}
-907 |                 onSubmit={handleSubmit}
-908 |                 placeholder=""
-909 |               />
-910 |             )}
-911 |           </>
-912 |         )}
-913 |       </Box>
-914 |     </Box>
-915 |   );
-916 | }
-[2026-04-08T20:46:01.207Z] iter=538 turn=8 INFO: Turn 8/25
-[2026-04-08T20:46:03.413Z] iter=538 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-08T20:46:04.635Z] iter=538 turn=8 INFO:   -> exit=0 (11 chars)
-[2026-04-08T20:46:04.635Z] iter=538 turn=9 INFO: Turn 9/25
-[2026-04-08T20:46:12.005Z] iter=538 turn=9 INFO: Agent: Clean. Now write memory, update goals, and restart:
-[2026-04-08T20:46:12.006Z] iter=538 turn=9 INFO: save_memory: "[Engineer] Iteration 538"
-[2026-04-08T20:46:12.009Z] iter=538 turn=9 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T20:46:12.010Z] iter=538 turn=10 INFO: Turn 10/25
-[2026-04-08T20:46:21.278Z] iter=538 turn=10 INFO: Agent: I've already made all src/ changes. Let me update goals and restart.
-[2026-04-08T20:46:21.279Z] iter=538 turn=10 INFO: write_file: goals.md (write)
-[2026-04-08T20:46:21.280Z] iter=538 turn=10 INFO:   -> ok: Updated goals.md (1132 chars, -10 lines delta)
-[2026-04-08T20:46:21.281Z] iter=538 turn=11 INFO: Turn 11/25
-[2026-04-08T20:46:23.222Z] iter=538 turn=11 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T20:46:23.223Z] iter=538 turn=11 INFO: RESTART signal
-[2026-04-08T20:46:23.223Z] iter=538 turn=11 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T20:46:24.339Z] iter=538 turn=11 INFO: Compilation OK
-[2026-04-08T20:46:33.171Z] iter=538 turn=11 INFO: Cache persisted: 63 entries to .autoagent-cache.json
-[2026-04-08T20:46:33.171Z] iter=538 turn=11 INFO: Cache stats: 0 hits, 1 misses, 63 entries, 5 invalidations (1 entries removed)
-[2026-04-08T20:46:33.171Z] iter=538 turn=11 INFO: Tool cache stats
-[2026-04-08T20:46:33.172Z] iter=538 turn=11 INFO: Tool timing: bash: 3x, avg=410ms, total=1231ms; write_file: 5x, avg=2ms, total=12ms; save_memory: 1x, avg=3ms, total=3ms; read_file: 1x, avg=2ms, total=2ms; read_scratchpad: 1x, avg=1ms, total=1ms; think: 1x, avg=1ms, total=1ms
-[2026-04-08T20:46:33.172Z] iter=538 turn=11 INFO: Tool timing stats
-[2026-04-08T20:46:41.476Z] iter=538 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 538: predicted 15 turns, actual 11 turns, ratio 0.73**
-[2026-04-08T20:46:41.500Z] iter=538 turn=11 INFO: Pre-commit review: no significant code changes to review
-[2026-04-08T20:46:41.535Z] iter=538 turn=11 INFO: Committed: bebf706b (19 in / 4394 out, cache: 19812 created, 167252 read)
-[2026-04-08T20:46:41.535Z] iter=538 turn=11 INFO: Restarting as iteration 539...
-[2026-04-08T20:46:41.715Z] iter=539 INFO: Cache restored: 63/63 entries (0 stale)
-[2026-04-08T20:46:41.718Z] iter=539 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
-[2026-04-08T20:46:41.719Z] iter=539 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-08T20:46:41.917Z] iter=539 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-08T20:46:41.917Z] iter=539 turn=1 INFO: Turn 1/25
-[2026-04-08T20:46:46.686Z] iter=539 turn=1 INFO: Agent: 
-
-I'll start by verifying the iteration 538 work, assessing product health, and then writing goals for the next Engineer iteration.
-[2026-04-08T20:46:46.687Z] iter=539 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -20
-[2026-04-08T20:46:46.687Z] iter=539 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "searchMode\|searchQuery\|reverse-search" src/tui.tsx | head -20
-[2026-04-08T20:46:46.688Z] iter=539 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null | tail -30
-[2026-04-08T20:46:46.701Z] iter=539 turn=1 INFO:   -> exit=0 (592 chars)
-[2026-04-08T20:46:46.719Z] iter=539 turn=1 INFO:   -> exit=0 (558 chars)
-[2026-04-08T20:46:47.898Z] iter=539 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-08T20:46:47.898Z] iter=539 turn=2 INFO: Turn 2/25
-[2026-04-08T20:46:58.539Z] iter=539 turn=2 INFO: Agent: 
-
-Good call. My deliverable is **goals.md** for the next Engineer iteration. I have all the context I need. Let me also do a quick health assessment and then write it.
-[2026-04-08T20:46:58.540Z] iter=539 turn=2 INFO: think: Health assessment:
-- Iteration 538: ✅ Ctrl+R reverse-search shipped (~70 LOC). tsc clean. Good.
-- LOC stalls: 3 of last ...
-[2026-04-08T20:46:58.540Z] iter=539 turn=3 INFO: Turn 3/25
-[2026-04-08T20:47:12.983Z] iter=539 turn=3 INFO: write_file: goals.md (write)
-[2026-04-08T20:47:12.986Z] iter=539 turn=3 INFO:   -> ok: Updated goals.md (1996 chars, +15 lines delta)
-[2026-04-08T20:47:12.987Z] iter=539 turn=4 INFO: Turn 4/25
-[2026-04-08T20:47:20.260Z] iter=539 turn=4 INFO: Agent: 
-
-Goals status:
-1. **goals.md for next Engineer iteration** — DONE ✅
-2. **Memory update** — NOT STARTED
 3. **Verify tsc** — DONE ✅ (confirmed clean at turn 1)
 
 Let me update memory and finish.
@@ -1066,3 +996,82 @@ Wrapping up now.
 [2026-04-08T21:02:51.299Z] iter=549 turn=8 INFO: Tool timing stats
 [2026-04-08T21:02:59.671Z] iter=549 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 549: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-08T21:02:59.694Z] iter=549 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T21:02:59.728Z] iter=549 turn=8 INFO: Committed: 68cd85e5 (18 in / 2720 out, cache: 10691 created, 56813 read)
+[2026-04-08T21:02:59.729Z] iter=549 turn=8 INFO: Restarting as iteration 550...
+[2026-04-08T21:02:59.911Z] iter=550 INFO: Cache restored: 69/69 entries (0 stale)
+[2026-04-08T21:02:59.913Z] iter=550 INFO: Turn budget: 14/25 (calibration=1.00x, predicted=15)
+[2026-04-08T21:02:59.914Z] iter=550 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T21:03:00.129Z] iter=550 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T21:03:00.129Z] iter=550 turn=1 INFO: Turn 1/25
+[2026-04-08T21:03:04.850Z] iter=550 turn=1 INFO: Agent: I'll start by reading the current state of tui.tsx to understand the status bar area and onStats callback.
+[2026-04-08T21:03:04.851Z] iter=550 turn=1 INFO: $ grep -n "onStats\|totalIn\|totalOut\|statusBar\|status.*bar\|contextUsage\|Context:" src/tui.tsx | head -50
+[2026-04-08T21:03:04.851Z] iter=550 turn=1 INFO: $ wc -l src/tui.tsx
+[2026-04-08T21:03:04.860Z] iter=550 turn=1 INFO:   -> exit=0 (21 chars)
+[2026-04-08T21:03:04.860Z] iter=550 turn=1 INFO:   -> exit=0 (606 chars)
+[2026-04-08T21:03:04.860Z] iter=550 turn=2 INFO: Turn 2/25
+[2026-04-08T21:03:07.085Z] iter=550 turn=2 INFO: think: It seems like context usage is already implemented in tui.tsx! Let me look more closely at the existing implementation....
+[2026-04-08T21:03:07.085Z] iter=550 turn=3 INFO: Turn 3/25
+[2026-04-08T21:03:10.378Z] iter=550 turn=3 INFO: Agent: Let me check if context usage is already implemented before writing anything.
+[2026-04-08T21:03:10.378Z] iter=550 turn=3 INFO: $ grep -n "ContextIndicator\|contextLimit\|contextTokens\|footerStats" src/tui.tsx | head -30
+[2026-04-08T21:03:10.391Z] iter=550 turn=3 INFO:   -> exit=0 (889 chars)
+[2026-04-08T21:03:10.391Z] iter=550 turn=4 INFO: Turn 4/25
+[2026-04-08T21:03:14.146Z] iter=550 turn=4 INFO: read_file: src/tui.tsx
+[2026-04-08T21:03:14.148Z] iter=550 turn=4 INFO:   -> ok (1941 chars)
+[2026-04-08T21:03:14.148Z] iter=550 turn=5 INFO: Turn 5/25
+[2026-04-08T21:03:19.445Z] iter=550 turn=5 INFO: think: Context usage indicator is ALREADY fully implemented in tui.tsx! It shows `ctx: usedK/thresholdK (percent%)` in the head...
+[2026-04-08T21:03:19.446Z] iter=550 turn=6 INFO: Turn 6/25
+[2026-04-08T21:03:23.670Z] iter=550 turn=6 INFO: Agent: Goal status:
+- **Task 1** (context usage indicator): **DONE** — already fully implemented in tui.tsx (ContextIndicator component, Header integration, footerStats wiring)
+- **Task 2** (update memory Next Up): **NOT STARTED**
+
+Let me do Task 2 and wrap up now.
+[2026-04-08T21:03:23.671Z] iter=550 turn=6 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T21:03:23.674Z] iter=550 turn=6 INFO: read_file: memory.md
+[2026-04-08T21:03:23.675Z] iter=550 turn=6 INFO:   -> ok (2344 chars)
+[2026-04-08T21:03:24.802Z] iter=550 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-08T21:03:24.803Z] iter=550 turn=7 INFO: Turn 7/25
+[2026-04-08T21:03:27.103Z] iter=550 turn=7 INFO: grep: "Next Up" in memory.md
+[2026-04-08T21:03:27.121Z] iter=550 turn=7 INFO:   -> 21 matches
+[2026-04-08T21:03:27.121Z] iter=550 turn=8 INFO: Turn 8/25
+[2026-04-08T21:03:34.352Z] iter=550 turn=8 INFO: Agent: TSC passes. Now update memory Next Up and write goals.md:
+[2026-04-08T21:03:34.353Z] iter=550 turn=8 INFO: write_file: memory.md (patch)
+[2026-04-08T21:03:34.354Z] iter=550 turn=8 INFO:   -> ok: Patched memory.md: -5 +8 lines
+
+Context after patch:
+44 | **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
+45 | - Consecutive sub-1.3 count: 2 (537: 1.00, 538: 0.73)
+46 | 
+47 | ## Next Up (Priority Order)
+48 | 1. **Token/cost summary at exit** — cost-tracker.ts exists but no exit summary in TUI. Show total tokens + cost when session ends.
+49 | 2. **Fix urgency regression in runAgentLoop** — line 737 calls `selectCompactionTier(lastInput)` without urgency. Track turnTokenHistory array and pass urgency multiplier. ~8 LOC.
+50 | 3. **Fix failing fuzzy patch test** — `replaceNormalized()` bug in write_file.ts, test file: `src/__tests__/tools-write-file.test.ts`.
+51 | 
+52 | ## Verified Existing (do NOT re-assign)
+53 | - ✅ Context usage indicator — fully implemented in tui.tsx (ContextIndicator, Header, footerStats wiring)
+54 | - ✅ /retry command — implemented in tui-commands.ts:133
+55 | 
+56 | **[AUTO-SCORED] Iteration 535: predicted 8 turns, actual 6 turns, ratio 0.75**
+57 | 
+[2026-04-08T21:03:34.355Z] iter=550 turn=9 INFO: Turn 9/25
+[2026-04-08T21:03:41.064Z] iter=550 turn=9 INFO: Agent: Now write the Engineer note in memory and update goals.md:
+[2026-04-08T21:03:41.064Z] iter=550 turn=9 INFO: save_memory: "[Engineer] Iteration 550"
+[2026-04-08T21:03:41.065Z] iter=550 turn=9 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T21:03:41.065Z] iter=550 turn=10 INFO: Turn 10/25
+[2026-04-08T21:03:52.263Z] iter=550 turn=10 INFO: Agent: I've made 0 src/ changes this iteration — Task 1 was already done. Wrapping up now.
+[2026-04-08T21:03:52.264Z] iter=550 turn=10 INFO: write_file: goals.md (write)
+[2026-04-08T21:03:52.264Z] iter=550 turn=10 INFO:   -> ok: Updated goals.md (1420 chars, -7 lines delta)
+[2026-04-08T21:03:52.265Z] iter=550 turn=11 INFO: Turn 11/25
+[2026-04-08T21:03:53.876Z] iter=550 turn=11 INFO: $ npx tsc --noEmit 2>&1 && echo "TSC OK"
+[2026-04-08T21:03:55.078Z] iter=550 turn=11 INFO:   -> exit=0 (7 chars)
+[2026-04-08T21:03:55.079Z] iter=550 turn=12 INFO: Turn 12/25
+[2026-04-08T21:03:56.847Z] iter=550 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T21:03:56.848Z] iter=550 turn=12 INFO: RESTART signal
+[2026-04-08T21:03:56.848Z] iter=550 turn=12 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T21:03:57.947Z] iter=550 turn=12 INFO: Compilation OK
+[2026-04-08T21:04:07.861Z] iter=550 turn=12 INFO: Cache persisted: 70 entries to .autoagent-cache.json
+[2026-04-08T21:04:07.861Z] iter=550 turn=12 INFO: Cache stats: 0 hits, 3 misses, 70 entries, 2 invalidations (2 entries removed)
+[2026-04-08T21:04:07.861Z] iter=550 turn=12 INFO: Tool cache stats
+[2026-04-08T21:04:07.861Z] iter=550 turn=12 INFO: Tool timing: bash: 6x, avg=395ms, total=2367ms; grep: 1x, avg=18ms, total=18ms; read_file: 2x, avg=2ms, total=3ms; think: 2x, avg=1ms, total=2ms; write_file: 2x, avg=1ms, total=2ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T21:04:07.861Z] iter=550 turn=12 INFO: Tool timing stats
+[2026-04-08T21:04:16.397Z] iter=550 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 550: predicted 15 turns, actual 12 turns, ratio 0.80**
+[2026-04-08T21:04:16.421Z] iter=550 turn=12 INFO: Pre-commit review: no significant code changes to review

@@ -45,10 +45,13 @@
 - Consecutive sub-1.3 count: 2 (537: 1.00, 538: 0.73)
 
 ## Next Up (Priority Order)
-1. **Fix urgency regression in runAgentLoop** — line 737 calls `selectCompactionTier(lastInput)` without urgency. Need to track turnTokenHistory array and pass urgency multiplier. ~8 LOC.
-2. **Fix failing fuzzy patch test** — `replaceNormalized()` bug in write_file.ts, test file: `src/__tests__/tools-write-file.test.ts`.
-3. **Token/cost summary at exit** — NOT implemented. cost-tracker.ts exists but no exit summary.
-4. **/retry command** — NOT implemented. Simple, high value, pairs with history.
+1. **Token/cost summary at exit** — cost-tracker.ts exists but no exit summary in TUI. Show total tokens + cost when session ends.
+2. **Fix urgency regression in runAgentLoop** — line 737 calls `selectCompactionTier(lastInput)` without urgency. Track turnTokenHistory array and pass urgency multiplier. ~8 LOC.
+3. **Fix failing fuzzy patch test** — `replaceNormalized()` bug in write_file.ts, test file: `src/__tests__/tools-write-file.test.ts`.
+
+## Verified Existing (do NOT re-assign)
+- ✅ Context usage indicator — fully implemented in tui.tsx (ContextIndicator, Header, footerStats wiring)
+- ✅ /retry command — implemented in tui-commands.ts:133
 
 **[AUTO-SCORED] Iteration 535: predicted 8 turns, actual 6 turns, ratio 0.75**
 
@@ -79,3 +82,5 @@
 **[AUTO-SCORED] Iteration 548: predicted 15 turns, actual 15 turns, ratio 1.00**
 
 **[AUTO-SCORED] Iteration 549: predicted 8 turns, actual 8 turns, ratio 1.00**
+
+**[AUTO-SCORED] Iteration 550: predicted 15 turns, actual 12 turns, ratio 0.80**
