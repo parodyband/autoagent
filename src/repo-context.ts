@@ -171,9 +171,23 @@ function estimateSize(dir: string): { fileCount: number; approxLoc: number } {
  * Analyze a repository directory and return a compact context block (~15-30 lines).
  * Safe to call on any directory — returns empty string on errors.
  */
+/** Quick check: is this directory a project root worth indexing? */
+export function isProjectDir(dir: string): boolean {
+  return existsSync(path.join(dir, ".git")) ||
+    existsSync(path.join(dir, "package.json")) ||
+    existsSync(path.join(dir, "Cargo.toml")) ||
+    existsSync(path.join(dir, "go.mod")) ||
+    existsSync(path.join(dir, "pyproject.toml")) ||
+    existsSync(path.join(dir, "setup.py")) ||
+    existsSync(path.join(dir, "Makefile"));
+}
+
 export function fingerprintRepo(dir: string): string {
   try {
     if (!existsSync(dir)) return "";
+
+    // Skip heavy indexing for non-project directories (e.g. ~ or ~/Documents)
+    if (!isProjectDir(dir)) return "";
 
     const proj = detectProject(dir);
     const dirs = topLevelDirs(dir);

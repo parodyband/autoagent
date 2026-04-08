@@ -148,6 +148,17 @@ export function rankFiles(dir: string, maxFiles: number = 20): RankedFile[] {
   try {
     if (!existsSync(dir)) return [];
 
+    // Skip walking non-project directories (e.g. ~ or ~/Documents)
+    if (!existsSync(path.join(dir, ".git")) &&
+        !existsSync(path.join(dir, "package.json")) &&
+        !existsSync(path.join(dir, "Cargo.toml")) &&
+        !existsSync(path.join(dir, "go.mod")) &&
+        !existsSync(path.join(dir, "pyproject.toml")) &&
+        !existsSync(path.join(dir, "setup.py")) &&
+        !existsSync(path.join(dir, "Makefile"))) {
+      return [];
+    }
+
     const files = walkFiles(dir, dir);
     if (files.length === 0) return [];
 
