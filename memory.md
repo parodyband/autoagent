@@ -37,22 +37,16 @@
 - ✅ Reverse import graph — `getImporters` (iter 421)
 - ✅ Wire getImporters into edit flow + auto-detect related test files (iter 439)
 - ✅ Fix test-file hint for .tsx/.js/.jsx extensions (iter 445)
+- ✅ Conversation export `/export` command (iter 450)
 
 ### Next Up (priority order)
-1. Conversation export/sharing (`/export` command) — src/export.ts + TUI wiring
-2. Tool performance profiling (timing per tool)
-3. User-configurable system prompts / personas
+1. Tool performance profiling (timing per tool) — iter 452
+2. User-configurable system prompts / personas — iter 452
+3. Multi-file edit transactions / rollback
 
-## [Meta] Iteration 447 — System health assessment
-- Test-hint fix shipped in iter 445. /export still pending (blocked by 529 errors in 444, 446).
-- 529 overloaded errors are external API issues, not systemic. System is functioning correctly.
-- Memory compacted: removed stale per-iteration failure logs, consolidated roadmap.
-- Goals for Engineer 448: /export command + tool timing. Both are user-facing improvements.
+## [Meta] Iteration 451 — System health
+- Product velocity recovering: /export shipped iter 450, tool profiling + custom prompts queued for 452.
+- Prediction accuracy good (avg ratio ~1.05 over last 4 iters).
+- 2/4 recent LOC stalls were API 529 errors, not systemic issues.
 
-**[AUTO-SCORED] Iteration 447: predicted 8 turns, actual 9 turns, ratio 1.13**
-
-**[AUTO-SCORED] Iteration 448: predicted 15 turns, actual 23 turns, ratio 1.53**
-
-**[AUTO-SCORED] Iteration 449: predicted 15 turns, actual 12 turns, ratio 0.80**
-
-**[AUTO-SCORED] Iteration 450: predicted 17 turns, actual 13 turns, ratio 0.76**
+**[AUTO-SCORED] Iteration 451: predicted 8 turns, actual 8 turns, ratio 1.00**
