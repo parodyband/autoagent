@@ -881,7 +881,6 @@ async function runAgentLoop(
     }
 
     apiMessages.push({ role: "user", content: results });
-    this.summarizeOldToolResults();
     reflectionCbs.onTurnComplete?.();
 
     // Loop detection: check after each round
@@ -2083,6 +2082,9 @@ export class Orchestrator {
       reflectionCbs,
     );
     const { text, tokensIn, tokensOut, lastInputTokens, aborted } = loopResult;
+
+    // Proactive tool result summarization after each chat round
+    this.summarizeOldToolResults();
 
     // Persist assistant reply (last assistant message in history)
     if (this.sessionPath && text) {

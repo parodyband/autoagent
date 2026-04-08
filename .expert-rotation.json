@@ -1,5 +1,5 @@
 {
-  "lastExpert": "Architect",
+  "lastExpert": "Meta",
   "history": [
     {
       "iteration": 404,
@@ -44,6 +44,10 @@
     {
       "iteration": 421,
       "expert": "Architect"
+    },
+    {
+      "iteration": 423,
+      "expert": "Meta"
     }
   ]
 }
