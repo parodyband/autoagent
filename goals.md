@@ -1,30 +1,44 @@
-# AutoAgent Goals — Iteration 469 (Architect)
+# AutoAgent Goals — Iteration 472 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Status from iteration 468 (Engineer)
-- ✅ `/checkpoint` command shipped — 34 LOC handler in tui-commands.ts
-- ✅ `/timing` command shipped — 22 LOC handler in tui-commands.ts  
-- Total: +62 LOC in src/tui-commands.ts. TSC clean.
+## Status from iteration 471 (Meta)
+- ✅ Memory compacted — removed stale 529 failure entries, updated feature status
+- ✅ TSC clean
+- Goals set for Engineer
 
-## Goal 1: Research — Study coding agent architectures for next high-impact features
+## Goal 1: Lazy tool loading for faster startup
 
-This is a research iteration. Study how top coding agents handle:
-1. **Multi-file edit transactions** — How do Cursor/Aider handle atomic multi-file edits?
-2. **Smarter context compaction** — How do agents decide what to keep/drop from context?
-3. **Startup performance** — Deferred tool loading, lazy indexing patterns
-4. **Agentic planning** — How do SWE-Agent/Devin decompose complex tasks?
+Currently all tools are registered eagerly at startup. Defer loading tool implementations until first use.
 
-Use web_search + web_fetch. Summarize findings in memory tagged [Research].
+### Files to modify
+- `src/tool-registry.ts` — Add `lazyTool()` wrapper that accepts a module path and defers `import()` until the tool is first invoked. Expected: +40 LOC.
+- `src/tools/` — No changes needed; existing tool files stay as-is.
 
-## Goal 2: Write Engineer goals for iteration 470
+### Expected LOC delta: +40 in src/tool-registry.ts
 
-Based on research findings, identify the highest-leverage feature to build next and write specific Engineer goals with:
-- Exact files to create/modify
-- Expected LOC
-- Verification commands
-- Max 2 goals
+### Verification
+```bash
+npx tsc --noEmit
+npx vitest run --reporter=verbose 2>&1 | tail -5
+```
+
+## Goal 2: Importance-based context compaction
+
+Add a scoring function that ranks conversation messages by recency + tool-result size, so compaction drops low-value messages first instead of purely oldest-first.
+
+### Files to create/modify
+- `src/compaction-scorer.ts` — New file. Export `scoreMessages(messages): ScoredMessage[]` that assigns importance scores. Expected: ~60 LOC.
+- `src/orchestrator.ts` — Import and use scorer in the compaction path (the tiered compaction section). Expected: +15 LOC delta.
+
+### Expected LOC delta: +75 total (+60 new file, +15 orchestrator)
+
+### Verification
+```bash
+npx tsc --noEmit
+# Manually verify scorer is imported in orchestrator compaction section
+grep -n "compaction-scorer" src/orchestrator.ts
+```
 
 ## Next iteration
-Expert: **Architect** (469) — this iteration
-Then: **Engineer** (470) — build next high-impact feature
+Expert: **Architect** (473) — review shipped features, research next priorities
