@@ -1,51 +1,3 @@
-{"timestamp":"2026-04-08T19:31:12.040Z","iteration":497,"level":"info","message":"  -> ok: Updated goals.md (2398 chars, +13 lines delta)","turn":15}
-{"timestamp":"2026-04-08T19:31:12.041Z","iteration":497,"level":"info","message":"Turn 16/25","turn":16}
-{"timestamp":"2026-04-08T19:31:14.342Z","iteration":497,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5","turn":16}
-{"timestamp":"2026-04-08T19:31:15.553Z","iteration":497,"level":"info","message":"  -> exit=0 (11 chars)","turn":16}
-{"timestamp":"2026-04-08T19:31:15.553Z","iteration":497,"level":"info","message":"Turn 17/25","turn":17}
-{"timestamp":"2026-04-08T19:31:18.041Z","iteration":497,"level":"info","message":"Agent: Build clean. Done.\n\n```\necho \"AUTOAGENT_RESTART\"\n```\n\nAUTOAGENT_RESTART","turn":17}
-{"timestamp":"2026-04-08T19:31:18.041Z","iteration":497,"level":"info","message":"Restart signal found in text (not tool call) — treating as restart","turn":17}
-{"timestamp":"2026-04-08T19:31:18.042Z","iteration":497,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":17}
-{"timestamp":"2026-04-08T19:31:19.181Z","iteration":497,"level":"info","message":"Compilation OK","turn":17}
-{"timestamp":"2026-04-08T19:31:27.824Z","iteration":497,"level":"info","message":"Cache persisted: 63 entries to .autoagent-cache.json","turn":17}
-{"timestamp":"2026-04-08T19:31:27.824Z","iteration":497,"level":"info","message":"Tool timing: web_fetch: 2x, avg=1609ms, total=3218ms; bash: 12x, avg=221ms, total=2651ms; web_search: 2x, avg=1023ms, total=2046ms; read_scratchpad: 1x, avg=7ms, total=7ms; write_file: 1x, avg=7ms, total=7ms; save_memory: 2x, avg=2ms, total=4ms; think: 3x, avg=0ms, total=1ms","turn":17}
-{"timestamp":"2026-04-08T19:31:27.824Z","iteration":497,"level":"info","message":"Tool timing stats","turn":17,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":7,"minMs":7,"maxMs":7,"avgMs":7},"bash":{"calls":12,"totalMs":2651,"minMs":11,"maxMs":1232,"avgMs":221},"think":{"calls":3,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":0},"web_search":{"calls":2,"totalMs":2046,"minMs":988,"maxMs":1058,"avgMs":1023},"web_fetch":{"calls":2,"totalMs":3218,"minMs":751,"maxMs":2467,"avgMs":1609},"save_memory":{"calls":2,"totalMs":4,"minMs":2,"maxMs":2,"avgMs":2},"write_file":{"calls":1,"totalMs":7,"minMs":7,"maxMs":7,"avgMs":7}},"totalCalls":23,"totalMs":7934}}}
-{"timestamp":"2026-04-08T19:31:35.745Z","iteration":497,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 497: predicted 15 turns, actual 17 turns, ratio 1.13**","turn":17}
-{"timestamp":"2026-04-08T19:31:38.627Z","iteration":497,"level":"info","message":"Pre-commit review (930in/57out): LGTM. The context budget ratio now correctly reflects actual context window utilization using the real input token count against the model's context window size, and the `/autoaccept` command is a str","turn":17}
-{"timestamp":"2026-04-08T19:31:38.716Z","iteration":497,"level":"info","message":"Committed: 00edc703 (31 in / 4641 out, cache: 44594 created, 430511 read)","turn":17}
-{"timestamp":"2026-04-08T19:31:38.717Z","iteration":497,"level":"info","message":"Restarting as iteration 498...","turn":17}
-{"timestamp":"2026-04-08T19:31:38.909Z","iteration":498,"level":"info","message":"Cache restored: 63/63 entries (0 stale)"}
-{"timestamp":"2026-04-08T19:31:38.914Z","iteration":498,"level":"info","message":"Turn budget: 18/25 (calibration=1.13x, predicted=15)"}
-{"timestamp":"2026-04-08T19:31:38.914Z","iteration":498,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
-{"timestamp":"2026-04-08T19:31:39.135Z","iteration":498,"level":"info","message":"Hard turn cap: 23 (1.5x prediction of 15)"}
-{"timestamp":"2026-04-08T19:31:39.136Z","iteration":498,"level":"info","message":"Turn 1/25","turn":1}
-{"timestamp":"2026-04-08T19:31:44.571Z","iteration":498,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && head -50 goals.md","turn":1}
-{"timestamp":"2026-04-08T19:31:44.572Z","iteration":498,"level":"info","message":"read_scratchpad: 450 chars","turn":1}
-{"timestamp":"2026-04-08T19:31:44.581Z","iteration":498,"level":"info","message":"  -> exit=0 (2398 chars)","turn":1}
-{"timestamp":"2026-04-08T19:31:44.582Z","iteration":498,"level":"info","message":"Turn 2/25","turn":2}
-{"timestamp":"2026-04-08T19:31:47.293Z","iteration":498,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"MICRO_COMPACT\\|selectCompaction\\|onCompact\\|compactHistory\\|COMPACT_TIER\" src/orchestrator.ts | head -60","turn":2}
-{"timestamp":"2026-04-08T19:31:47.296Z","iteration":498,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"apiMessages\\|branchConversation\\|branch\\|MessageParam\" src/orchestrator.ts | head -40","turn":2}
-{"timestamp":"2026-04-08T19:31:47.310Z","iteration":498,"level":"info","message":"  -> exit=0 (2367 chars)","turn":2}
-{"timestamp":"2026-04-08T19:31:47.311Z","iteration":498,"level":"info","message":"  -> exit=0 (1416 chars)","turn":2}
-{"timestamp":"2026-04-08T19:31:47.311Z","iteration":498,"level":"info","message":"Turn 3/25","turn":3}
-{"timestamp":"2026-04-08T19:31:49.826Z","iteration":498,"level":"info","message":"read_file: src/orchestrator.ts","turn":3}
-{"timestamp":"2026-04-08T19:31:49.829Z","iteration":498,"level":"info","message":"  -> ok (2151 chars)","turn":3}
-{"timestamp":"2026-04-08T19:31:49.830Z","iteration":498,"level":"info","message":"Turn 4/25","turn":4}
-{"timestamp":"2026-04-08T19:31:55.249Z","iteration":498,"level":"info","message":"think: The current micro-compact already calls `scoredPrune(messages, messages.length, 10_000)`. The goal is to implement micro...","turn":4}
-{"timestamp":"2026-04-08T19:31:55.250Z","iteration":498,"level":"info","message":"Turn 5/25","turn":5}
-{"timestamp":"2026-04-08T19:31:59.699Z","iteration":498,"level":"info","message":"Agent: Now let me look at the Orchestrator class to understand where to add branch methods:","turn":5}
-{"timestamp":"2026-04-08T19:31:59.699Z","iteration":498,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"class Orchestrator\\|private apiMessages\\|branchConversation\\|branches\\|Map<\" src/orchestrator.ts | head -30","turn":5}
-{"timestamp":"2026-04-08T19:31:59.704Z","iteration":498,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && grep -n \"getRecentFiles\\|rewindToTurn\\|getStatus\" src/orchestrator.ts | head -20","turn":5}
-{"timestamp":"2026-04-08T19:31:59.724Z","iteration":498,"level":"info","message":"  -> exit=0 (455 chars)","turn":5}
-{"timestamp":"2026-04-08T19:31:59.725Z","iteration":498,"level":"info","message":"  -> exit=0 (99 chars)","turn":5}
-{"timestamp":"2026-04-08T19:31:59.726Z","iteration":498,"level":"info","message":"Turn 6/25","turn":6}
-{"timestamp":"2026-04-08T19:32:04.832Z","iteration":498,"level":"info","message":"Agent: **Goal A (micro-compact)**: NOT STARTED — I need to patch the `onCompact` handler in orchestrator.ts  \n**Goal B (branch command)**: NOT STARTED — Need Orchestrator methods + tui-commands.ts\n\nLet me implement both now:","turn":6}
-{"timestamp":"2026-04-08T19:32:04.833Z","iteration":498,"level":"info","message":"read_file: src/orchestrator.ts","turn":6}
-{"timestamp":"2026-04-08T19:32:04.833Z","iteration":498,"level":"info","message":"  -> ok (1433 chars)","turn":6}
-{"timestamp":"2026-04-08T19:32:04.834Z","iteration":498,"level":"info","message":"Turn 7/25","turn":7}
-{"timestamp":"2026-04-08T19:32:09.020Z","iteration":498,"level":"info","message":"read_file: src/orchestrator.ts","turn":7}
-{"timestamp":"2026-04-08T19:32:09.022Z","iteration":498,"level":"info","message":"  -> ok (584 chars)","turn":7}
-{"timestamp":"2026-04-08T19:32:09.022Z","iteration":498,"level":"info","message":"Turn 8/25","turn":8}
 {"timestamp":"2026-04-08T19:32:12.930Z","iteration":498,"level":"info","message":"Agent: Now I have enough context. Let me implement both goals:","turn":8}
 {"timestamp":"2026-04-08T19:32:12.931Z","iteration":498,"level":"info","message":"write_file: src/orchestrator.ts (patch)","turn":8}
 {"timestamp":"2026-04-08T19:32:12.936Z","iteration":498,"level":"info","message":"  -> ok: Patched src/orchestrator.ts: -3 +6 lines\n\nContext after patch:\n1122 |   /** Path to current session's JSONL file */\n1123 |   sessionPath: string = \"\";\n1124 | \n1125 |   /** Conversation checkpoints for /rewind command. */\n1126 |   private checkpoints: ConversationCheckpoint[] = [];\n1127 |   private nextCheckpointId = 0;\n1128 | \n1129 |   /** Named conversation branches for /branch command. */\n1130 |   private branches = new Map<string, Anthropic.MessageParam[]>();\n1131 | \n1132 |   /** FileWatcher instance — tracks externally modified files. */\n1133 |   private fileWatcher = new FileWatcher();","turn":8}
@@ -544,3 +496,48 @@
 {"timestamp":"2026-04-08T19:44:27.606Z","iteration":505,"level":"info","message":"Tool timing stats","turn":8,"metadata":{"timing":{"tools":{"bash":{"calls":7,"totalMs":1228,"minMs":0,"maxMs":1120,"avgMs":175},"think":{"calls":2,"totalMs":1,"minMs":0,"maxMs":1,"avgMs":1},"write_file":{"calls":1,"totalMs":2,"minMs":2,"maxMs":2,"avgMs":2},"save_memory":{"calls":2,"totalMs":3,"minMs":1,"maxMs":2,"avgMs":2}},"totalCalls":12,"totalMs":1234}}}
 {"timestamp":"2026-04-08T19:44:35.855Z","iteration":505,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 505: predicted 8 turns, actual 8 turns, ratio 1.00**","turn":8}
 {"timestamp":"2026-04-08T19:44:35.879Z","iteration":505,"level":"info","message":"Pre-commit review: no significant code changes to review","turn":8}
+{"timestamp":"2026-04-08T19:44:35.915Z","iteration":505,"level":"info","message":"Committed: 466f998b (20 in / 2693 out, cache: 12525 created, 68995 read)","turn":8}
+{"timestamp":"2026-04-08T19:44:35.916Z","iteration":505,"level":"info","message":"Restarting as iteration 506...","turn":8}
+{"timestamp":"2026-04-08T19:44:36.101Z","iteration":506,"level":"info","message":"Cache restored: 64/64 entries (0 stale)"}
+{"timestamp":"2026-04-08T19:44:36.104Z","iteration":506,"level":"info","message":"Turn budget: 12/25 (calibration=0.75x, predicted=12)"}
+{"timestamp":"2026-04-08T19:44:36.104Z","iteration":506,"level":"info","message":"Starting. Expert=Engineer Model=claude-sonnet-4-6"}
+{"timestamp":"2026-04-08T19:44:36.316Z","iteration":506,"level":"info","message":"Hard turn cap: 18 (1.5x prediction of 12)"}
+{"timestamp":"2026-04-08T19:44:36.316Z","iteration":506,"level":"info","message":"Turn 1/25","turn":1}
+{"timestamp":"2026-04-08T19:44:38.276Z","iteration":506,"level":"info","message":"Agent: I'll start by reading the current state of the files I need to modify.","turn":1}
+{"timestamp":"2026-04-08T19:44:38.278Z","iteration":506,"level":"info","message":"read_file: src/tool-registry.ts","turn":1}
+{"timestamp":"2026-04-08T19:44:38.280Z","iteration":506,"level":"info","message":"read_scratchpad: 898 chars","turn":1}
+{"timestamp":"2026-04-08T19:44:38.282Z","iteration":506,"level":"info","message":"  -> ok (20350 chars)","turn":1}
+{"timestamp":"2026-04-08T19:44:38.283Z","iteration":506,"level":"info","message":"Turn 2/25","turn":2}
+{"timestamp":"2026-04-08T19:44:44.862Z","iteration":506,"level":"info","message":"think: Now I understand the task. I need to:\n\n1. Add a helper function `schemaToSignature(schema: Anthropic.Tool[\"input_schema\"...","turn":2}
+{"timestamp":"2026-04-08T19:44:44.863Z","iteration":506,"level":"info","message":"Turn 3/25","turn":3}
+{"timestamp":"2026-04-08T19:44:52.017Z","iteration":506,"level":"info","message":"Agent: I have all the context I need. Implementing now.","turn":3}
+{"timestamp":"2026-04-08T19:44:52.019Z","iteration":506,"level":"info","message":"write_file: src/tool-registry.ts (patch)","turn":3}
+{"timestamp":"2026-04-08T19:44:52.023Z","iteration":506,"level":"info","message":"  -> ok: Patched src/tool-registry.ts: -14 +21 lines\n\nContext after patch:\n159 |       .map((t) => t.definition);\n160 |   }\n161 | \n162 |   /**\n163 |    * Returns tool definitions with minimal schemas — description only, no property details.\n164 |    * Saves ~2-3K tokens per API call by omitting input_schema property listings.\n165 |    * Parameter names/types are preserved in a compact signature prepended to description.\n166 |    * Hidden tools are excluded.\n167 |    */\n168 |   getMinimalDefinitions(): Anthropic.Tool[] {\n169 |     return Array.from(this.tools.values())\n170 |       .filter((t) => !t.hidden)\n171 |       .map((t) => {\n172 |         const sig = schemaToSignature(t.definition.input_schema);\n173 |         const description = sig\n174 |           ? `${sig}\\n${t.definition.description ?? \"\"}`\n175 |           : t.definition.description;\n176 |         return {\n177 |           name: t.definition.name,\n178 |           description,\n179 |           input_schema: { type: \"object\" as const },\n180 |         };\n181 |       });\n182 |   }\n183 | \n184 |   /**\n185 |    * Returns the full schema for a single tool by name.","turn":3}
+{"timestamp":"2026-04-08T19:44:52.024Z","iteration":506,"level":"info","message":"Turn 4/25","turn":4}
+{"timestamp":"2026-04-08T19:44:58.418Z","iteration":506,"level":"info","message":"Agent: Now add the `schemaToSignature` helper function before the `ToolRegistry` class:","turn":4}
+{"timestamp":"2026-04-08T19:44:58.419Z","iteration":506,"level":"info","message":"write_file: src/tool-registry.ts (patch)","turn":4}
+{"timestamp":"2026-04-08T19:44:58.420Z","iteration":506,"level":"info","message":"  -> ok: Patched src/tool-registry.ts: -1 +21 lines\n\nContext after patch:\n85 | /** Mutable holder so orchestrator and TUI can share the latest index */\n86 | export const _searchIndexHolder: { index: CodeSearchIndex } = { index: codeSearchIndex };\n87 | \n88 | // ─── Schema helpers ─────────────────────────────────────────\n89 | \n90 | /**\n91 |  * Converts a JSON Schema object into a compact parameter signature string.\n92 |  * Example: \"Params: url (string, required), extract_text (boolean), headers (object)\"\n93 |  * Returns empty string for schemas with no properties.\n94 |  */\n95 | function schemaToSignature(schema: Anthropic.Tool[\"input_schema\"]): string {\n96 |   const props = (schema as { properties?: Record<string, { type?: string }> }).properties;\n97 |   if (!props || Object.keys(props).length === 0) return \"\";\n98 |   const required = new Set<string>(\n99 |     (schema as { required?: string[] }).required ?? []\n100 |   );\n101 |   const parts = Object.entries(props).map(([name, def]) => {\n102 |     const type = (def as { type?: string }).type ?? \"any\";\n103 |     return required.has(name) ? `${name} (${type}, required)` : `${name} (${type})`;\n104 |   });\n105 |   return `Params: ${parts.join(\", \")}`;\n106 | }\n107 | \n108 | // ─── Types ──────────────────────────────────────────────────\n109 | \n110 | export interface ToolContext {\n111 |   rootDir: string;","turn":4}
+{"timestamp":"2026-04-08T19:44:58.420Z","iteration":506,"level":"info","message":"Turn 5/25","turn":5}
+{"timestamp":"2026-04-08T19:45:01.896Z","iteration":506,"level":"info","message":"Agent: Goals status:\n- **Harden `getMinimalDefinitions()` with auto-generated parameter signatures**: DONE ✅\n\nBoth the helper function and the updated method are in place. Let me verify with TypeScript and run a quick sanity check.","turn":5}
+{"timestamp":"2026-04-08T19:45:01.898Z","iteration":506,"level":"info","message":"$ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1","turn":5}
+{"timestamp":"2026-04-08T19:45:03.077Z","iteration":506,"level":"info","message":"  -> exit=0 (11 chars)","turn":5}
+{"timestamp":"2026-04-08T19:45:03.077Z","iteration":506,"level":"info","message":"Turn 6/25","turn":6}
+{"timestamp":"2026-04-08T19:45:06.879Z","iteration":506,"level":"info","message":"Agent: Clean. Now update memory and goals:","turn":6}
+{"timestamp":"2026-04-08T19:45:06.879Z","iteration":506,"level":"info","message":"save_memory: \"[Engineer] Iteration 506\"","turn":6}
+{"timestamp":"2026-04-08T19:45:06.880Z","iteration":506,"level":"info","message":"  -> saved to /Users/austin/Documents/autoagent/.autoagent.md","turn":6}
+{"timestamp":"2026-04-08T19:45:06.880Z","iteration":506,"level":"info","message":"Turn 7/25","turn":7}
+{"timestamp":"2026-04-08T19:45:18.257Z","iteration":506,"level":"info","message":"write_file: goals.md (write)","turn":7}
+{"timestamp":"2026-04-08T19:45:18.258Z","iteration":506,"level":"info","message":"  -> ok: Updated goals.md (1469 chars, -7 lines delta)","turn":7}
+{"timestamp":"2026-04-08T19:45:18.259Z","iteration":506,"level":"info","message":"Turn 8/25","turn":8}
+{"timestamp":"2026-04-08T19:45:21.113Z","iteration":506,"level":"info","message":"Agent: src/ changes this iteration: `src/tool-registry.ts` — added `schemaToSignature()` helper (+20 LOC) and updated `getMinimalDefinitions()` to use it. Done. Wrapping up.","turn":8}
+{"timestamp":"2026-04-08T19:45:21.115Z","iteration":506,"level":"info","message":"$ echo \"AUTOAGENT_RESTART\"","turn":8}
+{"timestamp":"2026-04-08T19:45:21.116Z","iteration":506,"level":"info","message":"RESTART signal","turn":8}
+{"timestamp":"2026-04-08T19:45:21.117Z","iteration":506,"level":"info","message":"Validating: npx tsc --noEmit ...","turn":8}
+{"timestamp":"2026-04-08T19:45:22.284Z","iteration":506,"level":"info","message":"Compilation OK","turn":8}
+{"timestamp":"2026-04-08T19:45:31.451Z","iteration":506,"level":"info","message":"Cache persisted: 64 entries to .autoagent-cache.json","turn":8}
+{"timestamp":"2026-04-08T19:45:31.451Z","iteration":506,"level":"info","message":"Cache stats: 0 hits, 1 misses, 64 entries, 3 invalidations (1 entries removed)","turn":8}
+{"timestamp":"2026-04-08T19:45:31.451Z","iteration":506,"level":"info","message":"Tool cache stats","turn":8,"metadata":{"cacheHits":0,"cacheMisses":1,"cacheEntries":64,"invalidations":3,"invalidatedEntries":1,"toolStats":{"read_file":{"hits":0,"misses":1}}}}
+{"timestamp":"2026-04-08T19:45:31.451Z","iteration":506,"level":"info","message":"Tool timing: bash: 2x, avg=590ms, total=1180ms; write_file: 3x, avg=3ms, total=8ms; read_file: 1x, avg=5ms, total=5ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms","turn":8}
+{"timestamp":"2026-04-08T19:45:31.452Z","iteration":506,"level":"info","message":"Tool timing stats","turn":8,"metadata":{"timing":{"tools":{"read_scratchpad":{"calls":1,"totalMs":3,"minMs":3,"maxMs":3,"avgMs":3},"read_file":{"calls":1,"totalMs":5,"minMs":5,"maxMs":5,"avgMs":5},"think":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1},"write_file":{"calls":3,"totalMs":8,"minMs":1,"maxMs":5,"avgMs":3},"bash":{"calls":2,"totalMs":1180,"minMs":1,"maxMs":1179,"avgMs":590},"save_memory":{"calls":1,"totalMs":1,"minMs":1,"maxMs":1,"avgMs":1}},"totalCalls":9,"totalMs":1198}}}
+{"timestamp":"2026-04-08T19:45:39.698Z","iteration":506,"level":"info","message":"Accuracy score injected: **[AUTO-SCORED] Iteration 506: predicted 12 turns, actual 8 turns, ratio 0.67**","turn":8}
+{"timestamp":"2026-04-08T19:45:44.315Z","iteration":506,"level":"info","message":"Pre-commit review (904in/107out): **LGTM** — the logic is sound, the helper is straightforward, and the signature-prepending approach correctly preserves parameter info while still saving tokens; no regressions, import issues, or mean","turn":8}

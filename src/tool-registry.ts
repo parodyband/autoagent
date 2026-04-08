@@ -85,6 +85,26 @@ export async function buildSearchIndex(rootDir: string): Promise<number> {
 /** Mutable holder so orchestrator and TUI can share the latest index */
 export const _searchIndexHolder: { index: CodeSearchIndex } = { index: codeSearchIndex };
 
+// ─── Schema helpers ─────────────────────────────────────────
+
+/**
+ * Converts a JSON Schema object into a compact parameter signature string.
+ * Example: "Params: url (string, required), extract_text (boolean), headers (object)"
+ * Returns empty string for schemas with no properties.
+ */
+function schemaToSignature(schema: Anthropic.Tool["input_schema"]): string {
+  const props = (schema as { properties?: Record<string, { type?: string }> }).properties;
+  if (!props || Object.keys(props).length === 0) return "";
+  const required = new Set<string>(
+    (schema as { required?: string[] }).required ?? []
+  );
+  const parts = Object.entries(props).map(([name, def]) => {
+    const type = (def as { type?: string }).type ?? "any";
+    return required.has(name) ? `${name} (${type}, required)` : `${name} (${type})`;
+  });
+  return `Params: ${parts.join(", ")}`;
+}
+
 // ─── Types ──────────────────────────────────────────────────
 
 export interface ToolContext {
@@ -162,16 +182,23 @@ export class ToolRegistry {
   /**
    * Returns tool definitions with minimal schemas — description only, no property details.
    * Saves ~2-3K tokens per API call by omitting input_schema property listings.
+   * Parameter names/types are preserved in a compact signature prepended to description.
    * Hidden tools are excluded.
    */
   getMinimalDefinitions(): Anthropic.Tool[] {
     return Array.from(this.tools.values())
       .filter((t) => !t.hidden)
-      .map((t) => ({
-        name: t.definition.name,
-        description: t.definition.description,
-        input_schema: { type: "object" as const },
-      }));
+      .map((t) => {
+        const sig = schemaToSignature(t.definition.input_schema);
+        const description = sig
+          ? `${sig}\n${t.definition.description ?? ""}`
+          : t.definition.description;
+        return {
+          name: t.definition.name,
+          description,
+          input_schema: { type: "object" as const },
+        };
+      });
   }
 
   /**

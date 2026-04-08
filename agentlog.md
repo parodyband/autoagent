@@ -1,64 +1,3 @@
-[2026-04-08T19:29:06.619Z] iter=497 INFO: Cache restored: 63/63 entries (0 stale)
-[2026-04-08T19:29:06.622Z] iter=497 INFO: Turn budget: 17/25 (calibration=1.53x, predicted=15)
-[2026-04-08T19:29:06.622Z] iter=497 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-08T19:29:06.828Z] iter=497 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-08T19:29:06.829Z] iter=497 turn=1 INFO: Turn 1/25
-[2026-04-08T19:29:10.338Z] iter=497 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state of the codebase, then evaluate what the Engineer built in iteration 496, and plan the next iteration.
-[2026-04-08T19:29:10.339Z] iter=497 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
-[2026-04-08T19:29:10.339Z] iter=497 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git diff HEAD~1 --stat
-[2026-04-08T19:29:10.346Z] iter=497 turn=1 INFO: read_scratchpad: 450 chars
-[2026-04-08T19:29:10.363Z] iter=497 turn=1 INFO:   -> exit=0 (389 chars)
-[2026-04-08T19:29:10.370Z] iter=497 turn=1 INFO:   -> exit=0 (639 chars)
-[2026-04-08T19:29:10.370Z] iter=497 turn=2 INFO: Turn 2/25
-[2026-04-08T19:29:12.594Z] iter=497 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && git diff HEAD~1 -- src/
-[2026-04-08T19:29:12.616Z] iter=497 turn=2 INFO:   -> exit=0 (12829 chars)
-[2026-04-08T19:29:12.616Z] iter=497 turn=3 INFO: Turn 3/25
-[2026-04-08T19:29:29.087Z] iter=497 turn=3 INFO: think: I'm the Architect this iteration. My deliverables are:
-1. Evaluate what the Engineer built in iteration 496
-2. Research ...
-[2026-04-08T19:29:29.088Z] iter=497 turn=4 INFO: Turn 4/25
-[2026-04-08T19:29:36.001Z] iter=497 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -20
-[2026-04-08T19:29:36.004Z] iter=497 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "load_skill\|tool_search\|skillsBlock\|getSkillsMenu" src/orchestrator.ts | head -20
-[2026-04-08T19:29:36.006Z] iter=497 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "load_skill\|tool_search" src/tool-registry.ts | head -20
-[2026-04-08T19:29:36.022Z] iter=497 turn=4 INFO:   -> exit=0 (277 chars)
-[2026-04-08T19:29:36.024Z] iter=497 turn=4 INFO:   -> exit=0 (358 chars)
-[2026-04-08T19:29:37.233Z] iter=497 turn=4 INFO:   -> exit=0 (11 chars)
-[2026-04-08T19:29:37.233Z] iter=497 turn=5 INFO: Turn 5/25
-[2026-04-08T19:29:41.576Z] iter=497 turn=5 INFO: Agent: Good - build is clean, skills and tool_search are fully wired. Now let me do research (it's been a while) and then write goals.
-[2026-04-08T19:29:41.576Z] iter=497 turn=5 INFO: web_search: "Claude Code architecture sub-agents tasks coordinator 2025"
-[2026-04-08T19:29:41.577Z] iter=497 turn=5 INFO: web_search: "coding agent context window management techniques 2025"
-[2026-04-08T19:29:42.564Z] iter=497 turn=5 INFO:   -> 8 results
-[2026-04-08T19:29:42.635Z] iter=497 turn=5 INFO:   -> 8 results
-[2026-04-08T19:29:42.636Z] iter=497 turn=6 INFO: Turn 6/25
-[2026-04-08T19:29:47.818Z] iter=497 turn=6 INFO: think: I'm the Architect. My goals are:
-1. Evaluate what Engineer built in iteration 496 - DONE (skills + tool_search already w...
-[2026-04-08T19:29:47.819Z] iter=497 turn=7 INFO: Turn 7/25
-[2026-04-08T19:29:51.225Z] iter=497 turn=7 INFO: web_fetch: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
-[2026-04-08T19:29:51.225Z] iter=497 turn=7 INFO: web_fetch: https://gist.github.com/yanchuk/0c47dd351c2805236e44ec3935e9095d
-[2026-04-08T19:29:51.976Z] iter=497 turn=7 INFO:   -> ok (50756 chars)
-[2026-04-08T19:29:53.691Z] iter=497 turn=7 INFO:   -> ok (22770 chars)
-[2026-04-08T19:29:53.691Z] iter=497 turn=8 INFO: Turn 8/25
-[2026-04-08T19:30:22.432Z] iter=497 turn=8 INFO: think: Excellent research material. Let me synthesize the key findings from both sources:
-
-**From Anthropic's context engineeri...
-[2026-04-08T19:30:22.432Z] iter=497 turn=9 INFO: Turn 9/25
-[2026-04-08T19:30:25.893Z] iter=497 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "compact\|COMPACT\|compaction\|clearTool\|tool_result\|micro" src/orchestrator.ts | head -40
-[2026-04-08T19:30:25.896Z] iter=497 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/orchestrator.ts
-[2026-04-08T19:30:25.910Z] iter=497 turn=9 INFO:   -> exit=0 (29 chars)
-[2026-04-08T19:30:25.916Z] iter=497 turn=9 INFO:   -> exit=0 (3486 chars)
-[2026-04-08T19:30:25.917Z] iter=497 turn=10 INFO: Turn 10/25
-[2026-04-08T19:30:29.547Z] iter=497 turn=10 INFO: Agent: 
-
-I'm the Architect — my job is evaluation + goals, not src/ changes. Let me wrap up now.
-[2026-04-08T19:30:29.547Z] iter=497 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "microCompact\|micro_compact\|clearOldToolResults\|microcompact" src/orchestrator.ts | head -20
-[2026-04-08T19:30:29.562Z] iter=497 turn=10 INFO:   -> exit=0 (11 chars)
-[2026-04-08T19:30:29.563Z] iter=497 turn=11 INFO: Turn 11/25
-[2026-04-08T19:30:32.360Z] iter=497 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '710,760p' src/orchestrator.ts
-[2026-04-08T19:30:32.371Z] iter=497 turn=11 INFO:   -> exit=0 (2165 chars)
-[2026-04-08T19:30:32.372Z] iter=497 turn=12 INFO: Turn 12/25
-[2026-04-08T19:30:35.499Z] iter=497 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onCompact\|compactMessages\|compactHistory\|clearHistory\|doCompact\|performCompact" src/orchestrator.ts | head -20
 [2026-04-08T19:30:35.528Z] iter=497 turn=12 INFO:   -> exit=0 (533 chars)
 [2026-04-08T19:30:35.528Z] iter=497 turn=13 INFO: Turn 13/25
 [2026-04-08T19:30:46.912Z] iter=497 turn=13 INFO: Agent: 
@@ -1057,3 +996,111 @@ TSC passes. Save memory and restart.
 [2026-04-08T19:44:27.606Z] iter=505 turn=8 INFO: Tool timing stats
 [2026-04-08T19:44:35.855Z] iter=505 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 505: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-08T19:44:35.879Z] iter=505 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T19:44:35.915Z] iter=505 turn=8 INFO: Committed: 466f998b (20 in / 2693 out, cache: 12525 created, 68995 read)
+[2026-04-08T19:44:35.916Z] iter=505 turn=8 INFO: Restarting as iteration 506...
+[2026-04-08T19:44:36.101Z] iter=506 INFO: Cache restored: 64/64 entries (0 stale)
+[2026-04-08T19:44:36.104Z] iter=506 INFO: Turn budget: 12/25 (calibration=0.75x, predicted=12)
+[2026-04-08T19:44:36.104Z] iter=506 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T19:44:36.316Z] iter=506 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-08T19:44:36.316Z] iter=506 turn=1 INFO: Turn 1/25
+[2026-04-08T19:44:38.276Z] iter=506 turn=1 INFO: Agent: I'll start by reading the current state of the files I need to modify.
+[2026-04-08T19:44:38.278Z] iter=506 turn=1 INFO: read_file: src/tool-registry.ts
+[2026-04-08T19:44:38.280Z] iter=506 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T19:44:38.282Z] iter=506 turn=1 INFO:   -> ok (20350 chars)
+[2026-04-08T19:44:38.283Z] iter=506 turn=2 INFO: Turn 2/25
+[2026-04-08T19:44:44.862Z] iter=506 turn=2 INFO: think: Now I understand the task. I need to:
+
+1. Add a helper function `schemaToSignature(schema: Anthropic.Tool["input_schema"...
+[2026-04-08T19:44:44.863Z] iter=506 turn=3 INFO: Turn 3/25
+[2026-04-08T19:44:52.017Z] iter=506 turn=3 INFO: Agent: I have all the context I need. Implementing now.
+[2026-04-08T19:44:52.019Z] iter=506 turn=3 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-08T19:44:52.023Z] iter=506 turn=3 INFO:   -> ok: Patched src/tool-registry.ts: -14 +21 lines
+
+Context after patch:
+159 |       .map((t) => t.definition);
+160 |   }
+161 | 
+162 |   /**
+163 |    * Returns tool definitions with minimal schemas — description only, no property details.
+164 |    * Saves ~2-3K tokens per API call by omitting input_schema property listings.
+165 |    * Parameter names/types are preserved in a compact signature prepended to description.
+166 |    * Hidden tools are excluded.
+167 |    */
+168 |   getMinimalDefinitions(): Anthropic.Tool[] {
+169 |     return Array.from(this.tools.values())
+170 |       .filter((t) => !t.hidden)
+171 |       .map((t) => {
+172 |         const sig = schemaToSignature(t.definition.input_schema);
+173 |         const description = sig
+174 |           ? `${sig}\n${t.definition.description ?? ""}`
+175 |           : t.definition.description;
+176 |         return {
+177 |           name: t.definition.name,
+178 |           description,
+179 |           input_schema: { type: "object" as const },
+180 |         };
+181 |       });
+182 |   }
+183 | 
+184 |   /**
+185 |    * Returns the full schema for a single tool by name.
+[2026-04-08T19:44:52.024Z] iter=506 turn=4 INFO: Turn 4/25
+[2026-04-08T19:44:58.418Z] iter=506 turn=4 INFO: Agent: Now add the `schemaToSignature` helper function before the `ToolRegistry` class:
+[2026-04-08T19:44:58.419Z] iter=506 turn=4 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-08T19:44:58.420Z] iter=506 turn=4 INFO:   -> ok: Patched src/tool-registry.ts: -1 +21 lines
+
+Context after patch:
+85 | /** Mutable holder so orchestrator and TUI can share the latest index */
+86 | export const _searchIndexHolder: { index: CodeSearchIndex } = { index: codeSearchIndex };
+87 | 
+88 | // ─── Schema helpers ─────────────────────────────────────────
+89 | 
+90 | /**
+91 |  * Converts a JSON Schema object into a compact parameter signature string.
+92 |  * Example: "Params: url (string, required), extract_text (boolean), headers (object)"
+93 |  * Returns empty string for schemas with no properties.
+94 |  */
+95 | function schemaToSignature(schema: Anthropic.Tool["input_schema"]): string {
+96 |   const props = (schema as { properties?: Record<string, { type?: string }> }).properties;
+97 |   if (!props || Object.keys(props).length === 0) return "";
+98 |   const required = new Set<string>(
+99 |     (schema as { required?: string[] }).required ?? []
+100 |   );
+101 |   const parts = Object.entries(props).map(([name, def]) => {
+102 |     const type = (def as { type?: string }).type ?? "any";
+103 |     return required.has(name) ? `${name} (${type}, required)` : `${name} (${type})`;
+104 |   });
+105 |   return `Params: ${parts.join(", ")}`;
+106 | }
+107 | 
+108 | // ─── Types ──────────────────────────────────────────────────
+109 | 
+110 | export interface ToolContext {
+111 |   rootDir: string;
+[2026-04-08T19:44:58.420Z] iter=506 turn=5 INFO: Turn 5/25
+[2026-04-08T19:45:01.896Z] iter=506 turn=5 INFO: Agent: Goals status:
+- **Harden `getMinimalDefinitions()` with auto-generated parameter signatures**: DONE ✅
+
+Both the helper function and the updated method are in place. Let me verify with TypeScript and run a quick sanity check.
+[2026-04-08T19:45:01.898Z] iter=506 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-08T19:45:03.077Z] iter=506 turn=5 INFO:   -> exit=0 (11 chars)
+[2026-04-08T19:45:03.077Z] iter=506 turn=6 INFO: Turn 6/25
+[2026-04-08T19:45:06.879Z] iter=506 turn=6 INFO: Agent: Clean. Now update memory and goals:
+[2026-04-08T19:45:06.879Z] iter=506 turn=6 INFO: save_memory: "[Engineer] Iteration 506"
+[2026-04-08T19:45:06.880Z] iter=506 turn=6 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T19:45:06.880Z] iter=506 turn=7 INFO: Turn 7/25
+[2026-04-08T19:45:18.257Z] iter=506 turn=7 INFO: write_file: goals.md (write)
+[2026-04-08T19:45:18.258Z] iter=506 turn=7 INFO:   -> ok: Updated goals.md (1469 chars, -7 lines delta)
+[2026-04-08T19:45:18.259Z] iter=506 turn=8 INFO: Turn 8/25
+[2026-04-08T19:45:21.113Z] iter=506 turn=8 INFO: Agent: src/ changes this iteration: `src/tool-registry.ts` — added `schemaToSignature()` helper (+20 LOC) and updated `getMinimalDefinitions()` to use it. Done. Wrapping up.
+[2026-04-08T19:45:21.115Z] iter=506 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T19:45:21.116Z] iter=506 turn=8 INFO: RESTART signal
+[2026-04-08T19:45:21.117Z] iter=506 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T19:45:22.284Z] iter=506 turn=8 INFO: Compilation OK
+[2026-04-08T19:45:31.451Z] iter=506 turn=8 INFO: Cache persisted: 64 entries to .autoagent-cache.json
+[2026-04-08T19:45:31.451Z] iter=506 turn=8 INFO: Cache stats: 0 hits, 1 misses, 64 entries, 3 invalidations (1 entries removed)
+[2026-04-08T19:45:31.451Z] iter=506 turn=8 INFO: Tool cache stats
+[2026-04-08T19:45:31.451Z] iter=506 turn=8 INFO: Tool timing: bash: 2x, avg=590ms, total=1180ms; write_file: 3x, avg=3ms, total=8ms; read_file: 1x, avg=5ms, total=5ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T19:45:31.452Z] iter=506 turn=8 INFO: Tool timing stats
+[2026-04-08T19:45:39.698Z] iter=506 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 506: predicted 12 turns, actual 8 turns, ratio 0.67**
+[2026-04-08T19:45:44.315Z] iter=506 turn=8 INFO: Pre-commit review (904in/107out): **LGTM** — the logic is sound, the helper is straightforward, and the signature-prepending approach correctly preserves parameter info while still saving tokens; no regressions, import issues, or mean
