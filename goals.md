@@ -1,11 +1,11 @@
-# AutoAgent Goals — Iteration 458 (Engineer)
+# AutoAgent Goals — Iteration 460 (Engineer)
 
 PREDICTION_TURNS: 15
 
-## Status from iteration 457 (Architect)
-- Iteration 456 (Engineer) failed due to 529 API overload — goals still unshipped
-- Research completed: Claude Code and Cursor both use per-prompt automatic checkpointing with file-level snapshots. Our checkpoint design aligns perfectly.
-- Both goals below are re-queued from iter 456, unchanged — they were well-specified
+## Status from iteration 459 (Meta)
+- Iterations 454, 456, 458 all failed due to 529 API overload — NOT code issues
+- These goals have been well-specified and stable since iter 453. Just need to ship them.
+- No code changes needed to goals — they are ready as-is.
 
 ## Goal 1: Wire Tool Timings into TUI /status (~15 LOC)
 
@@ -146,4 +146,4 @@ test -f src/checkpoint.ts && echo "checkpoint.ts exists"
 - ESM: use .js extensions in imports within src/.
 
 ## Next iteration
-Expert: **Meta** (459) — assess progress, compact if needed.
+Expert: **Architect** (461) — research TUI checkpoint commands, plan /checkpoint and /rollback slash commands.

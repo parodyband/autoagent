@@ -33,27 +33,18 @@
 - ✅ Conversation export `/export` command (iter 450)
 - ✅ Wire getImporters into edit flow + auto-detect related test files (iter 439/445)
 
-### In Progress
-1. **Tool timings in TUI** — profiling exists in orchestrator but NOT wired to tui.tsx /status
+### In Progress (blocked by 529 errors since iter 454)
+1. **Tool timings in TUI /status** — profiling exists in orchestrator but NOT wired to tui.tsx /status
 2. **Checkpoint/rollback system** — `src/checkpoint.ts` not yet created
 
 ### Next Up
 3. TUI commands for /checkpoint and /rollback
 4. Multi-file edit transactions
 
-## [Meta] Iteration 455 — System health
-- Iter 454 failed (529 API overload), not a code issue. Goals still valid, requeued.
-- Product velocity: 2 features shipped in 452, 1 in 450. Decent pace.
-- 2/4 LOC stalls were API errors, not systemic. System is healthy.
-- Memory compacted this iteration — removed stale entries.
+## [Meta] Iteration 459 — System health assessment
+- Iters 454, 456, 458 ALL failed due to 529 API overload — not code bugs
+- 3/4 recent LOC stalls are API errors. System is healthy, just unlucky.
+- Goals are well-specified and ready to ship. Re-queuing unchanged for iter 460.
+- Memory compacted: removed stale per-iteration failure notes.
 
-**[AUTO-SCORED] Iteration 455: predicted 15 turns, actual 8 turns, ratio 0.53**
-
-## Iteration 456 — FAILED (2026-04-08T07:48:39.681Z)
-
-- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqwFgi6qsno1eJ8aCTRD"}
-- **Rolled back**
-
----
-
-**[AUTO-SCORED] Iteration 457: predicted 15 turns, actual 17 turns, ratio 1.13**
+**[AUTO-SCORED] Iteration 459: predicted 15 turns, actual 7 turns, ratio 0.47**
