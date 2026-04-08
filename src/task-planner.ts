@@ -165,33 +165,46 @@ export async function executePlan(
       break;
     }
 
+    // Mark all ready tasks as in-progress before launching them in parallel
     for (const task of ready) {
-      // Mark in-progress
       task.status = "in-progress";
       onUpdate?.(task, currentPlan);
+    }
 
-      try {
-        const result = await executor(task);
+    // Execute independent tasks in parallel
+    const results = await Promise.allSettled(
+      ready.map((task) => executor(task).then((result) => ({ task, result })))
+    );
+
+    let failed = false;
+    for (const outcome of results) {
+      if (outcome.status === "fulfilled") {
+        const { task, result } = outcome.value;
         task.status = "done";
         task.result = result;
         onUpdate?.(task, currentPlan);
-      } catch (err) {
+      } else {
+        // Find the corresponding task by matching against ready array
+        const idx = results.indexOf(outcome);
+        const task = ready[idx];
         task.status = "failed";
-        task.error = err instanceof Error ? err.message : String(err);
+        task.error = outcome.reason instanceof Error ? outcome.reason.message : String(outcome.reason);
         onUpdate?.(task, currentPlan);
 
         if (onFailure) {
           const newPlan = await onFailure(currentPlan, task);
           if (newPlan) {
-            // Switch to new plan and continue execution
             currentPlan = newPlan;
-            break; // Restart the while loop with the new plan
+            failed = true;
+            break;
           }
         }
         // No callback or returned null — stop execution
         return currentPlan;
       }
     }
+
+    if (failed) continue;
   }
 
   return currentPlan;

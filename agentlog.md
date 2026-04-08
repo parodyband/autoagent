@@ -1,67 +1,3 @@
-1628 |   summarizeOldToolResults(): void {
-1629 |     this.toolTurnCounter++;
-1630 |     if (this.toolTurnCounter % 5 !== 0) return;
-1631 | 
-1632 |     const toolUseIdMap = this.buildToolUseIdMap();
-1633 | 
-1634 |     // Find the index of the 9th most recent assistant message (skip last 8 turns)
-1635 |     const assistantIndices: number[] = [];
-1636 |     for (let i = this.apiMessages.length - 1; i >= 0; i--) {
-1637 |       if (this.apiMessages[i].role === "assistant") assistantIndices.push(i);
-1638 |     }
-1639 |     const cutoffIdx = assistantIndices[8] ?? 0;
-1640 | 
-1641 |     // Collect files actively being worked on (in last 4 tool_use blocks)
-1642 |     const activeFiles = new Set<string>();
-1643 |     let recentToolUseCount = 0;
-1644 |     for (let i = this.apiMessages.length - 1; i >= 0 && recentToolUseCount < 4; i--) {
-1645 |       const msg = this.apiMessages[i];
-1646 |       if (msg.role !== "assistant" || !Array.isArray(msg.content)) continue;
-1647 |       for (const block of msg.content) {
-1648 |         if (typeof block !== "object" || !("type" in block) || block.type !== "tool_use") continue;
-1649 |         recentToolUseCount++;
-1650 |         const inp = (block as { input?: Record<string, unknown> }).input;
-1651 |         if (inp?.path && typeof inp.path === "string") activeFiles.add(inp.path);
-1652 |         if (recentToolUseCount >= 4) break;
-1653 |       }
-1654 |     }
-1655 | 
-1656 |     for (let i = 0; i < cutoffIdx; i++) {
-1657 |       const msg = this.apiMessages[i];
-1658 |       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
-1659 | 
-[2026-04-08T08:36:05.485Z] iter=478 turn=14 INFO: Turn 14/25
-[2026-04-08T08:36:11.017Z] iter=478 turn=14 INFO: Agent: Now I need to also skip active files in the summarization loop. Let me check the current state of that loop and add the active file check:
-[2026-04-08T08:36:11.018Z] iter=478 turn=14 INFO: read_file: src/orchestrator.ts
-[2026-04-08T08:36:11.020Z] iter=478 turn=14 INFO:   -> ok (2841 chars)
-[2026-04-08T08:36:11.020Z] iter=478 turn=15 INFO: Turn 15/25
-[2026-04-08T08:36:17.943Z] iter=478 turn=15 INFO: Agent: I need to add the active file skip check. Let me also look at how `buildToolUseIdMap` works to understand if it maps to input paths:
-[2026-04-08T08:36:17.944Z] iter=478 turn=15 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T08:36:17.945Z] iter=478 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -2 +9 lines
-
-Context after patch:
-1663 |           type: string; tool_use_id: string;
-1664 |           content?: Array<{ type: string; text?: string }> | string;
-1665 |         };
-1666 |         if (this.summarizedToolIds.has(toolBlock.tool_use_id)) continue;
-1667 |         const toolName = toolUseIdMap.get(toolBlock.tool_use_id) ?? "unknown";
-1668 | 
-1669 |         // Skip tool results for files actively being worked on
-1670 |         if (activeFiles.size > 0 && toolName === "read_file") {
-1671 |           const toolUseBlock = this.findToolUseBlock(toolBlock.tool_use_id);
-1672 |           const filePath = toolUseBlock?.input?.path as string | undefined;
-1673 |           if (filePath && activeFiles.has(filePath)) continue;
-1674 |         }
-1675 | 
-1676 |         // Handle both string and array content
-1677 |         if (typeof toolBlock.content === "string") {
-[2026-04-08T08:36:17.945Z] iter=478 turn=16 INFO: Turn 16/25
-[2026-04-08T08:36:23.483Z] iter=478 turn=16 INFO: Agent: I need to add `findToolUseBlock` helper if it doesn't exist, then run tsc:
-[2026-04-08T08:36:23.483Z] iter=478 turn=16 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "findToolUseBlock\|buildToolUseIdMap" src/orchestrator.ts | head -10
-[2026-04-08T08:36:23.496Z] iter=478 turn=16 INFO:   -> exit=0 (252 chars)
-[2026-04-08T08:36:23.496Z] iter=478 turn=17 INFO: Turn 17/25
-[2026-04-08T08:36:28.798Z] iter=478 turn=17 INFO: Agent: `findToolUseBlock` doesn't exist. Let me add it and run tsc:
-[2026-04-08T08:36:28.799Z] iter=478 turn=17 INFO: read_file: src/orchestrator.ts
 [2026-04-08T08:36:28.800Z] iter=478 turn=17 INFO:   -> ok (631 chars)
 [2026-04-08T08:36:28.800Z] iter=478 turn=18 INFO: Turn 18/25
 [2026-04-08T08:36:33.211Z] iter=478 turn=18 INFO: write_file: src/orchestrator.ts (patch)
@@ -1060,3 +996,262 @@ Goals.md is written. Wrapping up now.
 [2026-04-08T08:56:27.867Z] iter=489 turn=8 INFO: Tool timing stats
 [2026-04-08T08:56:35.797Z] iter=489 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 489: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-08T08:56:35.819Z] iter=489 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T08:56:35.852Z] iter=489 turn=8 INFO: Committed: 96fbe27b (18 in / 2040 out, cache: 15611 created, 82422 read)
+[2026-04-08T08:56:35.853Z] iter=489 turn=8 INFO: Restarting as iteration 490...
+[2026-04-08T08:56:36.041Z] iter=490 INFO: Cache restored: 71/71 entries (0 stale)
+[2026-04-08T08:56:36.044Z] iter=490 INFO: Turn budget: 15/25 (calibration=1.13x, predicted=15)
+[2026-04-08T08:56:36.044Z] iter=490 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T08:56:36.256Z] iter=490 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T08:56:36.257Z] iter=490 turn=1 INFO: Turn 1/25
+[2026-04-08T08:56:39.346Z] iter=490 turn=1 INFO: read_file: src/tool-recovery.ts
+[2026-04-08T08:56:39.347Z] iter=490 turn=1 INFO: read_scratchpad: 450 chars
+[2026-04-08T08:56:39.348Z] iter=490 turn=1 INFO:   -> ok (1352 chars)
+[2026-04-08T08:56:39.349Z] iter=490 turn=2 INFO: Turn 2/25
+[2026-04-08T08:56:42.223Z] iter=490 turn=2 INFO: read_file: src/tool-recovery.ts
+[2026-04-08T08:56:42.223Z] iter=490 turn=2 INFO: grep: "retryWithBackoff" in src/orchestrator.ts
+[2026-04-08T08:56:42.224Z] iter=490 turn=2 INFO:   -> ok (386 chars)
+[2026-04-08T08:56:42.243Z] iter=490 turn=2 INFO:   -> 3 matches
+[2026-04-08T08:56:42.244Z] iter=490 turn=3 INFO: Turn 3/25
+[2026-04-08T08:56:47.870Z] iter=490 turn=3 INFO: think: I have enough context. Let me implement both goals:
+
+1. Goal 1: Add retryable status code filtering to retryWithBackoff ...
+[2026-04-08T08:56:47.871Z] iter=490 turn=4 INFO: Turn 4/25
+[2026-04-08T08:56:50.836Z] iter=490 turn=4 INFO: read_file: src/task-planner.ts
+[2026-04-08T08:56:50.837Z] iter=490 turn=4 INFO: read_file: src/orchestrator.ts
+[2026-04-08T08:56:50.838Z] iter=490 turn=4 INFO:   -> ok (2363 chars)
+[2026-04-08T08:56:50.839Z] iter=490 turn=4 INFO:   -> ok (685 chars)
+[2026-04-08T08:56:50.839Z] iter=490 turn=5 INFO: Turn 5/25
+[2026-04-08T08:56:52.959Z] iter=490 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-08T08:56:52.960Z] iter=490 turn=5 INFO:   -> ok (716 chars)
+[2026-04-08T08:56:52.960Z] iter=490 turn=6 INFO: Turn 6/25
+[2026-04-08T08:57:05.891Z] iter=490 turn=6 INFO: Agent: **Goal 1 (retryWithBackoff filtering): NOT STARTED**
+**Goal 2 (parallel executePlan): NOT STARTED**
+
+I've been reading too much. Writing now.
+[2026-04-08T08:57:05.892Z] iter=490 turn=6 INFO: write_file: src/tool-recovery.ts (patch)
+[2026-04-08T08:57:05.894Z] iter=490 turn=6 INFO:   -> ok: Patched src/tool-recovery.ts: -32 +58 lines
+
+Context after patch:
+401 | 
+402 | // ─── Retry with exponential backoff ───────────────────────────────────────────
+403 | 
+404 | /**
+405 |  * Retry a failing async function with exponential backoff and jitter.
+406 |  *
+407 |  * @param fn          - The async operation to attempt.
+408 |  * @param opts.maxRetries       - Total extra attempts after first failure (default 3).
+409 |  * @param opts.baseDelayMs      - Initial delay in ms (default 500).
+410 |  * @param opts.maxDelayMs       - Cap on delay in ms (default 10 000).
+411 |  * @param opts.retryableStatuses - HTTP status codes that should trigger retries (default [429, 500, 502, 503, 529]).
+412 |  * @param opts.isRetryable       - Optional callback to classify errors as retryable.
+413 |  */
+414 | export async function retryWithBackoff<T>(
+415 |   fn: () => Promise<T>,
+416 |   opts: {
+417 |     maxRetries?: number;
+418 |     baseDelayMs?: number;
+419 |     maxDelayMs?: number;
+420 |     retryableStatuses?: number[];
+421 |     isRetryable?: (err: Error) => boolean;
+422 |   } = {}
+423 | ): Promise<T> {
+424 |   const {
+425 |     maxRetries = 3,
+426 |     baseDelayMs = 500,
+427 |     maxDelayMs = 10_000,
+428 |     retryableStatuses = [429, 500, 502, 503, 529],
+429 |     isRetryable,
+430 |   } = opts;
+431 |   let lastError: Error | undefined;
+432 | 
+433 |   for (let attempt = 0; attempt <= maxRetries; attempt++) {
+434 |     try {
+435 |       return await fn();
+436 |     } catch (err) {
+437 |       lastError = err instanceof Error ? err : new Error(String(err));
+438 | 
+439 |       // Check if this error is retryable
+440 |       const status = (err as Record<string, unknown>)?.status as number | undefined;
+441 |       const hasRetryableStatus = status !== undefined && retryableStatuses.includes(status);
+442 |       const hasTransientMessage = /ETIMEDOUT|ECONNRESET|socket hang up/i.test(lastError.message);
+443 |       const customRetryable = isRetryable ? isRetryable(lastError) : false;
+444 | 
+445 |       if (!hasRetryableStatus && !hasTransientMessage && !customRetryable) {
+446 |         // Non-transient error — fail immediately without retrying
+447 |         throw lastError;
+448 |       }
+449 | 
+450 |       if (attempt < maxRetries) {
+451 |         const delay = Math.min(
+452 |           baseDelayMs * 2 ** attempt + Math.random() * 200,
+453 |           maxDelayMs
+454 |         );
+455 |         await new Promise<void>((r) => setTimeout(r, delay));
+456 |       }
+457 |     }
+458 |   }
+459 | 
+460 |   throw lastError;
+461 | }
+462 | 
+[2026-04-08T08:57:05.895Z] iter=490 turn=7 INFO: Turn 7/25
+[2026-04-08T08:57:11.559Z] iter=490 turn=7 INFO: Agent: Now update the 3 orchestrator call sites and fix task-planner in parallel:
+[2026-04-08T08:57:11.559Z] iter=490 turn=7 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T08:57:11.561Z] iter=490 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -8 +8 lines
+
+Context after patch:
+421 | 
+422 | function makeSimpleCaller(client: Anthropic): (prompt: string) => Promise<string> {
+423 |   return async (prompt: string) => {
+424 |     const response = await retryWithBackoff(
+425 |       () => client.messages.create({
+426 |         model: MODEL_SIMPLE,
+427 |         max_tokens: 2048,
+428 |         messages: [{ role: "user", content: prompt }],
+429 |       }),
+430 |       { maxRetries: 3, baseDelayMs: 1000, retryableStatuses: [429, 529] },
+431 |     );
+432 |     const block = response.content[0];
+433 |     return block.type === "text" ? block.text : "";
+434 |   };
+[2026-04-08T08:57:11.561Z] iter=490 turn=8 INFO: Turn 8/25
+[2026-04-08T08:57:13.735Z] iter=490 turn=8 INFO: read_file: src/orchestrator.ts
+[2026-04-08T08:57:13.737Z] iter=490 turn=8 INFO:   -> ok (576 chars)
+[2026-04-08T08:57:13.738Z] iter=490 turn=9 INFO: Turn 9/25
+[2026-04-08T08:57:17.126Z] iter=490 turn=9 INFO: Agent: Now I need to find the third call site (line 424 of orchestrator was the simple caller, 1449 is this one). Let me check what the actual third call site is:
+[2026-04-08T08:57:17.127Z] iter=490 turn=9 INFO: $ grep -n 'retryWithBackoff' src/orchestrator.ts
+[2026-04-08T08:57:17.137Z] iter=490 turn=9 INFO:   -> exit=0 (177 chars)
+[2026-04-08T08:57:17.138Z] iter=490 turn=10 INFO: Turn 10/25
+[2026-04-08T08:57:20.969Z] iter=490 turn=10 INFO: Agent: I've patched tool-recovery.ts and one orchestrator call site. Let me finish the remaining changes now.
+[2026-04-08T08:57:20.969Z] iter=490 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T08:57:20.971Z] iter=490 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -4 +4 lines
+
+Context after patch:
+1453 |           system: systemPrompt,
+1454 |           messages: [{ role: "user", content: userPrompt }],
+1455 |         }),
+1456 |         { maxRetries: 2, baseDelayMs: 1000, retryableStatuses: [429, 529] }
+1457 |       );
+1458 |       const block = response.content[0];
+1459 |       raw = block.type === "text" ? block.text.trim() : "";
+1460 |     } catch {
+1461 |       return null; // API failure is non-fatal
+1462 |     }
+[2026-04-08T08:57:20.971Z] iter=490 turn=11 INFO: Turn 11/25
+[2026-04-08T08:57:30.234Z] iter=490 turn=11 INFO: Agent: Now fix task-planner.ts to use Promise.allSettled:
+[2026-04-08T08:57:30.234Z] iter=490 turn=11 INFO: write_file: src/task-planner.ts (patch)
+[2026-04-08T08:57:30.236Z] iter=490 turn=11 INFO:   -> ok: Patched src/task-planner.ts: -27 +40 lines
+
+Context after patch:
+165 |       break;
+166 |     }
+167 | 
+168 |     // Mark all ready tasks as in-progress before launching them in parallel
+169 |     for (const task of ready) {
+170 |       task.status = "in-progress";
+171 |       onUpdate?.(task, currentPlan);
+172 |     }
+173 | 
+174 |     // Execute independent tasks in parallel
+175 |     const results = await Promise.allSettled(
+176 |       ready.map((task) => executor(task).then((result) => ({ task, result })))
+177 |     );
+178 | 
+179 |     let failed = false;
+180 |     for (const outcome of results) {
+181 |       if (outcome.status === "fulfilled") {
+182 |         const { task, result } = outcome.value;
+183 |         task.status = "done";
+184 |         task.result = result;
+185 |         onUpdate?.(task, currentPlan);
+186 |       } else {
+187 |         // Find the corresponding task by matching against ready array
+188 |         const idx = results.indexOf(outcome);
+189 |         const task = ready[idx];
+190 |         task.status = "failed";
+191 |         task.error = outcome.reason instanceof Error ? outcome.reason.message : String(outcome.reason);
+192 |         onUpdate?.(task, currentPlan);
+193 | 
+194 |         if (onFailure) {
+195 |           const newPlan = await onFailure(currentPlan, task);
+196 |           if (newPlan) {
+197 |             currentPlan = newPlan;
+198 |             failed = true;
+199 |             break;
+200 |           }
+201 |         }
+202 |         // No callback or returned null — stop execution
+203 |         return currentPlan;
+204 |       }
+205 |     }
+206 | 
+207 |     if (failed) continue;
+208 |   }
+209 | 
+210 |   return currentPlan;
+[2026-04-08T08:57:30.237Z] iter=490 turn=12 INFO: Turn 12/25
+[2026-04-08T08:57:39.553Z] iter=490 turn=12 INFO: Agent: Now add the parallel test file and run tsc:
+[2026-04-08T08:57:39.554Z] iter=490 turn=12 INFO: write_file: src/__tests__/task-planner-parallel.test.ts (write)
+[2026-04-08T08:57:39.556Z] iter=490 turn=12 INFO:   -> ok: Created src/__tests__/task-planner-parallel.test.ts (1743 chars)
+[2026-04-08T08:57:39.557Z] iter=490 turn=13 INFO: Turn 13/25
+[2026-04-08T08:57:42.935Z] iter=490 turn=13 INFO: Agent: Running tsc and tests now:
+[2026-04-08T08:57:42.935Z] iter=490 turn=13 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -40
+[2026-04-08T08:57:44.093Z] iter=490 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:57:44.093Z] iter=490 turn=14 INFO: Turn 14/25
+[2026-04-08T08:57:47.131Z] iter=490 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/task-planner-parallel.test.ts --reporter=verbose 2>&1 | tail -20
+[2026-04-08T08:57:48.164Z] iter=490 turn=14 INFO:   -> exit=0 (662 chars)
+[2026-04-08T08:57:48.164Z] iter=490 turn=15 INFO: Turn 15/25
+[2026-04-08T08:57:52.382Z] iter=490 turn=15 INFO: Agent: The test tasks use `dependencies` but the code expects `dependsOn`. Fix the test:
+[2026-04-08T08:57:52.382Z] iter=490 turn=15 INFO: write_file: src/__tests__/task-planner-parallel.test.ts (patch)
+[2026-04-08T08:57:52.383Z] iter=490 turn=15 INFO:   -> ok: Patched src/__tests__/task-planner-parallel.test.ts: -3 +3 lines
+
+Context after patch:
+6 |   it("runs independent tasks in parallel (faster than sequential)", async () => {
+7 |     const plan: TaskPlan = {
+8 |       tasks: [
+9 |         { id: "t1", title: "Task 1", description: "", status: "pending", dependsOn: [] },
+10 |         { id: "t2", title: "Task 2", description: "", status: "pending", dependsOn: [] },
+11 |         { id: "t3", title: "Task 3", description: "", status: "pending", dependsOn: [] },
+12 |       ],
+13 |     };
+14 | 
+[2026-04-08T08:57:52.383Z] iter=490 turn=16 INFO: Turn 16/25
+[2026-04-08T08:57:55.669Z] iter=490 turn=16 INFO: write_file: src/__tests__/task-planner-parallel.test.ts (patch)
+[2026-04-08T08:57:55.670Z] iter=490 turn=16 INFO:   -> ok: Patched src/__tests__/task-planner-parallel.test.ts: -2 +2 lines
+
+Context after patch:
+6 |   it("runs independent tasks in parallel (faster than sequential)", async () => {
+7 |     const plan: TaskPlan = {
+8 |       tasks: [
+9 |         { id: "t1", title: "Task 1", description: "", status: "pending", dependsOn: [] },
+10 |         { id: "t2", title: "Task 2", description: "", status: "pending", dependsOn: [] },
+11 |         { id: "t3", title: "Task 3", description: "", status: "pending", dependsOn: [] },
+12 |       ],
+13 |     };
+[2026-04-08T08:57:55.671Z] iter=490 turn=17 INFO: Turn 17/25
+[2026-04-08T08:57:58.867Z] iter=490 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/task-planner-parallel.test.ts --reporter=verbose 2>&1 | tail -15
+[2026-04-08T08:57:59.977Z] iter=490 turn=17 INFO:   -> exit=0 (501 chars)
+[2026-04-08T08:57:59.977Z] iter=490 turn=18 INFO: Turn 18/25
+[2026-04-08T08:58:06.605Z] iter=490 turn=18 INFO: Agent: Tests pass. Write memory and goals:
+[2026-04-08T08:58:06.607Z] iter=490 turn=18 INFO: save_memory: "[Engineer] Iteration 490"
+[2026-04-08T08:58:06.608Z] iter=490 turn=18 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T08:58:06.608Z] iter=490 turn=19 INFO: Turn 19/25
+[2026-04-08T08:58:16.037Z] iter=490 turn=19 INFO: write_file: goals.md (write)
+[2026-04-08T08:58:16.040Z] iter=490 turn=19 INFO:   -> ok: Updated goals.md (1302 chars, -49 lines delta)
+[2026-04-08T08:58:16.041Z] iter=490 turn=20 INFO: Turn 20/25
+[2026-04-08T08:58:18.383Z] iter=490 turn=20 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC OK"
+[2026-04-08T08:58:19.588Z] iter=490 turn=20 INFO:   -> exit=0 (7 chars)
+[2026-04-08T08:58:19.588Z] iter=490 turn=21 INFO: Turn 21/25
+[2026-04-08T08:58:21.022Z] iter=490 turn=21 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T08:58:21.022Z] iter=490 turn=21 INFO: RESTART signal
+[2026-04-08T08:58:21.023Z] iter=490 turn=21 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T08:58:22.209Z] iter=490 turn=21 INFO: Compilation OK
+[2026-04-08T08:58:31.026Z] iter=490 turn=21 INFO: Cache persisted: 67 entries to .autoagent-cache.json
+[2026-04-08T08:58:31.027Z] iter=490 turn=21 INFO: Cache stats: 0 hits, 7 misses, 67 entries, 8 invalidations (11 entries removed)
+[2026-04-08T08:58:31.027Z] iter=490 turn=21 INFO: Tool cache stats
+[2026-04-08T08:58:31.027Z] iter=490 turn=21 INFO: Tool timing: bash: 6x, avg=753ms, total=4518ms; grep: 1x, avg=20ms, total=20ms; write_file: 8x, avg=3ms, total=20ms; read_file: 6x, avg=2ms, total=13ms; read_scratchpad: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T08:58:31.027Z] iter=490 turn=21 INFO: Tool timing stats
+[2026-04-08T08:58:39.375Z] iter=490 turn=21 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 490: predicted 15 turns, actual 21 turns, ratio 1.40**
+[2026-04-08T08:58:52.359Z] iter=490 turn=21 INFO: Pre-commit review (2612in/482out): ## Issues Found
+
+- **Logic bug in parallel failure handling (`task-planner.ts`):** The failed-task lookup uses `results.indexOf(outcome)` to find the corresponding `ready[idx]` task, but this is redun

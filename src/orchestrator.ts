@@ -427,7 +427,7 @@ function makeSimpleCaller(client: Anthropic): (prompt: string) => Promise<string
         max_tokens: 2048,
         messages: [{ role: "user", content: prompt }],
       }),
-      { maxRetries: 3, baseDelayMs: 1000 },
+      { maxRetries: 3, baseDelayMs: 1000, retryableStatuses: [429, 529] },
     );
     const block = response.content[0];
     return block.type === "text" ? block.text : "";
@@ -1453,7 +1453,7 @@ export class Orchestrator {
           system: systemPrompt,
           messages: [{ role: "user", content: userPrompt }],
         }),
-        { maxRetries: 2, baseDelayMs: 1000 }
+        { maxRetries: 2, baseDelayMs: 1000, retryableStatuses: [429, 529] }
       );
       const block = response.content[0];
       raw = block.type === "text" ? block.text.trim() : "";

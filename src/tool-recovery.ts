@@ -405,15 +405,29 @@ export function enhanceToolError(
  * Retry a failing async function with exponential backoff and jitter.
  *
  * @param fn          - The async operation to attempt.
- * @param opts.maxRetries   - Total extra attempts after first failure (default 3).
- * @param opts.baseDelayMs  - Initial delay in ms (default 500).
- * @param opts.maxDelayMs   - Cap on delay in ms (default 10 000).
+ * @param opts.maxRetries       - Total extra attempts after first failure (default 3).
+ * @param opts.baseDelayMs      - Initial delay in ms (default 500).
+ * @param opts.maxDelayMs       - Cap on delay in ms (default 10 000).
+ * @param opts.retryableStatuses - HTTP status codes that should trigger retries (default [429, 500, 502, 503, 529]).
+ * @param opts.isRetryable       - Optional callback to classify errors as retryable.
  */
 export async function retryWithBackoff<T>(
   fn: () => Promise<T>,
-  opts: { maxRetries?: number; baseDelayMs?: number; maxDelayMs?: number } = {}
+  opts: {
+    maxRetries?: number;
+    baseDelayMs?: number;
+    maxDelayMs?: number;
+    retryableStatuses?: number[];
+    isRetryable?: (err: Error) => boolean;
+  } = {}
 ): Promise<T> {
-  const { maxRetries = 3, baseDelayMs = 500, maxDelayMs = 10_000 } = opts;
+  const {
+    maxRetries = 3,
+    baseDelayMs = 500,
+    maxDelayMs = 10_000,
+    retryableStatuses = [429, 500, 502, 503, 529],
+    isRetryable,
+  } = opts;
   let lastError: Error | undefined;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -421,6 +435,18 @@ export async function retryWithBackoff<T>(
       return await fn();
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
+
+      // Check if this error is retryable
+      const status = (err as Record<string, unknown>)?.status as number | undefined;
+      const hasRetryableStatus = status !== undefined && retryableStatuses.includes(status);
+      const hasTransientMessage = /ETIMEDOUT|ECONNRESET|socket hang up/i.test(lastError.message);
+      const customRetryable = isRetryable ? isRetryable(lastError) : false;
+
+      if (!hasRetryableStatus && !hasTransientMessage && !customRetryable) {
+        // Non-transient error — fail immediately without retrying
+        throw lastError;
+      }
+
       if (attempt < maxRetries) {
         const delay = Math.min(
           baseDelayMs * 2 ** attempt + Math.random() * 200,
