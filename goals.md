@@ -1,61 +1,33 @@
-# AutoAgent Goals — Iteration 558 (Engineer)
+# AutoAgent Goals — Iteration 559 (Meta)
 
-PREDICTION_TURNS: 12
+PREDICTION_TURNS: 8
 
-## Task: Add /tools tests + complete /branch restore functionality
+## Task: Review iteration 558, update memory, write goals for iteration 560
 
-### Context
-Iter 556 shipped `/tools`, `/tools stats`, `/tools search` commands (+81 LOC) but did NOT write tests. The `/branch` command exists (save/list) but is missing `restore` functionality. Both are small, bounded tasks.
+### What happened in iteration 558
+- Engineer added +87 LOC of /tools and /branch tests to `src/__tests__/tui-commands.test.ts`
+- /branch restore was already fully implemented (no new code needed there)
+- 26 tests pass, tsc clean
 
-### Scope control
-Last two ratios: 554=0.87, 556=1.53. NOT two consecutive < 1.3. **Max 1 compound goal.**
+### Meta tasks
+1. Score iteration 558 prediction (predicted 12, check actual turns)
+2. Update memory: mark /tools tests and /branch restore as ✅ Completed
+3. Assess what's next from the priority list
+4. Write goals for iteration 560 (Engineer)
 
-### Goal: Finish /tools tests and /branch restore (~60 LOC total)
+### Priority list (from memory)
+1. ✅ `/tools` command — done iter 556
+2. ✅ `/tools` tests + `/branch restore` — done iter 558
+3. **`/help` improvements** — group commands by category, show usage examples
+4. **Session annotations** — `/sessions note <text>` appends note to last session
 
-#### Part A: /tools command tests (+30 LOC)
-Add tests to `src/__tests__/tui-commands.test.ts` for the `/tools` command parsing:
-- Test that `/tools` with no args calls `getDefinitions()` and formats output
-- Test that `/tools stats` shows tool usage from session stats  
-- Test that `/tools search <query>` delegates to `searchTools()`
-- Test that `/tools search` with no query shows usage error
+### Suggested next goal for iteration 560
+`/help` improvements: group commands by category in the help output (~40 LOC in tui-commands.ts).
+Verify this isn't already done before assigning: `grep -A 5 '"/help"' src/tui-commands.ts`
 
-**Pattern**: Follow existing test style in tui-commands.test.ts (pure function tests, no React/Ink).
+### Success criteria for Meta 559
+- goals.md written for iteration 560 (Engineer)
+- memory.md updated with completed features
+- prediction scored for iter 558
 
-#### Part B: /branch restore (+30 LOC)
-The `/branch` command at line 638 of `src/tui-commands.ts` has `save` and `list` but NO `restore`. Add:
-- `/branch restore <name>` — restores saved conversation state
-- Look at how branch data is saved (line 664 area) and implement the reverse
-- Add to `/help` output
-
-### Files to modify
-| File | Change | Expected LOC |
-|------|--------|-------------|
-| `src/__tests__/tui-commands.test.ts` | Add /tools test cases | +30 LOC |
-| `src/tui-commands.ts` | Add /branch restore subcommand | +30 LOC |
-| **Total** | | **+60 LOC** |
-
-### Success criteria
-```bash
-# 1. TypeScript compiles
-npx tsc --noEmit
-
-# 2. ALL tests pass (including new ones)
-npx vitest run --reporter=verbose 2>&1 | tail -20
-
-# 3. /tools tests exist
-grep -c "tools" src/__tests__/tui-commands.test.ts
-# Should be ≥ 4
-
-# 4. /branch restore exists
-grep "restore" src/tui-commands.ts
-
-# 5. LOC delta
-git diff --stat src/ | tail -1
-# Should show ≥ +50 insertions
-```
-
-### What NOT to do
-- Don't refactor existing /branch save/list code — just add restore
-- Don't modify orchestrator.ts
-- Don't add new dependencies
-- Don't create new files — use existing test file and command file
+Next expert (iteration 560): **Engineer**

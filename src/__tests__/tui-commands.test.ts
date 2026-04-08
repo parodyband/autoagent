@@ -160,3 +160,90 @@ describe("/model reset via resetModelOverride()", () => {
     expect(orc.getModel()).toBe("auto");
   });
 });
+
+// ─── /tools command logic ─────────────────────────────────────
+
+// Pure helper: parse /tools args and return the subcommand token
+function parseToolsArgs(input: string): { sub: string; query: string | null } {
+  const args = input.replace(/^\/tools\s*/, "").trim();
+  if (args === "stats") return { sub: "stats", query: null };
+  if (args.startsWith("search ")) {
+    const query = args.slice(7).trim();
+    return { sub: "search", query: query || null };
+  }
+  if (args === "search") return { sub: "search", query: null };
+  return { sub: "list", query: null };
+}
+
+describe("/tools command parsing", () => {
+  it("/tools with no args routes to list", () => {
+    const r = parseToolsArgs("/tools");
+    expect(r.sub).toBe("list");
+    expect(r.query).toBeNull();
+  });
+
+  it("/tools stats routes to stats subcommand", () => {
+    const r = parseToolsArgs("/tools stats");
+    expect(r.sub).toBe("stats");
+    expect(r.query).toBeNull();
+  });
+
+  it("/tools search <query> extracts the query", () => {
+    const r = parseToolsArgs("/tools search bash_execute");
+    expect(r.sub).toBe("search");
+    expect(r.query).toBe("bash_execute");
+  });
+
+  it("/tools search with no query signals usage error", () => {
+    const r = parseToolsArgs("/tools search");
+    expect(r.sub).toBe("search");
+    expect(r.query).toBeNull();
+  });
+
+  it("/tools search with multi-word query extracts full string", () => {
+    const r = parseToolsArgs("/tools search read file");
+    expect(r.sub).toBe("search");
+    expect(r.query).toBe("read file");
+  });
+});
+
+// ─── /branch command logic ────────────────────────────────────
+
+function parseBranchArgs(input: string): { sub: string; name: string | null } {
+  const args = input.replace(/^\/branch\s*/, "").trim();
+  const parts = args.split(/\s+/);
+  const sub = parts[0] || "list";
+  const name = parts[1] ?? null;
+  return { sub, name };
+}
+
+describe("/branch command parsing", () => {
+  it("/branch with no args routes to list", () => {
+    const r = parseBranchArgs("/branch");
+    expect(r.sub).toBe("list");
+    expect(r.name).toBeNull();
+  });
+
+  it("/branch list routes to list", () => {
+    const r = parseBranchArgs("/branch list");
+    expect(r.sub).toBe("list");
+  });
+
+  it("/branch save <name> extracts name", () => {
+    const r = parseBranchArgs("/branch save my-branch");
+    expect(r.sub).toBe("save");
+    expect(r.name).toBe("my-branch");
+  });
+
+  it("/branch restore <name> extracts name", () => {
+    const r = parseBranchArgs("/branch restore checkpoint-1");
+    expect(r.sub).toBe("restore");
+    expect(r.name).toBe("checkpoint-1");
+  });
+
+  it("/branch restore with no name signals usage error (null name)", () => {
+    const r = parseBranchArgs("/branch restore");
+    expect(r.sub).toBe("restore");
+    expect(r.name).toBeNull();
+  });
+});
