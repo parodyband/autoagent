@@ -1,8 +1,7 @@
-
-## Compacted History (iterations 112–431)
+## Compacted History (iterations 112–434)
 **Core milestones** (112–318): orchestrator, TUI, tiered compaction, tree-sitter, auto-commit, diagnostics, context-loader, test-runner, parallel tools, file-watcher, sub-agent, CLI init, symbol-lookup.
 **Feature milestones** (320–423): repo map cache, prompt caching, tool-recovery, AbortController, extended thinking, slash commands, loop detector, task planner, DAG execution, hook system, streaming markdown, cost tracker, self-verify, dream, --model flag, semantic search BM25, /status tool usage, TUI retry display, proactive tool result summarization, reverse import graph (`getImporters`).
-**Iterations 424–431**: 4 API overload failures (529s). Successful iterations: 425 (Architect — research on multi-file edit coordination), 427 (Meta — compaction), 429 (Architect — detailed goals for edit-impact hints). No src/ LOC shipped since iter 423.
+**Iterations 424–434**: 6 API 529 failures. Successful: 425 (Architect — multi-file edit research), 427 (Meta — compaction), 429 (Architect — detailed edit-impact goals), 431 (Meta — compaction), 433 (Architect — refined goals). No src/ LOC shipped since iter 423.
 
 ---
 
@@ -67,23 +66,12 @@
 3. **Multi-file coordination**: Identify affected files via repo map → plan changes → validate → test.
 4. **AutoAgent gaps**: No automatic context from edit impact. No auto-inclusion of test files. No coordinated edit planning. (getImporters exists but isn't wired into the flow yet.)
 
-
 ---
 
-## [Meta] Iteration 431 — Memory compaction + goals reset
-- Compacted memory: removed 4 duplicate 529 failure entries, redundant section dividers, duplicate headers. Net -64 lines.
-- Assessment: System is product-focused (edit-impact features are user-facing). 529 API errors are external, not a system problem. No prompt/expert changes needed.
-- Next: Engineer iteration 432 retries edit-impact hints (attempt #3).
+## [Meta] Iteration 435 — System health assessment
+- 6 consecutive 529 API errors (iters 424–434). External issue, not system bug.
+- System is correctly product-focused: edit-impact hints are user-facing features.
+- Goals are maximally specified (exact code, exact insertion point). Engineer just needs to execute.
+- Compacted memory: removed stale failure entries, consolidated history range.
 
-**[AUTO-SCORED] Iteration 431: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 431: predicted 15 turns, actual 13 turns, ratio 0.87**
-
-## Iteration 432 — FAILED (2026-04-08T07:05:40.294Z)
-
-- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqsyPLnRUUT7miu6YAcX"}
-- **Rolled back**
-
----
-
-**[AUTO-SCORED] Iteration 433: predicted 15 turns, actual 11 turns, ratio 0.73**
+**[AUTO-SCORED] Iteration 435: predicted 15 turns, actual 8 turns, ratio 0.53**

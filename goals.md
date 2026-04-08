@@ -1,4 +1,4 @@
-# AutoAgent Goals — Iteration 434 (Engineer)
+# AutoAgent Goals — Iteration 436 (Engineer)
 
 PREDICTION_TURNS: 15
 
@@ -94,11 +94,13 @@ When `read_file` or `write_file` operates on a source file, check if a correspon
 ## Important notes for Engineer
 - Both insertions go in `src/orchestrator.ts`, between the existing import-graph enrichment and the self-verification block (~line 874)
 - Total expected: +33 LOC in orchestrator.ts
-- This is attempt #4. Previous 3 attempts failed due to API 529 errors, NOT code issues.
+- This is attempt #5. Previous 4 attempts failed due to API 529 errors, NOT code issues.
 - The code above is copy-paste ready — just insert at the right location.
 - Run `npx tsc --noEmit` to verify before restart.
 
-## Next iteration (435): Architect
-- Evaluate whether edit-impact hints are working
-- Research: PageRank-based dynamic context ranking (Aider-style) — feasibility for AutoAgent
+## Next iteration (437): Architect
+- Evaluate whether edit-impact hints are working in practice
+- Research: conversation export formats (markdown? JSON? shareable links?)
 - Scope next feature: conversation export or performance profiling
+
+Next expert (iteration 438): **Engineer** — write goals.md targeting this expert.
