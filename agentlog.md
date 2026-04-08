@@ -1,104 +1,3 @@
-[2026-04-06T07:35:38.227Z] iter=404 turn=5 INFO: Agent: Now I have exactly what I need. Making both changes:
-[2026-04-06T07:35:38.228Z] iter=404 turn=5 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-06T07:35:38.230Z] iter=404 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -13 +14 lines
-
-Context after patch:
-1127 |     }
-1128 |   }
-1129 | 
-1130 |   /** Session statistics for /status display. */
-1131 |   getSessionStats(): { durationMs: number; turnCount: number; avgCostPerTurn: number; costTrend: "↑" | "→" | "↓"; sessionCost: number; costSummary: string; filesModified: string[]; toolUsage: Record<string, number> } {
-1132 |     const durationMs = Date.now() - this.sessionStartTime;
-1133 |     const turnCount = this.turnCosts.length;
-1134 |     const avgCostPerTurn = turnCount > 0 ? this.sessionCost / turnCount : 0;
-1135 |     let costTrend: "↑" | "→" | "↓" = "→";
-1136 |     if (turnCount >= 3) {
-1137 |       const recentAvg = this.turnCosts.slice(-3).reduce((a, b) => a + b, 0) / 3;
-1138 |       if (recentAvg > avgCostPerTurn * 1.2) costTrend = "↑";
-1139 |       else if (recentAvg < avgCostPerTurn * 0.8) costTrend = "↓";
-1140 |     }
-1141 |     const toolUsage = Object.fromEntries(this.toolUsageCounts);
-1142 |     return { durationMs, turnCount, avgCostPerTurn, costTrend, sessionCost: this.costTracker.totalCost, costSummary: this.costTracker.sessionSummary, filesModified: Array.from(this.sessionFilesModified), toolUsage };
-1143 |   }
-1144 | 
-1145 |   /** Get the current model (override if set, otherwise "auto"). */
-1146 |   getModel(): string {
-[2026-04-06T07:35:38.231Z] iter=404 turn=6 INFO: Turn 6/25
-[2026-04-06T07:35:43.821Z] iter=404 turn=6 INFO: Agent: I've patched orchestrator.ts. Now patching tui.tsx to display tool usage in /status:
-[2026-04-06T07:35:43.822Z] iter=404 turn=6 INFO: write_file: src/tui.tsx (patch)
-[2026-04-06T07:35:43.823Z] iter=404 turn=6 INFO:   -> ok: Patched src/tui.tsx: -4 +12 lines
-
-Context after patch:
-738 |         sessionLines.push(`  Cost:           ${stats.costSummary}`);
-739 |         sessionLines.push(`  Avg cost/turn:  ${stats.avgCostPerTurn.toFixed(4)}`);
-740 |         sessionLines.push(`  Cost trend:     ${stats.costTrend}`);
-741 |         if (stats.filesModified?.length) {
-742 |           sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(", ")}`);
-743 |         }
-744 |         if (stats.toolUsage && Object.keys(stats.toolUsage).length > 0) {
-745 |           const topTools = Object.entries(stats.toolUsage)
-746 |             .sort((a, b) => b[1] - a[1])
-747 |             .slice(0, 5)
-748 |             .map(([name, count]) => `${name}:${count}`)
-749 |             .join("  ");
-750 |           sessionLines.push(`  Tool usage:     ${topTools}`);
-751 |         }
-752 |       }
-753 |       setMessages(prev => [...prev, {
-754 |         role: "assistant",
-755 |         content: [
-[2026-04-06T07:35:43.824Z] iter=404 turn=7 INFO: Turn 7/25
-[2026-04-06T07:35:45.806Z] iter=404 turn=7 INFO: Agent: Both changes done. Running TSC now.
-[2026-04-06T07:35:45.808Z] iter=404 turn=7 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-06T07:35:46.911Z] iter=404 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-06T07:35:46.912Z] iter=404 turn=8 INFO: Turn 8/25
-[2026-04-06T07:35:50.876Z] iter=404 turn=8 INFO: Agent: TSC clean. Writing memory and goals.
-[2026-04-06T07:35:50.877Z] iter=404 turn=8 INFO: save_memory: "[Engineer 404] Tool usage stats complete"
-[2026-04-06T07:35:50.880Z] iter=404 turn=8 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-06T07:35:50.881Z] iter=404 turn=9 INFO: Turn 9/25
-[2026-04-06T07:36:00.628Z] iter=404 turn=9 INFO: write_file: goals.md (write)
-[2026-04-06T07:36:00.631Z] iter=404 turn=9 INFO:   -> ok: Updated goals.md (1090 chars, -6 lines delta)
-[2026-04-06T07:36:00.631Z] iter=404 turn=10 INFO: Turn 10/25
-[2026-04-06T07:36:02.187Z] iter=404 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-06T07:36:02.188Z] iter=404 turn=10 INFO: RESTART signal
-[2026-04-06T07:36:02.188Z] iter=404 turn=10 INFO: Validating: npx tsc --noEmit ...
-[2026-04-06T07:36:03.254Z] iter=404 turn=10 INFO: Compilation OK
-[2026-04-06T07:36:11.907Z] iter=404 turn=10 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-06T07:36:11.907Z] iter=404 turn=10 INFO: Cache stats: 0 hits, 1 misses, 55 entries, 3 invalidations (1 entries removed)
-[2026-04-06T07:36:11.907Z] iter=404 turn=10 INFO: Tool cache stats
-[2026-04-06T07:36:11.907Z] iter=404 turn=10 INFO: Tool timing: bash: 6x, avg=192ms, total=1154ms; write_file: 3x, avg=3ms, total=8ms; save_memory: 1x, avg=4ms, total=4ms; read_scratchpad: 1x, avg=1ms, total=1ms; read_file: 1x, avg=0ms, total=0ms; think: 1x, avg=0ms, total=0ms
-[2026-04-06T07:36:11.907Z] iter=404 turn=10 INFO: Tool timing stats
-[2026-04-06T07:36:19.809Z] iter=404 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 404: predicted 8 turns, actual 10 turns, ratio 1.25**
-[2026-04-06T07:36:22.010Z] iter=404 turn=10 INFO: Pre-commit review (728in/77out): LGTM. The change cleanly adds `toolUsage` to the return type and value by converting `this.toolUsageCounts` (a `Map`) to a plain object — straightforward and consistent with the existing pattern of se
-[2026-04-06T07:36:22.066Z] iter=404 turn=10 INFO: Committed: b02a9864 (22 in / 2732 out, cache: 13321 created, 89786 read)
-[2026-04-06T07:36:22.066Z] iter=404 turn=10 INFO: Restarting as iteration 405...
-[2026-04-06T07:36:22.284Z] iter=405 INFO: Cache restored: 55/55 entries (0 stale)
-[2026-04-06T07:36:22.287Z] iter=405 INFO: Turn budget: 13/25 (calibration=1.25x, predicted=8)
-[2026-04-06T07:36:22.287Z] iter=405 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-06T07:36:22.472Z] iter=405 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-06T07:36:22.472Z] iter=405 turn=1 INFO: Turn 1/25
-[2026-04-06T07:36:27.181Z] iter=405 turn=1 INFO: Agent: 
-
-I'll start by evaluating the current state, scoring iteration 404, then doing research and planning the next high-value goals.
-[2026-04-06T07:36:27.182Z] iter=405 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-06T07:36:27.185Z] iter=405 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/*.ts src/*.tsx src/**/*.ts 2>/dev/null | tail -5
-[2026-04-06T07:36:27.189Z] iter=405 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json 2>/dev/null | head -80
-[2026-04-06T07:36:27.209Z] iter=405 turn=1 INFO:   -> exit=0 (141 chars)
-[2026-04-06T07:36:27.211Z] iter=405 turn=1 INFO:   -> exit=0 (1679 chars)
-[2026-04-06T07:36:28.278Z] iter=405 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-06T07:36:28.279Z] iter=405 turn=2 INFO: Turn 2/25
-[2026-04-06T07:36:41.206Z] iter=405 turn=2 INFO: Agent: 
-
-You're right. My deliverables are:
-1. Score iteration 404 (update memory)
-2. Compact memory
-3. Write goals.md for iteration 406 (Architect goals)
-
-Let me do the research and writing in parallel.
-[2026-04-06T07:36:41.208Z] iter=405 turn=2 INFO: think: Deliverables:
-1. Score iteration 404: predicted 8 turns, actual 10 turns, ratio 1.25 — already noted in memory
-2. Compac...
-[2026-04-06T07:36:41.209Z] iter=405 turn=3 INFO: Turn 3/25
 [2026-04-06T07:36:44.989Z] iter=405 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "search" src/tui.tsx | head -20
 [2026-04-06T07:36:44.991Z] iter=405 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "search\|Search" src/orchestrator.ts | head -20
 [2026-04-06T07:36:45.002Z] iter=405 turn=3 INFO:   -> exit=0 (686 chars)
@@ -1096,3 +995,248 @@ Wrapping up now.
 [2026-04-08T06:43:40.944Z] iter=419 turn=10 INFO: Tool timing stats
 [2026-04-08T06:43:48.856Z] iter=419 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 419: predicted 15 turns, actual 10 turns, ratio 0.67**
 [2026-04-08T06:43:48.878Z] iter=419 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T06:44:56.509Z] iter=420 turn=1 INFO: Rolled back to pre-iteration-420
+[2026-04-08T06:44:56.510Z] iter=420 turn=1 INFO: Failure recorded. Restarting...
+[2026-04-08T06:44:56.699Z] iter=421 1/3 consecutive failures
+[2026-04-08T06:44:56.702Z] iter=421 INFO: Cache restored: 56/56 entries (0 stale)
+[2026-04-08T06:44:56.704Z] iter=421 INFO: Turn budget: 15/25 (calibration=1.07x, predicted=15)
+[2026-04-08T06:44:56.704Z] iter=421 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-08T06:44:56.911Z] iter=421 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T06:44:56.911Z] iter=421 turn=1 INFO: Turn 1/25
+[2026-04-08T06:45:01.191Z] iter=421 turn=1 INFO: Agent: 
+
+I need to assess the current state and execute the Engineer goals that have been stalled since iteration 406. Let me start by understanding the codebase, then implement the two goals.
+[2026-04-08T06:45:01.193Z] iter=421 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git status --short | head -20
+[2026-04-08T06:45:01.197Z] iter=421 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/orchestrator.ts src/context-loader.ts
+[2026-04-08T06:45:01.209Z] iter=421 turn=1 INFO:   -> exit=0 (75 chars)
+[2026-04-08T06:45:01.213Z] iter=421 turn=1 INFO:   -> exit=0 (96 chars)
+[2026-04-08T06:45:01.214Z] iter=421 turn=2 INFO: Turn 2/25
+[2026-04-08T06:45:05.857Z] iter=421 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "pruneStaleToolResults\|hasErrorIndicator\|summarizeOld" src/orchestrator.ts | head -30
+[2026-04-08T06:45:05.862Z] iter=421 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "resolveImportGraph\|getImporters\|import.*regex" src/context-loader.ts | head -20
+[2026-04-08T06:45:05.879Z] iter=421 turn=2 INFO:   -> exit=0 (40 chars)
+[2026-04-08T06:45:05.880Z] iter=421 turn=2 INFO:   -> exit=0 (420 chars)
+[2026-04-08T06:45:05.880Z] iter=421 turn=3 INFO: Turn 3/25
+[2026-04-08T06:45:11.000Z] iter=421 turn=3 INFO: Agent: 
+
+You're right. Let me start producing code immediately. My two deliverables:
+
+1. `summarizeOldToolResults()` in `src/orchestrator.ts` + tests
+2. `getImporters()` in `src/context-loader.ts` + tests
+
+Let me read the specific sections I need to modify, then write code.
+[2026-04-08T06:45:11.001Z] iter=421 turn=3 INFO: read_file: src/orchestrator.ts
+[2026-04-08T06:45:11.002Z] iter=421 turn=3 INFO:   -> ok (2909 chars)
+[2026-04-08T06:45:11.003Z] iter=421 turn=3 INFO: read_file: src/context-loader.ts
+[2026-04-08T06:45:11.003Z] iter=421 turn=3 INFO:   -> ok (1979 chars)
+[2026-04-08T06:45:11.003Z] iter=421 turn=4 INFO: Turn 4/25
+[2026-04-08T06:45:16.176Z] iter=421 turn=4 INFO: Agent: Now let me look at the agent loop to know where to wire in the summarization, and the file-watcher callback:
+[2026-04-08T06:45:16.177Z] iter=421 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "toolTurnCount\|tool_result\|main.*loop\|processToolUse\|file-watcher.*changed\|fileWatcher\|onFileChange" src/orchestrator.ts | head -30
+[2026-04-08T06:45:16.179Z] iter=421 turn=4 INFO: read_file: src/orchestrator.ts
+[2026-04-08T06:45:16.180Z] iter=421 turn=4 INFO:   -> ok (1991 chars)
+[2026-04-08T06:45:16.194Z] iter=421 turn=4 INFO:   -> exit=0 (2311 chars)
+[2026-04-08T06:45:16.195Z] iter=421 turn=5 INFO: Turn 5/25
+[2026-04-08T06:45:20.327Z] iter=421 turn=5 INFO: read_file: src/orchestrator.ts
+[2026-04-08T06:45:20.329Z] iter=421 turn=5 INFO:   -> ok (1379 chars)
+[2026-04-08T06:45:20.330Z] iter=421 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "toolTurnCount\|toolCallCount\|turn.*count\|turnCount" src/orchestrator.ts | head -20
+[2026-04-08T06:45:20.361Z] iter=421 turn=5 INFO:   -> exit=0 (1285 chars)
+[2026-04-08T06:45:20.361Z] iter=421 turn=6 INFO: Turn 6/25
+[2026-04-08T06:45:34.280Z] iter=421 turn=6 INFO: Agent: 
+
+**Goal status:**
+- Goal 1 (summarizeOldToolResults): NOT STARTED
+- Goal 2 (getImporters): NOT STARTED
+
+I've been reading too much. Let me write code NOW. I have enough context.
+[2026-04-08T06:45:34.281Z] iter=421 turn=6 INFO: think: Let me plan both implementations based on what I've read:
+
+**Goal 1: summarizeOldToolResults()**
+- Add a `summarizedTool...
+[2026-04-08T06:45:34.283Z] iter=421 turn=7 INFO: Turn 7/25
+[2026-04-08T06:45:38.157Z] iter=421 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "apiMessages.push\|this\.toolTurns\|toolTurns\|agentLoop\|async chat\|while.*stop_reason\|end_turn\|tool_use" src/orchestrator.ts | head -40
+[2026-04-08T06:45:38.175Z] iter=421 turn=7 INFO:   -> exit=0 (3116 chars)
+[2026-04-08T06:45:38.176Z] iter=421 turn=8 INFO: Turn 8/25
+[2026-04-08T06:45:41.079Z] iter=421 turn=8 INFO: read_file: src/orchestrator.ts
+[2026-04-08T06:45:41.080Z] iter=421 turn=8 INFO:   -> ok (1422 chars)
+[2026-04-08T06:45:41.080Z] iter=421 turn=9 INFO: Turn 9/25
+[2026-04-08T06:45:43.968Z] iter=421 turn=9 INFO: Agent: Now I know where to wire it. Let me look at the class properties to see where to add `summarizedToolIds`:
+[2026-04-08T06:45:43.969Z] iter=421 turn=9 INFO: read_file: src/orchestrator.ts
+[2026-04-08T06:45:43.970Z] iter=421 turn=9 INFO:   -> ok (980 chars)
+[2026-04-08T06:45:43.971Z] iter=421 turn=10 INFO: Turn 10/25
+[2026-04-08T06:45:47.346Z] iter=421 turn=10 INFO: Agent: 
+
+I've changed NOTHING in src/. I'm in a drift loop. Let me write both features RIGHT NOW.
+[2026-04-08T06:45:47.346Z] iter=421 turn=10 INFO: read_file: src/orchestrator.ts
+[2026-04-08T06:45:47.348Z] iter=421 turn=10 INFO:   -> ok (867 chars)
+[2026-04-08T06:45:47.349Z] iter=421 turn=11 INFO: Turn 11/25
+[2026-04-08T06:45:52.268Z] iter=421 turn=11 INFO: Agent: Now let me write both features. First, Goal 1 - `summarizeOldToolResults`:
+[2026-04-08T06:45:52.268Z] iter=421 turn=11 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T06:45:52.271Z] iter=421 turn=11 INFO:   -> ok: Patched src/orchestrator.ts: -1 +6 lines
+
+Context after patch:
+1057 |   private cachedRepoMap: import("./tree-sitter-map.js").RepoMap | null = null;
+1058 |   private hooksConfig: HooksConfig = {};
+1059 |   /** Paths that have been changed externally and need incremental re-parse. */
+1060 |   private staleRepoPaths = new Set<string>();
+1061 | 
+1062 |   /** Track which tool_use_ids have already been summarized to avoid double-processing. */
+1063 |   private summarizedToolIds = new Set<string>();
+1064 |   /** Counter of tool turns processed, used to trigger periodic summarization. */
+1065 |   private toolTurnCounter = 0;
+1066 | 
+1067 |   /** Persists ReflectionCheckpoints and supplies aggregate stats. */
+1068 |   private reflectionStore!: ReflectionStore;
+[2026-04-08T06:45:52.272Z] iter=421 turn=12 INFO: Turn 12/25
+[2026-04-08T06:45:55.543Z] iter=421 turn=12 INFO: Agent: Now add the `summarizeOldToolResults` method right after `hasErrorIndicator`:
+[2026-04-08T06:45:55.544Z] iter=421 turn=12 INFO: read_file: src/orchestrator.ts
+[2026-04-08T06:45:55.547Z] iter=421 turn=12 INFO:   -> ok (727 chars)
+[2026-04-08T06:45:55.548Z] iter=421 turn=13 INFO: Turn 13/25
+[2026-04-08T06:46:11.827Z] iter=421 turn=13 INFO: Agent: 
+
+Let me write all the code now in one shot.
+[2026-04-08T06:46:11.828Z] iter=421 turn=13 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T06:46:11.829Z] iter=421 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -2 +81 lines
+
+Context after patch:
+1531 |     return /\bError\b|FAIL|error:|ERR!/.test(text);
+1532 |   }
+1533 | 
+1534 |   /**
+1535 |    * Proactive tool result summarization — runs every 5th tool turn.
+1536 |    * Replaces large, old tool results with compact summaries to keep
+1537 |    * the context window clean before hitting compaction thresholds.
+1538 |    */
+1539 |   summarizeOldToolResults(): void {
+1540 |     this.toolTurnCounter++;
+1541 |     if (this.toolTurnCounter % 5 !== 0) return;
+1542 | 
+1543 |     const toolUseIdMap = this.buildToolUseIdMap();
+1544 | 
+1545 |     // Find the index of the 6th most recent assistant message
+1546 |     const assistantIndices: number[] = [];
+1547 |     for (let i = this.apiMessages.length - 1; i >= 0; i--) {
+1548 |       if (this.apiMessages[i].role === "assistant") assistantIndices.push(i);
+1549 |     }
+1550 |     const cutoffIdx = assistantIndices[5] ?? 0;
+1551 | 
+1552 |     for (let i = 0; i < cutoffIdx; i++) {
+1553 |       const msg = this.apiMessages[i];
+1554 |       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
+1555 | 
+1556 |       for (const block of msg.content) {
+1557 |         if (typeof block !== "object" || !("type" in block) || block.type !== "tool_result") continue;
+1558 |         const toolBlock = block as {
+1559 |           type: string; tool_use_id: string;
+1560 |           content?: Array<{ type: string; text?: string }> | string;
+1561 |         };
+1562 |         if (this.summarizedToolIds.has(toolBlock.tool_use_id)) continue;
+1563 |         const toolName = toolUseIdMap.get(toolBlock.tool_use_id) ?? "unknown";
+1564 | 
+1565 |         // Handle both string and array content
+1566 |         if (typeof toolBlock.content === "string") {
+1567 |           const replaced = this.trySummarizeToolText(toolName, toolBlock.content);
+1568 |           if (replaced) {
+1569 |             toolBlock.content = replaced;
+1570 |             this.summarizedToolIds.add(toolBlock.tool_use_id);
+1571 |           }
+1572 |           continue;
+1573 |         }
+1574 |         if (!Array.isArray(toolBlock.content)) continue;
+1575 |         for (const cb of toolBlock.content) {
+1576 |           if (cb.type !== "text" || typeof cb.text !== "string") continue;
+1577 |           const replaced = this.trySummarizeToolText(toolName, cb.text);
+1578 |           if (replaced) {
+1579 |             cb.text = replaced;
+1580 |             this.summarizedToolIds.add(toolBlock.tool_use_id);
+1581 |           }
+1582 |         }
+1583 |       }
+1584 |     }
+1585 |   }
+1586 | 
+1587 |   /** Try to summarize a single tool result text. Returns summary or null if not applicable. */
+1588 |   private trySummarizeToolText(toolName: string, text: string): string | null {
+1589 |     if (this.hasErrorIndicator(text)) return null;
+1590 | 
+1591 |     if (toolName === "read_file" && text.length > 2000) {
+1592 |       const lineCount = text.split("\n").length;
+1593 |       const importMatches = text.match(/(?:import|from)\s+["'][^"']+["']/g);
+1594 |       const imports = importMatches ? importMatches.map(m => m.replace(/.*["']([^"']+)["'].*/, "$1")).slice(0, 8).join(", ") : "none";
+1595 |       return `[read_file: ${lineCount} lines, imports: ${imports}]`;
+1596 |     }
+1597 |     if (toolName === "grep" && text.length > 1500) {
+1598 |       const lines = text.split("\n").filter(l => l.trim());
+1599 |       const fileSet = new Set(lines.map(l => l.split(":")[0]).filter(Boolean));
+1600 |       return `[grep: ${lines.length} matches across ${fileSet.size} files]`;
+1601 |     }
+1602 |     if (toolName === "bash" && text.length > 3000) {
+1603 |       return `[bash: ${text.slice(0, 200)}... (truncated from ${text.length} chars)]`;
+1604 |     }
+1605 |     if (toolName === "list_files" && text.length > 1000) {
+1606 |       const lines = text.split("\n").filter(l => l.trim());
+1607 |       const dirs = lines.filter(l => l.endsWith("/")).length;
+1608 |       return `[list_files: ${dirs} directories, ${lines.length - dirs} files]`;
+1609 |     }
+1610 |     return null;
+1611 |   }
+1612 | 
+1613 |   /**
+1614 |    * Prune stale tool results with priority-based ordering.
+1615 |    *
+1616 |    * Fires at MICRO_COMPACT_THRESHOLD (80K) and above.
+1617 |    * - Never prunes results that contain error indicators.
+[2026-04-08T06:46:11.830Z] iter=421 turn=14 INFO: Turn 14/25
+[2026-04-08T06:46:15.730Z] iter=421 turn=14 INFO: Agent: Now wire it into the agent loop - after tool results are pushed to apiMessages (line ~883):
+[2026-04-08T06:46:15.731Z] iter=421 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "apiMessages.push.*role.*user.*content.*results" src/orchestrator.ts
+[2026-04-08T06:46:15.741Z] iter=421 turn=14 INFO:   -> exit=0 (62 chars)
+[2026-04-08T06:46:15.741Z] iter=421 turn=15 INFO: Turn 15/25
+[2026-04-08T06:46:18.275Z] iter=421 turn=15 INFO: read_file: src/orchestrator.ts
+[2026-04-08T06:46:18.278Z] iter=421 turn=15 INFO:   -> ok (382 chars)
+[2026-04-08T06:46:18.278Z] iter=421 turn=16 INFO: Turn 16/25
+[2026-04-08T06:46:22.371Z] iter=421 turn=16 INFO: Agent: 
+
+I need to wire it in, add Goal 2, write tests, run tsc, and restart. Moving fast.
+[2026-04-08T06:46:22.371Z] iter=421 turn=16 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T06:46:22.372Z] iter=421 turn=16 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
+
+Context after patch:
+880 |       }
+881 |     }
+882 | 
+883 |     apiMessages.push({ role: "user", content: results });
+884 |     this.summarizeOldToolResults();
+885 |     reflectionCbs.onTurnComplete?.();
+886 | 
+887 |     // Loop detection: check after each round
+888 |     const loopCheck = detectLoop(apiMessages);
+[2026-04-08T06:46:22.373Z] iter=421 turn=17 INFO: Turn 17/25
+[2026-04-08T06:46:25.769Z] iter=421 turn=17 INFO: Agent: Now Goal 2 - `getImporters` in context-loader.ts:
+[2026-04-08T06:46:25.770Z] iter=421 turn=17 INFO: read_file: src/context-loader.ts
+[2026-04-08T06:46:25.772Z] iter=421 turn=17 INFO:   -> ok (298 chars)
+[2026-04-08T06:46:25.773Z] iter=421 turn=18 INFO: Turn 18/25
+[2026-04-08T06:46:29.027Z] iter=421 turn=18 INFO: $ cd /Users/austin/Documents/autoagent && head -20 src/context-loader.ts | grep -n "import\|from\|require"
+[2026-04-08T06:46:29.036Z] iter=421 turn=18 INFO:   -> exit=0 (338 chars)
+[2026-04-08T06:46:29.036Z] iter=421 turn=19 INFO: Turn 19/25
+[2026-04-08T06:46:32.513Z] iter=421 turn=19 INFO: $ cd /Users/austin/Documents/autoagent && tail -5 src/context-loader.ts
+[2026-04-08T06:46:32.530Z] iter=421 turn=19 INFO:   -> exit=0 (86 chars)
+[2026-04-08T06:46:32.531Z] iter=421 turn=20 INFO: Turn 20/25
+[2026-04-08T06:46:43.137Z] iter=421 turn=20 INFO: write_file: src/context-loader.ts (append)
+[2026-04-08T06:46:43.139Z] iter=421 turn=20 INFO:   -> ok: Appended 1597 chars to src/context-loader.ts
+[2026-04-08T06:46:43.139Z] iter=421 turn=21 INFO: Turn 21/25
+[2026-04-08T06:46:46.851Z] iter=421 turn=21 INFO: Agent: Wait, `resolveSpecifier` is a module-private function. Let me check:
+[2026-04-08T06:46:46.852Z] iter=421 turn=21 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "^function resolveSpecifier\|^export function resolveSpecifier" src/context-loader.ts
+[2026-04-08T06:46:46.872Z] iter=421 turn=21 INFO:   -> exit=0 (84 chars)
+[2026-04-08T06:46:46.873Z] iter=421 turn=22 INFO: Turn 22/25
+[2026-04-08T06:46:50.472Z] iter=421 turn=22 INFO: Agent: Good - it's a module-level function (not exported but accessible within the file). Now wire into file-watcher:
+[2026-04-08T06:46:50.472Z] iter=421 turn=22 INFO: read_file: src/orchestrator.ts
+[2026-04-08T06:46:50.473Z] iter=421 turn=22 INFO:   -> ok (774 chars)
+[2026-04-08T06:46:50.474Z] iter=421 turn=23 INFO: Turn 23/25
+[2026-04-08T06:46:53.296Z] iter=421 turn=23 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "import.*context-loader\|from.*context-loader" src/orchestrator.ts | head -5
+[2026-04-08T06:46:53.317Z] iter=421 turn=23 INFO:   -> exit=0 (142 chars)
+[2026-04-08T06:46:53.317Z] iter=421 turn=23 INFO: HARD TURN CAP REACHED: 23 turns (predicted 15, cap 23). Forcing commit.
+[2026-04-08T06:46:53.320Z] iter=421 turn=23 INFO: Cache persisted: 57 entries to .autoagent-cache.json
+[2026-04-08T06:46:53.321Z] iter=421 turn=23 INFO: Cache stats: 0 hits, 11 misses, 57 entries, 4 invalidations (10 entries removed)
+[2026-04-08T06:46:53.321Z] iter=421 turn=23 INFO: Tool cache stats
+[2026-04-08T06:46:53.322Z] iter=421 turn=23 INFO: Tool timing: bash: 12x, avg=18ms, total=221ms; read_file: 11x, avg=2ms, total=24ms; write_file: 4x, avg=2ms, total=9ms; think: 1x, avg=1ms, total=1ms
+[2026-04-08T06:46:53.322Z] iter=421 turn=23 INFO: Tool timing stats
+[2026-04-08T06:47:01.083Z] iter=421 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 421: predicted 15 turns, actual 23 turns, ratio 1.53**
+[2026-04-08T06:47:35.484Z] iter=421 turn=23 INFO: Pre-commit review (0in/0out): ERROR: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqrbUFyYHMqfF8vZXNjB"}

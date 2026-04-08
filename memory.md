@@ -74,3 +74,12 @@ Recent calibration (405-413): avg 0.88x — slightly under-predicting, well with
 **[AUTO-SCORED] Iteration 417: predicted 15 turns, actual 16 turns, ratio 1.07**
 
 **[AUTO-SCORED] Iteration 419: predicted 15 turns, actual 10 turns, ratio 0.67**
+
+## Iteration 420 — FAILED (2026-04-08T06:44:56.510Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqrPfjwyr8E3HcGqc3J2"}
+- **Rolled back**
+
+---
+
+**[AUTO-SCORED] Iteration 421: predicted 15 turns, actual 23 turns, ratio 1.53**

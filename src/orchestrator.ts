@@ -881,6 +881,7 @@ async function runAgentLoop(
     }
 
     apiMessages.push({ role: "user", content: results });
+    this.summarizeOldToolResults();
     reflectionCbs.onTurnComplete?.();
 
     // Loop detection: check after each round
@@ -1058,6 +1059,11 @@ export class Orchestrator {
   private hooksConfig: HooksConfig = {};
   /** Paths that have been changed externally and need incremental re-parse. */
   private staleRepoPaths = new Set<string>();
+
+  /** Track which tool_use_ids have already been summarized to avoid double-processing. */
+  private summarizedToolIds = new Set<string>();
+  /** Counter of tool turns processed, used to trigger periodic summarization. */
+  private toolTurnCounter = 0;
 
   /** Persists ReflectionCheckpoints and supplies aggregate stats. */
   private reflectionStore!: ReflectionStore;
@@ -1524,6 +1530,85 @@ export class Orchestrator {
   /** Return true if the text contains error indicators we must preserve. */
   private hasErrorIndicator(text: string): boolean {
     return /\bError\b|FAIL|error:|ERR!/.test(text);
+  }
+
+  /**
+   * Proactive tool result summarization — runs every 5th tool turn.
+   * Replaces large, old tool results with compact summaries to keep
+   * the context window clean before hitting compaction thresholds.
+   */
+  summarizeOldToolResults(): void {
+    this.toolTurnCounter++;
+    if (this.toolTurnCounter % 5 !== 0) return;
+
+    const toolUseIdMap = this.buildToolUseIdMap();
+
+    // Find the index of the 6th most recent assistant message
+    const assistantIndices: number[] = [];
+    for (let i = this.apiMessages.length - 1; i >= 0; i--) {
+      if (this.apiMessages[i].role === "assistant") assistantIndices.push(i);
+    }
+    const cutoffIdx = assistantIndices[5] ?? 0;
+
+    for (let i = 0; i < cutoffIdx; i++) {
+      const msg = this.apiMessages[i];
+      if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
+
+      for (const block of msg.content) {
+        if (typeof block !== "object" || !("type" in block) || block.type !== "tool_result") continue;
+        const toolBlock = block as {
+          type: string; tool_use_id: string;
+          content?: Array<{ type: string; text?: string }> | string;
+        };
+        if (this.summarizedToolIds.has(toolBlock.tool_use_id)) continue;
+        const toolName = toolUseIdMap.get(toolBlock.tool_use_id) ?? "unknown";
+
+        // Handle both string and array content
+        if (typeof toolBlock.content === "string") {
+          const replaced = this.trySummarizeToolText(toolName, toolBlock.content);
+          if (replaced) {
+            toolBlock.content = replaced;
+            this.summarizedToolIds.add(toolBlock.tool_use_id);
+          }
+          continue;
+        }
+        if (!Array.isArray(toolBlock.content)) continue;
+        for (const cb of toolBlock.content) {
+          if (cb.type !== "text" || typeof cb.text !== "string") continue;
+          const replaced = this.trySummarizeToolText(toolName, cb.text);
+          if (replaced) {
+            cb.text = replaced;
+            this.summarizedToolIds.add(toolBlock.tool_use_id);
+          }
+        }
+      }
+    }
+  }
+
+  /** Try to summarize a single tool result text. Returns summary or null if not applicable. */
+  private trySummarizeToolText(toolName: string, text: string): string | null {
+    if (this.hasErrorIndicator(text)) return null;
+
+    if (toolName === "read_file" && text.length > 2000) {
+      const lineCount = text.split("\n").length;
+      const importMatches = text.match(/(?:import|from)\s+["'][^"']+["']/g);
+      const imports = importMatches ? importMatches.map(m => m.replace(/.*["']([^"']+)["'].*/, "$1")).slice(0, 8).join(", ") : "none";
+      return `[read_file: ${lineCount} lines, imports: ${imports}]`;
+    }
+    if (toolName === "grep" && text.length > 1500) {
+      const lines = text.split("\n").filter(l => l.trim());
+      const fileSet = new Set(lines.map(l => l.split(":")[0]).filter(Boolean));
+      return `[grep: ${lines.length} matches across ${fileSet.size} files]`;
+    }
+    if (toolName === "bash" && text.length > 3000) {
+      return `[bash: ${text.slice(0, 200)}... (truncated from ${text.length} chars)]`;
+    }
+    if (toolName === "list_files" && text.length > 1000) {
+      const lines = text.split("\n").filter(l => l.trim());
+      const dirs = lines.filter(l => l.endsWith("/")).length;
+      return `[list_files: ${dirs} directories, ${lines.length - dirs} files]`;
+    }
+    return null;
   }
 
   /**

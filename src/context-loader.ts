@@ -448,3 +448,60 @@ function resolveSpecifier(specifier: string, fromFile: string): string | null {
   }
   return null;
 }
+
+
+/**
+ * Reverse import lookup: find all files that import the given target path.
+ *
+ * @param targetPath - absolute or relative path of the target file
+ * @param workDir    - project working directory
+ * @param knownFiles - optional pre-computed file list (absolute paths)
+ * @returns array of absolute paths of files that import targetPath
+ */
+export function getImporters(
+  targetPath: string,
+  workDir: string,
+  knownFiles?: string[],
+): string[] {
+  const absTarget = targetPath.startsWith("/") ? targetPath : join(workDir, targetPath);
+
+  // Get file list from git if not provided
+  let files = knownFiles;
+  if (!files) {
+    try {
+      const raw = execSync("git ls-files", { cwd: workDir, encoding: "utf-8", timeout: 5000 });
+      files = raw.split("\n").filter(Boolean).map(f => join(workDir, f));
+    } catch {
+      return [];
+    }
+  }
+
+  // Filter to source files
+  const sourceExts = /\.(ts|tsx|js|jsx)$/;
+  const sourceFiles = files.filter(f => sourceExts.test(f));
+
+  const importRe = /(?:import\s+[\s\S]*?from\s+|require\s*\(\s*)["'](\.[^"']+)["']/g;
+  const importers: string[] = [];
+
+  for (const filePath of sourceFiles) {
+    if (filePath === absTarget) continue;
+    let src: string;
+    try {
+      src = readFileSync(filePath, "utf-8");
+    } catch {
+      continue;
+    }
+
+    let m: RegExpExecArray | null;
+    importRe.lastIndex = 0;
+    while ((m = importRe.exec(src)) !== null) {
+      const resolved = resolveSpecifier(m[1], filePath);
+      if (resolved === absTarget) {
+        importers.push(filePath);
+        break;
+      }
+    }
+  }
+
+  return importers;
+}
