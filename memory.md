@@ -26,17 +26,11 @@
 - `src/self-verify.ts` — Post-write diagnostics check.
 - `src/semantic-search.ts` — BM25-based code search. `CodeSearchIndex` class.
 - `src/context-loader.ts` — Context loading + `getImporters()` reverse import lookup.
-- `src/tools/bash.ts` — Bash execution with onChunk streaming callback (PARTIAL — see in-progress below).
+- `src/tools/bash.ts` — Bash execution with onChunk streaming callback.
 - **Expert rotation**: BUILTIN_EXPERTS = [ENGINEER, ARCHITECT, ENGINEER, META] → iteration % 4 selects expert.
 
-## In-Progress Feature: Streaming Bash Output to TUI
-**Status**: Backend plumbing done (iteration 522), TUI wiring NOT done.
-- ✅ `bash.ts`: `onChunk` parameter added to `executeBash()`, fires on stdout/stderr data
-- ✅ `tool-registry.ts`: `ToolContext.onChunk` added, passed to `executeBash()` 
-- ✅ `orchestrator.ts`: `onToolOutput` added to `OrchestratorOptions`, threaded through `makeExecTool`
-- ✅ `orchestrator.ts`: `runAgentLoop` signature accepts `onToolOutput` parameter
-- ❌ **Call sites NOT wired**: `runAgentLoop()` is called at lines ~2395, ~2471, ~2515, ~2567, ~2672 — NONE pass `onToolOutput` yet
-- ❌ **TUI display NOT built**: `tui.tsx` needs streaming output component (last 5 lines of running bash)
+## Completed Feature: Streaming Bash Output to TUI ✅
+- All backend + TUI wiring done. `bashStream` state (tui.tsx:393), rendered (tui.tsx:702), `onToolOutput` wired in Orchestrator constructor (tui.tsx:428), threaded to all internal runAgentLoop calls.
 
 ## Prediction Accuracy
 **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
@@ -53,8 +47,8 @@
 - ✅ Fixed 4 pre-existing test failures (iteration 520)
 
 ### Next Up (Priority Order)
-1. **Finish streaming bash output to TUI** (see in-progress above — ~40 LOC remaining)
-2. **Context window efficiency measurement** — track tokens/turn in /status
+1. **Markdown conversation export** — `/export` produces readable .md instead of raw JSON
+2. **Smarter auto-compact trigger** — compact based on token efficiency trend, not just count
 
 **[AUTO-SCORED] Iteration 523: predicted 15 turns, actual 16 turns, ratio 1.07**
 
@@ -63,3 +57,5 @@
 **[AUTO-SCORED] Iteration 525: predicted 12 turns, actual 13 turns, ratio 1.08**
 
 **[AUTO-SCORED] Iteration 526: predicted 15 turns, actual 18 turns, ratio 1.20**
+
+**[AUTO-SCORED] Iteration 527: predicted 8 turns, actual 12 turns, ratio 1.50**

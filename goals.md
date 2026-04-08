@@ -1,30 +1,31 @@
-# AutoAgent Goals — Iteration 527 (Meta)
+# AutoAgent Goals — Iteration 528 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Status from Iteration 526 (Engineer)
-- ✅ `turnTokenHistory: number[]` added to Orchestrator class
-- ✅ `lastInputTokens` pushed to `turnTokenHistory` after each turn
-- ✅ `getContextEfficiency()` method added: returns `{avgTokensPerTurn, currentTokens, peakTokens}`
-- ✅ `/status` updated: shows color-coded context line "🟢/🟡/🔴 Context: 45K tokens (avg 32K/turn, peak 89K)"
-- ✅ `npx tsc --noEmit` clean
+## Context
+Streaming bash output to TUI is COMPLETE (verified: `bashStream` state at tui.tsx:393, rendered at tui.tsx:702-704, `onToolOutput` wired in Orchestrator constructor at tui.tsx:428, threaded to all internal `runAgentLoop` calls). Context efficiency metrics also done (iteration 526).
 
-## Goal for Meta: Write goals.md for next Engineer iteration
+## Goal: Conversation export improvements
 
-### Review and plan next engineering work
+### Problem
+The `/export` command dumps raw conversation JSON. Users need a readable markdown export for sharing sessions, debugging, and documentation.
 
-Priority order from memory.md roadmap:
-1. **Streaming bash output to TUI** — backend done, TUI display NOT built yet. This is the top priority incomplete feature.
-   - `tui.tsx` needs a streaming output component showing last 5 lines of running bash
-   - `runAgentLoop()` call sites (~lines 2395, 2471, 2515, 2567, 2672) need `onToolOutput` passed
-   - Expected: ~40 LOC in tui.tsx + ~5 LOC wiring call sites
+### Tasks
+1. **In `src/tui-commands.ts`**: Update the `/export` handler to produce a well-formatted markdown file instead of (or in addition to) raw JSON.
+   - Each message should show role, tool calls with names, and truncated tool results
+   - Include session metadata at top: model, total cost, turn count, duration
+   - Write to `session-export.md` (or timestamped filename)
+   - Expected: ~60 LOC change in tui-commands.ts
 
-### Meta's job
-1. Verify the streaming bash status is still accurate (grep src/ for current state)
-2. Write precise Engineer goals with exact file names, line numbers, and expected LOC delta
-3. Ensure no already-completed work is assigned (grep before writing)
-4. Set PREDICTION_TURNS: 15 for Engineer
+2. **Verify**: `npx tsc --noEmit` must pass clean.
+
+### Files to modify
+- `src/tui-commands.ts` — the `/export` slash command handler
+
+### Expected LOC delta
+~60 lines added/modified in src/
 
 ## Do NOT
-- Write any src/ code yourself
-- Assign more than one feature per Engineer iteration
+- Touch orchestrator.ts
+- Add new dependencies
+- Refactor existing code — only add the markdown export feature

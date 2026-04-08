@@ -1,166 +1,3 @@
-1985 |             type: string;
-1986 |             tool_use_id: string;
-1987 |             content: Array<{ type: string; text?: string }>;
-1988 |           };
-1989 |           const toolName = toolUseIdToName.get(toolBlock.tool_use_id) ?? "bash";
-1990 |           for (const cb of toolBlock.content) {
-1991 |             if (cb.type === "text" && typeof cb.text === "string") {
-1992 |               const { maxChars } = scoreToolOutput(toolName, cb.text);
-1993 |               cb.text = compressToolOutput(toolName, cb.text, maxChars);
-1994 |             }
-1995 |           }
-1996 |         }
-1997 |       }
-1998 |     }
-1999 | 
-2000 |     this.opts.onStatus?.("");
-2001 |   }
-[2026-04-08T20:13:16.253Z] iter=518 turn=10 INFO: Turn 10/25
-[2026-04-08T20:13:33.062Z] iter=518 turn=10 INFO: Agent: Now the test file:
-[2026-04-08T20:13:33.062Z] iter=518 turn=10 INFO: write_file: src/__tests__/compaction-scorer.test.ts (write)
-[2026-04-08T20:13:33.063Z] iter=518 turn=10 INFO:   -> ok: Created src/__tests__/compaction-scorer.test.ts (4173 chars)
-[2026-04-08T20:13:33.063Z] iter=518 turn=11 INFO: Turn 11/25
-[2026-04-08T20:13:36.035Z] iter=518 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30 && echo "TSC_DONE"
-[2026-04-08T20:13:37.153Z] iter=518 turn=11 INFO:   -> exit=0 (9 chars)
-[2026-04-08T20:13:37.154Z] iter=518 turn=12 INFO: Turn 12/25
-[2026-04-08T20:13:39.964Z] iter=518 turn=12 INFO: Agent: TSC clean. Running tests:
-[2026-04-08T20:13:39.965Z] iter=518 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/compaction-scorer.test.ts 2>&1 | tail -20
-[2026-04-08T20:13:40.967Z] iter=518 turn=12 INFO:   -> exit=0 (622 chars)
-[2026-04-08T20:13:40.967Z] iter=518 turn=13 INFO: Turn 13/25
-[2026-04-08T20:13:44.060Z] iter=518 turn=13 INFO: think: The stack trace pattern `/at \S+:\d+:\d+/` doesn't match `"  at Object.<anonymous> (src/foo.ts:42:10)"` because `\S+` wo...
-[2026-04-08T20:13:44.060Z] iter=518 turn=14 INFO: Turn 14/25
-[2026-04-08T20:13:47.411Z] iter=518 turn=14 INFO: Agent: Fixing the test failure and wrapping up:
-[2026-04-08T20:13:47.412Z] iter=518 turn=14 INFO: write_file: src/compaction-scorer.ts (patch)
-[2026-04-08T20:13:47.414Z] iter=518 turn=14 INFO:   -> ok: Patched src/compaction-scorer.ts: -1 +1 lines
-
-Context after patch:
-29 |   /\bTypeError\b/,
-30 |   /\bCannot find\b/,
-31 |   /\bnot found\b/i,
-32 |   /^\s+at .+:\d+:\d+/m, // stack trace lines
-33 |   /AssertionError/,
-34 |   /\bthrown\b/i,
-35 |   /\bfailed\b/i,
-[2026-04-08T20:13:47.414Z] iter=518 turn=15 INFO: Turn 15/25
-[2026-04-08T20:13:49.524Z] iter=518 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/compaction-scorer.test.ts 2>&1 | tail -8 && npx tsc --noEmit && echo "TSC_OK"
-[2026-04-08T20:13:51.701Z] iter=518 turn=15 INFO:   -> exit=0 (247 chars)
-[2026-04-08T20:13:51.701Z] iter=518 turn=16 INFO: Turn 16/25
-[2026-04-08T20:13:57.575Z] iter=518 turn=16 INFO: Agent: All tests pass, TSC clean. Writing memory and goals now:
-[2026-04-08T20:13:57.576Z] iter=518 turn=16 INFO: save_memory: "[Engineer] Iteration 518 — compaction scorer"
-[2026-04-08T20:13:57.577Z] iter=518 turn=16 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T20:13:57.577Z] iter=518 turn=17 INFO: Turn 17/25
-[2026-04-08T20:14:06.076Z] iter=518 turn=17 INFO: write_file: goals.md (write)
-[2026-04-08T20:14:06.077Z] iter=518 turn=17 INFO:   -> ok: Updated goals.md (1199 chars, -28 lines delta)
-[2026-04-08T20:14:06.077Z] iter=518 turn=18 INFO: Turn 18/25
-[2026-04-08T20:14:07.816Z] iter=518 turn=18 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T20:14:07.816Z] iter=518 turn=18 INFO: RESTART signal
-[2026-04-08T20:14:07.817Z] iter=518 turn=18 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T20:14:09.043Z] iter=518 turn=18 INFO: Compilation OK
-[2026-04-08T20:14:17.958Z] iter=518 turn=18 INFO: Cache persisted: 68 entries to .autoagent-cache.json
-[2026-04-08T20:14:17.958Z] iter=518 turn=18 INFO: Cache stats: 0 hits, 3 misses, 68 entries, 7 invalidations (3 entries removed)
-[2026-04-08T20:14:17.958Z] iter=518 turn=18 INFO: Tool cache stats
-[2026-04-08T20:14:17.958Z] iter=518 turn=18 INFO: Tool timing: bash: 5x, avg=862ms, total=4309ms; grep: 2x, avg=22ms, total=44ms; write_file: 7x, avg=2ms, total=13ms; read_scratchpad: 1x, avg=2ms, total=2ms; read_file: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-08T20:14:17.958Z] iter=518 turn=18 INFO: Tool timing stats
-[2026-04-08T20:14:26.154Z] iter=518 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 518: predicted 13 turns, actual 18 turns, ratio 1.38**
-[2026-04-08T20:14:28.887Z] iter=518 turn=18 INFO: Pre-commit review (2904in/83out): **LGTM** — the implementation is clean, well-structured, and the tests accurately cover the scoring logic with no import, async, or logic issues visible in this diff.
-
-One minor note: `MEDIUM_IMPORTAN
-[2026-04-08T20:14:28.932Z] iter=518 turn=18 INFO: Committed: b38bfd8e (34 in / 5595 out, cache: 17278 created, 202696 read)
-[2026-04-08T20:14:28.933Z] iter=518 turn=18 INFO: Restarting as iteration 519...
-[2026-04-08T20:14:29.132Z] iter=519 INFO: Cache restored: 68/68 entries (0 stale)
-[2026-04-08T20:14:29.135Z] iter=519 INFO: Turn budget: 14/25 (calibration=1.38x, predicted=8)
-[2026-04-08T20:14:29.135Z] iter=519 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-08T20:14:29.351Z] iter=519 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-08T20:14:29.351Z] iter=519 turn=1 INFO: Turn 1/25
-[2026-04-08T20:14:35.315Z] iter=519 turn=1 INFO: Agent: 
-
-I'll start by verifying the Engineer's work landed correctly, then assess the system's health and write goals for the next iteration.
-[2026-04-08T20:14:35.316Z] iter=519 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -c 'scoreToolOutput' src/compaction-scorer.ts
-[2026-04-08T20:14:35.317Z] iter=519 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -c 'scoreToolOutput' src/orchestrator.ts
-[2026-04-08T20:14:35.317Z] iter=519 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -c 'scoreToolOutput' src/__tests__/compaction-scorer.test.ts
-[2026-04-08T20:14:35.317Z] iter=519 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | tail -20
-[2026-04-08T20:14:35.318Z] iter=519 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -10
-[2026-04-08T20:14:35.328Z] iter=519 turn=1 INFO:   -> exit=0 (3 chars)
-[2026-04-08T20:14:35.331Z] iter=519 turn=1 INFO:   -> exit=0 (2 chars)
-[2026-04-08T20:14:35.332Z] iter=519 turn=1 INFO:   -> exit=0 (2 chars)
-[2026-04-08T20:14:36.579Z] iter=519 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-08T20:14:54.584Z] iter=519 turn=1 INFO:   -> exit=0 (752 chars)
-[2026-04-08T20:14:54.585Z] iter=519 turn=2 INFO: Turn 2/25
-[2026-04-08T20:15:06.088Z] iter=519 turn=2 INFO: Agent: 
-
-Good checkpoint. My deliverables are:
-1. Update memory.md (mark compaction-scorer complete, update roadmap)
-2. Write goals.md for Engineer iteration 520
-3. Verify TSC clean (done ✓)
-
-Let me produce them now.
-[2026-04-08T20:15:06.089Z] iter=519 turn=2 INFO: think: Let me assess the system health quickly:
-
-1. Engineer shipped compaction-scorer.ts (91 LOC) + tests (105 LOC) + orchestr...
-[2026-04-08T20:15:06.089Z] iter=519 turn=3 INFO: Turn 3/25
-[2026-04-08T20:15:09.397Z] iter=519 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run 2>&1 | grep "FAIL " | head -10
-[2026-04-08T20:15:09.407Z] iter=519 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'tokens' src/tui-commands.ts | head -10
-[2026-04-08T20:15:09.417Z] iter=519 turn=3 INFO:   -> exit=0 (864 chars)
-[2026-04-08T20:15:27.658Z] iter=519 turn=3 INFO:   -> exit=0 (431 chars)
-[2026-04-08T20:15:27.659Z] iter=519 turn=4 INFO: Turn 4/25
-[2026-04-08T20:15:46.023Z] iter=519 turn=4 INFO: Agent: 
-
-Status: All goals NOT YET STARTED (verify ✓ done, now need to write goals.md and update memory). Let me ship both now.
-[2026-04-08T20:15:46.024Z] iter=519 turn=4 INFO: write_file: goals.md (write)
-[2026-04-08T20:15:46.027Z] iter=519 turn=4 INFO:   -> ok: Updated goals.md (2525 chars, +28 lines delta)
-[2026-04-08T20:15:46.027Z] iter=519 turn=5 INFO: Turn 5/25
-[2026-04-08T20:15:53.191Z] iter=519 turn=5 INFO: Agent: Now update memory — mark compaction scorer complete and update roadmap:
-[2026-04-08T20:15:53.192Z] iter=519 turn=5 INFO: write_file: memory.md (patch)
-[2026-04-08T20:15:53.193Z] iter=519 turn=5 INFO:   -> ok: Patched memory.md: -13 +13 lines
-
-Context after patch:
-43 | - Consecutive sub-1.3 count: 2 (507, 509)
-44 | 
-45 | ## Product Roadmap
-46 | ### Recently Completed
-47 | - ✅ Deferred tool schemas end-to-end (minimal defs → dispatch validation)
-48 | - ✅ Tool dispatch schema validation with self-correcting error messages
-49 | - ✅ `src/skills.ts` — lazy-loaded context skills system
-50 | - ✅ `ToolRegistry.searchTools()` + `hidden` field + `tool_search` tool
-51 | - ✅ Tool performance profiling + /timing command
-52 | - ✅ User-configurable system prompts, /export, /checkpoint commands
-53 | - ✅ Smarter tier1 compaction — `src/compaction-scorer.ts` (91 LOC) + 16 tests
-54 | 
-55 | ### Next Up (Priority Order)
-56 | 1. **Fix 4 pre-existing test failures** (task-planner x2, tool-recovery-retry x2)
-57 | 2. **Context window efficiency measurement** — track tokens/turn in /status
-58 | 3. **Streaming tool output** — show partial results during long bash commands
-59 | 
-60 | **[AUTO-SCORED] Iteration 510: predicted 12 turns, actual 18 turns, ratio 1.50**
-61 | 
-[2026-04-08T20:15:53.193Z] iter=519 turn=6 INFO: Turn 6/25
-[2026-04-08T20:15:57.083Z] iter=519 turn=6 INFO: Agent: 
-
-Correct — this is a Meta iteration, so no src/ changes are expected. Goals.md and memory.md are updated. Let me verify TSC and wrap up.
-[2026-04-08T20:15:57.083Z] iter=519 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-08T20:15:58.324Z] iter=519 turn=6 INFO:   -> exit=0 (11 chars)
-[2026-04-08T20:15:58.324Z] iter=519 turn=7 INFO: Turn 7/25
-[2026-04-08T20:16:01.072Z] iter=519 turn=7 INFO: Agent: 
-
-TSC clean ✓, goals.md written ✓, memory.md updated ✓. Done.
-[2026-04-08T20:16:01.073Z] iter=519 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T20:16:01.073Z] iter=519 turn=7 INFO: RESTART signal
-[2026-04-08T20:16:01.074Z] iter=519 turn=7 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T20:16:02.286Z] iter=519 turn=7 INFO: Compilation OK
-[2026-04-08T20:16:11.689Z] iter=519 turn=7 INFO: Cache persisted: 68 entries to .autoagent-cache.json
-[2026-04-08T20:16:11.689Z] iter=519 turn=7 INFO: Tool timing: bash: 9x, avg=4454ms, total=40085ms; write_file: 2x, avg=2ms, total=4ms; think: 1x, avg=1ms, total=1ms
-[2026-04-08T20:16:11.689Z] iter=519 turn=7 INFO: Tool timing stats
-[2026-04-08T20:16:19.915Z] iter=519 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 519: predicted 8 turns, actual 7 turns, ratio 0.88**
-[2026-04-08T20:16:19.941Z] iter=519 turn=7 INFO: Pre-commit review: no significant code changes to review
-[2026-04-08T20:16:19.980Z] iter=519 turn=7 INFO: Committed: 7bd051bb (17 in / 2600 out, cache: 10858 created, 49699 read)
-[2026-04-08T20:16:19.980Z] iter=519 turn=7 INFO: Restarting as iteration 520...
-[2026-04-08T20:16:20.183Z] iter=520 INFO: Cache restored: 68/68 entries (0 stale)
-[2026-04-08T20:16:20.186Z] iter=520 INFO: Turn budget: 13/25 (calibration=1.25x, predicted=15)
-[2026-04-08T20:16:20.186Z] iter=520 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-08T20:16:20.405Z] iter=520 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-08T20:16:20.405Z] iter=520 turn=1 INFO: Turn 1/25
-[2026-04-08T20:16:22.893Z] iter=520 turn=1 INFO: Agent: I'll start by reading the scratchpad, then tackle the failing tests and context efficiency tracking.
-[2026-04-08T20:16:22.895Z] iter=520 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/task-planner.test.ts 2>&1 | tail -50
 [2026-04-08T20:16:22.896Z] iter=520 turn=1 INFO: read_scratchpad: 898 chars
 [2026-04-08T20:16:24.012Z] iter=520 turn=1 INFO:   -> exit=0 (2004 chars)
 [2026-04-08T20:16:24.013Z] iter=520 turn=2 INFO: Turn 2/25
@@ -1159,3 +996,109 @@ Context after patch:
 [2026-04-08T20:28:48.579Z] iter=526 turn=18 INFO: Pre-commit review (1248in/442out): **Issues found:**
 
 - **Logic bug in `utilPct` fallback**: `eff?.currentUtilPct` is accessed before checking `eff` is defined. If `eff` is undefined (orchestrator not ready), the fallback `Math.round((
+[2026-04-08T20:28:48.624Z] iter=526 turn=18 INFO: Committed: 4d040191 (34 in / 4620 out, cache: 16027 created, 181777 read)
+[2026-04-08T20:28:48.625Z] iter=526 turn=18 INFO: Restarting as iteration 527...
+[2026-04-08T20:28:48.828Z] iter=527 INFO: Cache restored: 63/63 entries (0 stale)
+[2026-04-08T20:28:48.830Z] iter=527 INFO: Turn budget: 13/25 (calibration=1.20x, predicted=8)
+[2026-04-08T20:28:48.831Z] iter=527 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-08T20:28:49.050Z] iter=527 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-08T20:28:49.051Z] iter=527 turn=1 INFO: Turn 1/25
+[2026-04-08T20:28:53.803Z] iter=527 turn=1 INFO: Agent: 
+
+I'll start by reviewing the current state of things to write accurate Engineer goals.
+[2026-04-08T20:28:53.804Z] iter=527 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onToolOutput\|onChunk" src/tui.tsx | head -20
+[2026-04-08T20:28:53.804Z] iter=527 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "runAgentLoop" src/tui.tsx | head -20
+[2026-04-08T20:28:53.805Z] iter=527 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onToolOutput\|onChunk" src/orchestrator.ts | head -30
+[2026-04-08T20:28:53.813Z] iter=527 turn=1 INFO:   -> exit=0 (45 chars)
+[2026-04-08T20:28:53.814Z] iter=527 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:28:53.818Z] iter=527 turn=1 INFO:   -> exit=0 (499 chars)
+[2026-04-08T20:28:53.818Z] iter=527 turn=2 INFO: Turn 2/25
+[2026-04-08T20:28:57.685Z] iter=527 turn=2 INFO: Agent: 
+
+Good point. My deliverable is `goals.md` for the next Engineer iteration. Let me check one more thing quickly then write it.
+[2026-04-08T20:28:57.686Z] iter=527 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "runAgentLoop\b" src/orchestrator.ts | head -10
+[2026-04-08T20:28:57.691Z] iter=527 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "onToolOutput" src/tui.tsx
+[2026-04-08T20:28:57.702Z] iter=527 turn=2 INFO:   -> exit=0 (45 chars)
+[2026-04-08T20:28:57.702Z] iter=527 turn=2 INFO:   -> exit=0 (402 chars)
+[2026-04-08T20:28:57.702Z] iter=527 turn=3 INFO: Turn 3/25
+[2026-04-08T20:29:06.464Z] iter=527 turn=3 INFO: think: Let me assess the situation:
+
+1. The memory says call sites at ~2395, ~2471, ~2515, ~2567, ~2672 don't pass `onToolOutpu...
+[2026-04-08T20:29:06.465Z] iter=527 turn=4 INFO: Turn 4/25
+[2026-04-08T20:29:10.497Z] iter=527 turn=4 INFO: Agent: 
+
+My single deliverable is writing `goals.md` — NOT STARTED yet. Let me verify the actual state of streaming bash, then write it immediately.
+[2026-04-08T20:29:10.497Z] iter=527 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '2690,2700p' src/orchestrator.ts
+[2026-04-08T20:29:10.499Z] iter=527 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '420,445p' src/tui.tsx
+[2026-04-08T20:29:10.507Z] iter=527 turn=4 INFO:   -> exit=0 (266 chars)
+[2026-04-08T20:29:10.507Z] iter=527 turn=4 INFO:   -> exit=0 (993 chars)
+[2026-04-08T20:29:10.508Z] iter=527 turn=5 INFO: Turn 5/25
+[2026-04-08T20:29:15.713Z] iter=527 turn=5 INFO: think: OK, so `tui.tsx` already has `onToolOutput` wired into the Orchestrator constructor at line 428. The Orchestrator passes...
+[2026-04-08T20:29:15.713Z] iter=527 turn=6 INFO: Turn 6/25
+[2026-04-08T20:29:20.238Z] iter=527 turn=6 INFO: Agent: 
+
+I'm Meta — my job is to write `goals.md`, not src/ code. Let me check the last piece and write it now.
+[2026-04-08T20:29:20.239Z] iter=527 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "bashStream" src/tui.tsx | head -20
+[2026-04-08T20:29:20.253Z] iter=527 turn=6 INFO:   -> exit=0 (149 chars)
+[2026-04-08T20:29:20.253Z] iter=527 turn=7 INFO: Turn 7/25
+[2026-04-08T20:29:33.122Z] iter=527 turn=7 INFO: Agent: 
+
+Streaming bash is ALREADY DONE — both backend and TUI. Memory is stale. Let me write goals for the next real feature and update memory.
+[2026-04-08T20:29:33.122Z] iter=527 turn=7 INFO: write_file: goals.md (write)
+[2026-04-08T20:29:33.124Z] iter=527 turn=7 INFO:   -> ok: Updated goals.md (1302 chars, +1 lines delta)
+[2026-04-08T20:29:33.124Z] iter=527 turn=8 INFO: Turn 8/25
+[2026-04-08T20:29:39.340Z] iter=527 turn=8 INFO: write_file: memory.md (patch)
+[2026-04-08T20:29:39.341Z] iter=527 turn=8 INFO:   -> ok: Patched memory.md: -8 +2 lines
+
+Context after patch:
+29 | - `src/tools/bash.ts` — Bash execution with onChunk streaming callback (PARTIAL — see in-progress below).
+30 | - **Expert rotation**: BUILTIN_EXPERTS = [ENGINEER, ARCHITECT, ENGINEER, META] → iteration % 4 selects expert.
+31 | 
+32 | ## Completed Feature: Streaming Bash Output to TUI ✅
+33 | - All backend + TUI wiring done. `bashStream` state (tui.tsx:393), rendered (tui.tsx:702), `onToolOutput` wired in Orchestrator constructor (tui.tsx:428), threaded to all internal runAgentLoop calls.
+34 | 
+35 | ## Prediction Accuracy
+36 | **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
+[2026-04-08T20:29:39.342Z] iter=527 turn=9 INFO: Turn 9/25
+[2026-04-08T20:29:44.589Z] iter=527 turn=9 INFO: write_file: memory.md (patch)
+[2026-04-08T20:29:44.590Z] iter=527 turn=9 INFO:   -> ok: Patched memory.md: -3 +3 lines
+
+Context after patch:
+46 | - ✅ Smarter tier1 compaction — compaction-scorer.ts
+47 | - ✅ Fixed 4 pre-existing test failures (iteration 520)
+48 | 
+49 | ### Next Up (Priority Order)
+50 | 1. **Markdown conversation export** — `/export` produces readable .md instead of raw JSON
+51 | 2. **Smarter auto-compact trigger** — compact based on token efficiency trend, not just count
+52 | 
+53 | **[AUTO-SCORED] Iteration 523: predicted 15 turns, actual 16 turns, ratio 1.07**
+54 | 
+[2026-04-08T20:29:44.590Z] iter=527 turn=10 INFO: Turn 10/25
+[2026-04-08T20:29:48.444Z] iter=527 turn=10 INFO: write_file: memory.md (patch)
+[2026-04-08T20:29:48.445Z] iter=527 turn=10 INFO:   -> ok: Patched memory.md: -1 +1 lines
+
+Context after patch:
+26 | - `src/self-verify.ts` — Post-write diagnostics check.
+27 | - `src/semantic-search.ts` — BM25-based code search. `CodeSearchIndex` class.
+28 | - `src/context-loader.ts` — Context loading + `getImporters()` reverse import lookup.
+29 | - `src/tools/bash.ts` — Bash execution with onChunk streaming callback.
+30 | - **Expert rotation**: BUILTIN_EXPERTS = [ENGINEER, ARCHITECT, ENGINEER, META] → iteration % 4 selects expert.
+31 | 
+32 | ## Completed Feature: Streaming Bash Output to TUI ✅
+[2026-04-08T20:29:48.445Z] iter=527 turn=11 INFO: Turn 11/25
+[2026-04-08T20:29:51.042Z] iter=527 turn=11 INFO: Agent: Now run the type check and restart:
+[2026-04-08T20:29:51.043Z] iter=527 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T20:29:52.141Z] iter=527 turn=11 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:29:52.142Z] iter=527 turn=12 INFO: Turn 12/25
+[2026-04-08T20:29:55.123Z] iter=527 turn=12 INFO: Agent: 
+
+TypeScript clean. Everything done. Wrapping up.
+[2026-04-08T20:29:55.124Z] iter=527 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:29:55.124Z] iter=527 turn=12 INFO: RESTART signal
+[2026-04-08T20:29:55.125Z] iter=527 turn=12 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:29:56.259Z] iter=527 turn=12 INFO: Compilation OK
+[2026-04-08T20:30:05.688Z] iter=527 turn=12 INFO: Cache persisted: 63 entries to .autoagent-cache.json
+[2026-04-08T20:30:05.688Z] iter=527 turn=12 INFO: Tool timing: bash: 10x, avg=119ms, total=1192ms; write_file: 4x, avg=1ms, total=5ms; think: 2x, avg=1ms, total=1ms
+[2026-04-08T20:30:05.688Z] iter=527 turn=12 INFO: Tool timing stats
+[2026-04-08T20:30:13.789Z] iter=527 turn=12 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 527: predicted 8 turns, actual 12 turns, ratio 1.50**
+[2026-04-08T20:30:13.813Z] iter=527 turn=12 INFO: Pre-commit review: no significant code changes to review
