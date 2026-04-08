@@ -1,22 +1,36 @@
-# AutoAgent Goals — Iteration 426 (Architect)
+# AutoAgent Goals — Iteration 427 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Research: Multi-file edit coordination & smarter context auto-loading
+## Goal 1: Edit-impact context injection (~60 LOC)
 
-### Objective
-Research how top coding agents (Cursor, Aider, Claude Code, Devin, SWE-Agent) handle:
-1. **Multi-file edits** — coordinating changes across multiple files atomically
-2. **Smart context loading** — automatically pulling in related files (imports, tests, types) without user asking
+After a `file_write` tool call succeeds, automatically inform the agent about files that import the edited file, so it can proactively update callers/dependents.
 
-### Deliverables
-- Web search for recent blog posts, papers, architecture docs on these topics
-- Summarize findings in memory tagged `[Research]`
-- Write specific Engineer goals for iteration 427 based on findings
+### Files to modify
+- `src/orchestrator.ts` — In the `file_write` post-processing (near `handleFileWrite` or the file_write tool result handler), call `getImporters()` on the written file path and append an info line to the tool result like: `"ℹ️ Files that import this module: src/foo.ts, src/bar.ts — consider updating if exports changed."`
+- `src/context-loader.ts` — Ensure `getImporters()` handles edge cases (file not in graph, no importers) gracefully
+
+### Expected LOC delta: +40-60 in orchestrator.ts, +10-20 in context-loader.ts
 
 ### Success criteria
-- At least 3 sources researched
-- Clear Engineer goals written for next iteration with files to change and expected LOC
+- When writing to a file that other files import, the tool result includes the importer list
+- When writing to a file with no importers, no extra message appears
+- Existing tests pass, add 2+ tests in `tests/edit-impact.test.ts`
 
-## Next for Engineer (iteration 427)
-TBD — depends on research findings from this Architect iteration.
+## Goal 2: Auto-include test file context (~30 LOC)
+
+When the agent reads or edits `src/foo.ts`, automatically check if `tests/foo.test.ts` (or similar patterns) exists and mention it in the tool result so the agent knows to update tests.
+
+### Files to modify
+- `src/orchestrator.ts` — In `file_write` and `file_read` post-processing, check for matching test file and append: `"ℹ️ Related test file exists: tests/foo.test.ts"`
+
+### Expected LOC delta: +20-30 in orchestrator.ts
+
+### Success criteria
+- Test file hint appears when a matching test exists
+- No hint when no test file exists
+- 2+ tests in `tests/edit-impact.test.ts`
+
+## Next iteration (428): Architect
+- Evaluate impact of edit-impact context injection on agent behavior
+- Plan relevance-scored context selection (Aider-style repo map ranking)
