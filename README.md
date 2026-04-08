@@ -9,6 +9,20 @@ npm install
 cp .env.example .env  # add your ANTHROPIC_API_KEY
 ```
 
+### Global install (run from any directory)
+
+```bash
+npm link
+```
+
+This registers the `autoagent` command globally. You can then launch the TUI from any project:
+
+```bash
+cd ~/my-project
+autoagent                    # opens TUI in current directory
+autoagent --dir /other/repo  # or target a specific repo
+```
+
 ## Run
 
 ```bash
@@ -83,6 +97,93 @@ When run with `--once`, a JSON summary is written to stdout on exit:
 | `exitCode` | number | 0 = success, 1 = failure |
 | `tokensUsed` | object | Token breakdown (input, output, cacheRead, cacheCreation) |
 | `commitSha` | string | SHA of the commit made this iteration |
+
+## Interactive TUI
+
+autoagent includes a full interactive terminal UI built with [Ink](https://github.com/vadimdemedes/ink) (React for the terminal).
+
+```bash
+npm run tui                              # launch in current directory
+npm run tui -- --dir /path/to/repo       # target a specific repo
+npm run tui -- --continue                # resume last session
+```
+
+### Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│  autoagent / project / model   ⎇ main ●1 ±2   ctx: │  ← Header
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  > user message                                     │
+│  assistant response with **markdown**               │
+│  ▸ tool_call: read_file                             │
+│                                                     │  ← Scrollable message history
+│  ┌─ Architect Plan ────────────────────────┐        │
+│  │ 1. Create auth middleware               │        │  ← Plan display (when active)
+│  │ 2. Update route handlers                │        │
+│  └─────────────────────────────────────────┘        │
+│                                                     │
+│  ┌─ Diff: src/index.ts (+12 -3) ──────────┐        │
+│  │ + import { auth } from './auth'         │        │  ← Diff preview (before writes)
+│  │ - // TODO: add auth                     │        │
+│  │              [Y]es / [N]o               │        │
+│  └─────────────────────────────────────────┘        │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│  ⠋ Thinking...              ctx: 45K/200K (23%)    │  ← Status line
+│  > _                                                │  ← Input prompt
+└─────────────────────────────────────────────────────┘
+```
+
+### Features
+
+- **Streaming responses** — text appears in real-time with a blinking cursor as Claude generates
+- **Diff preview** — color-coded diffs with Y/N confirmation before any file write
+- **Context budget tracking** — visual meter (green → yellow → red) with auto-compaction
+- **Live git status** — branch, staged, and unstaged indicators in the header
+- **Architect plans** — structured step lists with file operations (create/modify/delete)
+- **Task plans** — multi-step work decomposed into a DAG with progress tracking
+- **File suggestions** — type `#partial/path` to fuzzy-search and autocomplete file references
+- **Session persistence** — conversations save as JSONL and resume with `--continue`
+- **Virtual scrolling** — windowed message rendering with tool call collapsing
+- **Markdown rendering** — bold, italic, code blocks, tables, headers, lists, blockquotes
+
+### Keyboard Shortcuts
+
+| Key | Action |
+|---|---|
+| `Enter` | Send message / accept file suggestion |
+| `Tab` | Cycle through file suggestions |
+| `Up/Down` | Scroll message history (when input is empty) |
+| `Shift+Up/Down` | Scroll faster |
+| `Esc` | Close suggestions / abort generation / exit (press twice) |
+| `Y/N` | Accept or reject diff previews |
+
+### Slash Commands
+
+| Command | Description |
+|---|---|
+| `/help` | Show available commands |
+| `/clear` | Clear conversation history |
+| `/compact` | Force context compaction |
+| `/init` | Initialize `.autoagent.md` project config |
+| `/exit` | Exit with session export |
+| `/reindex` | Rebuild repo file index |
+| `/autoaccept` | Toggle auto-accept for diffs |
+| `/dream` | Run memory consolidation |
+| `/sessions` | List saved sessions |
+| `/checkpoint` | Create conversation checkpoint |
+
+### Adaptive Model Routing
+
+Messages are automatically routed to the appropriate Claude model:
+
+| Tier | When |
+|---|---|
+| **Haiku** | Read-only queries and simple lookups |
+| **Sonnet** | Code changes and complex requests |
+| **Opus** | Architecture and planning phases |
 
 ## Project Structure
 
