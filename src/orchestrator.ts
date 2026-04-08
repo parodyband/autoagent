@@ -40,7 +40,7 @@ import { runDiagnostics } from "./diagnostics.js";
 import { findRelatedTests, runRelatedTests } from "./test-runner.js";
 import { computeUnifiedDiff } from "./diff-preview.js";
 import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences, resolveImportGraph, getImporters } from "./context-loader.js";
-import { enhanceToolError } from "./tool-recovery.js";
+import { enhanceToolError, retryWithBackoff } from "./tool-recovery.js";
 import { detectProject } from "./project-detector.js";
 import { detectLoop } from "./loop-detector.js";
 import { loadHooksConfig, runHooks, type HooksConfig } from "./hooks.js";
@@ -421,11 +421,14 @@ export function injectMessageCacheBreakpoints(
 
 function makeSimpleCaller(client: Anthropic): (prompt: string) => Promise<string> {
   return async (prompt: string) => {
-    const response = await client.messages.create({
-      model: MODEL_SIMPLE,
-      max_tokens: 2048,
-      messages: [{ role: "user", content: prompt }],
-    });
+    const response = await retryWithBackoff(
+      () => client.messages.create({
+        model: MODEL_SIMPLE,
+        max_tokens: 2048,
+        messages: [{ role: "user", content: prompt }],
+      }),
+      { maxRetries: 3, baseDelayMs: 1000 },
+    );
     const block = response.content[0];
     return block.type === "text" ? block.text : "";
   };

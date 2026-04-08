@@ -262,11 +262,45 @@ Rules:
     dependsOn: t.dependsOn ?? [],
   }));
 
+  const enrichedTasks = inferDependencies(tasks);
+
   return {
     goal: parsed.goal,
-    tasks,
+    tasks: enrichedTasks,
     createdAt: Date.now(),
   };
+}
+
+// ─── Dependency inference ─────────────────────────────────────────────────────
+
+/** Regex that matches file-path-like strings (must contain a slash or end with common extension) */
+const FILE_RE = /(?:[\w.-]+\/)+[\w.-]+\.(?:ts|tsx|js|jsx|json|md|css|html)\b/g;
+
+/**
+ * Auto-infers task dependencies by scanning task titles and descriptions for
+ * shared file path references. If tasks i and j both mention the same file and
+ * i comes before j, then i is added to j.dependsOn (unless already present).
+ */
+export function inferDependencies(tasks: Task[]): Task[] {
+  // Extract file refs per task
+  const filesByTask = tasks.map((t) => {
+    const text = `${t.title} ${t.description}`;
+    return new Set(text.match(FILE_RE) ?? []);
+  });
+
+  // For each later task, check overlap with earlier tasks
+  return tasks.map((task, j) => {
+    const extraDeps: string[] = [];
+    for (let i = 0; i < j; i++) {
+      const overlap = [...filesByTask[j]].some((f) => filesByTask[i].has(f));
+      if (overlap && !task.dependsOn.includes(tasks[i].id)) {
+        extraDeps.push(tasks[i].id);
+      }
+    }
+    return extraDeps.length > 0
+      ? { ...task, dependsOn: [...task.dependsOn, ...extraDeps] }
+      : task;
+  });
 }
 
 /**

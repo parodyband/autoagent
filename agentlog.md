@@ -1,64 +1,3 @@
-169 |     if (command.includes("AUTOAGENT_RESTART")) {
-170 |       ctx.log("RESTART signal");
-171 |       return {
-172 |         result: "RESTART acknowledged. Harness will validate, commit, restart.",
-173 |         isRestart: true,
-174 |       };
-175 |     }
-176 | 
-177 |     const effectiveTimeout = timeout || ctx.defaultTimeout || 120;
-178 |     const r = await lazyExecuteBash(command, effectiveTimeout, ctx.rootDir) as { exitCode: number; output: string };
-179 |     ctx.log(`  -> exit=${r.exitCode} (${r.output.length} chars)`);
-180 |     return { result: r.output };
-181 |   }, { defaultTimeout: 120 });
-182 | 
-183 |   // ── read_file ─────────────────────────────────────────
-184 |   const lazyExecuteReadFile = lazyExecutor("./tools/read_file.js", "executeReadFile");
-185 |   registry.register(readFileToolDefinition, async (input, ctx) => {
-186 |     const { path: filePath, start_line, end_line } = input as {
-187 |       path: string; start_line?: number; end_line?: number;
-188 |     };
-189 |     ctx.log(`read_file: ${filePath}`);
-190 |     const r = await lazyExecuteReadFile(filePath, start_line, end_line, ctx.rootDir) as { success: boolean; content: string };
-191 |     ctx.log(`  -> ${r.success ? "ok" : "err"} (${r.content.length} chars)`);
-192 |     return { result: r.content };
-193 |   }, { defaultTimeout: 10 });
-194 | 
-195 |   // ── write_file ────────────────────────────────────────
-196 |   const lazyExecuteWriteFile = lazyExecutor("./tools/write_file.js", "executeWriteFile");
-197 |   registry.register(writeFileToolDefinition, async (input, ctx) => {
-198 |     const {
-199 |       path: filePath, content, mode, old_string, new_string,
-200 |     } = input as {
-201 |       path: string; content?: string; mode?: "write" | "append" | "patch";
-202 |       old_string?: string; new_string?: string;
-203 |     };
-204 |     const m = mode || "write";
-205 |     ctx.log(`write_file: ${filePath} (${m})`);
-206 |     const r = await lazyExecuteWriteFile(filePath, content || "", m, ctx.rootDir, old_string, new_string) as { success: boolean; message: string };
-207 |     ctx.log(`  -> ${r.success ? "ok" : "err"}: ${r.message}`);
-208 |     return { result: r.message };
-209 |   }, { defaultTimeout: 10 });
-210 | 
-211 |   // ── grep ──────────────────────────────────────────────
-212 |   const lazyExecuteGrep = lazyExecutor("./tools/grep.js", "executeGrep");
-213 |   registry.register(grepToolDefinition, async (input, ctx) => {
-214 |     const {
-215 |       pattern, path: searchPath, glob: globPattern, type, output_mode,
-216 |       context, case_insensitive, max_results, multiline,
-217 |     } = input as {
-218 |       pattern: string; path?: string; glob?: string; type?: string;
-219 |       output_mode?: "content" | "files" | "count"; context?: number;
-220 |       case_insensitive?: boolean; max_results?: number; multiline?: boolean;
-221 |     };
-222 |     ctx.log(`grep: "${pattern}"${searchPath ? ` in ${searchPath}` : ""}`);
-223 |     const r = await lazyExecuteGrep(
-224 |       pattern, searchPath, globPattern, type, output_mode,
-225 |       context, case_insensitive, max_results, multiline, ctx.rootDir,
-226 |     ) as { matchCount: number; content: string };
-227 |     ctx.log(`  -> ${r.matchCount} matches`);
-228 |     return { result: r.content };
-229 |   }, { defaultTimeout: 30 });
 230 | 
 231 |   // ── web_fetch ─────────────────────────────────────────
 232 |   const lazyExecuteWebFetch = lazyExecutor("./tools/web_fetch.js", "executeWebFetch");
@@ -1057,3 +996,180 @@ TypeScript already passed. Goals.md is written. Memory saved. Done.
 [2026-04-08T08:48:59.113Z] iter=485 turn=7 INFO: Tool timing stats
 [2026-04-08T08:49:07.417Z] iter=485 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 485: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-08T08:49:07.439Z] iter=485 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T08:49:07.472Z] iter=485 turn=7 INFO: Committed: cf3b2f36 (17 in / 2518 out, cache: 12298 created, 44495 read)
+[2026-04-08T08:49:07.472Z] iter=485 turn=7 INFO: Restarting as iteration 486...
+[2026-04-08T08:49:07.658Z] iter=486 INFO: Cache restored: 70/70 entries (0 stale)
+[2026-04-08T08:49:07.660Z] iter=486 INFO: Turn budget: 16/25 (calibration=1.07x, predicted=15)
+[2026-04-08T08:49:07.661Z] iter=486 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T08:49:07.860Z] iter=486 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T08:49:07.861Z] iter=486 turn=1 INFO: Turn 1/25
+[2026-04-08T08:49:10.576Z] iter=486 turn=1 INFO: $ grep -n "inferDependencies\|retryWithBackoff" src/task-planner.ts src/orchestrator.ts 2>/dev/null | head -20
+[2026-04-08T08:49:10.577Z] iter=486 turn=1 INFO: read_scratchpad: 450 chars
+[2026-04-08T08:49:10.594Z] iter=486 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:49:10.595Z] iter=486 turn=2 INFO: Turn 2/25
+[2026-04-08T08:49:13.642Z] iter=486 turn=2 INFO: $ grep -n "retryWithBackoff" src/tool-recovery.ts | head -10
+[2026-04-08T08:49:13.645Z] iter=486 turn=2 INFO: $ wc -l src/task-planner.ts src/orchestrator.ts src/tool-recovery.ts
+[2026-04-08T08:49:13.654Z] iter=486 turn=2 INFO:   -> exit=0 (47 chars)
+[2026-04-08T08:49:13.655Z] iter=486 turn=2 INFO:   -> exit=0 (103 chars)
+[2026-04-08T08:49:13.655Z] iter=486 turn=3 INFO: Turn 3/25
+[2026-04-08T08:49:17.880Z] iter=486 turn=3 INFO: think: I have two goals:
+1. Add `inferDependencies` to task-planner.ts
+2. Wire `retryWithBackoff` into orchestrator.ts
+
+Let me ...
+[2026-04-08T08:49:17.881Z] iter=486 turn=4 INFO: Turn 4/25
+[2026-04-08T08:49:21.210Z] iter=486 turn=4 INFO: $ sed -n '255,280p' src/task-planner.ts
+[2026-04-08T08:49:21.216Z] iter=486 turn=4 INFO: $ grep -n "makeSimpleCaller\|client\.messages\." src/orchestrator.ts | head -20
+[2026-04-08T08:49:21.227Z] iter=486 turn=4 INFO:   -> exit=0 (710 chars)
+[2026-04-08T08:49:21.235Z] iter=486 turn=4 INFO:   -> exit=0 (512 chars)
+[2026-04-08T08:49:21.235Z] iter=486 turn=5 INFO: Turn 5/25
+[2026-04-08T08:49:23.614Z] iter=486 turn=5 INFO: $ sed -n '418,445p' src/orchestrator.ts
+[2026-04-08T08:49:23.619Z] iter=486 turn=5 INFO: $ sed -n '1440,1460p' src/orchestrator.ts
+[2026-04-08T08:49:23.634Z] iter=486 turn=5 INFO:   -> exit=0 (950 chars)
+[2026-04-08T08:49:23.636Z] iter=486 turn=5 INFO:   -> exit=0 (682 chars)
+[2026-04-08T08:49:23.637Z] iter=486 turn=6 INFO: Turn 6/25
+[2026-04-08T08:49:27.426Z] iter=486 turn=6 INFO: Agent: Goal 1 (inferDependencies): NOT STARTED
+Goal 2 (retryWithBackoff in orchestrator): NOT STARTED
+
+Let me look at the import section of orchestrator.ts and the task-planner structure, then write both changes now.
+[2026-04-08T08:49:27.426Z] iter=486 turn=6 INFO: $ grep -n "^import" src/orchestrator.ts | head -15
+[2026-04-08T08:49:27.429Z] iter=486 turn=6 INFO: $ sed -n '1,20p' src/task-planner.ts
+[2026-04-08T08:49:27.436Z] iter=486 turn=6 INFO:   -> exit=0 (576 chars)
+[2026-04-08T08:49:27.437Z] iter=486 turn=6 INFO:   -> exit=0 (995 chars)
+[2026-04-08T08:49:27.438Z] iter=486 turn=7 INFO: Turn 7/25
+[2026-04-08T08:49:31.156Z] iter=486 turn=7 INFO: Agent: Now I have everything I need. Let me implement both goals:
+[2026-04-08T08:49:31.157Z] iter=486 turn=7 INFO: $ sed -n '260,275p' src/task-planner.ts
+[2026-04-08T08:49:31.165Z] iter=486 turn=7 INFO:   -> exit=0 (317 chars)
+[2026-04-08T08:49:31.165Z] iter=486 turn=8 INFO: Turn 8/25
+[2026-04-08T08:49:41.705Z] iter=486 turn=8 INFO: write_file: src/task-planner.ts (patch)
+[2026-04-08T08:49:41.711Z] iter=486 turn=8 INFO:   -> ok: Patched src/task-planner.ts: -9 +43 lines
+
+Context after patch:
+262 |     dependsOn: t.dependsOn ?? [],
+263 |   }));
+264 | 
+265 |   const enrichedTasks = inferDependencies(tasks);
+266 | 
+267 |   return {
+268 |     goal: parsed.goal,
+269 |     tasks: enrichedTasks,
+270 |     createdAt: Date.now(),
+271 |   };
+272 | }
+273 | 
+274 | // ─── Dependency inference ─────────────────────────────────────────────────────
+275 | 
+276 | /** Regex that matches file-path-like strings (must contain a slash or end with common extension) */
+277 | const FILE_RE = /(?:[\w.-]+\/)+[\w.-]+\.(?:ts|tsx|js|jsx|json|md|css|html)\b/g;
+278 | 
+279 | /**
+280 |  * Auto-infers task dependencies by scanning task titles and descriptions for
+281 |  * shared file path references. If tasks i and j both mention the same file and
+282 |  * i comes before j, then i is added to j.dependsOn (unless already present).
+283 |  */
+284 | export function inferDependencies(tasks: Task[]): Task[] {
+285 |   // Extract file refs per task
+286 |   const filesByTask = tasks.map((t) => {
+287 |     const text = `${t.title} ${t.description}`;
+288 |     return new Set(text.match(FILE_RE) ?? []);
+289 |   });
+290 | 
+291 |   // For each later task, check overlap with earlier tasks
+292 |   return tasks.map((task, j) => {
+293 |     const extraDeps: string[] = [];
+294 |     for (let i = 0; i < j; i++) {
+295 |       const overlap = [...filesByTask[j]].some((f) => filesByTask[i].has(f));
+296 |       if (overlap && !task.dependsOn.includes(tasks[i].id)) {
+297 |         extraDeps.push(tasks[i].id);
+298 |       }
+299 |     }
+300 |     return extraDeps.length > 0
+301 |       ? { ...task, dependsOn: [...task.dependsOn, ...extraDeps] }
+302 |       : task;
+303 |   });
+304 | }
+305 | 
+306 | /**
+307 |  * Creates a recovery plan when a task fails by calling createPlan with
+308 |  * context about what succeeded and what failed.
+309 |  *
+310 |  * @param originalPlan    The original (partially-executed) plan
+[2026-04-08T08:49:41.713Z] iter=486 turn=9 INFO: Turn 9/25
+[2026-04-08T08:49:48.578Z] iter=486 turn=9 INFO: Agent: Goal 1 done. Now Goal 2 — wire retryWithBackoff into orchestrator.ts:
+[2026-04-08T08:49:48.578Z] iter=486 turn=9 INFO: $ grep -n "from.*tool-recovery" src/orchestrator.ts
+[2026-04-08T08:49:48.589Z] iter=486 turn=9 INFO:   -> exit=0 (58 chars)
+[2026-04-08T08:49:48.590Z] iter=486 turn=10 INFO: Turn 10/25
+[2026-04-08T08:49:52.679Z] iter=486 turn=10 INFO: Agent: I've changed `src/task-planner.ts` (Goal 1 done). Now finishing Goal 2 immediately.
+[2026-04-08T08:49:52.680Z] iter=486 turn=10 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T08:49:52.681Z] iter=486 turn=10 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
+
+Context after patch:
+40 | import { findRelatedTests, runRelatedTests } from "./test-runner.js";
+41 | import { computeUnifiedDiff } from "./diff-preview.js";
+42 | import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences, resolveImportGraph, getImporters } from "./context-loader.js";
+43 | import { enhanceToolError, retryWithBackoff } from "./tool-recovery.js";
+44 | import { detectProject } from "./project-detector.js";
+45 | import { detectLoop } from "./loop-detector.js";
+46 | import { loadHooksConfig, runHooks, type HooksConfig } from "./hooks.js";
+[2026-04-08T08:49:52.681Z] iter=486 turn=11 INFO: Turn 11/25
+[2026-04-08T08:49:58.700Z] iter=486 turn=11 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T08:49:58.703Z] iter=486 turn=11 INFO:   -> ok: Patched src/orchestrator.ts: -11 +14 lines
+
+Context after patch:
+419 | 
+420 | // ─── Simple Claude caller (for task decomposition / compaction) ─
+421 | 
+422 | function makeSimpleCaller(client: Anthropic): (prompt: string) => Promise<string> {
+423 |   return async (prompt: string) => {
+424 |     const response = await retryWithBackoff(
+425 |       () => client.messages.create({
+426 |         model: MODEL_SIMPLE,
+427 |         max_tokens: 2048,
+428 |         messages: [{ role: "user", content: prompt }],
+429 |       }),
+430 |       { maxRetries: 3, baseDelayMs: 1000 },
+431 |     );
+432 |     const block = response.content[0];
+433 |     return block.type === "text" ? block.text : "";
+434 |   };
+435 | }
+436 | 
+437 | // ─── Tool execution ───────────────────────────────────────────
+438 | 
+[2026-04-08T08:49:58.704Z] iter=486 turn=12 INFO: Turn 12/25
+[2026-04-08T08:50:01.875Z] iter=486 turn=12 INFO: Agent: Now check the `retryWithBackoff` signature to make sure options match:
+[2026-04-08T08:50:01.875Z] iter=486 turn=12 INFO: $ sed -n '405,435p' src/tool-recovery.ts
+[2026-04-08T08:50:01.884Z] iter=486 turn=12 INFO:   -> exit=0 (1071 chars)
+[2026-04-08T08:50:01.885Z] iter=486 turn=13 INFO: Turn 13/25
+[2026-04-08T08:50:06.445Z] iter=486 turn=13 INFO: Agent: Both goals done. Running verification now.
+[2026-04-08T08:50:06.446Z] iter=486 turn=13 INFO: $ npx tsc --noEmit 2>&1 | tail -20
+[2026-04-08T08:50:07.638Z] iter=486 turn=13 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:50:07.638Z] iter=486 turn=14 INFO: Turn 14/25
+[2026-04-08T08:50:18.771Z] iter=486 turn=14 INFO: Agent: TypeScript clean. Now writing the test file and wrapping up.
+[2026-04-08T08:50:18.771Z] iter=486 turn=14 INFO: write_file: src/__tests__/task-planner-deps.test.ts (write)
+[2026-04-08T08:50:18.772Z] iter=486 turn=14 INFO:   -> ok: Created src/__tests__/task-planner-deps.test.ts (2048 chars)
+[2026-04-08T08:50:18.772Z] iter=486 turn=15 INFO: Turn 15/25
+[2026-04-08T08:50:22.041Z] iter=486 turn=15 INFO: $ npx vitest run src/__tests__/task-planner-deps.test.ts --reporter=verbose 2>&1 | tail -20
+[2026-04-08T08:50:23.052Z] iter=486 turn=15 INFO:   -> exit=0 (711 chars)
+[2026-04-08T08:50:23.052Z] iter=486 turn=16 INFO: Turn 16/25
+[2026-04-08T08:50:29.229Z] iter=486 turn=16 INFO: Agent: All tests pass. Wrapping up now.
+[2026-04-08T08:50:29.230Z] iter=486 turn=16 INFO: save_memory: "[Engineer] Iteration 486"
+[2026-04-08T08:50:29.233Z] iter=486 turn=16 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T08:50:29.234Z] iter=486 turn=17 INFO: Turn 17/25
+[2026-04-08T08:50:42.425Z] iter=486 turn=17 INFO: write_file: goals.md (write)
+[2026-04-08T08:50:42.426Z] iter=486 turn=17 INFO:   -> ok: Updated goals.md (1881 chars, -55 lines delta)
+[2026-04-08T08:50:42.427Z] iter=486 turn=18 INFO: Turn 18/25
+[2026-04-08T08:50:44.760Z] iter=486 turn=18 INFO: $ npx tsc --noEmit && echo "TSC_OK"
+[2026-04-08T08:50:45.901Z] iter=486 turn=18 INFO:   -> exit=0 (7 chars)
+[2026-04-08T08:50:45.901Z] iter=486 turn=19 INFO: Turn 19/25
+[2026-04-08T08:50:48.978Z] iter=486 turn=19 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T08:50:48.978Z] iter=486 turn=19 INFO: RESTART signal
+[2026-04-08T08:50:48.979Z] iter=486 turn=19 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T08:50:50.049Z] iter=486 turn=19 INFO: Compilation OK
+[2026-04-08T08:50:58.857Z] iter=486 turn=19 INFO: Cache persisted: 67 entries to .autoagent-cache.json
+[2026-04-08T08:50:58.857Z] iter=486 turn=19 INFO: Tool timing: bash: 16x, avg=219ms, total=3511ms; write_file: 5x, avg=3ms, total=15ms; save_memory: 1x, avg=4ms, total=4ms; read_scratchpad: 1x, avg=1ms, total=1ms; think: 1x, avg=1ms, total=1ms
+[2026-04-08T08:50:58.857Z] iter=486 turn=19 INFO: Tool timing stats
+[2026-04-08T08:51:06.853Z] iter=486 turn=19 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 486: predicted 15 turns, actual 19 turns, ratio 1.27**
+[2026-04-08T08:51:18.176Z] iter=486 turn=19 INFO: Pre-commit review (2097in/340out): **Issues found:**
+
+- **False positive dependencies from generic filenames**: `FILE_RE` will match any shared filename across tasks. If two unrelated tasks both touch `src/config.ts` for genuinely inde
