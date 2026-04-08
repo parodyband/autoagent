@@ -1137,3 +1137,14 @@ Context after patch:
 [2026-04-08T20:17:59.963Z] iter=520 turn=17 INFO: $ cd /Users/austin/Documents/autoagent && git add -A && git commit -m "fix: 4 pre-existing test failures (task-planner x2, tool-recovery-retry x2)
 
 - task-planner: dependent tasks correctly marked 'fail...
+[2026-04-08T20:18:00.027Z] iter=520 turn=17 INFO:   -> exit=0 (147 chars)
+[2026-04-08T20:18:00.027Z] iter=520 turn=18 INFO: Turn 18/25
+[2026-04-08T20:18:02.185Z] iter=520 turn=18 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:18:02.185Z] iter=520 turn=18 INFO: RESTART signal
+[2026-04-08T20:18:02.186Z] iter=520 turn=18 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:18:03.417Z] iter=520 turn=18 INFO: Compilation OK
+[2026-04-08T20:18:12.827Z] iter=520 turn=18 INFO: Cache persisted: 68 entries to .autoagent-cache.json
+[2026-04-08T20:18:12.827Z] iter=520 turn=18 INFO: Tool timing: bash: 16x, avg=397ms, total=6357ms; write_file: 4x, avg=2ms, total=9ms; read_scratchpad: 1x, avg=2ms, total=2ms; save_memory: 1x, avg=2ms, total=2ms; think: 2x, avg=0ms, total=0ms
+[2026-04-08T20:18:12.827Z] iter=520 turn=18 INFO: Tool timing stats
+[2026-04-08T20:18:21.312Z] iter=520 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 520: predicted 15 turns, actual 18 turns, ratio 1.20**
+[2026-04-08T20:18:21.338Z] iter=520 turn=18 INFO: Pre-commit review: no significant code changes to review
