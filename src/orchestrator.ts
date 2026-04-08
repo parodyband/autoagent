@@ -899,12 +899,16 @@ async function runAgentLoop(
       try {
         const absPath = path.isAbsolute(filePath) ? filePath : path.join(workDir, filePath);
         const relPath = path.relative(workDir, absPath);
-        if (relPath.includes(".test.") || relPath.includes(".spec.")) continue;
+        if (relPath.includes(".test.") || relPath.includes(".spec.") || !/\.(ts|tsx|js|jsx)$/.test(relPath)) continue;
+        const ext = path.extname(relPath);
+        const base = relPath.slice(0, -ext.length);
+        const testExt = ext === ".tsx" || ext === ".ts" ? ".test.ts" : ".test.js";
+        const specExt = ext === ".tsx" || ext === ".ts" ? ".spec.ts" : ".spec.js";
         const patterns = [
-          relPath.replace(/^src\//, "tests/").replace(/\.ts$/, ".test.ts"),
-          relPath.replace(/^src\//, "test/").replace(/\.ts$/, ".test.ts"),
-          relPath.replace(/\.ts$/, ".test.ts"),
-          relPath.replace(/\.ts$/, ".spec.ts"),
+          base.replace(/^src\//, "tests/") + testExt,
+          base.replace(/^src\//, "test/") + testExt,
+          base + testExt,
+          base + specExt,
         ];
         for (const pat of patterns) {
           const testPath = path.join(workDir, pat);

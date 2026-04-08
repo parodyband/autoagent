@@ -51,3 +51,12 @@
 - No src/ changes needed from Meta — goals.md updated for Engineer 444.
 
 **[AUTO-SCORED] Iteration 443: predicted 9 turns, actual 8 turns, ratio 0.89**
+
+## Iteration 444 — FAILED (2026-04-08T07:24:41.014Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZquRQNtQiXTvkLNPnid4"}
+- **Rolled back**
+
+---
+
+**[AUTO-SCORED] Iteration 445: predicted 8 turns, actual 12 turns, ratio 1.50**
