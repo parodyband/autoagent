@@ -1,83 +1,3 @@
-[2026-04-08T20:12:37.669Z] iter=518 turn=4 INFO: Turn 4/25
-[2026-04-08T20:12:52.882Z] iter=518 turn=4 INFO: Agent: Now building all three deliverables:
-[2026-04-08T20:12:52.883Z] iter=518 turn=4 INFO: write_file: src/compaction-scorer.ts (write)
-[2026-04-08T20:12:52.886Z] iter=518 turn=4 INFO:   -> ok: Created src/compaction-scorer.ts (2725 chars)
-[2026-04-08T20:12:52.888Z] iter=518 turn=5 INFO: Turn 5/25
-[2026-04-08T20:12:56.541Z] iter=518 turn=5 INFO: Agent: **Goal status:**
-1. `src/compaction-scorer.ts` — ✅ DONE
-2. Modify `compactTier1()` in `src/orchestrator.ts` — IN PROGRESS
-3. `src/__tests__/compaction-scorer.test.ts` — NOT STARTED
-
-Continuing with the orchestrator modification now:
-[2026-04-08T20:12:56.541Z] iter=518 turn=5 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T20:12:56.542Z] iter=518 turn=5 INFO:   -> err: ERROR: old_string not found in src/orchestrator.ts. Must match exactly.
-[2026-04-08T20:12:56.543Z] iter=518 turn=6 INFO: Turn 6/25
-[2026-04-08T20:12:59.414Z] iter=518 turn=6 INFO: grep: "compressToolOutput|context-loader" in src/orchestrator.ts
-[2026-04-08T20:12:59.430Z] iter=518 turn=6 INFO:   -> 0 matches
-[2026-04-08T20:12:59.430Z] iter=518 turn=7 INFO: Turn 7/25
-[2026-04-08T20:13:01.596Z] iter=518 turn=7 INFO: grep: "compressToolOutput" in src
-[2026-04-08T20:13:01.623Z] iter=518 turn=7 INFO:   -> 23 matches
-[2026-04-08T20:13:01.624Z] iter=518 turn=8 INFO: Turn 8/25
-[2026-04-08T20:13:04.431Z] iter=518 turn=8 INFO: Agent: Now I have the right import. Let me patch the orchestrator:
-[2026-04-08T20:13:04.431Z] iter=518 turn=8 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T20:13:04.432Z] iter=518 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -1 +2 lines
-
-Context after patch:
-15 | 
-16 | import * as path from "node:path";
-17 | import Anthropic from "@anthropic-ai/sdk";
-18 | import { compressToolOutput } from "./tool-output-compressor.js";
-19 | import { scoreToolOutput } from "./compaction-scorer.js";
-20 | import { fingerprintRepo } from "./repo-context.js";
-21 | import { rankFiles } from "./file-ranker.js";
-22 | import { buildRepoMap, formatRepoMap, rankSymbols, truncateRepoMap, saveRepoMapCache, loadRepoMapCache, getStaleFiles, updateRepoMapIncremental, cacheToRepoMap } from "./tree-sitter-map.js";
-[2026-04-08T20:13:04.433Z] iter=518 turn=9 INFO: Turn 9/25
-[2026-04-08T20:13:16.250Z] iter=518 turn=9 INFO: Agent: **What I've changed in src/ so far:**
-1. ✅ `src/compaction-scorer.ts` — created (new file, ~90 LOC)
-2. ✅ `src/orchestrator.ts` — added import for `scoreToolOutput`
-3. ❌ `compactTier1()` body not yet updated to use the scorer
-4. ❌ `src/__tests__/compaction-scorer.test.ts` — not created
-
-Finishing now — patching compactTier1() and writing the test file:
-[2026-04-08T20:13:16.251Z] iter=518 turn=9 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T20:13:16.252Z] iter=518 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -26 +46 lines
-
-Context after patch:
-1950 |     // Keep the last 5 assistant turns fresh — compress everything older
-1951 |     const cutoffAssistantIdx = assistantIndices[4] ?? 0; // 5th most recent assistant turn
-1952 | 
-1953 |     // Build a map from tool_use_id -> tool name by scanning assistant messages
-1954 |     const toolUseIdToName = new Map<string, string>();
-1955 |     for (const msg of this.apiMessages) {
-1956 |       if (msg.role !== "assistant" || !Array.isArray(msg.content)) continue;
-1957 |       for (const block of msg.content) {
-1958 |         if (
-1959 |           typeof block === "object" &&
-1960 |           "type" in block &&
-1961 |           block.type === "tool_use" &&
-1962 |           "id" in block &&
-1963 |           "name" in block
-1964 |         ) {
-1965 |           toolUseIdToName.set(
-1966 |             (block as { id: string; name: string }).id,
-1967 |             (block as { id: string; name: string }).name,
-1968 |           );
-1969 |         }
-1970 |       }
-1971 |     }
-1972 | 
-1973 |     for (let i = 0; i < cutoffAssistantIdx; i++) {
-1974 |       const msg = this.apiMessages[i];
-1975 |       if (msg.role !== "user" || !Array.isArray(msg.content)) continue;
-1976 | 
-1977 |       for (const block of msg.content) {
-1978 |         if (
-1979 |           typeof block === "object" &&
-1980 |           "type" in block &&
-1981 |           block.type === "tool_result" &&
-1982 |           Array.isArray((block as { content?: unknown[] }).content)
-1983 |         ) {
-1984 |           const toolBlock = block as {
 1985 |             type: string;
 1986 |             tool_use_id: string;
 1987 |             content: Array<{ type: string; text?: string }>;
@@ -1076,3 +996,166 @@ Writing goals now and finishing up.
 [2026-04-08T20:26:46.695Z] iter=525 turn=13 INFO: Tool timing stats
 [2026-04-08T20:26:55.426Z] iter=525 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 525: predicted 12 turns, actual 13 turns, ratio 1.08**
 [2026-04-08T20:26:55.451Z] iter=525 turn=13 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:26:55.488Z] iter=525 turn=13 INFO: Committed: baaebfc6 (23 in / 2941 out, cache: 19684 created, 155896 read)
+[2026-04-08T20:26:55.489Z] iter=525 turn=13 INFO: Restarting as iteration 526...
+[2026-04-08T20:26:55.690Z] iter=526 INFO: Cache restored: 63/63 entries (0 stale)
+[2026-04-08T20:26:55.693Z] iter=526 INFO: Turn budget: 17/25 (calibration=1.08x, predicted=15)
+[2026-04-08T20:26:55.693Z] iter=526 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T20:26:55.892Z] iter=526 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T20:26:55.892Z] iter=526 turn=1 INFO: Turn 1/25
+[2026-04-08T20:26:59.059Z] iter=526 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be built.
+[2026-04-08T20:26:59.060Z] iter=526 turn=1 INFO: $ grep -n "turnTokenHistory\|getContextEfficiency\|lastInputTokens\|lastOutputTokens\|inputTokens\|outputTokens" src/orchestrator.ts | head -50
+[2026-04-08T20:26:59.060Z] iter=526 turn=1 INFO: $ grep -n "case 'status'\|costTracker\|getContextEfficiency" src/tui-commands.ts | head -30
+[2026-04-08T20:26:59.070Z] iter=526 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:26:59.073Z] iter=526 turn=1 INFO:   -> exit=0 (1566 chars)
+[2026-04-08T20:26:59.073Z] iter=526 turn=2 INFO: Turn 2/25
+[2026-04-08T20:27:01.568Z] iter=526 turn=2 INFO: $ grep -n "status\|costTracker\|getStatus\|getStats" src/tui-commands.ts | head -40
+[2026-04-08T20:27:01.573Z] iter=526 turn=2 INFO: $ grep -n "class Orchestrator\|private lastInputTokens\|turnTokenHistory\|getContextEfficiency" src/orchestrator.ts | head -20
+[2026-04-08T20:27:01.582Z] iter=526 turn=2 INFO:   -> exit=0 (111 chars)
+[2026-04-08T20:27:01.590Z] iter=526 turn=2 INFO:   -> exit=0 (69 chars)
+[2026-04-08T20:27:01.590Z] iter=526 turn=3 INFO: Turn 3/25
+[2026-04-08T20:27:04.652Z] iter=526 turn=3 INFO: think: I have enough context. I need to:
+1. Add `turnTokenHistory: number[]` to Orchestrator class (~line 1132)
+2. Push to it a...
+[2026-04-08T20:27:04.652Z] iter=526 turn=4 INFO: Turn 4/25
+[2026-04-08T20:27:07.199Z] iter=526 turn=4 INFO: read_file: src/orchestrator.ts
+[2026-04-08T20:27:07.200Z] iter=526 turn=4 INFO: read_file: src/orchestrator.ts
+[2026-04-08T20:27:07.202Z] iter=526 turn=4 INFO:   -> ok (515 chars)
+[2026-04-08T20:27:07.202Z] iter=526 turn=4 INFO:   -> ok (1249 chars)
+[2026-04-08T20:27:07.203Z] iter=526 turn=5 INFO: Turn 5/25
+[2026-04-08T20:27:11.581Z] iter=526 turn=5 INFO: Agent: Now I have what I need. Let me make both changes:
+[2026-04-08T20:27:11.582Z] iter=526 turn=5 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:27:11.585Z] iter=526 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -5 +7 lines
+
+Context after patch:
+1129 |   private sessionTokensOut = 0;
+1130 |   private sessionCost = 0;
+1131 |   private costTracker = new CostTracker();
+1132 |   private lastInputTokens = 0;
+1133 |   /** Input token count per turn, for context efficiency metrics. */
+1134 |   private turnTokenHistory: number[] = [];
+1135 |   /** Timestamp when this Orchestrator was constructed (session start). */
+1136 |   private sessionStartTime = Date.now();
+1137 |   /** Cost of each completed turn, for trend analysis. */
+1138 |   private turnCosts: number[] = [];
+1139 |   /** Files written during this session. */
+1140 |   private sessionFilesModified = new Set<string>();
+1141 |   /** Per-tool invocation counts for this session. */
+[2026-04-08T20:27:11.585Z] iter=526 turn=6 INFO: Turn 6/25
+[2026-04-08T20:27:15.963Z] iter=526 turn=6 INFO: Agent: **Goal status:**
+- Task A (turnTokenHistory field): ✅ DONE
+- Task A (push to turnTokenHistory after runAgentLoop): NOT STARTED
+- Task A (getContextEfficiency getter): NOT STARTED  
+- Task B (/status display): NOT STARTED
+
+Continuing now:
+[2026-04-08T20:27:15.965Z] iter=526 turn=6 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:27:15.968Z] iter=526 turn=6 INFO:   -> ok: Patched src/orchestrator.ts: -2 +3 lines
+
+Context after patch:
+2434 |     this.sessionCost += turnCost;
+2435 |     this.turnCosts.push(turnCost);
+2436 |     this.costTracker.record(model, tokensIn, tokensOut);
+2437 |     this.lastInputTokens = lastInputTokens;
+2438 |     this.turnTokenHistory.push(lastInputTokens);
+2439 |     this.tokenHistory.push({ turn: this.turnCosts.length, input: tokensIn, output: tokensOut });
+2440 | 
+2441 |     // If aborted, return early with partial result
+2442 |     if (aborted) {
+[2026-04-08T20:27:15.970Z] iter=526 turn=7 INFO: Turn 7/25
+[2026-04-08T20:27:19.179Z] iter=526 turn=7 INFO: Agent: Now add the getter. Let me find a good place near other getters:
+[2026-04-08T20:27:19.180Z] iter=526 turn=7 INFO: $ grep -n "getStatus\|getStats\|getTurnCosts\|tokenHistory\|public get\b" src/orchestrator.ts | head -20
+[2026-04-08T20:27:19.193Z] iter=526 turn=7 INFO:   -> exit=0 (236 chars)
+[2026-04-08T20:27:19.193Z] iter=526 turn=8 INFO: Turn 8/25
+[2026-04-08T20:27:21.752Z] iter=526 turn=8 INFO: read_file: src/orchestrator.ts
+[2026-04-08T20:27:21.753Z] iter=526 turn=8 INFO:   -> ok (1984 chars)
+[2026-04-08T20:27:21.754Z] iter=526 turn=9 INFO: Turn 9/25
+[2026-04-08T20:27:25.478Z] iter=526 turn=9 INFO: think: There's already a `getTokenEfficiency()` method that returns avgInput, avgOutput, peakInput, peakTurn, currentUtilPct. T...
+[2026-04-08T20:27:25.480Z] iter=526 turn=10 INFO: Turn 10/25
+[2026-04-08T20:27:28.500Z] iter=526 turn=10 INFO: Agent: I've made 2 src/ changes so far. Let me finish the remaining work now - add `getContextEfficiency()` and wire `/status`. I'll do it in one shot.
+[2026-04-08T20:27:28.501Z] iter=526 turn=10 INFO: read_file: src/tui-commands.ts
+[2026-04-08T20:27:28.501Z] iter=526 turn=10 INFO:   -> ok (3548 chars)
+[2026-04-08T20:27:28.502Z] iter=526 turn=11 INFO: Turn 11/25
+[2026-04-08T20:27:43.860Z] iter=526 turn=11 INFO: think: The `/status` command already has context efficiency stats using `getTokenEfficiency()`. And there's already a `getToken...
+[2026-04-08T20:27:43.860Z] iter=526 turn=12 INFO: Turn 12/25
+[2026-04-08T20:27:49.729Z] iter=526 turn=12 INFO: Agent: The `/status` command already shows context efficiency via `getTokenEfficiency()`. The goals want a `getContextEfficiency()` method using `turnTokenHistory`. Let me add it and update the display:
+[2026-04-08T20:27:49.729Z] iter=526 turn=12 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T20:27:49.731Z] iter=526 turn=12 INFO:   -> ok: Patched src/orchestrator.ts: -2 +12 lines
+
+Context after patch:
+1414 |       .sort((a, b) => b.avgMs - a.avgMs);
+1415 |   }
+1416 | 
+1417 |   /** Context window efficiency metrics for /status display. */
+1418 |   getContextEfficiency(): { avgTokensPerTurn: number; currentTokens: number; peakTokens: number } {
+1419 |     const h = this.turnTokenHistory;
+1420 |     if (h.length === 0) return { avgTokensPerTurn: 0, currentTokens: 0, peakTokens: 0 };
+1421 |     const avgTokensPerTurn = Math.round(h.reduce((s, n) => s + n, 0) / h.length);
+1422 |     const currentTokens = h[h.length - 1];
+1423 |     const peakTokens = Math.max(...h);
+1424 |     return { avgTokensPerTurn, currentTokens, peakTokens };
+1425 |   }
+1426 | 
+1427 |   /** Session statistics for /status display. */
+1428 |   getTokenEfficiency(): { avgInput: number; avgOutput: number; peakInput: number; peakTurn: number; currentUtilPct: number } {
+1429 |     const history = this.tokenHistory;
+1430 |     if (history.length === 0) return { avgInput: 0, avgOutput: 0, peakInput: 0, peakTurn: 0, currentUtilPct: 0 };
+1431 |     const avgInput = Math.round(history.reduce((s, t) => s + t.input, 0) / history.length);
+[2026-04-08T20:27:49.731Z] iter=526 turn=13 INFO: Turn 13/25
+[2026-04-08T20:27:58.735Z] iter=526 turn=13 INFO: Agent: Now update `/status` to use `getContextEfficiency()`, then wrap up:
+[2026-04-08T20:27:58.735Z] iter=526 turn=13 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T20:27:58.736Z] iter=526 turn=13 INFO:   -> ok: Patched src/tui-commands.ts: -10 +18 lines
+
+Context after patch:
+293 |         sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(", ")}`);
+294 |       }
+295 |     }
+296 |     // Context efficiency stats
+297 |     const effLines: string[] = [];
+298 |     const ctxEff = ctx.orchestratorRef.current?.getContextEfficiency();
+299 |     const eff = ctx.orchestratorRef.current?.getTokenEfficiency();
+300 |     if (ctxEff && ctxEff.currentTokens > 0) {
+301 |       const cur = Math.round(ctxEff.currentTokens / 1000);
+302 |       const avg = Math.round(ctxEff.avgTokensPerTurn / 1000);
+303 |       const peak = Math.round(ctxEff.peakTokens / 1000);
+304 |       const utilPct = eff?.currentUtilPct ?? Math.round((ctxEff.currentTokens / 200_000) * 100);
+305 |       const color = utilPct >= 90 ? "🔴" : utilPct >= 70 ? "🟡" : "🟢";
+306 |       effLines.push(`  ${color} Context: ${cur}K tokens (avg ${avg}K/turn, peak ${peak}K)`);
+307 |     } else if (eff && eff.avgInput > 0) {
+308 |       effLines.push(`  ⚡ Context Efficiency:`);
+309 |       effLines.push(`    Avg input/turn:   ${eff.avgInput.toLocaleString()} tokens`);
+310 |       effLines.push(`    Avg output/turn:  ${eff.avgOutput.toLocaleString()} tokens`);
+311 |       effLines.push(`    Peak input:       ${eff.peakInput.toLocaleString()} tokens (turn ${eff.peakTurn})`);
+312 |       effLines.push(`    Context util:     ${eff.currentUtilPct}% of 200K`);
+313 |     }
+314 | 
+315 |     // Tool performance timings
+316 |     const timingLines: string[] = [];
+[2026-04-08T20:27:58.736Z] iter=526 turn=14 INFO: Turn 14/25
+[2026-04-08T20:28:00.139Z] iter=526 turn=14 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-08T20:28:01.255Z] iter=526 turn=14 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:28:01.255Z] iter=526 turn=15 INFO: Turn 15/25
+[2026-04-08T20:28:03.573Z] iter=526 turn=15 INFO: Agent: TypeScript clean. Wrapping up now.
+[2026-04-08T20:28:03.573Z] iter=526 turn=15 INFO: $ npm test 2>&1 | tail -5
+[2026-04-08T20:28:03.678Z] iter=526 turn=15 INFO:   -> exit=0 (220 chars)
+[2026-04-08T20:28:03.678Z] iter=526 turn=16 INFO: Turn 16/25
+[2026-04-08T20:28:08.152Z] iter=526 turn=16 INFO: Agent: All done. Writing memory and goals now.
+[2026-04-08T20:28:08.153Z] iter=526 turn=16 INFO: save_memory: "[Engineer] Iteration 526"
+[2026-04-08T20:28:08.154Z] iter=526 turn=16 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T20:28:08.155Z] iter=526 turn=17 INFO: Turn 17/25
+[2026-04-08T20:28:19.306Z] iter=526 turn=17 INFO: write_file: goals.md (write)
+[2026-04-08T20:28:19.307Z] iter=526 turn=17 INFO:   -> ok: Updated goals.md (1383 chars, -25 lines delta)
+[2026-04-08T20:28:19.307Z] iter=526 turn=18 INFO: Turn 18/25
+[2026-04-08T20:28:21.131Z] iter=526 turn=18 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:28:21.131Z] iter=526 turn=18 INFO: RESTART signal
+[2026-04-08T20:28:21.131Z] iter=526 turn=18 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:28:22.239Z] iter=526 turn=18 INFO: Compilation OK
+[2026-04-08T20:28:30.941Z] iter=526 turn=18 INFO: Cache persisted: 63 entries to .autoagent-cache.json
+[2026-04-08T20:28:30.942Z] iter=526 turn=18 INFO: Cache stats: 0 hits, 4 misses, 63 entries, 5 invalidations (4 entries removed)
+[2026-04-08T20:28:30.942Z] iter=526 turn=18 INFO: Tool cache stats
+[2026-04-08T20:28:30.942Z] iter=526 turn=18 INFO: Tool timing: bash: 8x, avg=161ms, total=1288ms; write_file: 5x, avg=2ms, total=11ms; read_file: 4x, avg=2ms, total=8ms; save_memory: 1x, avg=2ms, total=2ms; think: 3x, avg=0ms, total=1ms
+[2026-04-08T20:28:30.942Z] iter=526 turn=18 INFO: Tool timing stats
+[2026-04-08T20:28:39.043Z] iter=526 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 526: predicted 15 turns, actual 18 turns, ratio 1.20**
+[2026-04-08T20:28:48.579Z] iter=526 turn=18 INFO: Pre-commit review (1248in/442out): **Issues found:**
+
+- **Logic bug in `utilPct` fallback**: `eff?.currentUtilPct` is accessed before checking `eff` is defined. If `eff` is undefined (orchestrator not ready), the fallback `Math.round((

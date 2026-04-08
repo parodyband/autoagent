@@ -295,8 +295,16 @@ const commands: Record<string, CommandHandler> = {
     }
     // Context efficiency stats
     const effLines: string[] = [];
+    const ctxEff = ctx.orchestratorRef.current?.getContextEfficiency();
     const eff = ctx.orchestratorRef.current?.getTokenEfficiency();
-    if (eff && eff.avgInput > 0) {
+    if (ctxEff && ctxEff.currentTokens > 0) {
+      const cur = Math.round(ctxEff.currentTokens / 1000);
+      const avg = Math.round(ctxEff.avgTokensPerTurn / 1000);
+      const peak = Math.round(ctxEff.peakTokens / 1000);
+      const utilPct = eff?.currentUtilPct ?? Math.round((ctxEff.currentTokens / 200_000) * 100);
+      const color = utilPct >= 90 ? "🔴" : utilPct >= 70 ? "🟡" : "🟢";
+      effLines.push(`  ${color} Context: ${cur}K tokens (avg ${avg}K/turn, peak ${peak}K)`);
+    } else if (eff && eff.avgInput > 0) {
       effLines.push(`  ⚡ Context Efficiency:`);
       effLines.push(`    Avg input/turn:   ${eff.avgInput.toLocaleString()} tokens`);
       effLines.push(`    Avg output/turn:  ${eff.avgOutput.toLocaleString()} tokens`);

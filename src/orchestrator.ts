@@ -1130,6 +1130,8 @@ export class Orchestrator {
   private sessionCost = 0;
   private costTracker = new CostTracker();
   private lastInputTokens = 0;
+  /** Input token count per turn, for context efficiency metrics. */
+  private turnTokenHistory: number[] = [];
   /** Timestamp when this Orchestrator was constructed (session start). */
   private sessionStartTime = Date.now();
   /** Cost of each completed turn, for trend analysis. */
@@ -1410,6 +1412,16 @@ export class Orchestrator {
     return [...this.toolTimings.entries()]
       .map(([toolName, { calls, totalMs }]) => ({ toolName, avgMs: Math.round(totalMs / calls), calls }))
       .sort((a, b) => b.avgMs - a.avgMs);
+  }
+
+  /** Context window efficiency metrics for /status display. */
+  getContextEfficiency(): { avgTokensPerTurn: number; currentTokens: number; peakTokens: number } {
+    const h = this.turnTokenHistory;
+    if (h.length === 0) return { avgTokensPerTurn: 0, currentTokens: 0, peakTokens: 0 };
+    const avgTokensPerTurn = Math.round(h.reduce((s, n) => s + n, 0) / h.length);
+    const currentTokens = h[h.length - 1];
+    const peakTokens = Math.max(...h);
+    return { avgTokensPerTurn, currentTokens, peakTokens };
   }
 
   /** Session statistics for /status display. */
@@ -2433,6 +2445,7 @@ export class Orchestrator {
     this.turnCosts.push(turnCost);
     this.costTracker.record(model, tokensIn, tokensOut);
     this.lastInputTokens = lastInputTokens;
+    this.turnTokenHistory.push(lastInputTokens);
     this.tokenHistory.push({ turn: this.turnCosts.length, input: tokensIn, output: tokensOut });
 
     // If aborted, return early with partial result
