@@ -522,7 +522,8 @@ const commands: Record<string, CommandHandler> = {
     try {
       const model = ctx.orchestratorRef.current?.getModel() ?? ctx.footerStats.model;
       const exportMsgs = ctx.messages.filter(m => m.role === "user" || m.role === "assistant") as import("./export-helper.js").ExportMessage[];
-      buildExportContentHelper(exportMsgs, model, { tokensIn: ctx.footerStats.tokensIn, tokensOut: ctx.footerStats.tokensOut, cost: ctx.footerStats.cost }, ctx.workDir, filePath);
+      const turnCount = exportMsgs.filter(m => m.role === "user").length;
+      buildExportContentHelper(exportMsgs, model, { tokensIn: ctx.footerStats.tokensIn, tokensOut: ctx.footerStats.tokensOut, cost: ctx.footerStats.cost, turnCount }, ctx.workDir, filePath);
       ctx.addMessage({ role: "assistant", content: `Exported to ${filename}` });
     } catch (err) {
       ctx.addMessage({ role: "assistant", content: `Export failed: ${err instanceof Error ? err.message : err}` });

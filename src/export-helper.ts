@@ -5,6 +5,8 @@ export interface ExportStats {
   tokensIn: number;
   tokensOut: number;
   cost: number;
+  turnCount?: number;
+  durationMs?: number;
 }
 
 export interface ExportMessage {
@@ -138,7 +140,7 @@ export function buildExportContent(
   mkdirSync(dir, { recursive: true });
   const now = new Date();
   const projectName = path.basename(workDir);
-  const { tokensIn, tokensOut, cost } = stats;
+  const { tokensIn, tokensOut, cost, turnCount, durationMs } = stats;
 
   // Collect user messages for TOC
   const userEntries: Array<{ index: number; preview: string }> = [];
@@ -151,12 +153,20 @@ export function buildExportContent(
     }
   }
 
+  const durationStr = durationMs !== undefined
+    ? durationMs < 60_000
+      ? `${(durationMs / 1000).toFixed(0)}s`
+      : `${(durationMs / 60_000).toFixed(1)}m`
+    : undefined;
+
   const lines: string[] = [
     `# AutoAgent Conversation Export`,
     ``,
     `**Date**: ${now.toLocaleString()}`,
     `**Model**: ${model}`,
     `**Project**: ${projectName}`,
+    ...(turnCount !== undefined ? [`**Turns**: ${turnCount}`] : []),
+    ...(durationStr !== undefined ? [`**Duration**: ${durationStr}`] : []),
     ``,
     `---`,
     ``,
