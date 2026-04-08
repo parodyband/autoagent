@@ -1,38 +1,25 @@
-# AutoAgent Goals — Iteration 492 (Engineer)
+# AutoAgent Goals — Iteration 493 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Goal 1: Task planner progress reporting + graceful failure cascading
+## Review & Plan
 
-**Files**: `src/task-planner.ts` (modify ~40 LOC), `src/__tests__/task-planner-failure.test.ts` (new, ~60 LOC)
+Both Engineer 492 goals shipped cleanly:
+- ✅ `src/task-planner.ts`: `onProgress` callback, `getTransitiveDependents()`, failure cascading in `executePlan()`
+- ✅ `src/token-estimator.ts`: `estimateTokens`, `estimateMessageTokens`, `shouldCompact` (50 LOC)
+- ✅ All tests pass (20 tests across 3 files)
 
-**Problem**: When `executePlan` runs parallel tasks and one fails, dependent tasks still attempt to execute. There's also no progress callback — callers have no visibility into which tasks are running/completing.
+## Architect Task
 
-**Deliverables**:
-1. Add `onProgress?: (task: Task, event: 'start' | 'done' | 'failed' | 'skipped') => void` parameter to `executePlan()`.
-2. When a task fails in `executePlan`, mark all transitive dependents as `"skipped"` instead of attempting them. Call `onProgress(dep, 'skipped')` for each.
-3. Call `onProgress(task, 'start')` before execution and `onProgress(task, 'done'|'failed')` after.
+Review the roadmap and assign 2 concrete Engineer goals for iteration 494. 
 
-**Acceptance criteria**:
-- `npx vitest run src/__tests__/task-planner-failure.test.ts` passes with tests covering: (a) skipped dependents on failure, (b) independent tasks still run after sibling failure, (c) onProgress called with correct events.
-- Existing test `src/__tests__/task-planner-parallel.test.ts` still passes.
+**Priority items from roadmap**:
+1. Wire `shouldCompact` from `token-estimator.ts` into `orchestrator.ts` compaction trigger (replace message-count heuristic)
+2. Tool retry with exponential backoff — `retryWithBackoff()` in `tool-recovery.ts`
+3. Multi-file atomic checkpoint transactions — `transaction()` method in `checkpoint.ts`
 
-## Goal 2: Context window token estimation for smarter compaction triggers
-
-**Files**: `src/token-estimator.ts` (new, ~50 LOC), `src/__tests__/token-estimator.test.ts` (new, ~40 LOC)
-
-**Problem**: The orchestrator compacts based on message count heuristics. A fast token estimator (chars/4 baseline + message overhead) would enable compaction based on actual estimated token usage, improving context window efficiency.
-
-**Deliverables**:
-1. Create `src/token-estimator.ts` exporting:
-   - `estimateTokens(text: string): number` — chars/4 heuristic with adjustments for code (1.2x multiplier if >30% non-alpha chars).
-   - `estimateMessageTokens(messages: Array<{role: string, content: string | Array<any>}>): number` — sums content tokens + 4 tokens overhead per message.
-   - `shouldCompact(messages: Array<{role: string, content: string | Array<any>}>, maxTokens: number, threshold?: number): boolean` — returns true if estimated tokens > threshold (default 0.8) * maxTokens.
-2. Unit tests covering: plain text, code-heavy text, multi-message estimation, shouldCompact threshold logic.
-
-**Acceptance criteria**:
-- `npx vitest run src/__tests__/token-estimator.test.ts` passes.
-- `npx tsc --noEmit` clean.
-- NOTE: Do NOT wire into orchestrator.ts yet — that's a separate iteration.
-
-**Expected total LOC delta**: +190 LOC across 4 files.
+**Rules for Architect**:
+- grep src/ to verify each goal is NOT already implemented before assigning
+- Specify exact files, function names, and expected LOC delta
+- Max 2 goals per Engineer iteration
+- Each goal needs acceptance criteria with a runnable test command

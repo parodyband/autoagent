@@ -33,6 +33,33 @@ export type TaskExecutor = (task: Task) => Promise<string>;
 /** Optional callback invoked when a task fails. Return a new plan to switch to it, or null to stop. */
 export type OnFailureCallback = (plan: TaskPlan, failedTask: Task) => Promise<TaskPlan | null>;
 
+/** Progress events fired during executePlan for each task lifecycle transition */
+export type ProgressEvent = "start" | "done" | "failed" | "skipped";
+export type OnProgressCallback = (task: Task, event: ProgressEvent) => void;
+
+/**
+ * Returns the set of task IDs that transitively depend on any of the given failed IDs.
+ */
+export function getTransitiveDependents(tasks: Task[], failedIds: Set<string>): Set<string> {
+  const dependents = new Set<string>();
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const task of tasks) {
+      if (!dependents.has(task.id) && !failedIds.has(task.id)) {
+        const hasFailedDep = task.dependsOn.some(
+          (dep) => failedIds.has(dep) || dependents.has(dep)
+        );
+        if (hasFailedDep) {
+          dependents.add(task.id);
+          changed = true;
+        }
+      }
+    }
+  }
+  return dependents;
+}
+
 const STATUS_ICON: Record<Task["status"], string> = {
   pending: "○",
   "in-progress": "◑",
@@ -127,12 +154,14 @@ export function buildTaskContext(plan: TaskPlan, task: Task): string {
  * @param executor   Async function that runs a single task and returns a result string
  * @param onUpdate   Optional callback after each status change
  * @param onFailure  Optional callback when a task fails — return a new plan to switch to it
+ * @param onProgress Optional callback fired at start/done/failed/skipped for each task
  */
 export async function executePlan(
   plan: TaskPlan,
   executor: TaskExecutor,
   onUpdate?: (task: Task, plan: TaskPlan) => void,
-  onFailure?: OnFailureCallback
+  onFailure?: OnFailureCallback,
+  onProgress?: OnProgressCallback
 ): Promise<TaskPlan> {
   // Capture git HEAD before execution for later diff tracking
   if (!plan.baseCommit) {
@@ -169,6 +198,7 @@ export async function executePlan(
     for (const task of ready) {
       task.status = "in-progress";
       onUpdate?.(task, currentPlan);
+      onProgress?.(task, "start");
     }
 
     // Execute independent tasks in parallel
@@ -176,13 +206,17 @@ export async function executePlan(
       ready.map((task) => executor(task).then((result) => ({ task, result })))
     );
 
+    // Collect failed task IDs to compute transitive skips
+    const failedIds = new Set<string>();
     let failed = false;
+
     for (const outcome of results) {
       if (outcome.status === "fulfilled") {
         const { task, result } = outcome.value;
         task.status = "done";
         task.result = result;
         onUpdate?.(task, currentPlan);
+        onProgress?.(task, "done");
       } else {
         // Find the corresponding task by matching against ready array
         const idx = results.indexOf(outcome);
@@ -190,18 +224,35 @@ export async function executePlan(
         task.status = "failed";
         task.error = outcome.reason instanceof Error ? outcome.reason.message : String(outcome.reason);
         onUpdate?.(task, currentPlan);
-
-        if (onFailure) {
-          const newPlan = await onFailure(currentPlan, task);
-          if (newPlan) {
-            currentPlan = newPlan;
-            failed = true;
-            break;
-          }
-        }
-        // No callback or returned null — stop execution
-        return currentPlan;
+        onProgress?.(task, "failed");
+        failedIds.add(task.id);
       }
+    }
+
+    if (failedIds.size > 0) {
+      // Mark all transitive dependents as skipped
+      const skipIds = getTransitiveDependents(currentPlan.tasks, failedIds);
+      for (const task of currentPlan.tasks) {
+        if (skipIds.has(task.id) && task.status === "pending") {
+          task.status = "failed"; // use 'failed' so loop terminates; event is 'skipped'
+          task.error = "Skipped due to failed dependency";
+          onUpdate?.(task, currentPlan);
+          onProgress?.(task, "skipped");
+        }
+      }
+
+      // Try onFailure for the first failed task
+      const firstFailedTask = currentPlan.tasks.find(
+        (t) => failedIds.has(t.id)
+      )!;
+      if (onFailure) {
+        const newPlan = await onFailure(currentPlan, firstFailedTask);
+        if (newPlan) {
+          currentPlan = newPlan;
+          failed = true;
+        }
+      }
+      if (!failed) return currentPlan;
     }
 
     if (failed) continue;

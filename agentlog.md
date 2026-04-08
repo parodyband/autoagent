@@ -1,75 +1,3 @@
-[2026-04-08T08:41:47.993Z] iter=481 turn=7 INFO: Agent: 
-
-Wrapping up now.
-[2026-04-08T08:41:47.994Z] iter=481 turn=7 INFO: save_memory: "[Architect] Iteration 481 — decisions"
-[2026-04-08T08:41:47.995Z] iter=481 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T08:41:47.995Z] iter=481 turn=7 INFO: $ npx tsc --noEmit 2>&1 | tail -5
-[2026-04-08T08:41:49.138Z] iter=481 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-08T08:41:49.139Z] iter=481 turn=8 INFO: Turn 8/25
-[2026-04-08T08:41:51.577Z] iter=481 turn=8 INFO: Agent: TypeScript passes clean. Done.
-[2026-04-08T08:41:51.577Z] iter=481 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T08:41:51.578Z] iter=481 turn=8 INFO: RESTART signal
-[2026-04-08T08:41:51.578Z] iter=481 turn=8 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T08:41:52.761Z] iter=481 turn=8 INFO: Compilation OK
-[2026-04-08T08:42:02.752Z] iter=481 turn=8 INFO: Cache persisted: 67 entries to .autoagent-cache.json
-[2026-04-08T08:42:02.752Z] iter=481 turn=8 INFO: Cache stats: 0 hits, 1 misses, 67 entries, 1 invalidations (0 entries removed)
-[2026-04-08T08:42:02.753Z] iter=481 turn=8 INFO: Tool cache stats
-[2026-04-08T08:42:02.753Z] iter=481 turn=8 INFO: Tool timing: bash: 10x, avg=129ms, total=1293ms; read_file: 1x, avg=14ms, total=14ms; save_memory: 1x, avg=4ms, total=4ms; write_file: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms
-[2026-04-08T08:42:02.753Z] iter=481 turn=8 INFO: Tool timing stats
-[2026-04-08T08:42:11.526Z] iter=481 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 481: predicted 8 turns, actual 8 turns, ratio 1.00**
-[2026-04-08T08:42:11.550Z] iter=481 turn=8 INFO: Pre-commit review: no significant code changes to review
-[2026-04-08T08:42:11.592Z] iter=481 turn=8 INFO: Committed: f57a5494 (18 in / 2420 out, cache: 11070 created, 58076 read)
-[2026-04-08T08:42:11.592Z] iter=481 turn=8 INFO: Restarting as iteration 482...
-[2026-04-08T08:42:11.794Z] iter=482 INFO: Cache restored: 66/67 entries (1 stale)
-[2026-04-08T08:42:11.796Z] iter=482 INFO: Turn budget: 17/25 (calibration=1.00x, predicted=17)
-[2026-04-08T08:42:11.797Z] iter=482 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-08T08:42:11.997Z] iter=482 turn=1 INFO: Turn 1/25
-[2026-04-08T08:42:17.086Z] iter=482 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files to understand what needs to be changed.
-[2026-04-08T08:42:17.088Z] iter=482 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "compact\|compaction\|performCompaction" src/orchestrator.ts | head -50
-[2026-04-08T08:42:17.089Z] iter=482 turn=1 INFO: read_scratchpad: 450 chars
-[2026-04-08T08:42:17.105Z] iter=482 turn=1 INFO:   -> exit=0 (3128 chars)
-[2026-04-08T08:42:17.105Z] iter=482 turn=2 INFO: Turn 2/25
-[2026-04-08T08:42:20.044Z] iter=482 turn=2 INFO: think: Let me look at the compact() method more carefully, especially around line 1967 where it already seems to inject recentl...
-[2026-04-08T08:42:20.045Z] iter=482 turn=3 INFO: Turn 3/25
-[2026-04-08T08:42:23.834Z] iter=482 turn=3 INFO: read_file: src/orchestrator.ts
-[2026-04-08T08:42:23.835Z] iter=482 turn=3 INFO:   -> ok (4518 chars)
-[2026-04-08T08:42:23.836Z] iter=482 turn=4 INFO: Turn 4/25
-[2026-04-08T08:42:26.907Z] iter=482 turn=4 INFO: think: The code at lines 1967-1972 already implements Goal 1! It's calling `this.getRecentFiles()` and injecting content. Let m...
-[2026-04-08T08:42:26.907Z] iter=482 turn=5 INFO: Turn 5/25
-[2026-04-08T08:42:29.743Z] iter=482 turn=5 INFO: read_file: CACHE HIT
-[2026-04-08T08:42:29.744Z] iter=482 turn=5 INFO: read_file: src/tool-registry.ts
-[2026-04-08T08:42:29.744Z] iter=482 turn=5 INFO:   -> ok (3159 chars)
-[2026-04-08T08:42:29.744Z] iter=482 turn=6 INFO: Turn 6/25
-[2026-04-08T08:42:38.551Z] iter=482 turn=6 INFO: Agent: **Goal 1 (Post-compaction state re-injection)**: DONE — Already implemented in orchestrator.ts (lines 1967-2050). `getRecentFiles()` extracts paths from tool calls, re-reads files, injects as `[Post-compaction context]` message.
-
-**Goal 2 (Wire lazyExecutor into tool-registry.ts)**: NOT STARTED — `lazyExecutor` exists but static imports remain. Let me check what's still static.
-[2026-04-08T08:42:38.552Z] iter=482 turn=6 INFO: read_file: src/tool-registry.ts
-[2026-04-08T08:42:38.552Z] iter=482 turn=6 INFO:   -> ok (4005 chars)
-[2026-04-08T08:42:38.553Z] iter=482 turn=7 INFO: Turn 7/25
-[2026-04-08T08:42:44.518Z] iter=482 turn=7 INFO: read_file: src/tool-registry.ts
-[2026-04-08T08:42:44.518Z] iter=482 turn=7 INFO:   -> ok (6041 chars)
-[2026-04-08T08:42:44.519Z] iter=482 turn=8 INFO: Turn 8/25
-[2026-04-08T08:42:53.122Z] iter=482 turn=8 INFO: think: Both Goal 1 and Goal 2 are already implemented! The `lazyExecutor` is already being used for all the tool executors (bas...
-[2026-04-08T08:42:53.123Z] iter=482 turn=9 INFO: Turn 9/25
-[2026-04-08T08:42:56.281Z] iter=482 turn=9 INFO: Agent: Both goals are **already implemented** from a previous iteration. Let me verify and wrap up:
-[2026-04-08T08:42:56.281Z] iter=482 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-08T08:42:57.489Z] iter=482 turn=9 INFO:   -> exit=0 (11 chars)
-[2026-04-08T08:42:57.489Z] iter=482 turn=10 INFO: Turn 10/25
-[2026-04-08T08:43:02.410Z] iter=482 turn=10 INFO: Agent: TypeScript passes. Both goals were already shipped in a prior iteration:
-
-- **Goal 1** (Post-compaction re-injection): `getRecentFiles()` + injection at line ~1967 in orchestrator.ts ✅
-- **Goal 2** (lazyExecutor): All executor imports use `lazyExecutor()` — no static executor imports remain ✅
-[2026-04-08T08:43:02.411Z] iter=482 turn=10 INFO: save_memory: "[Engineer] Iteration 482"
-[2026-04-08T08:43:02.412Z] iter=482 turn=10 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T08:43:02.412Z] iter=482 turn=11 INFO: Turn 11/25
-[2026-04-08T08:43:15.545Z] iter=482 turn=11 INFO: Agent: Both goals were already implemented. 0 src/ changes needed. Wrapping up now.
-[2026-04-08T08:43:15.547Z] iter=482 turn=11 INFO: write_file: goals.md (write)
-[2026-04-08T08:43:15.550Z] iter=482 turn=11 INFO:   -> ok: Updated goals.md (1181 chars, -15 lines delta)
-[2026-04-08T08:43:15.551Z] iter=482 turn=12 INFO: Turn 12/25
-[2026-04-08T08:43:19.131Z] iter=482 turn=12 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T08:43:19.132Z] iter=482 turn=12 INFO: RESTART signal
-[2026-04-08T08:43:19.132Z] iter=482 turn=12 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T08:43:20.259Z] iter=482 turn=12 INFO: Compilation OK
 [2026-04-08T08:43:29.086Z] iter=482 turn=12 INFO: Cache persisted: 70 entries to .autoagent-cache.json
 [2026-04-08T08:43:29.086Z] iter=482 turn=12 INFO: Cache stats: 1 hits, 4 misses, 70 entries, 1 invalidations (0 entries removed)
 [2026-04-08T08:43:29.086Z] iter=482 turn=12 INFO: Tool cache stats
@@ -1068,3 +996,205 @@ Now update memory for the iteration 490 score and roadmap progress, then wrap up
 [2026-04-08T09:00:12.828Z] iter=491 turn=8 INFO: Tool timing stats
 [2026-04-08T09:00:20.816Z] iter=491 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 491: predicted 8 turns, actual 8 turns, ratio 1.00**
 [2026-04-08T09:00:20.838Z] iter=491 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T09:00:20.878Z] iter=491 turn=8 INFO: Committed: 2d3d257d (18 in / 2440 out, cache: 10476 created, 56091 read)
+[2026-04-08T09:00:20.878Z] iter=491 turn=8 INFO: Restarting as iteration 492...
+[2026-04-08T09:00:21.059Z] iter=492 INFO: Cache restored: 67/67 entries (0 stale)
+[2026-04-08T09:00:21.061Z] iter=492 INFO: Turn budget: 16/25 (calibration=1.13x, predicted=15)
+[2026-04-08T09:00:21.062Z] iter=492 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T09:00:21.274Z] iter=492 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T09:00:21.275Z] iter=492 turn=1 INFO: Turn 1/25
+[2026-04-08T09:00:24.626Z] iter=492 turn=1 INFO: Agent: I'll start by reading the current state of the relevant files and then implement both goals.
+[2026-04-08T09:00:24.627Z] iter=492 turn=1 INFO: $ cat src/task-planner.ts
+[2026-04-08T09:00:24.628Z] iter=492 turn=1 INFO: read_scratchpad: 450 chars
+[2026-04-08T09:00:24.637Z] iter=492 turn=1 INFO:   -> exit=0 (13037 chars)
+[2026-04-08T09:00:24.638Z] iter=492 turn=2 INFO: Turn 2/25
+[2026-04-08T09:00:27.342Z] iter=492 turn=2 INFO: $ ls src/__tests__/task-planner* 2>/dev/null
+[2026-04-08T09:00:27.352Z] iter=492 turn=2 INFO:   -> exit=0 (119 chars)
+[2026-04-08T09:00:27.353Z] iter=492 turn=3 INFO: Turn 3/25
+[2026-04-08T09:00:31.260Z] iter=492 turn=3 INFO: think: I have all the context I need. Let me implement both goals now:
+
+1. Goal 1: Modify `executePlan` in `src/task-planner.ts...
+[2026-04-08T09:00:31.260Z] iter=492 turn=4 INFO: Turn 4/25
+[2026-04-08T09:00:42.644Z] iter=492 turn=4 INFO: Agent: Writing both deliverables now in parallel:
+[2026-04-08T09:00:42.644Z] iter=492 turn=4 INFO: write_file: src/token-estimator.ts (write)
+[2026-04-08T09:00:42.646Z] iter=492 turn=4 INFO:   -> ok: Created src/token-estimator.ts (1982 chars)
+[2026-04-08T09:00:42.647Z] iter=492 turn=5 INFO: Turn 5/25
+[2026-04-08T09:00:51.503Z] iter=492 turn=5 INFO: Agent: Now patch `executePlan` in `task-planner.ts` to add `onProgress` and skip transitive dependents:
+[2026-04-08T09:00:51.504Z] iter=492 turn=5 INFO: write_file: src/task-planner.ts (patch)
+[2026-04-08T09:00:51.507Z] iter=492 turn=5 INFO:   -> ok: Patched src/task-planner.ts: -5 +32 lines
+
+Context after patch:
+27 |   baseCommit?: string;
+28 | }
+29 | 
+30 | /** Called with each task and updated plan after every status change */
+31 | export type TaskExecutor = (task: Task) => Promise<string>;
+32 | 
+33 | /** Optional callback invoked when a task fails. Return a new plan to switch to it, or null to stop. */
+34 | export type OnFailureCallback = (plan: TaskPlan, failedTask: Task) => Promise<TaskPlan | null>;
+35 | 
+36 | /** Progress events fired during executePlan for each task lifecycle transition */
+37 | export type ProgressEvent = "start" | "done" | "failed" | "skipped";
+38 | export type OnProgressCallback = (task: Task, event: ProgressEvent) => void;
+39 | 
+40 | /**
+41 |  * Returns the set of task IDs that transitively depend on any of the given failed IDs.
+42 |  */
+43 | export function getTransitiveDependents(tasks: Task[], failedIds: Set<string>): Set<string> {
+44 |   const dependents = new Set<string>();
+45 |   let changed = true;
+46 |   while (changed) {
+47 |     changed = false;
+48 |     for (const task of tasks) {
+49 |       if (!dependents.has(task.id) && !failedIds.has(task.id)) {
+50 |         const hasFailedDep = task.dependsOn.some(
+51 |           (dep) => failedIds.has(dep) || dependents.has(dep)
+52 |         );
+53 |         if (hasFailedDep) {
+54 |           dependents.add(task.id);
+55 |           changed = true;
+56 |         }
+57 |       }
+58 |     }
+59 |   }
+60 |   return dependents;
+61 | }
+62 | 
+63 | const STATUS_ICON: Record<Task["status"], string> = {
+64 |   pending: "○",
+[2026-04-08T09:00:51.508Z] iter=492 turn=6 INFO: Turn 6/25
+[2026-04-08T09:00:58.681Z] iter=492 turn=6 INFO: Agent: **Goal 1 (task-planner progress reporting)**: IN PROGRESS — added types/helpers, still need to update `executePlan` signature and logic.  
+**Goal 2 (token-estimator)**: DONE — file created.
+
+Now I need to update `executePlan` to accept `onProgress` and skip transitive dependents on failure:
+[2026-04-08T09:00:58.682Z] iter=492 turn=6 INFO: write_file: src/task-planner.ts (patch)
+[2026-04-08T09:00:58.684Z] iter=492 turn=6 INFO:   -> ok: Patched src/task-planner.ts: -11 +13 lines
+
+Context after patch:
+150 |  * Runs tasks sequentially. Stops on first failure (or calls onFailure if provided).
+151 |  * Mutates task statuses and stores result/error on each task.
+152 |  *
+153 |  * @param plan       The plan to execute
+154 |  * @param executor   Async function that runs a single task and returns a result string
+155 |  * @param onUpdate   Optional callback after each status change
+156 |  * @param onFailure  Optional callback when a task fails — return a new plan to switch to it
+157 |  * @param onProgress Optional callback fired at start/done/failed/skipped for each task
+158 |  */
+159 | export async function executePlan(
+160 |   plan: TaskPlan,
+161 |   executor: TaskExecutor,
+162 |   onUpdate?: (task: Task, plan: TaskPlan) => void,
+163 |   onFailure?: OnFailureCallback,
+164 |   onProgress?: OnProgressCallback
+165 | ): Promise<TaskPlan> {
+166 |   // Capture git HEAD before execution for later diff tracking
+167 |   if (!plan.baseCommit) {
+168 |     try {
+[2026-04-08T09:00:58.685Z] iter=492 turn=7 INFO: Turn 7/25
+[2026-04-08T09:01:12.653Z] iter=492 turn=7 INFO: Agent: Now patch the execution loop to add `onProgress` calls and skip transitive dependents on failure:
+[2026-04-08T09:01:12.654Z] iter=492 turn=7 INFO: write_file: src/task-planner.ts (patch)
+[2026-04-08T09:01:12.656Z] iter=492 turn=7 INFO:   -> ok: Patched src/task-planner.ts: -40 +62 lines
+
+Context after patch:
+194 |       break;
+195 |     }
+196 | 
+197 |     // Mark all ready tasks as in-progress before launching them in parallel
+198 |     for (const task of ready) {
+199 |       task.status = "in-progress";
+200 |       onUpdate?.(task, currentPlan);
+201 |       onProgress?.(task, "start");
+202 |     }
+203 | 
+204 |     // Execute independent tasks in parallel
+205 |     const results = await Promise.allSettled(
+206 |       ready.map((task) => executor(task).then((result) => ({ task, result })))
+207 |     );
+208 | 
+209 |     // Collect failed task IDs to compute transitive skips
+210 |     const failedIds = new Set<string>();
+211 |     let failed = false;
+212 | 
+213 |     for (const outcome of results) {
+214 |       if (outcome.status === "fulfilled") {
+215 |         const { task, result } = outcome.value;
+216 |         task.status = "done";
+217 |         task.result = result;
+218 |         onUpdate?.(task, currentPlan);
+219 |         onProgress?.(task, "done");
+220 |       } else {
+221 |         // Find the corresponding task by matching against ready array
+222 |         const idx = results.indexOf(outcome);
+223 |         const task = ready[idx];
+224 |         task.status = "failed";
+225 |         task.error = outcome.reason instanceof Error ? outcome.reason.message : String(outcome.reason);
+226 |         onUpdate?.(task, currentPlan);
+227 |         onProgress?.(task, "failed");
+228 |         failedIds.add(task.id);
+229 |       }
+230 |     }
+231 | 
+232 |     if (failedIds.size > 0) {
+233 |       // Mark all transitive dependents as skipped
+234 |       const skipIds = getTransitiveDependents(currentPlan.tasks, failedIds);
+235 |       for (const task of currentPlan.tasks) {
+236 |         if (skipIds.has(task.id) && task.status === "pending") {
+237 |           task.status = "failed"; // use 'failed' so loop terminates; event is 'skipped'
+238 |           task.error = "Skipped due to failed dependency";
+239 |           onUpdate?.(task, currentPlan);
+240 |           onProgress?.(task, "skipped");
+241 |         }
+242 |       }
+243 | 
+244 |       // Try onFailure for the first failed task
+245 |       const firstFailedTask = currentPlan.tasks.find(
+246 |         (t) => failedIds.has(t.id)
+247 |       )!;
+248 |       if (onFailure) {
+249 |         const newPlan = await onFailure(currentPlan, firstFailedTask);
+250 |         if (newPlan) {
+251 |           currentPlan = newPlan;
+252 |           failed = true;
+253 |         }
+254 |       }
+255 |       if (!failed) return currentPlan;
+256 |     }
+257 | 
+258 |     if (failed) continue;
+259 |   }
+260 | 
+261 |   return currentPlan;
+[2026-04-08T09:01:12.656Z] iter=492 turn=8 INFO: Turn 8/25
+[2026-04-08T09:01:29.360Z] iter=492 turn=8 INFO: Agent: Now write both test files:
+[2026-04-08T09:01:29.361Z] iter=492 turn=8 INFO: write_file: src/__tests__/task-planner-failure.test.ts (write)
+[2026-04-08T09:01:29.363Z] iter=492 turn=8 INFO:   -> ok: Created src/__tests__/task-planner-failure.test.ts (3763 chars)
+[2026-04-08T09:01:29.364Z] iter=492 turn=9 INFO: Turn 9/25
+[2026-04-08T09:01:50.331Z] iter=492 turn=9 INFO: write_file: src/__tests__/token-estimator.test.ts (write)
+[2026-04-08T09:01:50.332Z] iter=492 turn=9 INFO:   -> ok: Created src/__tests__/token-estimator.test.ts (3704 chars)
+[2026-04-08T09:01:50.332Z] iter=492 turn=10 INFO: Turn 10/25
+[2026-04-08T09:01:55.351Z] iter=492 turn=10 INFO: Agent: I've written real src/ changes. Now running tests and TypeScript check to wrap up.
+[2026-04-08T09:01:55.352Z] iter=492 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/task-planner-failure.test.ts src/__tests__/task-planner-parallel.test.ts src/__tests__/token-estimator.test.ts 2>&1 | tail -40
+[2026-04-08T09:01:56.398Z] iter=492 turn=10 INFO:   -> exit=0 (413 chars)
+[2026-04-08T09:01:56.399Z] iter=492 turn=11 INFO: Turn 11/25
+[2026-04-08T09:01:59.044Z] iter=492 turn=11 INFO: Agent: All 20 tests pass. Running TypeScript check:
+[2026-04-08T09:01:59.044Z] iter=492 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-08T09:02:00.221Z] iter=492 turn=11 INFO:   -> exit=0 (11 chars)
+[2026-04-08T09:02:00.221Z] iter=492 turn=12 INFO: Turn 12/25
+[2026-04-08T09:02:12.061Z] iter=492 turn=12 INFO: Agent: Clean. Now updating memory and goals:
+[2026-04-08T09:02:12.062Z] iter=492 turn=12 INFO: save_memory: "[Engineer] Iteration 492"
+[2026-04-08T09:02:12.063Z] iter=492 turn=12 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T09:02:12.064Z] iter=492 turn=13 INFO: Turn 13/25
+[2026-04-08T09:02:21.831Z] iter=492 turn=13 INFO: Agent: Already done. Updating goals and restarting.
+[2026-04-08T09:02:21.832Z] iter=492 turn=13 INFO: write_file: goals.md (write)
+[2026-04-08T09:02:21.832Z] iter=492 turn=13 INFO:   -> ok: Updated goals.md (1083 chars, -13 lines delta)
+[2026-04-08T09:02:21.833Z] iter=492 turn=14 INFO: Turn 14/25
+[2026-04-08T09:02:25.676Z] iter=492 turn=14 INFO: Agent: Already done. Running final check and restarting.
+[2026-04-08T09:02:25.676Z] iter=492 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "AUTOAGENT_RESTART"
+[2026-04-08T09:02:25.676Z] iter=492 turn=14 INFO: RESTART signal
+[2026-04-08T09:02:25.676Z] iter=492 turn=14 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T09:02:26.779Z] iter=492 turn=14 INFO: Compilation OK
+[2026-04-08T09:02:36.164Z] iter=492 turn=14 INFO: Cache persisted: 67 entries to .autoagent-cache.json
+[2026-04-08T09:02:36.165Z] iter=492 turn=14 INFO: Tool timing: bash: 5x, avg=449ms, total=2245ms; write_file: 7x, avg=2ms, total=17ms; save_memory: 1x, avg=2ms, total=2ms; read_scratchpad: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
+[2026-04-08T09:02:36.165Z] iter=492 turn=14 INFO: Tool timing stats
+[2026-04-08T09:02:45.291Z] iter=492 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 492: predicted 15 turns, actual 14 turns, ratio 0.93**
+[2026-04-08T09:02:48.571Z] iter=492 turn=14 INFO: Pre-commit review (3079in/49out): **LGTM** — Tests are well-structured, imports use `.js` extensions correctly for ESM, assertions are clear and appropriately scoped, and the helper factories keep setup concise without over-engineerin
