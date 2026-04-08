@@ -86,6 +86,45 @@ class CheckpointManager {
         timestamp: c.timestamp,
       }));
   }
+
+  /**
+   * Wrap an async callback in an atomic transaction.
+   * - If the callback completes successfully → checkpoint is committed.
+   * - If the callback throws → all tracked files are automatically rolled back.
+   * - If the callback returns `{ rollback: true }` → same automatic rollback.
+   *
+   * @returns `{ success: boolean, filesTracked: number }`
+   */
+  async transaction(
+    label: string,
+    fn: () => Promise<void | { rollback: boolean }>
+  ): Promise<{ success: boolean; filesTracked: number }> {
+    this.startCheckpoint(label);
+    // Capture the id assigned so we can roll back even after commit
+    const txId = this.nextId - 1;
+
+    try {
+      const result = await fn();
+
+      const filesTracked = this.currentCheckpoint?.files.size ?? 0;
+
+      if (result && result.rollback) {
+        // Explicit rollback requested — commit so rollback() can find it, then roll back
+        this.commitCheckpoint();
+        this.rollback(txId);
+        return { success: false, filesTracked };
+      }
+
+      this.commitCheckpoint();
+      return { success: true, filesTracked };
+    } catch {
+      // Auto-rollback on error
+      const filesTracked = this.currentCheckpoint?.files.size ?? 0;
+      this.commitCheckpoint(); // move to checkpoints[] so rollback() can find it
+      this.rollback(txId);
+      return { success: false, filesTracked };
+    }
+  }
 }
 
 export const checkpointManager = new CheckpointManager();

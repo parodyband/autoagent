@@ -398,3 +398,38 @@ export function enhanceToolError(
     return error;
   }
 }
+
+// ─── Retry with exponential backoff ───────────────────────────────────────────
+
+/**
+ * Retry a failing async function with exponential backoff and jitter.
+ *
+ * @param fn          - The async operation to attempt.
+ * @param opts.maxRetries   - Total extra attempts after first failure (default 3).
+ * @param opts.baseDelayMs  - Initial delay in ms (default 500).
+ * @param opts.maxDelayMs   - Cap on delay in ms (default 10 000).
+ */
+export async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  opts: { maxRetries?: number; baseDelayMs?: number; maxDelayMs?: number } = {}
+): Promise<T> {
+  const { maxRetries = 3, baseDelayMs = 500, maxDelayMs = 10_000 } = opts;
+  let lastError: Error | undefined;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      if (attempt < maxRetries) {
+        const delay = Math.min(
+          baseDelayMs * 2 ** attempt + Math.random() * 200,
+          maxDelayMs
+        );
+        await new Promise<void>((r) => setTimeout(r, delay));
+      }
+    }
+  }
+
+  throw lastError;
+}

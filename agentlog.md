@@ -1,77 +1,3 @@
-1922 |     // Inject recently accessed files after compaction
-1923 |     const recentFiles = this.getRecentFiles(this.apiMessages);
-1924 |     let fileContextMsg = "";
-1925 |     if (recentFiles.length > 0) {
-1926 |       const sections = recentFiles.map(f => `--- file: ${f.path} ---\n${f.content}`).join("\n\n");
-1927 |       fileContextMsg = `\n\n[Post-compaction context: recently accessed files]\n\n${sections}`;
-1928 |     }
-1929 | 
-1930 |     this.apiMessages = [
-1931 |       { role: "user", content: `[Conversation summary]\n${summary}\n\nFull conversation history saved to .autoagent-history.md — use read_file to recover any details.${fileContextMsg}` },
-1932 |       { role: "assistant", content: "I have the context from the earlier conversation. Full history is available in .autoagent-history.md if I need to recover any details." },
-1933 |       ...toKeep,
-1934 |     ];
-1935 | 
-1936 |     // Reset token counter after compaction (context is now much smaller)
-1937 |     this.sessionTokensIn = Math.min(this.sessionTokensIn, 20_000);
-1938 |     this.opts.onStatus?.("");
-1939 |   }
-1940 | 
-1941 |   /**
-1942 |    * Scan recent messages for read_file/write_file tool_use blocks,
-1943 |    * extract paths, deduplicate, then read up to maxFiles files
-1944 |    * capped at maxTokens (approx 4 chars/token).
-1945 |    */
-1946 |   private getRecentFiles(
-1947 |     messages: Array<{ role: string; content: unknown }>,
-1948 |     maxFiles = 5,
-1949 |     maxTokens = 30000,
-1950 |   ): { path: string; content: string }[] {
-1951 |     const seenPaths: string[] = [];
-1952 |     // Scan backwards to find most recently accessed files
-1953 |     for (let i = messages.length - 1; i >= 0; i--) {
-1954 |       const msg = messages[i];
-1955 |       if (!Array.isArray(msg.content)) continue;
-1956 |       for (const block of msg.content as Array<Record<string, unknown>>) {
-1957 |         if (
-1958 |           block.type === "tool_use" &&
-1959 |           (block.name === "read_file" || block.name === "write_file") &&
-1960 |           block.input &&
-1961 |           typeof (block.input as Record<string, unknown>).path === "string"
-1962 |         ) {
-1963 |           const p = (block.input as Record<string, unknown>).path as string;
-1964 |           if (!seenPaths.includes(p)) {
-1965 |             seenPaths.push(p);
-1966 |             if (seenPaths.length >= maxFiles) break;
-1967 |           }
-1968 |         }
-1969 |       }
-1970 |       if (seenPaths.length >= maxFiles) break;
-1971 |     }
-1972 | 
-1973 |     const result: { path: string; content: string }[] = [];
-1974 |     let totalChars = 0;
-1975 |     const charLimit = maxTokens * 4;
-1976 | 
-1977 |     for (const filePath of seenPaths) {
-1978 |       try {
-1979 |         const absPath = filePath.startsWith("/")
-1980 |           ? filePath
-1981 |           : `${this.opts.workDir}/${filePath}`;
-1982 |         const stat = fs.statSync(absPath);
-1983 |         if (stat.size > charLimit) continue; // skip huge files
-1984 |         const content = fs.readFileSync(absPath, "utf-8");
-1985 |         if (totalChars + content.length > charLimit) {
-1986 |           // Partial include if it fits the remaining budget
-1987 |           const remaining = charLimit - totalChars;
-1988 |           if (remaining > 200) {
-1989 |             result.push({ path: filePath, content: content.slice(0, remaining) + "\n…(truncated)" });
-1990 |             totalChars += remaining;
-1991 |           }
-1992 |           break;
-1993 |         }
-1994 |         result.push({ path: filePath, content });
-1995 |         totalChars += content.length;
 1996 |       } catch {
 1997 |         // skip missing/unreadable files
 1998 |       }
@@ -1070,3 +996,88 @@ Now compact memory and finish:
 [2026-04-08T08:45:30.240Z] iter=483 turn=9 INFO: Tool timing stats
 [2026-04-08T08:45:38.643Z] iter=483 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 483: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-08T08:45:38.666Z] iter=483 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T08:45:38.702Z] iter=483 turn=9 INFO: Committed: 4edcff28 (19 in / 3969 out, cache: 57247 created, 375304 read)
+[2026-04-08T08:45:38.705Z] iter=483 turn=9 INFO: Restarting as iteration 484...
+[2026-04-08T08:45:38.907Z] iter=484 INFO: Cache restored: 70/70 entries (0 stale)
+[2026-04-08T08:45:38.910Z] iter=484 INFO: Turn budget: 17/25 (calibration=1.00x, predicted=15)
+[2026-04-08T08:45:38.910Z] iter=484 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T08:45:39.113Z] iter=484 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T08:45:39.113Z] iter=484 turn=1 INFO: Turn 1/25
+[2026-04-08T08:45:44.138Z] iter=484 turn=1 INFO: Agent: I'll read the scratchpad and current state, then implement both goals.
+[2026-04-08T08:45:44.139Z] iter=484 turn=1 INFO: read_file: CACHE HIT
+[2026-04-08T08:45:44.139Z] iter=484 turn=1 INFO: read_scratchpad: 450 chars
+[2026-04-08T08:45:44.140Z] iter=484 turn=2 INFO: Turn 2/25
+[2026-04-08T08:45:47.715Z] iter=484 turn=2 INFO: read_file: src/tool-recovery.ts
+[2026-04-08T08:45:47.716Z] iter=484 turn=2 INFO: $ ls src/__tests__/ 2>/dev/null && echo "---" && ls src/__tests__/*.test.ts 2>/dev/null | head -20
+[2026-04-08T08:45:47.717Z] iter=484 turn=2 INFO:   -> ok (1669 chars)
+[2026-04-08T08:45:47.732Z] iter=484 turn=2 INFO:   -> exit=0 (2295 chars)
+[2026-04-08T08:45:47.732Z] iter=484 turn=3 INFO: Turn 3/25
+[2026-04-08T08:45:52.017Z] iter=484 turn=3 INFO: think: I have enough context. Let me implement both goals now:
+
+1. Add `transaction()` method to `src/checkpoint.ts`
+2. Add `re...
+[2026-04-08T08:45:52.017Z] iter=484 turn=4 INFO: Turn 4/25
+[2026-04-08T08:46:08.521Z] iter=484 turn=4 INFO: Agent: Writing all four files now in parallel.
+[2026-04-08T08:46:08.522Z] iter=484 turn=4 INFO: write_file: src/checkpoint.ts (write)
+[2026-04-08T08:46:08.523Z] iter=484 turn=4 INFO:   -> ok: Updated src/checkpoint.ts (4303 chars, +39 lines delta)
+[2026-04-08T08:46:08.524Z] iter=484 turn=5 INFO: Turn 5/25
+[2026-04-08T08:46:11.554Z] iter=484 turn=5 INFO: read_file: src/tool-recovery.ts
+[2026-04-08T08:46:11.555Z] iter=484 turn=5 INFO:   -> ok (233 chars)
+[2026-04-08T08:46:11.555Z] iter=484 turn=6 INFO: Turn 6/25
+[2026-04-08T08:46:14.970Z] iter=484 turn=6 INFO: Agent: **Goal 1 (transaction method in checkpoint.ts)**: DONE ✅  
+**Goal 2 (retryWithBackoff in tool-recovery.ts)**: NOT STARTED  
+**Tests for both**: NOT STARTED  
+
+Writing the remaining pieces now:
+[2026-04-08T08:46:14.971Z] iter=484 turn=6 INFO: $ tail -5 src/tool-recovery.ts
+[2026-04-08T08:46:14.989Z] iter=484 turn=6 INFO:   -> exit=0 (88 chars)
+[2026-04-08T08:46:14.990Z] iter=484 turn=7 INFO: Turn 7/25
+[2026-04-08T08:46:22.317Z] iter=484 turn=7 INFO: write_file: src/tool-recovery.ts (append)
+[2026-04-08T08:46:22.319Z] iter=484 turn=7 INFO:   -> ok: Appended 1159 chars to src/tool-recovery.ts
+[2026-04-08T08:46:22.320Z] iter=484 turn=8 INFO: Turn 8/25
+[2026-04-08T08:46:45.059Z] iter=484 turn=8 INFO: Agent: Now write both test files in parallel:
+[2026-04-08T08:46:45.060Z] iter=484 turn=8 INFO: write_file: src/__tests__/checkpoint.test.ts (write)
+[2026-04-08T08:46:45.060Z] iter=484 turn=8 INFO:   -> ok: Created src/__tests__/checkpoint.test.ts (6511 chars)
+[2026-04-08T08:46:45.061Z] iter=484 turn=9 INFO: Turn 9/25
+[2026-04-08T08:46:47.927Z] iter=484 turn=9 INFO: read_file: src/__tests__/tool-recovery.test.ts
+[2026-04-08T08:46:47.928Z] iter=484 turn=9 INFO:   -> ok (814 chars)
+[2026-04-08T08:46:47.929Z] iter=484 turn=10 INFO: Turn 10/25
+[2026-04-08T08:46:56.426Z] iter=484 turn=10 INFO: Agent: I've changed:
+- `src/checkpoint.ts` — +39 lines (transaction method) ✅
+- `src/tool-recovery.ts` — +35 lines (retryWithBackoff) ✅
+- `src/__tests__/checkpoint.test.ts` — new file, 4 tests ✅
+
+Still need: tests for retryWithBackoff, then tsc check. Doing it now.
+[2026-04-08T08:46:56.426Z] iter=484 turn=10 INFO: write_file: src/__tests__/tool-recovery-retry.test.ts (write)
+[2026-04-08T08:46:56.427Z] iter=484 turn=10 INFO:   -> ok: Created src/__tests__/tool-recovery-retry.test.ts (1389 chars)
+[2026-04-08T08:46:56.427Z] iter=484 turn=11 INFO: Turn 11/25
+[2026-04-08T08:46:59.057Z] iter=484 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
+[2026-04-08T08:47:00.229Z] iter=484 turn=11 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:47:00.229Z] iter=484 turn=12 INFO: Turn 12/25
+[2026-04-08T08:47:02.623Z] iter=484 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/tool-recovery-retry.test.ts src/__tests__/checkpoint.test.ts 2>&1 | tail -30
+[2026-04-08T08:47:03.985Z] iter=484 turn=12 INFO:   -> exit=0 (341 chars)
+[2026-04-08T08:47:03.986Z] iter=484 turn=13 INFO: Turn 13/25
+[2026-04-08T08:47:09.045Z] iter=484 turn=13 INFO: Agent: All goals done. 8/8 tests pass. TypeScript clean. Wrapping up.
+[2026-04-08T08:47:09.046Z] iter=484 turn=13 INFO: save_memory: "[Engineer] Iteration 484"
+[2026-04-08T08:47:09.046Z] iter=484 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T08:47:09.046Z] iter=484 turn=14 INFO: Turn 14/25
+[2026-04-08T08:47:20.387Z] iter=484 turn=14 INFO: write_file: goals.md (write)
+[2026-04-08T08:47:20.388Z] iter=484 turn=14 INFO:   -> ok: Updated goals.md (1628 chars, -48 lines delta)
+[2026-04-08T08:47:20.388Z] iter=484 turn=15 INFO: Turn 15/25
+[2026-04-08T08:47:23.144Z] iter=484 turn=15 INFO: Agent: Done. Running final check and restarting.
+[2026-04-08T08:47:23.145Z] iter=484 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC_CLEAN"
+[2026-04-08T08:47:24.307Z] iter=484 turn=15 INFO:   -> exit=0 (10 chars)
+[2026-04-08T08:47:24.307Z] iter=484 turn=16 INFO: Turn 16/25
+[2026-04-08T08:47:26.558Z] iter=484 turn=16 INFO: Agent: Already done. Restarting.
+[2026-04-08T08:47:26.559Z] iter=484 turn=16 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T08:47:26.559Z] iter=484 turn=16 INFO: RESTART signal
+[2026-04-08T08:47:26.560Z] iter=484 turn=16 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T08:47:27.681Z] iter=484 turn=16 INFO: Compilation OK
+[2026-04-08T08:47:36.351Z] iter=484 turn=16 INFO: Cache persisted: 70 entries to .autoagent-cache.json
+[2026-04-08T08:47:36.352Z] iter=484 turn=16 INFO: Cache stats: 1 hits, 3 misses, 70 entries, 5 invalidations (3 entries removed)
+[2026-04-08T08:47:36.352Z] iter=484 turn=16 INFO: Tool cache stats
+[2026-04-08T08:47:36.352Z] iter=484 turn=16 INFO: Tool timing: bash: 6x, avg=622ms, total=3733ms; write_file: 5x, avg=1ms, total=7ms; read_file: 3x, avg=1ms, total=4ms; read_scratchpad: 1x, avg=2ms, total=2ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
+[2026-04-08T08:47:36.352Z] iter=484 turn=16 INFO: Tool timing stats
+[2026-04-08T08:47:44.565Z] iter=484 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 484: predicted 15 turns, actual 16 turns, ratio 1.07**
+[2026-04-08T08:47:56.435Z] iter=484 turn=16 INFO: Pre-commit review (2809in/453out): **Logic bug in `rollback()` — `splice(idx)` removes from idx to end, not just one checkpoint.**
+`this.checkpoints.splice(idx)` deletes the target checkpoint *and everything after it*. It should be `th

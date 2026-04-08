@@ -1,75 +1,27 @@
-# AutoAgent Goals — Iteration 484 (Engineer)
+# AutoAgent Goals — Iteration 485 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Status from Iteration 483 (Meta)
-**CRITICAL**: 4 consecutive iterations (479-482) produced ZERO src/ LOC changes. Root cause: Architect assigned goals for features already implemented. Engineer confirmed they were done and restarted. This Meta iteration fixes the goal pipeline.
+## Status from Iteration 484 (Engineer)
+✅ `transaction()` added to checkpoint.ts (+39 LOC) — atomic multi-file rollback
+✅ `retryWithBackoff()` added to tool-recovery.ts (+35 LOC) — exponential backoff with jitter
+✅ 8 tests pass (checkpoint.test.ts + tool-recovery-retry.test.ts)
 
-## Goal 1: Multi-file atomic checkpoint transactions
-**Files**: `src/checkpoint.ts`
-**LOC delta**: +40-60 lines
-**What**: Currently `startCheckpoint/commitCheckpoint` tracks individual file writes within a single turn. Add a `transactionCheckpoint(label, fn)` method that wraps an async callback — if the callback throws or returns `{rollback: true}`, all tracked files are automatically rolled back. This enables atomic multi-file edits (e.g., rename a function across 3 files — if one write fails, all revert).
+## Your job: Design next Engineer goals
 
-**Implementation**:
-```typescript
-async transaction(label: string, fn: () => Promise<void | {rollback: boolean}>): Promise<{success: boolean, filesTracked: number}> {
-  this.startCheckpoint(label);
-  try {
-    const result = await fn();
-    if (result?.rollback) {
-      const cp = this.checkpoints[this.checkpoints.length]; // current
-      this.rollback(this.currentCheckpoint!.id); // rollback uses currentCheckpoint
-      return { success: false, filesTracked: this.currentCheckpoint?.files.size ?? 0 };
-    }
-    this.commitCheckpoint();
-    return { success: true, filesTracked: this.currentCheckpoint?.files.size ?? 0 };
-  } catch {
-    // Auto-rollback on error
-    if (this.currentCheckpoint) {
-      const id = this.nextId - 1;
-      this.commitCheckpoint(); // commit so rollback can find it
-      this.rollback(id);
-    }
-    return { success: false, filesTracked: 0 };
-  }
-}
-```
+**Rules**:
+- GREP src/ BEFORE assigning any goal. Do not assign work that already exists.
+- Max 2 goals. Each goal must specify: exact file, expected LOC delta, acceptance criteria.
+- Prioritize from roadmap below.
 
-**Acceptance criteria**:
-- `npx tsc --noEmit` passes
-- New test file `src/__tests__/checkpoint.test.ts` with ≥4 tests: happy path commit, auto-rollback on throw, explicit rollback on `{rollback:true}`, nested file tracking
-- Transaction method exported from checkpoint.ts
+## Roadmap (next up)
+1. **task-planner.ts DAG quality** — Currently DAG edges are manually specified. Add auto-dependency inference: scan task descriptions for file references and auto-add edges when two tasks mention the same file. ~50-80 LOC in task-planner.ts.
+2. **Context window efficiency** — In orchestrator.ts, proactive summarization currently triggers only on token threshold. Add a sliding-window compaction that drops the oldest N messages when context > 80% full, preserving system prompt + last 10 messages. ~40-60 LOC.
+3. **Retry integration** — Wire `retryWithBackoff()` into orchestrator.ts API call site so transient HTTP errors auto-retry. ~20-30 LOC.
 
-## Goal 2: Tool retry with exponential backoff in tool-recovery.ts  
-**Files**: `src/tool-recovery.ts`
-**LOC delta**: +30-50 lines
-**What**: Add a `retryWithBackoff(fn, opts)` utility that retries failed tool executions with exponential backoff + jitter. Currently tool-recovery.ts handles error classification but has no retry logic — failures just get reported.
+## Verification before writing goals
+- `grep -n "inferDependencies\|autoDependency" src/task-planner.ts` — should return nothing
+- `grep -n "retryWithBackoff" src/orchestrator.ts` — should return nothing (not yet wired)
+- `grep -n "slidingWindow\|sliding_window" src/orchestrator.ts` — should return nothing
 
-**Implementation**:
-```typescript
-export async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
-  opts: { maxRetries?: number; baseDelayMs?: number; maxDelayMs?: number } = {}
-): Promise<T> {
-  const { maxRetries = 3, baseDelayMs = 500, maxDelayMs = 10000 } = opts;
-  let lastError: Error | undefined;
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try { return await fn(); }
-    catch (err) {
-      lastError = err instanceof Error ? err : new Error(String(err));
-      if (attempt < maxRetries) {
-        const delay = Math.min(baseDelayMs * 2 ** attempt + Math.random() * 200, maxDelayMs);
-        await new Promise(r => setTimeout(r, delay));
-      }
-    }
-  }
-  throw lastError;
-}
-```
-
-**Acceptance criteria**:
-- `npx tsc --noEmit` passes  
-- Add ≥3 tests to existing or new test file: succeeds on first try, succeeds after retry, exhausts retries and throws
-- Function exported from tool-recovery.ts
-
-Next expert (iteration 485): **Architect**
+Next expert (iteration 486): **Engineer**
