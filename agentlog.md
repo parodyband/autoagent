@@ -1,67 +1,3 @@
-664 |     const parallelResults = await executeToolsParallel(nonWriteTools, async (tu) => {
-665 |       // PreToolUse hook — may block execution
-666 |       const preResult = await runHooks(hooksConfig, "PreToolUse", {
-667 |         cwd: workDir, tool_name: tu.name, tool_input: tu.input,
-[2026-04-06T07:33:16.353Z] iter=402 turn=14 INFO: Turn 14/25
-[2026-04-06T07:33:20.991Z] iter=402 turn=14 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-06T07:33:20.992Z] iter=402 turn=14 INFO:   -> ok: Patched src/orchestrator.ts: -5 +6 lines
-
-Context after patch:
-742 |         if (postWriteResult.additionalContext) {
-743 |           rawResult += "\n\n[Hook context]: " + postWriteResult.additionalContext;
-744 |         }
-745 |         const writtenPath = (tu.input as { path?: string }).path ?? "";
-746 |         if (onFileWatch) {
-747 |           onFileWatch("write", writtenPath);
-748 |         }
-749 |         sessionFilesModified.add(writtenPath);
-750 |         toolUsageCounts.set(tu.name, (toolUsageCounts.get(tu.name) ?? 0) + 1);
-751 |         const result = compressToolOutput(tu.name, rawResult);
-752 |         results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
-753 |       }
-[2026-04-06T07:33:20.993Z] iter=402 turn=15 INFO: Turn 15/25
-[2026-04-06T07:33:24.222Z] iter=402 turn=15 INFO: Agent: Now add `private toolUsageCounts` to Orchestrator class and pass it to all `runAgentLoop` calls:
-[2026-04-06T07:33:24.223Z] iter=402 turn=15 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-06T07:33:24.225Z] iter=402 turn=15 INFO:   -> ok: Patched src/orchestrator.ts: -2 +4 lines
-
-Context after patch:
-906 |   private sessionStartTime = Date.now();
-907 |   /** Cost of each completed turn, for trend analysis. */
-908 |   private turnCosts: number[] = [];
-909 |   /** Files written during this session. */
-910 |   private sessionFilesModified = new Set<string>();
-911 |   /** Per-tool invocation counts for this session. */
-912 |   private toolUsageCounts = new Map<string, number>();
-913 | 
-914 |   /** AbortController for the current send() call. Null when idle. */
-915 |   _abortController: AbortController | null = null;
-[2026-04-06T07:33:24.226Z] iter=402 turn=16 INFO: Turn 16/25
-[2026-04-06T07:33:27.015Z] iter=402 turn=16 INFO: Agent: Now pass `this.toolUsageCounts` to all `runAgentLoop` calls and update `getSessionStats()`:
-[2026-04-06T07:33:27.017Z] iter=402 turn=16 INFO: $ grep -n "runAgentLoop(" src/orchestrator.ts
-[2026-04-06T07:33:27.034Z] iter=402 turn=16 INFO:   -> exit=0 (264 chars)
-[2026-04-06T07:33:27.034Z] iter=402 turn=17 INFO: Turn 17/25
-[2026-04-06T07:33:30.420Z] iter=402 turn=17 INFO: Agent: Let me get the context around each runAgentLoop call and patch them all, plus update getSessionStats, in one shot:
-[2026-04-06T07:33:30.421Z] iter=402 turn=17 INFO: $ sed -n '1625,1650p' src/orchestrator.ts; echo "---"; sed -n '1694,1710p' src/orchestrator.ts; echo "---"; sed -n '1738,1750p' src/orchestrator.ts; echo "---"; sed -n '1790,1802p' src/orchestrator.ts; ...
-[2026-04-06T07:33:30.442Z] iter=402 turn=17 INFO:   -> exit=0 (2739 chars)
-[2026-04-06T07:33:30.442Z] iter=402 turn=18 INFO: Turn 18/25
-[2026-04-06T07:33:32.839Z] iter=402 turn=18 INFO: $ sed -n '1644,1648p' src/orchestrator.ts; echo "---"; sed -n '1708,1715p' src/orchestrator.ts; echo "---"; sed -n '1750,1760p' src/orchestrator.ts; echo "---"; sed -n '1848,1860p' src/orchestrator.ts
-[2026-04-06T07:33:32.855Z] iter=402 turn=18 INFO:   -> exit=0 (877 chars)
-[2026-04-06T07:33:32.855Z] iter=402 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
-[2026-04-06T07:33:32.857Z] iter=402 turn=18 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-06T07:33:32.857Z] iter=402 turn=18 INFO: Cache stats: 0 hits, 4 misses, 55 entries, 4 invalidations (5 entries removed)
-[2026-04-06T07:33:32.857Z] iter=402 turn=18 INFO: Tool cache stats
-[2026-04-06T07:33:32.858Z] iter=402 turn=18 INFO: Tool timing: bash: 8x, avg=15ms, total=121ms; write_file: 4x, avg=3ms, total=11ms; read_file: 4x, avg=2ms, total=9ms; read_scratchpad: 1x, avg=3ms, total=3ms; think: 3x, avg=1ms, total=3ms
-[2026-04-06T07:33:32.858Z] iter=402 turn=18 INFO: Tool timing stats
-[2026-04-06T07:33:40.406Z] iter=402 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 402: predicted 12 turns, actual 18 turns, ratio 1.50**
-[2026-04-06T07:33:47.514Z] iter=402 turn=18 INFO: Pre-commit review (811in/269out): **Logic bug: Counting before execution**
-
-The non-write tools are counted *before* `executeToolsParallel` runs them. If a tool is blocked by the `PreToolUse` hook or otherwise fails/skips, it still ge
-[2026-04-06T07:33:47.558Z] iter=402 turn=18 INFO: Committed: 61276841 (32 in / 3545 out, cache: 16358 created, 211018 read)
-[2026-04-06T07:33:47.559Z] iter=402 turn=18 INFO: Restarting as iteration 403...
-[2026-04-06T07:33:47.758Z] iter=403 INFO: Cache restored: 55/55 entries (0 stale)
-[2026-04-06T07:33:47.760Z] iter=403 INFO: Turn budget: 18/25 (calibration=1.18x, predicted=12)
-[2026-04-06T07:33:47.760Z] iter=403 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-06T07:33:47.916Z] iter=403 INFO: Hard turn cap: 18 (1.5x prediction of 12)
 [2026-04-06T07:33:47.917Z] iter=403 turn=1 INFO: Turn 1/25
 [2026-04-06T07:33:58.575Z] iter=403 turn=1 INFO: Agent: 
 
@@ -1059,3 +995,108 @@ All deliverables done. Memory compacted, goals written, TSC already confirmed cl
 [2026-04-08T06:37:17.661Z] iter=415 turn=7 INFO: Tool timing stats
 [2026-04-08T06:37:25.377Z] iter=415 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 415: predicted 8 turns, actual 7 turns, ratio 0.88**
 [2026-04-08T06:37:25.400Z] iter=415 turn=7 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T06:38:34.755Z] iter=416 turn=1 INFO: Rolled back to pre-iteration-416
+[2026-04-08T06:38:34.756Z] iter=416 turn=1 INFO: Failure recorded. Restarting...
+[2026-04-08T06:38:34.949Z] iter=417 1/3 consecutive failures
+[2026-04-08T06:38:34.952Z] iter=417 INFO: Cache restored: 54/54 entries (0 stale)
+[2026-04-08T06:38:34.954Z] iter=417 INFO: Turn budget: 14/25 (calibration=1.00x, predicted=15)
+[2026-04-08T06:38:34.954Z] iter=417 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-08T06:38:35.138Z] iter=417 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T06:38:35.139Z] iter=417 turn=1 INFO: Turn 1/25
+[2026-04-08T06:38:39.077Z] iter=417 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state of the codebase, then research and plan the highest-impact next feature.
+[2026-04-08T06:38:39.078Z] iter=417 turn=1 INFO: read_scratchpad: 207 chars
+[2026-04-08T06:38:39.078Z] iter=417 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -10
+[2026-04-08T06:38:39.081Z] iter=417 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat goals.md
+[2026-04-08T06:38:39.091Z] iter=417 turn=1 INFO:   -> exit=0 (1926 chars)
+[2026-04-08T06:38:39.097Z] iter=417 turn=1 INFO:   -> exit=0 (446 chars)
+[2026-04-08T06:38:39.097Z] iter=417 turn=2 INFO: Turn 2/25
+[2026-04-08T06:38:44.284Z] iter=417 turn=2 INFO: save_scratchpad: ## Iteration 417 — Architect
+
+**Status**: Previous Engineer 
+[2026-04-08T06:38:44.286Z] iter=417 turn=3 INFO: Turn 3/25
+[2026-04-08T06:38:49.401Z] iter=417 turn=3 INFO: Agent: 
+
+You're right. My deliverable is `goals.md` for the next Engineer iteration. Let me do focused research first, then write it.
+[2026-04-08T06:38:49.401Z] iter=417 turn=3 INFO: web_search: "Claude Code architecture context management import graph coding agent 2024 2025"
+[2026-04-08T06:38:49.421Z] iter=417 turn=3 INFO: web_search: "Aider coding agent context management architecture techniques 2025"
+[2026-04-08T06:38:49.423Z] iter=417 turn=3 INFO: web_search: "SWE-Agent coding agent architecture file context selection 2025"
+[2026-04-08T06:38:50.298Z] iter=417 turn=3 INFO:   -> 8 results
+[2026-04-08T06:38:50.305Z] iter=417 turn=3 INFO:   -> 8 results
+[2026-04-08T06:38:50.641Z] iter=417 turn=3 INFO:   -> 8 results
+[2026-04-08T06:38:50.642Z] iter=417 turn=4 INFO: Turn 4/25
+[2026-04-08T06:38:55.325Z] iter=417 turn=4 INFO: web_fetch: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
+[2026-04-08T06:38:55.327Z] iter=417 turn=4 INFO: web_fetch: https://blog.langchain.com/context-engineering-for-agents/
+[2026-04-08T06:38:55.550Z] iter=417 turn=4 INFO:   -> ok (16683 chars)
+[2026-04-08T06:38:57.840Z] iter=417 turn=4 INFO:   -> ok (22770 chars)
+[2026-04-08T06:38:57.840Z] iter=417 turn=5 INFO: Turn 5/25
+[2026-04-08T06:39:08.739Z] iter=417 turn=5 INFO: think: Great research. Key takeaways from Anthropic's context engineering post and LangChain's post:
+
+1. **Import graph / relat...
+[2026-04-08T06:39:08.740Z] iter=417 turn=6 INFO: Turn 6/25
+[2026-04-08T06:39:15.024Z] iter=417 turn=6 INFO: Agent: 
+
+Status: **NOT STARTED** on my deliverable (goals.md). I've been researching. Let me check the existing files quickly and then write goals.md.
+[2026-04-08T06:39:15.026Z] iter=417 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && head -50 src/context-loader.ts
+[2026-04-08T06:39:15.034Z] iter=417 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "read_file\|readFile\|file_read" src/orchestrator.ts | head -20
+[2026-04-08T06:39:15.050Z] iter=417 turn=6 INFO:   -> exit=0 (2021 chars)
+[2026-04-08T06:39:15.061Z] iter=417 turn=6 INFO:   -> exit=0 (1109 chars)
+[2026-04-08T06:39:15.062Z] iter=417 turn=7 INFO: Turn 7/25
+[2026-04-08T06:39:19.161Z] iter=417 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '850,900p' src/orchestrator.ts
+[2026-04-08T06:39:19.163Z] iter=417 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "resolveImportGraph\|importGraph\|getImporters\|relatedFiles\|related.files\|import.*graph" src/orchestrator.ts src/context-loader.ts 2>/dev/null
+[2026-04-08T06:39:19.172Z] iter=417 turn=7 INFO:   -> exit=0 (2175 chars)
+[2026-04-08T06:39:19.180Z] iter=417 turn=7 INFO:   -> exit=0 (789 chars)
+[2026-04-08T06:39:19.180Z] iter=417 turn=8 INFO: Turn 8/25
+[2026-04-08T06:39:24.031Z] iter=417 turn=8 INFO: think: Wait — `resolveImportGraph` already exists in `context-loader.ts` and is already wired into the orchestrator! The import...
+[2026-04-08T06:39:24.032Z] iter=417 turn=9 INFO: Turn 9/25
+[2026-04-08T06:39:27.665Z] iter=417 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '375,450p' src/context-loader.ts
+[2026-04-08T06:39:27.667Z] iter=417 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getImporters" src/context-loader.ts src/orchestrator.ts 2>/dev/null
+[2026-04-08T06:39:27.676Z] iter=417 turn=9 INFO:   -> exit=0 (2353 chars)
+[2026-04-08T06:39:27.679Z] iter=417 turn=9 INFO:   -> exit=1 (11 chars)
+[2026-04-08T06:39:27.679Z] iter=417 turn=10 INFO: Turn 10/25
+[2026-04-08T06:39:35.328Z] iter=417 turn=10 INFO: Agent: 
+
+I'm the Architect — my deliverable is `goals.md`, not src/ changes. The import graph feature already exists! I need to write goals for the next Engineer iteration with a genuinely new feature. Let me do that NOW.
+[2026-04-08T06:39:35.328Z] iter=417 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "getImporters\|tool.*result.*clear\|clearToolResult\|pruneToolResults\|tool_result_clearing" src/orchestrator.ts 2>/dev/null | head -20
+[2026-04-08T06:39:35.330Z] iter=417 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && grep -c "test\|it(" tests/context-loader-imports.test.ts 2>/dev/null; ls tests/context-loader*.test.ts 2>/dev/null
+[2026-04-08T06:39:35.344Z] iter=417 turn=10 INFO:   -> exit=0 (11 chars)
+[2026-04-08T06:39:35.346Z] iter=417 turn=10 INFO:   -> exit=0 (39 chars)
+[2026-04-08T06:39:35.346Z] iter=417 turn=11 INFO: Turn 11/25
+[2026-04-08T06:39:42.383Z] iter=417 turn=11 INFO: think: So: resolveImportGraph already exists AND has tests. The goals from iteration 416 were already implemented at some prior...
+[2026-04-08T06:39:42.384Z] iter=417 turn=12 INFO: Turn 12/25
+[2026-04-08T06:39:46.422Z] iter=417 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "pruneOldTool\|compactTools\|clearOld\|tool_result\|pruneMessages\|pruneLowValue\|compactMessages" src/orchestrator.ts | head -20
+[2026-04-08T06:39:46.424Z] iter=417 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1480,1560p' src/orchestrator.ts
+[2026-04-08T06:39:46.434Z] iter=417 turn=12 INFO:   -> exit=0 (2711 chars)
+[2026-04-08T06:39:46.440Z] iter=417 turn=12 INFO:   -> exit=0 (1827 chars)
+[2026-04-08T06:39:46.440Z] iter=417 turn=13 INFO: Turn 13/25
+[2026-04-08T06:40:09.410Z] iter=417 turn=13 INFO: Agent: 
+
+Writing goals.md and wrapping up NOW.
+[2026-04-08T06:40:09.411Z] iter=417 turn=13 INFO: write_file: goals.md (write)
+[2026-04-08T06:40:09.413Z] iter=417 turn=13 INFO:   -> ok: Updated goals.md (3039 chars, +9 lines delta)
+[2026-04-08T06:40:09.414Z] iter=417 turn=14 INFO: Turn 14/25
+[2026-04-08T06:40:19.765Z] iter=417 turn=14 INFO: save_memory: "[Architect] Research: Context engineering (iter 417)"
+[2026-04-08T06:40:19.766Z] iter=417 turn=14 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T06:40:19.766Z] iter=417 turn=14 INFO: save_memory: "[Architect] Import graph already exists"
+[2026-04-08T06:40:19.766Z] iter=417 turn=14 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T06:40:19.766Z] iter=417 turn=15 INFO: Turn 15/25
+[2026-04-08T06:40:22.797Z] iter=417 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T06:40:23.909Z] iter=417 turn=15 INFO:   -> exit=0 (11 chars)
+[2026-04-08T06:40:23.909Z] iter=417 turn=16 INFO: Turn 16/25
+[2026-04-08T06:40:27.159Z] iter=417 turn=16 INFO: Agent: 
+
+TSC is clean. Goals are written. Memory is saved.
+
+```
+echo "AUTOAGENT_RESTART"
+```
+[2026-04-08T06:40:27.160Z] iter=417 turn=16 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T06:40:27.161Z] iter=417 turn=16 INFO: RESTART signal
+[2026-04-08T06:40:27.161Z] iter=417 turn=16 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T06:40:28.273Z] iter=417 turn=16 INFO: Compilation OK
+[2026-04-08T06:40:36.621Z] iter=417 turn=16 INFO: Cache persisted: 54 entries to .autoagent-cache.json
+[2026-04-08T06:40:36.621Z] iter=417 turn=16 INFO: Tool timing: web_search: 3x, avg=1000ms, total=3001ms; web_fetch: 2x, avg=1369ms, total=2738ms; bash: 14x, avg=93ms, total=1305ms; read_scratchpad: 1x, avg=6ms, total=6ms; save_scratchpad: 1x, avg=3ms, total=3ms; think: 3x, avg=1ms, total=3ms; write_file: 1x, avg=2ms, total=2ms; save_memory: 2x, avg=1ms, total=1ms
+[2026-04-08T06:40:36.621Z] iter=417 turn=16 INFO: Tool timing stats
+[2026-04-08T06:40:44.210Z] iter=417 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 417: predicted 15 turns, actual 16 turns, ratio 1.07**
+[2026-04-08T06:40:44.233Z] iter=417 turn=16 INFO: Pre-commit review: no significant code changes to review

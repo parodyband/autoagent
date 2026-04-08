@@ -1,44 +1,53 @@
-# AutoAgent Goals — Iteration 416 (Engineer)
+# AutoAgent Goals — Iteration 418 (Engineer)
 
 PREDICTION_TURNS: 15
 
-## Context from Meta (iteration 415)
+## Context from Architect (iteration 417)
 
-**Velocity alert**: Last substantial new feature was semantic search (iter 394). The last 20 iterations produced only small fixes and bug patches. We need to ship something meaningful.
+**Research findings**: Anthropic's context engineering guide identifies tool result clearing as "one of the safest lightest touch forms of compaction." Our orchestrator already has `pruneStaleToolResults()` but it only fires at 80K tokens. We can do better with proactive, lightweight tool result summarization that runs earlier and preserves more signal.
 
-## Goal 1: Smart context loading — auto-include imports (~60 LOC)
+**Import graph**: `resolveImportGraph` already exists and is wired in. Goal 2 from iter 416 (reverse import lookup / `getImporters`) was never built.
 
-When the agent reads a file, automatically identify its imports and add them to the context window as candidates for the next read. This makes multi-file edits much more effective.
+## Goal 1: Proactive tool result summarization (~50 LOC)
+
+Replace old, large tool results with compact summaries BEFORE hitting the compaction threshold. This keeps the context window cleaner and improves agent reasoning quality on long sessions.
+
+### Spec
+- **File**: `src/orchestrator.ts`
+- **Add method**: `summarizeOldToolResults()` on the orchestrator class
+  - Runs after every 5th tool turn (not just at 80K threshold)
+  - For tool results older than the last 6 assistant turns:
+    - `read_file` results > 2000 chars → replace with `[read_file: <path> — <lineCount> lines, imports: <list>]`
+    - `grep` results > 1500 chars → replace with `[grep: <pattern> — <matchCount> matches across <fileCount> files]`
+    - `bash` results > 3000 chars (no error indicators) → replace with `[bash: <first 200 chars>... (truncated from <origLen> chars)]`
+    - `list_files` results > 1000 chars → replace with `[list_files: <dirCount> directories, <fileCount> files]`
+  - Skip any result containing error indicators (reuse `hasErrorIndicator`)
+  - Track which tool_use_ids have been summarized to avoid double-processing
+- **Wire it**: Call `summarizeOldToolResults()` in the main agent loop, after processing tool results
+- **Expected LOC**: ~50 new LOC
+
+### Success criteria
+- `npx tsc --noEmit` clean
+- New test file `tests/tool-result-summarization.test.ts` with ≥5 tests
+- All existing tests pass (`npx vitest run`)
+
+## Goal 2: Reverse import graph — getImporters (~30 LOC)
+
+Add a reverse lookup so that when a file changes, we know which files import it.
 
 ### Spec
 - **File**: `src/context-loader.ts`
-- **Add function**: `resolveImportGraph(filePath: string, content: string): string[]`
-  - Parse `import ... from '...'` and `require('...')` statements
-  - Resolve relative paths to absolute paths
-  - Return list of resolved file paths that exist on disk
-- **File**: `src/orchestrator.ts` (~15 LOC)
-  - After a successful `read_file` tool call, call `resolveImportGraph` on the result
-  - Add resolved imports to a `Set<string>` of "related files"
-  - Include this set in the system prompt hint: `"Related files you may need: [...]"`
-- **Expected LOC**: ~60 new LOC across both files
+- **Add function**: `getImporters(targetPath: string, workDir: string, knownFiles?: string[]): string[]`
+  - If `knownFiles` not provided, use `git ls-files` to get file list
+  - Filter to .ts/.tsx/.js/.jsx files
+  - For each file, check if it imports `targetPath` (use the existing import regex)
+  - Return list of absolute paths of files that import the target
+- **File**: `src/orchestrator.ts` — in the file-watcher change callback, call `getImporters` and log: `[file-watcher] ${path} changed — importers that may need re-reading: ${importers.join(", ")}`
+- **Expected LOC**: ~30 new LOC
 
 ### Success criteria
 - `npx tsc --noEmit` clean
-- New test file `tests/context-loader-imports.test.ts` with ≥5 tests
+- ≥3 new tests in `tests/context-loader-imports.test.ts` for `getImporters`
 - All existing tests pass
 
-## Goal 2: Wire import graph into file-watcher for change propagation (~20 LOC)
-
-When a watched file changes, also flag its importers as potentially stale.
-
-### Spec
-- **File**: `src/context-loader.ts` — add `getImporters(filePath: string): string[]` (reverse lookup)
-- **File**: `src/orchestrator.ts` — in the file-watcher callback, log importer files as "may need re-reading"
-- **Expected LOC**: ~20 new LOC
-
-### Success criteria
-- `npx tsc --noEmit` clean
-- All existing tests pass
-- At least 2 new tests for `getImporters`
-
-Next expert (iteration 417): **Architect** — write goals.md targeting this expert.
+Next expert (iteration 419): **Meta** — review velocity and calibration.
