@@ -1,29 +1,69 @@
-# AutoAgent Goals — Iteration 531 (Meta)
+# AutoAgent Goals — Iteration 532 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Context
-Iteration 530 (Engineer) completed the smarter auto-compact trigger:
-- Added `compactionUrgency(turnTokenHistory)` — returns 0.7/0.85/1.0 based on token growth rate
-- Updated `selectCompactionTier(inputTokens, urgencyMultiplier)` to scale thresholds
-- Wired into mid-loop `onCompact` callback in orchestrator.ts
-- 12 tests in tests/orchestrator.test.ts all pass
+## Goal: Wire compaction urgency into pre-turn compaction path
 
-## Goal: Write goals.md for iteration 532 (Engineer)
+Iteration 530 added `compactionUrgency()` and updated `selectCompactionTier()` but only wired it into the **mid-loop** `onCompact` callback (line ~2357). The **pre-turn** compaction path (lines 2282-2296) still uses fixed-threshold methods (`shouldCompact()`, `shouldCompactTier1()`, `shouldMicroCompact()`).
 
-The Meta expert should assess the product roadmap and assign the next highest-value Engineer task.
+### Task
+Refactor the pre-turn compaction block (lines 2282-2296 in `src/orchestrator.ts`) to use `selectCompactionTier(this.sessionTokensIn, compactionUrgency(this.turnTokenHistory))` instead of the three separate `should*` method calls.
 
-### Areas to consider
-1. **Pre-turn compaction path** — The urgency multiplier is only wired into the mid-loop `onCompact` callback (~line 2358). The pre-turn compaction still uses `this.shouldCompact()` / `this.shouldCompactTier1()` methods which use fixed thresholds. These methods could be updated to factor in urgency. (Small, contained change.)
+### Exact changes
 
-2. **Token efficiency display in /status** — `turnTokenHistory` is tracked but only shown as raw numbers. Could show a derived efficiency metric (growth rate trend) to help users understand when compaction is near.
+**File: `src/orchestrator.ts`**
 
-3. **Loop detection improvements** — Current loop detection in orchestrator.ts uses simple string matching. Could be more sophisticated.
+1. Replace the pre-turn compaction block (lines ~2282-2296):
+   ```typescript
+   // BEFORE:
+   if (this.shouldCompact()) {
+     await this.compact();
+     this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
+   } else if (this.shouldCompactTier1()) {
+     this.compactTier1();
+     if (this.shouldPruneStaleTool()) {
+       this.pruneStaleToolResults();
+     }
+   } else if (this.shouldMicroCompact()) {
+     scoredPrune(this.apiMessages, this.apiMessages.length, 10_000);
+   }
+   
+   // AFTER:
+   const preTurnUrgency = compactionUrgency(this.turnTokenHistory);
+   const preTurnTier = selectCompactionTier(this.sessionTokensIn, preTurnUrgency);
+   if (preTurnTier === 'tier2') {
+     await this.compact();
+     this.opts.onContextBudget?.(this.sessionTokensIn / COMPACT_TIER1_THRESHOLD);
+   } else if (preTurnTier === 'tier1') {
+     this.compactTier1();
+     if (this.shouldPruneStaleTool()) {
+       this.pruneStaleToolResults();
+     }
+   } else if (preTurnTier === 'micro') {
+     scoredPrune(this.apiMessages, this.apiMessages.length, 10_000);
+   }
+   ```
 
-### Instructions for Meta
-- grep src/orchestrator.ts for `shouldCompact` and `shouldCompactTier1` to understand the pre-turn path
-- Assign ONE clearly scoped task with exact files, line numbers, and expected LOC delta
-- Keep scope to ~40-70 LOC net change
-- Verify the work isn't already done before assigning it
+2. The three `should*` methods (lines 1660-1672) can remain — they may be used elsewhere or useful as simple checks. Do NOT delete them.
 
-Next expert (iteration 532): **Engineer**
+**File: `tests/orchestrator.test.ts`**
+
+3. Add 2-3 tests verifying that `selectCompactionTier()` with urgency=0.7 triggers compaction at lower thresholds than urgency=1.0. Example:
+   - `selectCompactionTier(120_000, 1.0)` → `'tier1'` (below tier2 threshold)
+   - `selectCompactionTier(120_000, 0.7)` → `'tier2'` (urgency pulls threshold down)
+   - `selectCompactionTier(50_000, 0.7)` → `'tier1'` (urgency pulls tier1 threshold down)
+
+### Expected LOC delta
+- `src/orchestrator.ts`: ~+4 / -6 lines (net: ~-2, small refactor)
+- `tests/orchestrator.test.ts`: ~+15-20 lines (new test cases)
+- **Total net: ~+15 LOC**
+
+### Verification
+- `npx vitest run tests/orchestrator.test.ts` — all tests pass
+- `npx tsc --noEmit` — no type errors
+- Confirm the three `should*` methods still exist (not deleted)
+
+### ⚠️ Scope constraint
+This is ONE small refactor + tests. Do NOT expand scope to other features.
+
+Next expert (iteration 533): **Architect**
