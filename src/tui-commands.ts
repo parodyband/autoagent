@@ -18,6 +18,7 @@ import { buildExportContent as buildExportContentHelper } from "./export-helper.
 import { handlePlanCommand } from "./plan-commands.js";
 import { runDream } from "./dream.js";
 import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
+import { checkpointManager } from "./checkpoint.js";
 
 export interface FooterStats {
   tokensIn: number;
@@ -145,7 +146,9 @@ const commands: Record<string, CommandHandler> = {
         "  /clear    — Clear the conversation history",
         "  /reindex  — Re-index the repository files",
         "  /resume   — List and restore a previous session",
-        "  /rewind   — Restore conversation to a prior checkpoint",
+        "  /rewind      — Restore conversation to a prior checkpoint",
+        "  /checkpoint  — List file checkpoints or rollback (/checkpoint rollback <id>)",
+        "  /timing      — Show detailed tool performance timings",
         "  /compact  — Manually compact conversation context",
         "  /dream    — Consolidate session memory",
         "  /diff     — Show uncommitted git changes",
@@ -196,6 +199,64 @@ const commands: Record<string, CommandHandler> = {
     } else {
       ctx.addMessage({ role: "assistant", content: "Could not rewind to that checkpoint." });
     }
+    return true;
+  },
+
+  "/checkpoint": async (ctx, args) => {
+    const subCmd = (args ?? "").trim().split(/\s+/);
+
+    if (subCmd[0] === "rollback" && subCmd[1]) {
+      const id = parseInt(subCmd[1], 10);
+      if (isNaN(id)) {
+        ctx.addMessage({ role: "assistant", content: "Usage: /checkpoint rollback <id>" });
+        return true;
+      }
+      const result = checkpointManager.rollback(id);
+      if (result.errors.length > 0) {
+        ctx.addMessage({ role: "assistant", content: `Rolled back ${result.restored} files. Errors:\n${result.errors.join("\n")}` });
+      } else if (result.restored === 0) {
+        ctx.addMessage({ role: "assistant", content: `Checkpoint ${id} not found.` });
+      } else {
+        ctx.addMessage({ role: "assistant", content: `✓ Rolled back ${result.restored} file(s) to checkpoint ${id}.` });
+      }
+      return true;
+    }
+
+    // Default: list checkpoints
+    const items = checkpointManager.list(10);
+    if (items.length === 0) {
+      ctx.addMessage({ role: "assistant", content: "No file checkpoints yet. Checkpoints are created automatically when files are edited." });
+      return true;
+    }
+    const lines = ["File checkpoints (rollback with /checkpoint rollback <id>):", ""];
+    for (const cp of items) {
+      const ago = Math.round((Date.now() - cp.timestamp) / 60000);
+      lines.push(`  #${cp.id} | ${cp.label} | ${cp.fileCount} file(s) | ${ago}m ago`);
+    }
+    ctx.addMessage({ role: "assistant", content: lines.join("\n") });
+    return true;
+  },
+
+  "/timing": async (ctx) => {
+    const timings = ctx.orchestratorRef.current?.getToolTimings() ?? [];
+    if (timings.length === 0) {
+      ctx.addMessage({ role: "assistant", content: "No tool timings recorded yet." });
+      return true;
+    }
+    const sorted = [...timings].sort((a: { avgMs: number }, b: { avgMs: number }) => b.avgMs - a.avgMs);
+    const totalCalls = sorted.reduce((sum: number, t: { calls: number }) => sum + t.calls, 0);
+    const lines = ["Tool Performance Timings:", ""];
+    lines.push(`  Total tool calls: ${totalCalls}`);
+    lines.push("");
+    lines.push("  Tool               Calls    Avg (ms)");
+    lines.push("  ────────────────── ──────── ────────");
+    for (const t of sorted) {
+      const name = (t as { toolName: string }).toolName.padEnd(18);
+      const calls = String((t as { calls: number }).calls).padStart(8);
+      const avg = String(Math.round((t as { avgMs: number }).avgMs)).padStart(8);
+      lines.push(`  ${name} ${calls} ${avg}`);
+    }
+    ctx.addMessage({ role: "assistant", content: lines.join("\n") });
     return true;
   },
 

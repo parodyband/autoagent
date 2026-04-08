@@ -52,3 +52,12 @@
 - Memory compacted: removed 6 stale 529 failure entries, corrected feature status.
 
 **[AUTO-SCORED] Iteration 467: predicted 15 turns, actual 13 turns, ratio 0.87**
+
+## Iteration 468 — FAILED (2026-04-08T08:08:48.709Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqxn3yjX891B5PE2NAfo"}
+- **Rolled back**
+
+---
+
+**[AUTO-SCORED] Iteration 469: predicted 15 turns, actual 13 turns, ratio 0.87**

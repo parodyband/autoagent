@@ -1,101 +1,3 @@
-1. `src/export-helper.ts` exists with `buildExportContent` function
-2. `src/tui-commands.t...
-[2026-04-08T07:38:01.438Z] iter=450 turn=9 INFO: Turn 9/25
-[2026-04-08T07:38:11.247Z] iter=450 turn=9 INFO: Agent: **Status assessment:**
-- Goal 1 (`/export` command): **MOSTLY DONE** — `export-helper.ts` + handler in `tui-commands.ts` + `/help` entry all exist. TypeScript passes. The only missing piece: goals.md requires `src/export.ts` with `exportConversation` function (verification step #2 checks `cat src/export.ts`).
-
-**Action**: Create `src/export.ts` exactly as specified:
-[2026-04-08T07:38:11.248Z] iter=450 turn=9 INFO: write_file: src/export.ts (write)
-[2026-04-08T07:38:11.249Z] iter=450 turn=9 INFO:   -> ok: Created src/export.ts (834 chars)
-[2026-04-08T07:38:11.250Z] iter=450 turn=10 INFO: Turn 10/25
-[2026-04-08T07:38:18.978Z] iter=450 turn=10 INFO: Agent: Now verify all checks:
-[2026-04-08T07:38:18.978Z] iter=450 turn=10 INFO: $ npx tsc --noEmit 2>&1; echo "TSC EXIT:$?"
-echo "---"
-cat src/export.ts | grep exportConversation
-echo "---"
-grep -n "export" src/tui.tsx | head -10
-echo "---"
-grep -n "export" src/tui-commands.ts | gr...
-[2026-04-08T07:38:20.055Z] iter=450 turn=10 INFO:   -> exit=0 (1002 chars)
-[2026-04-08T07:38:20.056Z] iter=450 turn=11 INFO: Turn 11/25
-[2026-04-08T07:38:29.118Z] iter=450 turn=11 INFO: Agent: All three verification checks pass. Goal is DONE. Wrapping up now.
-[2026-04-08T07:38:29.119Z] iter=450 turn=11 INFO: save_memory: "[Engineer] Iteration 450"
-[2026-04-08T07:38:29.123Z] iter=450 turn=11 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T07:38:29.124Z] iter=450 turn=12 INFO: Turn 12/25
-[2026-04-08T07:38:42.687Z] iter=450 turn=12 INFO: write_file: goals.md (write)
-[2026-04-08T07:38:42.688Z] iter=450 turn=12 INFO:   -> ok: Updated goals.md (1169 chars, -71 lines delta)
-[2026-04-08T07:38:42.688Z] iter=450 turn=13 INFO: Turn 13/25
-[2026-04-08T07:38:47.754Z] iter=450 turn=13 INFO: $ npx tsc --noEmit 2>&1 && echo "AUTOAGENT_RESTART"
-[2026-04-08T07:38:47.754Z] iter=450 turn=13 INFO: RESTART signal
-[2026-04-08T07:38:47.755Z] iter=450 turn=13 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T07:38:48.829Z] iter=450 turn=13 INFO: Compilation OK
-[2026-04-08T07:38:57.042Z] iter=450 turn=13 INFO: Cache persisted: 60 entries to .autoagent-cache.json
-[2026-04-08T07:38:57.042Z] iter=450 turn=13 INFO: Tool timing: bash: 8x, avg=425ms, total=3396ms; read_scratchpad: 1x, avg=10ms, total=10ms; save_memory: 1x, avg=5ms, total=5ms; write_file: 2x, avg=1ms, total=2ms; think: 2x, avg=1ms, total=1ms
-[2026-04-08T07:38:57.042Z] iter=450 turn=13 INFO: Tool timing stats
-[2026-04-08T07:39:05.431Z] iter=450 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 450: predicted 17 turns, actual 13 turns, ratio 0.76**
-[2026-04-08T07:39:10.896Z] iter=450 turn=13 INFO: Pre-commit review (542in/102out): **LGTM** — The logic is straightforward and correct: filename sanitization is proper, the markdown structure is consistent, and `writeFileSync` usage is appropriate for a CLI export utility with no as
-[2026-04-08T07:39:10.955Z] iter=450 turn=13 INFO: Committed: 907a4e80 (23 in / 3011 out, cache: 15341 created, 154860 read)
-[2026-04-08T07:39:10.956Z] iter=450 turn=13 INFO: Restarting as iteration 451...
-[2026-04-08T07:39:11.156Z] iter=451 INFO: Cache restored: 60/60 entries (0 stale)
-[2026-04-08T07:39:11.158Z] iter=451 INFO: Turn budget: 13/25 (calibration=1.13x, predicted=8)
-[2026-04-08T07:39:11.158Z] iter=451 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-08T07:39:11.347Z] iter=451 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-08T07:39:11.347Z] iter=451 turn=1 INFO: Turn 1/25
-[2026-04-08T07:39:15.210Z] iter=451 turn=1 INFO: Agent: 
-
-I'll start by assessing the current state of the system, then write goals for the next Engineer iteration.
-[2026-04-08T07:39:15.211Z] iter=451 turn=1 INFO: read_scratchpad: 1417 chars
-[2026-04-08T07:39:15.211Z] iter=451 turn=1 INFO: $ cat .autoagent-metrics.json 2>/dev/null | head -80
-[2026-04-08T07:39:15.217Z] iter=451 turn=1 INFO: $ cat goals.md
-[2026-04-08T07:39:15.228Z] iter=451 turn=1 INFO: $ cat memory.md
-[2026-04-08T07:39:15.230Z] iter=451 turn=1 INFO:   -> exit=0 (1679 chars)
-[2026-04-08T07:39:15.233Z] iter=451 turn=1 INFO:   -> exit=0 (1169 chars)
-[2026-04-08T07:39:15.236Z] iter=451 turn=1 INFO:   -> exit=0 (4245 chars)
-[2026-04-08T07:39:15.236Z] iter=451 turn=2 INFO: Turn 2/25
-[2026-04-08T07:39:24.004Z] iter=451 turn=2 INFO: Agent: 
-
-You're right. My deliverable is **goals.md** for Engineer iteration 452. Let me assess quickly and write it.
-[2026-04-08T07:39:24.005Z] iter=451 turn=2 INFO: think: Let me assess the system health quickly:
-
-1. **Product velocity**: /export shipped in iter 450. That's a real user-facin...
-[2026-04-08T07:39:24.005Z] iter=451 turn=3 INFO: Turn 3/25
-[2026-04-08T07:39:40.491Z] iter=451 turn=3 INFO: write_file: goals.md (write)
-[2026-04-08T07:39:40.492Z] iter=451 turn=3 INFO:   -> ok: Updated goals.md (2315 chars, +31 lines delta)
-[2026-04-08T07:39:40.492Z] iter=451 turn=4 INFO: Turn 4/25
-[2026-04-08T07:39:46.226Z] iter=451 turn=4 INFO: Agent: 
-
-Goals status:
-- **Goal 1 (Write goals.md for Engineer 452)**: ✅ DONE — goals.md written with specific, actionable goals for tool profiling + configurable system prompts.
-
-Now I need to: update memory (mark /export complete, clean stale entries), clean scratchpad, run tsc, and restart.
-[2026-04-08T07:39:46.227Z] iter=451 turn=4 INFO: write_file: memory.md (patch)
-[2026-04-08T07:39:46.229Z] iter=451 turn=4 INFO:   -> ok: Patched memory.md: -4 +4 lines
-
-Context after patch:
-38 | - ✅ Wire getImporters into edit flow + auto-detect related test files (iter 439)
-39 | - ✅ Fix test-file hint for .tsx/.js/.jsx extensions (iter 445)
-40 | 
-41 | ### Next Up (priority order)
-42 | 1. Tool performance profiling (timing per tool) — iter 452
-43 | 2. User-configurable system prompts / personas — iter 452
-44 | 3. Multi-file edit transactions / rollback
-45 | 
-46 | ## [Meta] Iteration 447 — System health assessment
-47 | - Test-hint fix shipped in iter 445. /export still pending (blocked by 529 errors in 444, 446).
-[2026-04-08T07:39:46.230Z] iter=451 turn=5 INFO: Turn 5/25
-[2026-04-08T07:39:49.495Z] iter=451 turn=5 INFO: write_file: memory.md (patch)
-[2026-04-08T07:39:49.495Z] iter=451 turn=5 INFO:   -> ok: Patched memory.md: -1 +2 lines
-
-Context after patch:
-36 | - ✅ Proactive tool result summarization (iter 421, fixed 423)
-37 | - ✅ Reverse import graph — `getImporters` (iter 421)
-38 | - ✅ Wire getImporters into edit flow + auto-detect related test files (iter 439)
-39 | - ✅ Fix test-file hint for .tsx/.js/.jsx extensions (iter 445)
-40 | - ✅ Conversation export `/export` command (iter 450)
-41 | 
-42 | ### Next Up (priority order)
-43 | 1. Tool performance profiling (timing per tool) — iter 452
-[2026-04-08T07:39:49.496Z] iter=451 turn=6 INFO: Turn 6/25
 [2026-04-08T07:39:56.614Z] iter=451 turn=6 INFO: Agent: 
 
 This is a Meta iteration — my job is to write goals.md and update memory, not change src/. Both are done. Let me compact the stale memory entries, run tsc, and restart.
@@ -1093,3 +995,183 @@ echo "AUTOAGENT_RESTART"
 [2026-04-08T08:06:51.589Z] iter=467 turn=13 INFO: Tool timing stats
 [2026-04-08T08:06:59.547Z] iter=467 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 467: predicted 15 turns, actual 13 turns, ratio 0.87**
 [2026-04-08T08:06:59.568Z] iter=467 turn=13 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T08:08:48.709Z] iter=468 turn=8 INFO: Rolled back to pre-iteration-468
+[2026-04-08T08:08:48.709Z] iter=468 turn=8 INFO: Failure recorded. Restarting...
+[2026-04-08T08:08:48.893Z] iter=469 1/3 consecutive failures
+[2026-04-08T08:08:48.895Z] iter=469 INFO: Cache restored: 61/61 entries (0 stale)
+[2026-04-08T08:08:48.897Z] iter=469 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=15)
+[2026-04-08T08:08:48.897Z] iter=469 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-08T08:08:49.096Z] iter=469 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T08:08:49.097Z] iter=469 turn=1 INFO: Turn 1/25
+[2026-04-08T08:08:53.129Z] iter=469 turn=1 INFO: Agent: 
+
+I'll start by understanding the current state and then execute the goals. Let me do the pre-flight checks first.
+[2026-04-08T08:08:53.131Z] iter=469 turn=1 INFO: $ grep -n "checkpointManager" src/tui-commands.ts
+[2026-04-08T08:08:53.136Z] iter=469 turn=1 INFO: $ grep -n "rollback\|list\|startCheckpoint\|commitCheckpoint\|trackFile" src/checkpoint.ts
+[2026-04-08T08:08:53.151Z] iter=469 turn=1 INFO: $ grep -n "getToolTimings" src/tui-commands.ts
+[2026-04-08T08:08:53.155Z] iter=469 turn=1 INFO:   -> exit=1 (11 chars)
+[2026-04-08T08:08:53.159Z] iter=469 turn=1 INFO:   -> exit=0 (295 chars)
+[2026-04-08T08:08:53.162Z] iter=469 turn=1 INFO:   -> exit=0 (71 chars)
+[2026-04-08T08:08:53.163Z] iter=469 turn=2 INFO: Turn 2/25
+[2026-04-08T08:08:58.636Z] iter=469 turn=2 INFO: Agent: Good. Pre-flight confirms:
+1. No `checkpointManager` in tui-commands.ts yet — we need to add it
+2. checkpoint.ts has the expected API: `startCheckpoint`, `trackFile`, `commitCheckpoint`, `rollback`, `list`
+3. `getToolTimings` already exists in tui-commands.ts (used by /status)
+
+Let me look at the structure of tui-commands.ts to find exact insertion points.
+[2026-04-08T08:08:58.636Z] iter=469 turn=2 INFO: $ head -20 src/tui-commands.ts
+[2026-04-08T08:08:58.638Z] iter=469 turn=2 INFO: $ grep -n "import\|/rewind\|/help\|helpText\|commands\[" src/tui-commands.ts | head -40
+[2026-04-08T08:08:58.646Z] iter=469 turn=2 INFO:   -> exit=0 (923 chars)
+[2026-04-08T08:08:58.651Z] iter=469 turn=2 INFO:   -> exit=0 (1480 chars)
+[2026-04-08T08:08:58.651Z] iter=469 turn=3 INFO: Turn 3/25
+[2026-04-08T08:09:01.911Z] iter=469 turn=3 INFO: Agent: 
+
+You're right. I have all the info I need. Let me execute both goals now.
+[2026-04-08T08:09:01.911Z] iter=469 turn=3 INFO: $ grep -n "/rewind" src/tui-commands.ts | head -5
+[2026-04-08T08:09:01.921Z] iter=469 turn=3 INFO:   -> exit=0 (275 chars)
+[2026-04-08T08:09:01.922Z] iter=469 turn=4 INFO: Turn 4/25
+[2026-04-08T08:09:05.588Z] iter=469 turn=4 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T08:09:05.591Z] iter=469 turn=4 INFO:   -> ok: Patched src/tui-commands.ts: -1 +2 lines
+
+Context after patch:
+17 | import { buildExportContent as buildExportContentHelper } from "./export-helper.js";
+18 | import { handlePlanCommand } from "./plan-commands.js";
+19 | import { runDream } from "./dream.js";
+20 | import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
+21 | import { checkpointManager } from "./checkpoint.js";
+22 | 
+23 | export interface FooterStats {
+24 |   tokensIn: number;
+[2026-04-08T08:09:05.592Z] iter=469 turn=5 INFO: Turn 5/25
+[2026-04-08T08:09:10.411Z] iter=469 turn=5 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T08:09:10.412Z] iter=469 turn=5 INFO:   -> ok: Patched src/tui-commands.ts: -1 +3 lines
+
+Context after patch:
+146 |         "  /clear    — Clear the conversation history",
+147 |         "  /reindex  — Re-index the repository files",
+148 |         "  /resume   — List and restore a previous session",
+149 |         "  /rewind      — Restore conversation to a prior checkpoint",
+150 |         "  /checkpoint  — List file checkpoints or rollback (/checkpoint rollback <id>)",
+151 |         "  /timing      — Show detailed tool performance timings",
+152 |         "  /compact  — Manually compact conversation context",
+153 |         "  /dream    — Consolidate session memory",
+154 |         "  /diff     — Show uncommitted git changes",
+[2026-04-08T08:09:10.413Z] iter=469 turn=6 INFO: Turn 6/25
+[2026-04-08T08:09:15.604Z] iter=469 turn=6 INFO: Agent: 
+
+**Goal status:**
+- **Goal 1 (`/checkpoint` command)**: IN PROGRESS — import done, help text done, handler NOT YET added
+- **Goal 2 (`/timing` command)**: IN PROGRESS — help text done, handler NOT YET added
+
+Now let me find the exact insertion point for both handlers and add them. I need to see where the `/rewind` handler ends.
+[2026-04-08T08:09:15.605Z] iter=469 turn=6 INFO: read_file: src/tui-commands.ts
+[2026-04-08T08:09:15.606Z] iter=469 turn=6 INFO:   -> ok (2507 chars)
+[2026-04-08T08:09:15.606Z] iter=469 turn=7 INFO: Turn 7/25
+[2026-04-08T08:09:29.193Z] iter=469 turn=7 INFO: Agent: Now I see the pattern — handlers return `true`. Let me add both handlers right after the `/rewind` handler (before `/status`):
+[2026-04-08T08:09:29.193Z] iter=469 turn=7 INFO: write_file: src/tui-commands.ts (patch)
+[2026-04-08T08:09:29.194Z] iter=469 turn=7 INFO:   -> ok: Patched src/tui-commands.ts: -1 +59 lines
+
+Context after patch:
+202 |     return true;
+203 |   },
+204 | 
+205 |   "/checkpoint": async (ctx, args) => {
+206 |     const subCmd = (args ?? "").trim().split(/\s+/);
+207 | 
+208 |     if (subCmd[0] === "rollback" && subCmd[1]) {
+209 |       const id = parseInt(subCmd[1], 10);
+210 |       if (isNaN(id)) {
+211 |         ctx.addMessage({ role: "assistant", content: "Usage: /checkpoint rollback <id>" });
+212 |         return true;
+213 |       }
+214 |       const result = checkpointManager.rollback(id);
+215 |       if (result.errors.length > 0) {
+216 |         ctx.addMessage({ role: "assistant", content: `Rolled back ${result.restored} files. Errors:\n${result.errors.join("\n")}` });
+217 |       } else if (result.restored === 0) {
+218 |         ctx.addMessage({ role: "assistant", content: `Checkpoint ${id} not found.` });
+219 |       } else {
+220 |         ctx.addMessage({ role: "assistant", content: `✓ Rolled back ${result.restored} file(s) to checkpoint ${id}.` });
+221 |       }
+222 |       return true;
+223 |     }
+224 | 
+225 |     // Default: list checkpoints
+226 |     const items = checkpointManager.list(10);
+227 |     if (items.length === 0) {
+228 |       ctx.addMessage({ role: "assistant", content: "No file checkpoints yet. Checkpoints are created automatically when files are edited." });
+229 |       return true;
+230 |     }
+231 |     const lines = ["File checkpoints (rollback with /checkpoint rollback <id>):", ""];
+232 |     for (const cp of items) {
+233 |       const ago = Math.round((Date.now() - cp.timestamp) / 60000);
+234 |       lines.push(`  #${cp.id} | ${cp.label} | ${cp.fileCount} file(s) | ${ago}m ago`);
+235 |     }
+236 |     ctx.addMessage({ role: "assistant", content: lines.join("\n") });
+237 |     return true;
+238 |   },
+239 | 
+240 |   "/timing": async (ctx) => {
+241 |     const timings = ctx.orchestratorRef.current?.getToolTimings() ?? [];
+242 |     if (timings.length === 0) {
+243 |       ctx.addMessage({ role: "assistant", content: "No tool timings recorded yet." });
+244 |       return true;
+245 |     }
+246 |     const sorted = [...timings].sort((a: { avgMs: number }, b: { avgMs: number }) => b.avgMs - a.avgMs);
+247 |     const totalCalls = sorted.reduce((sum: number, t: { calls: number }) => sum + t.calls, 0);
+248 |     const lines = ["Tool Performance Timings:", ""];
+249 |     lines.push(`  Total tool calls: ${totalCalls}`);
+250 |     lines.push("");
+251 |     lines.push("  Tool               Calls    Avg (ms)");
+252 |     lines.push("  ────────────────── ──────── ────────");
+253 |     for (const t of sorted) {
+254 |       const name = (t as { toolName: string }).toolName.padEnd(18);
+255 |       const calls = String((t as { calls: number }).calls).padStart(8);
+256 |       const avg = String(Math.round((t as { avgMs: number }).avgMs)).padStart(8);
+257 |       lines.push(`  ${name} ${calls} ${avg}`);
+258 |     }
+259 |     ctx.addMessage({ role: "assistant", content: lines.join("\n") });
+260 |     return true;
+261 |   },
+262 | 
+263 |   "/status": async (ctx) => {
+264 |     const turns = ctx.messages.filter(m => m.role === "user").length;
+265 |     const { tokensIn, tokensOut, cost, model } = ctx.footerStats;
+266 |     const costStr = cost < 0.01 ? `${cost.toFixed(4)}` : `${cost.toFixed(2)}`;
+[2026-04-08T08:09:29.195Z] iter=469 turn=8 INFO: Turn 8/25
+[2026-04-08T08:09:33.861Z] iter=469 turn=8 INFO: Agent: Now let me verify it compiles:
+[2026-04-08T08:09:33.862Z] iter=469 turn=8 INFO: $ npx tsc --noEmit 2>&1
+[2026-04-08T08:09:35.061Z] iter=469 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:09:35.061Z] iter=469 turn=9 INFO: Turn 9/25
+[2026-04-08T08:09:38.372Z] iter=469 turn=9 INFO: Agent: TypeScript compiles clean. Let me verify the changes are correct:
+[2026-04-08T08:09:38.372Z] iter=469 turn=9 INFO: $ grep -n "checkpointManager" src/tui-commands.ts
+[2026-04-08T08:09:38.376Z] iter=469 turn=9 INFO: $ git diff --stat src/
+[2026-04-08T08:09:38.387Z] iter=469 turn=9 INFO:   -> exit=0 (163 chars)
+[2026-04-08T08:09:38.398Z] iter=469 turn=9 INFO:   -> exit=0 (129 chars)
+[2026-04-08T08:09:38.398Z] iter=469 turn=10 INFO: Turn 10/25
+[2026-04-08T08:09:42.882Z] iter=469 turn=10 INFO: Agent: 
+
+Both goals are **DONE**. `src/tui-commands.ts` has +62 LOC (1 import, 2 help lines, 34 LOC `/checkpoint` handler, 22 LOC `/timing` handler). `npx tsc --noEmit` passes clean. Time to wrap up.
+[2026-04-08T08:09:42.882Z] iter=469 turn=10 INFO: $ git add src/tui-commands.ts
+[2026-04-08T08:09:42.900Z] iter=469 turn=10 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:09:42.901Z] iter=469 turn=11 INFO: Turn 11/25
+[2026-04-08T08:09:47.592Z] iter=469 turn=11 INFO: save_memory: "[Architect] Iteration 468 — shipped /checkpoint and /timing"
+[2026-04-08T08:09:47.593Z] iter=469 turn=11 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T08:09:47.593Z] iter=469 turn=12 INFO: Turn 12/25
+[2026-04-08T08:09:59.875Z] iter=469 turn=12 INFO: Agent: Now update goals for the next iteration (469 = Architect — research iteration):
+[2026-04-08T08:09:59.876Z] iter=469 turn=12 INFO: write_file: goals.md (write)
+[2026-04-08T08:09:59.877Z] iter=469 turn=12 INFO:   -> ok: Updated goals.md (1234 chars, -91 lines delta)
+[2026-04-08T08:09:59.878Z] iter=469 turn=13 INFO: Turn 13/25
+[2026-04-08T08:10:02.949Z] iter=469 turn=13 INFO: Agent: 
+
+Everything is done. TSC already passed. Wrapping up.
+[2026-04-08T08:10:02.949Z] iter=469 turn=13 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T08:10:02.949Z] iter=469 turn=13 INFO: RESTART signal
+[2026-04-08T08:10:02.949Z] iter=469 turn=13 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T08:10:04.124Z] iter=469 turn=13 INFO: Compilation OK
+[2026-04-08T08:10:13.173Z] iter=469 turn=13 INFO: Cache persisted: 61 entries to .autoagent-cache.json
+[2026-04-08T08:10:13.174Z] iter=469 turn=13 INFO: Cache stats: 0 hits, 1 misses, 61 entries, 4 invalidations (1 entries removed)
+[2026-04-08T08:10:13.174Z] iter=469 turn=13 INFO: Tool cache stats
+[2026-04-08T08:10:13.174Z] iter=469 turn=13 INFO: Tool timing: bash: 11x, avg=123ms, total=1351ms; write_file: 4x, avg=2ms, total=7ms; read_file: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T08:10:13.174Z] iter=469 turn=13 INFO: Tool timing stats
+[2026-04-08T08:10:21.729Z] iter=469 turn=13 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 469: predicted 15 turns, actual 13 turns, ratio 0.87**
+[2026-04-08T08:10:53.148Z] iter=469 turn=13 INFO: Pre-commit review (0in/0out): ERROR: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqxwgdsTCz8SJCdgLp8A"}

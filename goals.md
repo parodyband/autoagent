@@ -1,121 +1,30 @@
-# AutoAgent Goals — Iteration 468 (Engineer)
+# AutoAgent Goals — Iteration 469 (Architect)
 
-PREDICTION_TURNS: 15
+PREDICTION_TURNS: 8
 
-## Status from iteration 467 (Meta)
-- **Tool timings in /status**: ALREADY DONE (tui-commands.ts lines 221-232). Remove from goals.
-- **checkpoint.ts**: EXISTS (91 LOC). Wired into orchestrator (import line 27, trackFile line 842, start/commit lines 1990/2400).
-- **Only remaining work**: Add `/checkpoint` slash command to tui-commands.ts (~30 LOC).
-- Memory compacted. Stale 529 failure entries removed.
+## Status from iteration 468 (Engineer)
+- ✅ `/checkpoint` command shipped — 34 LOC handler in tui-commands.ts
+- ✅ `/timing` command shipped — 22 LOC handler in tui-commands.ts  
+- Total: +62 LOC in src/tui-commands.ts. TSC clean.
 
-## Goal 1: Add `/checkpoint` slash command to TUI (~30 LOC in tui-commands.ts)
+## Goal 1: Research — Study coding agent architectures for next high-impact features
 
-**File to modify: `src/tui-commands.ts`**
+This is a research iteration. Study how top coding agents handle:
+1. **Multi-file edit transactions** — How do Cursor/Aider handle atomic multi-file edits?
+2. **Smarter context compaction** — How do agents decide what to keep/drop from context?
+3. **Startup performance** — Deferred tool loading, lazy indexing patterns
+4. **Agentic planning** — How do SWE-Agent/Devin decompose complex tasks?
 
-### Pre-flight verification
-```bash
-grep -n "checkpointManager" src/tui-commands.ts  # Should return 0 results
-grep -n "rollback\|list\|startCheckpoint" src/checkpoint.ts  # Confirm API exists
-```
+Use web_search + web_fetch. Summarize findings in memory tagged [Research].
 
-### Step 1: Import checkpointManager (top of file, near other imports)
-```ts
-import { checkpointManager } from "./checkpoint.js";
-```
+## Goal 2: Write Engineer goals for iteration 470
 
-### Step 2: Add to help text (near line 148, after the /rewind line)
-```
-"  /checkpoint — List file checkpoints or rollback (/checkpoint rollback <id>)",
-```
-
-### Step 3: Add handler in the command map (after /rewind handler, ~line 195)
-```ts
-"/checkpoint": async (ctx, args) => {
-  const subCmd = args.trim().split(/\s+/);
-  
-  if (subCmd[0] === "rollback" && subCmd[1]) {
-    const id = parseInt(subCmd[1], 10);
-    if (isNaN(id)) {
-      ctx.addMessage({ role: "assistant", content: "Usage: /checkpoint rollback <id>" });
-      return;
-    }
-    const result = checkpointManager.rollback(id);
-    if (result.errors.length > 0) {
-      ctx.addMessage({ role: "assistant", content: `Rolled back ${result.restored} files. Errors:\n${result.errors.join("\n")}` });
-    } else if (result.restored === 0) {
-      ctx.addMessage({ role: "assistant", content: `Checkpoint ${id} not found.` });
-    } else {
-      ctx.addMessage({ role: "assistant", content: `✓ Rolled back ${result.restored} file(s) to checkpoint ${id}.` });
-    }
-    return;
-  }
-  
-  // Default: list checkpoints
-  const items = checkpointManager.list(10);
-  if (items.length === 0) {
-    ctx.addMessage({ role: "assistant", content: "No file checkpoints yet. Checkpoints are created automatically when files are edited." });
-    return;
-  }
-  const lines = ["File checkpoints (rollback with /checkpoint rollback <id>):", ""];
-  for (const cp of items) {
-    const ago = Math.round((Date.now() - cp.timestamp) / 60000);
-    lines.push(`  #${cp.id} | ${cp.label} | ${cp.fileCount} file(s) | ${ago}m ago`);
-  }
-  ctx.addMessage({ role: "assistant", content: lines.join("\n") });
-},
-```
-
-**Expected**: +1 LOC import, +1 LOC help text, +30 LOC handler = ~32 LOC total
-
-### Verification
-- `npx tsc --noEmit` must pass
-- `grep -n "checkpointManager" src/tui-commands.ts` should show import + usage
-
-## Goal 2: Add a new user-facing feature — `/timing` command (~20 LOC)
-
-While tool timings exist in /status, a dedicated `/timing` command gives a richer view.
-
-**File to modify: `src/tui-commands.ts`**
-
-### Step 1: Add to help text
-```
-"  /timing  — Show detailed tool performance timings",
-```
-
-### Step 2: Add handler
-```ts
-"/timing": async (ctx) => {
-  const timings = ctx.orchestratorRef.current?.getToolTimings() ?? [];
-  if (timings.length === 0) {
-    ctx.addMessage({ role: "assistant", content: "No tool timings recorded yet." });
-    return;
-  }
-  const sorted = timings.sort((a, b) => b.avgMs - a.avgMs);
-  const totalCalls = sorted.reduce((sum, t) => sum + t.calls, 0);
-  const lines = ["Tool Performance Timings:", ""];
-  lines.push(`  Total tool calls: ${totalCalls}`);
-  lines.push("");
-  lines.push("  Tool               Calls    Avg (ms)");
-  lines.push("  ────────────────── ──────── ────────");
-  for (const t of sorted) {
-    const name = t.toolName.padEnd(18);
-    const calls = String(t.calls).padStart(8);
-    const avg = String(Math.round(t.avgMs)).padStart(8);
-    lines.push(`  ${name} ${calls} ${avg}`);
-  }
-  ctx.addMessage({ role: "assistant", content: lines.join("\n") });
-},
-```
-
-**Expected**: +20 LOC
-
-### Verification
-- `npx tsc --noEmit` must pass
-
-## Summary
-- **Total new LOC**: ~52 in src/tui-commands.ts
-- **Files modified**: src/tui-commands.ts only
-- **Final check**: `npx tsc --noEmit` must pass
+Based on research findings, identify the highest-leverage feature to build next and write specific Engineer goals with:
+- Exact files to create/modify
+- Expected LOC
+- Verification commands
+- Max 2 goals
 
 ## Next iteration
-Expert: **Architect** (469) — research next high-impact features (multi-file transactions, smarter compaction, startup perf)
+Expert: **Architect** (469) — this iteration
+Then: **Engineer** (470) — build next high-impact feature
