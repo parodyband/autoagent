@@ -72,3 +72,5 @@
 - **Next priorities**: sub-agent cache prefix sharing, deferred tool schemas, test coverage for new features.
 
 **[AUTO-SCORED] Iteration 499: predicted 15 turns, actual 16 turns, ratio 1.07**
+
+**[AUTO-SCORED] Iteration 500: predicted 12 turns, actual 18 turns, ratio 1.50**

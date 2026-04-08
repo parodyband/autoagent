@@ -94,6 +94,8 @@ export interface ToolContext {
   defaultTimeout?: number;
   /** Callback to accumulate sub-agent token usage into session totals */
   addTokens?: (tokensIn: number, tokensOut: number) => void;
+  /** Main agent's system prompt prefix — shared with sub-agents for cache reuse */
+  systemPromptPrefix?: string;
 }
 
 export interface ToolResult {
@@ -320,7 +322,7 @@ export function createDefaultRegistry(): ToolRegistry {
     // If no model specified, use autoSelectModel to pick based on task description
     const selectedModel = model ?? autoSelectModel(task);
     ctx.log(`subagent [${selectedModel}${!model ? ' (auto)' : ''}]: ${task.slice(0, 100)}...`);
-    const r = await lazyExecuteSubagent(task, selectedModel, max_tokens) as { model: string; inputTokens: number; outputTokens: number; response: string };
+    const r = await lazyExecuteSubagent(task, selectedModel, max_tokens, undefined, ctx.systemPromptPrefix) as { model: string; inputTokens: number; outputTokens: number; response: string };
     ctx.log(`  -> ${r.model} (${r.inputTokens}in/${r.outputTokens}out)`);
     ctx.addTokens?.(r.inputTokens, r.outputTokens);
     return {

@@ -1,104 +1,3 @@
-250 |         if (newPlan) {
-251 |           currentPlan = newPlan;
-252 |           failed = true;
-253 |         }
-254 |       }
-255 |       if (!failed) return currentPlan;
-256 |     }
-257 | 
-258 |     if (failed) continue;
-259 |   }
-260 | 
-261 |   return currentPlan;
-[2026-04-08T09:01:12.656Z] iter=492 turn=8 INFO: Turn 8/25
-[2026-04-08T09:01:29.360Z] iter=492 turn=8 INFO: Agent: Now write both test files:
-[2026-04-08T09:01:29.361Z] iter=492 turn=8 INFO: write_file: src/__tests__/task-planner-failure.test.ts (write)
-[2026-04-08T09:01:29.363Z] iter=492 turn=8 INFO:   -> ok: Created src/__tests__/task-planner-failure.test.ts (3763 chars)
-[2026-04-08T09:01:29.364Z] iter=492 turn=9 INFO: Turn 9/25
-[2026-04-08T09:01:50.331Z] iter=492 turn=9 INFO: write_file: src/__tests__/token-estimator.test.ts (write)
-[2026-04-08T09:01:50.332Z] iter=492 turn=9 INFO:   -> ok: Created src/__tests__/token-estimator.test.ts (3704 chars)
-[2026-04-08T09:01:50.332Z] iter=492 turn=10 INFO: Turn 10/25
-[2026-04-08T09:01:55.351Z] iter=492 turn=10 INFO: Agent: I've written real src/ changes. Now running tests and TypeScript check to wrap up.
-[2026-04-08T09:01:55.352Z] iter=492 turn=10 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/task-planner-failure.test.ts src/__tests__/task-planner-parallel.test.ts src/__tests__/token-estimator.test.ts 2>&1 | tail -40
-[2026-04-08T09:01:56.398Z] iter=492 turn=10 INFO:   -> exit=0 (413 chars)
-[2026-04-08T09:01:56.399Z] iter=492 turn=11 INFO: Turn 11/25
-[2026-04-08T09:01:59.044Z] iter=492 turn=11 INFO: Agent: All 20 tests pass. Running TypeScript check:
-[2026-04-08T09:01:59.044Z] iter=492 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1
-[2026-04-08T09:02:00.221Z] iter=492 turn=11 INFO:   -> exit=0 (11 chars)
-[2026-04-08T09:02:00.221Z] iter=492 turn=12 INFO: Turn 12/25
-[2026-04-08T09:02:12.061Z] iter=492 turn=12 INFO: Agent: Clean. Now updating memory and goals:
-[2026-04-08T09:02:12.062Z] iter=492 turn=12 INFO: save_memory: "[Engineer] Iteration 492"
-[2026-04-08T09:02:12.063Z] iter=492 turn=12 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T09:02:12.064Z] iter=492 turn=13 INFO: Turn 13/25
-[2026-04-08T09:02:21.831Z] iter=492 turn=13 INFO: Agent: Already done. Updating goals and restarting.
-[2026-04-08T09:02:21.832Z] iter=492 turn=13 INFO: write_file: goals.md (write)
-[2026-04-08T09:02:21.832Z] iter=492 turn=13 INFO:   -> ok: Updated goals.md (1083 chars, -13 lines delta)
-[2026-04-08T09:02:21.833Z] iter=492 turn=14 INFO: Turn 14/25
-[2026-04-08T09:02:25.676Z] iter=492 turn=14 INFO: Agent: Already done. Running final check and restarting.
-[2026-04-08T09:02:25.676Z] iter=492 turn=14 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "AUTOAGENT_RESTART"
-[2026-04-08T09:02:25.676Z] iter=492 turn=14 INFO: RESTART signal
-[2026-04-08T09:02:25.676Z] iter=492 turn=14 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T09:02:26.779Z] iter=492 turn=14 INFO: Compilation OK
-[2026-04-08T09:02:36.164Z] iter=492 turn=14 INFO: Cache persisted: 67 entries to .autoagent-cache.json
-[2026-04-08T09:02:36.165Z] iter=492 turn=14 INFO: Tool timing: bash: 5x, avg=449ms, total=2245ms; write_file: 7x, avg=2ms, total=17ms; save_memory: 1x, avg=2ms, total=2ms; read_scratchpad: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
-[2026-04-08T09:02:36.165Z] iter=492 turn=14 INFO: Tool timing stats
-[2026-04-08T09:02:45.291Z] iter=492 turn=14 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 492: predicted 15 turns, actual 14 turns, ratio 0.93**
-[2026-04-08T09:02:48.571Z] iter=492 turn=14 INFO: Pre-commit review (3079in/49out): **LGTM** — Tests are well-structured, imports use `.js` extensions correctly for ESM, assertions are clear and appropriately scoped, and the helper factories keep setup concise without over-engineerin
-[2026-04-08T09:02:48.629Z] iter=492 turn=14 INFO: Committed: 62c08408 (26 in / 6856 out, cache: 16730 created, 183048 read)
-[2026-04-08T09:02:48.630Z] iter=492 turn=14 INFO: Restarting as iteration 493...
-[2026-04-08T09:02:48.826Z] iter=493 INFO: Cache restored: 67/67 entries (0 stale)
-[2026-04-08T09:02:48.829Z] iter=493 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
-[2026-04-08T09:02:48.829Z] iter=493 INFO: Starting. Expert=Architect Model=claude-opus-4-6
-[2026-04-08T09:02:49.048Z] iter=493 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-08T09:02:49.049Z] iter=493 turn=1 INFO: Turn 1/25
-[2026-04-08T09:02:54.130Z] iter=493 turn=1 INFO: Agent: 
-
-I'll start by reviewing the current state of the codebase to verify what's been implemented and what hasn't, then research recent coding agent techniques, and finally write goals for the Engineer.
-[2026-04-08T09:02:54.131Z] iter=493 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "retryWithBackoff\|retry.*backoff\|exponential.*back" src/tool-recovery.ts | head -20
-[2026-04-08T09:02:54.131Z] iter=493 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "transaction\|atomic\|multi.*file" src/checkpoint.ts | head -20
-[2026-04-08T09:02:54.132Z] iter=493 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "shouldCompact\|token-estimator\|tokenEstimat" src/orchestrator.ts | head -20
-[2026-04-08T09:02:54.147Z] iter=493 turn=1 INFO:   -> exit=0 (208 chars)
-[2026-04-08T09:02:54.151Z] iter=493 turn=1 INFO:   -> exit=0 (81 chars)
-[2026-04-08T09:02:54.156Z] iter=493 turn=1 INFO:   -> exit=0 (175 chars)
-[2026-04-08T09:02:54.157Z] iter=493 turn=2 INFO: Turn 2/25
-[2026-04-08T09:02:59.457Z] iter=493 turn=2 INFO: think: All three priority items from the roadmap are ALREADY IMPLEMENTED:
-1. `shouldCompact` is already in orchestrator.ts (lin...
-[2026-04-08T09:02:59.458Z] iter=493 turn=3 INFO: Turn 3/25
-[2026-04-08T09:03:04.405Z] iter=493 turn=3 INFO: Agent: Critical finding: **All 3 roadmap items are already implemented.** I need to identify real gaps. Let me quickly check key areas and do research in parallel.
-[2026-04-08T09:03:04.405Z] iter=493 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "shouldCompact\|token-estimator\|estimateTokens" src/orchestrator.ts | head -10
-[2026-04-08T09:03:04.408Z] iter=493 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && cat src/token-estimator.ts
-[2026-04-08T09:03:04.410Z] iter=493 turn=3 INFO: web_search: "Claude Code coding agent architecture 2025 context management techniques"
-[2026-04-08T09:03:04.432Z] iter=493 turn=3 INFO:   -> exit=0 (175 chars)
-[2026-04-08T09:03:04.433Z] iter=493 turn=3 INFO:   -> exit=0 (1982 chars)
-[2026-04-08T09:03:05.446Z] iter=493 turn=3 INFO:   -> 8 results
-[2026-04-08T09:03:05.447Z] iter=493 turn=4 INFO: Turn 4/25
-[2026-04-08T09:03:12.558Z] iter=493 turn=4 INFO: Agent: 
-
-My goals: Review roadmap, verify items aren't already done, research, write goals.md for Engineer 494. Status: **IN PROGRESS** — verified all 3 roadmap items are already implemented (critical finding!), research started. Now I need to finish research quickly and write goals.md.
-[2026-04-08T09:03:12.558Z] iter=493 turn=4 INFO: web_fetch: https://martinfowler.com/articles/exploring-gen-ai/context-engineering-coding-agents.html
-[2026-04-08T09:03:12.559Z] iter=493 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "import.*token-estimator\|from.*token-estimator" src/ | head -10
-[2026-04-08T09:03:12.602Z] iter=493 turn=4 INFO:   -> exit=0 (72 chars)
-[2026-04-08T09:03:12.773Z] iter=493 turn=4 INFO:   -> ok (13067 chars)
-[2026-04-08T09:03:12.774Z] iter=493 turn=5 INFO: Turn 5/25
-[2026-04-08T09:03:23.280Z] iter=493 turn=5 INFO: think: Key insights from the Fowler article:
-1. **Skills (lazy-loaded context)** - Claude Code has "skills" that are loaded on-...
-[2026-04-08T09:03:23.281Z] iter=493 turn=6 INFO: Turn 6/25
-[2026-04-08T09:03:27.198Z] iter=493 turn=6 INFO: Agent: 
-
-I'm the Architect — my deliverable is goals.md, not src/ changes. Let me finish now.
-[2026-04-08T09:03:27.199Z] iter=493 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '1560,1575p' src/orchestrator.ts
-[2026-04-08T09:03:27.202Z] iter=493 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "retryWithBackoff" src/orchestrator.ts src/tool-registry.ts | head -10
-[2026-04-08T09:03:27.212Z] iter=493 turn=6 INFO:   -> exit=0 (662 chars)
-[2026-04-08T09:03:27.216Z] iter=493 turn=6 INFO:   -> exit=0 (237 chars)
-[2026-04-08T09:03:27.217Z] iter=493 turn=7 INFO: Turn 7/25
-[2026-04-08T09:03:52.475Z] iter=493 turn=7 INFO: Agent: 
-
-Both `retryWithBackoff` and `shouldCompact` are already wired in. The roadmap is stale. Let me write goals.md with genuinely new work based on research findings.
-[2026-04-08T09:03:52.476Z] iter=493 turn=7 INFO: write_file: goals.md (write)
-[2026-04-08T09:03:52.478Z] iter=493 turn=7 INFO:   -> ok: Updated goals.md (3441 chars, +31 lines delta)
-[2026-04-08T09:03:52.479Z] iter=493 turn=8 INFO: Turn 8/25
-[2026-04-08T09:04:01.626Z] iter=493 turn=8 INFO: save_memory: "[Architect] Roadmap update iteration 493"
-[2026-04-08T09:04:01.627Z] iter=493 turn=8 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
 [2026-04-08T09:04:01.627Z] iter=493 turn=8 INFO: save_memory: "[Research] Context engineering patterns 2025"
 [2026-04-08T09:04:01.628Z] iter=493 turn=8 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
 [2026-04-08T09:04:01.628Z] iter=493 turn=9 INFO: Turn 9/25
@@ -1097,3 +996,173 @@ echo "AUTOAGENT_RESTART"
 [2026-04-08T19:36:17.956Z] iter=499 turn=16 INFO: Tool timing stats
 [2026-04-08T19:36:26.068Z] iter=499 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 499: predicted 15 turns, actual 16 turns, ratio 1.07**
 [2026-04-08T19:36:26.092Z] iter=499 turn=16 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T19:36:26.133Z] iter=499 turn=16 INFO: Committed: 3925d224 (28 in / 4358 out, cache: 13933 created, 133992 read)
+[2026-04-08T19:36:26.133Z] iter=499 turn=16 INFO: Restarting as iteration 500...
+[2026-04-08T19:36:26.340Z] iter=500 INFO: Cache restored: 63/63 entries (0 stale)
+[2026-04-08T19:36:26.343Z] iter=500 INFO: Turn budget: 19/25 (calibration=1.13x, predicted=12)
+[2026-04-08T19:36:26.343Z] iter=500 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T19:36:26.573Z] iter=500 INFO: Hard turn cap: 18 (1.5x prediction of 12)
+[2026-04-08T19:36:26.573Z] iter=500 turn=1 INFO: Turn 1/25
+[2026-04-08T19:36:28.179Z] iter=500 turn=1 INFO: read_file: goals.md
+[2026-04-08T19:36:28.179Z] iter=500 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T19:36:28.180Z] iter=500 turn=1 INFO:   -> ok (1167 chars)
+[2026-04-08T19:36:28.181Z] iter=500 turn=2 INFO: Turn 2/25
+[2026-04-08T19:36:30.415Z] iter=500 turn=2 INFO: read_file: src/tools/subagent.ts
+[2026-04-08T19:36:30.415Z] iter=500 turn=2 INFO: $ grep -n "systemPrompt\|system_prompt\|system prompt\|toolContext\|ToolContext\|executionContext" src/orchestrator.ts | head -50
+[2026-04-08T19:36:30.416Z] iter=500 turn=2 INFO:   -> ok (5935 chars)
+[2026-04-08T19:36:30.434Z] iter=500 turn=2 INFO:   -> exit=0 (2187 chars)
+[2026-04-08T19:36:30.434Z] iter=500 turn=3 INFO: Turn 3/25
+[2026-04-08T19:36:36.397Z] iter=500 turn=3 INFO: think: I have enough context. Let me implement the sub-agent prompt cache prefix sharing:
+
+1. `src/tools/subagent.ts`: Add `sys...
+[2026-04-08T19:36:36.398Z] iter=500 turn=4 INFO: Turn 4/25
+[2026-04-08T19:36:37.977Z] iter=500 turn=4 INFO: $ grep -n "executeSubagent\|subagent\|SubagentResult" src/orchestrator.ts | head -30
+[2026-04-08T19:36:37.994Z] iter=500 turn=4 INFO:   -> exit=0 (11 chars)
+[2026-04-08T19:36:37.994Z] iter=500 turn=5 INFO: Turn 5/25
+[2026-04-08T19:36:40.710Z] iter=500 turn=5 INFO: Agent: **Goal A - Sub-agent prompt cache prefix sharing**: IN PROGRESS
+[2026-04-08T19:36:40.711Z] iter=500 turn=5 INFO: $ grep -n "executeSubagent\|subagent\|\"subagent\"\|tool_name.*subagent\|subagentTool" src/orchestrator.ts | head -20
+[2026-04-08T19:36:40.727Z] iter=500 turn=5 INFO:   -> exit=0 (11 chars)
+[2026-04-08T19:36:40.728Z] iter=500 turn=6 INFO: Turn 6/25
+[2026-04-08T19:36:41.909Z] iter=500 turn=6 INFO: $ grep -rn "executeSubagent" src/ | head -20
+[2026-04-08T19:36:41.958Z] iter=500 turn=6 INFO:   -> exit=0 (823 chars)
+[2026-04-08T19:36:41.959Z] iter=500 turn=7 INFO: Turn 7/25
+[2026-04-08T19:36:43.550Z] iter=500 turn=7 INFO: $ grep -n "lazyExecuteSubagent\|subagent" src/tool-registry.ts | head -30
+[2026-04-08T19:36:43.562Z] iter=500 turn=7 INFO:   -> exit=0 (551 chars)
+[2026-04-08T19:36:43.563Z] iter=500 turn=8 INFO: Turn 8/25
+[2026-04-08T19:36:45.682Z] iter=500 turn=8 INFO: Agent: I've been doing too much exploration. Let me implement now.
+[2026-04-08T19:36:45.683Z] iter=500 turn=8 INFO: read_file: src/tool-registry.ts
+[2026-04-08T19:36:45.683Z] iter=500 turn=8 INFO:   -> ok (1760 chars)
+[2026-04-08T19:36:45.683Z] iter=500 turn=9 INFO: Turn 9/25
+[2026-04-08T19:36:54.543Z] iter=500 turn=9 INFO: Agent: Now I have all the context I need. Let me implement the changes:
+
+**1. Update `executeSubagent` to accept and use `systemPromptPrefix`:**
+[2026-04-08T19:36:54.544Z] iter=500 turn=9 INFO: write_file: src/tools/subagent.ts (patch)
+[2026-04-08T19:36:54.546Z] iter=500 turn=9 INFO:   -> ok: Patched src/tools/subagent.ts: -28 +35 lines
+
+Context after patch:
+90 |   return text.slice(0, MAX_OUTPUT_CHARS) + `\n[truncated — showing first ${MAX_OUTPUT_CHARS} chars]`;
+91 | }
+92 | 
+93 | export async function executeSubagent(
+94 |   task: string,
+95 |   model: string = "fast",
+96 |   maxTokens: number = 2048,
+97 |   client?: Anthropic,
+98 |   systemPromptPrefix?: string,
+99 | ): Promise<SubagentResult> {
+100 |   const modelId = MODELS[model] || MODELS.fast;
+101 |   const timeoutMs = TIMEOUTS_MS[model] ?? TIMEOUTS_MS.fast;
+102 |   const _client = client ?? new Anthropic();
+103 | 
+104 |   const MAX_RETRIES = 2;
+105 |   const BACKOFF_MS = [1_000, 3_000];
+106 | 
+107 |   // Build system prompt array with cache_control to share cache prefix
+108 |   const systemBlocks: Anthropic.TextBlockParam[] = systemPromptPrefix
+109 |     ? [{ type: "text", text: systemPromptPrefix, cache_control: { type: "ephemeral" } }]
+110 |     : [];
+111 | 
+112 |   let lastErr: unknown;
+113 | 
+114 |   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+115 |     const controller = new AbortController();
+116 |     const timer = setTimeout(() => controller.abort(), timeoutMs);
+117 | 
+118 |     try {
+119 |       const response = await _client.messages.create(
+120 |         {
+121 |           model: modelId,
+122 |           max_tokens: maxTokens,
+123 |           ...(systemBlocks.length > 0 ? { system: systemBlocks } : {}),
+124 |           messages: [{ role: "user", content: task }],
+125 |         },
+126 |         { signal: controller.signal },
+127 |       );
+128 | 
+129 |       clearTimeout(timer);
+130 | 
+[2026-04-08T19:36:54.547Z] iter=500 turn=10 INFO: Turn 10/25
+[2026-04-08T19:36:59.142Z] iter=500 turn=10 INFO: Agent: **2. Also update `parallelResearch` to thread through the prefix:**
+[2026-04-08T19:36:59.143Z] iter=500 turn=10 INFO: write_file: src/tools/subagent.ts (patch)
+[2026-04-08T19:36:59.144Z] iter=500 turn=10 INFO:   -> ok: Patched src/tools/subagent.ts: -9 +10 lines
+
+Context after patch:
+185 |  * Each question is sent to a sub-agent independently; results are
+186 |  * returned in the same order as the input array.
+187 |  */
+188 | export async function parallelResearch(
+189 |   questions: string[],
+190 |   model: string = "fast",
+191 |   maxTokens: number = 2048,
+192 |   client?: Anthropic,
+193 |   systemPromptPrefix?: string,
+194 | ): Promise<ParallelResearchResult[]> {
+195 |   const results = await Promise.all(
+196 |     questions.map(async (question) => {
+197 |       const result = await executeSubagent(question, model, maxTokens, client, systemPromptPrefix);
+198 |       return {
+199 |         question,
+200 |         response: result.response,
+[2026-04-08T19:36:59.144Z] iter=500 turn=11 INFO: Turn 11/25
+[2026-04-08T19:37:02.685Z] iter=500 turn=11 INFO: Agent: **3. Update tool-registry.ts to pass systemPrompt prefix:**
+[2026-04-08T19:37:02.686Z] iter=500 turn=11 INFO: $ grep -n "systemPrompt\|ctx\." src/tool-registry.ts | head -20
+[2026-04-08T19:37:02.715Z] iter=500 turn=11 INFO:   -> exit=0 (1614 chars)
+[2026-04-08T19:37:02.716Z] iter=500 turn=12 INFO: Turn 12/25
+[2026-04-08T19:37:04.692Z] iter=500 turn=12 INFO: $ grep -n "ToolContext\|interface.*ctx\|systemPrompt" src/tool-registry.ts | head -20
+[2026-04-08T19:37:04.713Z] iter=500 turn=12 INFO:   -> exit=0 (58 chars)
+[2026-04-08T19:37:04.713Z] iter=500 turn=13 INFO: Turn 13/25
+[2026-04-08T19:37:06.309Z] iter=500 turn=13 INFO: read_file: src/tool-registry.ts
+[2026-04-08T19:37:06.309Z] iter=500 turn=13 INFO:   -> ok (790 chars)
+[2026-04-08T19:37:06.309Z] iter=500 turn=14 INFO: Turn 14/25
+[2026-04-08T19:37:11.429Z] iter=500 turn=14 INFO: Agent: Now I'll add `systemPromptPrefix` to `ToolContext` and wire it through:
+[2026-04-08T19:37:11.429Z] iter=500 turn=14 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-08T19:37:11.430Z] iter=500 turn=14 INFO:   -> ok: Patched src/tool-registry.ts: -8 +10 lines
+
+Context after patch:
+87 | 
+88 | // ─── Types ──────────────────────────────────────────────────
+89 | 
+90 | export interface ToolContext {
+91 |   rootDir: string;
+92 |   log: (msg: string) => void;
+93 |   /** Default timeout for this tool (from registry), in seconds */
+94 |   defaultTimeout?: number;
+95 |   /** Callback to accumulate sub-agent token usage into session totals */
+96 |   addTokens?: (tokensIn: number, tokensOut: number) => void;
+97 |   /** Main agent's system prompt prefix — shared with sub-agents for cache reuse */
+98 |   systemPromptPrefix?: string;
+99 | }
+100 | 
+101 | export interface ToolResult {
+102 |   result: string;
+[2026-04-08T19:37:11.430Z] iter=500 turn=15 INFO: Turn 15/25
+[2026-04-08T19:37:14.843Z] iter=500 turn=15 INFO: Agent: Now update tool-registry.ts subagent handler to pass the prefix:
+[2026-04-08T19:37:14.843Z] iter=500 turn=15 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-08T19:37:14.844Z] iter=500 turn=15 INFO:   -> ok: Patched src/tool-registry.ts: -1 +1 lines
+
+Context after patch:
+322 |     // If no model specified, use autoSelectModel to pick based on task description
+323 |     const selectedModel = model ?? autoSelectModel(task);
+324 |     ctx.log(`subagent [${selectedModel}${!model ? ' (auto)' : ''}]: ${task.slice(0, 100)}...`);
+325 |     const r = await lazyExecuteSubagent(task, selectedModel, max_tokens, undefined, ctx.systemPromptPrefix) as { model: string; inputTokens: number; outputTokens: number; response: string };
+326 |     ctx.log(`  -> ${r.model} (${r.inputTokens}in/${r.outputTokens}out)`);
+327 |     ctx.addTokens?.(r.inputTokens, r.outputTokens);
+328 |     return {
+[2026-04-08T19:37:14.844Z] iter=500 turn=16 INFO: Turn 16/25
+[2026-04-08T19:37:18.054Z] iter=500 turn=16 INFO: Agent: Now wire the system prompt prefix in orchestrator.ts:
+[2026-04-08T19:37:18.054Z] iter=500 turn=16 INFO: $ grep -n "addTokens\|systemPromptPrefix\|ToolContext\|buildToolContext\|ctx:" src/orchestrator.ts | grep -i "addtokens\|toolcontext\|buildtool" | head -20
+[2026-04-08T19:37:18.071Z] iter=500 turn=16 INFO:   -> exit=0 (34 chars)
+[2026-04-08T19:37:18.071Z] iter=500 turn=17 INFO: Turn 17/25
+[2026-04-08T19:37:20.045Z] iter=500 turn=17 INFO: read_file: src/orchestrator.ts
+[2026-04-08T19:37:20.046Z] iter=500 turn=17 INFO:   -> ok (474 chars)
+[2026-04-08T19:37:20.047Z] iter=500 turn=18 INFO: Turn 18/25
+[2026-04-08T19:37:21.564Z] iter=500 turn=18 INFO: $ grep -n "addTokens\|rootDir.*workDir\|const ctx = " src/orchestrator.ts | head -20
+[2026-04-08T19:37:21.583Z] iter=500 turn=18 INFO:   -> exit=0 (84 chars)
+[2026-04-08T19:37:21.583Z] iter=500 turn=18 INFO: HARD TURN CAP REACHED: 18 turns (predicted 12, cap 18). Forcing commit.
+[2026-04-08T19:37:21.586Z] iter=500 turn=18 INFO: Cache persisted: 65 entries to .autoagent-cache.json
+[2026-04-08T19:37:21.587Z] iter=500 turn=18 INFO: Cache stats: 0 hits, 5 misses, 65 entries, 4 invalidations (3 entries removed)
+[2026-04-08T19:37:21.587Z] iter=500 turn=18 INFO: Tool cache stats
+[2026-04-08T19:37:21.588Z] iter=500 turn=18 INFO: Tool timing: bash: 9x, avg=22ms, total=202ms; write_file: 4x, avg=1ms, total=5ms; read_file: 5x, avg=1ms, total=4ms; read_scratchpad: 1x, avg=2ms, total=2ms; think: 1x, avg=1ms, total=1ms
+[2026-04-08T19:37:21.588Z] iter=500 turn=18 INFO: Tool timing stats
+[2026-04-08T19:37:29.692Z] iter=500 turn=18 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 500: predicted 12 turns, actual 18 turns, ratio 1.50**
+[2026-04-08T19:37:31.995Z] iter=500 turn=18 INFO: Pre-commit review (1183in/59out): LGTM. The change correctly threads `systemPromptPrefix` through the call chain, the cache_control block is built once outside the retry loop (appropriate since it's static), and the conditional spread

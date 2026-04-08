@@ -95,6 +95,7 @@ export async function executeSubagent(
   model: string = "fast",
   maxTokens: number = 2048,
   client?: Anthropic,
+  systemPromptPrefix?: string,
 ): Promise<SubagentResult> {
   const modelId = MODELS[model] || MODELS.fast;
   const timeoutMs = TIMEOUTS_MS[model] ?? TIMEOUTS_MS.fast;
@@ -102,6 +103,11 @@ export async function executeSubagent(
 
   const MAX_RETRIES = 2;
   const BACKOFF_MS = [1_000, 3_000];
+
+  // Build system prompt array with cache_control to share cache prefix
+  const systemBlocks: Anthropic.TextBlockParam[] = systemPromptPrefix
+    ? [{ type: "text", text: systemPromptPrefix, cache_control: { type: "ephemeral" } }]
+    : [];
 
   let lastErr: unknown;
 
@@ -114,6 +120,7 @@ export async function executeSubagent(
         {
           model: modelId,
           max_tokens: maxTokens,
+          ...(systemBlocks.length > 0 ? { system: systemBlocks } : {}),
           messages: [{ role: "user", content: task }],
         },
         { signal: controller.signal },
@@ -183,10 +190,11 @@ export async function parallelResearch(
   model: string = "fast",
   maxTokens: number = 2048,
   client?: Anthropic,
+  systemPromptPrefix?: string,
 ): Promise<ParallelResearchResult[]> {
   const results = await Promise.all(
     questions.map(async (question) => {
-      const result = await executeSubagent(question, model, maxTokens, client);
+      const result = await executeSubagent(question, model, maxTokens, client, systemPromptPrefix);
       return {
         question,
         response: result.response,
