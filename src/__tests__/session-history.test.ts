@@ -63,4 +63,23 @@ describe("session-history", () => {
     const sessions = getRecentSessions(5);
     expect(sessions).toHaveLength(5);
   });
+
+  it("searchSessions returns only matching entries", async () => {
+    const { recordSession, searchSessions } = await import("../session-history.js");
+    recordSession({ date: "2025-01-01T00:00:00.000Z", turns: 2, cost: 0.01, inputTokens: 100, outputTokens: 50, firstMessage: "Fix the login bug", model: "m" });
+    recordSession({ date: "2025-01-02T00:00:00.000Z", turns: 3, cost: 0.02, inputTokens: 200, outputTokens: 100, firstMessage: "Refactor the database layer", model: "m" });
+    recordSession({ date: "2025-01-03T00:00:00.000Z", turns: 4, cost: 0.03, inputTokens: 300, outputTokens: 150, firstMessage: "Add login tests", model: "m" });
+    const results = searchSessions("login");
+    expect(results).toHaveLength(2);
+    expect(results.every((r) => r.firstMessage.toLowerCase().includes("login"))).toBe(true);
+  });
+
+  it("clearSessionHistory removes the history file", async () => {
+    const { recordSession, clearSessionHistory, getRecentSessions } = await import("../session-history.js");
+    recordSession({ date: "2025-01-01T00:00:00.000Z", turns: 1, cost: 0.01, inputTokens: 10, outputTokens: 5, firstMessage: "hello", model: "m" });
+    expect(getRecentSessions(10)).toHaveLength(1);
+    clearSessionHistory();
+    expect(fs.existsSync(historyFile)).toBe(false);
+    expect(getRecentSessions(10)).toEqual([]);
+  });
 });

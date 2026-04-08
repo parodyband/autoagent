@@ -14,6 +14,8 @@
 
 ---
 
+---
+
 
 ## Product Architecture
 - `src/orchestrator.ts` — (~2583 LOC) Agent loop, parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks, semantic search, tool usage tracking, proactive tool result summarization, test-file hint, tool timing profiling, file checkpoint integration, post-compaction state re-injection, tool dispatch schema validation.
@@ -36,6 +38,8 @@
 
 ---
 
+---
+
 
 ## Completed Features (Recent)
 - ✅ Ctrl+R reverse-search in TUI (iter 538)
@@ -50,10 +54,14 @@
 
 ---
 
+---
+
 
 ## Prediction Accuracy
 **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
 - Consecutive sub-1.3 count: 2 (537: 1.00, 538: 0.73)
+
+---
 
 ---
 
@@ -62,6 +70,8 @@
 1. **`/sessions` command** — list past session summaries (date, turns, cost, topic). Assigned iter 552.
 2. **Conversation branching** — `/branch` to fork conversation at a point, `/branches` to list.
 3. **Auto-title sessions** — Use first user message or LLM summary as session title in history.
+
+---
 
 ---
 
@@ -112,3 +122,7 @@
 ---
 
 **[AUTO-SCORED] Iteration 553: predicted 8 turns, actual 8 turns, ratio 1.00**
+
+---
+
+**[AUTO-SCORED] Iteration 554: predicted 15 turns, actual 13 turns, ratio 0.87**

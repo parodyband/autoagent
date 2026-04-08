@@ -19,7 +19,7 @@ import { handlePlanCommand } from "./plan-commands.js";
 import { runDream } from "./dream.js";
 import { _searchIndexHolder, buildSearchIndex } from "./tool-registry.js";
 import { checkpointManager } from "./checkpoint.js";
-import { getRecentSessions } from "./session-history.js";
+import { getRecentSessions, searchSessions, clearSessionHistory } from "./session-history.js";
 
 export interface FooterStats {
   tokensIn: number;
@@ -603,19 +603,41 @@ const commands: Record<string, CommandHandler> = {
     return true;
   },
 
-  "/sessions": async (ctx) => {
+  "/sessions": async (ctx, args) => {
+    const formatSession = (s: import("./session-history.js").SessionHistoryEntry) => {
+      const date = new Date(s.date).toLocaleDateString("en-CA"); // YYYY-MM-DD
+      const cost = `${s.cost.toFixed(2)}`;
+      const topic = s.firstMessage.length > 40 ? s.firstMessage.slice(0, 40) + "…" : s.firstMessage;
+      return `${date}  ${String(s.turns).padStart(2)} turns  ${cost.padStart(7)}  "${topic}"`;
+    };
+
+    if (args.startsWith("search ")) {
+      const query = args.slice("search ".length).trim();
+      if (!query) {
+        ctx.addMessage({ role: "assistant", content: "Usage: /sessions search <term>" });
+        return true;
+      }
+      const results = searchSessions(query);
+      if (results.length === 0) {
+        ctx.addMessage({ role: "assistant", content: `No sessions matching "${query}".` });
+        return true;
+      }
+      ctx.addMessage({ role: "assistant", content: `Sessions matching "${query}":\n${results.map(formatSession).join("\n")}` });
+      return true;
+    }
+
+    if (args === "clear") {
+      clearSessionHistory();
+      ctx.addMessage({ role: "assistant", content: "✓ Session history cleared." });
+      return true;
+    }
+
     const sessions = getRecentSessions(10);
     if (sessions.length === 0) {
       ctx.addMessage({ role: "assistant", content: "No session history found. Sessions are recorded when you exit." });
       return true;
     }
-    const lines = sessions.map((s) => {
-      const date = new Date(s.date).toLocaleDateString("en-CA"); // YYYY-MM-DD
-      const cost = `${s.cost.toFixed(2)}`;
-      const topic = s.firstMessage.length > 40 ? s.firstMessage.slice(0, 40) + "…" : s.firstMessage;
-      return `${date}  ${String(s.turns).padStart(2)} turns  ${cost.padStart(6)}  "${topic}"`;
-    });
-    ctx.addMessage({ role: "assistant", content: `Recent sessions:\n${lines.join("\n")}` });
+    ctx.addMessage({ role: "assistant", content: `Recent sessions:\n${sessions.map(formatSession).join("\n")}` });
     return true;
   },
 };

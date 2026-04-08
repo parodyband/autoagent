@@ -45,3 +45,28 @@ export function getRecentSessions(n = 10): SessionHistoryEntry[] {
     .filter((e): e is SessionHistoryEntry => e !== null)
     .reverse();
 }
+
+export function searchSessions(query: string, limit = 50): SessionHistoryEntry[] {
+  const file = historyFilePath();
+  if (!fs.existsSync(file)) return [];
+  const lower = query.toLowerCase();
+  const lines = fs.readFileSync(file, "utf8").trim().split("\n").filter(Boolean);
+  return lines
+    .map((line) => {
+      try {
+        return JSON.parse(line) as SessionHistoryEntry;
+      } catch {
+        return null;
+      }
+    })
+    .filter((e): e is SessionHistoryEntry => e !== null && e.firstMessage.toLowerCase().includes(lower))
+    .slice(-limit)
+    .reverse();
+}
+
+export function clearSessionHistory(): void {
+  const file = historyFilePath();
+  if (fs.existsSync(file)) {
+    fs.unlinkSync(file);
+  }
+}
