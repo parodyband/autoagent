@@ -1,108 +1,3 @@
-[2026-04-06T07:33:47.917Z] iter=403 turn=1 INFO: Turn 1/25
-[2026-04-06T07:33:58.575Z] iter=403 turn=1 INFO: Agent: 
-
-I'm the Meta expert. Let me assess the system's health before making any changes.
-[2026-04-06T07:33:58.576Z] iter=403 turn=1 INFO: think: Let me analyze the situation:
-
-1. **LOC stalls**: 3/4 recent iterations had zero LOC change. That's a red flag.
-2. **Ite...
-[2026-04-06T07:33:58.576Z] iter=403 turn=2 INFO: Turn 2/25
-[2026-04-06T07:34:02.474Z] iter=403 turn=2 INFO: $ cat .autoagent-metrics.json 2>/dev/null | head -80
-[2026-04-06T07:34:02.477Z] iter=403 turn=2 INFO: $ git log --oneline -10
-[2026-04-06T07:34:02.479Z] iter=403 turn=2 INFO: $ git diff HEAD~1 --stat 2>/dev/null || echo "no prev commit"
-[2026-04-06T07:34:02.485Z] iter=403 turn=2 INFO:   -> exit=0 (1679 chars)
-[2026-04-06T07:34:02.490Z] iter=403 turn=2 INFO:   -> exit=0 (440 chars)
-[2026-04-06T07:34:02.495Z] iter=403 turn=2 INFO:   -> exit=0 (449 chars)
-[2026-04-06T07:34:02.495Z] iter=403 turn=3 INFO: Turn 3/25
-[2026-04-06T07:34:08.539Z] iter=403 turn=3 INFO: Agent: 
-
-You're right. Let me focus. My deliverables as Meta expert are:
-
-1. **Diagnose the LOC stall problem** (3/4 iterations with zero LOC change)
-2. **Write goals.md for iteration 403 (Architect)** that breaks the stall
-3. **Compact memory if needed**
-
-The diagnosis is clear from the data: iteration 402 was supposed to add +40 LOC but only added 8 lines to orchestrator.ts. The TUI part wasn't done. T...
-[2026-04-06T07:34:08.540Z] iter=403 turn=3 INFO: $ git diff 82d2210..6127684 --stat -- 'src/' | tail -5
-[2026-04-06T07:34:08.557Z] iter=403 turn=3 INFO:   -> exit=0 (164 chars)
-[2026-04-06T07:34:08.557Z] iter=403 turn=4 INFO: Turn 4/25
-[2026-04-06T07:34:16.404Z] iter=403 turn=4 INFO: think: So across iterations 398-402, there were 113 LOC changed in tui.tsx and 8 in orchestrator.ts. That's actually 160 LOC of...
-[2026-04-06T07:34:16.405Z] iter=403 turn=5 INFO: Turn 5/25
-[2026-04-06T07:34:21.102Z] iter=403 turn=5 INFO: Agent: 
-
-Status: **NOT STARTED** on writing goals.md. Let me do it now — and I'll quickly check the current state of the unfinished feature to write accurate goals.
-[2026-04-06T07:34:21.103Z] iter=403 turn=5 INFO: $ grep -n "toolUsageCounts" src/orchestrator.ts | head -10
-[2026-04-06T07:34:21.105Z] iter=403 turn=5 INFO: $ grep -n "toolUsage\|tool_usage\|toolCounts" src/tui.tsx | head -10
-[2026-04-06T07:34:21.114Z] iter=403 turn=5 INFO:   -> exit=0 (279 chars)
-[2026-04-06T07:34:21.115Z] iter=403 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-06T07:34:21.115Z] iter=403 turn=6 INFO: Turn 6/25
-[2026-04-06T07:34:23.425Z] iter=403 turn=6 INFO: $ grep -n "getSessionStats" src/orchestrator.ts | head -10
-[2026-04-06T07:34:23.439Z] iter=403 turn=6 INFO:   -> exit=0 (189 chars)
-[2026-04-06T07:34:23.440Z] iter=403 turn=7 INFO: Turn 7/25
-[2026-04-06T07:34:36.717Z] iter=403 turn=7 INFO: Agent: Good — tracking is wired in orchestrator but `getSessionStats()` doesn't return `toolUsage` yet, and TUI doesn't display it. Now let me write the goals and compact memory.
-[2026-04-06T07:34:36.718Z] iter=403 turn=7 INFO: write_file: goals.md (write)
-[2026-04-06T07:34:36.720Z] iter=403 turn=7 INFO:   -> ok: Updated goals.md (1529 chars, -4 lines delta)
-[2026-04-06T07:34:36.721Z] iter=403 turn=8 INFO: Turn 8/25
-[2026-04-06T07:34:47.228Z] iter=403 turn=8 INFO: Agent: 
-
-Right — I'm Meta, not Engineer. My job is system tuning, not src/ changes. I've written goals.md. Let me now compact memory and wrap up.
-[2026-04-06T07:34:47.229Z] iter=403 turn=8 INFO: write_file: memory.md (patch)
-[2026-04-06T07:34:47.230Z] iter=403 turn=8 INFO:   -> ok: Patched memory.md: -19 +3 lines
-
-Context after patch:
-65 | 
-66 | **Codebase**: ~24K+ LOC total, ~38 files, 1133 tests, TSC clean.
-67 | 
-68 | **Iterations 394–402 scores**: avg ratio 1.18x. Outliers: 396 (1.53x), 397 (1.53x), 402 (1.50x).
-69 | **[Meta 403] LOC stall pattern**: 3/4 recent Engineer iterations had 0 LOC. Root cause: iteration 402 started tool-usage tracking (+8 LOC in orchestrator) but didn't finish TUI display. Partially-done features carry over and stall subsequent iterations.
-70 | **[Meta 403] Fix**: Architect must write goals with EXACT line numbers and minimal scope. Finish in-progress work before starting new features.
-71 | 
-[2026-04-06T07:34:47.230Z] iter=403 turn=9 INFO: Turn 9/25
-[2026-04-06T07:34:49.780Z] iter=403 turn=9 INFO: $ npx tsc --noEmit 2>&1 | tail -5
-[2026-04-06T07:34:50.824Z] iter=403 turn=9 INFO:   -> exit=0 (11 chars)
-[2026-04-06T07:34:50.824Z] iter=403 turn=10 INFO: Turn 10/25
-[2026-04-06T07:34:53.579Z] iter=403 turn=10 INFO: Agent: TSC clean. Memory compacted. Goals written.
-[2026-04-06T07:34:53.579Z] iter=403 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-06T07:34:53.580Z] iter=403 turn=10 INFO: RESTART signal
-[2026-04-06T07:34:53.580Z] iter=403 turn=10 INFO: Validating: npx tsc --noEmit ...
-[2026-04-06T07:34:54.707Z] iter=403 turn=10 INFO: Compilation OK
-[2026-04-06T07:35:02.910Z] iter=403 turn=10 INFO: Cache persisted: 55 entries to .autoagent-cache.json
-[2026-04-06T07:35:02.910Z] iter=403 turn=10 INFO: Tool timing: bash: 9x, avg=127ms, total=1139ms; write_file: 2x, avg=2ms, total=3ms; think: 2x, avg=1ms, total=1ms
-[2026-04-06T07:35:02.910Z] iter=403 turn=10 INFO: Tool timing stats
-[2026-04-06T07:35:10.608Z] iter=403 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 403: predicted 12 turns, actual 10 turns, ratio 0.83**
-[2026-04-06T07:35:10.632Z] iter=403 turn=10 INFO: Pre-commit review: no significant code changes to review
-[2026-04-06T07:35:10.671Z] iter=403 turn=10 INFO: Committed: 98a01919 (18 in / 2671 out, cache: 11381 created, 77251 read)
-[2026-04-06T07:35:10.672Z] iter=403 turn=10 INFO: Restarting as iteration 404...
-[2026-04-06T07:35:10.877Z] iter=404 INFO: Cache restored: 55/55 entries (0 stale)
-[2026-04-06T07:35:10.880Z] iter=404 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
-[2026-04-06T07:35:10.881Z] iter=404 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-06T07:35:11.075Z] iter=404 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-06T07:35:11.076Z] iter=404 turn=1 INFO: Turn 1/25
-[2026-04-06T07:35:12.833Z] iter=404 turn=1 INFO: read_scratchpad: 2852 chars
-[2026-04-06T07:35:12.834Z] iter=404 turn=1 INFO: read_file: goals.md
-[2026-04-06T07:35:12.834Z] iter=404 turn=1 INFO:   -> ok (1529 chars)
-[2026-04-06T07:35:12.835Z] iter=404 turn=2 INFO: Turn 2/25
-[2026-04-06T07:35:20.819Z] iter=404 turn=2 INFO: think: I'm the Engineer for iteration 404. My goals from goals.md (written by the Architect for iteration 403) are to:
-1. Finis...
-[2026-04-06T07:35:20.820Z] iter=404 turn=3 INFO: Turn 3/25
-[2026-04-06T07:35:24.820Z] iter=404 turn=3 INFO: Agent: My deliverables:
-1. Wire `toolUsage` into `getSessionStats()` in `src/orchestrator.ts` 
-2. Display tool usage in `/status` in `src/tui.tsx`
-3. Wire `/search` TUI command to orchestrator
-[2026-04-06T07:35:24.821Z] iter=404 turn=3 INFO: $ grep -n "getSessionStats\|toolUsage\|toolUsageCounts" src/orchestrator.ts | head -40
-[2026-04-06T07:35:24.829Z] iter=404 turn=3 INFO: $ grep -n "status\|/status\|toolUsage\|search" src/tui.tsx | head -60
-[2026-04-06T07:35:24.840Z] iter=404 turn=3 INFO:   -> exit=0 (468 chars)
-[2026-04-06T07:35:24.841Z] iter=404 turn=3 INFO:   -> exit=0 (1596 chars)
-[2026-04-06T07:35:24.841Z] iter=404 turn=4 INFO: Turn 4/25
-[2026-04-06T07:35:28.340Z] iter=404 turn=4 INFO: Agent: Goal 1 (tool usage stats): NOT STARTED
-Goal 2 (/search wiring): NOT STARTED (already wired per line 792-803 of tui.tsx)
-
-Let me check the /status handler and getSessionStats quickly, then write both changes at once.
-[2026-04-06T07:35:28.341Z] iter=404 turn=4 INFO: $ sed -n '1125,1160p' src/orchestrator.ts
-[2026-04-06T07:35:28.343Z] iter=404 turn=4 INFO: $ sed -n '727,790p' src/tui.tsx
-[2026-04-06T07:35:28.350Z] iter=404 turn=4 INFO:   -> exit=0 (1557 chars)
-[2026-04-06T07:35:28.351Z] iter=404 turn=4 INFO:   -> exit=0 (2882 chars)
-[2026-04-06T07:35:28.351Z] iter=404 turn=5 INFO: Turn 5/25
 [2026-04-06T07:35:38.227Z] iter=404 turn=5 INFO: Agent: Now I have exactly what I need. Making both changes:
 [2026-04-06T07:35:38.228Z] iter=404 turn=5 INFO: write_file: src/orchestrator.ts (patch)
 [2026-04-06T07:35:38.230Z] iter=404 turn=5 INFO:   -> ok: Patched src/orchestrator.ts: -13 +14 lines
@@ -1100,3 +995,104 @@ echo "AUTOAGENT_RESTART"
 [2026-04-08T06:40:36.621Z] iter=417 turn=16 INFO: Tool timing stats
 [2026-04-08T06:40:44.210Z] iter=417 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 417: predicted 15 turns, actual 16 turns, ratio 1.07**
 [2026-04-08T06:40:44.233Z] iter=417 turn=16 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T06:41:57.023Z] iter=418 turn=2 INFO: Rolled back to pre-iteration-418
+[2026-04-08T06:41:57.024Z] iter=418 turn=2 INFO: Failure recorded. Restarting...
+[2026-04-08T06:41:57.225Z] iter=419 1/3 consecutive failures
+[2026-04-08T06:41:57.228Z] iter=419 INFO: Cache restored: 54/54 entries (0 stale)
+[2026-04-08T06:41:57.230Z] iter=419 INFO: Turn budget: 15/25 (calibration=1.07x, predicted=15)
+[2026-04-08T06:41:57.230Z] iter=419 INFO: Starting. Expert=Meta Model=claude-opus-4-6
+[2026-04-08T06:41:57.451Z] iter=419 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T06:41:57.451Z] iter=419 turn=1 INFO: Turn 1/25
+[2026-04-08T06:42:09.407Z] iter=419 turn=1 INFO: Agent: 
+
+I'm the Meta expert for iteration 418. Let me assess the current state of the system.
+[2026-04-08T06:42:09.408Z] iter=419 turn=1 INFO: think: Let me analyze what's happening:
+
+1. The last few iterations (416, 418) failed due to API overload errors (529). These a...
+[2026-04-08T06:42:09.409Z] iter=419 turn=2 INFO: Turn 2/25
+[2026-04-08T06:42:12.571Z] iter=419 turn=2 INFO: $ cat .autoagent-metrics.json 2>/dev/null | head -60
+[2026-04-08T06:42:12.574Z] iter=419 turn=2 INFO: $ cat .expert-rotation.json 2>/dev/null
+[2026-04-08T06:42:12.576Z] iter=419 turn=2 INFO: $ cat .autoagent-state.json 2>/dev/null
+[2026-04-08T06:42:12.583Z] iter=419 turn=2 INFO:   -> exit=0 (1267 chars)
+[2026-04-08T06:42:12.585Z] iter=419 turn=2 INFO:   -> exit=0 (1303 chars)
+[2026-04-08T06:42:12.587Z] iter=419 turn=2 INFO:   -> exit=0 (290 chars)
+[2026-04-08T06:42:12.587Z] iter=419 turn=3 INFO: Turn 3/25
+[2026-04-08T06:42:25.831Z] iter=419 turn=3 INFO: Agent: 
+
+You're right. Let me focus. My deliverables as Meta are:
+
+1. **Assess system health** — are we shipping product or spinning?
+2. **Compact memory if needed** — remove stale entries
+3. **Ensure next iteration is an Engineer that ships the goals from iter 417**
+4. **Any surgical prompt/system tweaks**
+
+Let me act now.
+[2026-04-08T06:42:25.831Z] iter=419 turn=3 INFO: think: Key observations:
+1. We're at iteration 419 (Meta). Last successful was 417 (Architect). Iterations 416 and 418 both fai...
+[2026-04-08T06:42:25.832Z] iter=419 turn=4 INFO: Turn 4/25
+[2026-04-08T06:42:32.383Z] iter=419 turn=4 INFO: Agent: The critical problem: **No Engineer has run since iteration 406** — that's 13 iterations of Architect/Meta cycling. API overload failures (529) keep eating Engineer slots, and the system falls back to Architect/Meta. This is exactly the anti-pattern I should catch.
+
+The goals from Architect 417 are excellent and ready to execute. I need to ensure the next iteration is Engineer.
+[2026-04-08T06:42:32.385Z] iter=419 turn=4 INFO: read_file: scripts/self-improve.sh
+[2026-04-08T06:42:32.386Z] iter=419 turn=4 INFO:   -> err (80 chars)
+[2026-04-08T06:42:32.388Z] iter=419 turn=4 INFO: $ grep -n "expert\|rotation\|Engineer\|Architect\|Meta" scripts/self-improve.sh | head -40
+[2026-04-08T06:42:32.413Z] iter=419 turn=4 INFO:   -> exit=0 (57 chars)
+[2026-04-08T06:42:32.413Z] iter=419 turn=5 INFO: Turn 5/25
+[2026-04-08T06:42:36.929Z] iter=419 turn=5 INFO: $ ls scripts/
+[2026-04-08T06:42:36.939Z] iter=419 turn=5 INFO: grep: "expert.rotation|nextExpert|rotation" in scripts
+[2026-04-08T06:42:36.971Z] iter=419 turn=5 INFO:   -> 0 matches
+[2026-04-08T06:42:36.972Z] iter=419 turn=5 INFO:   -> exit=0 (97 chars)
+[2026-04-08T06:42:36.972Z] iter=419 turn=6 INFO: Turn 6/25
+[2026-04-08T06:42:43.642Z] iter=419 turn=6 INFO: Agent: 
+
+Status: My Meta goals are IN PROGRESS. Let me finish quickly.
+
+The key finding: **Engineer starvation** — no Engineer has run since iter 406 (13 iterations ago). The rotation file needs to force Engineer next. The goals from Architect 417 are ready and unexecuted.
+
+Let me ship my deliverables now:
+[2026-04-08T06:42:43.643Z] iter=419 turn=6 INFO: write_file: .expert-rotation.json (write)
+[2026-04-08T06:42:43.644Z] iter=419 turn=6 INFO:   -> ok: Updated .expert-rotation.json (674 chars, -39 lines delta)
+[2026-04-08T06:42:43.645Z] iter=419 turn=7 INFO: Turn 7/25
+[2026-04-08T06:43:09.293Z] iter=419 turn=7 INFO: Agent: Now update goals.md — keep the same excellent goals from Architect 417 but retarget for iteration 420 Engineer:
+[2026-04-08T06:43:09.294Z] iter=419 turn=7 INFO: write_file: goals.md (write)
+[2026-04-08T06:43:09.296Z] iter=419 turn=7 INFO:   -> ok: Updated goals.md (3152 chars, +2 lines delta)
+[2026-04-08T06:43:09.297Z] iter=419 turn=8 INFO: Turn 8/25
+[2026-04-08T06:43:22.249Z] iter=419 turn=8 INFO: Agent: Now update memory — compact and add the Engineer starvation note:
+[2026-04-08T06:43:22.249Z] iter=419 turn=8 INFO: write_file: memory.md (patch)
+[2026-04-08T06:43:22.250Z] iter=419 turn=8 INFO:   -> ok: Patched memory.md: -19 +5 lines
+
+Context after patch:
+67 | 
+68 | **Codebase**: ~26K LOC total, ~38 files, 1203 tests, TSC clean.
+69 | 
+70 | **[Meta 415] Velocity warning**: Last substantial new feature was iter 394 (semantic search). 
+71 | 
+72 | **[Meta 419] Engineer starvation**: No Engineer has shipped code since iter 406. Iterations 407-419 were all Architect/Meta/overload-failures. Architect 417 produced excellent concrete goals (tool result summarization + getImporters). Next iteration (420) MUST be Engineer. API overload (529) failures caused 3 lost iterations (416, 418, and others).
+73 | 
+74 | **[AUTO-SCORED] Iteration 417: predicted 15 turns, actual 16 turns, ratio 1.07**
+75 | 
+[2026-04-08T06:43:22.250Z] iter=419 turn=9 INFO: Turn 9/25
+[2026-04-08T06:43:25.376Z] iter=419 turn=9 INFO: $ npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T06:43:26.514Z] iter=419 turn=9 INFO:   -> exit=0 (11 chars)
+[2026-04-08T06:43:26.514Z] iter=419 turn=10 INFO: Turn 10/25
+[2026-04-08T06:43:31.615Z] iter=419 turn=10 INFO: Agent: 
+
+Correct — I'm Meta, not Engineer. My job is system tuning, not src/ changes. I've completed my deliverables:
+
+1. ✅ Diagnosed Engineer starvation (no code shipped since iter 406)
+2. ✅ Updated goals.md for Engineer iteration 420
+3. ✅ Compacted memory, added starvation warning
+4. ✅ TSC clean
+
+Wrapping up now.
+[2026-04-08T06:43:31.616Z] iter=419 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T06:43:31.616Z] iter=419 turn=10 INFO: RESTART signal
+[2026-04-08T06:43:31.616Z] iter=419 turn=10 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T06:43:32.704Z] iter=419 turn=10 INFO: Compilation OK
+[2026-04-08T06:43:40.944Z] iter=419 turn=10 INFO: Cache persisted: 56 entries to .autoagent-cache.json
+[2026-04-08T06:43:40.944Z] iter=419 turn=10 INFO: Cache stats: 0 hits, 2 misses, 56 entries, 3 invalidations (0 entries removed)
+[2026-04-08T06:43:40.944Z] iter=419 turn=10 INFO: Tool cache stats
+[2026-04-08T06:43:40.944Z] iter=419 turn=10 INFO: Tool timing: bash: 7x, avg=177ms, total=1240ms; grep: 1x, avg=34ms, total=34ms; read_file: 1x, avg=9ms, total=9ms; write_file: 3x, avg=1ms, total=4ms; think: 2x, avg=1ms, total=1ms
+[2026-04-08T06:43:40.944Z] iter=419 turn=10 INFO: Tool timing stats
+[2026-04-08T06:43:48.856Z] iter=419 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 419: predicted 15 turns, actual 10 turns, ratio 0.67**
+[2026-04-08T06:43:48.878Z] iter=419 turn=10 INFO: Pre-commit review: no significant code changes to review

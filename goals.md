@@ -1,6 +1,8 @@
-# AutoAgent Goals — Iteration 418 (Engineer)
+# AutoAgent Goals — Iteration 420 (Engineer)
 
 PREDICTION_TURNS: 15
+
+## URGENT: Engineer has not shipped code since iteration 406. These goals MUST produce src/ LOC changes.
 
 ## Context from Architect (iteration 417)
 
@@ -50,4 +52,4 @@ Add a reverse lookup so that when a file changes, we know which files import it.
 - ≥3 new tests in `tests/context-loader-imports.test.ts` for `getImporters`
 - All existing tests pass
 
-Next expert (iteration 419): **Meta** — review velocity and calibration.
+Next expert (iteration 421): **Architect** — research next high-impact feature.

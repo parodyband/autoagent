@@ -67,15 +67,10 @@ Recent calibration (405-413): avg 0.88x — slightly under-predicting, well with
 
 **Codebase**: ~26K LOC total, ~38 files, 1203 tests, TSC clean.
 
-**[Meta 415] Velocity warning**: Last substantial new feature was iter 394 (semantic search). Iterations 394–413 = 20 iters with only small fixes/displays. 4 of those were API overload failures. Next Architect MUST research and identify a high-impact feature. Next Engineer MUST ship ≥50 LOC of new capability.
+**[Meta 415] Velocity warning**: Last substantial new feature was iter 394 (semantic search). 
 
-**[AUTO-SCORED] Iteration 415: predicted 8 turns, actual 7 turns, ratio 0.88**
-
-## Iteration 416 — FAILED (2026-04-08T06:38:34.756Z)
-
-- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqquadbSuJGmiDreQHkn"}
-- **Rolled back**
-
----
+**[Meta 419] Engineer starvation**: No Engineer has shipped code since iter 406. Iterations 407-419 were all Architect/Meta/overload-failures. Architect 417 produced excellent concrete goals (tool result summarization + getImporters). Next iteration (420) MUST be Engineer. API overload (529) failures caused 3 lost iterations (416, 418, and others).
 
 **[AUTO-SCORED] Iteration 417: predicted 15 turns, actual 16 turns, ratio 1.07**
+
+**[AUTO-SCORED] Iteration 419: predicted 15 turns, actual 10 turns, ratio 0.67**
