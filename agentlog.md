@@ -1,51 +1,3 @@
-2297 |     // 2b. Extract #file references from user message, inject as context
-2298 |     const fileRefs = extractFileReferences(userMessage, this.opts.workDir);
-[2026-04-08T20:36:06.151Z] iter=532 turn=4 INFO: Turn 4/25
-[2026-04-08T20:36:08.810Z] iter=532 turn=4 INFO: Agent: Now let me check the existing tests for `selectCompactionTier` to know where to add the new ones:
-[2026-04-08T20:36:08.810Z] iter=532 turn=4 INFO: $ grep -n "selectCompactionTier\|compactionUrgency" tests/orchestrator.test.ts | head -20
-[2026-04-08T20:36:08.821Z] iter=532 turn=4 INFO:   -> exit=0 (1209 chars)
-[2026-04-08T20:36:08.821Z] iter=532 turn=5 INFO: Turn 5/25
-[2026-04-08T20:36:10.446Z] iter=532 turn=5 INFO: $ sed -n '42,80p' tests/orchestrator.test.ts
-[2026-04-08T20:36:10.454Z] iter=532 turn=5 INFO:   -> exit=0 (1091 chars)
-[2026-04-08T20:36:10.455Z] iter=532 turn=6 INFO: Turn 6/25
-[2026-04-08T20:36:15.261Z] iter=532 turn=6 INFO: think: Let me review goal status:
-
-1. Replace pre-turn compaction block with urgency-aware version — DONE (patched in turn 3)
-2...
-[2026-04-08T20:36:15.261Z] iter=532 turn=7 INFO: Turn 7/25
-[2026-04-08T20:36:18.563Z] iter=532 turn=7 INFO: Agent: Goal status:
-- **Wire pre-turn compaction to urgency** — DONE (patched)
-- **Add urgency tests** — DONE (already existed from iter 530, lines 61-68)
-- **Verify** — NOT DONE yet
-
-Running verification now:
-[2026-04-08T20:36:18.564Z] iter=532 turn=7 INFO: $ npx vitest run tests/orchestrator.test.ts 2>&1 | tail -20
-[2026-04-08T20:36:18.566Z] iter=532 turn=7 INFO: $ npx tsc --noEmit 2>&1
-[2026-04-08T20:36:19.802Z] iter=532 turn=7 INFO:   -> exit=0 (277 chars)
-[2026-04-08T20:36:19.813Z] iter=532 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-08T20:36:19.813Z] iter=532 turn=8 INFO: Turn 8/25
-[2026-04-08T20:36:26.773Z] iter=532 turn=8 INFO: Agent: All 12 tests pass, no type errors. Writing memory and updating goals:
-[2026-04-08T20:36:26.773Z] iter=532 turn=8 INFO: save_memory: "[Engineer] Iteration 532"
-[2026-04-08T20:36:26.774Z] iter=532 turn=8 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T20:36:26.774Z] iter=532 turn=9 INFO: Turn 9/25
-[2026-04-08T20:36:38.415Z] iter=532 turn=9 INFO: write_file: goals.md (write)
-[2026-04-08T20:36:38.416Z] iter=532 turn=9 INFO:   -> ok: Updated goals.md (1482 chars, -38 lines delta)
-[2026-04-08T20:36:38.416Z] iter=532 turn=10 INFO: Turn 10/25
-[2026-04-08T20:36:40.438Z] iter=532 turn=10 INFO: Agent: All work is done. Restarting.
-[2026-04-08T20:36:40.438Z] iter=532 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T20:36:40.438Z] iter=532 turn=10 INFO: RESTART signal
-[2026-04-08T20:36:40.438Z] iter=532 turn=10 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T20:36:41.550Z] iter=532 turn=10 INFO: Compilation OK
-[2026-04-08T20:36:50.319Z] iter=532 turn=10 INFO: Cache persisted: 64 entries to .autoagent-cache.json
-[2026-04-08T20:36:50.319Z] iter=532 turn=10 INFO: Tool timing: bash: 8x, avg=318ms, total=2541ms; write_file: 2x, avg=2ms, total=4ms; save_memory: 1x, avg=1ms, total=1ms; think: 1x, avg=0ms, total=0ms
-[2026-04-08T20:36:50.319Z] iter=532 turn=10 INFO: Tool timing stats
-[2026-04-08T20:36:58.527Z] iter=532 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 532: predicted 15 turns, actual 10 turns, ratio 0.67**
-[2026-04-08T20:37:01.551Z] iter=532 turn=10 INFO: Pre-commit review (624in/55out): LGTM. The refactor consolidates three separate `should*()` predicate calls into a single `selectCompactionTier()` dispatch, reducing redundant threshold checks and making the tiering logic easier to r
-[2026-04-08T20:37:01.607Z] iter=532 turn=10 INFO: Committed: 5c961783 (18 in / 2125 out, cache: 10088 created, 82234 read)
-[2026-04-08T20:37:01.608Z] iter=532 turn=10 INFO: Restarting as iteration 533...
-[2026-04-08T20:37:01.801Z] iter=533 INFO: Cache restored: 64/64 entries (0 stale)
-[2026-04-08T20:37:01.804Z] iter=533 INFO: Turn budget: 11/25 (calibration=0.88x, predicted=8)
-[2026-04-08T20:37:01.804Z] iter=533 INFO: Starting. Expert=Architect Model=claude-opus-4-6
 [2026-04-08T20:37:02.011Z] iter=533 INFO: Hard turn cap: 12 (1.5x prediction of 8)
 [2026-04-08T20:37:02.011Z] iter=533 turn=1 INFO: Turn 1/25
 [2026-04-08T20:37:08.563Z] iter=533 turn=1 INFO: Agent: 
@@ -1044,3 +996,77 @@ TypeScript: clean. Writing memory and updating goals now.
 [2026-04-08T20:48:34.099Z] iter=540 turn=8 INFO: Tool timing stats
 [2026-04-08T20:48:42.779Z] iter=540 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 540: predicted 15 turns, actual 8 turns, ratio 0.53**
 [2026-04-08T20:48:42.804Z] iter=540 turn=8 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:48:42.840Z] iter=540 turn=8 INFO: Committed: 58d12cbf (14 in / 1599 out, cache: 13477 created, 101374 read)
+[2026-04-08T20:48:42.840Z] iter=540 turn=8 INFO: Restarting as iteration 541...
+[2026-04-08T20:48:43.020Z] iter=541 INFO: Cache restored: 65/65 entries (0 stale)
+[2026-04-08T20:48:43.023Z] iter=541 INFO: Turn budget: 8/25 (calibration=0.73x, predicted=8)
+[2026-04-08T20:48:43.023Z] iter=541 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-08T20:48:43.211Z] iter=541 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-08T20:48:43.211Z] iter=541 turn=1 INFO: Turn 1/25
+[2026-04-08T20:48:48.842Z] iter=541 turn=1 INFO: Agent: 
+
+I'll start by verifying what's actually implemented vs. what's on the priority queue, then research for new high-leverage features, and write concrete goals for the Engineer.
+[2026-04-08T20:48:48.842Z] iter=541 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'autoCompact\|auto.compact\|preCompact\|pre.*compact\|midLoop.*compact' src/orchestrator.ts | head -30
+[2026-04-08T20:48:48.844Z] iter=541 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'onChunk\|streamFooter\|stream.*footer\|bash.*stream\|STREAM' src/tools/bash.ts | head -20
+[2026-04-08T20:48:48.845Z] iter=541 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'onChunk\|streamFooter\|stream.*footer\|bash.*stream' src/tui.tsx | head -20
+[2026-04-08T20:48:48.853Z] iter=541 turn=1 INFO:   -> exit=0 (105 chars)
+[2026-04-08T20:48:48.855Z] iter=541 turn=1 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:48:48.857Z] iter=541 turn=1 INFO:   -> exit=0 (183 chars)
+[2026-04-08T20:48:48.858Z] iter=541 turn=2 INFO: Turn 2/25
+[2026-04-08T20:48:56.109Z] iter=541 turn=2 INFO: Agent: 
+
+You're right. My deliverables are: (1) verify what's actually unimplemented, (2) research one high-leverage feature, (3) write goals.md for Engineer iteration 542. Let me finish verification and write goals now.
+[2026-04-08T20:48:56.110Z] iter=541 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'compactionUrgency\|preTurnUrgency\|auto.*compact\|compact.*trigger\|shouldCompact' src/orchestrator.ts | head -20
+[2026-04-08T20:48:56.112Z] iter=541 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'retry\|/retry' src/tui-commands.ts | head -10
+[2026-04-08T20:48:56.114Z] iter=541 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'exit.*cost\|cost.*exit\|getCostTracker\|costSummary\|session.*summary' src/tui.tsx src/tui-commands.ts | head -15
+[2026-04-08T20:48:56.121Z] iter=541 turn=2 INFO:   -> exit=0 (171 chars)
+[2026-04-08T20:48:56.123Z] iter=541 turn=2 INFO:   -> exit=0 (396 chars)
+[2026-04-08T20:48:56.126Z] iter=541 turn=2 INFO:   -> exit=0 (386 chars)
+[2026-04-08T20:48:56.127Z] iter=541 turn=3 INFO: Turn 3/25
+[2026-04-08T20:49:01.845Z] iter=541 turn=3 INFO: think: Verification results:
+1. /retry — ✅ Already implemented (line 133 in tui-commands.ts)
+2. Token/cost summary at exit — ✅ ...
+[2026-04-08T20:49:01.846Z] iter=541 turn=4 INFO: Turn 4/25
+[2026-04-08T20:49:06.234Z] iter=541 turn=4 INFO: Agent: 
+
+Goals status: **IN PROGRESS** — I need to (1) finish verifying items 3-4, (2) write goals.md. Let me do both now in parallel.
+[2026-04-08T20:49:06.235Z] iter=541 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '2280,2310p' src/orchestrator.ts
+[2026-04-08T20:49:06.237Z] iter=541 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'onChunk\|streamCallback\|toolStream\|stream.*tool\|bashStream' src/orchestrator.ts | head -15
+[2026-04-08T20:49:06.245Z] iter=541 turn=4 INFO:   -> exit=0 (1585 chars)
+[2026-04-08T20:49:06.249Z] iter=541 turn=4 INFO:   -> exit=0 (97 chars)
+[2026-04-08T20:49:06.249Z] iter=541 turn=5 INFO: Turn 5/25
+[2026-04-08T20:49:23.965Z] iter=541 turn=5 INFO: think: Findings:
+1. Auto-compact pre-turn: ✅ FULLY WIRED. Lines 2286-2300 show preTurnUrgency is computed, selectCompactionTier...
+[2026-04-08T20:49:23.965Z] iter=541 turn=6 INFO: Turn 6/25
+[2026-04-08T20:49:28.577Z] iter=541 turn=6 INFO: Agent: 
+
+I'm the Architect — my deliverable is goals.md, not src/ changes. Let me write it now with verified, genuinely new goals.
+[2026-04-08T20:49:28.578Z] iter=541 turn=6 INFO: $ cd /Users/austin/Documents/autoagent && grep -n 'write_file\|writeFile\|patch.*mode\|search.*replace\|old_string\|new_string' src/tools/ -r | head -20
+[2026-04-08T20:49:28.589Z] iter=541 turn=6 INFO:   -> exit=0 (1152 chars)
+[2026-04-08T20:49:28.589Z] iter=541 turn=7 INFO: Turn 7/25
+[2026-04-08T20:49:54.272Z] iter=541 turn=7 INFO: Agent: 
+
+Wrapping up now. Patch mode exists in write_file. All 4 priority queue items are done. I'll assign a genuinely new, high-value goal.
+[2026-04-08T20:49:54.273Z] iter=541 turn=7 INFO: write_file: goals.md (write)
+[2026-04-08T20:49:54.274Z] iter=541 turn=7 INFO:   -> ok: Updated goals.md (1796 chars, +12 lines delta)
+[2026-04-08T20:49:54.275Z] iter=541 turn=8 INFO: Turn 8/25
+[2026-04-08T20:49:58.984Z] iter=541 turn=8 INFO: save_memory: "[Architect] Priority queue update iter 541"
+[2026-04-08T20:49:58.985Z] iter=541 turn=8 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T20:49:58.985Z] iter=541 turn=9 INFO: Turn 9/25
+[2026-04-08T20:50:02.146Z] iter=541 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T20:50:03.297Z] iter=541 turn=9 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:50:03.297Z] iter=541 turn=10 INFO: Turn 10/25
+[2026-04-08T20:50:06.623Z] iter=541 turn=10 INFO: Agent: tsc clean. Done.
+
+```
+echo "AUTOAGENT_RESTART"
+```
+[2026-04-08T20:50:06.624Z] iter=541 turn=10 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:50:06.624Z] iter=541 turn=10 INFO: RESTART signal
+[2026-04-08T20:50:06.624Z] iter=541 turn=10 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:50:07.819Z] iter=541 turn=10 INFO: Compilation OK
+[2026-04-08T20:50:17.641Z] iter=541 turn=10 INFO: Cache persisted: 65 entries to .autoagent-cache.json
+[2026-04-08T20:50:17.641Z] iter=541 turn=10 INFO: Tool timing: bash: 11x, avg=114ms, total=1254ms; think: 2x, avg=1ms, total=1ms; write_file: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T20:50:17.641Z] iter=541 turn=10 INFO: Tool timing stats
+[2026-04-08T20:50:26.158Z] iter=541 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 541: predicted 8 turns, actual 10 turns, ratio 1.25**
+[2026-04-08T20:50:26.181Z] iter=541 turn=10 INFO: Pre-commit review: no significant code changes to review
