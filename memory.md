@@ -1,3 +1,5 @@
+
+
 ## Key Patterns
 - **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
 - **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning`.
@@ -9,6 +11,9 @@
 - **Finish before starting**: Complete in-progress features before new ones. Partial work causes stalls.
 - **runAgentLoop is standalone**: `runAgentLoop()` in orchestrator.ts is a standalone async function, NOT an Orchestrator method.
 - **Architect MUST verify before assigning**: grep src/ for existing implementations before writing goals. Assigning already-done work causes multi-iteration stalls.
+
+---
+
 
 ## Product Architecture
 - `src/orchestrator.ts` — (~2583 LOC) Agent loop, parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks, semantic search, tool usage tracking, proactive tool result summarization, test-file hint, tool timing profiling, file checkpoint integration, post-compaction state re-injection, tool dispatch schema validation.
@@ -29,6 +34,9 @@
 - `src/tools/bash.ts` — Bash execution with onChunk streaming callback.
 - **Expert rotation**: BUILTIN_EXPERTS = [ENGINEER, ARCHITECT, ENGINEER, META] → iteration % 4 selects expert.
 
+---
+
+
 ## Completed Features (Recent)
 - ✅ Ctrl+R reverse-search in TUI (iter 538)
 - ✅ Command history with up/down arrow navigation (iter 534)
@@ -40,14 +48,23 @@
 - ✅ Markdown conversation export (/export)
 - ✅ Mid-loop auto-compact trigger (iter 530)
 
+---
+
+
 ## Prediction Accuracy
 **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
 - Consecutive sub-1.3 count: 2 (537: 1.00, 538: 0.73)
+
+---
+
 
 ## Next Up (Priority Order)
 1. **`/sessions` command** — list past session summaries (date, turns, cost, topic). Assigned iter 552.
 2. **Conversation branching** — `/branch` to fork conversation at a point, `/branches` to list.
 3. **Auto-title sessions** — Use first user message or LLM summary as session title in history.
+
+---
+
 
 ## Verified Existing (do NOT re-assign)
 - ✅ Context usage indicator — fully implemented in tui.tsx (ContextIndicator, Header, footerStats wiring)
@@ -91,3 +108,7 @@
 **[AUTO-SCORED] Iteration 551: predicted 8 turns, actual 10 turns, ratio 1.25**
 
 **[AUTO-SCORED] Iteration 552: predicted 15 turns, actual 23 turns, ratio 1.53**
+
+---
+
+**[AUTO-SCORED] Iteration 553: predicted 8 turns, actual 8 turns, ratio 1.00**

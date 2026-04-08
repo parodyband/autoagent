@@ -1,182 +1,3 @@
-45 | 
-46 | export interface WriteFileResult {
-47 |   message: string;
-48 |   success: boolean;
-49 | }
-50 | 
-51 | /**
-52 |  * Normalize a string for fuzzy matching by trimming trailing whitespace from each line.
-53 |  */
-54 | function normalizeWhitespace(s: string): string {
-55 |   return s.split("\n").map(line => line.trimEnd()).join("\n");
-56 | }
-57 | 
-58 | /**
-59 |  * Normalize a string by collapsing all whitespace runs to a single space and trimming lines.
-60 |  */
-61 | function collapseWhitespace(s: string): string {
-62 |   return s.split("\n").map(line => line.trim().replace(/\s+/g, " ")).join("\n");
-63 | }
-64 | 
-65 | /**
-66 |  * Try to find oldStr in content using fuzzy matching (whitespace normalization).
-67 |  * Returns the patched content and a warning string, or null if no match found.
-68 |  *
-69 |  * Strategy:
-70 |  * 1. Trim trailing whitespace from each line of both strings, retry match
-71 |  * 2. If still no match, collapse all whitespace runs, retry match
-72 |  */
-73 | export function fuzzyFindReplace(
-74 |   content: string,
-75 |   oldStr: string,
-76 |   newStr: string
-77 | ): { result: string; warning: string } | null {
-78 |   // Try trimming trailing whitespace
-79 |   const normContent = normalizeWhitespace(content);
-80 |   const normOld = normalizeWhitespace(oldStr);
-81 |   if (normContent.includes(normOld)) {
-82 |     // Find the matching region in the original content by matching line-by-line
-83 |     const result = replaceNormalized(content, oldStr, newStr, "trailing");
-84 |     if (result !== null) {
-85 |       return {
-86 |         result,
-87 |         warning: "Applied with fuzzy match (whitespace normalized). Original had minor whitespace differences.",
-88 |       };
-89 |     }
-90 |   }
-91 | 
-92 |   // Try collapsing all whitespace
-93 |   const colContent = collapseWhitespace(content);
-94 |   const colOld = collapseWhitespace(oldStr);
-95 |   if (colOld.length > 0 && colContent.includes(colOld)) {
-96 |     const result = replaceNormalized(content, oldStr, newStr, "collapse");
-97 |     if (result !== null) {
-98 |       return {
-99 |         result,
-100 |         warning: "Applied with fuzzy match (whitespace collapsed). Original had significant whitespace differences.",
-101 |       };
-102 |     }
-103 |   }
-104 | 
-105 |   return null;
-106 | }
-107 | 
-108 | /**
-109 |  * Replace lines in content that fuzzy-match oldStr lines, substituting with newStr.
-110 |  */
-111 | function replaceNormalized(
-112 |   content: string,
-113 |   oldStr: string,
-114 |   newStr: string,
-115 |   mode: "trailing" | "collapse"
-116 | ): string | null {
-117 |   const normalize = mode === "trailing" ? normalizeWhitespace : collapseWhitespace;
-118 |   const contentLines = content.split("\n");
-119 |   const oldLines = oldStr.split("\n");
-120 |   const normOldLines = oldLines.map(l => (mode === "trailing" ? l.trimEnd() : l.trim().replace(/\s+/g, " ")));
-121 | 
-122 |   for (let i = 0; i <= contentLines.length - oldLines.length; i++) {
-123 |     const slice = contentLines.slice(i, i + oldLines.length);
-124 |     const normSlice = slice.map(l => (mode === "trailing" ? l.trimEnd() : l.trim().replace(/\s+/g, " ")));
-125 |     if (normSlice.join("\n") === normOldLines.join("\n")) {
-126 |       // Found matching region — replace it
-127 |       const before = contentLines.slice(0, i);
-128 |       const after = contentLines.slice(i + oldLines.length);
-129 |       const newLines = newStr.split("\n");
-130 |       return [...before, ...newLines, ...after].join("\n");
-131 |     }
-132 |   }
-133 |   return null;
-134 | }
-135 | 
-136 | function countLines(s: string): number {
-137 |   if (!s) return 0;
-[2026-04-08T20:50:49.479Z] iter=542 turn=4 INFO: Turn 4/25
-[2026-04-08T20:50:57.771Z] iter=542 turn=4 INFO: Agent: **Goal 1 - Fuzzy patch matching**: IN PROGRESS — fuzzy logic added, need to wire it into the patch execution path + write tests.
-[2026-04-08T20:50:57.771Z] iter=542 turn=4 INFO: write_file: src/tools/write_file.ts (patch)
-[2026-04-08T20:50:57.772Z] iter=542 turn=4 INFO:   -> ok: Patched src/tools/write_file.ts: -7 +15 lines
-
-Context after patch:
-196 |       }
-197 |     }
-198 | 
-199 |     if (mode === "patch") {
-200 |       if (!oldString) return { message: "ERROR: patch mode requires old_string", success: false };
-201 |       if (!existed) return { message: `ERROR: Cannot patch non-existent file: ${filePath}`, success: false };
-202 |       let fuzzyWarning = "";
-203 |       let patched: string;
-204 |       if (oldContent.includes(oldString)) {
-205 |         patched = oldContent.replace(oldString, newString ?? "");
-206 |       } else {
-207 |         const fuzzy = fuzzyFindReplace(oldContent, oldString, newString ?? "");
-208 |         if (fuzzy === null) {
-209 |           return { message: `ERROR: old_string not found in ${filePath}. Must match exactly.`, success: false };
-210 |         }
-211 |         patched = fuzzy.result;
-212 |         fuzzyWarning = fuzzy.warning + "\n";
-213 |       }
-214 |       writeFileSync(resolved, patched, "utf-8");
-215 |       globalFileCache.invalidate(resolved);
-216 |       globalMtimeTracker.delete(resolved);
-[2026-04-08T20:50:57.772Z] iter=542 turn=5 INFO: Turn 5/25
-[2026-04-08T20:51:01.308Z] iter=542 turn=5 INFO: Agent: Now update the return message to include fuzzyWarning:
-[2026-04-08T20:51:01.309Z] iter=542 turn=5 INFO: write_file: src/tools/write_file.ts (patch)
-[2026-04-08T20:51:01.310Z] iter=542 turn=5 INFO:   -> ok: Patched src/tools/write_file.ts: -4 +4 lines
-
-Context after patch:
-237 |         .map((line, i) => `${contextStart + i + 1} | ${line}`)
-238 |         .join("\n");
-239 | 
-240 |       return {
-241 |         message: `${staleWarning}${fuzzyWarning}Patched ${filePath}: -${countLines(oldString)} +${countLines(replacement)} lines\n\nContext after patch:\n${contextPreview}`,
-242 |         success: true,
-243 |       };
-244 |     }
-245 | 
-246 |     if (mode === "append") {
-[2026-04-08T20:51:01.310Z] iter=542 turn=6 INFO: Turn 6/25
-[2026-04-08T20:51:05.343Z] iter=542 turn=6 INFO: Agent: I've made real src/ changes. Now writing the test file, then TypeScript check.
-[2026-04-08T20:51:05.345Z] iter=542 turn=6 INFO: $ mkdir -p src/tools/__tests__
-[2026-04-08T20:51:05.362Z] iter=542 turn=6 INFO:   -> exit=0 (11 chars)
-[2026-04-08T20:51:05.362Z] iter=542 turn=7 INFO: Turn 7/25
-[2026-04-08T20:51:16.183Z] iter=542 turn=7 INFO: Agent: Writing test, tsc, done.
-[2026-04-08T20:51:16.184Z] iter=542 turn=7 INFO: write_file: src/tools/__tests__/write_file.test.ts (write)
-[2026-04-08T20:51:16.184Z] iter=542 turn=7 INFO:   -> ok: Created src/tools/__tests__/write_file.test.ts (2400 chars)
-[2026-04-08T20:51:16.184Z] iter=542 turn=8 INFO: Turn 8/25
-[2026-04-08T20:51:18.856Z] iter=542 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
-[2026-04-08T20:51:20.063Z] iter=542 turn=8 INFO:   -> exit=0 (11 chars)
-[2026-04-08T20:51:20.063Z] iter=542 turn=9 INFO: Turn 9/25
-[2026-04-08T20:51:24.397Z] iter=542 turn=9 INFO: Agent: Clean. Writing memory and goals now.
-[2026-04-08T20:51:24.398Z] iter=542 turn=9 INFO: save_memory: "[Engineer] Iteration 542"
-[2026-04-08T20:51:24.399Z] iter=542 turn=9 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T20:51:24.400Z] iter=542 turn=10 INFO: Turn 10/25
-[2026-04-08T20:51:34.865Z] iter=542 turn=10 INFO: write_file: goals.md (write)
-[2026-04-08T20:51:34.865Z] iter=542 turn=10 INFO:   -> ok: Updated goals.md (1517 chars, -7 lines delta)
-[2026-04-08T20:51:34.866Z] iter=542 turn=11 INFO: Turn 11/25
-[2026-04-08T20:51:37.289Z] iter=542 turn=11 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T20:51:37.290Z] iter=542 turn=11 INFO: RESTART signal
-[2026-04-08T20:51:37.290Z] iter=542 turn=11 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T20:51:38.445Z] iter=542 turn=11 INFO: Compilation OK
-[2026-04-08T20:51:47.883Z] iter=542 turn=11 INFO: Cache persisted: 65 entries to .autoagent-cache.json
-[2026-04-08T20:51:47.883Z] iter=542 turn=11 INFO: Cache stats: 0 hits, 1 misses, 65 entries, 5 invalidations (1 entries removed)
-[2026-04-08T20:51:47.883Z] iter=542 turn=11 INFO: Tool cache stats
-[2026-04-08T20:51:47.883Z] iter=542 turn=11 INFO: Tool timing: bash: 3x, avg=409ms, total=1226ms; write_file: 5x, avg=2ms, total=9ms; read_scratchpad: 1x, avg=2ms, total=2ms; read_file: 1x, avg=1ms, total=1ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-08T20:51:47.883Z] iter=542 turn=11 INFO: Tool timing stats
-[2026-04-08T20:51:56.566Z] iter=542 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 542: predicted 8 turns, actual 11 turns, ratio 1.38**
-[2026-04-08T20:52:09.871Z] iter=542 turn=11 INFO: Pre-commit review (2731in/488out): **Issue 1: `normalize` variable declared but never used**
-In `replaceNormalized`, `const normalize = mode === "trailing" ? normalizeWhitespace : collapseWhitespace;` is assigned but never called — the
-[2026-04-08T20:52:09.916Z] iter=542 turn=11 INFO: Committed: f8d0d0d2 (25 in / 4014 out, cache: 11573 created, 114955 read)
-[2026-04-08T20:52:09.916Z] iter=542 turn=11 INFO: Restarting as iteration 543...
-[2026-04-08T20:52:10.120Z] iter=543 INFO: Cache restored: 65/65 entries (0 stale)
-[2026-04-08T20:52:10.123Z] iter=543 INFO: Turn budget: 8/25 (calibration=0.73x, predicted=8)
-[2026-04-08T20:52:10.124Z] iter=543 INFO: Starting. Expert=Meta Model=claude-opus-4-6
-[2026-04-08T20:52:10.338Z] iter=543 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-08T20:52:10.339Z] iter=543 turn=1 INFO: Turn 1/25
-[2026-04-08T20:52:14.160Z] iter=543 turn=1 INFO: Agent: 
-
-I'll start by understanding the current state and doing my Meta analysis.
-[2026-04-08T20:52:14.162Z] iter=543 turn=1 INFO: read_scratchpad: 898 chars
-[2026-04-08T20:52:14.163Z] iter=543 turn=2 INFO: Turn 2/25
 [2026-04-08T20:52:17.501Z] iter=543 turn=2 INFO: think: My deliverables as Meta expert:
 1. Verify the fuzzy patch work from iteration 542
 2. Assess system health - are we build...
@@ -1175,3 +996,58 @@ Context after patch:
 [2026-04-08T21:08:09.066Z] iter=552 turn=23 INFO: Pre-commit review (2293in/518out): **Issues:**
 
 - **Module caching breaks tests**: The `session-history.ts` module is imported with dynamic `await import(...)` in each test, but ES module caching means all tests share the same module i
+[2026-04-08T21:08:09.129Z] iter=552 turn=23 INFO: Committed: 5b4bd1d6 (39 in / 5138 out, cache: 13468 created, 259740 read)
+[2026-04-08T21:08:09.129Z] iter=552 turn=23 INFO: Restarting as iteration 553...
+[2026-04-08T21:08:09.327Z] iter=553 INFO: Cache restored: 66/66 entries (0 stale)
+[2026-04-08T21:08:09.330Z] iter=553 INFO: Turn budget: 11/25 (calibration=1.00x, predicted=8)
+[2026-04-08T21:08:09.331Z] iter=553 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-08T21:08:09.545Z] iter=553 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-08T21:08:09.546Z] iter=553 turn=1 INFO: Turn 1/25
+[2026-04-08T21:08:15.104Z] iter=553 turn=1 INFO: Agent: 
+
+I'll start by verifying what was completed in iteration 552, then check what's already implemented before planning the next feature.
+[2026-04-08T21:08:15.104Z] iter=553 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "branch\|Branch" src/tui-commands.ts
+[2026-04-08T21:08:15.105Z] iter=553 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "auto.title\|autoTitle\|session.*title\|firstMessage" src/session-history.ts src/tui-commands.ts src/tui.tsx 2>/dev/null
+[2026-04-08T21:08:15.105Z] iter=553 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "sessions clear\|sessions.*clear\|clearSession" src/tui-commands.ts src/session-history.ts 2>/dev/null
+[2026-04-08T21:08:15.112Z] iter=553 turn=1 INFO:   -> exit=0 (1060 chars)
+[2026-04-08T21:08:15.113Z] iter=553 turn=1 INFO:   -> exit=1 (11 chars)
+[2026-04-08T21:08:15.113Z] iter=553 turn=1 INFO:   -> exit=0 (281 chars)
+[2026-04-08T21:08:15.114Z] iter=553 turn=2 INFO: Turn 2/25
+[2026-04-08T21:08:24.627Z] iter=553 turn=2 INFO: think: My deliverable is goals.md for iteration 554 (Engineer). Let me assess what I've found:
+
+1. **Conversation branching** —...
+[2026-04-08T21:08:24.628Z] iter=553 turn=3 INFO: Turn 3/25
+[2026-04-08T21:08:28.309Z] iter=553 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "resume" src/tui-commands.ts | head -20
+[2026-04-08T21:08:28.313Z] iter=553 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "saveBranch\|restoreBranch\|listBranches" src/orchestrator.ts | head -10
+[2026-04-08T21:08:28.316Z] iter=553 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -rn "session.*resume\|resume.*session\|loadSession\|restoreSession" src/ 2>/dev/null | head -10
+[2026-04-08T21:08:28.321Z] iter=553 turn=3 INFO:   -> exit=0 (343 chars)
+[2026-04-08T21:08:28.323Z] iter=553 turn=3 INFO:   -> exit=0 (120 chars)
+[2026-04-08T21:08:28.357Z] iter=553 turn=3 INFO:   -> exit=0 (780 chars)
+[2026-04-08T21:08:28.357Z] iter=553 turn=4 INFO: Turn 4/25
+[2026-04-08T21:08:57.338Z] iter=553 turn=4 INFO: think: Status of my goals:
+1. **Verify next items not already implemented** — DONE. Found that conversation branching IS alread...
+[2026-04-08T21:08:57.339Z] iter=553 turn=5 INFO: Turn 5/25
+[2026-04-08T21:08:59.755Z] iter=553 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "sessions" src/tui-commands.ts
+[2026-04-08T21:08:59.765Z] iter=553 turn=5 INFO:   -> exit=0 (609 chars)
+[2026-04-08T21:08:59.766Z] iter=553 turn=6 INFO: Turn 6/25
+[2026-04-08T21:09:17.641Z] iter=553 turn=6 INFO: Agent: 
+
+Right — I'm the Architect. My deliverable is goals.md, not src/ changes. Let me write it now.
+[2026-04-08T21:09:17.642Z] iter=553 turn=6 INFO: write_file: goals.md (write)
+[2026-04-08T21:09:17.644Z] iter=553 turn=6 INFO:   -> ok: Updated goals.md (2344 chars, +27 lines delta)
+[2026-04-08T21:09:17.645Z] iter=553 turn=7 INFO: Turn 7/25
+[2026-04-08T21:09:24.226Z] iter=553 turn=7 INFO: save_memory: "[Architect] Iteration 553 — Verified features"
+[2026-04-08T21:09:24.227Z] iter=553 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T21:09:24.227Z] iter=553 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T21:09:25.323Z] iter=553 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-08T21:09:25.323Z] iter=553 turn=8 INFO: Turn 8/25
+[2026-04-08T21:09:30.157Z] iter=553 turn=8 INFO: Agent: TypeScript clean. Goals written for Engineer iteration 554.
+[2026-04-08T21:09:30.158Z] iter=553 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T21:09:30.158Z] iter=553 turn=8 INFO: RESTART signal
+[2026-04-08T21:09:30.159Z] iter=553 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T21:09:31.301Z] iter=553 turn=8 INFO: Compilation OK
+[2026-04-08T21:09:40.257Z] iter=553 turn=8 INFO: Cache persisted: 66 entries to .autoagent-cache.json
+[2026-04-08T21:09:40.257Z] iter=553 turn=8 INFO: Tool timing: bash: 9x, avg=133ms, total=1194ms; save_memory: 1x, avg=3ms, total=3ms; think: 2x, avg=1ms, total=2ms; write_file: 1x, avg=2ms, total=2ms
+[2026-04-08T21:09:40.257Z] iter=553 turn=8 INFO: Tool timing stats
+[2026-04-08T21:09:49.036Z] iter=553 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 553: predicted 8 turns, actual 8 turns, ratio 1.00**
+[2026-04-08T21:09:49.060Z] iter=553 turn=8 INFO: Pre-commit review: no significant code changes to review
