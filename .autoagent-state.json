@@ -1,6 +1,6 @@
 {
-  "iteration": 447,
-  "lastSuccessfulIteration": 445,
-  "lastFailedCommit": "982428856d4b5a1b33ed3130445009b2fa104a35",
-  "lastFailureReason": "529 {\"type\":\"error\",\"error\":{\"type\":\"overloaded_error\",\"message\":\"Overloaded\"},\"request_id\":\"req_011CZquerDksn5AwBu6FRWN9\"}"
+  "iteration": 448,
+  "lastSuccessfulIteration": 447,
+  "lastFailedCommit": null,
+  "lastFailureReason": null
 }

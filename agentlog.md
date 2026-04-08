@@ -1,82 +1,3 @@
-I'll start by understanding the current state of the codebase, then execute both goals.
-[2026-04-08T06:53:07.085Z] iter=425 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git status --short | head -20
-[2026-04-08T06:53:07.089Z] iter=425 turn=1 INFO: grep: "summarizeOldToolResults|trySummarizeToolText" in src/orchestrator.ts
-[2026-04-08T06:53:07.107Z] iter=425 turn=1 INFO:   -> 0 matches
-[2026-04-08T06:53:07.108Z] iter=425 turn=1 INFO: grep: "fileWatch|onFileChange|file-watcher" in src/orchestrator.ts
-[2026-04-08T06:53:07.118Z] iter=425 turn=1 INFO:   -> 0 matches
-[2026-04-08T06:53:07.118Z] iter=425 turn=1 INFO:   -> exit=0 (96 chars)
-[2026-04-08T06:53:07.119Z] iter=425 turn=2 INFO: Turn 2/25
-[2026-04-08T06:53:10.509Z] iter=425 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "summarize" src/orchestrator.ts | head -20
-[2026-04-08T06:53:10.522Z] iter=425 turn=2 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "fileWatch\|file.watch\|file-watch\|onFileChange\|watcher" src/orchestrator.ts | head -20
-[2026-04-08T06:53:10.547Z] iter=425 turn=2 INFO:   -> exit=0 (1533 chars)
-[2026-04-08T06:53:10.558Z] iter=425 turn=2 INFO:   -> exit=0 (647 chars)
-[2026-04-08T06:53:10.558Z] iter=425 turn=3 INFO: Turn 3/25
-[2026-04-08T06:53:14.668Z] iter=425 turn=3 INFO: Agent: 
-
-You're right. Let me get the code I need and start writing immediately.
-[2026-04-08T06:53:14.668Z] iter=425 turn=3 INFO: read_file: src/orchestrator.ts
-[2026-04-08T06:53:14.669Z] iter=425 turn=3 INFO:   -> ok (4554 chars)
-[2026-04-08T06:53:14.669Z] iter=425 turn=3 INFO: read_file: src/orchestrator.ts
-[2026-04-08T06:53:14.670Z] iter=425 turn=3 INFO:   -> ok (1116 chars)
-[2026-04-08T06:53:14.671Z] iter=425 turn=4 INFO: Turn 4/25
-[2026-04-08T06:53:19.070Z] iter=425 turn=4 INFO: think: Now I have everything I need. Let me:
-
-1. Write tests/tool-result-summarization.test.ts
-2. Wire getImporters into the fi...
-[2026-04-08T06:53:19.071Z] iter=425 turn=5 INFO: Turn 5/25
-[2026-04-08T06:53:22.607Z] iter=425 turn=5 INFO: grep: "export.*getImporters" in src/context-loader.ts
-[2026-04-08T06:53:22.625Z] iter=425 turn=5 INFO:   -> 7 matches
-[2026-04-08T06:53:22.625Z] iter=425 turn=5 INFO: grep: "hasErrorIndicator" in src/orchestrator.ts
-[2026-04-08T06:53:22.641Z] iter=425 turn=5 INFO:   -> 23 matches
-[2026-04-08T06:53:22.641Z] iter=425 turn=6 INFO: Turn 6/25
-[2026-04-08T06:53:41.599Z] iter=425 turn=6 INFO: Agent: 
-
-**Goal status:**
-- Goal 1 (Tests): NOT STARTED
-- Goal 2 (Wire getImporters): NOT STARTED
-
-Both are small. Writing both now.
-[2026-04-08T06:53:41.599Z] iter=425 turn=6 INFO: write_file: tests/tool-result-summarization.test.ts (write)
-[2026-04-08T06:53:41.600Z] iter=425 turn=6 INFO:   -> ok: Created tests/tool-result-summarization.test.ts (3471 chars)
-[2026-04-08T06:53:41.601Z] iter=425 turn=7 INFO: Turn 7/25
-[2026-04-08T06:53:44.468Z] iter=425 turn=7 INFO: Agent: Now Goal 2 — wire `getImporters` into the file-watcher callback:
-[2026-04-08T06:53:44.469Z] iter=425 turn=7 INFO: grep: "^import.*context-loader" in src/orchestrator.ts
-[2026-04-08T06:53:44.495Z] iter=425 turn=7 INFO:   -> 1 matches
-[2026-04-08T06:53:44.496Z] iter=425 turn=8 INFO: Turn 8/25
-[2026-04-08T06:53:48.435Z] iter=425 turn=8 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T06:53:48.437Z] iter=425 turn=8 INFO:   -> ok: Patched src/orchestrator.ts: -1 +1 lines
-
-Context after patch:
-38 | import { runDiagnostics } from "./diagnostics.js";
-39 | import { findRelatedTests, runRelatedTests } from "./test-runner.js";
-40 | import { computeUnifiedDiff } from "./diff-preview.js";
-41 | import { autoLoadContext, extractFileReferences, loadFileReferences, stripFileReferences, resolveImportGraph, getImporters } from "./context-loader.js";
-42 | import { enhanceToolError } from "./tool-recovery.js";
-43 | import { detectProject } from "./project-detector.js";
-44 | import { detectLoop } from "./loop-detector.js";
-[2026-04-08T06:53:48.437Z] iter=425 turn=9 INFO: Turn 9/25
-[2026-04-08T06:53:55.218Z] iter=425 turn=9 INFO: Agent: Now add the `getImporters` call inside the file-watcher onChange callback:
-[2026-04-08T06:53:55.218Z] iter=425 turn=9 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T06:53:55.220Z] iter=425 turn=9 INFO:   -> ok: Patched src/orchestrator.ts: -5 +11 lines
-
-Context after patch:
-1088 | 
-1089 |     // Wire up file watcher callback
-1090 |     let searchRebuildTimer: ReturnType<typeof setTimeout> | null = null;
-1091 |     this.fileWatcher.onChange = (filePath: string) => {
-1092 |       this.externallyChangedFiles.add(filePath);
-1093 |       // Mark this path stale in the incremental repo map cache
-1094 |       this.staleRepoPaths.add(filePath);
-1095 |       this.opts.onExternalFileChange?.([...this.externallyChangedFiles]);
-1096 |       // Log reverse-import graph for changed file
-1097 |       try {
-1098 |         const importers = getImporters(filePath, this.opts.workDir);
-1099 |         const relImporters = importers.map(p => p.replace(this.opts.workDir + "/", ""));
-1100 |         this.opts.onStatus?.(`[file-watcher] ${filePath.replace(this.opts.workDir + "/", "")} changed — importers: ${relImporters.join(", ") || "none"}`);
-1101 |       } catch { /* non-fatal */ }
-1102 |       // Debounce search index rebuild (2s after last change)
-1103 |       if (searchRebuildTimer) clearTimeout(searchRebuildTimer);
-1104 |       searchRebuildTimer = setTimeout(() => {
 [2026-04-08T06:53:55.220Z] iter=425 turn=10 INFO: Turn 10/25
 [2026-04-08T06:53:58.180Z] iter=425 turn=10 INFO: Agent: 
 
@@ -1075,3 +996,146 @@ Shipping now. Writing goals.md and updating memory in parallel.
 [2026-04-08T07:29:21.022Z] iter=447 turn=9 INFO: Tool timing stats
 [2026-04-08T07:29:29.129Z] iter=447 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 447: predicted 8 turns, actual 9 turns, ratio 1.13**
 [2026-04-08T07:29:29.151Z] iter=447 turn=9 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T07:29:29.187Z] iter=447 turn=9 INFO: Committed: 153eb092 (19 in / 4071 out, cache: 12251 created, 70765 read)
+[2026-04-08T07:29:29.188Z] iter=447 turn=9 INFO: Restarting as iteration 448...
+[2026-04-08T07:29:29.395Z] iter=448 INFO: Cache restored: 59/59 entries (0 stale)
+[2026-04-08T07:29:29.398Z] iter=448 INFO: Turn budget: 13/25 (calibration=1.00x, predicted=15)
+[2026-04-08T07:29:29.398Z] iter=448 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T07:29:29.586Z] iter=448 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T07:29:29.586Z] iter=448 turn=1 INFO: Turn 1/25
+[2026-04-08T07:30:31.000Z] iter=448 turn=1 INFO: read_scratchpad: 1417 chars
+[2026-04-08T07:30:31.000Z] iter=448 turn=1 INFO: $ cat goals.md
+[2026-04-08T07:30:31.009Z] iter=448 turn=1 INFO:   -> exit=0 (3463 chars)
+[2026-04-08T07:30:31.009Z] iter=448 turn=2 INFO: Turn 2/25
+[2026-04-08T07:31:21.586Z] iter=448 turn=2 INFO: $ grep -n "slash\|trimmed.startsWith\|cmd ===\|/clear\|/help\|/export" src/tui.tsx | head -60
+[2026-04-08T07:31:21.590Z] iter=448 turn=2 INFO: $ grep -n "addSystemMessage\|system.*message\|setMessages\|push.*role.*system" src/tui.tsx | head -30
+[2026-04-08T07:31:21.603Z] iter=448 turn=2 INFO:   -> exit=0 (265 chars)
+[2026-04-08T07:31:21.604Z] iter=448 turn=2 INFO:   -> exit=0 (735 chars)
+[2026-04-08T07:31:21.605Z] iter=448 turn=3 INFO: Turn 3/25
+[2026-04-08T07:31:53.661Z] iter=448 turn=3 INFO: Agent: Let me look at the slash command handler and start building immediately.
+[2026-04-08T07:31:53.662Z] iter=448 turn=3 INFO: read_file: src/tui.tsx
+[2026-04-08T07:31:53.663Z] iter=448 turn=3 INFO:   -> ok (1047 chars)
+[2026-04-08T07:31:53.663Z] iter=448 turn=4 INFO: Turn 4/25
+[2026-04-08T07:32:12.583Z] iter=448 turn=4 INFO: $ grep -n "routeCommand\|/clear\|/help\|/find\|/model\|addMessage" src/tui.tsx | head -40
+[2026-04-08T07:32:12.594Z] iter=448 turn=4 INFO:   -> exit=0 (382 chars)
+[2026-04-08T07:32:12.594Z] iter=448 turn=5 INFO: Turn 5/25
+[2026-04-08T07:32:30.095Z] iter=448 turn=5 INFO: $ grep -n "export\|/export\|cmd\|command\|addMessage" src/tui-commands.ts | head -60
+[2026-04-08T07:32:30.114Z] iter=448 turn=5 INFO:   -> exit=0 (4761 chars)
+[2026-04-08T07:32:30.115Z] iter=448 turn=6 INFO: Turn 6/25
+[2026-04-08T07:32:45.347Z] iter=448 turn=6 INFO: think: Looking at the output, it seems both `/export` AND `src/export-helper.ts` already exist! Let me check what's there befor...
+[2026-04-08T07:32:45.348Z] iter=448 turn=7 INFO: Turn 7/25
+[2026-04-08T07:33:09.810Z] iter=448 turn=7 INFO: $ ls src/export*.ts 2>/dev/null; cat src/export-helper.ts 2>/dev/null || echo "NOT FOUND"; ls src/export.ts 2>/dev/null || echo "export.ts NOT FOUND"
+[2026-04-08T07:33:09.829Z] iter=448 turn=7 INFO:   -> exit=0 (5816 chars)
+[2026-04-08T07:33:09.830Z] iter=448 turn=8 INFO: Turn 8/25
+[2026-04-08T07:33:17.180Z] iter=448 turn=8 INFO: $ grep -n "export\|/export" src/tui-commands.ts | grep -i "407\|export\|helper" | head -20
+[2026-04-08T07:33:17.184Z] iter=448 turn=8 INFO: $ grep -n "toolTiming\|toolStart\|toolMs\|perf.*Tool\|tool.*timing" src/orchestrator.ts | head -20
+[2026-04-08T07:33:17.199Z] iter=448 turn=8 INFO:   -> exit=0 (1219 chars)
+[2026-04-08T07:33:17.206Z] iter=448 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-08T07:33:17.206Z] iter=448 turn=9 INFO: Turn 9/25
+[2026-04-08T07:33:37.737Z] iter=448 turn=9 INFO: think: Goal 1 (/export) is ALREADY DONE - it exists in tui-commands.ts at line 407 with full implementation. The goals.md says ...
+[2026-04-08T07:33:37.738Z] iter=448 turn=10 INFO: Turn 10/25
+[2026-04-08T07:33:44.620Z] iter=448 turn=10 INFO: think: I have made 0 src/ changes this iteration. Goal 1 (/export) is already done. I need to implement Goal 2 (tool timing in ...
+[2026-04-08T07:33:44.620Z] iter=448 turn=11 INFO: Turn 11/25
+[2026-04-08T07:33:50.138Z] iter=448 turn=11 INFO: $ grep -n "toolName\|tool_use\|tool call\|executeT\|runTool" src/orchestrator.ts | head -30
+[2026-04-08T07:33:50.154Z] iter=448 turn=11 INFO:   -> exit=0 (2301 chars)
+[2026-04-08T07:33:50.155Z] iter=448 turn=12 INFO: Turn 12/25
+[2026-04-08T07:33:55.293Z] iter=448 turn=12 INFO: Agent: I need to act immediately. Goal 1 (/export) is already done. Let me implement Goal 2 (tool timing) now.
+[2026-04-08T07:33:55.294Z] iter=448 turn=12 INFO: read_file: src/orchestrator.ts
+[2026-04-08T07:33:55.294Z] iter=448 turn=12 INFO:   -> ok (1487 chars)
+[2026-04-08T07:33:55.295Z] iter=448 turn=13 INFO: Turn 13/25
+[2026-04-08T07:33:59.284Z] iter=448 turn=13 INFO: Agent: I'll add the tool timing now and wrap up.
+[2026-04-08T07:33:59.285Z] iter=448 turn=13 INFO: read_file: src/orchestrator.ts
+[2026-04-08T07:33:59.285Z] iter=448 turn=13 INFO:   -> ok (6953 chars)
+[2026-04-08T07:33:59.286Z] iter=448 turn=14 INFO: Turn 14/25
+[2026-04-08T07:34:05.569Z] iter=448 turn=14 INFO: think: I see the orchestrator already has `durationMs` tracking per tool call via `reflectionCbs.onToolRecord`. The `t0` and `d...
+[2026-04-08T07:34:05.570Z] iter=448 turn=15 INFO: Turn 15/25
+[2026-04-08T07:34:12.313Z] iter=448 turn=15 INFO: $ grep -n "export async function runAgentLoop\|^export function runAgentLoop\|toolUsageCounts\s*=\s*new Map\|return {.*tokensIn\|// Session end\|sessionFilesModified" src/orchestrator.ts | head -20
+[2026-04-08T07:34:12.345Z] iter=448 turn=15 INFO:   -> exit=0 (1287 chars)
+[2026-04-08T07:34:12.345Z] iter=448 turn=16 INFO: Turn 16/25
+[2026-04-08T07:34:19.867Z] iter=448 turn=16 INFO: Agent: I need to stop exploring and act. Let me add tool timing to orchestrator.ts and wrap up.
+[2026-04-08T07:34:19.867Z] iter=448 turn=16 INFO: read_file: src/orchestrator.ts
+[2026-04-08T07:34:19.868Z] iter=448 turn=16 INFO:   -> ok (837 chars)
+[2026-04-08T07:34:19.868Z] iter=448 turn=17 INFO: Turn 17/25
+[2026-04-08T07:34:24.108Z] iter=448 turn=17 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T07:34:24.113Z] iter=448 turn=17 INFO:   -> ok: Patched src/orchestrator.ts: -2 +4 lines
+
+Context after patch:
+1076 |   private turnCosts: number[] = [];
+1077 |   /** Files written during this session. */
+1078 |   private sessionFilesModified = new Set<string>();
+1079 |   /** Per-tool invocation counts for this session. */
+1080 |   private toolUsageCounts = new Map<string, number>();
+1081 |   /** Per-tool cumulative timing for this session. */
+1082 |   private toolTimings = new Map<string, { calls: number; totalMs: number }>();
+1083 | 
+1084 |   /** AbortController for the current send() call. Null when idle. */
+1085 |   _abortController: AbortController | null = null;
+[2026-04-08T07:34:24.114Z] iter=448 turn=18 INFO: Turn 18/25
+[2026-04-08T07:34:28.164Z] iter=448 turn=18 INFO: Agent: Now find where `onToolRecord` is called in the Orchestrator class (not the standalone function) to hook timing:
+[2026-04-08T07:34:28.165Z] iter=448 turn=18 INFO: $ grep -n "onToolRecord\|durationMs\|toolUsageCounts.set" src/orchestrator.ts | grep -v "^[0-9]*:.*//\|reflectionCbs\|standalone" | head -30
+[2026-04-08T07:34:28.182Z] iter=448 turn=18 INFO:   -> exit=0 (1613 chars)
+[2026-04-08T07:34:28.182Z] iter=448 turn=19 INFO: Turn 19/25
+[2026-04-08T07:34:32.053Z] iter=448 turn=19 INFO: read_file: src/orchestrator.ts
+[2026-04-08T07:34:32.054Z] iter=448 turn=19 INFO:   -> ok (780 chars)
+[2026-04-08T07:34:32.054Z] iter=448 turn=20 INFO: Turn 20/25
+[2026-04-08T07:34:37.931Z] iter=448 turn=20 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T07:34:37.933Z] iter=448 turn=20 INFO:   -> ok: Patched src/orchestrator.ts: -6 +12 lines
+
+Context after patch:
+2102 |     };
+2103 | 
+2104 |     const reflectionCbs: ReflectionCallbacks = {
+2105 |       onToolRecord: (rec) => {
+2106 |         taskToolCount++;
+2107 |         if (rec.isError)    taskToolErrors++;
+2108 |         if (rec.wasRetried) taskRetries++;
+2109 |         this.reflectionStore.recordToolCall(rec);
+2110 |         // Accumulate tool timing
+2111 |         const existing = this.toolTimings.get(rec.name) ?? { calls: 0, totalMs: 0 };
+2112 |         this.toolTimings.set(rec.name, { calls: existing.calls + 1, totalMs: existing.totalMs + rec.durationMs });
+2113 |         if (rec.durationMs > 2000) {
+2114 |           process.stderr.write(`[perf] Tool ${rec.name} took ${rec.durationMs}ms\n`);
+2115 |         }
+2116 |       },
+2117 |       onTurnComplete: () => {
+2118 |         taskTurns++;
+2119 |         this.reflectionStore.incrementTurn();
+[2026-04-08T07:34:37.933Z] iter=448 turn=21 INFO: Turn 21/25
+[2026-04-08T07:34:41.372Z] iter=448 turn=21 INFO: Agent: Now add the summary log at session end:
+[2026-04-08T07:34:41.372Z] iter=448 turn=21 INFO: read_file: src/orchestrator.ts
+[2026-04-08T07:34:41.373Z] iter=448 turn=21 INFO:   -> ok (1052 chars)
+[2026-04-08T07:34:41.374Z] iter=448 turn=22 INFO: Turn 22/25
+[2026-04-08T07:34:46.888Z] iter=448 turn=22 INFO: write_file: src/orchestrator.ts (patch)
+[2026-04-08T07:34:46.889Z] iter=448 turn=22 INFO:   -> ok: Patched src/orchestrator.ts: -2 +11 lines
+
+Context after patch:
+2361 |       }).then(() => { /* lessons written to local.md */ }).catch(() => { /* non-fatal */ });
+2362 |     }
+2363 | 
+2364 |     // Log tool timing summary to stderr
+2365 |     if (this.toolTimings.size > 0) {
+2366 |       const sorted = [...this.toolTimings.entries()].sort((a, b) => b[1].totalMs - a[1].totalMs);
+2367 |       const lines = sorted.map(([name, { calls, totalMs }]) =>
+2368 |         `  ${name}: ${calls} calls, ${totalMs}ms total, avg ${Math.round(totalMs / calls)}ms`
+2369 |       );
+2370 |       process.stderr.write(`[perf] Tool timing summary:\n${lines.join("\n")}\n`);
+2371 |     }
+2372 | 
+2373 |     return { text, tokensIn, tokensOut, model, verificationPassed, commitResult };
+2374 |   }
+2375 | }
+2376 | 
+2377 | /**
+[2026-04-08T07:34:46.890Z] iter=448 turn=23 INFO: Turn 23/25
+[2026-04-08T07:34:52.021Z] iter=448 turn=23 INFO: $ npx tsc --noEmit 2>&1 | head -30
+[2026-04-08T07:34:53.147Z] iter=448 turn=23 INFO:   -> exit=0 (11 chars)
+[2026-04-08T07:34:53.147Z] iter=448 turn=23 INFO: HARD TURN CAP REACHED: 23 turns (predicted 15, cap 23). Forcing commit.
+[2026-04-08T07:34:53.149Z] iter=448 turn=23 INFO: Cache persisted: 60 entries to .autoagent-cache.json
+[2026-04-08T07:34:53.149Z] iter=448 turn=23 INFO: Cache stats: 0 hits, 6 misses, 60 entries, 3 invalidations (5 entries removed)
+[2026-04-08T07:34:53.149Z] iter=448 turn=23 INFO: Tool cache stats
+[2026-04-08T07:34:53.149Z] iter=448 turn=23 INFO: Tool timing: bash: 12x, avg=110ms, total=1325ms; write_file: 3x, avg=3ms, total=9ms; read_file: 6x, avg=1ms, total=5ms; read_scratchpad: 1x, avg=4ms, total=4ms; think: 4x, avg=1ms, total=2ms
+[2026-04-08T07:34:53.149Z] iter=448 turn=23 INFO: Tool timing stats
+[2026-04-08T07:35:01.153Z] iter=448 turn=23 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 448: predicted 15 turns, actual 23 turns, ratio 1.53**
+[2026-04-08T07:35:10.828Z] iter=448 turn=23 INFO: Pre-commit review (810in/282out): **Issues:**
+
+- **`rec.durationMs` may be undefined/NaN**: If the `ToolRecord` type doesn't guarantee `durationMs` is always populated (e.g., for errored or retried calls that short-circuit), `existing

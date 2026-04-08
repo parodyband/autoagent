@@ -1078,6 +1078,8 @@ export class Orchestrator {
   private sessionFilesModified = new Set<string>();
   /** Per-tool invocation counts for this session. */
   private toolUsageCounts = new Map<string, number>();
+  /** Per-tool cumulative timing for this session. */
+  private toolTimings = new Map<string, { calls: number; totalMs: number }>();
 
   /** AbortController for the current send() call. Null when idle. */
   _abortController: AbortController | null = null;
@@ -2105,6 +2107,12 @@ export class Orchestrator {
         if (rec.isError)    taskToolErrors++;
         if (rec.wasRetried) taskRetries++;
         this.reflectionStore.recordToolCall(rec);
+        // Accumulate tool timing
+        const existing = this.toolTimings.get(rec.name) ?? { calls: 0, totalMs: 0 };
+        this.toolTimings.set(rec.name, { calls: existing.calls + 1, totalMs: existing.totalMs + rec.durationMs });
+        if (rec.durationMs > 2000) {
+          process.stderr.write(`[perf] Tool ${rec.name} took ${rec.durationMs}ms\n`);
+        }
       },
       onTurnComplete: () => {
         taskTurns++;
@@ -2351,6 +2359,15 @@ export class Orchestrator {
         turnCount:           taskTurns,
         compactionTriggered: taskCompacted,
       }).then(() => { /* lessons written to local.md */ }).catch(() => { /* non-fatal */ });
+    }
+
+    // Log tool timing summary to stderr
+    if (this.toolTimings.size > 0) {
+      const sorted = [...this.toolTimings.entries()].sort((a, b) => b[1].totalMs - a[1].totalMs);
+      const lines = sorted.map(([name, { calls, totalMs }]) =>
+        `  ${name}: ${calls} calls, ${totalMs}ms total, avg ${Math.round(totalMs / calls)}ms`
+      );
+      process.stderr.write(`[perf] Tool timing summary:\n${lines.join("\n")}\n`);
     }
 
     return { text, tokensIn, tokensOut, model, verificationPassed, commitResult };

@@ -50,3 +50,5 @@
 - Goals for Engineer 448: /export command + tool timing. Both are user-facing improvements.
 
 **[AUTO-SCORED] Iteration 447: predicted 8 turns, actual 9 turns, ratio 1.13**
+
+**[AUTO-SCORED] Iteration 448: predicted 15 turns, actual 23 turns, ratio 1.53**
