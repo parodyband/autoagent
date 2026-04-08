@@ -108,12 +108,19 @@ export type ToolHandler = (
 export interface ToolOptions {
   /** Default timeout in seconds for this tool (used when caller doesn't specify) */
   defaultTimeout?: number;
+  /**
+   * When true, this tool is excluded from the default system-prompt tool listing.
+   * It is still callable and findable via searchTools().
+   */
+  hidden?: boolean;
 }
 
 export interface RegisteredTool {
   definition: Anthropic.Tool;
   handler: ToolHandler;
   defaultTimeout?: number;
+  /** Hidden tools don't appear in getDefinitions() but are discoverable via searchTools() */
+  hidden?: boolean;
 }
 
 // ─── Registry ───────────────────────────────────────────────
@@ -126,6 +133,7 @@ export class ToolRegistry {
       definition,
       handler,
       defaultTimeout: options?.defaultTimeout,
+      hidden: options?.hidden,
     });
   }
 
@@ -138,7 +146,20 @@ export class ToolRegistry {
     return this.tools.get(name)?.defaultTimeout;
   }
 
+  /**
+   * Returns tool definitions for the system prompt.
+   * Hidden tools are excluded — they're discoverable via searchTools().
+   */
   getDefinitions(): Anthropic.Tool[] {
+    return Array.from(this.tools.values())
+      .filter((t) => !t.hidden)
+      .map((t) => t.definition);
+  }
+
+  /**
+   * Returns ALL tool definitions including hidden ones (for dispatching).
+   */
+  getAllDefinitions(): Anthropic.Tool[] {
     return Array.from(this.tools.values()).map((t) => t.definition);
   }
 
@@ -152,6 +173,36 @@ export class ToolRegistry {
 
   size(): number {
     return this.tools.size;
+  }
+
+  /**
+   * Fuzzy substring search across tool name + description.
+   * Returns all matching tools (including hidden ones) sorted by relevance.
+   */
+  searchTools(query: string): RegisteredTool[] {
+    const q = query.toLowerCase();
+    const results: Array<{ tool: RegisteredTool; score: number }> = [];
+
+    for (const tool of this.tools.values()) {
+      const name = tool.definition.name.toLowerCase();
+      const desc = (
+        typeof tool.definition.description === "string"
+          ? tool.definition.description
+          : ""
+      ).toLowerCase();
+
+      let score = 0;
+      if (name === q) score = 10;
+      else if (name.startsWith(q)) score = 7;
+      else if (name.includes(q)) score = 5;
+      if (desc.includes(q)) score += 3;
+
+      if (score > 0) results.push({ tool, score });
+    }
+
+    return results
+      .sort((a, b) => b.score - a.score)
+      .map((r) => r.tool);
   }
 }
 

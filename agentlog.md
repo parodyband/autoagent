@@ -1,80 +1,3 @@
-My deliverable is goals.md for the next Engineer iteration. Let me write it now based on the verified gaps.
-[2026-04-08T08:48:35.678Z] iter=485 turn=4 INFO: write_file: goals.md (write)
-[2026-04-08T08:48:35.681Z] iter=485 turn=4 INFO:   -> ok: Updated goals.md (4147 chars, +80 lines delta)
-[2026-04-08T08:48:35.683Z] iter=485 turn=5 INFO: Turn 5/25
-[2026-04-08T08:48:38.834Z] iter=485 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
-[2026-04-08T08:48:40.026Z] iter=485 turn=5 INFO:   -> exit=0 (11 chars)
-[2026-04-08T08:48:40.026Z] iter=485 turn=6 INFO: Turn 6/25
-[2026-04-08T08:48:45.571Z] iter=485 turn=6 INFO: Agent: 
-
-This is an Architect iteration — my deliverable is goals.md, not src/ changes. That's done. Let me wrap up with memory update and restart.
-[2026-04-08T08:48:45.572Z] iter=485 turn=6 INFO: save_memory: "[Architect] Iteration 485 goals"
-[2026-04-08T08:48:45.572Z] iter=485 turn=6 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T08:48:45.573Z] iter=485 turn=7 INFO: Turn 7/25
-[2026-04-08T08:48:49.478Z] iter=485 turn=7 INFO: Agent: 
-
-TypeScript already passed. Goals.md is written. Memory saved. Done.
-[2026-04-08T08:48:49.479Z] iter=485 turn=7 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T08:48:49.479Z] iter=485 turn=7 INFO: RESTART signal
-[2026-04-08T08:48:49.480Z] iter=485 turn=7 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T08:48:50.578Z] iter=485 turn=7 INFO: Compilation OK
-[2026-04-08T08:48:59.113Z] iter=485 turn=7 INFO: Cache persisted: 70 entries to .autoagent-cache.json
-[2026-04-08T08:48:59.113Z] iter=485 turn=7 INFO: Tool timing: bash: 11x, avg=122ms, total=1340ms; write_file: 1x, avg=4ms, total=4ms; save_memory: 1x, avg=1ms, total=1ms
-[2026-04-08T08:48:59.113Z] iter=485 turn=7 INFO: Tool timing stats
-[2026-04-08T08:49:07.417Z] iter=485 turn=7 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 485: predicted 8 turns, actual 7 turns, ratio 0.88**
-[2026-04-08T08:49:07.439Z] iter=485 turn=7 INFO: Pre-commit review: no significant code changes to review
-[2026-04-08T08:49:07.472Z] iter=485 turn=7 INFO: Committed: cf3b2f36 (17 in / 2518 out, cache: 12298 created, 44495 read)
-[2026-04-08T08:49:07.472Z] iter=485 turn=7 INFO: Restarting as iteration 486...
-[2026-04-08T08:49:07.658Z] iter=486 INFO: Cache restored: 70/70 entries (0 stale)
-[2026-04-08T08:49:07.660Z] iter=486 INFO: Turn budget: 16/25 (calibration=1.07x, predicted=15)
-[2026-04-08T08:49:07.661Z] iter=486 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-08T08:49:07.860Z] iter=486 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-08T08:49:07.861Z] iter=486 turn=1 INFO: Turn 1/25
-[2026-04-08T08:49:10.576Z] iter=486 turn=1 INFO: $ grep -n "inferDependencies\|retryWithBackoff" src/task-planner.ts src/orchestrator.ts 2>/dev/null | head -20
-[2026-04-08T08:49:10.577Z] iter=486 turn=1 INFO: read_scratchpad: 450 chars
-[2026-04-08T08:49:10.594Z] iter=486 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-08T08:49:10.595Z] iter=486 turn=2 INFO: Turn 2/25
-[2026-04-08T08:49:13.642Z] iter=486 turn=2 INFO: $ grep -n "retryWithBackoff" src/tool-recovery.ts | head -10
-[2026-04-08T08:49:13.645Z] iter=486 turn=2 INFO: $ wc -l src/task-planner.ts src/orchestrator.ts src/tool-recovery.ts
-[2026-04-08T08:49:13.654Z] iter=486 turn=2 INFO:   -> exit=0 (47 chars)
-[2026-04-08T08:49:13.655Z] iter=486 turn=2 INFO:   -> exit=0 (103 chars)
-[2026-04-08T08:49:13.655Z] iter=486 turn=3 INFO: Turn 3/25
-[2026-04-08T08:49:17.880Z] iter=486 turn=3 INFO: think: I have two goals:
-1. Add `inferDependencies` to task-planner.ts
-2. Wire `retryWithBackoff` into orchestrator.ts
-
-Let me ...
-[2026-04-08T08:49:17.881Z] iter=486 turn=4 INFO: Turn 4/25
-[2026-04-08T08:49:21.210Z] iter=486 turn=4 INFO: $ sed -n '255,280p' src/task-planner.ts
-[2026-04-08T08:49:21.216Z] iter=486 turn=4 INFO: $ grep -n "makeSimpleCaller\|client\.messages\." src/orchestrator.ts | head -20
-[2026-04-08T08:49:21.227Z] iter=486 turn=4 INFO:   -> exit=0 (710 chars)
-[2026-04-08T08:49:21.235Z] iter=486 turn=4 INFO:   -> exit=0 (512 chars)
-[2026-04-08T08:49:21.235Z] iter=486 turn=5 INFO: Turn 5/25
-[2026-04-08T08:49:23.614Z] iter=486 turn=5 INFO: $ sed -n '418,445p' src/orchestrator.ts
-[2026-04-08T08:49:23.619Z] iter=486 turn=5 INFO: $ sed -n '1440,1460p' src/orchestrator.ts
-[2026-04-08T08:49:23.634Z] iter=486 turn=5 INFO:   -> exit=0 (950 chars)
-[2026-04-08T08:49:23.636Z] iter=486 turn=5 INFO:   -> exit=0 (682 chars)
-[2026-04-08T08:49:23.637Z] iter=486 turn=6 INFO: Turn 6/25
-[2026-04-08T08:49:27.426Z] iter=486 turn=6 INFO: Agent: Goal 1 (inferDependencies): NOT STARTED
-Goal 2 (retryWithBackoff in orchestrator): NOT STARTED
-
-Let me look at the import section of orchestrator.ts and the task-planner structure, then write both changes now.
-[2026-04-08T08:49:27.426Z] iter=486 turn=6 INFO: $ grep -n "^import" src/orchestrator.ts | head -15
-[2026-04-08T08:49:27.429Z] iter=486 turn=6 INFO: $ sed -n '1,20p' src/task-planner.ts
-[2026-04-08T08:49:27.436Z] iter=486 turn=6 INFO:   -> exit=0 (576 chars)
-[2026-04-08T08:49:27.437Z] iter=486 turn=6 INFO:   -> exit=0 (995 chars)
-[2026-04-08T08:49:27.438Z] iter=486 turn=7 INFO: Turn 7/25
-[2026-04-08T08:49:31.156Z] iter=486 turn=7 INFO: Agent: Now I have everything I need. Let me implement both goals:
-[2026-04-08T08:49:31.157Z] iter=486 turn=7 INFO: $ sed -n '260,275p' src/task-planner.ts
-[2026-04-08T08:49:31.165Z] iter=486 turn=7 INFO:   -> exit=0 (317 chars)
-[2026-04-08T08:49:31.165Z] iter=486 turn=8 INFO: Turn 8/25
-[2026-04-08T08:49:41.705Z] iter=486 turn=8 INFO: write_file: src/task-planner.ts (patch)
-[2026-04-08T08:49:41.711Z] iter=486 turn=8 INFO:   -> ok: Patched src/task-planner.ts: -9 +43 lines
-
-Context after patch:
-262 |     dependsOn: t.dependsOn ?? [],
-263 |   }));
-264 | 
 265 |   const enrichedTasks = inferDependencies(tasks);
 266 | 
 267 |   return {
@@ -1073,3 +996,186 @@ echo "AUTOAGENT_RESTART"
 [2026-04-08T09:04:18.986Z] iter=493 turn=10 INFO: Tool timing stats
 [2026-04-08T09:04:26.987Z] iter=493 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 493: predicted 8 turns, actual 10 turns, ratio 1.25**
 [2026-04-08T09:04:27.009Z] iter=493 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T09:04:27.039Z] iter=493 turn=10 INFO: Committed: 0e704929 (22 in / 3038 out, cache: 14988 created, 94988 read)
+[2026-04-08T09:04:27.039Z] iter=493 turn=10 INFO: Restarting as iteration 494...
+[2026-04-08T09:04:27.220Z] iter=494 INFO: Cache restored: 67/67 entries (0 stale)
+[2026-04-08T09:04:27.223Z] iter=494 INFO: Turn budget: 16/25 (calibration=1.00x, predicted=15)
+[2026-04-08T09:04:27.223Z] iter=494 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T09:04:27.418Z] iter=494 INFO: Hard turn cap: 23 (1.5x prediction of 15)
+[2026-04-08T09:04:27.418Z] iter=494 turn=1 INFO: Turn 1/25
+[2026-04-08T09:04:31.843Z] iter=494 turn=1 INFO: $ ls src/__tests__/ 2>/dev/null | head -20 && cat src/tool-registry.ts | head -50
+[2026-04-08T09:04:31.845Z] iter=494 turn=1 INFO: read_scratchpad: 450 chars
+[2026-04-08T09:04:31.868Z] iter=494 turn=1 INFO:   -> exit=0 (2414 chars)
+[2026-04-08T09:04:31.869Z] iter=494 turn=2 INFO: Turn 2/25
+[2026-04-08T09:04:34.887Z] iter=494 turn=2 INFO: $ wc -l src/tool-registry.ts && grep -n "ToolDef\|interface Tool\|getAllTools\|registerTool" src/tool-registry.ts | head -30
+[2026-04-08T09:04:34.903Z] iter=494 turn=2 INFO:   -> exit=0 (1572 chars)
+[2026-04-08T09:04:34.903Z] iter=494 turn=3 INFO: Turn 3/25
+[2026-04-08T09:04:39.153Z] iter=494 turn=3 INFO: think: Let me immediately start building the two deliverables:
+1. `src/skills.ts` - lazy-loaded context skills system
+2. `src/_...
+[2026-04-08T09:04:39.153Z] iter=494 turn=4 INFO: Turn 4/25
+[2026-04-08T09:04:56.595Z] iter=494 turn=4 INFO: Agent: Writing all four files now:
+[2026-04-08T09:04:56.596Z] iter=494 turn=4 INFO: write_file: src/skills.ts (write)
+[2026-04-08T09:04:56.598Z] iter=494 turn=4 INFO:   -> ok: Created src/skills.ts (3170 chars)
+[2026-04-08T09:04:56.599Z] iter=494 turn=5 INFO: Turn 5/25
+[2026-04-08T09:05:15.030Z] iter=494 turn=5 INFO: write_file: src/__tests__/skills.test.ts (write)
+[2026-04-08T09:05:15.031Z] iter=494 turn=5 INFO:   -> ok: Created src/__tests__/skills.test.ts (4696 chars)
+[2026-04-08T09:05:15.032Z] iter=494 turn=6 INFO: Turn 6/25
+[2026-04-08T09:05:18.615Z] iter=494 turn=6 INFO: Agent: **Goal 1 (skills.ts + tests): DONE**
+**Goal 2 (tool-registry.ts searchTools + hidden field + tests): IN PROGRESS**
+
+Continuing now:
+[2026-04-08T09:05:18.616Z] iter=494 turn=6 INFO: read_file: src/tool-registry.ts
+[2026-04-08T09:05:18.618Z] iter=494 turn=6 INFO:   -> ok (3412 chars)
+[2026-04-08T09:05:18.620Z] iter=494 turn=7 INFO: Turn 7/25
+[2026-04-08T09:05:29.877Z] iter=494 turn=7 INFO: Agent: Now I have the full picture. I'll add `hidden` to `ToolDef`/`RegisteredTool`, add `searchTools`, and adjust `getDefinitions` to filter hidden tools:
+[2026-04-08T09:05:29.877Z] iter=494 turn=7 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-08T09:05:29.878Z] iter=494 turn=7 INFO:   -> ok: Patched src/tool-registry.ts: -10 +17 lines
+
+Context after patch:
+105 |   ctx: ToolContext,
+106 | ) => Promise<ToolResult>;
+107 | 
+108 | export interface ToolOptions {
+109 |   /** Default timeout in seconds for this tool (used when caller doesn't specify) */
+110 |   defaultTimeout?: number;
+111 |   /**
+112 |    * When true, this tool is excluded from the default system-prompt tool listing.
+113 |    * It is still callable and findable via searchTools().
+114 |    */
+115 |   hidden?: boolean;
+116 | }
+117 | 
+118 | export interface RegisteredTool {
+119 |   definition: Anthropic.Tool;
+120 |   handler: ToolHandler;
+121 |   defaultTimeout?: number;
+122 |   /** Hidden tools don't appear in getDefinitions() but are discoverable via searchTools() */
+123 |   hidden?: boolean;
+124 | }
+125 | 
+126 | // ─── Registry ───────────────────────────────────────────────
+127 | 
+[2026-04-08T09:05:29.879Z] iter=494 turn=8 INFO: Turn 8/25
+[2026-04-08T09:05:35.098Z] iter=494 turn=8 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-08T09:05:35.099Z] iter=494 turn=8 INFO:   -> ok: Patched src/tool-registry.ts: -7 +8 lines
+
+Context after patch:
+128 | export class ToolRegistry {
+129 |   private tools: Map<string, RegisteredTool> = new Map();
+130 | 
+131 |   register(definition: Anthropic.Tool, handler: ToolHandler, options?: ToolOptions): void {
+132 |     this.tools.set(definition.name, {
+133 |       definition,
+134 |       handler,
+135 |       defaultTimeout: options?.defaultTimeout,
+136 |       hidden: options?.hidden,
+137 |     });
+138 |   }
+139 | 
+140 |   get(name: string): RegisteredTool | undefined {
+141 |     return this.tools.get(name);
+[2026-04-08T09:05:35.099Z] iter=494 turn=9 INFO: Turn 9/25
+[2026-04-08T09:05:43.873Z] iter=494 turn=9 INFO: write_file: src/tool-registry.ts (patch)
+[2026-04-08T09:05:43.874Z] iter=494 turn=9 INFO:   -> ok: Patched src/tool-registry.ts: -16 +59 lines
+
+Context after patch:
+146 |     return this.tools.get(name)?.defaultTimeout;
+147 |   }
+148 | 
+149 |   /**
+150 |    * Returns tool definitions for the system prompt.
+151 |    * Hidden tools are excluded — they're discoverable via searchTools().
+152 |    */
+153 |   getDefinitions(): Anthropic.Tool[] {
+154 |     return Array.from(this.tools.values())
+155 |       .filter((t) => !t.hidden)
+156 |       .map((t) => t.definition);
+157 |   }
+158 | 
+159 |   /**
+160 |    * Returns ALL tool definitions including hidden ones (for dispatching).
+161 |    */
+162 |   getAllDefinitions(): Anthropic.Tool[] {
+163 |     return Array.from(this.tools.values()).map((t) => t.definition);
+164 |   }
+165 | 
+166 |   getNames(): string[] {
+167 |     return Array.from(this.tools.keys());
+168 |   }
+169 | 
+170 |   has(name: string): boolean {
+171 |     return this.tools.has(name);
+172 |   }
+173 | 
+174 |   size(): number {
+175 |     return this.tools.size;
+176 |   }
+177 | 
+178 |   /**
+179 |    * Fuzzy substring search across tool name + description.
+180 |    * Returns all matching tools (including hidden ones) sorted by relevance.
+181 |    */
+182 |   searchTools(query: string): RegisteredTool[] {
+183 |     const q = query.toLowerCase();
+184 |     const results: Array<{ tool: RegisteredTool; score: number }> = [];
+185 | 
+186 |     for (const tool of this.tools.values()) {
+187 |       const name = tool.definition.name.toLowerCase();
+188 |       const desc = (
+189 |         typeof tool.definition.description === "string"
+190 |           ? tool.definition.description
+191 |           : ""
+192 |       ).toLowerCase();
+193 | 
+194 |       let score = 0;
+195 |       if (name === q) score = 10;
+196 |       else if (name.startsWith(q)) score = 7;
+197 |       else if (name.includes(q)) score = 5;
+198 |       if (desc.includes(q)) score += 3;
+199 | 
+200 |       if (score > 0) results.push({ tool, score });
+201 |     }
+202 | 
+203 |     return results
+204 |       .sort((a, b) => b.score - a.score)
+205 |       .map((r) => r.tool);
+206 |   }
+207 | }
+208 | 
+209 | // ─── Default Registry ───────────────────────────────────────
+210 | 
+[2026-04-08T09:05:43.874Z] iter=494 turn=10 INFO: Turn 10/25
+[2026-04-08T09:06:00.070Z] iter=494 turn=10 INFO: Agent: I've changed `src/skills.ts` (new, ~90 LOC), `src/__tests__/skills.test.ts` (new, ~120 LOC), and `src/tool-registry.ts` (modified, +50 LOC). Now writing the last test file, then running checks.
+[2026-04-08T09:06:00.071Z] iter=494 turn=10 INFO: write_file: src/__tests__/tool-search.test.ts (write)
+[2026-04-08T09:06:00.071Z] iter=494 turn=10 INFO:   -> ok: Created src/__tests__/tool-search.test.ts (4081 chars)
+[2026-04-08T09:06:00.072Z] iter=494 turn=11 INFO: Turn 11/25
+[2026-04-08T09:06:05.284Z] iter=494 turn=11 INFO: $ cd /Users/austin/Documents/autoagent && npx vitest run src/__tests__/skills.test.ts src/__tests__/tool-search.test.ts 2>&1 | tail -30
+[2026-04-08T09:06:06.330Z] iter=494 turn=11 INFO:   -> exit=0 (332 chars)
+[2026-04-08T09:06:06.330Z] iter=494 turn=12 INFO: Turn 12/25
+[2026-04-08T09:06:08.432Z] iter=494 turn=12 INFO: Agent: All 25 tests pass. Now TypeScript check:
+[2026-04-08T09:06:08.433Z] iter=494 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-08T09:06:09.637Z] iter=494 turn=12 INFO:   -> exit=0 (11 chars)
+[2026-04-08T09:06:09.638Z] iter=494 turn=13 INFO: Turn 13/25
+[2026-04-08T09:06:15.274Z] iter=494 turn=13 INFO: Agent: Clean. Writing memory and updating goals now.
+[2026-04-08T09:06:15.275Z] iter=494 turn=13 INFO: save_memory: "[Engineer] Iteration 494 — Skills + Tool Search"
+[2026-04-08T09:06:15.276Z] iter=494 turn=13 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T09:06:15.277Z] iter=494 turn=14 INFO: Turn 14/25
+[2026-04-08T09:06:34.444Z] iter=494 turn=14 INFO: write_file: goals.md (write)
+[2026-04-08T09:06:34.445Z] iter=494 turn=14 INFO:   -> ok: Updated goals.md (2301 chars, -4 lines delta)
+[2026-04-08T09:06:34.445Z] iter=494 turn=15 INFO: Turn 15/25
+[2026-04-08T09:06:36.438Z] iter=494 turn=15 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 && echo "TSC_CLEAN"
+[2026-04-08T09:06:37.647Z] iter=494 turn=15 INFO:   -> exit=0 (10 chars)
+[2026-04-08T09:06:37.647Z] iter=494 turn=16 INFO: Turn 16/25
+[2026-04-08T09:06:39.926Z] iter=494 turn=16 INFO: Agent: All done. TypeScript is clean, goals updated, memory saved.
+[2026-04-08T09:06:39.927Z] iter=494 turn=16 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T09:06:39.927Z] iter=494 turn=16 INFO: RESTART signal
+[2026-04-08T09:06:39.927Z] iter=494 turn=16 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T09:06:41.037Z] iter=494 turn=16 INFO: Compilation OK
+[2026-04-08T09:06:51.013Z] iter=494 turn=16 INFO: Cache persisted: 63 entries to .autoagent-cache.json
+[2026-04-08T09:06:51.013Z] iter=494 turn=16 INFO: Cache stats: 0 hits, 1 misses, 63 entries, 7 invalidations (5 entries removed)
+[2026-04-08T09:06:51.013Z] iter=494 turn=16 INFO: Tool cache stats
+[2026-04-08T09:06:51.013Z] iter=494 turn=16 INFO: Tool timing: bash: 6x, avg=584ms, total=3501ms; write_file: 7x, avg=1ms, total=9ms; read_file: 1x, avg=3ms, total=3ms; read_scratchpad: 1x, avg=2ms, total=2ms; save_memory: 1x, avg=2ms, total=2ms; think: 1x, avg=0ms, total=0ms
+[2026-04-08T09:06:51.013Z] iter=494 turn=16 INFO: Tool timing stats
+[2026-04-08T09:06:59.251Z] iter=494 turn=16 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 494: predicted 15 turns, actual 16 turns, ratio 1.07**
+[2026-04-08T09:07:02.445Z] iter=494 turn=16 INFO: Pre-commit review (2967in/55out): LGTM. The tests are well-structured, use proper ESM imports with `.js` extensions, correctly isolate filesystem state with `beforeEach`/`afterEach` temp dirs, and cover meaningful edge cases without u
