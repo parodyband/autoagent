@@ -45,12 +45,26 @@ export interface CommandContext {
   repoMapRef: React.MutableRefObject<RepoMap | null>;
   sessionList: SessionInfo[];
   setSessionList: React.Dispatch<React.SetStateAction<SessionInfo[]>>;
+  autoAccept: boolean;
+  setAutoAccept: (b: boolean) => void;
   exit: () => void;
 }
 
 type CommandHandler = (ctx: CommandContext, args: string) => Promise<boolean>;
 
 const commands: Record<string, CommandHandler> = {
+  "/autoaccept": async (ctx) => {
+    const next = !ctx.autoAccept;
+    ctx.setAutoAccept(next);
+    ctx.addMessage({
+      role: "assistant",
+      content: next
+        ? "Auto-accept enabled — edits will be applied without confirmation."
+        : "Auto-accept disabled — edits will require Y/N confirmation.",
+    });
+    return true;
+  },
+
   "/clear": async (ctx) => {
     ctx.orchestratorRef.current?.clearHistory();
     ctx.setMessages([]);
@@ -137,7 +151,8 @@ const commands: Record<string, CommandHandler> = {
         `Current model: ${ctx.currentModel}`,
         "",
         "Available commands:",
-        "  /help     — Show this help message",
+        "  /help       — Show this help message",
+        "  /autoaccept — Toggle auto-accept edits (skip Y/N prompts)",
         "  /init     — Analyze repo and generate/update .autoagent.md",
         "  /status   — Show session stats (turns, tokens, cost, model)",
         "  /find Q   — Fuzzy search files & symbols in the repo",

@@ -202,7 +202,7 @@ function ContextIndicator({ tokensUsed, threshold }: { tokensUsed: number; thres
   );
 }
 
-function Header({ model, git, cost, contextUsage }: { model: string; git: GitInfo; cost?: number; contextUsage?: { tokensUsed: number; threshold: number } }) {
+function Header({ model, git, cost, contextUsage, autoAccept }: { model: string; git: GitInfo; cost?: number; contextUsage?: { tokensUsed: number; threshold: number }; autoAccept?: boolean }) {
   const modelLabel = model.includes("haiku") ? "haiku" : model.includes("opus") ? "opus" : "sonnet";
   const costStr = cost != null ? (cost < 0.01 ? "<$0.01" : `${cost.toFixed(2)}`) : "";
   return (
@@ -216,6 +216,7 @@ function Header({ model, git, cost, contextUsage }: { model: string; git: GitInf
         <GitBadge git={git} />
       </Box>
       <Box gap={2}>
+        {autoAccept && <Text color="green" dimColor>auto</Text>}
         {contextUsage && contextUsage.tokensUsed > 0
           ? <ContextIndicator tokensUsed={contextUsage.tokensUsed} threshold={contextUsage.threshold} />
           : null}
@@ -262,30 +263,41 @@ function MessageDisplay({ msg }: { msg: Message }) {
   );
 }
 
-/** Diff preview display — shown when agent proposes a file edit (or batch of edits). */
+/** Diff preview display — compact summary with expandable detail. */
 function DiffPreviewDisplay({ diff, filePath }: { diff: string; filePath: string }) {
-  const lines = diff.split("\n");
+  const allLines = diff.split("\n");
+  const added = allLines.filter(l => l.startsWith("+") && !l.startsWith("+++")).length;
+  const removed = allLines.filter(l => l.startsWith("-") && !l.startsWith("---")).length;
   const isBatch = /^\d+ files$/.test(filePath);
-  const header = isBatch ? `📝 Batch edit: ${filePath} changed` : `📝 ${filePath}`;
+  const header = isBatch ? filePath : path.basename(filePath);
+  // Show only hunk headers + changed lines (max ~15 lines)
+  const preview: { line: string; idx: number }[] = [];
+  for (let i = 0; i < allLines.length && preview.length < 15; i++) {
+    const l = allLines[i];
+    if (l.startsWith("@@") || l.startsWith("+") || l.startsWith("-")) {
+      if (l.startsWith("---") || l.startsWith("+++")) continue;
+      preview.push({ line: l, idx: i });
+    }
+  }
+  const truncated = allLines.length > 15 && preview.length >= 15;
+
   return (
     <Box flexDirection="column" borderStyle="round" borderColor="yellow" paddingX={1} marginTop={1}>
-      <Text bold>{header}</Text>
-      {lines.map((line, i) => {
-        if (line.startsWith("---") || line.startsWith("+++")) {
-          return <Text key={i} color="yellow" bold>{line}</Text>;
-        }
-        if (line.startsWith("+")) {
-          return <Text key={i} color="green">{line}</Text>;
-        }
-        if (line.startsWith("-")) {
-          return <Text key={i} color="red">{line}</Text>;
-        }
-        if (line.startsWith("@@")) {
-          return <Text key={i} color="cyan">{line}</Text>;
-        }
-        return <Text key={i}>{line}</Text>;
+      <Box>
+        <Text bold color="yellow">✏️  {header} </Text>
+        <Text color="green" dimColor>{added > 0 ? `+${added}` : ""}</Text>
+        {added > 0 && removed > 0 && <Text color="gray" dimColor> </Text>}
+        <Text color="red" dimColor>{removed > 0 ? `-${removed}` : ""}</Text>
+        {!isBatch && filePath.includes("/") && <Text color="gray" dimColor> {path.dirname(filePath)}/</Text>}
+      </Box>
+      {preview.map(({ line, idx }) => {
+        if (line.startsWith("@@")) return <Text key={idx} color="cyan" dimColor>{line}</Text>;
+        if (line.startsWith("+")) return <Text key={idx} color="green">{line}</Text>;
+        if (line.startsWith("-")) return <Text key={idx} color="red">{line}</Text>;
+        return <Text key={idx}>{line}</Text>;
       })}
-      <Text bold color="yellow">[Y]es / [n]o — Apply this change?</Text>
+      {truncated && <Text color="gray" dimColor>  … {allLines.length - 15} more lines</Text>}
+      <Text bold color="yellow">[Y]es / [n]o</Text>
     </Box>
   );
 }
@@ -375,6 +387,7 @@ function App() {
   const [activePlan, setActivePlan] = useState<EditPlan | null>(null);
   const [confirmExit, setConfirmExit] = useState(false);
   const [pendingDiff, setPendingDiff] = useState<PendingDiff | null>(null);
+  const [autoAccept, setAutoAccept] = useState(noConfirm);
   const [externalChanges, setExternalChanges] = useState<string[]>([]);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [footerStats, setFooterStats] = useState<FooterStats>({
@@ -386,6 +399,7 @@ function App() {
     contextLimit: 200_000,
   });
   const orchestratorRef = useRef<Orchestrator | null>(null);
+  const autoAcceptRef = useRef(noConfirm);
   const { exit } = useApp();
   const gitInfo = useGitStatus(workDir);
 
@@ -396,6 +410,9 @@ function App() {
     fileSuggestions, fileSuggestionIdx, setFileSuggestionIdx,
     repoMapRef, handleInputChange: onFileInput, acceptFileSuggestion, dismissSuggestions,
   } = useFileSuggestions({ workDir, setInput: (fn) => setInput(fn) });
+
+  // Keep autoAccept ref in sync with state
+  useEffect(() => { autoAcceptRef.current = autoAccept; }, [autoAccept]);
 
   // Initialize orchestrator
   useEffect(() => {
@@ -414,13 +431,20 @@ function App() {
       onPlan: (plan: EditPlan) => {
         setActivePlan(plan);
       },
-      onDiffPreview: noConfirm ? undefined : (diff, filePath) => {
+      onDiffPreview: (diff, filePath) => {
+        // Check autoAccept at call time via ref
+        if (autoAcceptRef.current) return Promise.resolve(true);
         return new Promise<boolean>((resolve) => {
           setPendingDiff({ diff, filePath, resolve });
         });
       },
       onContextBudget: (ratio) => {
         setContextBudgetRatio(ratio);
+        // Update footer stats live during tool loops so context counter stays current
+        setFooterStats(prev => ({
+          ...prev,
+          contextTokens: Math.round(ratio * prev.contextLimit),
+        }));
       },
       onContextWarning: () => {
         setContextWarning(true);
@@ -471,12 +495,15 @@ function App() {
       return;
     }
     // Scroll-back: Up/Down arrow when input is empty and not loading
+    // Shift+arrow or pageUp/pageDown for larger jumps
     if (key.upArrow && !loading && input === "") {
-      setScrollOffset(prev => Math.min(prev + 3, Math.max(0, messages.length - 1)));
+      const step = key.shift ? 15 : 3;
+      setScrollOffset(prev => Math.min(prev + step, Math.max(0, messages.length)));
       return;
     }
     if (key.downArrow && !loading && input === "") {
-      setScrollOffset(prev => Math.max(prev - 3, 0));
+      const step = key.shift ? 15 : 3;
+      setScrollOffset(prev => Math.max(prev - step, 0));
       return;
     }
     // Tab: cycle through / accept file suggestions
@@ -537,6 +564,8 @@ function App() {
         repoMapRef,
         sessionList,
         setSessionList,
+        autoAccept,
+        setAutoAccept,
         exit,
       };
       const handled = await routeCommand(trimmed, ctx);
@@ -638,7 +667,7 @@ function App() {
 
   return (
     <Box flexDirection="column" paddingX={1}>
-      <Header model={currentModel} git={gitInfo} cost={footerStats.cost} contextUsage={footerStats.contextTokens > 0 ? { tokensUsed: footerStats.contextTokens, threshold: footerStats.contextLimit } : undefined} />
+      <Header model={currentModel} git={gitInfo} cost={footerStats.cost} contextUsage={footerStats.contextTokens > 0 ? { tokensUsed: footerStats.contextTokens, threshold: footerStats.contextLimit } : undefined} autoAccept={autoAccept} />
 
       {/* Messages — clean, auto-cleared view */}
       <Box flexDirection="column" flexGrow={1}>
@@ -686,7 +715,7 @@ function App() {
       ) : externalChanges.length > 0 ? (
         <Box paddingLeft={2}><Text color="gray" dimColor>Files changed externally: {externalChanges.map(p => path.basename(p)).join(", ")}</Text></Box>
       ) : scrollOffset > 0 ? (
-        <Box paddingLeft={2}><Text color="gray" dimColor>↑{scrollOffset} — ↓ to return</Text></Box>
+        <Box paddingLeft={2}><Text color="gray" dimColor>↑{scrollOffset} — ↓ to return · shift+arrow for fast scroll</Text></Box>
       ) : contextWarning ? (
         <Box paddingLeft={2}><Text color="yellow" dimColor>Context 80%+ — /clear or start new session</Text></Box>
       ) : null}

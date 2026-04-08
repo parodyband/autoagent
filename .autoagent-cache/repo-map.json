@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1775668815116,
+  "generatedAt": 1775676115931,
   "files": [
     {
       "path": "src/file-cache.ts",
@@ -1342,7 +1342,7 @@
           "from": "./tui-commands.js"
         }
       ],
-      "lastModified": 1775637606635.996
+      "lastModified": 1775673494265.0903
     },
     {
       "path": "src/virtual-message-list.tsx",
@@ -1575,353 +1575,6 @@
       "lastModified": 1775634082196.4019
     },
     {
-      "path": "src/orchestrator.ts",
-      "exports": [
-        {
-          "name": "PARALLEL_SAFE_TOOLS",
-          "kind": "const",
-          "line": 61,
-          "exported": true
-        },
-        {
-          "name": "MICRO_COMPACT_THRESHOLD",
-          "kind": "const",
-          "line": 76,
-          "exported": true
-        },
-        {
-          "name": "COMPACT_TIER1_THRESHOLD",
-          "kind": "const",
-          "line": 78,
-          "exported": true
-        },
-        {
-          "name": "COMPACT_THRESHOLD",
-          "kind": "const",
-          "line": 80,
-          "exported": true
-        },
-        {
-          "name": "CONTEXT_WARNING_THRESHOLD",
-          "kind": "const",
-          "line": 82,
-          "exported": true
-        },
-        {
-          "name": "PRUNE_THRESHOLD",
-          "kind": "const",
-          "line": 83,
-          "exported": true
-        },
-        {
-          "name": "selectCompactionTier",
-          "kind": "function",
-          "line": 89,
-          "exported": true
-        },
-        {
-          "name": "MODEL_PRICING",
-          "kind": "const",
-          "line": 97,
-          "exported": true
-        },
-        {
-          "name": "MODEL_CONTEXT_WINDOW",
-          "kind": "const",
-          "line": 103,
-          "exported": true
-        },
-        {
-          "name": "ConversationCheckpoint",
-          "kind": "interface",
-          "line": 126,
-          "exported": true
-        },
-        {
-          "name": "MAX_CHECKPOINTS",
-          "kind": "const",
-          "line": 134,
-          "exported": true
-        },
-        {
-          "name": "OrchestratorOptions",
-          "kind": "interface",
-          "line": 136,
-          "exported": true
-        },
-        {
-          "name": "OrchestratorResult",
-          "kind": "interface",
-          "line": 181,
-          "exported": true
-        },
-        {
-          "name": "CostInfo",
-          "kind": "interface",
-          "line": 190,
-          "exported": true
-        },
-        {
-          "name": "TaskReflection",
-          "kind": "interface",
-          "line": 205,
-          "exported": true
-        },
-        {
-          "name": "routeModel",
-          "kind": "function",
-          "line": 246,
-          "exported": true
-        },
-        {
-          "name": "computeCost",
-          "kind": "function",
-          "line": 274,
-          "exported": true
-        },
-        {
-          "name": "buildSystemPrompt",
-          "kind": "function",
-          "line": 286,
-          "exported": true
-        },
-        {
-          "name": "buildCachedSystem",
-          "kind": "function",
-          "line": 371,
-          "exported": true
-        },
-        {
-          "name": "injectMessageCacheBreakpoints",
-          "kind": "function",
-          "line": 382,
-          "exported": true
-        },
-        {
-          "name": "isToolError",
-          "kind": "function",
-          "line": 481,
-          "exported": true
-        },
-        {
-          "name": "pruneStaleToolResults",
-          "kind": "function",
-          "line": 542,
-          "exported": true
-        },
-        {
-          "name": "Orchestrator",
-          "kind": "class",
-          "line": 1078,
-          "exported": true
-        },
-        {
-          "name": "runSingleTask",
-          "kind": "function",
-          "line": 2541,
-          "exported": true
-        }
-      ],
-      "imports": [
-        {
-          "names": [
-            "* as path"
-          ],
-          "from": "node:path"
-        },
-        {
-          "names": [
-            "Anthropic"
-          ],
-          "from": "@anthropic-ai/sdk"
-        },
-        {
-          "names": [
-            "compressToolOutput"
-          ],
-          "from": "./tool-output-compressor.js"
-        },
-        {
-          "names": [
-            "fingerprintRepo"
-          ],
-          "from": "./repo-context.js"
-        },
-        {
-          "names": [
-            "rankFiles"
-          ],
-          "from": "./file-ranker.js"
-        },
-        {
-          "names": [
-            "buildRepoMap",
-            "formatRepoMap",
-            "rankSymbols",
-            "truncateRepoMap",
-            "saveRepoMapCache",
-            "loadRepoMapCache",
-            "getStaleFiles",
-            "updateRepoMapIncremental",
-            "cacheToRepoMap"
-          ],
-          "from": "./tree-sitter-map.js"
-        },
-        {
-          "names": [
-            "shouldDecompose",
-            "decomposeTasks",
-            "formatSubtasks"
-          ],
-          "from": "./task-decomposer.js"
-        },
-        {
-          "names": [
-            "runVerification",
-            "formatVerificationResults"
-          ],
-          "from": "./verification.js"
-        },
-        {
-          "names": [
-            "createDefaultRegistry",
-            "buildSearchIndex"
-          ],
-          "from": "./tool-registry.js"
-        },
-        {
-          "names": [
-            "getProjectMemoryBlock",
-            "saveToLocalMemory"
-          ],
-          "from": "./project-memory.js"
-        },
-        {
-          "names": [
-            "getSkillsMenu"
-          ],
-          "from": "./skills.js"
-        },
-        {
-          "names": [
-            "CostTracker"
-          ],
-          "from": "./cost-tracker.js"
-        },
-        {
-          "names": [
-            "checkpointManager"
-          ],
-          "from": "./checkpoint.js"
-        },
-        {
-          "names": [
-            "autoCommit",
-            "type AutoCommitResult"
-          ],
-          "from": "./auto-commit.js"
-        },
-        {
-          "names": [
-            "runDiagnostics"
-          ],
-          "from": "./diagnostics.js"
-        },
-        {
-          "names": [
-            "findRelatedTests",
-            "runRelatedTests"
-          ],
-          "from": "./test-runner.js"
-        },
-        {
-          "names": [
-            "computeUnifiedDiff"
-          ],
-          "from": "./diff-preview.js"
-        },
-        {
-          "names": [
-            "autoLoadContext",
-            "extractFileReferences",
-            "loadFileReferences",
-            "stripFileReferences",
-            "resolveImportGraph",
-            "getImporters"
-          ],
-          "from": "./context-loader.js"
-        },
-        {
-          "names": [
-            "enhanceToolError",
-            "retryWithBackoff"
-          ],
-          "from": "./tool-recovery.js"
-        },
-        {
-          "names": [
-            "detectProject"
-          ],
-          "from": "./project-detector.js"
-        },
-        {
-          "names": [
-            "detectLoop"
-          ],
-          "from": "./loop-detector.js"
-        },
-        {
-          "names": [
-            "loadHooksConfig",
-            "runHooks",
-            "type HooksConfig"
-          ],
-          "from": "./hooks.js"
-        },
-        {
-          "names": [
-            "ReflectionStore",
-            "type ToolCallRecord"
-          ],
-          "from": "./reflection.js"
-        },
-        {
-          "names": [
-            "aggregate",
-            "savePatternCache",
-            "loadPatternCache"
-          ],
-          "from": "./reflection-aggregator.js"
-        },
-        {
-          "names": [
-            "selfVerify"
-          ],
-          "from": "./self-verify.js"
-        },
-        {
-          "names": [
-            "* as fs"
-          ],
-          "from": "fs"
-        },
-        {
-          "names": [
-            "FileWatcher"
-          ],
-          "from": "./file-watcher.js"
-        },
-        {
-          "names": [
-            "scoredPrune"
-          ],
-          "from": "./context-pruner.js"
-        }
-      ],
-      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
-      "lastModified": 1775639367641.9424
-    },
-    {
       "path": "src/skills.ts",
       "exports": [
         {
@@ -2124,6 +1777,401 @@
       "lastModified": 1775638625893.53
     },
     {
+      "path": "src/__tests__/checkpoint-transaction.test.ts",
+      "exports": [],
+      "imports": [
+        {
+          "names": [],
+          "from": "vitest"
+        },
+        {
+          "names": [],
+          "from": "node:fs"
+        },
+        {
+          "names": [],
+          "from": "node:path"
+        },
+        {
+          "names": [],
+          "from": "../checkpoint.js"
+        }
+      ],
+      "lastModified": 1775638445694.5254
+    },
+    {
+      "path": "src/token-estimator.ts",
+      "exports": [
+        {
+          "name": "estimateTokens",
+          "kind": "function",
+          "line": 13,
+          "exported": true
+        },
+        {
+          "name": "estimateMessageTokens",
+          "kind": "function",
+          "line": 44,
+          "exported": true
+        },
+        {
+          "name": "shouldCompact",
+          "kind": "function",
+          "line": 60,
+          "exported": true
+        }
+      ],
+      "imports": [],
+      "lastModified": 1775638842646.4307
+    },
+    {
+      "path": "src/orchestrator.ts",
+      "exports": [
+        {
+          "name": "PARALLEL_SAFE_TOOLS",
+          "kind": "const",
+          "line": 61,
+          "exported": true
+        },
+        {
+          "name": "MICRO_COMPACT_THRESHOLD",
+          "kind": "const",
+          "line": 76,
+          "exported": true
+        },
+        {
+          "name": "COMPACT_TIER1_THRESHOLD",
+          "kind": "const",
+          "line": 78,
+          "exported": true
+        },
+        {
+          "name": "COMPACT_THRESHOLD",
+          "kind": "const",
+          "line": 80,
+          "exported": true
+        },
+        {
+          "name": "CONTEXT_WARNING_THRESHOLD",
+          "kind": "const",
+          "line": 82,
+          "exported": true
+        },
+        {
+          "name": "PRUNE_THRESHOLD",
+          "kind": "const",
+          "line": 83,
+          "exported": true
+        },
+        {
+          "name": "selectCompactionTier",
+          "kind": "function",
+          "line": 89,
+          "exported": true
+        },
+        {
+          "name": "MODEL_PRICING",
+          "kind": "const",
+          "line": 97,
+          "exported": true
+        },
+        {
+          "name": "MODEL_CONTEXT_WINDOW",
+          "kind": "const",
+          "line": 103,
+          "exported": true
+        },
+        {
+          "name": "ConversationCheckpoint",
+          "kind": "interface",
+          "line": 126,
+          "exported": true
+        },
+        {
+          "name": "MAX_CHECKPOINTS",
+          "kind": "const",
+          "line": 134,
+          "exported": true
+        },
+        {
+          "name": "OrchestratorOptions",
+          "kind": "interface",
+          "line": 136,
+          "exported": true
+        },
+        {
+          "name": "OrchestratorResult",
+          "kind": "interface",
+          "line": 181,
+          "exported": true
+        },
+        {
+          "name": "CostInfo",
+          "kind": "interface",
+          "line": 190,
+          "exported": true
+        },
+        {
+          "name": "TaskReflection",
+          "kind": "interface",
+          "line": 205,
+          "exported": true
+        },
+        {
+          "name": "routeModel",
+          "kind": "function",
+          "line": 246,
+          "exported": true
+        },
+        {
+          "name": "computeCost",
+          "kind": "function",
+          "line": 274,
+          "exported": true
+        },
+        {
+          "name": "buildSystemPrompt",
+          "kind": "function",
+          "line": 286,
+          "exported": true
+        },
+        {
+          "name": "buildCachedSystem",
+          "kind": "function",
+          "line": 374,
+          "exported": true
+        },
+        {
+          "name": "injectMessageCacheBreakpoints",
+          "kind": "function",
+          "line": 385,
+          "exported": true
+        },
+        {
+          "name": "isToolError",
+          "kind": "function",
+          "line": 484,
+          "exported": true
+        },
+        {
+          "name": "pruneStaleToolResults",
+          "kind": "function",
+          "line": 545,
+          "exported": true
+        },
+        {
+          "name": "Orchestrator",
+          "kind": "class",
+          "line": 1082,
+          "exported": true
+        },
+        {
+          "name": "runSingleTask",
+          "kind": "function",
+          "line": 2545,
+          "exported": true
+        }
+      ],
+      "imports": [
+        {
+          "names": [
+            "* as path"
+          ],
+          "from": "node:path"
+        },
+        {
+          "names": [
+            "Anthropic"
+          ],
+          "from": "@anthropic-ai/sdk"
+        },
+        {
+          "names": [
+            "compressToolOutput"
+          ],
+          "from": "./tool-output-compressor.js"
+        },
+        {
+          "names": [
+            "fingerprintRepo"
+          ],
+          "from": "./repo-context.js"
+        },
+        {
+          "names": [
+            "rankFiles"
+          ],
+          "from": "./file-ranker.js"
+        },
+        {
+          "names": [
+            "buildRepoMap",
+            "formatRepoMap",
+            "rankSymbols",
+            "truncateRepoMap",
+            "saveRepoMapCache",
+            "loadRepoMapCache",
+            "getStaleFiles",
+            "updateRepoMapIncremental",
+            "cacheToRepoMap"
+          ],
+          "from": "./tree-sitter-map.js"
+        },
+        {
+          "names": [
+            "shouldDecompose",
+            "decomposeTasks",
+            "formatSubtasks"
+          ],
+          "from": "./task-decomposer.js"
+        },
+        {
+          "names": [
+            "runVerification",
+            "formatVerificationResults"
+          ],
+          "from": "./verification.js"
+        },
+        {
+          "names": [
+            "createDefaultRegistry",
+            "buildSearchIndex"
+          ],
+          "from": "./tool-registry.js"
+        },
+        {
+          "names": [
+            "getProjectMemoryBlock",
+            "saveToLocalMemory"
+          ],
+          "from": "./project-memory.js"
+        },
+        {
+          "names": [
+            "getSkillsMenu"
+          ],
+          "from": "./skills.js"
+        },
+        {
+          "names": [
+            "CostTracker"
+          ],
+          "from": "./cost-tracker.js"
+        },
+        {
+          "names": [
+            "checkpointManager"
+          ],
+          "from": "./checkpoint.js"
+        },
+        {
+          "names": [
+            "autoCommit",
+            "type AutoCommitResult"
+          ],
+          "from": "./auto-commit.js"
+        },
+        {
+          "names": [
+            "runDiagnostics"
+          ],
+          "from": "./diagnostics.js"
+        },
+        {
+          "names": [
+            "findRelatedTests",
+            "runRelatedTests"
+          ],
+          "from": "./test-runner.js"
+        },
+        {
+          "names": [
+            "computeUnifiedDiff"
+          ],
+          "from": "./diff-preview.js"
+        },
+        {
+          "names": [
+            "autoLoadContext",
+            "extractFileReferences",
+            "loadFileReferences",
+            "stripFileReferences",
+            "resolveImportGraph",
+            "getImporters"
+          ],
+          "from": "./context-loader.js"
+        },
+        {
+          "names": [
+            "enhanceToolError",
+            "retryWithBackoff"
+          ],
+          "from": "./tool-recovery.js"
+        },
+        {
+          "names": [
+            "detectProject"
+          ],
+          "from": "./project-detector.js"
+        },
+        {
+          "names": [
+            "detectLoop"
+          ],
+          "from": "./loop-detector.js"
+        },
+        {
+          "names": [
+            "loadHooksConfig",
+            "runHooks",
+            "type HooksConfig"
+          ],
+          "from": "./hooks.js"
+        },
+        {
+          "names": [
+            "ReflectionStore",
+            "type ToolCallRecord"
+          ],
+          "from": "./reflection.js"
+        },
+        {
+          "names": [
+            "aggregate",
+            "savePatternCache",
+            "loadPatternCache"
+          ],
+          "from": "./reflection-aggregator.js"
+        },
+        {
+          "names": [
+            "selfVerify"
+          ],
+          "from": "./self-verify.js"
+        },
+        {
+          "names": [
+            "* as fs"
+          ],
+          "from": "fs"
+        },
+        {
+          "names": [
+            "FileWatcher"
+          ],
+          "from": "./file-watcher.js"
+        },
+        {
+          "names": [
+            "scoredPrune"
+          ],
+          "from": "./context-pruner.js"
+        }
+      ],
+      "parseError": "tree-sitter failed: Error: Invalid argument; used regex fallback",
+      "lastModified": 1775673430502.849
+    },
+    {
       "path": "src/tool-registry.ts",
       "exports": [
         {
@@ -2257,55 +2305,7 @@
           "from": "glob"
         }
       ],
-      "lastModified": 1775668781947.2834
-    },
-    {
-      "path": "src/__tests__/checkpoint-transaction.test.ts",
-      "exports": [],
-      "imports": [
-        {
-          "names": [],
-          "from": "vitest"
-        },
-        {
-          "names": [],
-          "from": "node:fs"
-        },
-        {
-          "names": [],
-          "from": "node:path"
-        },
-        {
-          "names": [],
-          "from": "../checkpoint.js"
-        }
-      ],
-      "lastModified": 1775638445694.5254
-    },
-    {
-      "path": "src/token-estimator.ts",
-      "exports": [
-        {
-          "name": "estimateTokens",
-          "kind": "function",
-          "line": 13,
-          "exported": true
-        },
-        {
-          "name": "estimateMessageTokens",
-          "kind": "function",
-          "line": 44,
-          "exported": true
-        },
-        {
-          "name": "shouldCompact",
-          "kind": "function",
-          "line": 60,
-          "exported": true
-        }
-      ],
-      "imports": [],
-      "lastModified": 1775638842646.4307
+      "lastModified": 1775669455963.596
     }
   ]
 }

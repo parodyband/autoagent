@@ -701,9 +701,10 @@ async function runAgentLoop(
     apiMessages.push({ role: "assistant", content: finalMessage.content });
 
     // Emit context budget ratio after each round so TUI footer updates live
-    // Use cumulative input tokens (not per-call) so ratio reflects how full the context window is
+    // Use lastInput (the actual input tokens for this API call, which IS the current context size)
+    const contextWindow = MODEL_CONTEXT_WINDOW[model] ?? 200_000;
     if (onContextBudget) {
-      onContextBudget(cumulativeIn / COMPACT_TIER1_THRESHOLD);
+      onContextBudget(lastInput / contextWindow);
     }
 
     // Mid-loop compaction: if context is growing large, compact between rounds

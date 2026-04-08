@@ -1,16 +1,17 @@
 {
-  "windowSize": 5,
-  "totalTasks": 5,
+  "windowSize": 6,
+  "totalTasks": 6,
   "successRate": 1,
   "topPatterns": [],
   "toolErrorRates": {
     "read_file": 0,
     "bash": 0,
     "save_memory": 0,
-    "list_files": 1
+    "list_files": 1,
+    "write_file": 0
   },
   "avgRetryRate": 0,
   "compactionRate": 0,
   "guidancePrompt": "",
-  "generatedAt": "2026-04-08T17:29:42.687Z"
+  "generatedAt": "2026-04-08T17:31:02.785Z"
 }
