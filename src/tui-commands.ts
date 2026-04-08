@@ -217,6 +217,19 @@ const commands: Record<string, CommandHandler> = {
         sessionLines.push(`  Files changed:  ${stats.filesModified.length} — ${stats.filesModified.join(", ")}`);
       }
     }
+    // Tool performance timings
+    const timingLines: string[] = [];
+    const timings = ctx.orchestratorRef.current?.getToolTimings();
+    if (timings && timings.length > 0) {
+      timingLines.push(`  ⏱ Tool Performance (top 5 slowest):`);
+      const top5 = timings
+        .sort((a, b) => b.avgMs - a.avgMs)
+        .slice(0, 5);
+      for (const t of top5) {
+        timingLines.push(`    ${t.toolName}: ${Math.round(t.avgMs)}ms avg (${t.calls} calls)`);
+      }
+    }
+
     ctx.addMessage({
       role: "assistant",
       content: [
@@ -227,6 +240,7 @@ const commands: Record<string, CommandHandler> = {
         `  Cost:       ${costStr}`,
         `  Model:      ${model}`,
         ...sessionLines,
+        ...timingLines,
       ].join("\n"),
     });
     return true;

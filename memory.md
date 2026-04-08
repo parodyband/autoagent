@@ -48,3 +48,12 @@
 - Memory compacted: removed stale per-iteration failure notes.
 
 **[AUTO-SCORED] Iteration 459: predicted 15 turns, actual 7 turns, ratio 0.47**
+
+## Iteration 460 — FAILED (2026-04-08T07:54:34.622Z)
+
+- **Error**: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CZqwhpZMasLMpGxp3bjxy"}
+- **Rolled back**
+
+---
+
+**[AUTO-SCORED] Iteration 461: predicted 15 turns, actual 20 turns, ratio 1.33**

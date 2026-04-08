@@ -24,6 +24,7 @@ import { runVerification, formatVerificationResults } from "./verification.js";
 import { createDefaultRegistry, buildSearchIndex } from "./tool-registry.js";
 import { getProjectMemoryBlock, saveToLocalMemory } from "./project-memory.js";
 import { CostTracker } from "./cost-tracker.js";
+import { checkpointManager } from "./checkpoint.js";
 import {
   initSession,
   saveMessage,
@@ -833,6 +834,12 @@ async function runAgentLoop(
           });
           results.push({ type: "tool_result", tool_use_id: tu.id, content: `[Hook blocked]: ${preWriteResult.reason ?? "blocked by hook"}` });
           continue;
+        }
+        // Track file for checkpoint rollback before writing
+        if (tu.name === "write_file") {
+          const wp = (tu.input as { path?: string }).path ?? "";
+          const fullWp = path.resolve(workDir, wp);
+          checkpointManager.trackFile(fullWp);
         }
         const writeT0 = Date.now();
         let rawResult = await execTool(tu.name, tu.input as Record<string, unknown>);
@@ -1979,6 +1986,9 @@ export class Orchestrator {
     let taskRetries          = 0;
     let taskTurns            = 0;
 
+    // Start an edit checkpoint for this user turn
+    checkpointManager.startCheckpoint(userMessage.substring(0, 80));
+
     // Create fresh AbortController for this send() call
     this._abortController = new AbortController();
 
@@ -2385,6 +2395,9 @@ export class Orchestrator {
       );
       process.stderr.write(`[perf] Tool timing summary:\n${lines.join("\n")}\n`);
     }
+
+    // Commit the edit checkpoint for this turn
+    checkpointManager.commitCheckpoint();
 
     return { text, tokensIn, tokensOut, model, verificationPassed, commitResult };
   }
