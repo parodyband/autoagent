@@ -328,7 +328,16 @@ export function buildSystemPrompt(
 
   const projectMemory = getProjectMemoryBlock(workDir);
 
-  const systemPrompt = `You are an expert coding assistant with direct access to the filesystem and shell.
+  // User-configurable system prompt overlay
+  let userSystemPromptPrefix = "";
+  const userPromptPath = path.join(workDir, ".autoagent", "system-prompt.md");
+  if (fs.existsSync(userPromptPath)) {
+    try {
+      userSystemPromptPrefix = fs.readFileSync(userPromptPath, "utf8").trim() + "\n\n---\n\n";
+    } catch { /* non-fatal */ }
+  }
+
+  const systemPrompt = `${userSystemPromptPrefix}You are an expert coding assistant with direct access to the filesystem and shell.
 
 Working directory: ${workDir}
 
@@ -1320,6 +1329,13 @@ export class Orchestrator {
       this._abortController.abort();
       this._abortController = null;
     }
+  }
+
+  /** Tool timing statistics for /status display. */
+  getToolTimings(): { toolName: string; avgMs: number; calls: number }[] {
+    return [...this.toolTimings.entries()]
+      .map(([toolName, { calls, totalMs }]) => ({ toolName, avgMs: Math.round(totalMs / calls), calls }))
+      .sort((a, b) => b.avgMs - a.avgMs);
   }
 
   /** Session statistics for /status display. */

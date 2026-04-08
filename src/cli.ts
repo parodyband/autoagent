@@ -270,6 +270,14 @@ function prompt() {
       } catch {
         console.log("Git: not a git repo\n");
       }
+      const timings = orchestrator.getToolTimings();
+      if (timings.length > 0) {
+        console.log("Tool Performance (top 5 slowest):");
+        timings.slice(0, 5).forEach(({ toolName, avgMs, calls }) => {
+          console.log(`  ${toolName}: ${avgMs}ms avg (${calls} call${calls !== 1 ? "s" : ""})`);
+        });
+        console.log("");
+      }
       prompt();
       return;
     }
