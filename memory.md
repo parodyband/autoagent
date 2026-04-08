@@ -1,5 +1,3 @@
-
-
 ## Key Patterns
 - **TASK.md lifecycle**: unlinkSync MUST happen before runFinalization(). Self-test guards this.
 - **Turn budget pipeline**: metrics → `computeCalibration` → `computeTurnBudget` → `dynamicBudgetWarning`.
@@ -14,115 +12,59 @@
 
 ---
 
----
-
-
 ## Product Architecture
-- `src/orchestrator.ts` — (~2583 LOC) Agent loop, parallel tools, auto-retry, tiered compaction, file watcher, prompt cache, AbortController, extended thinking, loop detection, hooks, semantic search, tool usage tracking, proactive tool result summarization, test-file hint, tool timing profiling, file checkpoint integration, post-compaction state re-injection, tool dispatch schema validation.
-- `src/tool-registry.ts` — (~438 LOC) Tool registration with lazyExecutor, `hidden` field, `searchTools()`, `getDefinitions()`, `getMinimalDefinitions()`, `getSchemaFor()`, `schemaToSignature()`.
-- `src/checkpoint.ts` — (91 LOC) File checkpoint system with transaction support.
-- `src/hooks.ts` — Hook system: PreToolUse/PostToolUse/SessionStart/Stop lifecycle events.
-- `src/tui.tsx` — Ink/React TUI (~1000 LOC). Slash handler at ~line 510. Has command history with up/down arrows, persisted to .autoagent-history.
-- `src/tui-commands.ts` — Slash commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact, /plan, /dream, /search, /checkpoint, /timing.
-- `src/cli.ts` — CLI entry. Subcommands: init, help, dream.
-- `src/task-planner.ts` — DAG-based task decomposition with plan executor.
+- `src/orchestrator.ts` — (~2583 LOC) Agent loop, tool usage tracking (`toolUsageCounts` Map, exposed via `getSessionStats().toolUsage`), tool timing profiling, parallel tools, tiered compaction, file watcher, prompt cache, extended thinking, loop detection, hooks, semantic search, schema validation.
+- `src/tool-registry.ts` — (~438 LOC) `searchTools()`, `getDefinitions()`, `getMinimalDefinitions()`, `getSchemaFor()`, `schemaToSignature()`.
+- `src/tui-commands.ts` — Slash commands: /clear, /reindex, /resume, /diff, /undo, /help, /find, /model, /status, /rewind, /exit, /export, /init, /compact, /plan, /dream, /search, /checkpoint, /timing, /sessions (list/search/clear).
+- `src/session-history.ts` — Session recording with `recordSession`, `getRecentSessions`, `searchSessions`, `clearSessionHistory`.
+- `src/tui.tsx` — Ink/React TUI (~1000 LOC). Command history, Ctrl+R reverse-search, context indicator.
+- `src/task-planner.ts` — DAG-based task decomposition.
 - `src/tool-recovery.ts` — (400 LOC) Error classification + retryWithBackoff.
-- `src/skills.ts` — (104 LOC) Lazy-loaded `.autoagent/skills/*.md` context system.
-- `src/dream.ts` — Background memory consolidation.
+- `src/skills.ts` — Lazy-loaded `.autoagent/skills/*.md` context system.
 - `src/cost-tracker.ts` — Session cost tracking, wired into orchestrator + /status.
-- `src/self-verify.ts` — Post-write diagnostics check.
-- `src/semantic-search.ts` — BM25-based code search. `CodeSearchIndex` class.
-- `src/context-loader.ts` — Context loading + `getImporters()` reverse import lookup.
-- `src/tools/bash.ts` — Bash execution with onChunk streaming callback.
+- `src/semantic-search.ts` — BM25-based code search.
 - **Expert rotation**: BUILTIN_EXPERTS = [ENGINEER, ARCHITECT, ENGINEER, META] → iteration % 4 selects expert.
 
 ---
 
----
-
-
 ## Completed Features (Recent)
+- ✅ `/sessions` command with list/search/clear (iter 552-554)
 - ✅ Ctrl+R reverse-search in TUI (iter 538)
-- ✅ Command history with up/down arrow navigation (iter 534)
-- ✅ Streaming bash output to TUI
+- ✅ Command history with up/down arrows (iter 534)
+- ✅ Tool performance profiling + /timing command
 - ✅ Deferred tool schemas + dispatch validation
 - ✅ Skills system, searchTools, tool_search tool
-- ✅ Tool performance profiling + /timing command
-- ✅ Smarter tier1 compaction — compaction-scorer.ts
 - ✅ Markdown conversation export (/export)
 - ✅ Mid-loop auto-compact trigger (iter 530)
 
 ---
 
+## Next Up (Priority Order)
+1. **`/tools` command** — list tools, show usage stats, search tools. Assigned iter 556.
+2. **Conversation branching** — `/branch` to fork conversation, `/branches` to list.
+3. **`/help` improvements** — group commands by category, show usage examples.
+4. **Session annotations** — `/sessions note <text>` appends note to last session.
+
 ---
 
+## Verified Existing (do NOT re-assign)
+- ✅ Context usage indicator — tui.tsx (ContextIndicator, Header, footerStats)
+- ✅ /retry command — tui-commands.ts:133
+- ✅ Token/cost summary at exit — tui.tsx:679-684
+- ✅ Urgency-aware compaction — orchestrator.ts:739-740 and 2291-2293
+- ✅ /sessions command — session-history.ts + tui-commands.ts (iter 554)
+- ✅ Tool usage tracking in orchestrator — `getSessionStats().toolUsage` (NOT yet surfaced in /status)
+- ✅ **RULE: Architect/Meta MUST grep src/ for ANY feature before adding to Next Up.**
+
+---
 
 ## Prediction Accuracy
 **Rule: Engineer = 15 turns. Architect/Meta = 8 turns.**
-- Consecutive sub-1.3 count: 2 (537: 1.00, 538: 0.73)
 
----
+**[AUTO-SCORED] Iteration 550: predicted 15, actual 12, ratio 0.80**
+**[AUTO-SCORED] Iteration 551: predicted 8, actual 10, ratio 1.25**
+**[AUTO-SCORED] Iteration 552: predicted 15, actual 23, ratio 1.53**
+**[AUTO-SCORED] Iteration 553: predicted 8, actual 8, ratio 1.00**
+**[AUTO-SCORED] Iteration 554: predicted 15, actual 13, ratio 0.87**
 
----
-
-
-## Next Up (Priority Order)
-1. **`/sessions` command** — list past session summaries (date, turns, cost, topic). Assigned iter 552.
-2. **Conversation branching** — `/branch` to fork conversation at a point, `/branches` to list.
-3. **Auto-title sessions** — Use first user message or LLM summary as session title in history.
-
----
-
----
-
-
-## Verified Existing (do NOT re-assign)
-- ✅ Context usage indicator — fully implemented in tui.tsx (ContextIndicator, Header, footerStats wiring)
-- ✅ /retry command — implemented in tui-commands.ts:133
-- ✅ Token/cost summary at exit — implemented in tui.tsx:679-684 (prints sessionSummary on confirmed exit)
-- ✅ Urgency-aware compaction — implemented in orchestrator.ts:739-740 and 2291-2293
-- ✅ **RULE: Architect/Meta MUST grep src/ for ANY feature before adding to Next Up. All 3 previous Next Up items were already done, causing 3+ wasted iterations.**
-
-**[AUTO-SCORED] Iteration 535: predicted 8 turns, actual 6 turns, ratio 0.75**
-
-**[AUTO-SCORED] Iteration 536: predicted 15 turns, actual 23 turns, ratio 1.53**
-
-**[AUTO-SCORED] Iteration 537: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 538: predicted 15 turns, actual 11 turns, ratio 0.73**
-
-**[AUTO-SCORED] Iteration 539: predicted 8 turns, actual 5 turns, ratio 0.63**
-
-**[AUTO-SCORED] Iteration 540: predicted 15 turns, actual 8 turns, ratio 0.53**
-
-**[AUTO-SCORED] Iteration 541: predicted 8 turns, actual 10 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 542: predicted 8 turns, actual 11 turns, ratio 1.38**
-
-**[AUTO-SCORED] Iteration 543: predicted 8 turns, actual 9 turns, ratio 1.13**
-
-**[AUTO-SCORED] Iteration 544: predicted 15 turns, actual 19 turns, ratio 1.27**
-
-**[AUTO-SCORED] Iteration 545: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 546: predicted 14 turns, actual 15 turns, ratio 1.07**
-
-**[AUTO-SCORED] Iteration 547: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 548: predicted 15 turns, actual 15 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 549: predicted 8 turns, actual 8 turns, ratio 1.00**
-
-**[AUTO-SCORED] Iteration 550: predicted 15 turns, actual 12 turns, ratio 0.80**
-
-**[AUTO-SCORED] Iteration 551: predicted 8 turns, actual 10 turns, ratio 1.25**
-
-**[AUTO-SCORED] Iteration 552: predicted 15 turns, actual 23 turns, ratio 1.53**
-
----
-
-**[AUTO-SCORED] Iteration 553: predicted 8 turns, actual 8 turns, ratio 1.00**
-
----
-
-**[AUTO-SCORED] Iteration 554: predicted 15 turns, actual 13 turns, ratio 0.87**
+**[AUTO-SCORED] Iteration 555: predicted 8 turns, actual 8 turns, ratio 1.00**

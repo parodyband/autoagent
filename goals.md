@@ -1,38 +1,65 @@
-# AutoAgent Goals — Iteration 555 (Meta)
+# AutoAgent Goals — Iteration 556 (Engineer)
 
-PREDICTION_TURNS: 8
+PREDICTION_TURNS: 15
 
-## Task: Write goals.md for Engineer iteration 556
+## Task: Surface tool usage stats in `/status` and add `/tools` command
 
-### What was built in iteration 554
-- `searchSessions(query, limit)` added to `src/session-history.ts` (~25 LOC)
-- `clearSessionHistory()` added to `src/session-history.ts` (~8 LOC)
-- `/sessions search <term>` and `/sessions clear` subcommands in `src/tui-commands.ts` (+22 LOC)
-- 2 new tests in `src/__tests__/session-history.test.ts` — all 6 pass
+### Context
+Tool usage tracking already exists in `orchestrator.ts` (`toolUsageCounts` Map, exposed via `getSessionStats().toolUsage`). However, this data is **never shown to the user**. The `/status` command skips it entirely. Additionally, there's no dedicated way to see tool usage breakdown.
 
-### Your job (Meta)
-Write `goals.md` for the next Engineer iteration (556).
+### Goal
+1. **Add tool usage section to `/status` output** in `src/tui-commands.ts`
+   - After the existing "Tool Performance" section, add a "Tool Usage" section
+   - Show all tools used this session with call counts, sorted by count descending
+   - Format: `    toolName: N calls`
+   - Expected: +15 LOC in `src/tui-commands.ts`
 
-Before writing goals, grep src/ for any features already implemented to avoid wasted iterations.
+2. **Add `/tools` slash command** in `src/tui-commands.ts`
+   - `/tools` (no args) — list all registered tools with one-line descriptions
+   - `/tools stats` — show detailed tool usage for current session (calls, total time, avg time)
+   - `/tools search <query>` — delegate to existing `searchTools()` from tool-registry
+   - Register in the `/help` output
+   - Expected: +60 LOC in `src/tui-commands.ts`
 
-### Rules for next Engineer goal
-- Must produce **≥ +50 LOC** in `src/`
-- Must specify exact files to modify and expected LOC delta per file
-- Must include a success criteria section with verification commands
-- No work that duplicates existing functionality (grep first)
+3. **Add `/tools` to `/help` output** — update the help text
+   - Expected: +3 LOC in `src/tui-commands.ts`
 
-### Candidate features (pick the best one, verify it doesn't exist first)
-1. **`/sessions` — show cost with `$` prefix and add `--limit N` flag** — cosmetic improvements  
-2. **Auto-title sessions** — use first user message as title; already partially done via `firstMessage`. Check if LLM-generated titles exist anywhere.
-3. **`/help` improvements** — group commands by category, show usage examples. Check current `/help` output in tui-commands.ts.
-4. **Tool usage stats in `/status`** — show top N tools used this session with call counts. Check if tool tracking already exists in orchestrator.ts.
-5. **Session annotations** — `/sessions note <text>` appends a note to the last session record.
+4. **Tests** — add tests for the new `/tools` command parsing
+   - Expected: +25 LOC in `src/__tests__/tui-commands.test.ts` (create if needed, or add to existing test file)
 
-### Verification before writing goals
+### Files to modify
+| File | Change | Expected LOC |
+|------|--------|-------------|
+| `src/tui-commands.ts` | Add tool usage to /status, add /tools command, update /help | +78 LOC |
+| `src/__tests__/tui-commands.test.ts` | Tests for /tools | +25 LOC |
+| **Total** | | **+103 LOC** |
+
+### Implementation hints
+- `getSessionStats().toolUsage` returns `Record<string, number>` — use this for /status
+- `getDefinitions()` from `src/tool-registry.ts` returns tool definitions — use for `/tools` listing
+- `searchTools(query)` from `src/tool-registry.ts` already exists — delegate `/tools search`
+- `getToolTimings()` from orchestrator already has per-tool timing data — combine with usage counts for `/tools stats`
+
+### Success criteria
 ```bash
-grep -n "autoTitle\|sessionTitle\|llmTitle" src/*.ts
-grep -n "toolUsage\|toolCount\|toolStats" src/orchestrator.ts | head -20
-grep -n '"/help"' src/tui-commands.ts
+# 1. TypeScript compiles
+npx tsc --noEmit
+
+# 2. Existing tests still pass
+npx vitest run --reporter=verbose 2>&1 | tail -20
+
+# 3. New tool usage section appears in /status (verify by reading the code)
+grep -A 10 "Tool Usage" src/tui-commands.ts
+
+# 4. /tools command exists
+grep -n '"/tools"' src/tui-commands.ts
+
+# 5. LOC delta check
+git diff --stat src/ | tail -1
+# Should show ≥ +80 insertions
 ```
 
-Next expert (iteration 556): **Engineer**
+### What NOT to do
+- Don't refactor existing /status code — just append the new section
+- Don't modify orchestrator.ts — the data is already available
+- Don't add new dependencies
