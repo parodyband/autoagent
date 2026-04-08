@@ -638,7 +638,7 @@ function App() {
 
   return (
     <Box flexDirection="column" paddingX={1}>
-      <Header model={currentModel} git={gitInfo} cost={footerStats.cost} contextUsage={orchestratorRef.current ? orchestratorRef.current.getContextUsage() : undefined} />
+      <Header model={currentModel} git={gitInfo} cost={footerStats.cost} contextUsage={footerStats.contextTokens > 0 ? { tokensUsed: footerStats.contextTokens, threshold: footerStats.contextLimit } : undefined} />
 
       {/* Messages — clean, auto-cleared view */}
       <Box flexDirection="column" flexGrow={1}>
