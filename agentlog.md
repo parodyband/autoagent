@@ -1,77 +1,3 @@
-[2026-04-08T20:37:02.011Z] iter=533 INFO: Hard turn cap: 12 (1.5x prediction of 8)
-[2026-04-08T20:37:02.011Z] iter=533 turn=1 INFO: Turn 1/25
-[2026-04-08T20:37:08.563Z] iter=533 turn=1 INFO: Agent: 
-
-I'll start by evaluating the current state and picking the highest-impact user-facing feature. Let me first check what already exists.
-[2026-04-08T20:37:08.564Z] iter=533 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "diff\|inline.*diff\|before.*after" src/tui.tsx | head -20
-[2026-04-08T20:37:08.564Z] iter=533 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "cost\|session.*cost\|\$.*prompt" src/tui.tsx | head -20
-[2026-04-08T20:37:08.564Z] iter=533 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "history\|up.*arrow\|previous.*command\|inputHistory\|commandHistory" src/tui.tsx | head -20
-[2026-04-08T20:37:08.565Z] iter=533 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "retry\|re-run\|lastMessage\|lastUserMessage" src/tui.tsx src/tui-commands.ts | head -20
-[2026-04-08T20:37:08.574Z] iter=533 turn=1 INFO:   -> exit=0 (406 chars)
-[2026-04-08T20:37:08.575Z] iter=533 turn=1 INFO:   -> exit=0 (942 chars)
-[2026-04-08T20:37:08.576Z] iter=533 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-08T20:37:08.578Z] iter=533 turn=1 INFO:   -> exit=0 (11 chars)
-[2026-04-08T20:37:08.578Z] iter=533 turn=2 INFO: Turn 2/25
-[2026-04-08T20:37:14.859Z] iter=533 turn=2 INFO: think: My deliverable is goals.md for the next Engineer iteration targeting ONE high-value user-visible feature.
-
-From my grep ...
-[2026-04-08T20:37:14.859Z] iter=533 turn=3 INFO: Turn 3/25
-[2026-04-08T20:37:18.131Z] iter=533 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "TextInput\|useInput\|inputValue\|setInputValue\|onSubmit" src/tui.tsx | head -25
-[2026-04-08T20:37:18.142Z] iter=533 turn=3 INFO:   -> exit=0 (200 chars)
-[2026-04-08T20:37:18.142Z] iter=533 turn=4 INFO: Turn 4/25
-[2026-04-08T20:37:22.571Z] iter=533 turn=4 INFO: Agent: 
-
-Status: NOT STARTED on writing goals.md. Let me get the minimal context I need and write it now.
-[2026-04-08T20:37:22.572Z] iter=533 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '740,760p' src/tui.tsx
-[2026-04-08T20:37:22.579Z] iter=533 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '490,520p' src/tui.tsx
-[2026-04-08T20:37:22.588Z] iter=533 turn=4 INFO:   -> exit=0 (539 chars)
-[2026-04-08T20:37:22.588Z] iter=533 turn=4 INFO:   -> exit=0 (1130 chars)
-[2026-04-08T20:37:22.589Z] iter=533 turn=5 INFO: Turn 5/25
-[2026-04-08T20:37:36.261Z] iter=533 turn=5 INFO: think: Key observations:
-- Up arrow when input is empty = scroll-back (lines 509-512)
-- Up arrow when input is NOT empty = curr...
-[2026-04-08T20:37:36.262Z] iter=533 turn=6 INFO: Turn 6/25
-[2026-04-08T20:38:02.234Z] iter=533 turn=6 INFO: Agent: 
-
-I'm an Architect iteration — my deliverable is goals.md, not src/ changes. Writing it now.
-[2026-04-08T20:38:02.235Z] iter=533 turn=6 INFO: write_file: goals.md (write)
-[2026-04-08T20:38:02.236Z] iter=533 turn=6 INFO:   -> ok: Updated goals.md (3402 chars, +27 lines delta)
-[2026-04-08T20:38:02.237Z] iter=533 turn=7 INFO: Turn 7/25
-[2026-04-08T20:38:04.602Z] iter=533 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit
-[2026-04-08T20:38:05.756Z] iter=533 turn=7 INFO:   -> exit=0 (11 chars)
-[2026-04-08T20:38:05.756Z] iter=533 turn=8 INFO: Turn 8/25
-[2026-04-08T20:38:11.454Z] iter=533 turn=8 INFO: save_memory: "[Architect] Iteration 533 — Command history feature planned"
-[2026-04-08T20:38:11.455Z] iter=533 turn=8 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
-[2026-04-08T20:38:11.456Z] iter=533 turn=9 INFO: Turn 9/25
-[2026-04-08T20:38:13.645Z] iter=533 turn=9 INFO: $ echo "AUTOAGENT_RESTART"
-[2026-04-08T20:38:13.646Z] iter=533 turn=9 INFO: RESTART signal
-[2026-04-08T20:38:13.646Z] iter=533 turn=9 INFO: Validating: npx tsc --noEmit ...
-[2026-04-08T20:38:14.837Z] iter=533 turn=9 INFO: Compilation OK
-[2026-04-08T20:38:24.681Z] iter=533 turn=9 INFO: Cache persisted: 64 entries to .autoagent-cache.json
-[2026-04-08T20:38:24.682Z] iter=533 turn=9 INFO: Tool timing: bash: 9x, avg=138ms, total=1240ms; write_file: 1x, avg=2ms, total=2ms; save_memory: 1x, avg=2ms, total=2ms; think: 2x, avg=1ms, total=1ms
-[2026-04-08T20:38:24.682Z] iter=533 turn=9 INFO: Tool timing stats
-[2026-04-08T20:38:32.810Z] iter=533 turn=9 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 533: predicted 8 turns, actual 9 turns, ratio 1.13**
-[2026-04-08T20:38:32.833Z] iter=533 turn=9 INFO: Pre-commit review: no significant code changes to review
-[2026-04-08T20:38:32.867Z] iter=533 turn=9 INFO: Committed: 3ddcd5e1 (19 in / 2672 out, cache: 12352 created, 66434 read)
-[2026-04-08T20:38:32.867Z] iter=533 turn=9 INFO: Restarting as iteration 534...
-[2026-04-08T20:38:33.055Z] iter=534 INFO: Cache restored: 64/64 entries (0 stale)
-[2026-04-08T20:38:33.058Z] iter=534 INFO: Turn budget: 15/25 (calibration=0.88x, predicted=15)
-[2026-04-08T20:38:33.058Z] iter=534 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
-[2026-04-08T20:38:33.275Z] iter=534 INFO: Hard turn cap: 23 (1.5x prediction of 15)
-[2026-04-08T20:38:33.275Z] iter=534 turn=1 INFO: Turn 1/25
-[2026-04-08T20:38:37.097Z] iter=534 turn=1 INFO: Agent: I'll implement command history with up/down arrow navigation in the TUI. Let me start by reading the relevant sections of tui.tsx.
-[2026-04-08T20:38:37.098Z] iter=534 turn=1 INFO: $ wc -l src/tui.tsx && grep -n "historyIndex\|inputHistory\|savedInput\|useInput\|handleSubmit\|handleInputChange\|scroll\|arrowUp\|arrowDown" src/tui.tsx | head -60
-[2026-04-08T20:38:37.099Z] iter=534 turn=1 INFO: read_scratchpad: 898 chars
-[2026-04-08T20:38:37.109Z] iter=534 turn=1 INFO:   -> exit=0 (882 chars)
-[2026-04-08T20:38:37.110Z] iter=534 turn=2 INFO: Turn 2/25
-[2026-04-08T20:38:40.061Z] iter=534 turn=2 INFO: read_file: src/tui.tsx
-[2026-04-08T20:38:40.061Z] iter=534 turn=2 INFO: read_file: src/tui.tsx
-[2026-04-08T20:38:40.062Z] iter=534 turn=2 INFO:   -> ok (1615 chars)
-[2026-04-08T20:38:40.063Z] iter=534 turn=2 INFO:   -> ok (2342 chars)
-[2026-04-08T20:38:40.063Z] iter=534 turn=3 INFO: Turn 3/25
-[2026-04-08T20:38:44.268Z] iter=534 turn=3 INFO: think: I have enough context. I need to:
-1. Add `inputHistory`, `historyIndex`, `savedInput` state near line 390
-2. Add useEffe...
 [2026-04-08T20:38:44.269Z] iter=534 turn=4 INFO: Turn 4/25
 [2026-04-08T20:38:46.973Z] iter=534 turn=4 INFO: Agent: I have enough context. Let me implement the changes now.
 [2026-04-08T20:38:46.973Z] iter=534 turn=4 INFO: read_file: src/tui.tsx
@@ -1070,3 +996,192 @@ echo "AUTOAGENT_RESTART"
 [2026-04-08T20:50:17.641Z] iter=541 turn=10 INFO: Tool timing stats
 [2026-04-08T20:50:26.158Z] iter=541 turn=10 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 541: predicted 8 turns, actual 10 turns, ratio 1.25**
 [2026-04-08T20:50:26.181Z] iter=541 turn=10 INFO: Pre-commit review: no significant code changes to review
+[2026-04-08T20:50:26.215Z] iter=541 turn=10 INFO: Committed: cb5a7dad (24 in / 2823 out, cache: 10904 created, 74826 read)
+[2026-04-08T20:50:26.215Z] iter=541 turn=10 INFO: Restarting as iteration 542...
+[2026-04-08T20:50:26.401Z] iter=542 INFO: Cache restored: 65/65 entries (0 stale)
+[2026-04-08T20:50:26.404Z] iter=542 INFO: Turn budget: 8/25 (calibration=0.73x, predicted=8)
+[2026-04-08T20:50:26.404Z] iter=542 INFO: Starting. Expert=Engineer Model=claude-sonnet-4-6
+[2026-04-08T20:50:26.623Z] iter=542 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-08T20:50:26.623Z] iter=542 turn=1 INFO: Turn 1/25
+[2026-04-08T20:50:29.199Z] iter=542 turn=1 INFO: read_file: src/tools/write_file.ts
+[2026-04-08T20:50:29.199Z] iter=542 turn=1 INFO: read_scratchpad: 898 chars
+[2026-04-08T20:50:29.200Z] iter=542 turn=1 INFO:   -> ok (6418 chars)
+[2026-04-08T20:50:29.201Z] iter=542 turn=2 INFO: Turn 2/25
+[2026-04-08T20:50:36.342Z] iter=542 turn=2 INFO: think: I have the write_file.ts content. I need to:
+1. Add `fuzzyFindReplace(content, oldStr, newStr)` exported function
+2. Use...
+[2026-04-08T20:50:36.343Z] iter=542 turn=3 INFO: Turn 3/25
+[2026-04-08T20:50:49.471Z] iter=542 turn=3 INFO: Agent: Now I'll implement the fuzzy patch matching. I have everything I need.
+[2026-04-08T20:50:49.473Z] iter=542 turn=3 INFO: write_file: src/tools/write_file.ts (patch)
+[2026-04-08T20:50:49.477Z] iter=542 turn=3 INFO:   -> ok: Patched src/tools/write_file.ts: -4 +89 lines
+
+Context after patch:
+43 |   },
+44 | };
+45 | 
+46 | export interface WriteFileResult {
+47 |   message: string;
+48 |   success: boolean;
+49 | }
+50 | 
+51 | /**
+52 |  * Normalize a string for fuzzy matching by trimming trailing whitespace from each line.
+53 |  */
+54 | function normalizeWhitespace(s: string): string {
+55 |   return s.split("\n").map(line => line.trimEnd()).join("\n");
+56 | }
+57 | 
+58 | /**
+59 |  * Normalize a string by collapsing all whitespace runs to a single space and trimming lines.
+60 |  */
+61 | function collapseWhitespace(s: string): string {
+62 |   return s.split("\n").map(line => line.trim().replace(/\s+/g, " ")).join("\n");
+63 | }
+64 | 
+65 | /**
+66 |  * Try to find oldStr in content using fuzzy matching (whitespace normalization).
+67 |  * Returns the patched content and a warning string, or null if no match found.
+68 |  *
+69 |  * Strategy:
+70 |  * 1. Trim trailing whitespace from each line of both strings, retry match
+71 |  * 2. If still no match, collapse all whitespace runs, retry match
+72 |  */
+73 | export function fuzzyFindReplace(
+74 |   content: string,
+75 |   oldStr: string,
+76 |   newStr: string
+77 | ): { result: string; warning: string } | null {
+78 |   // Try trimming trailing whitespace
+79 |   const normContent = normalizeWhitespace(content);
+80 |   const normOld = normalizeWhitespace(oldStr);
+81 |   if (normContent.includes(normOld)) {
+82 |     // Find the matching region in the original content by matching line-by-line
+83 |     const result = replaceNormalized(content, oldStr, newStr, "trailing");
+84 |     if (result !== null) {
+85 |       return {
+86 |         result,
+87 |         warning: "Applied with fuzzy match (whitespace normalized). Original had minor whitespace differences.",
+88 |       };
+89 |     }
+90 |   }
+91 | 
+92 |   // Try collapsing all whitespace
+93 |   const colContent = collapseWhitespace(content);
+94 |   const colOld = collapseWhitespace(oldStr);
+95 |   if (colOld.length > 0 && colContent.includes(colOld)) {
+96 |     const result = replaceNormalized(content, oldStr, newStr, "collapse");
+97 |     if (result !== null) {
+98 |       return {
+99 |         result,
+100 |         warning: "Applied with fuzzy match (whitespace collapsed). Original had significant whitespace differences.",
+101 |       };
+102 |     }
+103 |   }
+104 | 
+105 |   return null;
+106 | }
+107 | 
+108 | /**
+109 |  * Replace lines in content that fuzzy-match oldStr lines, substituting with newStr.
+110 |  */
+111 | function replaceNormalized(
+112 |   content: string,
+113 |   oldStr: string,
+114 |   newStr: string,
+115 |   mode: "trailing" | "collapse"
+116 | ): string | null {
+117 |   const normalize = mode === "trailing" ? normalizeWhitespace : collapseWhitespace;
+118 |   const contentLines = content.split("\n");
+119 |   const oldLines = oldStr.split("\n");
+120 |   const normOldLines = oldLines.map(l => (mode === "trailing" ? l.trimEnd() : l.trim().replace(/\s+/g, " ")));
+121 | 
+122 |   for (let i = 0; i <= contentLines.length - oldLines.length; i++) {
+123 |     const slice = contentLines.slice(i, i + oldLines.length);
+124 |     const normSlice = slice.map(l => (mode === "trailing" ? l.trimEnd() : l.trim().replace(/\s+/g, " ")));
+125 |     if (normSlice.join("\n") === normOldLines.join("\n")) {
+126 |       // Found matching region — replace it
+127 |       const before = contentLines.slice(0, i);
+128 |       const after = contentLines.slice(i + oldLines.length);
+129 |       const newLines = newStr.split("\n");
+130 |       return [...before, ...newLines, ...after].join("\n");
+131 |     }
+132 |   }
+133 |   return null;
+134 | }
+135 | 
+136 | function countLines(s: string): number {
+137 |   if (!s) return 0;
+[2026-04-08T20:50:49.479Z] iter=542 turn=4 INFO: Turn 4/25
+[2026-04-08T20:50:57.771Z] iter=542 turn=4 INFO: Agent: **Goal 1 - Fuzzy patch matching**: IN PROGRESS — fuzzy logic added, need to wire it into the patch execution path + write tests.
+[2026-04-08T20:50:57.771Z] iter=542 turn=4 INFO: write_file: src/tools/write_file.ts (patch)
+[2026-04-08T20:50:57.772Z] iter=542 turn=4 INFO:   -> ok: Patched src/tools/write_file.ts: -7 +15 lines
+
+Context after patch:
+196 |       }
+197 |     }
+198 | 
+199 |     if (mode === "patch") {
+200 |       if (!oldString) return { message: "ERROR: patch mode requires old_string", success: false };
+201 |       if (!existed) return { message: `ERROR: Cannot patch non-existent file: ${filePath}`, success: false };
+202 |       let fuzzyWarning = "";
+203 |       let patched: string;
+204 |       if (oldContent.includes(oldString)) {
+205 |         patched = oldContent.replace(oldString, newString ?? "");
+206 |       } else {
+207 |         const fuzzy = fuzzyFindReplace(oldContent, oldString, newString ?? "");
+208 |         if (fuzzy === null) {
+209 |           return { message: `ERROR: old_string not found in ${filePath}. Must match exactly.`, success: false };
+210 |         }
+211 |         patched = fuzzy.result;
+212 |         fuzzyWarning = fuzzy.warning + "\n";
+213 |       }
+214 |       writeFileSync(resolved, patched, "utf-8");
+215 |       globalFileCache.invalidate(resolved);
+216 |       globalMtimeTracker.delete(resolved);
+[2026-04-08T20:50:57.772Z] iter=542 turn=5 INFO: Turn 5/25
+[2026-04-08T20:51:01.308Z] iter=542 turn=5 INFO: Agent: Now update the return message to include fuzzyWarning:
+[2026-04-08T20:51:01.309Z] iter=542 turn=5 INFO: write_file: src/tools/write_file.ts (patch)
+[2026-04-08T20:51:01.310Z] iter=542 turn=5 INFO:   -> ok: Patched src/tools/write_file.ts: -4 +4 lines
+
+Context after patch:
+237 |         .map((line, i) => `${contextStart + i + 1} | ${line}`)
+238 |         .join("\n");
+239 | 
+240 |       return {
+241 |         message: `${staleWarning}${fuzzyWarning}Patched ${filePath}: -${countLines(oldString)} +${countLines(replacement)} lines\n\nContext after patch:\n${contextPreview}`,
+242 |         success: true,
+243 |       };
+244 |     }
+245 | 
+246 |     if (mode === "append") {
+[2026-04-08T20:51:01.310Z] iter=542 turn=6 INFO: Turn 6/25
+[2026-04-08T20:51:05.343Z] iter=542 turn=6 INFO: Agent: I've made real src/ changes. Now writing the test file, then TypeScript check.
+[2026-04-08T20:51:05.345Z] iter=542 turn=6 INFO: $ mkdir -p src/tools/__tests__
+[2026-04-08T20:51:05.362Z] iter=542 turn=6 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:51:05.362Z] iter=542 turn=7 INFO: Turn 7/25
+[2026-04-08T20:51:16.183Z] iter=542 turn=7 INFO: Agent: Writing test, tsc, done.
+[2026-04-08T20:51:16.184Z] iter=542 turn=7 INFO: write_file: src/tools/__tests__/write_file.test.ts (write)
+[2026-04-08T20:51:16.184Z] iter=542 turn=7 INFO:   -> ok: Created src/tools/__tests__/write_file.test.ts (2400 chars)
+[2026-04-08T20:51:16.184Z] iter=542 turn=8 INFO: Turn 8/25
+[2026-04-08T20:51:18.856Z] iter=542 turn=8 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | head -30
+[2026-04-08T20:51:20.063Z] iter=542 turn=8 INFO:   -> exit=0 (11 chars)
+[2026-04-08T20:51:20.063Z] iter=542 turn=9 INFO: Turn 9/25
+[2026-04-08T20:51:24.397Z] iter=542 turn=9 INFO: Agent: Clean. Writing memory and goals now.
+[2026-04-08T20:51:24.398Z] iter=542 turn=9 INFO: save_memory: "[Engineer] Iteration 542"
+[2026-04-08T20:51:24.399Z] iter=542 turn=9 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T20:51:24.400Z] iter=542 turn=10 INFO: Turn 10/25
+[2026-04-08T20:51:34.865Z] iter=542 turn=10 INFO: write_file: goals.md (write)
+[2026-04-08T20:51:34.865Z] iter=542 turn=10 INFO:   -> ok: Updated goals.md (1517 chars, -7 lines delta)
+[2026-04-08T20:51:34.866Z] iter=542 turn=11 INFO: Turn 11/25
+[2026-04-08T20:51:37.289Z] iter=542 turn=11 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T20:51:37.290Z] iter=542 turn=11 INFO: RESTART signal
+[2026-04-08T20:51:37.290Z] iter=542 turn=11 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T20:51:38.445Z] iter=542 turn=11 INFO: Compilation OK
+[2026-04-08T20:51:47.883Z] iter=542 turn=11 INFO: Cache persisted: 65 entries to .autoagent-cache.json
+[2026-04-08T20:51:47.883Z] iter=542 turn=11 INFO: Cache stats: 0 hits, 1 misses, 65 entries, 5 invalidations (1 entries removed)
+[2026-04-08T20:51:47.883Z] iter=542 turn=11 INFO: Tool cache stats
+[2026-04-08T20:51:47.883Z] iter=542 turn=11 INFO: Tool timing: bash: 3x, avg=409ms, total=1226ms; write_file: 5x, avg=2ms, total=9ms; read_scratchpad: 1x, avg=2ms, total=2ms; read_file: 1x, avg=1ms, total=1ms; think: 1x, avg=1ms, total=1ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T20:51:47.883Z] iter=542 turn=11 INFO: Tool timing stats
+[2026-04-08T20:51:56.566Z] iter=542 turn=11 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 542: predicted 8 turns, actual 11 turns, ratio 1.38**
+[2026-04-08T20:52:09.871Z] iter=542 turn=11 INFO: Pre-commit review (2731in/488out): **Issue 1: `normalize` variable declared but never used**
+In `replaceNormalized`, `const normalize = mode === "trailing" ? normalizeWhitespace : collapseWhitespace;` is assigned but never called — the

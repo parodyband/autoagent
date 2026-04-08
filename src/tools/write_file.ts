@@ -48,6 +48,91 @@ export interface WriteFileResult {
   success: boolean;
 }
 
+/**
+ * Normalize a string for fuzzy matching by trimming trailing whitespace from each line.
+ */
+function normalizeWhitespace(s: string): string {
+  return s.split("\n").map(line => line.trimEnd()).join("\n");
+}
+
+/**
+ * Normalize a string by collapsing all whitespace runs to a single space and trimming lines.
+ */
+function collapseWhitespace(s: string): string {
+  return s.split("\n").map(line => line.trim().replace(/\s+/g, " ")).join("\n");
+}
+
+/**
+ * Try to find oldStr in content using fuzzy matching (whitespace normalization).
+ * Returns the patched content and a warning string, or null if no match found.
+ *
+ * Strategy:
+ * 1. Trim trailing whitespace from each line of both strings, retry match
+ * 2. If still no match, collapse all whitespace runs, retry match
+ */
+export function fuzzyFindReplace(
+  content: string,
+  oldStr: string,
+  newStr: string
+): { result: string; warning: string } | null {
+  // Try trimming trailing whitespace
+  const normContent = normalizeWhitespace(content);
+  const normOld = normalizeWhitespace(oldStr);
+  if (normContent.includes(normOld)) {
+    // Find the matching region in the original content by matching line-by-line
+    const result = replaceNormalized(content, oldStr, newStr, "trailing");
+    if (result !== null) {
+      return {
+        result,
+        warning: "Applied with fuzzy match (whitespace normalized). Original had minor whitespace differences.",
+      };
+    }
+  }
+
+  // Try collapsing all whitespace
+  const colContent = collapseWhitespace(content);
+  const colOld = collapseWhitespace(oldStr);
+  if (colOld.length > 0 && colContent.includes(colOld)) {
+    const result = replaceNormalized(content, oldStr, newStr, "collapse");
+    if (result !== null) {
+      return {
+        result,
+        warning: "Applied with fuzzy match (whitespace collapsed). Original had significant whitespace differences.",
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Replace lines in content that fuzzy-match oldStr lines, substituting with newStr.
+ */
+function replaceNormalized(
+  content: string,
+  oldStr: string,
+  newStr: string,
+  mode: "trailing" | "collapse"
+): string | null {
+  const normalize = mode === "trailing" ? normalizeWhitespace : collapseWhitespace;
+  const contentLines = content.split("\n");
+  const oldLines = oldStr.split("\n");
+  const normOldLines = oldLines.map(l => (mode === "trailing" ? l.trimEnd() : l.trim().replace(/\s+/g, " ")));
+
+  for (let i = 0; i <= contentLines.length - oldLines.length; i++) {
+    const slice = contentLines.slice(i, i + oldLines.length);
+    const normSlice = slice.map(l => (mode === "trailing" ? l.trimEnd() : l.trim().replace(/\s+/g, " ")));
+    if (normSlice.join("\n") === normOldLines.join("\n")) {
+      // Found matching region — replace it
+      const before = contentLines.slice(0, i);
+      const after = contentLines.slice(i + oldLines.length);
+      const newLines = newStr.split("\n");
+      return [...before, ...newLines, ...after].join("\n");
+    }
+  }
+  return null;
+}
+
 function countLines(s: string): number {
   if (!s) return 0;
   return s.split("\n").length;
@@ -114,10 +199,18 @@ export function executeWriteFile(
     if (mode === "patch") {
       if (!oldString) return { message: "ERROR: patch mode requires old_string", success: false };
       if (!existed) return { message: `ERROR: Cannot patch non-existent file: ${filePath}`, success: false };
-      if (!oldContent.includes(oldString)) {
-        return { message: `ERROR: old_string not found in ${filePath}. Must match exactly.`, success: false };
+      let fuzzyWarning = "";
+      let patched: string;
+      if (oldContent.includes(oldString)) {
+        patched = oldContent.replace(oldString, newString ?? "");
+      } else {
+        const fuzzy = fuzzyFindReplace(oldContent, oldString, newString ?? "");
+        if (fuzzy === null) {
+          return { message: `ERROR: old_string not found in ${filePath}. Must match exactly.`, success: false };
+        }
+        patched = fuzzy.result;
+        fuzzyWarning = fuzzy.warning + "\n";
       }
-      const patched = oldContent.replace(oldString, newString ?? "");
       writeFileSync(resolved, patched, "utf-8");
       globalFileCache.invalidate(resolved);
       globalMtimeTracker.delete(resolved);
@@ -145,7 +238,7 @@ export function executeWriteFile(
         .join("\n");
 
       return {
-        message: `${staleWarning}Patched ${filePath}: -${countLines(oldString)} +${countLines(replacement)} lines\n\nContext after patch:\n${contextPreview}`,
+        message: `${staleWarning}${fuzzyWarning}Patched ${filePath}: -${countLines(oldString)} +${countLines(replacement)} lines\n\nContext after patch:\n${contextPreview}`,
         success: true,
       };
     }
