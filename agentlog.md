@@ -1,122 +1,3 @@
-[2026-04-08T08:35:14.787Z] iter=478 turn=6 INFO: Turn 6/25
-[2026-04-08T08:35:19.062Z] iter=478 turn=6 INFO: Agent: Goal 1 (Context budget indicator): NOT STARTED
-Goal 2 (Age-aware summarization): NOT STARTED
-
-Let me look at the Header component and start writing:
-[2026-04-08T08:35:19.062Z] iter=478 turn=6 INFO: read_file: src/tui.tsx
-[2026-04-08T08:35:19.063Z] iter=478 turn=6 INFO: read_file: src/tui.tsx
-[2026-04-08T08:35:19.063Z] iter=478 turn=6 INFO:   -> ok (1300 chars)
-[2026-04-08T08:35:19.063Z] iter=478 turn=6 INFO:   -> ok (1702 chars)
-[2026-04-08T08:35:19.064Z] iter=478 turn=7 INFO: Turn 7/25
-[2026-04-08T08:35:26.378Z] iter=478 turn=7 INFO: Agent: Now I have what I need. Let me implement both goals:
-
-**Goal 1: Add `getContextUsage()` to orchestrator and update Header in TUI**
-[2026-04-08T08:35:26.379Z] iter=478 turn=7 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T08:35:26.383Z] iter=478 turn=7 INFO:   -> ok: Patched src/orchestrator.ts: -4 +12 lines
-
-Context after patch:
-1560 |     return this.sessionTokensIn >= COMPACT_THRESHOLD;
-1561 |   }
-1562 | 
-1563 |   /** Check if stale tool result pruning is needed (at or above micro-compact threshold). */
-1564 |   private shouldPruneStaleTool(): boolean {
-1565 |     return this.sessionTokensIn >= MICRO_COMPACT_THRESHOLD;
-1566 |   }
-1567 | 
-1568 |   /** Returns current context usage for display in TUI. */
-1569 |   getContextUsage(): { tokensUsed: number; threshold: number; percent: number } {
-1570 |     const tokensUsed = this.sessionTokensIn;
-1571 |     const threshold = COMPACT_THRESHOLD;
-1572 |     const percent = Math.round((tokensUsed / threshold) * 100);
-1573 |     return { tokensUsed, threshold, percent };
-1574 |   }
-1575 | 
-1576 |   /**
-1577 |    * Determine the "prune priority" for a tool result.
-[2026-04-08T08:35:26.383Z] iter=478 turn=8 INFO: Turn 8/25
-[2026-04-08T08:35:34.843Z] iter=478 turn=8 INFO: Agent: Now update the TUI Header to accept and display context usage:
-[2026-04-08T08:35:34.843Z] iter=478 turn=8 INFO: write_file: src/tui.tsx (patch)
-[2026-04-08T08:35:34.844Z] iter=478 turn=8 INFO:   -> ok: Patched src/tui.tsx: -20 +33 lines
-
-Context after patch:
-1 | /**
-2 |  * AutoAgent Interactive TUI — React-based terminal UI using Ink.
-3 |  *
-4 |  * Usage:
-5 |  *   npm run tui                          # work in current directory
-6 |  *   npm run tui -- --dir /path/to/repo   # work in a specific repo
-7 |  */
-8 | 
-9 | import React, { useState, useCallback, useEffect, useRef } from "react";
-10 | import { render, Box, Text, useInput, useApp } from "ink";
-11 | import Spinner from "ink-spinner";
-12 | import TextInput from "ink-text-input";
-13 | import path from "path";
-14 | import "dotenv/config";
-15 | import { Orchestrator } from "./orchestrator.js";
-16 | import { listSessions, type SessionInfo } from "./session-store.js";
-17 | import type { EditPlan } from "./architect-mode.js";
-18 | import { VirtualMessageList } from "./virtual-message-list.js";
-19 | import { buildRepoMap, fuzzySearch } from "./tree-sitter-map.js";
-20 | import { execSync, exec } from "child_process";
-21 | import { promisify } from "util";
-22 | import { runInit } from "./init-command.js";
-23 | import { useContextBudget, useStreaming, useFileSuggestions } from "./hooks/index.js";
-24 | import { TuiErrorBoundary } from "./error-boundary.js";
-25 | 
-26 | const execAsync = promisify(exec);
-27 | import { shouldShowWelcome } from "./welcome.js";
-28 | import type { Task, TaskPlan } from "./task-planner.js";
-29 | import { Markdown } from "./markdown-renderer.js";
-30 | import { routeCommand, type FooterStats } from "./tui-commands.js";
-31 | 
-32 | // Parse args
-33 | let workDir = process.cwd();
-34 | const dirIdx = process.argv.indexOf("--dir");
-35 | if (dirIdx !== -1 && process.argv[dirIdx + 1]) {
-36 |   workDir = path.resolve(process.argv[dirIdx + 1]);
-[2026-04-08T08:35:34.844Z] iter=478 turn=9 INFO: Turn 9/25
-[2026-04-08T08:35:40.272Z] iter=478 turn=9 INFO: Agent: Now I need to wire `contextUsage` state into the TUI. Let me find where the Header is rendered and where state is managed:
-[2026-04-08T08:35:40.272Z] iter=478 turn=9 INFO: read_file: src/tui.tsx
-[2026-04-08T08:35:40.273Z] iter=478 turn=9 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "footerStats\|useState\|contextBudgetRatio\|setContextBudget" src/tui.tsx | head -30
-[2026-04-08T08:35:40.274Z] iter=478 turn=9 INFO:   -> ok (1243 chars)
-[2026-04-08T08:35:40.283Z] iter=478 turn=9 INFO:   -> exit=0 (1229 chars)
-[2026-04-08T08:35:40.284Z] iter=478 turn=10 INFO: Turn 10/25
-[2026-04-08T08:35:43.525Z] iter=478 turn=10 INFO: Agent: I've already patched both src/orchestrator.ts and src/tui.tsx. Let me finish wiring up the context state and then do Goal 2.
-[2026-04-08T08:35:43.526Z] iter=478 turn=10 INFO: read_file: src/tui.tsx
-[2026-04-08T08:35:43.527Z] iter=478 turn=10 INFO:   -> ok (561 chars)
-[2026-04-08T08:35:43.527Z] iter=478 turn=11 INFO: Turn 11/25
-[2026-04-08T08:35:47.641Z] iter=478 turn=11 INFO: write_file: src/tui.tsx (patch)
-[2026-04-08T08:35:47.642Z] iter=478 turn=11 INFO:   -> ok: Patched src/tui.tsx: -1 +1 lines
-
-Context after patch:
-638 | 
-639 |   return (
-640 |     <Box flexDirection="column" paddingX={1}>
-641 |       <Header model={currentModel} git={gitInfo} cost={footerStats.cost} contextUsage={orchestratorRef.current ? orchestratorRef.current.getContextUsage() : undefined} />
-642 | 
-643 |       {/* Messages — clean, auto-cleared view */}
-644 |       <Box flexDirection="column" flexGrow={1}>
-[2026-04-08T08:35:47.643Z] iter=478 turn=12 INFO: Turn 12/25
-[2026-04-08T08:35:51.643Z] iter=478 turn=12 INFO: Agent: The context indicator needs to re-render when tokens update. The `onContextBudget` callback already updates `contextBudgetRatio` state - I'll use that to trigger a re-read from the orchestrator. Let me check how the Header re-renders are triggered:
-[2026-04-08T08:35:51.643Z] iter=478 turn=12 INFO: $ cd /Users/austin/Documents/autoagent && grep -n "contextBudgetRatio\|setContextBudgetRatio" src/tui.tsx
-[2026-04-08T08:35:51.654Z] iter=478 turn=12 INFO:   -> exit=0 (157 chars)
-[2026-04-08T08:35:51.655Z] iter=478 turn=13 INFO: Turn 13/25
-[2026-04-08T08:36:05.481Z] iter=478 turn=13 INFO: Agent: The `contextBudgetRatio` state already triggers re-renders when tokens update. The `orchestratorRef.current.getContextUsage()` call in the Header render will pick up fresh values. Now Goal 2 - age-aware summarization:
-[2026-04-08T08:36:05.482Z] iter=478 turn=13 INFO: write_file: src/orchestrator.ts (patch)
-[2026-04-08T08:36:05.484Z] iter=478 turn=13 INFO:   -> ok: Patched src/orchestrator.ts: -19 +36 lines
-
-Context after patch:
-1618 |     return /\bError\b|FAIL|error:|ERR!/.test(text);
-1619 |   }
-1620 | 
-1621 |   /**
-1622 |    * Proactive tool result summarization — runs every 5th tool turn.
-1623 |    * Replaces large, old tool results with compact summaries to keep
-1624 |    * the context window clean before hitting compaction thresholds.
-1625 |    * Only summarizes results older than 8 assistant turns; skips files
-1626 |    * actively being worked on (seen in last 4 tool_use blocks).
-1627 |    */
 1628 |   summarizeOldToolResults(): void {
 1629 |     this.toolTurnCounter++;
 1630 |     if (this.toolTurnCounter % 5 !== 0) return;
@@ -1115,3 +996,67 @@ Context after patch:
 **Test file issues:**
 
 - **Sha
+[2026-04-08T08:55:24.327Z] iter=488 turn=17 INFO: Committed: d7896d3f (33 in / 3616 out, cache: 12339 created, 156466 read)
+[2026-04-08T08:55:24.327Z] iter=488 turn=17 INFO: Restarting as iteration 489...
+[2026-04-08T08:55:24.525Z] iter=489 INFO: Cache restored: 67/67 entries (0 stale)
+[2026-04-08T08:55:24.527Z] iter=489 INFO: Turn budget: 13/25 (calibration=1.13x, predicted=8)
+[2026-04-08T08:55:24.528Z] iter=489 INFO: Starting. Expert=Architect Model=claude-opus-4-6
+[2026-04-08T08:55:24.741Z] iter=489 INFO: Hard turn cap: 12 (1.5x prediction of 8)
+[2026-04-08T08:55:24.741Z] iter=489 turn=1 INFO: Turn 1/25
+[2026-04-08T08:55:29.037Z] iter=489 turn=1 INFO: Agent: 
+
+I'll start by evaluating what the Engineer built in iteration 488, then research and plan the next goals.
+[2026-04-08T08:55:29.038Z] iter=489 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && git log --oneline -5
+[2026-04-08T08:55:29.038Z] iter=489 turn=1 INFO: $ cd /Users/austin/Documents/autoagent && cat .autoagent-metrics.json | head -80
+[2026-04-08T08:55:29.039Z] iter=489 turn=1 INFO: read_file: src/tool-recovery.ts
+[2026-04-08T08:55:29.044Z] iter=489 turn=1 INFO:   -> ok (13596 chars)
+[2026-04-08T08:55:29.051Z] iter=489 turn=1 INFO:   -> exit=0 (1679 chars)
+[2026-04-08T08:55:29.056Z] iter=489 turn=1 INFO:   -> exit=0 (165 chars)
+[2026-04-08T08:55:29.057Z] iter=489 turn=2 INFO: Turn 2/25
+[2026-04-08T08:55:34.431Z] iter=489 turn=2 INFO: Agent: 
+
+You're right. My deliverable is `goals.md` for the Engineer. Let me do the two targeted checks and write it immediately.
+[2026-04-08T08:55:34.432Z] iter=489 turn=2 INFO: grep: "retryableStatus|statusCode.*429|status.*529" in src/tool-recovery.ts
+[2026-04-08T08:55:34.433Z] iter=489 turn=2 INFO: grep: "executeBatch|parallel.*task|runBatch" in src/task-planner.ts
+[2026-04-08T08:55:34.466Z] iter=489 turn=2 INFO:   -> 0 matches
+[2026-04-08T08:55:34.476Z] iter=489 turn=2 INFO:   -> 0 matches
+[2026-04-08T08:55:34.477Z] iter=489 turn=3 INFO: Turn 3/25
+[2026-04-08T08:55:38.106Z] iter=489 turn=3 INFO: grep: "executePlan|runPlan|executeTask" in src/task-planner.ts
+[2026-04-08T08:55:38.125Z] iter=489 turn=3 INFO: $ cd /Users/austin/Documents/autoagent && wc -l src/task-planner.ts && grep -n 'function\|export\|class' src/task-planner.ts | head -20
+[2026-04-08T08:55:38.127Z] iter=489 turn=3 INFO:   -> 0 matches
+[2026-04-08T08:55:38.138Z] iter=489 turn=3 INFO:   -> exit=0 (1041 chars)
+[2026-04-08T08:55:38.138Z] iter=489 turn=4 INFO: Turn 4/25
+[2026-04-08T08:55:41.583Z] iter=489 turn=4 INFO: Agent: 
+
+Goals.md status: **NOT STARTED** — writing it now.
+[2026-04-08T08:55:41.584Z] iter=489 turn=4 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '340,370p' src/tool-recovery.ts
+[2026-04-08T08:55:41.593Z] iter=489 turn=4 INFO:   -> exit=0 (1034 chars)
+[2026-04-08T08:55:41.593Z] iter=489 turn=5 INFO: Turn 5/25
+[2026-04-08T08:55:45.377Z] iter=489 turn=5 INFO: $ cd /Users/austin/Documents/autoagent && sed -n '131,200p' src/task-planner.ts
+[2026-04-08T08:55:45.386Z] iter=489 turn=5 INFO:   -> exit=0 (1953 chars)
+[2026-04-08T08:55:45.386Z] iter=489 turn=6 INFO: Turn 6/25
+[2026-04-08T08:56:08.045Z] iter=489 turn=6 INFO: Agent: 
+
+I'm the Architect — my deliverable is `goals.md`, not src/ changes. Writing it now with the two verified gaps.
+[2026-04-08T08:56:08.046Z] iter=489 turn=6 INFO: write_file: goals.md (write)
+[2026-04-08T08:56:08.048Z] iter=489 turn=6 INFO:   -> ok: Updated goals.md (3004 chars, +43 lines delta)
+[2026-04-08T08:56:08.049Z] iter=489 turn=7 INFO: Turn 7/25
+[2026-04-08T08:56:13.419Z] iter=489 turn=7 INFO: Agent: 
+
+Goals.md is written. Wrapping up now.
+[2026-04-08T08:56:13.420Z] iter=489 turn=7 INFO: $ cd /Users/austin/Documents/autoagent && npx tsc --noEmit 2>&1 | tail -5
+[2026-04-08T08:56:13.422Z] iter=489 turn=7 INFO: save_memory: "[Architect] Iteration 489 goals"
+[2026-04-08T08:56:13.423Z] iter=489 turn=7 INFO:   -> saved to /Users/austin/Documents/autoagent/.autoagent.md
+[2026-04-08T08:56:14.538Z] iter=489 turn=7 INFO:   -> exit=0 (11 chars)
+[2026-04-08T08:56:14.538Z] iter=489 turn=8 INFO: Turn 8/25
+[2026-04-08T08:56:17.918Z] iter=489 turn=8 INFO: $ echo "AUTOAGENT_RESTART"
+[2026-04-08T08:56:17.919Z] iter=489 turn=8 INFO: RESTART signal
+[2026-04-08T08:56:17.919Z] iter=489 turn=8 INFO: Validating: npx tsc --noEmit ...
+[2026-04-08T08:56:19.005Z] iter=489 turn=8 INFO: Compilation OK
+[2026-04-08T08:56:27.866Z] iter=489 turn=8 INFO: Cache persisted: 71 entries to .autoagent-cache.json
+[2026-04-08T08:56:27.866Z] iter=489 turn=8 INFO: Cache stats: 0 hits, 4 misses, 71 entries, 1 invalidations (0 entries removed)
+[2026-04-08T08:56:27.866Z] iter=489 turn=8 INFO: Tool cache stats
+[2026-04-08T08:56:27.867Z] iter=489 turn=8 INFO: Tool timing: bash: 7x, avg=169ms, total=1182ms; grep: 3x, avg=33ms, total=100ms; read_file: 1x, avg=6ms, total=6ms; write_file: 1x, avg=3ms, total=3ms; save_memory: 1x, avg=1ms, total=1ms
+[2026-04-08T08:56:27.867Z] iter=489 turn=8 INFO: Tool timing stats
+[2026-04-08T08:56:35.797Z] iter=489 turn=8 INFO: Accuracy score injected: **[AUTO-SCORED] Iteration 489: predicted 8 turns, actual 8 turns, ratio 1.00**
+[2026-04-08T08:56:35.819Z] iter=489 turn=8 INFO: Pre-commit review: no significant code changes to review
